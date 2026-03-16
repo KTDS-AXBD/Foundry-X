@@ -10,12 +10,15 @@
 | — | PRD v4 (현행 권위 문서) | — | Active | [specs/prd-v4.md](specs/prd-v4.md) |
 | — | 개발 투명성 스펙 | — | Active | [specs/dev-transparency-spec.md](specs/dev-transparency-spec.md) |
 | — | 요구사항 인터뷰 종합 (Part 1-5) | — | Active | [specs/interview-log.md](specs/interview-log.md) |
+| FX-SPEC-002 | Plumb Output Format & decisions.jsonl Contract | 1.0 | Active | [specs/plumb-output-contract.md](specs/plumb-output-contract.md) |
+| FX-SPEC-003 | Plumb Subprocess Error Handling Contract | 1.0 | Active | [specs/plumb-error-contract.md](specs/plumb-error-contract.md) |
 
 ## PLAN
 
 | 코드 | 제목 | 버전 | 상태 | 파일 |
 |------|------|:----:|:----:|------|
-| FX-PLAN-001 | Foundry-X CLI MVP Plan | 2.0 | Draft | [01-plan/features/foundry-x-cli.plan.md](01-plan/features/foundry-x-cli.plan.md) |
+| FX-PLAN-001 | Foundry-X CLI MVP Plan | 2.0 | Archived | [archive/2026-03/foundry-x-cli/foundry-x-cli.plan.md](archive/2026-03/foundry-x-cli/foundry-x-cli.plan.md) |
+| FX-PLAN-002 | Plumb Internal Contracts | 1.0 | Draft | [01-plan/features/plumb-contracts.plan.md](01-plan/features/plumb-contracts.plan.md) |
 
 ## DSGN
 
