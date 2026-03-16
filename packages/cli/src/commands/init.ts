@@ -11,12 +11,110 @@ import { verifyHarness } from '../harness/verify.js';
 import { ConfigManager } from '../services/config-manager.js';
 import { Logger } from '../services/logger.js';
 import { FoundryXError, NotGitRepoError } from '../plumb/errors.js';
+import { renderOutput } from '../ui/render.js';
 import type { RepoMode } from '@foundry-x/shared';
+import type { InitData } from '../ui/types.js';
 
 interface InitOptions {
   mode?: string;
   template: string;
   force: boolean;
+}
+
+export interface InitStep {
+  step: string;
+  label: string;
+  status: 'ok' | 'skip' | 'fail';
+  detail: string;
+}
+
+export interface InitResult {
+  steps: InitStep[];
+  result: { created: string[]; merged: string[]; skipped: string[] };
+  integrity: { score: number };
+}
+
+/** 비즈니스 로직: 하네스 초기화 파이프라인 실행 후 구조화된 결과 반환 */
+export async function runInit(
+  cwd: string,
+  options: { mode?: string; template: string; force: boolean },
+): Promise<InitResult> {
+  const steps: InitStep[] = [];
+
+  // 1. Git repo check
+  const git = simpleGit(cwd);
+  const isRepo = await git.checkIsRepo();
+  if (!isRepo) throw new NotGitRepoError();
+  steps.push({ step: 'git-check', label: 'Git repository', status: 'ok', detail: 'valid git repo' });
+
+  // 2. Already initialized check
+  const configManager = new ConfigManager(cwd);
+  if ((await configManager.exists()) && !options.force) {
+    throw new FoundryXInitError();
+  }
+
+  // 3. Detect repo mode
+  const mode = await detectRepoMode(cwd, options.mode as RepoMode | undefined);
+  steps.push({ step: 'detect-mode', label: 'Detect mode', status: 'ok', detail: mode });
+
+  // 4. Discover stack
+  const profile = await discoverStack(cwd, mode);
+  steps.push({
+    step: 'discover-stack',
+    label: 'Discover stack',
+    status: 'ok',
+    detail: `${profile.languages.join(', ')} / ${profile.frameworks.join(', ') || '(none)'}`,
+  });
+
+  // 5. Analyze architecture
+  const enrichedProfile = await analyzeArchitecture(cwd, profile);
+  steps.push({
+    step: 'analyze-arch',
+    label: 'Analyze architecture',
+    status: 'ok',
+    detail: enrichedProfile.architecturePattern,
+  });
+
+  // 6. Resolve template directory
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  const templateDir = resolve(__dirname, '../../templates', options.template);
+  try {
+    await access(templateDir);
+    steps.push({ step: 'resolve-template', label: 'Resolve template', status: 'ok', detail: options.template });
+  } catch {
+    throw new TemplateNotFoundError(options.template);
+  }
+
+  // 7. Generate harness
+  const result = await generateHarness(cwd, enrichedProfile, templateDir, {
+    force: options.force,
+  });
+  steps.push({
+    step: 'generate-harness',
+    label: 'Generate harness',
+    status: 'ok',
+    detail: `created=${result.created.length} merged=${result.merged.length} skipped=${result.skipped.length}`,
+  });
+
+  // 8. Verify harness
+  const integrity = await verifyHarness(cwd);
+  steps.push({
+    step: 'verify-integrity',
+    label: 'Verify integrity',
+    status: integrity.passed ? 'ok' : 'fail',
+    detail: `${integrity.score}/100`,
+  });
+
+  // 9. Save config
+  await configManager.init(mode, enrichedProfile, options.template);
+  steps.push({ step: 'save-config', label: 'Save config', status: 'ok', detail: '.foundry-x/config.json' });
+
+  return {
+    steps,
+    result: { created: result.created, merged: result.merged, skipped: result.skipped },
+    integrity: { score: integrity.score },
+  };
 }
 
 export function initCommand(): Command {
@@ -33,52 +131,9 @@ export function initCommand(): Command {
       const logger = new Logger(cwd);
 
       try {
-        // 1. Git repo check
-        const git = simpleGit(cwd);
-        const isRepo = await git.checkIsRepo();
-        if (!isRepo) throw new NotGitRepoError();
+        const initResult = await runInit(cwd, options);
 
-        // 2. Already initialized check
-        const configManager = new ConfigManager(cwd);
-        if ((await configManager.exists()) && !options.force) {
-          throw new FoundryXInitError();
-        }
-
-        // 3. Detect repo mode
-        const mode = await detectRepoMode(cwd, options.mode as RepoMode | undefined);
-        console.log(`  Mode: ${mode}`);
-
-        // 4. Discover stack
-        const profile = await discoverStack(cwd, mode);
-        console.log(`  Languages: ${profile.languages.join(', ')}`);
-        console.log(`  Frameworks: ${profile.frameworks.join(', ') || '(none)'}`);
-
-        // 5. Analyze architecture
-        const enrichedProfile = await analyzeArchitecture(cwd, profile);
-        console.log(`  Architecture: ${enrichedProfile.architecturePattern}`);
-
-        // 6. Resolve template directory
-        const __filename = fileURLToPath(import.meta.url);
-        const __dirname = dirname(__filename);
-        const templateDir = resolve(__dirname, '../../templates', options.template);
-        try {
-          await access(templateDir);
-        } catch {
-          throw new TemplateNotFoundError(options.template);
-        }
-
-        // 7. Generate harness
-        const result = await generateHarness(cwd, enrichedProfile, templateDir, {
-          force: options.force,
-        });
-
-        // 8. Verify harness
-        const integrity = await verifyHarness(cwd);
-
-        // 9. Save config
-        await configManager.init(mode, enrichedProfile, options.template);
-
-        // 10. Log
+        // Log
         const duration = Date.now() - startTime;
         await logger.record({
           command: 'init',
@@ -87,24 +142,23 @@ export function initCommand(): Command {
           success: true,
           args: { mode: options.mode, template: options.template, force: options.force },
           plumbCalled: false,
-          harnessIntegrity: integrity.score,
+          harnessIntegrity: initResult.integrity.score,
         });
 
-        // 11. Output results
-        console.log('\nFoundry-X initialized successfully!\n');
-        if (result.created.length > 0) {
-          console.log('  Created:');
-          result.created.forEach((f) => console.log(`    + ${f}`));
-        }
-        if (result.merged.length > 0) {
-          console.log('  Merged:');
-          result.merged.forEach((f) => console.log(`    ~ ${f}`));
-        }
-        if (result.skipped.length > 0) {
-          console.log('  Skipped:');
-          result.skipped.forEach((f) => console.log(`    - ${f}`));
-        }
-        console.log(`\n  Harness Integrity: ${integrity.score}/100`);
+        // Map to InitData for renderOutput
+        const viewData: InitData = {
+          steps: initResult.steps.map((s) => ({
+            step: s.step as InitData['steps'][number]['step'],
+            label: s.label,
+            status: s.status === 'ok' ? 'done' as const : s.status === 'fail' ? 'error' as const : 'done' as const,
+            detail: s.detail,
+          })),
+          result: initResult.result,
+          integrity: initResult.integrity,
+        };
+
+        // Output via renderOutput (TTY → Ink, non-TTY → plain text)
+        await renderOutput('init', viewData, { json: false });
       } catch (err) {
         const duration = Date.now() - startTime;
         if (err instanceof FoundryXError) {

@@ -5,11 +5,63 @@ import { Logger } from '../services/logger.js';
 import { HealthScoreCalculator } from '../services/health-score.js';
 import { verifyHarness } from '../harness/verify.js';
 import { FoundryXError, NotInitializedError } from '../plumb/errors.js';
-import type { SyncResult, HealthScore } from '@foundry-x/shared';
+import { renderOutput } from '../ui/render.js';
+import type { HealthScore } from '@foundry-x/shared';
+import type { StatusData } from '../ui/types.js';
 
 interface StatusOptions {
   json: boolean;
   short: boolean;
+}
+
+/** 비즈니스 로직: 상태 정보 수집 후 구조화된 객체 반환 */
+export async function runStatus(cwd: string): Promise<StatusData> {
+  // 1. Check initialized
+  const configManager = new ConfigManager(cwd);
+  if (!(await configManager.exists())) {
+    throw new NotInitializedError();
+  }
+
+  // 2. Read config
+  const config = await configManager.read();
+  if (!config) {
+    throw new NotInitializedError();
+  }
+
+  // 3. PlumbBridge status (with fallback)
+  const bridge = new PlumbBridge({
+    cwd,
+    timeout: config.plumb.timeout,
+    pythonPath: config.plumb.pythonPath,
+  });
+
+  let healthScore: HealthScore | null = null;
+  let plumbAvailable = false;
+
+  try {
+    if (await bridge.isAvailable()) {
+      plumbAvailable = true;
+      const syncResult = await bridge.getStatus();
+      const calculator = new HealthScoreCalculator();
+      healthScore = calculator.compute(syncResult);
+    }
+  } catch {
+    // Plumb failed — continue without SDD data
+  }
+
+  // 4. Verify harness integrity
+  const integrity = await verifyHarness(cwd);
+
+  return {
+    config: {
+      mode: config.mode,
+      template: config.template,
+      initialized: config.initialized,
+    },
+    healthScore,
+    integrity,
+    plumbAvailable,
+  };
 }
 
 export function statusCommand(): Command {
@@ -25,44 +77,9 @@ export function statusCommand(): Command {
       const logger = new Logger(cwd);
 
       try {
-        // 1. Check initialized
-        const configManager = new ConfigManager(cwd);
-        if (!(await configManager.exists())) {
-          throw new NotInitializedError();
-        }
+        const result = await runStatus(cwd);
 
-        // 2. Read config
-        const config = await configManager.read();
-        if (!config) {
-          throw new NotInitializedError();
-        }
-
-        // 3. PlumbBridge status (with fallback)
-        const bridge = new PlumbBridge({
-          cwd,
-          timeout: config.plumb.timeout,
-          pythonPath: config.plumb.pythonPath,
-        });
-
-        let syncResult: SyncResult | null = null;
-        let healthScore: HealthScore | null = null;
-        let plumbAvailable = false;
-
-        try {
-          if (await bridge.isAvailable()) {
-            plumbAvailable = true;
-            syncResult = await bridge.getStatus();
-            const calculator = new HealthScoreCalculator();
-            healthScore = calculator.compute(syncResult);
-          }
-        } catch {
-          // Plumb failed — continue without SDD data
-        }
-
-        // 4. Verify harness integrity
-        const integrity = await verifyHarness(cwd);
-
-        // 5. Log
+        // Log
         const duration = Date.now() - startTime;
         await logger.record({
           command: 'status',
@@ -70,54 +87,12 @@ export function statusCommand(): Command {
           duration,
           success: true,
           args: { json: options.json, short: options.short },
-          plumbCalled: plumbAvailable,
-          harnessIntegrity: integrity.score,
+          plumbCalled: result.plumbAvailable,
+          harnessIntegrity: result.integrity.score,
         });
 
-        // 6. Output
-        if (options.json) {
-          console.log(JSON.stringify({
-            config: {
-              mode: config.mode,
-              template: config.template,
-              initialized: config.initialized,
-            },
-            healthScore,
-            integrity,
-            plumbAvailable,
-          }, null, 2));
-          return;
-        }
-
-        if (options.short) {
-          const hs = healthScore ? `${healthScore.overall.toFixed(0)}(${healthScore.grade})` : 'N/A';
-          console.log(`[${config.mode}] health=${hs} integrity=${integrity.score}/100`);
-          return;
-        }
-
-        // Full output
-        console.log('Foundry-X Status\n');
-        console.log('  Project');
-        console.log(`    Mode:      ${config.mode}`);
-        console.log(`    Template:  ${config.template}`);
-        console.log(`    Init:      ${config.initialized}`);
-
-        if (healthScore) {
-          console.log('\n  Health Score');
-          console.log(`    Overall:     ${healthScore.overall.toFixed(1)} (${healthScore.grade})`);
-          console.log(`    Spec→Code:   ${healthScore.specToCode.toFixed(1)}`);
-          console.log(`    Code→Test:   ${healthScore.codeToTest.toFixed(1)}`);
-          console.log(`    Spec→Test:   ${healthScore.specToTest.toFixed(1)}`);
-        } else {
-          console.log('\n  Health Score: unavailable (Plumb not installed)');
-        }
-
-        console.log('\n  Harness Integrity');
-        console.log(`    Score: ${integrity.score}/100 (${integrity.passed ? 'PASS' : 'FAIL'})`);
-        integrity.checks.forEach((c) => {
-          const icon = c.level === 'PASS' ? '+' : c.level === 'WARN' ? '!' : 'x';
-          console.log(`    [${icon}] ${c.name}: ${c.message}`);
-        });
+        // Output via renderOutput (TTY → Ink, non-TTY → plain text)
+        await renderOutput('status', result, { json: options.json, short: options.short });
       } catch (err) {
         const duration = Date.now() - startTime;
         if (err instanceof FoundryXError) {

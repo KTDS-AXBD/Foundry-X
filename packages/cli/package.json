@@ -3,7 +3,9 @@
   "version": "0.2.0",
   "description": "AI-human collaboration harness for Git repositories — SDD Triangle sync",
   "type": "module",
-  "bin": { "foundry-x": "dist/index.js" },
+  "bin": {
+    "foundry-x": "dist/index.js"
+  },
   "main": "dist/index.js",
   "files": [
     "dist/**/*.js",
@@ -12,7 +14,15 @@
     "!dist/**/*.test.js.map",
     "templates/"
   ],
-  "keywords": ["ai", "agent", "harness", "sdd", "git", "cli", "foundry"],
+  "keywords": [
+    "ai",
+    "agent",
+    "harness",
+    "sdd",
+    "git",
+    "cli",
+    "foundry"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -37,11 +47,14 @@
     "simple-git": "^3.27.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@foundry-x/shared": "workspace:*",
     "@types/node": "^22.0.0",
     "@types/react": "^18.3.0",
+    "eslint": "^10.0.3",
+    "tsx": "^4.19.0",
     "typescript": "^5.7.0",
-    "vitest": "^3.0.0",
-    "tsx": "^4.19.0"
+    "typescript-eslint": "^8.57.0",
+    "vitest": "^3.0.0"
   }
 }
