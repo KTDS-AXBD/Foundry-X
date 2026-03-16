@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 1 구현 진행 중 (PRD v4, 모노리포 scaffolding + 핵심 모듈 구현 완료)
+**현재 상태:** CLI MVP 구현 완료 (PRD v4, Sprint 1+2 완료, Match Rate 93%, npm publish 대기)
 
 ## Architecture
 
