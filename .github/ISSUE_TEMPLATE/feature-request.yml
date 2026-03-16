@@ -1,0 +1,45 @@
+name: Feature Request
+description: 새 기능 또는 개선 요청
+labels: ["feature"]
+body:
+  - type: input
+    id: req-code
+    attributes:
+      label: REQ 코드
+      description: "SPEC.md의 요구사항 코드 (예: FX-REQ-021)"
+      placeholder: "FX-REQ-XXX"
+  - type: input
+    id: f-item
+    attributes:
+      label: F-Item 번호
+      description: "SPEC.md의 F번호 (예: F21)"
+      placeholder: "F##"
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 우선순위
+      options:
+        - "🔴 P0 (즉시)"
+        - "🟠 P1 (이번 마일스톤)"
+        - "🟡 P2 (다음)"
+        - "⚪ P3 (백로그)"
+  - type: dropdown
+    id: type
+    attributes:
+      label: 유형
+      options:
+        - Feature
+        - Bug
+        - Improvement
+        - Chore
+        - Doc
+  - type: textarea
+    id: description
+    attributes:
+      label: 상세 설명
+      placeholder: "구현 목표, 배경, 제약 사항 등"
+  - type: input
+    id: deliverable
+    attributes:
+      label: 예상 산출물 경로
+      placeholder: "docs/01-plan/features/..., src/..."

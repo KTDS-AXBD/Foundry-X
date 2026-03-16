@@ -1,0 +1,29 @@
+name: Bug Report
+description: 버그 리포트
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: 버그 설명
+      placeholder: "무엇이 문제인가요?"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 재현 방법
+      placeholder: "1. ... 2. ... 3. ..."
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대 동작
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 심각도
+      options:
+        - "🔴 Critical"
+        - "🟠 High"
+        - "🟡 Medium"
+        - "⚪ Low"

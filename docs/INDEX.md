@@ -19,12 +19,16 @@
 |------|------|:----:|:----:|------|
 | FX-PLAN-001 | Foundry-X CLI MVP Plan | 2.0 | Archived | [archive/2026-03/foundry-x-cli/foundry-x-cli.plan.md](archive/2026-03/foundry-x-cli/foundry-x-cli.plan.md) |
 | FX-PLAN-002 | Plumb Internal Contracts | 1.0 | Draft | [01-plan/features/plumb-contracts.plan.md](01-plan/features/plumb-contracts.plan.md) |
+| FX-PLAN-003 | Sprint 3 (v0.3.0) — Ink TUI, eslint, 안정화 | 0.1 | Draft | [01-plan/features/sprint-3.plan.md](01-plan/features/sprint-3.plan.md) |
+| FX-PLAN-004 | F21: 프로젝트 관리 점검 및 개선 | 0.1 | Draft | [01-plan/features/프로젝트-관리-개선.plan.md](01-plan/features/프로젝트-관리-개선.plan.md) |
 
 ## DSGN
 
 | 코드 | 제목 | 버전 | 상태 | 파일 |
 |------|------|:----:|:----:|------|
 | FX-DSGN-001 | Foundry-X CLI MVP Design | 2.0 | Draft | [02-design/features/foundry-x-cli.design.md](02-design/features/foundry-x-cli.design.md) |
+| FX-DSGN-003 | Sprint 3 (v0.3.0) — Ink TUI + eslint | 0.1 | Draft | [02-design/features/sprint-3.design.md](02-design/features/sprint-3.design.md) |
+| FX-DSGN-004 | F21: 프로젝트 관리 점검 및 개선 | 0.1 | Draft | [02-design/features/프로젝트-관리-개선.design.md](02-design/features/프로젝트-관리-개선.design.md) |
 
 ## 기타 설계 참조
 
