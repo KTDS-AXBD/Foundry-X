@@ -7,3 +7,9 @@ dist/
 .team-tmp/
 *.tsbuildinfo
 .turbo/
+
+# secrets
+.env
+.env.*
+!.env.example
+.dev.vars

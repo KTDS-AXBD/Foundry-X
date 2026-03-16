@@ -39,6 +39,12 @@
 | Round 1 | [review-synthesis.md](review/round-1/review-synthesis.md) | ChatGPT, Gemini, Claude, Grok |
 | Round 2 | [review-synthesis.md](review/round-2/review-synthesis.md) | ChatGPT, Gemini, Claude, Grok |
 
+## CHANGELOG
+
+| 파일 | 비고 |
+|------|------|
+| [CHANGELOG.md](CHANGELOG.md) | 버전별 변경 이력 (Keep a Changelog 형식) |
+
 ## Archive
 
 | 파일 | 비고 |
