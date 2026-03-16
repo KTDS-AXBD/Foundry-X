@@ -16,9 +16,9 @@ export function makeStatusData(overrides?: Partial<StatusData>): StatusData {
       score: 95,
       passed: true,
       checks: [
-        { name: 'CLAUDE.md', level: 'PASS' as const, message: 'found at root' },
-        { name: '.gitignore', level: 'WARN' as const, message: 'missing patterns' },
-        { name: 'tests', level: 'PASS' as const, message: '8 test files' },
+        { name: 'CLAUDE.md', level: 'PASS' as const, passed: true, message: 'found at root' },
+        { name: '.gitignore', level: 'WARN' as const, passed: false, message: 'missing patterns' },
+        { name: 'tests', level: 'PASS' as const, passed: true, message: '8 test files' },
       ],
     },
     plumbAvailable: true,
@@ -45,9 +45,9 @@ const INIT_STEP_LABELS = [
 export function makeInitSteps(
   statuses: Array<InitStepResult['status']> = Array(8).fill('done'),
 ): InitStepResult[] {
-  return INIT_STEP_NAMES.map((step, i) => ({
+  return INIT_STEP_NAMES.map((step, i): InitStepResult => ({
     step,
-    label: INIT_STEP_LABELS[i],
+    label: INIT_STEP_LABELS[i] ?? step,
     status: statuses[i] ?? 'pending',
     detail: statuses[i] === 'done' ? 'OK' : undefined,
   }));
@@ -68,10 +68,10 @@ export function makeSyncData(overrides?: Partial<SyncData>): SyncData {
   return {
     triangle: {
       specToCode: { matched: 9, total: 10, gaps: [] },
-      codeToTest: { matched: 7, total: 10, gaps: [{ type: 'missing-test', path: 'src/foo.ts', description: 'No test file' }] },
+      codeToTest: { matched: 7, total: 10, gaps: [{ type: 'test_missing', path: 'src/foo.ts', description: 'No test file' }] },
       specToTest: { matched: 8, total: 10, gaps: [] },
     },
-    decisions: [{ status: 'approved', summary: 'Add test for foo', source: 'plumb' }],
+    decisions: [{ id: 'D-001', status: 'approved', summary: 'Add test for foo', source: 'agent', commit: 'abc1234' }],
     healthScore: { overall: 80.0, grade: 'B', specToCode: 90, codeToTest: 70, specToTest: 80 },
     ...overrides,
   };
