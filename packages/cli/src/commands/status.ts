@@ -12,6 +12,8 @@ import type { StatusData } from '../ui/types.js';
 interface StatusOptions {
   json: boolean;
   short: boolean;
+  watch: boolean;
+  interval: string;
 }
 
 /** 비즈니스 로직: 상태 정보 수집 후 구조화된 객체 반환 */
@@ -71,6 +73,8 @@ export function statusCommand(): Command {
     .description('Show Triangle Health Score and harness integrity')
     .option('--json', 'output as JSON', false)
     .option('--short', 'show compact output', false)
+    .option('--watch', 'watch mode', false)
+    .option('--interval <ms>', 'debounce ms', '500')
     .action(async (options: StatusOptions) => {
       const startTime = Date.now();
       const cwd = process.cwd();
@@ -90,6 +94,27 @@ export function statusCommand(): Command {
           plumbCalled: result.plumbAvailable,
           harnessIntegrity: result.integrity.score,
         });
+
+        // Watch mode: render StatusWatchView with live fs.watch
+        if (options.watch) {
+          if (!process.stdout.isTTY) {
+            console.error('Error: --watch requires a TTY terminal');
+            process.exit(1);
+          }
+          const { render: inkRender } = await import('ink');
+          const React = await import('react');
+          const { StatusWatchView } = await import('../ui/views/StatusWatchView.js');
+          const { waitUntilExit } = inkRender(
+            React.createElement(StatusWatchView, {
+              initialData: result,
+              cwd,
+              refreshFn: runStatus,
+              interval: parseInt(options.interval, 10),
+            }),
+          );
+          await waitUntilExit();
+          return;
+        }
 
         // Output via renderOutput (TTY → Ink, non-TTY → plain text)
         await renderOutput('status', result, { json: options.json, short: options.short });
