@@ -4,11 +4,12 @@
 
 ## SPEC
 
-| 파일 | 제목 | 상태 |
-|------|------|:----:|
-| [specs/prd-v4.md](specs/prd-v4.md) | PRD v4 (현행 권위 문서) | Active |
-| [specs/dev-transparency-spec.md](specs/dev-transparency-spec.md) | 개발 투명성 스펙 | Active |
-| [specs/interview-log.md](specs/interview-log.md) | 요구사항 인터뷰 종합 (Part 1-5) | Active |
+| 코드 | 제목 | 버전 | 상태 | 파일 |
+|------|------|:----:|:----:|------|
+| FX-SPEC-001 | Project Specification | 1.0 | Active | [../SPEC.md](../SPEC.md) |
+| — | PRD v4 (현행 권위 문서) | — | Active | [specs/prd-v4.md](specs/prd-v4.md) |
+| — | 개발 투명성 스펙 | — | Active | [specs/dev-transparency-spec.md](specs/dev-transparency-spec.md) |
+| — | 요구사항 인터뷰 종합 (Part 1-5) | — | Active | [specs/interview-log.md](specs/interview-log.md) |
 
 ## PLAN
 
