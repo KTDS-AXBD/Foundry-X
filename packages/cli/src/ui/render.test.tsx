@@ -18,7 +18,7 @@ describe('renderOutput', () => {
     await renderOutput('status', data, { json: true });
 
     expect(logSpy).toHaveBeenCalledOnce();
-    const parsed = JSON.parse(logSpy.mock.calls[0][0] as string);
+    const parsed = JSON.parse(logSpy.mock.calls[0]![0] as string);
     expect(parsed.config.mode).toBe('brownfield');
     expect(parsed.healthScore.overall).toBe(85.5);
   });
@@ -28,7 +28,7 @@ describe('renderOutput', () => {
     await renderOutput('init', data, { json: true });
 
     expect(logSpy).toHaveBeenCalledOnce();
-    const parsed = JSON.parse(logSpy.mock.calls[0][0] as string);
+    const parsed = JSON.parse(logSpy.mock.calls[0]![0] as string);
     expect(parsed.result.created).toContain('CLAUDE.md');
     expect(parsed.integrity.score).toBe(92);
   });
@@ -38,7 +38,7 @@ describe('renderOutput', () => {
     await renderOutput('status', data, { json: false, short: true });
 
     expect(logSpy).toHaveBeenCalledOnce();
-    const output = logSpy.mock.calls[0][0] as string;
+    const output = logSpy.mock.calls[0]![0] as string;
     expect(output).toContain('brownfield');
     expect(output).toContain('health=');
     expect(output).toContain('integrity=');
@@ -47,13 +47,13 @@ describe('renderOutput', () => {
   it('--short 모드: init/sync 한 줄 요약을 출력한다', async () => {
     const initData = makeInitData();
     await renderOutput('init', initData, { json: false, short: true });
-    expect(logSpy.mock.calls[0][0]).toContain('init:');
+    expect(logSpy.mock.calls[0]![0]).toContain('init:');
 
     logSpy.mockClear();
 
     const syncData = makeSyncData();
     await renderOutput('sync', syncData, { json: false, short: true });
-    expect(logSpy.mock.calls[0][0]).toContain('sync:');
+    expect(logSpy.mock.calls[0]![0]).toContain('sync:');
   });
 
   it('non-TTY 환경에서 plain text로 출력한다', async () => {
@@ -69,12 +69,12 @@ describe('renderOutput', () => {
       await renderOutput('status', data, { json: false });
 
       expect(logSpy).toHaveBeenCalledOnce();
-      const output = logSpy.mock.calls[0][0] as string;
+      const output = logSpy.mock.calls[0]![0] as string;
       expect(output).toContain('Foundry-X Status');
       expect(output).toContain('Mode:      brownfield');
     } finally {
       if (original === undefined) {
-        delete (process.stdout as Record<string, unknown>)['isTTY'];
+        delete (process.stdout as unknown as Record<string, unknown>)['isTTY'];
       } else {
         Object.defineProperty(process.stdout, 'isTTY', {
           value: original,
