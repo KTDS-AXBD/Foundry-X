@@ -4,7 +4,7 @@ title: Foundry-X Project Specification
 version: 1.0
 status: Active
 category: SPEC
-system-version: 0.2.0
+system-version: 0.3.1
 created: 2026-03-16
 updated: 2026-03-16
 author: Sinclair Seo
@@ -19,7 +19,7 @@ Foundry-X CLI — 사람과 AI 에이전트가 동등한 팀원으로 협업하�
 
 - **PRD**: [[FX-SPEC-PRD-V4]] (`docs/specs/prd-v4.md`)
 - **Phase**: Phase 1 (MVP, Month 1-3) — CLI + Plumb
-- **Version**: 0.2.0
+- **Version**: 0.3.1
 
 ## §2 현재 상태
 
