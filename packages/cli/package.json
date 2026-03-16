@@ -1,6 +1,6 @@
 {
   "name": "foundry-x",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "AI-human collaboration harness for Git repositories — SDD Triangle sync",
   "type": "module",
   "bin": {
@@ -26,7 +26,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AXBD-Team/Foundry-X.git",
+    "url": "https://github.com/KTDS-AXBD/Foundry-X.git",
     "directory": "packages/cli"
   },
   "engines": {

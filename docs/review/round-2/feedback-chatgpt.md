@@ -57,4 +57,4 @@ v3는 Round 1의 핵심 문제 중 두 가지를 실질적으로 정리했습니
 
 이 3개가 채워지면, v3는 **소규모 파일럿 착수용으로는 충분히 타당**합니다.
 
-[1]: https://raw.githubusercontent.com/AXBD-Team/Foundry-X/master/prd-v3.md "raw.githubusercontent.com"
+[1]: https://raw.githubusercontent.com/KTDS-AXBD/Foundry-X/master/prd-v3.md "raw.githubusercontent.com"
