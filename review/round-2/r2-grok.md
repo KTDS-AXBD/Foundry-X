@@ -62,9 +62,3 @@ Round 1 조건:
 Round 1 조건 충족: ①[충족/미충족] ②[충족/미충족] ③[충족/미충족]
 이유: [상세]
 ```
-
----
-
-## 참고 문서
-
-- **PRD v3**: https://github.com/AXBD-Team/Foundry-X/blob/master/prd-v3.md
