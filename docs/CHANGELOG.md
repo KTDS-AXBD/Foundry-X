@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased]
+
+### Added
+- Governance standards compliance (GOV-004/005/007/010): .gitignore secrets, .env.example, CHANGELOG.md, MEMORY.md active risks
+- ADR-000 PDCA documents (plan, design, analysis, report)
+- Project hygiene: archive stale .docx from 01-plan
+
 ## [0.2.0] - 2026-03-16
 
 ### Added
