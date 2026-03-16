@@ -48,7 +48,8 @@
 ## Archive
 
 | 파일 | 비고 |
-|------|------|
+|------|------
+| [archive/Foundry-X_Integrated_Plan.docx](archive/Foundry-X_Integrated_Plan.docx) | PRD 인터뷰 통합 기획서 (원본) |
 | [archive/prd-v1.md](archive/prd-v1.md) | PRD v1 (구버전) |
 | [archive/prd-v2.md](archive/prd-v2.md) | PRD v2 (구버전) |
 | [archive/prd-v3.md](archive/prd-v3.md) | PRD v3 (v4로 대체) |
