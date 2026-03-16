@@ -1,2 +1,9 @@
 # bkit runtime state
 .bkit/
+
+node_modules/
+dist/
+.foundry-x/
+.team-tmp/
+*.tsbuildinfo
+.turbo/

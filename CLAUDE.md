@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** 설계/기획 완료, 구현 착수 대기 (PRD v3, 다중 AI 검토 2라운드 완료, 착수 점수 84/100)
+**현재 상태:** Sprint 1 구현 진행 중 (PRD v4, 모노리포 scaffolding + 핵심 모듈 구현 완료)
 
 ## Architecture
 
@@ -65,7 +65,7 @@ foundry-x/
 
 | 문서 | 용도 |
 |------|------|
-| `prd-v3.md` | 현행 PRD (권위 문서) |
+| `prd-v4.md` | 현행 PRD (권위 문서, v4: synthnoosh harness bootstrap 반영) |
 | `tech-stack-review.md` | 기술 스택 결정 근거 |
 | `interview-log.md` | 요구사항 인터뷰 종합 (Part 1-5) |
 | `review/round-1/` | 1차 다중 AI 검토 (ChatGPT, Gemini, Claude, Grok) |

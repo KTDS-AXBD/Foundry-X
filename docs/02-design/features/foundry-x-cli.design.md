@@ -1,13 +1,24 @@
+---
+code: FX-DSGN-001
+title: Foundry-X CLI MVP Design
+version: 2.0
+status: Draft
+category: DSGN
+created: 2026-03-16
+updated: 2026-03-16
+author: Sinclair Seo
+---
+
 # foundry-x-cli Design Document
 
-> **Summary**: CLI 3개 커맨드(init/sync/status) + PlumbBridge subprocess 래퍼의 상세 설계
+> **Summary**: CLI 3개 커맨드(init/sync/status) + Harness Pipeline(4단계) + PlumbBridge subprocess 래퍼의 상세 설계 (PRD v4 반영)
 >
 > **Project**: Foundry-X
 > **Version**: 0.1.0
 > **Author**: AX BD팀
 > **Date**: 2026-03-16
 > **Status**: Draft
-> **Planning Doc**: [foundry-x-cli.plan.md](../../01-plan/features/foundry-x-cli.plan.md)
+> **Planning Doc**: [foundry-x-cli.plan.md](../../01-plan/features/foundry-x-cli.plan.md) (v2.0)
 
 ---
 
@@ -15,17 +26,19 @@
 
 ### 1.1 Design Goals
 
-- PlumbBridge를 통한 Python subprocess 안정 통합 (timeout/에러/복구)
-- 3개 커맨드의 명확한 입출력 계약 정의
-- Phase 2 확장을 고려한 모듈 분리 (packages/cli ↔ packages/shared)
-- 개발 흐름을 끊지 않는 UX (30초 이내 피드백)
+- **Harness Pipeline**: Brownfield/Greenfield 자동 감지 + 4단계 파이프라인으로 맞춤 하네스 구축 (v4 핵심)
+- **PlumbBridge**: Python subprocess 안정 통합 (timeout/에러/복구)
+- **멱등성**: `init` 재실행 시 기존 파일 보존, 신규 섹션만 merge
+- **Phase 2 확장**: packages/cli ↔ packages/shared 모듈 분리
+- **개발 흐름 UX**: init < 60초, sync < 30초, status < 5초
 
 ### 1.2 Design Principles
 
 - **Git이 진실**: 모든 데이터는 Git 리포에서 읽고, `.foundry-x/`는 캐시/메타만 저장
-- **Fail-safe**: Plumb 실패 시 CLI가 행(hang)하지 않고 즉시 에러 출력 + 안내
-- **최소 의존성**: Phase 1은 DB/서버 없이 로컬 Git + Plumb만으로 동작
+- **Fail-safe**: 모든 외부 의존(Plumb, 파일시스템) 실패 시 graceful fallback
+- **멱등 우선**: `init`은 몇 번을 실행해도 기존 커스터마이징을 절대 파괴하지 않음
 - **측정 가능**: 모든 커맨드 실행이 로그에 기록되어 KPI 측정 가능
+- **Semantic Linting**: 린터 메시지 = 에이전트 교육 채널 (어떻게 고치나를 포함)
 
 ---
 
@@ -34,68 +47,85 @@
 ### 2.1 Component Diagram
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  foundry-x CLI (packages/cli)                       │
-│                                                      │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐          │
-│  │  init    │  │  sync    │  │  status  │          │
-│  │ command  │  │ command  │  │ command  │          │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘          │
-│       │              │              │                │
-│       ▼              ▼              ▼                │
-│  ┌──────────────────────────────────────┐           │
-│  │          Core Services               │           │
-│  │  ┌────────────┐  ┌───────────────┐  │           │
-│  │  │ Template   │  │ PlumbBridge   │  │           │
-│  │  │ Manager    │  │ (subprocess)  │  │           │
-│  │  └────────────┘  └───────┬───────┘  │           │
-│  │  ┌────────────┐  ┌───────┴───────┐  │           │
-│  │  │ Config     │  │ Logger        │  │           │
-│  │  │ Manager    │  │ (KPI 측정)    │  │           │
-│  │  └────────────┘  └───────────────┘  │           │
-│  └──────────────────────────────────────┘           │
-│                      │                               │
-│                      ▼                               │
-│  ┌──────────────────────────────────────┐           │
-│  │  packages/shared (공유 타입)          │           │
-│  │  - HealthScore, SyncResult, etc.     │           │
-│  └──────────────────────────────────────┘           │
-└──────────────────────────┬──────────────────────────┘
-                           │
-              ┌────────────┼────────────┐
-              ▼            ▼            ▼
-     ┌──────────┐  ┌──────────┐  ┌──────────┐
-     │ Git Repo │  │ Plumb    │  │.foundry-x│
-     │ (SSOT)   │  │ (Python) │  │ (local)  │
-     └──────────┘  └──────────┘  └──────────┘
+┌─────────────────────────────────────────────────────────┐
+│  foundry-x CLI (packages/cli)                           │
+│                                                          │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐              │
+│  │  init    │  │  sync    │  │  status  │              │
+│  │ command  │  │ command  │  │ command  │              │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘              │
+│       │              │              │                    │
+│       ▼              ▼              ▼                    │
+│  ┌────────────────────────────────────────────────┐     │
+│  │              Core Services                      │     │
+│  │                                                  │     │
+│  │  ┌─────────────────────────┐  ┌──────────────┐ │     │
+│  │  │  Harness Pipeline       │  │ PlumbBridge  │ │     │
+│  │  │  ┌────────┐ ┌────────┐ │  │ (subprocess) │ │     │
+│  │  │  │detect  │→│discover│ │  └──────┬───────┘ │     │
+│  │  │  └────────┘ └───┬────┘ │         │         │     │
+│  │  │  ┌────────┐ ┌───▼────┐ │  ┌──────┴───────┐ │     │
+│  │  │  │verify  │←│generate│ │  │ Logger       │ │     │
+│  │  │  └────────┘ └───┬────┘ │  │ (KPI 측정)   │ │     │
+│  │  │              ┌───▼────┐ │  └──────────────┘ │     │
+│  │  │              │analyze │ │  ┌──────────────┐ │     │
+│  │  │              └────────┘ │  │ ConfigManager│ │     │
+│  │  └─────────────────────────┘  └──────────────┘ │     │
+│  └────────────────────────────────────────────────┘     │
+│                      │                                   │
+│  ┌───────────────────▼──────────────────────────────┐   │
+│  │  packages/shared (공유 타입)                       │   │
+│  │  RepoProfile, SyncResult, HealthScore, etc.       │   │
+│  └───────────────────────────────────────────────────┘   │
+└──────────────────────┬──────────────────────────────────┘
+                       │
+          ┌────────────┼────────────┐
+          ▼            ▼            ▼
+   ┌──────────┐ ┌──────────┐ ┌──────────┐
+   │ Git Repo │ │ Plumb    │ │.foundry-x│
+   │ (SSOT)   │ │ (Python) │ │ (local)  │
+   └──────────┘ └──────────┘ └──────────┘
 ```
 
 ### 2.2 Data Flow
 
 ```
-[init]    User → init command → TemplateManager.copy() → Git Repo (specs/, .plumb/)
-                                                       → .foundry-x/config.json
+[init]
+  User → init command
+       → detect.ts: Brownfield or Greenfield?
+       → discover.ts: 스택 스캔 → RepoProfile
+       → analyze.ts: 아키텍처 분석 → RepoProfile 확장
+       → generate.ts: 산출물 생성 (merge, 멱등)
+       → verify.ts: 무결성 검증
+       → .foundry-x/config.json 생성
+       → Logger.record()
 
-[sync]    User → sync command → PlumbBridge.execute('review')
-                              → Parse stdout JSON → SyncResult
-                              → Logger.record() → .foundry-x/logs/
+[sync]
+  User → sync command
+       → PlumbBridge.execute('review')
+       → Parse stdout → SyncResult
+       → HealthScoreCalculator.compute()
+       → progress.md 업데이트
+       → Logger.record()
 
-[status]  User → status command → PlumbBridge.execute('status')
-                                → HealthScoreCalculator.compute()
-                                → Ink TUI render → Terminal
+[status]
+  User → status command
+       → PlumbBridge.execute('status') (또는 캐시)
+       → HealthScore 계산
+       → verify-harness 실행 → HarnessIntegrity
+       → Ink TUI render
 ```
 
 ### 2.3 Dependencies
 
 | Component | Depends On | Purpose |
 |-----------|-----------|---------|
-| init command | TemplateManager, ConfigManager | 하네스 스캐폴딩 + 초기 설정 |
-| sync command | PlumbBridge, Logger | Plumb 호출 + 결과 로깅 |
-| status command | PlumbBridge, HealthScoreCalculator | 상태 조회 + 점수 계산 |
-| PlumbBridge | child_process (Node.js) | Python subprocess 실행 |
-| TemplateManager | fs, path | 템플릿 파일 복사 |
-| ConfigManager | fs | `.foundry-x/config.json` 읽기/쓰기 |
-| Logger | fs | `.foundry-x/logs/` 실행 로그 기록 |
+| init command | Harness Pipeline, ConfigManager | 하네스 구축 |
+| sync command | PlumbBridge, Logger | Plumb 호출 + progress.md |
+| status command | PlumbBridge, HarnessVerifier | 상태 + 무결성 |
+| Harness Pipeline | fs, path, RepoProfile | 4단계 파이프라인 |
+| PlumbBridge | child_process | Python subprocess |
+| HarnessVerifier | fs, path | verify-harness.sh 래퍼 |
 
 ---
 
@@ -106,29 +136,83 @@
 ```typescript
 // packages/shared/src/types.ts
 
-/** SDD Triangle 동기화 상태 */
+// ─── Harness Pipeline Types (v4 신규) ───
+
+/** 리포지토리 유형 */
+type RepoMode = 'brownfield' | 'greenfield';
+
+/** 프로젝트 마커 감지 결과 */
+interface RepoProfile {
+  mode: RepoMode;
+  // Phase 0: discover
+  languages: string[];           // ['typescript', 'python']
+  frameworks: string[];          // ['react', 'express']
+  buildTools: string[];          // ['pnpm', 'turbo']
+  testFrameworks: string[];      // ['vitest', 'pytest']
+  ci: string | null;             // 'github-actions' | 'gitlab-ci' | null
+  packageManager: string | null; // 'pnpm' | 'npm' | 'yarn' | 'pip' | null
+  markers: MarkerFile[];         // 감지된 프로젝트 마커 파일
+  // Phase 1: analyze
+  entryPoints: string[];         // ['src/index.ts', 'main.py']
+  modules: ModuleInfo[];         // 주요 모듈/패키지 정보
+  architecturePattern: string;   // 'monorepo' | 'single-package' | 'unknown'
+}
+
+interface MarkerFile {
+  path: string;                  // 'package.json'
+  type: 'node' | 'python' | 'go' | 'java' | 'unknown';
+}
+
+interface ModuleInfo {
+  name: string;
+  path: string;
+  role: string;                  // 'cli', 'api', 'shared', 'unknown'
+}
+
+/** 산출물 생성 결과 */
+interface GenerateResult {
+  created: string[];             // 새로 생성된 파일
+  merged: string[];              // 기존 파일에 merge된 파일
+  skipped: string[];             // 이미 존재하여 건너뛴 파일
+}
+
+/** 하네스 무결성 검증 결과 */
+interface HarnessIntegrity {
+  passed: boolean;
+  score: number;                 // 0~100 (KPI K6 기준 >95)
+  checks: IntegrityCheck[];
+}
+
+interface IntegrityCheck {
+  name: string;                  // 'claude-md-exists', 'constitution-3tier', etc.
+  passed: boolean;
+  message?: string;
+}
+
+// ─── SDD Triangle Types (v3 유지) ───
+
 interface SyncResult {
   success: boolean;
-  timestamp: string;              // ISO 8601
-  duration: number;               // ms
+  timestamp: string;
+  duration: number;              // ms
   triangle: {
-    specToCode: SyncStatus;       // 명세 → 코드 일치도
-    codeToTest: SyncStatus;       // 코드 → 테스트 커버리지
-    specToTest: SyncStatus;       // 명세 → 테스트 추적성
+    specToCode: SyncStatus;
+    codeToTest: SyncStatus;
+    specToTest: SyncStatus;
   };
-  decisions: Decision[];          // Plumb 추출 결정사항
+  decisions: Decision[];
   errors: PlumbError[];
 }
 
 interface SyncStatus {
-  matched: number;                // 일치 항목 수
-  total: number;                  // 전체 항목 수
-  gaps: GapItem[];                // 불일치 목록
+  matched: number;
+  total: number;
+  gaps: GapItem[];
 }
 
 interface GapItem {
   type: 'spec_only' | 'code_only' | 'test_missing' | 'drift';
-  path: string;                   // 파일 경로 또는 명세 항목 ID
+  path: string;
   description: string;
 }
 
@@ -137,29 +221,30 @@ interface Decision {
   source: 'agent' | 'human';
   summary: string;
   status: 'pending' | 'approved' | 'rejected';
-  commit: string;                 // Git commit hash
+  commit: string;
 }
 
-/** Triangle Health Score (Gemini 권고) */
 interface HealthScore {
-  overall: number;                // 0~100
-  specToCode: number;             // 0~100
-  codeToTest: number;             // 0~100
-  specToTest: number;             // 0~100
+  overall: number;               // 0~100
+  specToCode: number;
+  codeToTest: number;
+  specToTest: number;
   grade: 'A' | 'B' | 'C' | 'D' | 'F';
 }
 
-/** PlumbBridge 실행 결과 */
+// ─── PlumbBridge Types (v3 유지) ───
+
 interface PlumbResult {
   success: boolean;
-  exitCode: number;               // 0: success, 1: error, 2: partial
+  exitCode: number;
   stdout: string;
   stderr: string;
-  duration: number;               // ms
-  data?: unknown;                 // parsed JSON from stdout
+  duration: number;
+  data?: unknown;
 }
 
-/** CLI 실행 로그 (KPI 측정용) */
+// ─── Config & Logging (v3 유지 + v4 확장) ───
+
 interface CommandLog {
   command: 'init' | 'sync' | 'status';
   timestamp: string;
@@ -167,17 +252,19 @@ interface CommandLog {
   success: boolean;
   args: Record<string, unknown>;
   plumbCalled: boolean;
+  harnessIntegrity?: number;     // v4: status에서 하네스 무결성 점수
   error?: string;
 }
 
-/** 프로젝트 메타데이터 */
 interface FoundryXConfig {
-  version: string;                // CLI 버전
-  initialized: string;            // 초기화 일시
-  template: string;               // 사용된 템플릿 이름
+  version: string;
+  initialized: string;
+  template: string;
+  mode: RepoMode;                // v4: Brownfield/Greenfield
+  repoProfile: RepoProfile;     // v4: 감지된 리포 프로필
   plumb: {
-    timeout: number;              // ms, default 30000
-    pythonPath: string;           // default 'python'
+    timeout: number;
+    pythonPath: string;
   };
   git: {
     provider: 'github' | 'gitlab';
@@ -190,124 +277,223 @@ interface FoundryXConfig {
 
 ```
 .foundry-x/
-├── config.json          # FoundryXConfig
+├── config.json          # FoundryXConfig (v4: repoProfile 포함)
 ├── logs/
 │   └── YYYY-MM-DD.jsonl # CommandLog (일별 JSONL)
 └── cache/
     └── last-sync.json   # 마지막 SyncResult 캐시
 ```
 
-> `.foundry-x/`는 `.gitignore`에 추가. Git에는 커밋하지 않음.
+---
+
+## 4. Harness Pipeline Design (v4 핵심)
+
+### 4.1 Pipeline Overview
+
+```
+foundry-x init [--mode brownfield|greenfield] [--template name]
+    │
+    ▼
+┌─ detect.ts ─────────────────────────────────────────┐
+│  Input:  cwd, --mode flag                            │
+│  Logic:  프로젝트 마커 파일 스캔 (5종 MVP)           │
+│          package.json, go.mod, pom.xml,              │
+│          Pipfile, Cargo.toml                          │
+│  Output: RepoMode ('brownfield' | 'greenfield')      │
+└──────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─ discover.ts ───────────────────────────────────────┐
+│  Input:  cwd, RepoMode                              │
+│  Logic:                                              │
+│    [Brownfield] 파일시스템 스캔                       │
+│      - package.json → languages, frameworks,         │
+│        dependencies, scripts 파싱                     │
+│      - go.mod / Pipfile / pom.xml → 동일             │
+│      - .github/workflows/ or .gitlab-ci.yml → CI     │
+│      - jest.config / vitest.config / pytest.ini      │
+│    [Greenfield] 인터랙티브 질문                       │
+│      - "어떤 언어?" → "어떤 프레임워크?" → 스택 확정  │
+│  Output: RepoProfile (phase 0 필드 채움)             │
+└──────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─ analyze.ts ────────────────────────────────────────┐
+│  Input:  RepoProfile (phase 0)                       │
+│  Logic:                                              │
+│    - 디렉토리 구조 스캔 → entryPoints 감지            │
+│    - src/, packages/, app/ 패턴 → modules 추출       │
+│    - monorepo 감지 (pnpm-workspace, lerna, turbo)    │
+│    - architecturePattern 결정                        │
+│  Output: RepoProfile (phase 1 필드 추가)             │
+└──────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─ generate.ts ───────────────────────────────────────┐
+│  Input:  RepoProfile (완성), template name           │
+│  Logic:                                              │
+│    1. 템플릿 파일 로드 (templates/{name}/)            │
+│    2. RepoProfile 기반 변수 치환                      │
+│    3. 기존 파일 존재 여부 확인                         │
+│       - 없으면: 생성                                  │
+│       - 있으면: 섹션 단위 merge (기존 보존)           │
+│    4. lint 템플릿: 스택에 맞는 설정 선택              │
+│    5. progress.md 초기 생성                           │
+│  Output: GenerateResult { created, merged, skipped } │
+│                                                      │
+│  ★ 멱등성 보장:                                      │
+│    - Markdown 파일: ## 헤딩 기준으로 섹션 단위 비교   │
+│    - JSON 파일: deep merge (기존 키 보존)             │
+│    - 기타 파일: 존재하면 skip                         │
+└──────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─ verify.ts ─────────────────────────────────────────┐
+│  Input:  GenerateResult, cwd                         │
+│  Logic:                                              │
+│    1. 필수 파일 존재 확인                             │
+│       (CLAUDE.md, AGENTS.md, ARCHITECTURE.md,        │
+│        CONSTITUTION.md, .plumb/config.json)           │
+│    2. CONSTITUTION.md 3계층 구조 파싱 검증            │
+│       (Always / Ask / Never 섹션 존재?)               │
+│    3. CLAUDE.md ↔ AGENTS.md 섹션 구조 일치 검사      │
+│    4. JSON 파일 파싱 검증 (.plumb/config.json)       │
+│    5. Harness Evolution Rules 섹션 존재 확인          │
+│  Output: HarnessIntegrity { passed, score, checks }  │
+└──────────────────────────────────────────────────────┘
+```
+
+### 4.2 Merge Strategy (멱등성 핵심)
+
+```typescript
+// generate.ts 내부 merge 전략
+
+async function mergeMarkdown(
+  existing: string,
+  template: string
+): Promise<string> {
+  // 1. 기존 파일을 ## 헤딩 기준으로 섹션 분리
+  const existingSections = parseSections(existing);
+  const templateSections = parseSections(template);
+
+  // 2. 기존에 없는 섹션만 추가
+  for (const [heading, content] of templateSections) {
+    if (!existingSections.has(heading)) {
+      existingSections.set(heading, content);  // 신규 섹션 추가
+    }
+    // 기존에 있으면 → 건드리지 않음 (사용자 커스터마이징 보존)
+  }
+
+  // 3. 원래 순서 유지 + 신규 섹션은 끝에 추가
+  return reconstructMarkdown(existingSections);
+}
+
+async function mergeJson(
+  existing: Record<string, unknown>,
+  template: Record<string, unknown>
+): Promise<Record<string, unknown>> {
+  // deep merge: 기존 키 보존, 신규 키만 추가
+  return deepMerge(existing, template, { overwrite: false });
+}
+```
 
 ---
 
-## 4. CLI Interface Specification
+## 5. CLI Interface Specification
 
-### 4.1 Command Overview
+### 5.1 `foundry-x init`
 
-| Command | Arguments | Options | Description |
-|---------|-----------|---------|-------------|
-| `init` | — | `--template <name>`, `--force` | 하네스 스캐폴딩 |
-| `sync` | — | `--json`, `--verbose` | SDD 동기화 검사 |
-| `status` | — | `--json`, `--short` | Triangle 상태 표시 |
+**Options:**
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--mode <mode>` | `brownfield` or `greenfield` | auto-detect |
+| `--template <name>` | 템플릿 선택 | `default` |
+| `--force` | 기존 .foundry-x/ 재초기화 | false |
 
-### 4.2 `foundry-x init`
+**Flow:** §4.1 참조 (detect→discover→analyze→generate→verify)
 
-**Flow:**
+**Output (Brownfield 성공):**
 ```
-1. Git 리포 여부 확인 (not git repo → 에러)
-2. .foundry-x/ 존재 여부 확인 (exists + !force → 에러)
-3. 템플릿 선택 (--template 또는 대화형 선택)
-4. TemplateManager.copy(templateName, targetDir)
-   - templates/{name}/ → 현재 디렉토리로 복사
-   - 기존 파일 충돌 시 skip + 경고
-5. ConfigManager.init() → .foundry-x/config.json 생성
-6. Plumb 설치 여부 확인
-   - 미설치 → "pip install plumb-dev" 안내 (non-blocking)
-7. 성공 메시지 + 다음 단계 안내
-```
+✓ Foundry-X initialized (brownfield mode)
 
-**Output (성공):**
-```
-✓ Foundry-X initialized with 'default' template
+  Detected:
+    Language: TypeScript, Python
+    Framework: React, Express
+    Build: pnpm + Turborepo
+    Architecture: monorepo (3 packages)
 
   Created:
-    specs/             — 명세 디렉토리
-    CLAUDE.md          — 에이전트 컨텍스트
-    AGENTS.md          — 에이전트 규칙
-    .plumb/config.json — SDD 엔진 설정
+    ARCHITECTURE.md    — 에이전트용 레이어 맵
+    CONSTITUTION.md    — Always/Ask/Never 행동 경계
+    progress.md        — 에이전트 세션 지속성
 
-  Next steps:
-    1. Write your first spec in specs/
-    2. Run 'foundry-x sync' to check SDD Triangle
-    3. Run 'foundry-x status' to view health score
+  Merged:
+    CLAUDE.md          — Harness Evolution Rules 섹션 추가
+
+  Skipped:
+    AGENTS.md          — 이미 존재 (커스터마이징 보존)
+
+  Harness integrity: 95/100 ✓
+
+  Next: foundry-x sync
+```
+
+**Output (Greenfield 성공):**
+```
+✓ Foundry-X initialized (greenfield mode)
+
+  Stack: TypeScript + React + Vitest
+
+  Created:
+    CLAUDE.md, AGENTS.md, ARCHITECTURE.md,
+    CONSTITUTION.md, progress.md, specs/, .plumb/
+
+  Harness integrity: 100/100 ✓
+
+  Next: Write your first spec in specs/
 ```
 
 **Error Cases:**
 | Condition | Message | Exit Code |
 |-----------|---------|-----------|
 | Not a git repo | `Error: Not a git repository. Run 'git init' first.` | 1 |
-| Already initialized | `Error: Already initialized. Use --force to reinitialize.` | 1 |
+| Already initialized (without --force) | `Error: Already initialized. Use --force to reinitialize.` | 1 |
 | Template not found | `Error: Template '{name}' not found. Available: default, kt-ds-sr` | 1 |
 
-### 4.3 `foundry-x sync`
+### 5.2 `foundry-x sync`
 
-**Flow:**
-```
-1. .foundry-x/ 존재 확인 (없으면 → "Run 'foundry-x init' first")
-2. PlumbBridge.execute('review', { cwd: process.cwd() })
-3. Parse stdout → SyncResult
-4. HealthScoreCalculator.compute(syncResult) → HealthScore
-5. Logger.record({ command: 'sync', ... })
-6. 결과 렌더링 (Ink TUI 또는 --json)
-7. decisions[status='pending'] → 승인/거부 대화형 프롬프트 (optional)
-```
-
-**Output (TUI):**
-```
-SDD Triangle Sync Report
-─────────────────────────────────────────
-  Spec → Code   ████████░░  80% (4/5 matched)
-  Code → Test   ██████░░░░  60% (3/5 covered)
-  Spec → Test   ████████████ 100% (5/5 traced)
-─────────────────────────────────────────
-  Health Score: 80/100 (B)
-
-  Gaps found: 2
-    ⚠ specs/auth.md:L12 — no matching implementation
-    ⚠ src/api/users.ts — no test coverage
-
-  Pending decisions: 1
-    → "Add rate limiting to /api/users" (agent, commit a1b2c3d)
-      [approve] [reject] [skip]
-```
-
-**Output (`--json`):**
-```json
-{
-  "healthScore": { "overall": 80, "grade": "B", ... },
-  "triangle": { ... },
-  "gaps": [ ... ],
-  "decisions": [ ... ]
-}
-```
-
-### 4.4 `foundry-x status`
+v3 Design 유지 + **progress.md 업데이트 추가**.
 
 **Flow:**
 ```
 1. .foundry-x/ 존재 확인
-2. .foundry-x/cache/last-sync.json 읽기 (캐시 있으면 사용)
-3. 캐시 없거나 stale(>5분) → PlumbBridge.execute('status')
-4. HealthScore 계산 + 렌더링
-5. Logger.record()
+2. PlumbBridge.execute('review')
+3. Parse stdout → SyncResult
+4. HealthScoreCalculator.compute()
+5. progress.md "최근 결정사항" 자동 업데이트
+6. Logger.record()
+7. 결과 렌더링 (Ink TUI 또는 --json)
 ```
 
-**Output (TUI):**
+**TUI Output:** v3 Design 동일 (HealthScore 바 차트 + gaps + decisions)
+
+### 5.3 `foundry-x status`
+
+v3 Design + **하네스 무결성 표시 추가**.
+
+**Flow:**
+```
+1. .foundry-x/ 존재 확인
+2. 캐시/PlumbBridge → HealthScore
+3. HarnessVerifier.verify() → HarnessIntegrity
+4. Ink TUI render (Triangle + Harness 섹션)
+```
+
+**TUI Output:**
 ```
 Foundry-X Status
 ─────────────────────────────────────────
-  Project: my-project
+  Project: my-project (brownfield)
   Template: default
   Last sync: 2 minutes ago
 
@@ -320,376 +506,285 @@ Foundry-X Status
   │    └──── Test ───────────┘       │
   └──────────────────────────────────┘
 
+  Harness Integrity: 95/100 ✓         ← v4 신규
+    ✓ CLAUDE.md exists
+    ✓ ARCHITECTURE.md exists
+    ✓ CONSTITUTION.md 3-tier valid
+    ✓ CLAUDE.md ↔ AGENTS.md sync
+    ⚠ progress.md not updated (3 days)
+
   Pending decisions: 0
   --no-verify bypasses: 2 (this week)
 ```
 
-**Output (`--short`):**
-```
-Health: 85/100 (B+) | Gaps: 3 | Decisions: 0 | Last sync: 2m ago
-```
+---
+
+## 6. PlumbBridge Design
+
+v3 Design 전체 유지. 변경 없음.
+
+- Class: `PlumbBridge` (execute, review, getStatus, isAvailable)
+- Subprocess 계약: timeout 30s, exit code 0/1/2/127, SIGTERM
+- Error hierarchy: `FoundryXError` → PlumbNotInstalled/Timeout/Execution/Output Error
+- Config: `.foundry-x/config.json`의 `plumb.timeout`, `plumb.pythonPath`
 
 ---
 
-## 5. PlumbBridge Design
+## 7. Template System Design (v4 확장)
 
-### 5.1 Class Structure
-
-```typescript
-// packages/cli/src/plumb/bridge.ts
-
-class PlumbBridge {
-  private config: PlumbConfig;
-
-  constructor(config?: Partial<PlumbConfig>) {
-    this.config = {
-      pythonPath: process.env.FOUNDRY_X_PYTHON_PATH || 'python',
-      timeout: Number(process.env.FOUNDRY_X_PLUMB_TIMEOUT) || 30_000,
-      cwd: process.cwd(),
-      ...config,
-    };
-  }
-
-  /** Plumb 설치 여부 확인 */
-  async isAvailable(): Promise<boolean>;
-
-  /** Plumb 커맨드 실행 */
-  async execute(command: string, args?: string[]): Promise<PlumbResult>;
-
-  /** sync 전용: review 실행 + SyncResult 파싱 */
-  async review(): Promise<SyncResult>;
-
-  /** status 전용: 현재 상태 조회 */
-  async getStatus(): Promise<SyncResult>;
-}
-```
-
-### 5.2 Subprocess 실행 계약
-
-```typescript
-// 내부 계약 (Sprint 1 문서화 대상)
-
-interface PlumbConfig {
-  pythonPath: string;     // default: 'python'
-  timeout: number;        // default: 30000 (ms)
-  cwd: string;            // default: process.cwd()
-}
-
-// 실행 방식
-spawn(config.pythonPath, ['-m', 'plumb', command, ...args], {
-  cwd: config.cwd,
-  timeout: config.timeout,
-  env: { ...process.env, PLUMB_OUTPUT_FORMAT: 'json' },
-});
-
-// Exit Code 계약
-// 0 — 성공 (stdout: JSON)
-// 1 — 에러 (stderr: 에러 메시지)
-// 2 — 부분 성공 (stdout: JSON with warnings)
-// 127 — Plumb 미설치
-// SIGTERM — timeout 초과
-```
-
-### 5.3 Error Handling Chain
-
-```
-PlumbBridge.execute()
-  ├── spawn 실패 (ENOENT)
-  │     → PlumbNotInstalledError
-  │     → "Plumb is not installed. Run: pip install plumb-dev"
-  │
-  ├── timeout (SIGTERM)
-  │     → PlumbTimeoutError
-  │     → "Plumb timed out after 30s. Try: FOUNDRY_X_PLUMB_TIMEOUT=60000"
-  │
-  ├── exit code 1
-  │     → PlumbExecutionError(stderr)
-  │     → stderr 내용 그대로 출력
-  │
-  ├── exit code 2 (partial)
-  │     → 경고 표시 + 부분 결과 반환
-  │
-  └── stdout JSON 파싱 실패
-        → PlumbOutputError
-        → "Unexpected Plumb output. Check plumb version."
-```
-
-### 5.4 Error Class Hierarchy
-
-```typescript
-// packages/cli/src/plumb/errors.ts
-
-abstract class FoundryXError extends Error {
-  abstract code: string;
-  abstract exitCode: number;
-}
-
-class PlumbNotInstalledError extends FoundryXError {
-  code = 'PLUMB_NOT_INSTALLED';
-  exitCode = 1;
-}
-
-class PlumbTimeoutError extends FoundryXError {
-  code = 'PLUMB_TIMEOUT';
-  exitCode = 1;
-}
-
-class PlumbExecutionError extends FoundryXError {
-  code = 'PLUMB_EXECUTION_ERROR';
-  exitCode = 1;
-  constructor(public stderr: string) { ... }
-}
-
-class PlumbOutputError extends FoundryXError {
-  code = 'PLUMB_OUTPUT_ERROR';
-  exitCode = 1;
-}
-
-class NotInitializedError extends FoundryXError {
-  code = 'NOT_INITIALIZED';
-  exitCode = 1;
-}
-
-class NotGitRepoError extends FoundryXError {
-  code = 'NOT_GIT_REPO';
-  exitCode = 1;
-}
-```
-
----
-
-## 6. Template System Design
-
-### 6.1 Template Structure
+### 7.1 Template Structure
 
 ```
 templates/
 ├── default/
-│   ├── _meta.json           # 템플릿 메타데이터
-│   ├── CLAUDE.md             # 에이전트 컨텍스트 (프로젝트별 커스터마이징 가능)
-│   ├── AGENTS.md             # 에이전트 행동 규칙
-│   ├── CONSTITUTION.md       # 프로젝트 헌법 (변경 불가 규칙)
+│   ├── _meta.json
+│   ├── CLAUDE.md               # Harness Evolution Rules 내장
+│   ├── AGENTS.md               # CLAUDE.md와 섹션 구조 동기화
+│   ├── ARCHITECTURE.md         # ★ v4 신규: 에이전트용 레이어 맵
+│   ├── CONSTITUTION.md         # ★ v4 강화: Always/Ask/Never 3계층
+│   ├── progress.md             # ★ v4 신규: 에이전트 세션 지속성
 │   ├── specs/
 │   │   └── .gitkeep
 │   └── .plumb/
-│       └── config.json       # Plumb 엔진 설정
-│
+│       └── config.json
+├── lint/                       # ★ v4 신규: 스택별 lint 설정
+│   ├── eslint.config.ts.tmpl
+│   ├── .ruff.toml.tmpl
+│   └── golangci-lint.yml.tmpl
 └── kt-ds-sr/
     ├── _meta.json
-    ├── CLAUDE.md             # KT DS SM 운영 맞춤
-    ├── AGENTS.md
-    ├── specs/
-    │   └── sr-template.md    # SR 처리 명세 템플릿
-    └── .plumb/
-        └── config.json       # SR 특화 Plumb 설정
+    ├── CLAUDE.md
+    ├── CONSTITUTION.md         # SR 특화 Always/Ask/Never
+    └── specs/
+        └── sr-template.md
 ```
 
-### 6.2 `_meta.json` 스키마
+### 7.2 CONSTITUTION.md 3계층 구조 (v4 핵심)
 
-```json
-{
-  "name": "default",
-  "description": "Standard harness for general-purpose projects",
-  "version": "1.0.0",
-  "files": ["CLAUDE.md", "AGENTS.md", "CONSTITUTION.md", "specs/", ".plumb/"],
-  "requiredPython": ">=3.10",
-  "requiredPlumb": ">=0.1.0"
-}
+```markdown
+# CONSTITUTION.md — 에이전트 행동 경계
+
+## Always (항상 해도 됨)
+- specs/ 파일 읽기
+- 테스트 실행 (read-only)
+- lint 실행
+- feature branch 생성
+- progress.md 업데이트
+- ADR 초안 작성 (commit 전 human 확인 필요)
+
+## Ask (반드시 확인 후 실행)
+- 외부 API 호출 (부작용 있는 것)
+- 의존성 추가 (package.json 등 수정)
+- 스키마 변경
+- PR merge 또는 main 브랜치 직접 수정
+- 새 환경 변수 추가
+- 기존 테스트 삭제 또는 skip 처리
+
+## Never (절대 금지)
+- main 브랜치 직접 push
+- --no-verify 플래그 사용
+- 인증 정보 Git commit
+- DB 직접 수정 (마이그레이션 외)
+- 다른 에이전트의 작업 브랜치에 직접 push
 ```
 
-### 6.3 TemplateManager
+### 7.3 ARCHITECTURE.md 구조 (v4 신규)
 
-```typescript
-class TemplateManager {
-  /** 사용 가능한 템플릿 목록 */
-  listTemplates(): TemplateMeta[];
+```markdown
+# ARCHITECTURE.md
 
-  /** 템플릿을 대상 디렉토리에 복사 */
-  async copy(templateName: string, targetDir: string, options?: {
-    force?: boolean;     // 기존 파일 덮어쓰기
-    skip?: string[];     // 건너뛸 파일 목록
-  }): Promise<CopyResult>;
-}
+## 레이어 구조
+[RepoProfile.modules 기반 자동 생성 다이어그램]
 
-interface CopyResult {
-  created: string[];     // 새로 생성된 파일
-  skipped: string[];     // 이미 존재하여 건너뛴 파일
-  overwritten: string[]; // --force로 덮어쓴 파일
-}
+## 모듈 맵
+| 모듈 | 경로 | 역할 | 진입점 |
+[RepoProfile.modules + entryPoints 기반 자동 생성]
+
+## 의존성 규칙
+[generate.ts가 RepoProfile.architecturePattern 기반 생성]
+
+## 금지 패턴
+[템플릿 기본값 + 스택별 커스텀]
 ```
 
 ---
 
-## 7. Logging & KPI Measurement
+## 8. Verification Scripts (v4 신규)
 
-### 7.1 Log Format (JSONL)
+### 8.1 `scripts/verify-harness.sh`
 
-```jsonl
-{"command":"init","timestamp":"2026-03-16T09:00:00Z","duration":1200,"success":true,"args":{"template":"default"},"plumbCalled":false}
-{"command":"sync","timestamp":"2026-03-16T09:05:00Z","duration":8500,"success":true,"args":{},"plumbCalled":true,"healthScore":85}
-{"command":"status","timestamp":"2026-03-16T09:10:00Z","duration":2100,"success":true,"args":{"short":true},"plumbCalled":false}
+```bash
+#!/bin/bash
+# 하네스 무결성 검증 — foundry-x status에서 호출
+
+SCORE=100
+CHECKS=()
+
+# 1. 필수 파일 존재
+for f in CLAUDE.md AGENTS.md ARCHITECTURE.md CONSTITUTION.md .plumb/config.json; do
+  if [ ! -f "$f" ]; then
+    SCORE=$((SCORE - 15))
+    CHECKS+=("FAIL: $f not found")
+  else
+    CHECKS+=("PASS: $f exists")
+  fi
+done
+
+# 2. CONSTITUTION.md 3계층 구조
+if [ -f CONSTITUTION.md ]; then
+  for tier in "## Always" "## Ask" "## Never"; do
+    grep -q "$tier" CONSTITUTION.md || {
+      SCORE=$((SCORE - 10))
+      CHECKS+=("FAIL: CONSTITUTION.md missing '$tier' section")
+    }
+  done
+fi
+
+# 3. Harness Evolution Rules
+for f in CLAUDE.md AGENTS.md ARCHITECTURE.md; do
+  if [ -f "$f" ] && ! grep -q "갱신 규칙\|Evolution Rules" "$f"; then
+    SCORE=$((SCORE - 5))
+    CHECKS+=("WARN: $f missing Evolution Rules section")
+  fi
+done
+
+# 4. progress.md 존재
+[ ! -f progress.md ] && SCORE=$((SCORE - 5)) && CHECKS+=("WARN: progress.md not found")
+
+echo "{\"score\":$SCORE,\"checks\":[$(printf '"%s",' "${CHECKS[@]}" | sed 's/,$//')]}"
 ```
 
-### 7.2 KPI 측정 매핑
+### 8.2 `scripts/check-sync.sh`
 
-| KPI | 측정 소스 | 계산 방법 |
-|-----|----------|----------|
-| K1: CLI 주간 호출/사용자 | `.foundry-x/logs/*.jsonl` | 주간 로그 라인 수 |
-| K2: `--no-verify` 비율 | Git hook 로그 (별도 hook 구현 필요) | 우회 수 / 전체 커밋 수 |
-| K3: sync 후 수동 수정 | `sync` 결과 → 다음 `sync` 결과 비교 | gap 감소 추세 |
-| K4: 결정 승인율 | `decisions.jsonl` (Plumb 생성) | approved / total |
+```bash
+#!/bin/bash
+# CLAUDE.md ↔ AGENTS.md 섹션 구조 일치 검사
+
+CLAUDE_SECTIONS=$(grep '^## ' CLAUDE.md 2>/dev/null | sort)
+AGENTS_SECTIONS=$(grep '^## ' AGENTS.md 2>/dev/null | sort)
+
+if [ "$CLAUDE_SECTIONS" = "$AGENTS_SECTIONS" ]; then
+  echo '{"synced":true}'
+else
+  echo '{"synced":false,"claude_only":[],"agents_only":[]}'
+fi
+```
 
 ---
 
-## 8. Test Plan
+## 9. Test Plan
 
-### 8.1 Test Scope
+### 9.1 Test Scope
 
 | Type | Target | Tool | Coverage |
 |------|--------|------|----------|
-| Unit Test | PlumbBridge, TemplateManager, ConfigManager, Logger | Vitest | ≥ 80% |
-| Integration Test | CLI 커맨드 e2e (init→sync→status 시나리오) | Vitest + execa | 주요 경로 |
-| Mock Test | PlumbBridge (Plumb 미설치 환경) | Vitest mock | subprocess 에러 시나리오 |
+| Unit | Harness Pipeline (detect, discover, analyze, generate, verify) | Vitest | ≥ 80% |
+| Unit | PlumbBridge, ConfigManager, Logger | Vitest | ≥ 80% |
+| Integration | init → sync → status e2e | Vitest + execa | 주요 경로 |
+| Integration | init 멱등성 (2회 실행) | Vitest | 필수 |
+| Mock | PlumbBridge (Plumb 미설치 환경) | Vitest mock | subprocess 에러 |
 
-### 8.2 Test Cases (Key)
+### 9.2 Test Cases (Key)
 
-**PlumbBridge:**
-- [ ] Happy path: `execute('review')` → exit 0 → JSON 파싱 성공
-- [ ] Timeout: 30초 초과 → PlumbTimeoutError
-- [ ] Not installed: spawn ENOENT → PlumbNotInstalledError
-- [ ] Partial success: exit 2 → 경고 + 부분 결과
-- [ ] Invalid JSON output: → PlumbOutputError
+**Harness Pipeline:**
+- [ ] detect: package.json 있음 → brownfield
+- [ ] detect: 빈 디렉토리 → greenfield
+- [ ] detect: --mode flag 우선
+- [ ] discover (brownfield): package.json 파싱 → RepoProfile
+- [ ] discover (greenfield): 인터랙티브 질문 → RepoProfile
+- [ ] analyze: monorepo 감지 (pnpm-workspace.yaml 존재)
+- [ ] generate: 신규 리포 → 모든 파일 created
+- [ ] generate: 기존 CLAUDE.md 있음 → merge (기존 내용 보존 + 신규 섹션 추가)
+- [ ] generate: 2회 실행 → merged 0건 (이미 merge됨, 멱등성)
+- [ ] verify: 모든 파일 존재 → score 100
+- [ ] verify: CONSTITUTION.md에 Ask 섹션 누락 → score 감점
+
+**PlumbBridge:** v3 Design 동일 (5개 케이스)
 
 **init command:**
-- [ ] Happy path: Git 리포에서 init → 파일 생성 확인
-- [ ] Not git repo: → NotGitRepoError
-- [ ] Already initialized: → 에러 (without --force)
-- [ ] `--force`: 기존 .foundry-x/ 재생성
-- [ ] `--template kt-ds-sr`: SR 템플릿 파일 확인
+- [ ] Brownfield happy path: git repo + package.json → 하네스 생성 + integrity 표시
+- [ ] Greenfield happy path: 빈 git repo → 인터랙티브 → scaffolding
+- [ ] 멱등성: 2회 init → 기존 커스터마이징 보존
+- [ ] --force: .foundry-x/ 재생성
+- [ ] Not git repo → NotGitRepoError
 
-**sync command:**
-- [ ] Happy path: PlumbBridge 호출 → SyncResult → TUI 렌더링
-- [ ] Not initialized: → NotInitializedError
-- [ ] `--json` flag: JSON 출력
-- [ ] Plumb 실패: graceful 에러 메시지
-
-**status command:**
-- [ ] Happy path: 캐시 있음 → 즉시 표시
-- [ ] 캐시 stale: → PlumbBridge 재호출
-- [ ] `--short` flag: 한 줄 출력
+**sync/status:** v3 Design 동일 + progress.md 업데이트 검증, 하네스 무결성 표시 검증
 
 ---
 
-## 9. Module Structure
+## 10. Module Structure
 
-### 9.1 Layer Assignment
-
-| Module | Layer | Location | Responsibility |
-|--------|-------|----------|----------------|
-| commands/init.ts | Presentation | `packages/cli/src/commands/` | CLI 인터페이스 + Ink 렌더링 |
-| commands/sync.ts | Presentation | `packages/cli/src/commands/` | CLI 인터페이스 + Ink 렌더링 |
-| commands/status.ts | Presentation | `packages/cli/src/commands/` | CLI 인터페이스 + Ink 렌더링 |
-| plumb/bridge.ts | Infrastructure | `packages/cli/src/plumb/` | Python subprocess 실행 |
-| plumb/errors.ts | Domain | `packages/cli/src/plumb/` | 에러 타입 정의 |
-| services/template-manager.ts | Application | `packages/cli/src/services/` | 템플릿 복사 로직 |
-| services/config-manager.ts | Application | `packages/cli/src/services/` | 설정 읽기/쓰기 |
-| services/health-score.ts | Application | `packages/cli/src/services/` | Triangle Health Score 계산 |
-| services/logger.ts | Infrastructure | `packages/cli/src/services/` | 실행 로그 기록 |
-| types.ts | Domain | `packages/shared/src/` | 공유 타입 정의 |
-
-### 9.2 File Structure
+### 10.1 File Structure
 
 ```
 packages/cli/
 ├── src/
-│   ├── index.ts                  # Commander 프로그램 정의
+│   ├── index.ts                      # Commander 프로그램 정의
 │   ├── commands/
-│   │   ├── init.ts               # FR-01, FR-02
-│   │   ├── sync.ts               # FR-03
-│   │   └── status.ts             # FR-04
+│   │   ├── init.ts                   # FR-01~09: harness pipeline 통합
+│   │   ├── sync.ts                   # FR-10~11: Plumb + progress.md
+│   │   └── status.ts                 # FR-12~13: HealthScore + integrity
+│   ├── harness/                      # ★ v4 신규
+│   │   ├── detect.ts                 # Brownfield/Greenfield 감지
+│   │   ├── discover.ts               # Phase 0: 스택 스캔
+│   │   ├── analyze.ts                # Phase 1: 아키텍처 분석
+│   │   ├── generate.ts               # Phase 2: 산출물 생성 (merge)
+│   │   ├── verify.ts                 # Phase 3: 무결성 검증
+│   │   └── merge-utils.ts            # Markdown/JSON merge 유틸
 │   ├── plumb/
-│   │   ├── bridge.ts             # FR-05
-│   │   └── errors.ts             # 에러 클래스 계층
+│   │   ├── bridge.ts                 # FR-14: subprocess 래퍼
+│   │   └── errors.ts                 # 에러 클래스 계층
 │   ├── services/
-│   │   ├── template-manager.ts   # 템플릿 복사
-│   │   ├── config-manager.ts     # FR-06
-│   │   ├── health-score.ts       # Triangle Health Score
-│   │   └── logger.ts             # FR-07, FR-08
+│   │   ├── config-manager.ts         # FR-18: .foundry-x/ 관리
+│   │   ├── health-score.ts           # Triangle Health Score 계산
+│   │   ├── harness-verifier.ts       # FR-15: verify-harness 래퍼
+│   │   └── logger.ts                 # FR-19~20: 실행 로그 + KPI
 │   └── ui/
-│       ├── sync-report.tsx       # Ink TUI: sync 결과
-│       └── status-display.tsx    # Ink TUI: status 대시보드
+│       ├── init-report.tsx           # Ink: init 결과 표시
+│       ├── sync-report.tsx           # Ink: sync 결과 표시
+│       └── status-display.tsx        # Ink: status + integrity 표시
 ├── package.json
 ├── tsconfig.json
 └── vitest.config.ts
 
 packages/shared/
 ├── src/
-│   └── types.ts                  # SyncResult, HealthScore, etc.
+│   └── types.ts                      # 공유 타입 (§3.1)
 └── package.json
-```
-
----
-
-## 10. Coding Convention
-
-### 10.1 Naming Conventions
-
-| Target | Rule | Example |
-|--------|------|---------|
-| Files (module) | kebab-case.ts | `plumb-bridge.ts`, `template-manager.ts` |
-| Files (command) | kebab-case.ts | `init.ts`, `sync.ts` |
-| Files (UI component) | kebab-case.tsx | `sync-report.tsx` |
-| Classes | PascalCase | `PlumbBridge`, `TemplateManager` |
-| Functions | camelCase | `computeHealthScore()`, `parseOutput()` |
-| Constants | UPPER_SNAKE_CASE | `DEFAULT_TIMEOUT`, `MAX_RETRY` |
-| Types/Interfaces | PascalCase | `SyncResult`, `HealthScore` |
-
-### 10.2 Import Order
-
-```typescript
-// 1. Node.js builtins
-import { spawn } from 'node:child_process';
-import { readFile } from 'node:fs/promises';
-
-// 2. External packages
-import { Command } from 'commander';
-import { render } from 'ink';
-
-// 3. Internal packages
-import type { SyncResult } from '@foundry-x/shared';
-
-// 4. Relative imports
-import { PlumbBridge } from '../plumb/bridge.js';
-
-// 5. Type-only imports
-import type { PlumbConfig } from '../plumb/types.js';
 ```
 
 ---
 
 ## 11. Implementation Order
 
-### Phase 1 — Sprint 1 (Week 1~2): 기반
+### Sprint 1 (Week 1~2): 기반 + Harness Pipeline + PlumbBridge
 
-1. [ ] 모노리포 scaffolding (`pnpm-workspace.yaml`, `turbo.json`, `tsconfig.json`)
-2. [ ] `packages/shared/src/types.ts` — 공유 타입 정의
-3. [ ] `packages/cli/src/plumb/errors.ts` — 에러 클래스 계층
-4. [ ] `packages/cli/src/plumb/bridge.ts` — PlumbBridge 구현
-5. [ ] PlumbBridge 단위 테스트 (mock subprocess)
-6. [ ] `packages/cli/src/services/config-manager.ts`
-7. [ ] `packages/cli/src/services/logger.ts`
-8. [ ] `packages/cli/src/index.ts` — Commander 프로그램 뼈대
+1. [ ] 모노리포 scaffolding (pnpm + Turborepo + tsconfig)
+2. [ ] `packages/shared/src/types.ts` — 전체 타입 정의
+3. [ ] `packages/cli/src/plumb/errors.ts` — 에러 클래스
+4. [ ] `packages/cli/src/plumb/bridge.ts` — PlumbBridge
+5. [ ] PlumbBridge 단위 테스트
+6. [ ] `harness/detect.ts` — Brownfield/Greenfield 감지
+7. [ ] `harness/discover.ts` — 스택 스캔 (MVP: 마커 5종)
+8. [ ] `harness/analyze.ts` — 아키텍처 분석 (MVP: 디렉토리+진입점)
+9. [ ] `harness/merge-utils.ts` — Markdown/JSON merge 유틸
+10. [ ] `harness/generate.ts` — 산출물 생성 + merge
+11. [ ] `harness/verify.ts` — 무결성 검증
+12. [ ] Harness Pipeline 단위 테스트 (특히 멱등성)
 
-### Phase 2 — Sprint 2 (Week 3~4): 커맨드 + 배포
+### Sprint 2 (Week 3~4): 커맨드 + 템플릿 + 스크립트 + 배포
 
-9. [ ] `packages/cli/src/services/template-manager.ts`
-10. [ ] `packages/cli/src/commands/init.ts` + 템플릿 2종
-11. [ ] `packages/cli/src/services/health-score.ts`
-12. [ ] `packages/cli/src/commands/sync.ts` + `ui/sync-report.tsx`
-13. [ ] `packages/cli/src/commands/status.ts` + `ui/status-display.tsx`
-14. [ ] Integration test (init → sync → status 시나리오)
-15. [ ] npm publish 설정 + `npx foundry-x` 검증
-16. [ ] 사용자 가이드 + 5명 온보딩
+13. [ ] 템플릿: default (CLAUDE/AGENTS/ARCHITECTURE/CONSTITUTION/progress.md)
+14. [ ] 템플릿: kt-ds-sr + lint 스택별
+15. [ ] `commands/init.ts` — Pipeline 통합 + Ink TUI
+16. [ ] `commands/sync.ts` + progress.md 업데이트
+17. [ ] `commands/status.ts` + 하네스 무결성 표시
+18. [ ] `scripts/verify-harness.sh` + `check-sync.sh`
+19. [ ] `services/config-manager.ts` + `logger.ts`
+20. [ ] `.github/workflows/harness-sync-check.yml`
+21. [ ] Integration test (init→sync→status + 멱등성)
+22. [ ] npm publish + npx 검증
+23. [ ] 사용자 가이드 + 5명 온보딩
 
 ---
 
@@ -697,4 +792,5 @@ import type { PlumbConfig } from '../plumb/types.js';
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 0.1 | 2026-03-16 | Initial draft (Plan document 기반 상세 설계) | AX BD팀 |
+| 0.1 | 2026-03-16 | Initial draft (PRD v3 기반) | AX BD팀 |
+| **2.0** | **2026-03-16** | **PRD v4 반영: Harness Pipeline 4단계 설계, RepoProfile 타입, merge 전략, CONSTITUTION.md 3계층, ARCHITECTURE.md, progress.md, verify-harness.sh, HarnessIntegrity, harness/ 모듈 6파일. 테스트 케이스 v4 추가** | **AX BD팀** |
