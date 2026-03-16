@@ -1,0 +1,18 @@
+export type {
+  RepoMode,
+  MarkerFile,
+  ModuleInfo,
+  RepoProfile,
+  GenerateResult,
+  HarnessIntegrity,
+  IntegrityCheck,
+  SyncResult,
+  SyncStatus,
+  GapItem,
+  Decision,
+  PlumbResult,
+  PlumbError,
+  CommandLog,
+  HealthScore,
+  FoundryXConfig,
+} from './types.js';
