@@ -49,3 +49,9 @@
 Round 1 대비 변화: [개선됨 / 동일 / 악화됨]
 이유: [상세]
 ```
+
+---
+
+## 참고 문서
+
+- **PRD v3**: https://github.com/AXBD-Team/Foundry-X/blob/master/prd-v3.md

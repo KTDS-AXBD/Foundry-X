@@ -62,3 +62,9 @@ High 5건:
 Round 1 대비: Critical [3→?], High [5→?]
 이유: [상세]
 ```
+
+---
+
+## 참고 문서
+
+- **PRD v3**: https://github.com/AXBD-Team/Foundry-X/blob/master/prd-v3.md

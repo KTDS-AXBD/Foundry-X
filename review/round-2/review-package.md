@@ -8,8 +8,8 @@
 
 ## 사용법
 
-1. **prd-v3.md 전문을 먼저 첨부**하세요
-2. 그 아래에 각 AI별 프롬프트를 붙여넣기
+1. **PRD v3** 확인: https://github.com/AXBD-Team/Foundry-X/blob/master/prd-v3.md
+2. 각 AI별 프롬프트 파일 하단의 링크를 참고하여 AI 서비스에 붙여넣기
 3. Round 1 피드백도 함께 첨부하면 "이전에 지적한 것이 해결되었는지" 검증 가능
 
 | AI | 파일 | Round 1 판정 | Round 2 핵심 질문 |
