@@ -32,6 +32,7 @@ async function scanMarkers(cwd: string): Promise<MarkerFile[]> {
 interface PackageJson {
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
+  scripts?: Record<string, string>;
 }
 
 function detectFromPackageJson(pkg: PackageJson): {
@@ -109,10 +110,11 @@ export async function discoverStack(
 
   let packageManager: string | null = null;
 
+  let pkg: PackageJson | null = null;
   const pkgMarker = markers.find((m) => m.path === 'package.json');
   if (pkgMarker) {
     const raw = await readFile(join(cwd, 'package.json'), 'utf-8');
-    const pkg = JSON.parse(raw) as PackageJson;
+    pkg = JSON.parse(raw) as PackageJson;
     const result = detectFromPackageJson(pkg);
     languages = result.languages;
     frameworks = result.frameworks;
@@ -146,6 +148,17 @@ export async function discoverStack(
 
   const ci = await detectCI(cwd);
 
+  // Detect relevant scripts from package.json (reuse parsed pkg)
+  const RELEVANT_SCRIPT_KEYS = ['build', 'test', 'lint', 'dev', 'typecheck', 'start', 'format'] as const;
+  let scripts: Record<string, string> | undefined;
+  if (pkg?.scripts) {
+    const found: Record<string, string> = {};
+    for (const key of RELEVANT_SCRIPT_KEYS) {
+      if (pkg.scripts[key]) found[key] = pkg.scripts[key];
+    }
+    if (Object.keys(found).length > 0) scripts = found;
+  }
+
   return {
     mode,
     languages,
@@ -158,5 +171,6 @@ export async function discoverStack(
     entryPoints: [],
     modules: [],
     architecturePattern: 'single-package',
+    scripts,
   };
 }

@@ -30,6 +30,8 @@ export interface RepoProfile {
   entryPoints: string[];
   modules: ModuleInfo[];
   architecturePattern: string;
+  /** package.json scripts 중 주요 커맨드 (build, test, lint 등) */
+  scripts?: Record<string, string>;
 }
 
 /** 산출물 생성 결과 */

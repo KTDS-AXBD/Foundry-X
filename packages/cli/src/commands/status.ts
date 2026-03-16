@@ -4,6 +4,7 @@ import { ConfigManager } from '../services/config-manager.js';
 import { Logger } from '../services/logger.js';
 import { HealthScoreCalculator } from '../services/health-score.js';
 import { verifyHarness } from '../harness/verify.js';
+import { checkHarnessFreshness } from '../services/harness-freshness.js';
 import { FoundryXError, NotInitializedError } from '../plumb/errors.js';
 import { renderOutput } from '../ui/render.js';
 import type { HealthScore } from '@foundry-x/shared';
@@ -54,6 +55,14 @@ export async function runStatus(cwd: string): Promise<StatusData> {
   // 4. Verify harness integrity
   const integrity = await verifyHarness(cwd);
 
+  // 5. Check harness freshness
+  let harnessFreshness;
+  try {
+    harnessFreshness = await checkHarnessFreshness(cwd);
+  } catch {
+    // Freshness check failed — continue without it
+  }
+
   return {
     config: {
       mode: config.mode,
@@ -63,6 +72,7 @@ export async function runStatus(cwd: string): Promise<StatusData> {
     healthScore,
     integrity,
     plumbAvailable,
+    harnessFreshness,
   };
 }
 
