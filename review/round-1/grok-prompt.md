@@ -31,6 +31,4 @@
 
 ---
 
-## PRD v2 전문
-
-참고 문서: https://github.com/AXBD-Team/Foundry-X/blob/master/prd-v2.md
+## [여기에 prd-v2.md 전문을 붙여넣기]

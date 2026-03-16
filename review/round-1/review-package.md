@@ -7,8 +7,8 @@
 
 ## 사용 방법
 
-1. 각 프롬프트 파일을 열어 하단의 GitHub 링크(https://github.com/AXBD-Team/Foundry-X/blob/master/prd-v2.md)를 확인
-2. 해당 AI 서비스에 프롬프트 전체를 붙여넣기
+1. `prd-v2.md`의 전문을 각 프롬프트 파일 하단의 `[여기에 prd-v2.md 전문을 붙여넣기]`에 붙여넣기
+2. 해당 AI 서비스에 전체 내용을 붙여넣기
 3. 검토 결과를 받으면 이 폴더에 `feedback-{ai}.md`로 저장
 4. 모든 검토 완료 후 "검토의견 반영"을 요청
 
