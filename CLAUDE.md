@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** CLI v0.3.1 배포 완료 (PRD v4, Sprint 1-3 완료, Ink TUI + eslint, Match Rate 94%)
+**현재 상태:** CLI v0.4.0 (PRD v4, Sprint 1-4 완료, Ink TUI + UI 테스트 + watch, Match Rate 97%)
 
 ## Architecture
 
@@ -114,8 +114,8 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 
 ## Current Sprint
 
-- **Sprint 1-3:** 완료 (v0.3.1, Match Rate 94%)
-- **Sprint 4 (진행 예정):** UI 테스트 프레임워크 + `status --watch` 실시간 모니터링
+- **Sprint 1-4:** 완료 (v0.4.0, 71 tests, Match Rate 97%)
+- **Sprint 4 성과:** ink-testing-library 도입, 36개 신규 테스트, StatusWatchView, `status --watch` 옵션
   - Plan: `docs/01-plan/features/sprint-4.plan.md`
   - Design: `docs/02-design/features/sprint-4.design.md`
 - **미완료 Sprint 1 과제:** `.plumb` 출력 형식 문서화, subprocess 오류 처리 계약 (Phase 2 시점에 재검토)
