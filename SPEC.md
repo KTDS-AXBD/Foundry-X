@@ -4,7 +4,7 @@ title: Foundry-X Project Specification
 version: 1.0
 status: Active
 category: SPEC
-system-version: 0.1.1
+system-version: 0.2.0
 created: 2026-03-16
 updated: 2026-03-16
 author: Sinclair Seo
