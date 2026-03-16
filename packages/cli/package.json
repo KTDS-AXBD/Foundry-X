@@ -1,24 +1,43 @@
 {
   "name": "foundry-x",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "description": "AI-human collaboration harness for Git repositories — SDD Triangle sync",
   "type": "module",
   "bin": { "foundry-x": "dist/index.js" },
   "main": "dist/index.js",
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.js.map",
+    "!dist/**/*.test.js",
+    "!dist/**/*.test.js.map",
+    "templates/"
+  ],
+  "keywords": ["ai", "agent", "harness", "sdd", "git", "cli", "foundry"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AXBD-Team/Foundry-X.git",
+    "directory": "packages/cli"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@foundry-x/shared": "workspace:*",
     "commander": "^13.0.0",
     "ink": "^5.1.0",
     "react": "^18.3.0",
     "simple-git": "^3.27.0"
   },
   "devDependencies": {
+    "@foundry-x/shared": "workspace:*",
     "@types/node": "^22.0.0",
     "@types/react": "^18.3.0",
     "typescript": "^5.7.0",

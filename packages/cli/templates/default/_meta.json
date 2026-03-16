@@ -1,0 +1,8 @@
+{
+  "name": "default",
+  "description": "Standard harness for general-purpose projects",
+  "version": "1.0.0",
+  "files": ["CLAUDE.md", "AGENTS.md", "ARCHITECTURE.md", "CONSTITUTION.md", "progress.md", "specs/", ".plumb/"],
+  "requiredPython": ">=3.10",
+  "requiredPlumb": ">=0.1.0"
+}

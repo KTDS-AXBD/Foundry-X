@@ -1,4 +1,5 @@
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { access } from 'node:fs/promises';
 import { Command } from 'commander';
 import { simpleGit } from 'simple-git';
@@ -57,6 +58,8 @@ export function initCommand(): Command {
         console.log(`  Architecture: ${enrichedProfile.architecturePattern}`);
 
         // 6. Resolve template directory
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = dirname(__filename);
         const templateDir = resolve(__dirname, '../../templates', options.template);
         try {
           await access(templateDir);
