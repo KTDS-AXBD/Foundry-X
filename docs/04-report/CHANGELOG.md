@@ -2,6 +2,59 @@
 
 모든 주요 변경 사항을 기록합니다. 형식은 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 를 따릅니다.
 
+## [2026-03-17] Sprint 4 (v0.4.0): UI 테스트 프레임워크 + Ink 실시간 업데이트
+
+**Match Rate**: 97% (설계 대비 구현 일치)
+**Status**: ✅ Completed
+**Tests**: 71/71 passed (35 existing + 36 new)
+**Quality**: 0 TypeScript errors, 0 ESLint errors
+
+### Added
+- ink-testing-library 기반 테스트 프레임워크 도입
+  - vitest 설정: `.test.tsx` 패턴 추가
+  - 공통 테스트 데이터 팩토리 (`src/ui/__tests__/test-data.ts`)
+  - 36개 신규 테스트 (컴포넌트 24 + View 7 + render branch 5)
+
+- 공통 컴포넌트 단위 테스트 (5개 컴포넌트, 24 테스트)
+  - Header (3 tests)
+  - StatusBadge (5 tests)
+  - HealthBar (7 tests)
+  - ProgressStep (6 tests)
+  - ErrorBox (3 tests)
+
+- View 컴포넌트 통합 테스트 (3개 View + render.tsx, 12 테스트)
+  - StatusView (3 tests)
+  - InitView (2 tests)
+  - SyncView (2 tests)
+  - render.tsx 4-branch (5 tests)
+
+- `foundry-x status --watch` 실시간 모니터링 모드
+  - StatusWatchView 컴포넌트 (Ink useInput + fs.watch)
+  - `--watch` 옵션: 파일시스템 변경 감시 자동 리렌더
+  - `--interval <ms>`: Debounce 간격 설정 (기본값 500ms)
+  - Non-TTY 안전 처리 (터미널 환경만 실행)
+
+### Changed
+- vitest.config.ts: `include` 패턴에 `src/**/*.test.tsx` 추가
+- package.json: ink-testing-library@^4.0.0 devDependency 추가
+- src/commands/status.ts: `--watch`, `--interval` 커맨드 옵션 추가
+
+### Metrics
+- New test files: 9개 (컴포넌트 5 + View 3 + render 1)
+- New test data factory: 1개 (8개 데이터 생성 함수)
+- New watch mode view: 1개 (StatusWatchView.tsx)
+- LOC added: ~515 (테스트 ~340 + 팩토리 ~80 + watch ~95)
+- LOC modified: ~25
+
+### PDCA Cycle
+- **Plan**: [[FX-PLAN-004]] (2026-03-16)
+- **Design**: [[FX-DSGN-004]] (2026-03-16)
+- **Do**: (2026-03-16~2026-03-17, actual 2 days)
+- **Check**: [[FX-ANLS-004]] (2026-03-17, Match Rate 97%)
+- **Act**: [[FX-RPRT-004]] (2026-03-17, Completion Report)
+
+---
+
 ## [2026-03-16] F21: 프로젝트 관리 점검 및 개선 완료
 
 **Match Rate**: 90% (초기 78% → 최종 90%)
