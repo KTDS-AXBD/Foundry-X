@@ -51,8 +51,9 @@ foundry-x/
 │   ├── cli/                # foundry-x CLI (TypeScript)
 │   │   └── src/
 │   │       ├── harness/    # analyze, detect, discover, generate, merge-utils, verify
+│   │       │   └── builders/  # 동적 산출물 builder (architecture, constitution, claude, agents)
 │   │       ├── plumb/      # bridge, errors, types (Plumb subprocess 래퍼)
-│   │       ├── services/   # config-manager, health-score, logger
+│   │       ├── services/   # config-manager, health-score, logger, harness-freshness
 │   │       ├── ui/         # Ink TUI (React 18 + Ink 5)
 │   │       │   ├── components/  # 순수 UI: Header, StatusBadge, HealthBar, ProgressStep, ErrorBox
 │   │       │   ├── views/       # 로직 포함: StatusView, InitView, SyncView, StatusWatchView
@@ -114,10 +115,14 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 
 ## Current Sprint
 
-- **Sprint 1-4:** 완료 (v0.4.0, 71 tests, Match Rate 97%)
-- **Sprint 4 성과:** ink-testing-library 도입, 36개 신규 테스트, StatusWatchView, `status --watch` 옵션
-  - Plan: `docs/01-plan/features/sprint-4.plan.md`
-  - Design: `docs/02-design/features/sprint-4.design.md`
+- **Sprint 1-4:** 완료 (v0.4.0)
+- **Sprint 5 Part B:** 완료 — 하네스 산출물 확장 (F32~F36), 106 tests, Match Rate 93%
+  - Builder 패턴으로 ARCHITECTURE.md, CONSTITUTION.md, CLAUDE.md, AGENTS.md 동적 생성
+  - verify.ts 강화 (플레이스홀더 감지 + 모듈 맵 일관성)
+  - 하네스 신선도 검사 (`foundry-x status`)
+  - Plan: `docs/01-plan/features/sprint-5.plan.md`
+  - Design: `docs/02-design/features/sprint-5.design.md`
+- **Sprint 5 Part A:** 미착수 — Frontend Design (F26~F31)
 - **미완료 Sprint 1 과제:** `.plumb` 출력 형식 문서화, subprocess 오류 처리 계약 (Phase 2 시점에 재검토)
 
 ## Git Workflow

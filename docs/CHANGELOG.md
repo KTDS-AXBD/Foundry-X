@@ -5,6 +5,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Session 14 (2026-03-17)
+**Sprint 5 Part B — 하네스 산출물 동적 생성 (F32~F36)**:
+- ✅ Builder 패턴 도입: architecture/constitution/claude/agents 4개 builder
+- ✅ RepoProfile.scripts 필드 추가 + discover.ts scripts 감지
+- ✅ generate.ts builder 통합 (builder 있으면 동적 생성, 없으면 템플릿)
+- ✅ verify.ts 강화: 플레이스홀더 잔존 감지 + 모듈 맵 일관성 검증
+- ✅ harness-freshness.ts: 하네스 문서 신선도 검사 (status 통합)
+- ✅ 22파일 106테스트 (기존 71 + 신규 35), typecheck/lint/build 전부 통과
+- PDCA: Plan→Design→Do→Check(93%)→Report 완료
+
 ### Session 13 (2026-03-17)
 **CLAUDE.md 현행화 + Claude Code 자동화 설정**:
 - CLAUDE.md 품질 감사 (78→91점, Grade B→A): stale 참조 수정, 섹션 추가/현행화
