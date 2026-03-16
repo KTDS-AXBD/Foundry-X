@@ -12,6 +12,7 @@
 | — | 요구사항 인터뷰 종합 (Part 1-5) | — | Active | [specs/interview-log.md](specs/interview-log.md) |
 | FX-SPEC-002 | Plumb Output Format & decisions.jsonl Contract | 1.0 | Active | [specs/plumb-output-contract.md](specs/plumb-output-contract.md) |
 | FX-SPEC-003 | Plumb Subprocess Error Handling Contract | 1.0 | Active | [specs/plumb-error-contract.md](specs/plumb-error-contract.md) |
+| FX-GUID-001 | AX BD팀 프로젝트 관리 온보딩 가이드 | 1.0 | Active | [specs/team-onboarding-guide.md](specs/team-onboarding-guide.md) |
 
 ## PLAN
 
