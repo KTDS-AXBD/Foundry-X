@@ -99,7 +99,7 @@ npx foundry-x init
 
 ### Day 1 전
 - [x] ADR-000: v3가 기존 멀티리포/AI Foundry 문서를 대체한다는 선언 → `docs/adr/ADR-000.md`
-- [x] Phase 1 Git provider 확정 (GitHub 또는 GitLab) → GitHub (AXBD-Team org)
+- [x] Phase 1 Git provider 확정 (GitHub 또는 GitLab) → GitHub (KTDS-AXBD org)
 
 ### Week 1~2
 - [ ] `.plumb` 출력 형식 + `decisions.jsonl` 필드 내부 계약 문서화
