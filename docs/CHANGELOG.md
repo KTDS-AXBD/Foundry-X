@@ -5,6 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Session 13 (2026-03-17)
+**CLAUDE.md 현행화 + Claude Code 자동화 설정**:
+- CLAUDE.md 품질 감사 (78→91점, Grade B→A): stale 참조 수정, 섹션 추가/현행화
+- Claude Code settings.json: permissions 17 allow + 4 deny
+- PostToolUse hook: .ts/.tsx 편집 시 auto-typecheck (60s timeout)
+- PreToolUse hook: .env/credentials/lock 파일 보호 (exit 2 차단)
+- npm-release 스킬: version bump → 검증 → build → publish 자동화
+
 ## [0.3.1] - 2026-03-16
 
 ### Added
