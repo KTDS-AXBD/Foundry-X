@@ -1,6 +1,6 @@
 import { access, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { HarnessIntegrity, IntegrityCheck, IntegrityLevel } from './types.js';
+import type { HarnessIntegrity, IntegrityCheck, IntegrityLevel } from '@foundry-x/shared';
 
 async function fileExists(path: string): Promise<boolean> {
   try {
@@ -24,7 +24,7 @@ function check(
   level: IntegrityLevel,
   message: string,
 ): IntegrityCheck {
-  return { name, level, message };
+  return { name, passed: level === 'PASS', level, message };
 }
 
 const REQUIRED_FILES = [

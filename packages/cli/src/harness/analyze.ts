@@ -1,6 +1,6 @@
 import { access, readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { ModuleInfo, RepoProfile } from './types.js';
+import type { ModuleInfo, RepoProfile } from '@foundry-x/shared';
 
 async function fileExists(path: string): Promise<boolean> {
   try {
@@ -45,11 +45,13 @@ async function discoverModules(cwd: string): Promise<ModuleInfo[]> {
       modules.push({
         name: pkg.name ?? entry.name,
         path: join('packages', entry.name),
+        role: 'unknown',
       });
     } else {
       modules.push({
         name: entry.name,
         path: join('packages', entry.name),
+        role: 'unknown',
       });
     }
   }
@@ -91,7 +93,7 @@ export async function analyzeArchitecture(
   return {
     ...profile,
     architecturePattern,
-    modules: modules.length > 0 ? modules : undefined,
-    entryPoints: entryPoints.length > 0 ? entryPoints : undefined,
+    modules,
+    entryPoints,
   };
 }

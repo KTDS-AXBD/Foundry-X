@@ -6,6 +6,7 @@ export type {
   GenerateResult,
   HarnessIntegrity,
   IntegrityCheck,
+  IntegrityLevel,
   SyncResult,
   SyncStatus,
   GapItem,

@@ -1,6 +1,6 @@
 import { access, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, extname, join, relative } from 'node:path';
-import type { GenerateResult, RepoProfile } from './types.js';
+import type { GenerateResult, RepoProfile } from '@foundry-x/shared';
 import { mergeMarkdown, mergeJson } from './merge-utils.js';
 
 async function fileExists(path: string): Promise<boolean> {
@@ -40,9 +40,19 @@ async function listFilesRecursive(
   return files;
 }
 
+function applyProfileVariables(content: string, profile: RepoProfile): string {
+  return content
+    .replace(/\{\{languages\}\}/g, profile.languages.join(', '))
+    .replace(/\{\{frameworks\}\}/g, profile.frameworks.join(', '))
+    .replace(/\{\{buildTools\}\}/g, profile.buildTools.join(', '))
+    .replace(/\{\{packageManager\}\}/g, profile.packageManager ?? 'unknown')
+    .replace(/\{\{architecturePattern\}\}/g, profile.architecturePattern)
+    .replace(/\{\{mode\}\}/g, profile.mode);
+}
+
 export async function generateHarness(
   cwd: string,
-  _profile: RepoProfile,
+  profile: RepoProfile,
   templateDir: string,
   options?: { force?: boolean },
 ): Promise<GenerateResult> {
@@ -64,19 +74,22 @@ export async function generateHarness(
     const destExists = await fileExists(destPath);
 
     if (!destExists) {
-      // File doesn't exist → copy
-      const content = await readFile(srcPath);
+      // File doesn't exist → copy with variable substitution
+      const raw = await readFile(srcPath, 'utf-8');
+      const content = ext === '.md' ? applyProfileVariables(raw, profile) : raw;
       await writeFile(destPath, content);
       created.push(relPath);
     } else if (force) {
-      // Force mode → overwrite
-      const content = await readFile(srcPath);
+      // Force mode → overwrite with variable substitution
+      const raw = await readFile(srcPath, 'utf-8');
+      const content = ext === '.md' ? applyProfileVariables(raw, profile) : raw;
       await writeFile(destPath, content);
       created.push(relPath);
     } else if (ext === '.md') {
-      // Merge markdown
+      // Merge markdown (template gets variable substitution)
       const existingContent = await readFile(destPath, 'utf-8');
-      const templateContent = await readFile(srcPath, 'utf-8');
+      const rawTemplate = await readFile(srcPath, 'utf-8');
+      const templateContent = applyProfileVariables(rawTemplate, profile);
       const mergedContent = mergeMarkdown(existingContent, templateContent);
       await writeFile(destPath, mergedContent);
       merged.push(relPath);

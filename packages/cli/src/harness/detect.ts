@@ -1,6 +1,6 @@
 import { access } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { RepoMode } from './types.js';
+import type { RepoMode } from '@foundry-x/shared';
 
 const MARKER_FILES = [
   'package.json',

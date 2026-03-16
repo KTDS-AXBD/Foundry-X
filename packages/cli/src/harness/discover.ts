@@ -1,14 +1,14 @@
 import { access, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { MarkerFile, RepoMode, RepoProfile } from './types.js';
+import type { MarkerFile, RepoMode, RepoProfile } from '@foundry-x/shared';
 
-const MARKER_NAMES = [
-  'package.json',
-  'go.mod',
-  'pom.xml',
-  'Pipfile',
-  'Cargo.toml',
-] as const;
+const MARKER_MAP: Record<string, MarkerFile['type']> = {
+  'package.json': 'node',
+  'go.mod': 'go',
+  'pom.xml': 'java',
+  'Pipfile': 'python',
+  'Cargo.toml': 'unknown',
+};
 
 async function fileExists(path: string): Promise<boolean> {
   try {
@@ -20,12 +20,13 @@ async function fileExists(path: string): Promise<boolean> {
 }
 
 async function scanMarkers(cwd: string): Promise<MarkerFile[]> {
-  return Promise.all(
-    MARKER_NAMES.map(async (name) => {
-      const path = join(cwd, name);
-      return { name, path, exists: await fileExists(path) };
-    }),
-  );
+  const found: MarkerFile[] = [];
+  for (const [name, type] of Object.entries(MARKER_MAP)) {
+    if (await fileExists(join(cwd, name))) {
+      found.push({ path: name, type });
+    }
+  }
+  return found;
 }
 
 interface PackageJson {
@@ -81,7 +82,12 @@ function greenfieldDefault(markers: MarkerFile[]): RepoProfile {
     frameworks: [],
     buildTools: ['pnpm'],
     testFrameworks: [],
+    ci: null,
+    packageManager: 'pnpm',
     markers,
+    entryPoints: [],
+    modules: [],
+    architecturePattern: 'single-package',
   };
 }
 
@@ -101,8 +107,10 @@ export async function discoverStack(
   const buildTools: string[] = [];
   let testFrameworks: string[] = [];
 
-  const pkgMarker = markers.find((m) => m.name === 'package.json');
-  if (pkgMarker?.exists) {
+  let packageManager: string | null = null;
+
+  const pkgMarker = markers.find((m) => m.path === 'package.json');
+  if (pkgMarker) {
     const raw = await readFile(join(cwd, 'package.json'), 'utf-8');
     const pkg = JSON.parse(raw) as PackageJson;
     const result = detectFromPackageJson(pkg);
@@ -110,21 +118,28 @@ export async function discoverStack(
     frameworks = result.frameworks;
     testFrameworks = result.testFrameworks;
 
-    if (await fileExists(join(cwd, 'pnpm-lock.yaml'))) buildTools.push('pnpm');
-    else if (await fileExists(join(cwd, 'yarn.lock'))) buildTools.push('yarn');
-    else buildTools.push('npm');
+    if (await fileExists(join(cwd, 'pnpm-lock.yaml'))) {
+      buildTools.push('pnpm');
+      packageManager = 'pnpm';
+    } else if (await fileExists(join(cwd, 'yarn.lock'))) {
+      buildTools.push('yarn');
+      packageManager = 'yarn';
+    } else {
+      buildTools.push('npm');
+      packageManager = 'npm';
+    }
   }
 
-  if (markers.find((m) => m.name === 'go.mod')?.exists) {
+  if (markers.find((m) => m.path === 'go.mod')) {
     if (!languages.includes('go')) languages.push('go');
   }
-  if (markers.find((m) => m.name === 'Pipfile')?.exists) {
+  if (markers.find((m) => m.path === 'Pipfile')) {
     if (!languages.includes('python')) languages.push('python');
   }
-  if (markers.find((m) => m.name === 'Cargo.toml')?.exists) {
+  if (markers.find((m) => m.path === 'Cargo.toml')) {
     if (!languages.includes('rust')) languages.push('rust');
   }
-  if (markers.find((m) => m.name === 'pom.xml')?.exists) {
+  if (markers.find((m) => m.path === 'pom.xml')) {
     if (!languages.includes('java')) languages.push('java');
     buildTools.push('maven');
   }
@@ -137,7 +152,11 @@ export async function discoverStack(
     frameworks,
     buildTools,
     testFrameworks,
-    ci,
+    ci: ci ?? null,
+    packageManager,
     markers,
+    entryPoints: [],
+    modules: [],
+    architecturePattern: 'single-package',
   };
 }

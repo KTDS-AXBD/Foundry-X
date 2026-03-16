@@ -1,0 +1,15 @@
+name: Harness Sync Check
+on:
+  push:
+    paths: ['CLAUDE.md', 'AGENTS.md', 'ARCHITECTURE.md', 'CONSTITUTION.md']
+  pull_request:
+    paths: ['CLAUDE.md', 'AGENTS.md', 'ARCHITECTURE.md', 'CONSTITUTION.md']
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify harness integrity
+        run: bash scripts/verify-harness.sh
+      - name: Check CLAUDE-AGENTS sync
+        run: bash scripts/check-sync.sh

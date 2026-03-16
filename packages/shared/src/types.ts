@@ -46,10 +46,13 @@ export interface HarnessIntegrity {
   checks: IntegrityCheck[];
 }
 
+export type IntegrityLevel = 'PASS' | 'WARN' | 'FAIL';
+
 export interface IntegrityCheck {
   name: string;
   passed: boolean;
-  message?: string;
+  level: IntegrityLevel;
+  message: string;
 }
 
 // ─── SDD Triangle Types (v3) ───
