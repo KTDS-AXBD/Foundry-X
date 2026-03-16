@@ -55,7 +55,7 @@ Sprint 3의 목표:
 
 - PRD: [[FX-SPEC-PRD-V4]] (`docs/specs/prd-v4.md`)
 - Sprint 2 Design: `docs/archive/2026-03/foundry-x-cli/` (archived)
-- Tech Stack: `docs/02-design/tech-stack-review.md`
+- Tech Stack: `docs/02-design/features/tech-stack-review.md`
 - SPEC: [[FX-SPEC-001]] (`SPEC.md`)
 
 ---

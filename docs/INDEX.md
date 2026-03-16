@@ -35,7 +35,7 @@
 
 | 파일 | 제목 |
 |------|------|
-| [02-design/tech-stack-review.md](02-design/tech-stack-review.md) | 기술 스택 결정 근거 |
+| [02-design/features/tech-stack-review.md](02-design/features/tech-stack-review.md) | 기술 스택 결정 근거 |
 
 ## Review
 
