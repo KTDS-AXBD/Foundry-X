@@ -9,7 +9,7 @@ const program = new Command();
 program
   .name('foundry-x')
   .description('AI-human collaboration harness for Git repositories')
-  .version('0.2.0');
+  .version('0.3.1');
 
 program.addCommand(initCommand());
 program.addCommand(syncCommand());
