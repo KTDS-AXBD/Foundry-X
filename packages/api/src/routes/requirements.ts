@@ -16,9 +16,7 @@ import {
   type SpecRequirement,
 } from "../services/spec-parser.js";
 
-type EnvWithCache = Env & { CACHE: KVNamespace };
-
-export const requirementsRoute = new OpenAPIHono<{ Bindings: EnvWithCache }>({
+export const requirementsRoute = new OpenAPIHono<{ Bindings: Env }>({
   defaultHook: validationHook as any,
 });
 
@@ -66,6 +64,7 @@ const listRequirements = createRoute({
 });
 
 requirementsRoute.openapi(listRequirements, async (c) => {
+  let items: RequirementItem[];
   try {
     const github = new GitHubService(c.env.GITHUB_TOKEN, c.env.GITHUB_REPO);
     const cache = new KVCacheService(c.env.CACHE);
@@ -79,10 +78,18 @@ requirementsRoute.openapi(listRequirements, async (c) => {
       300,
     );
 
-    return c.json(specItems.map(toRequirementItem));
+    items = specItems.map(toRequirementItem);
   } catch {
-    return c.json(MOCK_REQUIREMENTS);
+    items = [...MOCK_REQUIREMENTS];
   }
+
+  // Apply in-memory status overrides (ephemeral, isolate-scoped)
+  return c.json(
+    items.map((item) => {
+      const override = statusOverrides.get(item.id);
+      return override ? { ...item, status: override } : item;
+    }),
+  );
 });
 
 // ─── PUT /requirements/:id ───
@@ -123,7 +130,9 @@ requirementsRoute.openapi(updateRequirement, (c) => {
 
   statusOverrides.set(id, status);
 
+  // Return the updated item (override is ephemeral — Workers isolate scope only)
   const updated: RequirementItem = { ...item, status };
   return c.json(updated);
 });
+
 

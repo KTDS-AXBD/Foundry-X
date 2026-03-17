@@ -35,12 +35,7 @@ const generateSpecRoute = createRoute({
 specRoute.openapi(generateSpecRoute, async (c) => {
   const { text, context, language } = c.req.valid("json");
 
-  let llm: LLMService;
-  try {
-    llm = new LLMService(c.env.AI, c.env.ANTHROPIC_API_KEY);
-  } catch {
-    return c.json({ error: "LLM service unavailable" }, 503);
-  }
+  const llm = new LLMService(c.env.AI, c.env.ANTHROPIC_API_KEY);
 
   const systemPrompt =
     language === "en"

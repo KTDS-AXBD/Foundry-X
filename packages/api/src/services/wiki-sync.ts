@@ -37,7 +37,11 @@ export class WikiSyncService {
 
     for (const filePath of wikiFiles) {
       try {
-        const slug = filePath.replace("docs/wiki/", "").replace(".md", "");
+        const slug = filePath.slice("docs/wiki/".length).replace(/\.md$/, "");
+        if (!/^[\w-]+$/.test(slug)) {
+          errors.push(`${filePath}: invalid slug "${slug}"`);
+          continue;
+        }
         const { content } = await this.github.getFileContent(filePath);
         const title = slug
           .replace(/-/g, " ")

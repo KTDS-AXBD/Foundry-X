@@ -12,8 +12,13 @@ export class KVCacheService {
     const raw = await this.kv.get(key, "text");
     if (!raw) return null;
 
-    const entry = JSON.parse(raw) as CacheEntry<T>;
-    return entry.data;
+    try {
+      const entry = JSON.parse(raw) as CacheEntry<T>;
+      return entry.data ?? null;
+    } catch {
+      // Corrupted cache entry — treat as cache miss
+      return null;
+    }
   }
 
   async set<T>(key: string, data: T, ttlSeconds?: number): Promise<void> {

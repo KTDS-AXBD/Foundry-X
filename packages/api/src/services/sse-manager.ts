@@ -17,7 +17,23 @@ export class SSEManager {
 
     return new ReadableStream({
       start: (controller) => {
+        let closed = false;
+
+        const safeEnqueue = (data: Uint8Array): boolean => {
+          try {
+            controller.enqueue(data);
+            return true;
+          } catch {
+            // Stream closed/errored — stop polling
+            closed = true;
+            if (timerId) clearInterval(timerId);
+            return false;
+          }
+        };
+
         const poll = async () => {
+          if (closed) return;
+
           try {
             const sessions = await this.db
               .prepare(
@@ -35,11 +51,11 @@ export class SSEManager {
             for (const session of sessions.results ?? []) {
               const event = this.sessionToSSEEvent(session);
               const payload = `event: ${event.event}\ndata: ${JSON.stringify(event.data)}\n\n`;
-              controller.enqueue(this.encoder.encode(payload));
+              if (!safeEnqueue(this.encoder.encode(payload))) return;
             }
 
             if (!sessions.results?.length) {
-              controller.enqueue(
+              safeEnqueue(
                 this.encoder.encode(`: heartbeat ${new Date().toISOString()}\n\n`),
               );
             }
@@ -50,7 +66,7 @@ export class SSEManager {
               message: err instanceof Error ? err.message : "Unknown error",
               timestamp: new Date().toISOString(),
             };
-            controller.enqueue(
+            safeEnqueue(
               this.encoder.encode(`event: error\ndata: ${JSON.stringify(errorPayload)}\n\n`),
             );
           }

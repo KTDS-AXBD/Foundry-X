@@ -35,16 +35,19 @@ const gitWebhookRoute = createRoute({
 });
 
 webhookRoute.openapi(gitWebhookRoute, async (c) => {
+  // Read body once — ReadableStream can only be consumed once
+  const body = await c.req.text();
+
+  // HMAC-SHA256 signature verification (required when secret is configured)
   if (c.env.WEBHOOK_SECRET) {
     const signature = c.req.header("x-hub-signature-256");
-    const body = await c.req.text();
     const expected = await computeHmacSha256(c.env.WEBHOOK_SECRET, body);
     if (signature !== `sha256=${expected}`) {
       return c.json({ error: "Invalid signature" }, 401);
     }
   }
 
-  const payload = await c.req.json();
+  const payload = JSON.parse(body);
 
   if (payload.ref !== "refs/heads/master") {
     return c.json({ message: "Skipped: not master branch" });
