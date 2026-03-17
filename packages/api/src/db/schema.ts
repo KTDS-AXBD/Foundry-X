@@ -67,6 +67,8 @@ export const agentSessions = sqliteTable("agent_sessions", {
   })
     .notNull()
     .default("active"),
+  progress: real("progress").default(0),
+  currentTask: text("current_task"),
   startedAt: text("started_at").notNull(),
   endedAt: text("ended_at"),
 });

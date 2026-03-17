@@ -81,7 +81,7 @@ export function Sidebar() {
             </div>
           </SheetContent>
         </Sheet>
-        <span className="text-sm font-bold">Foundry-X</span>
+        <Link href="/dashboard" className="text-sm font-bold">Foundry-X</Link>
         <div className="ml-auto">
           <ThemeToggle />
         </div>
@@ -93,7 +93,7 @@ export function Sidebar() {
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:w-60 lg:shrink-0 lg:flex-col lg:border-r lg:bg-card">
         <div className="flex h-14 items-center border-b px-4">
-          <span className="text-base font-bold">Foundry-X</span>
+          <Link href="/dashboard" className="text-base font-bold">Foundry-X</Link>
           <div className="ml-auto">
             <ThemeToggle />
           </div>
