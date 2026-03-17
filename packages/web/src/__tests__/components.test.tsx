@@ -3,7 +3,11 @@ import { render, screen } from "@testing-library/react";
 import DashboardCard from "../components/feature/DashboardCard";
 import HarnessHealth from "../components/feature/HarnessHealth";
 import AgentCard from "../components/feature/AgentCard";
-import type { HarnessIntegrity, AgentProfile } from "@foundry-x/shared";
+import MarkdownViewer from "../components/feature/MarkdownViewer";
+import ModuleMap from "../components/feature/ModuleMap";
+import TokenUsageChart from "../components/feature/TokenUsageChart";
+import MermaidDiagram from "../components/feature/MermaidDiagram";
+import type { HarnessIntegrity, AgentProfile, RepoProfile } from "@foundry-x/shared";
 
 describe("DashboardCard", () => {
   it("renders title and children", () => {
@@ -17,12 +21,12 @@ describe("DashboardCard", () => {
   });
 
   it("shows loading state", () => {
-    render(
+    const { container } = render(
       <DashboardCard title="Loading" loading={true} error={null}>
         <span>Hidden</span>
       </DashboardCard>,
     );
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
+    expect(container.querySelector("[data-slot='skeleton']")).toBeInTheDocument();
     expect(screen.queryByText("Hidden")).not.toBeInTheDocument();
   });
 
@@ -124,5 +128,88 @@ describe("AgentCard", () => {
     render(<AgentCard agent={idleAgent} />);
     expect(screen.getByText("idle")).toBeInTheDocument();
     expect(screen.queryByText("Processing files...")).not.toBeInTheDocument();
+  });
+});
+
+describe("MarkdownViewer", () => {
+  it("renders plain content", () => {
+    render(<MarkdownViewer content="# Hello World" />);
+    expect(screen.getByText("# Hello World")).toBeInTheDocument();
+  });
+
+  it("renders file metadata when provided", () => {
+    render(
+      <MarkdownViewer content="body" filePath="docs/test.md" author="sinclair" lastModified="2026-03-17" />,
+    );
+    expect(screen.getByText(/docs\/test\.md/)).toBeInTheDocument();
+  });
+
+  it("renders auto-generated sections distinctly", () => {
+    const content = "Human text<!-- foundry-x:auto start -->Auto content<!-- foundry-x:auto end -->More human";
+    render(<MarkdownViewer content={content} />);
+    expect(screen.getByText("Auto-generated")).toBeInTheDocument();
+    expect(screen.getByText("Auto content")).toBeInTheDocument();
+  });
+});
+
+describe("ModuleMap", () => {
+  const mockProfile: RepoProfile = {
+    mode: "brownfield",
+    architecturePattern: "monorepo",
+    languages: ["TypeScript", "Python"],
+    frameworks: ["hono", "next"],
+    buildTools: [],
+    testFrameworks: [],
+    ci: null,
+    packageManager: "pnpm",
+    markers: [],
+    entryPoints: [],
+    modules: [
+      { name: "cli", path: "packages/cli", role: "CLI tool" },
+      { name: "api", path: "packages/api", role: "API server" },
+    ],
+  };
+
+  it("renders profile summary", () => {
+    render(<ModuleMap profile={mockProfile} />);
+    expect(screen.getAllByText("monorepo").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("TypeScript, Python")).toBeInTheDocument();
+  });
+
+  it("renders module table", () => {
+    render(<ModuleMap profile={mockProfile} />);
+    expect(screen.getByText("cli")).toBeInTheDocument();
+    expect(screen.getByText("packages/api")).toBeInTheDocument();
+    expect(screen.getByText("API server")).toBeInTheDocument();
+  });
+});
+
+describe("TokenUsageChart", () => {
+  it("renders table with data", () => {
+    const data = {
+      "claude-3": { tokens: 150000, cost: 1.25 },
+      "gpt-4": { tokens: 50000, cost: 0.75 },
+    };
+    render(<TokenUsageChart title="By Model" data={data} />);
+    expect(screen.getByText("By Model")).toBeInTheDocument();
+    expect(screen.getByText("claude-3")).toBeInTheDocument();
+    expect(screen.getByText("$1.2500")).toBeInTheDocument();
+  });
+
+  it("renders empty state", () => {
+    render(<TokenUsageChart title="Empty" data={{}} />);
+    expect(screen.getByText("No data available.")).toBeInTheDocument();
+  });
+});
+
+describe("MermaidDiagram", () => {
+  it("renders mermaid code block", () => {
+    render(<MermaidDiagram code="graph TD; A-->B;" />);
+    expect(screen.getByText("graph TD; A-->B;")).toBeInTheDocument();
+  });
+
+  it("renders custom caption", () => {
+    render(<MermaidDiagram code="graph LR;" caption="My Diagram" />);
+    expect(screen.getByText("My Diagram")).toBeInTheDocument();
   });
 });
