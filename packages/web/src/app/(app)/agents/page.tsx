@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchApi } from "../../lib/api-client";
+import { fetchApi } from "@/lib/api-client";
 import type { AgentProfile, AgentActivity } from "@foundry-x/shared";
-import AgentCard from "../../components/feature/AgentCard";
+import AgentCard from "@/components/feature/AgentCard";
+import { SSEClient } from "@/lib/sse-client";
 
 export default function AgentsPage() {
   const [agents, setAgents] = useState<AgentProfile[] | null>(null);
@@ -27,28 +28,24 @@ export default function AgentsPage() {
         }
       });
 
-    const es = new EventSource("/api/agents/stream");
-    es.addEventListener("activity", (e: MessageEvent) => {
-      if (cancelled) return;
-      try {
-        const payload = JSON.parse(e.data as string) as {
-          agentId: string;
-          activity: AgentActivity;
-        };
+    const client = new SSEClient({
+      url: "/api/agents/stream",
+      onActivity: (data) => {
+        if (cancelled) return;
+        const payload = data as { agentId: string; activity: AgentActivity };
         setAgents((prev) => {
           if (!prev) return prev;
           return prev.map((a) =>
             a.id === payload.agentId ? { ...a, activity: payload.activity } : a,
           );
         });
-      } catch {
-        // ignore malformed events
-      }
+      },
     });
+    client.connect();
 
     return () => {
       cancelled = true;
-      es.close();
+      client.disconnect();
     };
   }, []);
 

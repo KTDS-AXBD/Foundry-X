@@ -24,7 +24,7 @@ import {
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/wiki", label: "Wiki", icon: BookOpen },
   { href: "/architecture", label: "Architecture", icon: Blocks },
   { href: "/workspace", label: "Workspace", icon: FolderKanban },

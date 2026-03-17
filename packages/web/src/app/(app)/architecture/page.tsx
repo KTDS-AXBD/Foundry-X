@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchApi } from "../../lib/api-client";
+import { fetchApi } from "@/lib/api-client";
 import type { RepoProfile, RequirementItem } from "@foundry-x/shared";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,8 +13,8 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
-import ModuleMap from "../../components/feature/ModuleMap";
-import MermaidDiagram from "../../components/feature/MermaidDiagram";
+import ModuleMap from "@/components/feature/ModuleMap";
+import MermaidDiagram from "@/components/feature/MermaidDiagram";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 

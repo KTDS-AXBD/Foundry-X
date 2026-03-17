@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchApi } from "../lib/api-client";
+import { fetchApi } from "@/lib/api-client";
 import type {
   HealthScore,
   RequirementItem,
   HarnessIntegrity,
   FreshnessReport,
 } from "@foundry-x/shared";
-import DashboardCard from "../components/feature/DashboardCard";
-import HarnessHealth from "../components/feature/HarnessHealth";
+import DashboardCard from "@/components/feature/DashboardCard";
+import HarnessHealth from "@/components/feature/HarnessHealth";
 import { cn } from "@/lib/utils";
 
 interface AsyncState<T> {

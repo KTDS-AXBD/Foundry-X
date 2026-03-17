@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchApi } from "../../lib/api-client";
+import { fetchApi } from "@/lib/api-client";
 import type { TokenSummary } from "@foundry-x/shared";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import TokenUsageChart from "../../components/feature/TokenUsageChart";
+import TokenUsageChart from "@/components/feature/TokenUsageChart";
 import { cn } from "@/lib/utils";
 
 function formatCost(cost: number): string {

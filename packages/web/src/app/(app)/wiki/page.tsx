@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchApi } from "../../lib/api-client";
+import { fetchApi } from "@/lib/api-client";
 import type { WikiPage as WikiPageType } from "@foundry-x/shared";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import MarkdownViewer from "../../components/feature/MarkdownViewer";
+import MarkdownViewer from "@/components/feature/MarkdownViewer";
 import { cn } from "@/lib/utils";
 
 export default function WikiPageView() {
