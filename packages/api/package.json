@@ -6,6 +6,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
+    "dev:workers": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:generate": "drizzle-kit generate:sqlite --schema=src/db/schema.ts --out=src/db/migrations",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/"
@@ -13,12 +16,20 @@
   "dependencies": {
     "@foundry-x/shared": "workspace:*",
     "hono": "^4.0.0",
-    "@hono/node-server": "^1.0.0"
+    "@hono/node-server": "^1.0.0",
+    "@hono/zod-openapi": "^0.9.0",
+    "@hono/swagger-ui": "^0.4.0",
+    "drizzle-orm": "^0.33.0",
+    "zod": "^3.23.0",
+    "nanoid": "^5.0.0"
   },
   "devDependencies": {
     "typescript": "^5.7.0",
     "vitest": "^3.0.0",
     "tsx": "^4.0.0",
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "wrangler": "^3.80.0",
+    "drizzle-kit": "^0.24.0",
+    "@cloudflare/workers-types": "^4.0.0"
   }
 }

@@ -1,0 +1,11 @@
+name = "foundry-x-api"
+main = "src/index.ts"
+compatibility_date = "2026-03-17"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "foundry-x-db"
+database_id = "TODO"
+
+[vars]
+GITHUB_REPO = "KTDS-AXBD/Foundry-X"

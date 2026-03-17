@@ -7,11 +7,16 @@ import { wikiRoute } from "./routes/wiki.js";
 import { requirementsRoute } from "./routes/requirements.js";
 import { agentRoute } from "./routes/agent.js";
 import { tokenRoute } from "./routes/token.js";
+import { authRoute } from "./routes/auth.js";
+import type { Env } from "./index.js";
 
-export const app = new Hono();
+export const app = new Hono<{ Bindings: Env }>();
 
-// Health check
+// Health check (public)
 app.get("/", (c) => c.json({ status: "ok", service: "foundry-x-api" }));
+
+// Auth routes (public)
+app.route("/api", authRoute);
 
 // API routes
 app.route("/api", profileRoute);
