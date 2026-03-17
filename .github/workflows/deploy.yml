@@ -47,9 +47,17 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @foundry-x/shared build
       - run: pnpm --filter @foundry-x/web build
-      - uses: cloudflare/wrangler-action@v3
+      - name: Ensure Pages project exists
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: pages deploy out --project-name=foundry-x-web
+          command: pages project create foundry-x-web --production-branch=master
+          packageManager: pnpm
+        continue-on-error: true
+      - name: Deploy to Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: pages deploy out --project-name=foundry-x-web --commit-dirty=true
           workingDirectory: packages/web
           packageManager: pnpm
