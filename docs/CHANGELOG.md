@@ -7,13 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased] — towards v0.8.0
+## [0.8.0] - 2026-03-18
 
-### Pending (Sprint 8)
-- F44 SSE 실시간 통신
-- F45 NL→Spec 변환
-- F46 Wiki Git 동기화
-- F41 잔여: requirements GitHub API + KV 캐시
+### Summary
+**Sprint 8 완료** — 서비스 레이어 9개 도입(F41, 95%) + SSE D1 폴링(F44, 92%) + NL→Spec LLM 통합(F45, 96%) + Wiki Git 동기화(F46, 94%) + fx.minu.best 프로덕션 사이트(F47, 90%). Overall Match Rate 93%.
+
+### Added
+- **F41 API 실데이터 완성** (Match Rate 95%)
+  - `services/` 디렉토리 신설: 9개 서비스 클래스 (github, kv-cache, spec-parser, health-calc, integrity-checker, freshness-checker, sse-manager, llm, wiki-sync)
+  - requirements/health/integrity/freshness 라우트 → 서비스 호출 + mock fallback 패턴
+  - env.ts: CACHE(KV), AI(Workers AI), ANTHROPIC_API_KEY, WEBHOOK_SECRET 바인딩
+- **F44 SSE 실시간 통신** (Match Rate 92%)
+  - SSEManager: D1 agent_sessions 폴링, 3 이벤트 타입 (activity/status/error)
+  - Web SSEClient: auto-reconnect, disposed guard
+- **F45 NL→Spec 변환** (Match Rate 96%)
+  - LLMService: Workers AI (Llama 3.1) + Claude fallback
+  - `POST /api/spec/generate` + schemas/spec.ts
+  - Web spec-generator 페이지: 입력 폼 + 결과 미리보기 + 클립보드 복사
+- **F46 Wiki Git 동기화** (Match Rate 94%)
+  - WikiSyncService: pushToGit + pullFromGit
+  - Webhook 라우트: HMAC-SHA256 검증 + master branch 필터
+  - wiki.ts waitUntil Git push 통합
+- **F47 Production Site Design** (Match Rate 90%)
+  - Next.js Route Groups: `(landing)/` + `(app)/` 레이아웃 분리
+  - 랜딩 페이지 6섹션: Hero, Features, How It Works, Testimonials, Pricing, CTA
+  - Digital Forge 디자인: Syne + Plus Jakarta Sans + JetBrains Mono, amber 액센트
+  - Navbar (스크롤 반응형 + 모바일 드로어) + Footer (3컬럼)
+  - Cloudflare Pages wrangler.toml + _redirects 프록시
+- D1 마이그레이션: wiki_pages slug UNIQUE index, agent_sessions progress 컬럼
+- API 테스트 +33 (43→76), Web 테스트 +7 (27→34), 합계 216
+
+### Changed
+- Dashboard 경로: `/` → `/dashboard` (Route Groups 분리)
+- Sidebar 로고: `span` → `Link href="/dashboard"`
+- API 서비스 패턴: 라우트 인라인 로직 → 서비스 계층 DI
 
 ---
 
