@@ -6,13 +6,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Session 17 (2026-03-17)
-**Sub-Sprint D — API+Web 테스트 추가 + v0.5.0 버전 범프**:
-- packages/api 테스트: 6파일 36테스트 (라우트 5 + data-reader 1)
+**Sub-Sprint D — API+Web 테스트 추가 + v0.5.0 버전 범프 + requirements 파서 수정**:
+- packages/api 테스트: 6파일 38테스트 (라우트 5 + data-reader 1)
 - packages/web 테스트: 2파일 18테스트 (api-client + 컴포넌트 3종)
 - app.ts 분리: index.ts에서 Hono app 생성을 분리하여 테스트 가능하게
 - CLI 버전 범프: foundry-x@0.4.0 → 0.5.0, index.ts --version 하드코딩 수정
 - Web 테스트 인프라: vitest + @testing-library/react + jsdom 설정
-- 모노리포 전체: 30파일 160테스트 ✅, typecheck ✅, build ✅
+- requirements 파서: 5컬럼 SPEC 형식 + 이모지 상태(✅/🔧/📋) 파싱으로 수정
+- Workers types 호환: @cloudflare/workers-types의 Response.json() 타입 오버라이드 대응
+- 모노리포 전체: 30파일 162테스트 ✅, typecheck ✅, build ✅
 
 ### Session 16 (2026-03-17)
 **Phase 1 Go 판정 + Phase 2 전환 준비**:
