@@ -42,6 +42,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sidebar 로고: `span` → `Link href="/dashboard"`
 - API 서비스 패턴: 라우트 인라인 로직 → 서비스 계층 DI
 
+### Fixed (세션 #25 코드 리뷰)
+- Webhook: 더블 바디 소비 수정 (ReadableStream 한 번만 읽기)
+- SSEManager: safeEnqueue 가드로 타이머 누수 및 enqueue-after-close 방지
+- requirements: GET에서 statusOverrides 적용 (PUT no-op 문제)
+- LLMService: Claude model ID 수정 (claude-haiku-4-5-20250714)
+- WikiSyncService: slug 경로 순회 방지 ([\w-]+ 검증)
+- KVCacheService: JSON.parse 실패 시 null 반환 (cache miss fallback)
+- spec route: 생성자 dead try/catch 제거
+
 ---
 
 ## [0.7.0] - 2026-03-17
