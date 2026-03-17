@@ -17,3 +17,26 @@ export type {
   HealthScore,
   FoundryXConfig,
 } from './types.js';
+
+// Web Dashboard types (Sprint 5 Part A)
+export type {
+  WikiPage,
+  RequirementItem,
+  TodoItem,
+  Message,
+  FreshnessReport,
+  FreshnessItem,
+} from './web.js';
+
+// Agent types (Sprint 5 Part A)
+export type {
+  AgentProfile,
+  AgentCapability,
+  AgentConstraint,
+  AgentStatus,
+  AgentActivity,
+  TokenUsage,
+  TokenSummary,
+  LLMFallbackConfig,
+  LLMProvider,
+} from './agent.js';
