@@ -52,3 +52,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           command: pages deploy out --project-name=foundry-x-web
           workingDirectory: packages/web
+          packageManager: pnpm
