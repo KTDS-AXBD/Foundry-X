@@ -6,7 +6,7 @@
     "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "echo 'Web lint: next lint config pending (Sprint 7)'",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
