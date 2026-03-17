@@ -5,7 +5,7 @@ describe("agent routes", () => {
   it("GET /agents returns agent list", async () => {
     const res = await agentRoute.request("/agents");
     expect(res.status).toBe(200);
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(Array.isArray(data)).toBe(true);
     expect(data.length).toBeGreaterThanOrEqual(2);
 
@@ -33,7 +33,7 @@ describe("agent routes", () => {
 
   it("agent profile has correct constraint tiers", async () => {
     const res = await agentRoute.request("/agents");
-    const data = await res.json();
+    const data = await res.json() as any;
     const agent = data[0];
 
     for (const constraint of agent.constraints) {

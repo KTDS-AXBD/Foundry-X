@@ -35,14 +35,14 @@ describe("requirements routes", () => {
   it("GET /requirements parses F-items from SPEC.md", async () => {
     const res = await requirementsRoute.request("/requirements");
     expect(res.status).toBe(200);
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(Array.isArray(data)).toBe(true);
     expect(data.length).toBe(4);
   });
 
   it("extracts reqCode from title parentheses", async () => {
     const res = await requirementsRoute.request("/requirements");
-    const data = await res.json();
+    const data = await res.json() as any;
     const f1 = data[0];
 
     expect(f1.id).toBe("F1");
@@ -54,21 +54,21 @@ describe("requirements routes", () => {
 
   it("parses ✅ emoji as done status", async () => {
     const res = await requirementsRoute.request("/requirements");
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(data[0].status).toBe("done");
     expect(data[1].status).toBe("done");
   });
 
   it("parses 🔧 emoji as in_progress status", async () => {
     const res = await requirementsRoute.request("/requirements");
-    const data = await res.json();
+    const data = await res.json() as any;
     const f3 = data.find((d: any) => d.id === "F3");
     expect(f3.status).toBe("in_progress");
   });
 
   it("parses 📋 emoji as planned status", async () => {
     const res = await requirementsRoute.request("/requirements");
-    const data = await res.json();
+    const data = await res.json() as any;
     const f4 = data.find((d: any) => d.id === "F4");
     expect(f4.status).toBe("planned");
   });
@@ -82,7 +82,7 @@ describe("requirements routes", () => {
       body: JSON.stringify({ status: "in_progress" }),
     });
     expect(res.status).toBe(200);
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(data.id).toBe("F1");
     expect(data.status).toBe("in_progress");
   });
@@ -94,7 +94,7 @@ describe("requirements routes", () => {
       body: JSON.stringify({ status: "invalid_status" }),
     });
     expect(res.status).toBe(400);
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(data).toHaveProperty("error");
   });
 

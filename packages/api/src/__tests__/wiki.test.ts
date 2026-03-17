@@ -46,7 +46,7 @@ describe("wiki routes", () => {
 
     const res = await wikiRoute.request("/wiki");
     expect(res.status).toBe(200);
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(Array.isArray(data)).toBe(true);
     expect(data.length).toBe(2);
     expect(data[0]).toHaveProperty("slug");
@@ -59,7 +59,7 @@ describe("wiki routes", () => {
 
     const res = await wikiRoute.request("/wiki");
     expect(res.status).toBe(200);
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(data).toEqual([]);
   });
 
@@ -74,7 +74,7 @@ describe("wiki routes", () => {
     const slug = toSlug("docs/guide.md");
     const res = await wikiRoute.request(`/wiki/${slug}`);
     expect(res.status).toBe(200);
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(data.content).toBe("# Hello World\n\nContent here.");
     expect(data.slug).toBe(slug);
   });
@@ -99,7 +99,7 @@ describe("wiki routes", () => {
       body: JSON.stringify({ content: "# Updated\n\nNew content." }),
     });
     expect(res.status).toBe(200);
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(data.ok).toBe(true);
     expect(data.slug).toBe(slug);
   });
@@ -118,7 +118,7 @@ describe("wiki routes", () => {
       body: JSON.stringify({ filePath: "docs/new-page.md", title: "New Page" }),
     });
     expect(res.status).toBe(201);
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(data.title).toBe("New Page");
     expect(data.filePath).toBe("docs/new-page.md");
   });
@@ -140,7 +140,7 @@ describe("wiki routes", () => {
     const slug = toSlug("docs/old-page.md");
     const res = await wikiRoute.request(`/wiki/${slug}`, { method: "DELETE" });
     expect(res.status).toBe(200);
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(data.ok).toBe(true);
   });
 

@@ -13,7 +13,7 @@ describe("API simple routes", () => {
   it("GET / returns service status", async () => {
     const res = await app.request("/");
     expect(res.status).toBe(200);
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(data).toEqual({ status: "ok", service: "foundry-x-api" });
   });
 
@@ -22,7 +22,7 @@ describe("API simple routes", () => {
   it("GET /api/health returns HealthScore", async () => {
     const res = await app.request("/api/health");
     expect(res.status).toBe(200);
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(data).toEqual(MOCK_HEALTH);
     expect(data).toHaveProperty("overall");
     expect(data).toHaveProperty("grade");
@@ -33,7 +33,7 @@ describe("API simple routes", () => {
   it("GET /api/profile returns RepoProfile (fallback to mock)", async () => {
     const res = await app.request("/api/profile");
     expect(res.status).toBe(200);
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(data).toHaveProperty("mode");
     expect(data).toHaveProperty("languages");
     expect(data).toHaveProperty("frameworks");
@@ -45,7 +45,7 @@ describe("API simple routes", () => {
   it("GET /api/integrity returns HarnessIntegrity (fallback to mock)", async () => {
     const res = await app.request("/api/integrity");
     expect(res.status).toBe(200);
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(data).toHaveProperty("passed");
     expect(data).toHaveProperty("score");
     expect(data).toHaveProperty("checks");
@@ -57,7 +57,7 @@ describe("API simple routes", () => {
   it("GET /api/freshness returns FreshnessReport (fallback to mock)", async () => {
     const res = await app.request("/api/freshness");
     expect(res.status).toBe(200);
-    const data = await res.json();
+    const data = await res.json() as any;
     expect(data).toHaveProperty("documents");
     expect(data).toHaveProperty("overallStale");
     expect(data).toHaveProperty("checkedAt");
