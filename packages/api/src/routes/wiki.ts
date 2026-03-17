@@ -7,6 +7,7 @@ import {
   readTextFile,
   writeTextFile,
 } from "../services/data-reader.js";
+import { rbac } from "../middleware/rbac.js";
 
 export const wikiRoute = new Hono();
 
@@ -103,8 +104,8 @@ wikiRoute.get("/wiki/:slug", async (c) => {
   return c.json(page);
 });
 
-// PUT /wiki/:slug — update page content
-wikiRoute.put("/wiki/:slug", async (c) => {
+// PUT /wiki/:slug — update page content (member+)
+wikiRoute.put("/wiki/:slug", rbac("member"), async (c) => {
   const slug = c.req.param("slug");
   const filePath = fromSlug(slug);
   const root = getProjectRoot();
@@ -124,8 +125,8 @@ wikiRoute.put("/wiki/:slug", async (c) => {
   return c.json({ ok: true, slug, filePath });
 });
 
-// POST /wiki — create a new Wiki page
-wikiRoute.post("/wiki", async (c) => {
+// POST /wiki — create a new Wiki page (member+)
+wikiRoute.post("/wiki", rbac("member"), async (c) => {
   const body = await c.req.json<{ filePath: string; content?: string; title?: string }>();
   if (!body.filePath) {
     return c.json({ error: "filePath field is required" }, 400);
@@ -170,8 +171,8 @@ wikiRoute.post("/wiki", async (c) => {
   return c.json(page, 201);
 });
 
-// DELETE /wiki/:slug — delete a page
-wikiRoute.delete("/wiki/:slug", async (c) => {
+// DELETE /wiki/:slug — delete a page (member+)
+wikiRoute.delete("/wiki/:slug", rbac("member"), async (c) => {
   const slug = c.req.param("slug");
   const filePath = fromSlug(slug);
   const root = getProjectRoot();

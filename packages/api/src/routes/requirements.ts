@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { join } from "node:path";
 import type { RequirementItem } from "@foundry-x/shared";
 import { getProjectRoot, readTextFile } from "../services/data-reader.js";
+import { rbac } from "../middleware/rbac.js";
 
 export const requirementsRoute = new Hono();
 
@@ -66,7 +67,7 @@ requirementsRoute.get("/requirements", async (c) => {
 // In-memory mock store for status overrides (SPEC.md는 직접 수정하지 않음)
 const statusOverrides = new Map<string, RequirementItem["status"]>();
 
-requirementsRoute.put("/requirements/:id", async (c) => {
+requirementsRoute.put("/requirements/:id", rbac("member"), async (c) => {
   const id = c.req.param("id");
   const body = await c.req.json<{ status: RequirementItem["status"] }>();
 

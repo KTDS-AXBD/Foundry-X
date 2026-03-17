@@ -23,7 +23,16 @@ vi.mock("../services/data-reader.js", async (importOriginal) => {
   };
 });
 
+import { Hono } from "hono";
 import { requirementsRoute } from "../routes/requirements.js";
+
+// Wrap with test middleware that sets jwtPayload (simulates auth)
+const testApp = new Hono();
+testApp.use("*", async (c, next) => {
+  c.set("jwtPayload", { sub: "test-user", email: "test@test.com", role: "member" });
+  return next();
+});
+testApp.route("/", requirementsRoute);
 
 describe("requirements routes", () => {
   beforeEach(() => {
@@ -33,7 +42,7 @@ describe("requirements routes", () => {
   // ─── GET /requirements ───
 
   it("GET /requirements parses F-items from SPEC.md", async () => {
-    const res = await requirementsRoute.request("/requirements");
+    const res = await testApp.request("/requirements");
     expect(res.status).toBe(200);
     const data = await res.json() as any;
     expect(Array.isArray(data)).toBe(true);
@@ -41,7 +50,7 @@ describe("requirements routes", () => {
   });
 
   it("extracts reqCode from title parentheses", async () => {
-    const res = await requirementsRoute.request("/requirements");
+    const res = await testApp.request("/requirements");
     const data = await res.json() as any;
     const f1 = data[0];
 
@@ -53,21 +62,21 @@ describe("requirements routes", () => {
   });
 
   it("parses ✅ emoji as done status", async () => {
-    const res = await requirementsRoute.request("/requirements");
+    const res = await testApp.request("/requirements");
     const data = await res.json() as any;
     expect(data[0].status).toBe("done");
     expect(data[1].status).toBe("done");
   });
 
   it("parses 🔧 emoji as in_progress status", async () => {
-    const res = await requirementsRoute.request("/requirements");
+    const res = await testApp.request("/requirements");
     const data = await res.json() as any;
     const f3 = data.find((d: any) => d.id === "F3");
     expect(f3.status).toBe("in_progress");
   });
 
   it("parses 📋 emoji as planned status", async () => {
-    const res = await requirementsRoute.request("/requirements");
+    const res = await testApp.request("/requirements");
     const data = await res.json() as any;
     const f4 = data.find((d: any) => d.id === "F4");
     expect(f4.status).toBe("planned");
@@ -76,7 +85,7 @@ describe("requirements routes", () => {
   // ─── PUT /requirements/:id ───
 
   it("PUT /requirements/:id updates status", async () => {
-    const res = await requirementsRoute.request("/requirements/F1", {
+    const res = await testApp.request("/requirements/F1", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "in_progress" }),
@@ -88,7 +97,7 @@ describe("requirements routes", () => {
   });
 
   it("PUT /requirements/:id rejects invalid status", async () => {
-    const res = await requirementsRoute.request("/requirements/F1", {
+    const res = await testApp.request("/requirements/F1", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "invalid_status" }),
@@ -99,7 +108,7 @@ describe("requirements routes", () => {
   });
 
   it("PUT /requirements/:id returns 404 for unknown id", async () => {
-    const res = await requirementsRoute.request("/requirements/F999", {
+    const res = await testApp.request("/requirements/F999", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "done" }),

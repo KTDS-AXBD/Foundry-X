@@ -21,8 +21,17 @@ vi.mock("../services/data-reader.js", async (importOriginal) => {
 });
 
 import { readdir, stat, unlink } from "node:fs/promises";
+import { Hono } from "hono";
 import { readTextFile, writeTextFile } from "../services/data-reader.js";
 import { wikiRoute } from "../routes/wiki.js";
+
+// Wrap wikiRoute with a test middleware that sets jwtPayload (simulates auth)
+const testApp = new Hono();
+testApp.use("*", async (c, next) => {
+  c.set("jwtPayload", { sub: "test-user", email: "test@test.com", role: "member" });
+  return next();
+});
+testApp.route("/", wikiRoute);
 
 function toSlug(filePath: string): string {
   return Buffer.from(filePath).toString("base64url");
@@ -44,7 +53,7 @@ describe("wiki routes", () => {
       mtime: new Date("2026-03-17T00:00:00Z"),
     } as any);
 
-    const res = await wikiRoute.request("/wiki");
+    const res = await testApp.request("/wiki");
     expect(res.status).toBe(200);
     const data = await res.json() as any;
     expect(Array.isArray(data)).toBe(true);
@@ -57,7 +66,7 @@ describe("wiki routes", () => {
   it("GET /wiki returns empty array when docs/ missing", async () => {
     vi.mocked(readdir).mockRejectedValue(new Error("ENOENT"));
 
-    const res = await wikiRoute.request("/wiki");
+    const res = await testApp.request("/wiki");
     expect(res.status).toBe(200);
     const data = await res.json() as any;
     expect(data).toEqual([]);
@@ -72,7 +81,7 @@ describe("wiki routes", () => {
     } as any);
 
     const slug = toSlug("docs/guide.md");
-    const res = await wikiRoute.request(`/wiki/${slug}`);
+    const res = await testApp.request(`/wiki/${slug}`);
     expect(res.status).toBe(200);
     const data = await res.json() as any;
     expect(data.content).toBe("# Hello World\n\nContent here.");
@@ -83,7 +92,7 @@ describe("wiki routes", () => {
     vi.mocked(readTextFile).mockResolvedValue("");
 
     const slug = toSlug("docs/nonexistent.md");
-    const res = await wikiRoute.request(`/wiki/${slug}`);
+    const res = await testApp.request(`/wiki/${slug}`);
     expect(res.status).toBe(404);
   });
 
@@ -93,7 +102,7 @@ describe("wiki routes", () => {
     vi.mocked(writeTextFile).mockResolvedValue(undefined);
 
     const slug = toSlug("docs/guide.md");
-    const res = await wikiRoute.request(`/wiki/${slug}`, {
+    const res = await testApp.request(`/wiki/${slug}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content: "# Updated\n\nNew content." }),
@@ -112,7 +121,7 @@ describe("wiki routes", () => {
       mtime: new Date("2026-03-17T00:00:00Z"),
     } as any);
 
-    const res = await wikiRoute.request("/wiki", {
+    const res = await testApp.request("/wiki", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ filePath: "docs/new-page.md", title: "New Page" }),
@@ -124,7 +133,7 @@ describe("wiki routes", () => {
   });
 
   it("POST /wiki rejects missing filePath", async () => {
-    const res = await wikiRoute.request("/wiki", {
+    const res = await testApp.request("/wiki", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content: "no path" }),
@@ -138,7 +147,7 @@ describe("wiki routes", () => {
     vi.mocked(unlink).mockResolvedValue(undefined);
 
     const slug = toSlug("docs/old-page.md");
-    const res = await wikiRoute.request(`/wiki/${slug}`, { method: "DELETE" });
+    const res = await testApp.request(`/wiki/${slug}`, { method: "DELETE" });
     expect(res.status).toBe(200);
     const data = await res.json() as any;
     expect(data.ok).toBe(true);
@@ -148,7 +157,7 @@ describe("wiki routes", () => {
     vi.mocked(unlink).mockRejectedValue(new Error("ENOENT"));
 
     const slug = toSlug("docs/nonexistent.md");
-    const res = await wikiRoute.request(`/wiki/${slug}`, { method: "DELETE" });
+    const res = await testApp.request(`/wiki/${slug}`, { method: "DELETE" });
     expect(res.status).toBe(404);
   });
 });

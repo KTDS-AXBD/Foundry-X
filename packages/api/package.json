@@ -9,6 +9,9 @@
     "dev:workers": "wrangler dev",
     "deploy": "wrangler deploy",
     "db:generate": "drizzle-kit generate:sqlite --schema=src/db/schema.ts --out=src/db/migrations",
+    "db:migrate:local": "wrangler d1 migrations apply foundry-x-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply foundry-x-db --remote",
+    "db:seed:local": "wrangler d1 execute foundry-x-db --local --file=src/db/seed.sql",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/"
@@ -16,7 +19,6 @@
   "dependencies": {
     "@foundry-x/shared": "workspace:*",
     "hono": "^4.0.0",
-    "@hono/node-server": "^1.0.0",
     "@hono/zod-openapi": "^0.9.0",
     "@hono/swagger-ui": "^0.4.0",
     "drizzle-orm": "^0.33.0",
@@ -24,6 +26,7 @@
     "nanoid": "^5.0.0"
   },
   "devDependencies": {
+    "@hono/node-server": "^1.0.0",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0",
     "tsx": "^4.0.0",
