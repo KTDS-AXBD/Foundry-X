@@ -5,6 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Session 19 (2026-03-17)
+**D1 프로덕션 DB 생성 + Workers 실배포 검증**:
+- D1 `foundry-x-db` 생성 (APAC/ICN, database_id 교체)
+- wrangler.toml: migrations_dir + nodejs_compat 플래그 추가
+- D1 마이그레이션 적용 (0001_initial.sql — 6테이블 + 6인덱스)
+- GitHub Secret: CLOUDFLARE_API_TOKEN 등록
+- Workers 배포 성공: `https://foundry-x-api.ktds-axbd.workers.dev`
+- 배포 검증: signup + health API 정상 응답 확인
+
 ### Session 18 (2026-03-17)
 **Phase 2 Sprint 6 — Cloudflare 인프라 + D1 + JWT 인증 (F37~F40)**:
 - Phase 1 Go 판정 공식화 + Phase 2 Plan/Design 문서 작성
