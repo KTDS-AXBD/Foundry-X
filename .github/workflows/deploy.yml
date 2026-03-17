@@ -50,5 +50,6 @@ jobs:
       - uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: b6c06059b413892a92f150e5ca496236
           projectName: foundry-x-web
           directory: packages/web/out
