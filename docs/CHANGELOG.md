@@ -5,6 +5,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Session 17 (2026-03-17)
+**Sub-Sprint D — API+Web 테스트 추가 + v0.5.0 버전 범프**:
+- packages/api 테스트: 6파일 36테스트 (라우트 5 + data-reader 1)
+- packages/web 테스트: 2파일 18테스트 (api-client + 컴포넌트 3종)
+- app.ts 분리: index.ts에서 Hono app 생성을 분리하여 테스트 가능하게
+- CLI 버전 범프: foundry-x@0.4.0 → 0.5.0, index.ts --version 하드코딩 수정
+- Web 테스트 인프라: vitest + @testing-library/react + jsdom 설정
+- 모노리포 전체: 30파일 160테스트 ✅, typecheck ✅, build ✅
+
+### Session 16 (2026-03-17)
+**Phase 1 Go 판정 + Phase 2 전환 준비**:
+- Phase 1 Go 판정 완료 — 36건 F-item 전부 DONE, Tech Debt 0건, PDCA 93~97%
+- SPEC.md v1.4: Go 판정 근거 + v0.5.0 마일스톤 + Phase 2 전환 기록
+- CLAUDE.md 현행화: Phase 2 상태 반영, Repository Structure(api/web 추가)
+- MEMORY.md 갱신: Phase 2 전환, 다음 작업 업데이트
+
 ### Session 15 (2026-03-17)
 **Sprint 5 Part A — Frontend Design 웹 대시보드 + API 서버 (F26~F31)**:
 - packages/api: Hono API 서버 (8 routes, 15 endpoints, data-reader 서비스)

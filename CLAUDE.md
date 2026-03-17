@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** CLI v0.4.0 (PRD v4, Sprint 1-4 완료, Ink TUI + UI 테스트 + watch, Match Rate 97%)
+**현재 상태:** v0.5.0 — Phase 1 Go 판정 완료, Phase 2 전환 중 (Sprint 1~5 전체 완료, F-item 36/36 DONE, PDCA 93~97%)
 
 ## Architecture
 
@@ -18,14 +18,15 @@ Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원�
 4. **지식 공유 (SSOT)** — Git 리포 = 단일 진실 공급원
 5. **협업 워크스페이스** — 웹 대시보드 (Phase 2)
 
-### Phase 1 (MVP, Month 1-3): CLI + Plumb
-- CLI가 Plumb를 subprocess로 직접 호출, API Server 없음
-- 저장소: Git만 (PostgreSQL/Redis 불필요)
-- 3개 핵심 커맨드: `foundry-x init`, `foundry-x status`, `foundry-x sync`
-- 타겟: 개발자 5명 강제 온보딩
+### Phase 1 (완료, v0.1.0~v0.5.0): CLI + Plumb
+- CLI 3개 커맨드: `foundry-x init`, `foundry-x status`, `foundry-x sync`
+- Ink TUI + 4개 Builder (동적 하네스 산출물)
+- 160 테스트 (CLI 106 + API 36 + Web 18), Go 판정 완료 (2026-03-17)
 
-### Phase 2+: API Server + Web Dashboard 추가
-- Hono(API) + Next.js(Web) + PostgreSQL + Redis (상세: `docs/specs/prd-v4.md`)
+### Phase 2 (진행 중): API Server + Web Dashboard
+- packages/api: Hono API 서버 (15 endpoints, 36 테스트)
+- packages/web: Next.js 14 대시보드 (6 pages, 18 테스트)
+- 다음 단계: PostgreSQL + Redis + 인증 + OpenAPI 계약 (상세: `docs/specs/prd-v4.md`)
 
 ### Tech Stack
 
@@ -33,8 +34,8 @@ Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원�
 |------|------|
 | CLI | TypeScript, Node.js 20, Commander + Ink |
 | SDD Engine | Python, Plumb (subprocess) |
-| API Server (Phase 2) | TypeScript, Hono + Drizzle |
-| Web Dashboard (Phase 2) | Next.js 14, shadcn/ui, Zustand |
+| API Server | TypeScript, Hono, @hono/node-server |
+| Web Dashboard | Next.js 14, React 18, Zustand |
 | Git 연동 | simple-git + octokit |
 
 ### Plumb 2트랙 전략
@@ -43,7 +44,7 @@ Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원�
 
 ## Repository Structure
 
-모노리포 (pnpm workspace + Turborepo). Sprint 1 핵심 모듈 구현 완료:
+모노리포 (pnpm workspace + Turborepo). 4개 패키지:
 
 ```
 foundry-x/
@@ -60,10 +61,22 @@ foundry-x/
 │   │       │   ├── render.tsx   # 4-branch dispatcher (json/short/non-TTY/TTY)
 │   │       │   └── types.ts     # DTO 타입
 │   │       └── index.ts
-│   └── shared/             # 공유 타입 (types.ts)
+│   ├── api/                # Hono API Server (Phase 2)
+│   │   └── src/
+│   │       ├── routes/     # agent, freshness, health, integrity, profile, requirements, token, wiki
+│   │       ├── services/   # data-reader (Git/파일 데이터 읽기)
+│   │       └── index.ts
+│   ├── web/                # Next.js 14 Dashboard (Phase 2)
+│   │   └── src/
+│   │       ├── app/        # pages: dashboard, agents, architecture, tokens, wiki, workspace
+│   │       ├── components/ # feature components: AgentCard, DashboardCard, MarkdownViewer 등
+│   │       └── lib/        # api-client
+│   └── shared/             # 공유 타입 (types.ts, web.ts, agent.ts)
 ├── docs/
 │   ├── 01-plan/            # PLAN 문서
 │   ├── 02-design/          # DSGN 문서
+│   ├── 03-analysis/        # 갭 분석 문서
+│   ├── 04-report/          # PDCA 완료 보고서
 │   ├── specs/              # PRD v4, dev-transparency-spec, interview-log
 │   ├── review/             # AI 검토 (round-1, round-2)
 │   └── archive/            # 구버전 PRD (v1~v3)
@@ -82,10 +95,10 @@ foundry-x/
 | `docs/02-design/features/tech-stack-review.md` | 기술 스택 결정 근거 |
 | `docs/review/round-1/` | 1차 다중 AI 검토 (ChatGPT, Gemini, Claude, Grok) |
 | `docs/review/round-2/` | 2차 검토 및 최종 착수 판정 |
-| `docs/01-plan/features/sprint-3.plan.md` | Sprint 3 Plan (Ink TUI + eslint) |
-| `docs/01-plan/features/sprint-4.plan.md` | Sprint 4 Plan (UI 테스트 + watch) |
-| `docs/02-design/features/sprint-3.design.md` | Sprint 3 Design |
-| `docs/02-design/features/sprint-4.design.md` | Sprint 4 Design |
+| `docs/01-plan/features/sprint-5.plan.md` | Sprint 5 Plan (Frontend Design + 하네스 확장) |
+| `docs/02-design/features/sprint-5.design.md` | Sprint 5 Design |
+| `docs/03-analysis/features/sprint-5.analysis.md` | Sprint 5B Gap Analysis (93%) |
+| `docs/03-analysis/features/sprint-5-part-a.analysis.md` | Sprint 5A Gap Analysis (~90%) |
 
 ## Development Commands
 
@@ -113,21 +126,17 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 - **TSX 지원:** vitest.config에 `.test.tsx` 패턴 포함, tsconfig에 `jsx: "react-jsx"`
 - **Mock 전략:** Ink 컴포넌트는 실제 렌더링, 외부 서비스만 mock
 
-## Current Sprint
+## Current Phase
 
-- **Sprint 1-4:** 완료 (v0.4.0)
-- **Sprint 5 Part B:** 완료 — 하네스 산출물 확장 (F32~F36), 106 tests, Match Rate 93%
-  - Builder 패턴으로 ARCHITECTURE.md, CONSTITUTION.md, CLAUDE.md, AGENTS.md 동적 생성
-  - verify.ts 강화 (플레이스홀더 감지 + 모듈 맵 일관성)
-  - 하네스 신선도 검사 (`foundry-x status`)
+- **Phase 1:** ✅ 완료 — Go 판정 (2026-03-17), v0.5.0
+  - Sprint 1~5 전체 완료, F-item 36/36 DONE, PDCA 93~97%
+  - CLI 3개 커맨드 + Ink TUI + 4개 Builder + 160 테스트 (CLI 106 + API 36 + Web 18)
+- **Phase 2:** 진행 중 — API Server + Web Dashboard
+  - packages/api: Hono 15 endpoints + 36 테스트
+  - packages/web: Next.js 6 pages + 18 테스트
+  - 다음: DB(PostgreSQL) + 인증(JWT/OAuth) + OpenAPI 계약 + 배포 파이프라인
   - Plan: `docs/01-plan/features/sprint-5.plan.md`
   - Design: `docs/02-design/features/sprint-5.design.md`
-- **Sprint 5 Part A:** 완료 — Frontend Design (F26~F31), Match Rate ~90%
-  - packages/api: Hono API 서버 (8 routes, 15 endpoints)
-  - packages/web: Next.js 14 대시보드 (6 pages, 7 components)
-  - packages/shared: web.ts + agent.ts (15 신규 타입)
-  - PDCA: 72% → 84% → ~90% (2 iterations)
-- **미완료 Sprint 1 과제:** `.plumb` 출력 형식 문서화, subprocess 오류 처리 계약 (Phase 2 시점에 재검토)
 
 ## Git Workflow
 
@@ -138,8 +147,8 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 ## Design Decisions & Constraints
 
 - **모노리포 (v3 확정)**: TS+Python 공존, Turborepo + Python 독립 빌드 단위. 안정화 후 분리 가능
-- **3개월 Go/Kill 마일스톤**: Month 3에 KPI 기반 착수 지속/중단 판정
-- **Phase 1 범위 엄수**: CLI 3개 커맨드만. 웹/API/오케스트레이션은 Phase 2로 이관
+- **Phase 1 Go 판정 완료**: 2026-03-17 Go 확정. Phase 2(API+Web) 착수
+- **Phase 2 범위**: API Server(Hono) + Web Dashboard(Next.js) + DB(PostgreSQL) + 인증 + 에이전트 오케스트레이션
 - **Git hook 우회 금지**: `--no-verify` 비율 < 20% 목표. hook 실패 시 human escalation
 - **NL→Spec 변환은 Phase 2**: Phase 1에서는 수동 명세 작성
 - **메타데이터 저장**: Phase 1은 DB 없이 `.foundry-x/` 디렉토리에 JSON 파일로 저장
