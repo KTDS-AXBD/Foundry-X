@@ -1,6 +1,7 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import type { RequirementItem } from "@foundry-x/shared";
+import type { Env } from "../env.js";
 import { rbac } from "../middleware/rbac.js";
 import {
   RequirementSchema,
@@ -8,8 +9,16 @@ import {
   ReqIdParamSchema,
 } from "../schemas/requirements.js";
 import { ErrorSchema, validationHook } from "../schemas/common.js";
+import { GitHubService } from "../services/github.js";
+import { KVCacheService } from "../services/kv-cache.js";
+import {
+  parseSpecRequirements as parseSpecFItems,
+  type SpecRequirement,
+} from "../services/spec-parser.js";
 
-export const requirementsRoute = new OpenAPIHono({
+type EnvWithCache = Env & { CACHE: KVNamespace };
+
+export const requirementsRoute = new OpenAPIHono<{ Bindings: EnvWithCache }>({
   defaultHook: validationHook as any,
 });
 
@@ -26,46 +35,15 @@ const MOCK_REQUIREMENTS: RequirementItem[] = [
   { id: "F41", reqCode: "FX-REQ-041", title: "API 실데이터 연동", version: "v0.7.0", status: "in_progress", note: "Sprint 7" },
 ];
 
-function parseStatusEmoji(raw: string): RequirementItem["status"] {
-  const s = raw.trim().toLowerCase();
-  if (s === "done" || s === "completed") return "done";
-  if (s === "in_progress" || s === "in progress" || s === "wip") return "in_progress";
-  if (s === "planned") return "planned";
-  return "planned";
-}
-
-function parseSpecRequirements(specContent: string): RequirementItem[] {
-  const items: RequirementItem[] = [];
-  const lines = specContent.split("\n");
-
-  const rowPattern = /^\|\s*(F\d+)\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|/;
-  const reqPattern = /\((FX-REQ-\d+)[^)]*\)/;
-
-  for (const line of lines) {
-    const match = rowPattern.exec(line);
-    if (!match) continue;
-
-    const id = (match[1] ?? "").trim();
-    const rawTitle = (match[2] ?? "").trim();
-    const version = (match[3] ?? "").trim();
-    const rawStatus = (match[4] ?? "").trim();
-    const note = (match[5] ?? "").trim();
-
-    const reqMatch = reqPattern.exec(rawTitle);
-    const reqCode = reqMatch?.[1] ?? "";
-    const title = rawTitle.replace(/\s*\([^)]*\)\s*$/, "").trim();
-
-    items.push({
-      id,
-      reqCode,
-      title,
-      version,
-      status: parseStatusEmoji(rawStatus),
-      note,
-    });
-  }
-
-  return items;
+function toRequirementItem(spec: SpecRequirement): RequirementItem {
+  return {
+    id: spec.id,
+    reqCode: spec.reqCode,
+    title: spec.title,
+    version: spec.version,
+    status: spec.status === "rejected" ? "planned" : spec.status,
+    note: spec.notes,
+  };
 }
 
 // ─── RBAC middleware for write operations ───
@@ -87,8 +65,24 @@ const listRequirements = createRoute({
   },
 });
 
-requirementsRoute.openapi(listRequirements, (c) => {
-  return c.json(MOCK_REQUIREMENTS);
+requirementsRoute.openapi(listRequirements, async (c) => {
+  try {
+    const github = new GitHubService(c.env.GITHUB_TOKEN, c.env.GITHUB_REPO);
+    const cache = new KVCacheService(c.env.CACHE);
+
+    const specItems = await cache.getOrFetch<SpecRequirement[]>(
+      "spec:requirements",
+      async () => {
+        const { content } = await github.getFileContent("SPEC.md");
+        return parseSpecFItems(content);
+      },
+      300,
+    );
+
+    return c.json(specItems.map(toRequirementItem));
+  } catch {
+    return c.json(MOCK_REQUIREMENTS);
+  }
 });
 
 // ─── PUT /requirements/:id ───
@@ -133,4 +127,3 @@ requirementsRoute.openapi(updateRequirement, (c) => {
   return c.json(updated);
 });
 
-export { parseSpecRequirements };

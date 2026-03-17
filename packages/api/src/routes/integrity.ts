@@ -1,8 +1,14 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { IntegritySchema } from "../schemas/integrity.js";
 import type { HarnessIntegrity } from "@foundry-x/shared";
+import type { Env } from "../env.js";
+import { GitHubService } from "../services/github.js";
+import { KVCacheService } from "../services/kv-cache.js";
+import { IntegrityChecker } from "../services/integrity-checker.js";
 
-export const integrityRoute = new OpenAPIHono();
+type EnvWithCache = Env & { CACHE: KVNamespace };
+
+export const integrityRoute = new OpenAPIHono<{ Bindings: EnvWithCache }>();
 
 const MOCK_INTEGRITY: HarnessIntegrity = {
   passed: true,
@@ -54,6 +60,15 @@ const getIntegrity = createRoute({
   },
 });
 
-integrityRoute.openapi(getIntegrity, (c) => {
-  return c.json(MOCK_INTEGRITY);
+integrityRoute.openapi(getIntegrity, async (c) => {
+  try {
+    const github = new GitHubService(c.env.GITHUB_TOKEN, c.env.GITHUB_REPO);
+    const cache = new KVCacheService(c.env.CACHE);
+    const checker = new IntegrityChecker(github, cache);
+
+    const result = await checker.check();
+    return c.json(result);
+  } catch {
+    return c.json(MOCK_INTEGRITY);
+  }
 });

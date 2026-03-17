@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { agentRoute } from "../routes/agent.js";
+import { createTestEnv } from "./helpers/test-app.js";
 
 describe("agent routes", () => {
   it("GET /agents returns agent list", async () => {
@@ -17,17 +18,17 @@ describe("agent routes", () => {
   });
 
   it("GET /agents/stream returns SSE response", async () => {
-    const res = await agentRoute.request("/agents/stream");
+    const env = createTestEnv();
+    const res = await agentRoute.request("/agents/stream", {}, env);
     expect(res.status).toBe(200);
     expect(res.headers.get("Content-Type")).toBe("text/event-stream");
     expect(res.headers.get("Cache-Control")).toBe("no-cache");
 
-    // Read first chunk to verify SSE format
+    // Read first chunk to verify SSE format (heartbeat since DB is empty)
     const reader = res.body!.getReader();
     const { value } = await reader.read();
     const text = new TextDecoder().decode(value);
-    expect(text).toContain("event: activity");
-    expect(text).toContain("data: ");
+    expect(text).toContain("heartbeat");
     reader.cancel();
   });
 

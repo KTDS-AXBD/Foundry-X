@@ -13,6 +13,8 @@ import {
   WikiActionResponseSchema,
 } from "../schemas/wiki.js";
 import { ErrorSchema, validationHook } from "../schemas/common.js";
+import { WikiSyncService } from "../services/wiki-sync.js";
+import { GitHubService } from "../services/github.js";
 
 const DEFAULT_PROJECT_ID = "default";
 
@@ -154,6 +156,21 @@ wikiRoute.openapi(updateWikiPage, async (c) => {
     .update(wikiPages)
     .set({ content, updatedAt: new Date().toISOString() })
     .where(eq(wikiPages.slug, slug));
+
+  // Async Git sync (non-blocking)
+  if (c.env.GITHUB_TOKEN && c.env.GITHUB_REPO) {
+    c.executionCtx.waitUntil(
+      (async () => {
+        try {
+          const github = new GitHubService(c.env.GITHUB_TOKEN, c.env.GITHUB_REPO);
+          const sync = new WikiSyncService(github, c.env.DB);
+          await sync.pushToGit(slug, content, "api");
+        } catch (err) {
+          console.error("Wiki->Git sync failed:", err);
+        }
+      })(),
+    );
+  }
 
   return c.json({ ok: true as const, slug, filePath: existing.filePath ?? "" });
 });

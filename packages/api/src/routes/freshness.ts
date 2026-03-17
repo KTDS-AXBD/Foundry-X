@@ -1,8 +1,14 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { FreshnessSchema } from "../schemas/freshness.js";
 import type { FreshnessReport } from "@foundry-x/shared";
+import type { Env } from "../env.js";
+import { GitHubService } from "../services/github.js";
+import { KVCacheService } from "../services/kv-cache.js";
+import { FreshnessChecker } from "../services/freshness-checker.js";
 
-export const freshnessRoute = new OpenAPIHono();
+type EnvWithCache = Env & { CACHE: KVNamespace };
+
+export const freshnessRoute = new OpenAPIHono<{ Bindings: EnvWithCache }>();
 
 const MOCK_FRESHNESS: FreshnessReport = {
   documents: [
@@ -38,6 +44,15 @@ const getFreshness = createRoute({
   },
 });
 
-freshnessRoute.openapi(getFreshness, (c) => {
-  return c.json(MOCK_FRESHNESS);
+freshnessRoute.openapi(getFreshness, async (c) => {
+  try {
+    const github = new GitHubService(c.env.GITHUB_TOKEN, c.env.GITHUB_REPO);
+    const cache = new KVCacheService(c.env.CACHE);
+    const checker = new FreshnessChecker(github, cache);
+
+    const report = await checker.check();
+    return c.json(report);
+  } catch {
+    return c.json(MOCK_FRESHNESS);
+  }
 });

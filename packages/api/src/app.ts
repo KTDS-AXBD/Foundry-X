@@ -9,6 +9,8 @@ import { requirementsRoute } from "./routes/requirements.js";
 import { agentRoute } from "./routes/agent.js";
 import { tokenRoute } from "./routes/token.js";
 import { authRoute } from "./routes/auth.js";
+import { specRoute } from "./routes/spec.js";
+import { webhookRoute } from "./routes/webhook.js";
 import { authMiddleware } from "./middleware/auth.js";
 import type { Env } from "./env.js";
 
@@ -22,7 +24,7 @@ app.doc("/api/openapi.json", {
   openapi: "3.1.0",
   info: {
     title: "Foundry-X API",
-    version: "0.7.0",
+    version: "0.8.0",
     description:
       "Foundry-X — 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼 API",
   },
@@ -36,12 +38,17 @@ app.doc("/api/openapi.json", {
     { name: "Requirements", description: "SPEC.md F-item management" },
     { name: "Agents", description: "Agent profiles and activity" },
     { name: "Tokens", description: "Token usage and cost tracking" },
+    { name: "Spec", description: "NL→Spec 변환" },
+    { name: "Webhook", description: "외부 Webhook 수신" },
   ],
 });
 app.get("/api/docs", swaggerUI({ url: "/api/openapi.json" }));
 
 // Auth routes (public)
 app.route("/api", authRoute);
+
+// Webhook (public — HMAC-SHA256 서명으로 보호)
+app.route("/api", webhookRoute);
 
 // Protected API routes — JWT required
 app.use("/api/*", authMiddleware);
@@ -53,3 +60,4 @@ app.route("/api", wikiRoute);
 app.route("/api", requirementsRoute);
 app.route("/api", agentRoute);
 app.route("/api", tokenRoute);
+app.route("/api", specRoute);

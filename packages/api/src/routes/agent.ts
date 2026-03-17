@@ -4,6 +4,7 @@ import { AgentProfileSchema } from "../schemas/agent.js";
 import type { AgentProfile, AgentActivity } from "@foundry-x/shared";
 import { getDb } from "../db/index.js";
 import { agentSessions } from "../db/schema.js";
+import { SSEManager } from "../services/sse-manager.js";
 import type { Env } from "../env.js";
 
 export const agentRoute = new OpenAPIHono<{ Bindings: Env }>();
@@ -117,36 +118,10 @@ agentRoute.openapi(getAgents, async (c) => {
 // ─── SSE Stream (non-OpenAPI — SSE is not well-represented in OpenAPI) ───
 
 agentRoute.get("/agents/stream", (c) => {
-  const encoder = new TextEncoder();
-  let timerId: ReturnType<typeof setInterval> | undefined;
+  const sseManager = new SSEManager(c.env.DB);
+  const stream = sseManager.createStream();
 
-  const readable = new ReadableStream({
-    start(controller) {
-      const send = () => {
-        const agentId = Math.random() > 0.5 ? "agent-code-review" : "agent-test-writer";
-        const statuses = ["idle", "running", "waiting", "completed"] as const;
-        const status = statuses[Math.floor(Math.random() * statuses.length)] ?? "idle";
-
-        const activity: AgentActivity = {
-          status,
-          currentTask: status === "running" ? "Processing files..." : undefined,
-          progress: status === "running" ? Math.floor(Math.random() * 100) : undefined,
-          tokenUsed: Math.floor(Math.random() * 5000),
-        };
-
-        const data = JSON.stringify({ agentId, activity, timestamp: new Date().toISOString() });
-        controller.enqueue(encoder.encode(`event: activity\ndata: ${data}\n\n`));
-      };
-
-      send();
-      timerId = setInterval(send, 5000);
-    },
-    cancel() {
-      if (timerId) clearInterval(timerId);
-    },
-  });
-
-  return new Response(readable, {
+  return new Response(stream, {
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",

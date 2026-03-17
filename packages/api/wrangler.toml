@@ -21,3 +21,12 @@ binding = "DB"
 database_name = "foundry-x-db"
 database_id = "6338688e-b050-4835-98a2-7101f9215c76"
 migrations_dir = "src/db/migrations"
+
+# Sprint 8: KV Cache
+[[kv_namespaces]]
+binding = "CACHE"
+id = "TBD"
+
+# Sprint 8: Workers AI
+[ai]
+binding = "AI"
