@@ -33,31 +33,3 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: packages/api
-
-  deploy-web:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @foundry-x/shared build
-      - run: pnpm --filter @foundry-x/web build
-      - name: Ensure Pages project exists
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: pages project create foundry-x-web --production-branch=master
-          packageManager: pnpm
-        continue-on-error: true
-      - name: Deploy to Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: pages deploy out --project-name=foundry-x-web --commit-dirty=true
-          workingDirectory: packages/web
-          packageManager: pnpm
