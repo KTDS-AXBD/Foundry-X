@@ -7,6 +7,12 @@ dist/
 .team-tmp/
 *.tsbuildinfo
 .turbo/
+.next/
+
+# tsc build artifacts (source is .ts)
+packages/*/src/**/*.js
+packages/*/src/**/*.d.ts
+packages/*/src/**/*.js.map
 
 # secrets
 .env

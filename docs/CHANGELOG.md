@@ -5,6 +5,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Session 18 (2026-03-17)
+**Phase 2 Sprint 6 — Cloudflare 인프라 + D1 + JWT 인증 (F37~F40)**:
+- Phase 1 Go 판정 공식화 + Phase 2 Plan/Design 문서 작성
+- F37: Cloudflare Workers entry + wrangler.toml + deploy.yml CI/CD (92%)
+- F39: Drizzle 스키마 6 테이블 + 마이그레이션 + seed (97%)
+- F40: JWT 인증 (signup/login/refresh) + PBKDF2 + RBAC (100%)
+- F38: OpenAPI Sprint 7 이관 (Swagger UI + 패키지 설치는 완료)
+- PDCA: Plan→Design→Do(Agent Teams ×2)→Check(61%)→Iterate ×2(84%)→Report
+- Agent Teams: W1(Infra+DB) + W2(Auth+RBAC) 병렬 실행, 8 신규 파일
+- .gitignore: .js 빌드 아티팩트 + .next/ 추가
+- 145/145 테스트 pass (CLI 106 + API 39)
+
 ### Session 17 (2026-03-17)
 **Sub-Sprint D — API+Web 테스트 추가 + v0.5.0 버전 범프 + requirements 파서 수정**:
 - packages/api 테스트: 6파일 38테스트 (라우트 5 + data-reader 1)

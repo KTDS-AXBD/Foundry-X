@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** v0.5.0 — Phase 1 Go 판정 완료, Phase 2 전환 중 (Sprint 1~5 전체 완료, F-item 36/36 DONE, PDCA 93~97%)
+**현재 상태:** v0.5.0 — Phase 2 Sprint 6 완료 (인프라+D1+JWT 구축, Match Rate 84%, F37+F39+F40=96%)
 
 ## Architecture
 
@@ -131,12 +131,14 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 - **Phase 1:** ✅ 완료 — Go 판정 (2026-03-17), v0.5.0
   - Sprint 1~5 전체 완료, F-item 36/36 DONE, PDCA 93~97%
   - CLI 3개 커맨드 + Ink TUI + 4개 Builder + 160 테스트 (CLI 106 + API 36 + Web 18)
-- **Phase 2:** 진행 중 — API Server + Web Dashboard
-  - packages/api: Hono 15 endpoints + 36 테스트
-  - packages/web: Next.js 6 pages + 18 테스트
-  - 다음: DB(PostgreSQL) + 인증(JWT/OAuth) + OpenAPI 계약 + 배포 파이프라인
-  - Plan: `docs/01-plan/features/sprint-5.plan.md`
-  - Design: `docs/02-design/features/sprint-5.design.md`
+- **Phase 2 Sprint 6:** ✅ 완료 — 인프라 + D1 + JWT 인증
+  - Cloudflare Workers entry + wrangler.toml + deploy.yml (F37, 92%)
+  - D1 Drizzle 스키마 6 테이블 + 마이그레이션 + seed (F39, 97%)
+  - JWT 인증 + RBAC 미들웨어 (F40, 100%)
+  - 145 테스트 (CLI 106 + API 39), Match Rate 84%
+  - 다음: F38 OpenAPI 전환 + F41 실데이터 연동 (Sprint 7)
+  - Plan: `docs/01-plan/features/phase-2.plan.md`
+  - Design: `docs/02-design/features/phase-2.design.md`
 
 ## Git Workflow
 
