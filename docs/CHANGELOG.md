@@ -1,80 +1,145 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-Format follows [Keep a Changelog](https://keepachangelog.com/).
+All notable changes to the Foundry-X project are documented here.
 
-## [Unreleased]
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### Session 19 (2026-03-17)
-**D1 프로덕션 DB 생성 + Workers 실배포 검증**:
-- D1 `foundry-x-db` 생성 (APAC/ICN, database_id 교체)
+---
+
+## [Unreleased] — towards v0.7.0
+
+### Added
+- **F38 OpenAPI 전환** (Session 20, Match Rate 98%)
+  - OpenAPIHono + createRoute: 9개 라우트 17 endpoints 전환
+  - Zod 스키마 10파일 21개 (`packages/api/src/schemas/`)
+  - `app.doc("/api/openapi.json")` 자동 스펙 생성
+  - validationHook: Zod 에러 → `{ error: "message" }` 정규화
+  - SSE stream (`/agents/stream`) — OpenAPI 미적합으로 일반 라우트 유지
+
+- **D1 프로덕션 배포 검증** (Session 19)
+  - D1 `foundry-x-db` 생성 (APAC/ICN)
+  - D1 마이그레이션 적용 (0001_initial.sql — 6테이블 + 6인덱스)
+  - GitHub Secret: CLOUDFLARE_API_TOKEN 등록
+  - Workers 배포 성공: `https://foundry-x-api.ktds-axbd.workers.dev`
+
+### Changed
 - wrangler.toml: migrations_dir + nodejs_compat 플래그 추가
-- D1 마이그레이션 적용 (0001_initial.sql — 6테이블 + 6인덱스)
-- GitHub Secret: CLOUDFLARE_API_TOKEN 등록
-- Workers 배포 성공: `https://foundry-x-api.ktds-axbd.workers.dev`
-- 배포 검증: signup + health API 정상 응답 확인
+- 165/165 테스트 pass (CLI 106 + API 41 + Web 18)
 
-### Session 18 (2026-03-17)
-**Phase 2 Sprint 6 — Cloudflare 인프라 + D1 + JWT 인증 (F37~F40)**:
-- Phase 1 Go 판정 공식화 + Phase 2 Plan/Design 문서 작성
-- F37: Cloudflare Workers entry + wrangler.toml + deploy.yml CI/CD (92%)
-- F39: Drizzle 스키마 6 테이블 + 마이그레이션 + seed (97%)
-- F40: JWT 인증 (signup/login/refresh) + PBKDF2 + RBAC (100%)
-- F38: OpenAPI Sprint 7 이관 (Swagger UI + 패키지 설치는 완료)
-- PDCA: Plan→Design→Do(Agent Teams ×2)→Check(61%)→Iterate ×2(84%)→Report
-- Agent Teams: W1(Infra+DB) + W2(Auth+RBAC) 병렬 실행, 8 신규 파일
+### Pending (Sprint 7)
+- F41 실데이터 연동 (D1 전환)
+- F42 shadcn/ui + 웹 고도화
+- F43 테스트 스위트 강화
+
+---
+
+## [0.6.0] - 2026-03-17
+
+### Summary
+**Phase 2 Sprint 6 완료** — Cloudflare 인프라 기반 구축 (F37 배포 + F39 D1 스키마 + F40 JWT 인증 + RBAC). F38 OpenAPI는 복잡도 증가로 Sprint 7 이관. 전체 Match Rate 84% (F37+F39+F40 범위 96%).
+
+### Added
+- **Cloudflare Workers 배포 파이프라인** (F37, 92%)
+  - `wrangler.toml` — D1 바인딩 + env 설정
+  - `.github/workflows/deploy.yml` — CI/CD (typecheck/lint/test/deploy)
+  - `src/index.ts` — Workers entry point (`export default app`)
+  - Hono + Workers 네이티브 지원
+
+- **D1 데이터베이스** (F39, 97%)
+  - `src/db/schema.ts` — Drizzle ORM 스키마 (6 테이블)
+    - `users` (인증 + RBAC), `projects` (Git 리포 연결)
+    - `wiki_pages` (Wiki CRUD), `token_usage` (AI 비용 추적)
+    - `agent_sessions` (에이전트 작업), `refresh_tokens` (JWT 회전)
+  - `src/db/migrations/0001_initial.sql` — 초기 DDL (6 테이블 + 6 인덱스)
+  - `src/db/seed.sql` — 샘플 데이터 (admin + Foundry-X 프로젝트)
+
+- **JWT 인증 + RBAC** (F40, 100%)
+  - `src/routes/auth.ts` — auth 라우트 (signup/login/refresh)
+  - `src/middleware/auth.ts` — JWT 검증 + Access Token 1h / Refresh Token 7d
+  - `src/middleware/rbac.ts` — admin / member / viewer 3등급
+  - `src/utils/crypto.ts` — PBKDF2 비밀번호 해싱 (Web Crypto API)
+
+- **API 인증 적용**
+  - GET 엔드포인트: `viewer` 역할
+  - POST/PUT/DELETE: `member` 역할
+  - Public: /api/health, /api/auth/*, /api/docs, /api/openapi.json
+
+- **Swagger UI**
+  - `/api/docs` — Swagger UI, `/api/openapi.json` — OpenAPI 3.1 spec
+
+- **DB 관리 스크립트**: db:migrate:local, db:migrate:remote, db:seed:local
+
+### Changed
+- 개발 워크플로우: `turbo dev` → `wrangler dev` (D1 로컬 포함)
+- `app.use("/api/*", authMiddleware)` — 전역 JWT 검증
+- `@hono/node-server` → devDependencies 이동
 - .gitignore: .js 빌드 아티팩트 + .next/ 추가
+
+### Fixed
+- wiki/requirements 라우트에 RBAC 미들웨어 누락 수정
+- authMiddleware 전역 미적용 해소
+
+### Removed
+- 프로토타입 mock auth routes (auth.ts로 통합)
+
+### Notes
+- PDCA: Plan→Design→Do(Agent Teams ×2)→Check(61%)→Iterate ×2(84%)→Report
 - 145/145 테스트 pass (CLI 106 + API 39)
 
-### Session 17 (2026-03-17)
-**Sub-Sprint D — API+Web 테스트 추가 + v0.5.0 버전 범프 + requirements 파서 수정**:
-- packages/api 테스트: 6파일 38테스트 (라우트 5 + data-reader 1)
-- packages/web 테스트: 2파일 18테스트 (api-client + 컴포넌트 3종)
-- app.ts 분리: index.ts에서 Hono app 생성을 분리하여 테스트 가능하게
-- CLI 버전 범프: foundry-x@0.4.0 → 0.5.0, index.ts --version 하드코딩 수정
-- Web 테스트 인프라: vitest + @testing-library/react + jsdom 설정
-- requirements 파서: 5컬럼 SPEC 형식 + 이모지 상태(✅/🔧/📋) 파싱으로 수정
-- Workers types 호환: @cloudflare/workers-types의 Response.json() 타입 오버라이드 대응
-- 모노리포 전체: 30파일 162테스트 ✅, typecheck ✅, build ✅
+---
 
-### Session 16 (2026-03-17)
-**Phase 1 Go 판정 + Phase 2 전환 준비**:
-- Phase 1 Go 판정 완료 — 36건 F-item 전부 DONE, Tech Debt 0건, PDCA 93~97%
-- SPEC.md v1.4: Go 판정 근거 + v0.5.0 마일스톤 + Phase 2 전환 기록
-- CLAUDE.md 현행화: Phase 2 상태 반영, Repository Structure(api/web 추가)
-- MEMORY.md 갱신: Phase 2 전환, 다음 작업 업데이트
+## [0.5.0] - 2026-03-17
 
-### Session 15 (2026-03-17)
-**Sprint 5 Part A — Frontend Design 웹 대시보드 + API 서버 (F26~F31)**:
-- packages/api: Hono API 서버 (8 routes, 15 endpoints, data-reader 서비스)
-- packages/web: Next.js 14 대시보드 (6 pages, 7 Feature 컴포넌트)
-- packages/shared: web.ts(6) + agent.ts(9) = 15 신규 타입
-- F26 대시보드: SDD Triangle + Sprint + Harness Health 위젯
-- F27 Wiki: CRUD + D3 소유권 마커 보호 (foundry-x:auto 읽기 전용)
-- F28 아키텍처 뷰: ModuleMap + Diagram + Roadmap + Requirements 4탭
-- F29 워크스페이스: ToDo + Messages + Settings (localStorage)
-- F30 Agent 투명성: AgentCard 3소스 통합 + SSE EventSource
-- F31 Token 관리: Summary + 모델/Agent별 비용 테이블
-- PDCA: Plan → Design → Do(Agent Teams ×3) → Check(72%) → Iterate ×2(~90%) → Report
+### Summary
+**Phase 1 MVP 완료** — Sprint 5 Part A (F26~F31) + Go 판정. CLI v0.5.0, 36/36 F-items DONE, PDCA 93~97%.
+
+### Added
+- **API 서버** — packages/api: Hono, 8 routes, 15 endpoints, data-reader 서비스
+- **웹 대시보드** — packages/web: Next.js 14, 6 pages, 7 Feature 컴포넌트
+  - F26 대시보드: SDD Triangle + Sprint + Harness Health 위젯
+  - F27 Wiki: CRUD + D3 소유권 마커 보호
+  - F28 아키텍처 뷰: ModuleMap + Diagram + Roadmap + Requirements 4탭
+  - F29 워크스페이스: ToDo + Messages + Settings (localStorage)
+  - F30 Agent 투명성: AgentCard 3소스 통합 + SSE EventSource
+  - F31 Token 관리: Summary + 모델/Agent별 비용 테이블
+- **공유 타입** — packages/shared: web.ts(6) + agent.ts(9) = 15 신규 타입
+- **테스트 강화** — API 38테스트 + Web 18테스트 (vitest + @testing-library/react)
+
+### Changed
+- app.ts 분리: index.ts에서 Hono app 생성을 분리 (테스트 가능)
+- CLI 버전 범프: 0.4.0 → 0.5.0
+- requirements 파서: 5컬럼 SPEC 형식 + 이모지 상태 파싱
+- Workers types 호환: @cloudflare/workers-types Response.json() 오버라이드
+
+### Notes
+- Phase 1 Go 판정 완료 (2026-03-17) — Tech Debt 0건
 - 모노리포 4 패키지: cli + shared + api + web
+- 162테스트 pass, typecheck ✅, build ✅
+- 참고: [Sprint 5 Part B 보고서](04-report/features/sprint-5-part-b.report.md)
 
-### Session 14 (2026-03-17)
-**Sprint 5 Part B — 하네스 산출물 동적 생성 (F32~F36)**:
-- ✅ Builder 패턴 도입: architecture/constitution/claude/agents 4개 builder
-- ✅ RepoProfile.scripts 필드 추가 + discover.ts scripts 감지
-- ✅ generate.ts builder 통합 (builder 있으면 동적 생성, 없으면 템플릿)
-- ✅ verify.ts 강화: 플레이스홀더 잔존 감지 + 모듈 맵 일관성 검증
-- ✅ harness-freshness.ts: 하네스 문서 신선도 검사 (status 통합)
-- ✅ 22파일 106테스트 (기존 71 + 신규 35), typecheck/lint/build 전부 통과
-- PDCA: Plan→Design→Do→Check(93%)→Report 완료
+---
 
-### Session 13 (2026-03-17)
-**CLAUDE.md 현행화 + Claude Code 자동화 설정**:
-- CLAUDE.md 품질 감사 (78→91점, Grade B→A): stale 참조 수정, 섹션 추가/현행화
+## [0.4.0] - 2026-03-17
+
+### Summary
+**Sprint 5 Part B** — 하네스 산출물 동적 생성 (F32~F36), Builder 패턴. PDCA 93%.
+
+### Added
+- Builder 패턴: architecture / constitution / claude / agents 4개 builder
+- RepoProfile.scripts 필드 + discover.ts scripts 감지
+- generate.ts builder 통합 (builder 있으면 동적, 없으면 템플릿)
+- verify.ts 강화: 플레이스홀더 잔존 감지 + 모듈 맵 일관성 검증
+- harness-freshness.ts: 하네스 문서 신선도 검사 (status 통합)
+- CLAUDE.md 품질 감사 (78→91점, Grade B→A)
 - Claude Code settings.json: permissions 17 allow + 4 deny
-- PostToolUse hook: .ts/.tsx 편집 시 auto-typecheck (60s timeout)
-- PreToolUse hook: .env/credentials/lock 파일 보호 (exit 2 차단)
-- npm-release 스킬: version bump → 검증 → build → publish 자동화
+- PreToolUse hook: .env/credentials/lock 파일 보호
+- PostToolUse hook: .ts/.tsx 편집 시 auto-typecheck
+
+### Notes
+- 22파일 106테스트, typecheck/lint/build 전부 통과
+
+---
 
 ## [0.3.1] - 2026-03-16
 
@@ -89,17 +154,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ### Changed
 - Commands refactored: runStatus/runInit/runSync logic extraction
 - npm published: foundry-x@0.3.1
-- Branch protection relaxed (1인 개발 효율화, approval 0명)
 
 ### Fixed
 - CLI --version 하드코딩 → 0.3.1 반영
 
-## [0.2.0+unreleased] - 2026-03-16
-
-### Added
-- Governance standards compliance (GOV-004/005/007/010): .gitignore secrets, .env.example, CHANGELOG.md, MEMORY.md active risks
-- ADR-000 PDCA documents (plan, design, analysis, report)
-- Project hygiene: archive stale .docx from 01-plan
+---
 
 ## [0.2.0] - 2026-03-16
 
@@ -112,6 +171,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - npm publish: foundry-x@0.1.1, `npx foundry-x init` support (F11)
 - ADR-000: v3 monorepo supersedes legacy multi-repo (F12)
 - Internal contracts: Plumb output format (FX-SPEC-002), error handling (FX-SPEC-003) (F13, F14)
+- Governance standards compliance (GOV-004/005/007/010)
+
+---
 
 ## [0.1.0] - 2026-03-16
 
