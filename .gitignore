@@ -20,3 +20,6 @@ packages/*/src/**/*.js.map
 !.env.example
 .dev.vars
 .playwright-mcp/
+
+# Next.js export output
+out/
