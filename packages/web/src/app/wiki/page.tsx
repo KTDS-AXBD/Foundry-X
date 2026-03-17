@@ -3,17 +3,10 @@
 import { useEffect, useState } from "react";
 import { fetchApi } from "../../lib/api-client";
 import type { WikiPage as WikiPageType } from "@foundry-x/shared";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import MarkdownViewer from "../../components/feature/MarkdownViewer";
-
-const colors = {
-  bg: "#0a0a0a",
-  text: "#ededed",
-  card: "#1a1a1a",
-  border: "#333",
-  accent: "#3b82f6",
-  muted: "#888",
-  red: "#ef4444",
-};
+import { cn } from "@/lib/utils";
 
 export default function WikiPageView() {
   const [pages, setPages] = useState<WikiPageType[]>([]);
@@ -37,100 +30,74 @@ export default function WikiPageView() {
   const activePage = pages.find((p) => p.slug === selected);
 
   if (loading) {
-    return <p style={{ color: colors.muted }}>Loading wiki...</p>;
+    return <p className="text-muted-foreground">Loading wiki...</p>;
   }
 
   if (error) {
-    return <p style={{ color: colors.red }}>{error}</p>;
+    return <p className="text-destructive">{error}</p>;
   }
 
   return (
-    <div style={{ color: colors.text }}>
-      <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>Wiki</h1>
+    <div>
+      <h1 className="mb-6 text-2xl font-bold">Wiki</h1>
 
-      <div style={{ display: "flex", gap: 16, minHeight: "70vh" }}>
+      <div className="flex min-h-[70vh] flex-col gap-4 lg:flex-row lg:gap-4">
         {/* Left: document list */}
-        <nav
-          style={{
-            width: 260,
-            flexShrink: 0,
-            background: colors.card,
-            border: `1px solid ${colors.border}`,
-            borderRadius: 8,
-            padding: 12,
-            overflowY: "auto",
-          }}
-        >
-          {pages.length === 0 ? (
-            <p style={{ color: colors.muted, fontSize: 13 }}>
-              No documents found
-            </p>
-          ) : (
-            pages.map((page) => (
-              <button
-                key={page.slug}
-                onClick={() => setSelected(page.slug)}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  textAlign: "left",
-                  background:
-                    selected === page.slug ? colors.accent : "transparent",
-                  color:
-                    selected === page.slug ? "#fff" : colors.text,
-                  border: "none",
-                  borderRadius: 4,
-                  padding: "8px 12px",
-                  marginBottom: 4,
-                  cursor: "pointer",
-                  fontSize: 14,
-                }}
-              >
-                <div style={{ fontWeight: 500 }}>{page.title}</div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    color:
-                      selected === page.slug ? "rgba(255,255,255,0.7)" : colors.muted,
-                    marginTop: 2,
-                  }}
-                >
-                  {page.author} &middot; {page.lastModified}
-                </div>
-              </button>
-            ))
-          )}
-        </nav>
+        <Card className="w-full shrink-0 lg:w-64">
+          <CardContent className="p-3">
+            {pages.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No documents found</p>
+            ) : (
+              <nav className="flex flex-col gap-1">
+                {pages.map((page) => (
+                  <button
+                    key={page.slug}
+                    onClick={() => setSelected(page.slug)}
+                    className={cn(
+                      "w-full rounded-md px-3 py-2 text-left text-sm transition-colors",
+                      selected === page.slug
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-muted",
+                    )}
+                  >
+                    <div className="font-medium">{page.title}</div>
+                    <div
+                      className={cn(
+                        "mt-0.5 text-[11px]",
+                        selected === page.slug
+                          ? "text-primary-foreground/70"
+                          : "text-muted-foreground",
+                      )}
+                    >
+                      {page.author} &middot; {page.lastModified}
+                    </div>
+                  </button>
+                ))}
+              </nav>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Right: document content */}
-        <div
-          style={{
-            flex: 1,
-            background: colors.card,
-            border: `1px solid ${colors.border}`,
-            borderRadius: 8,
-            padding: 24,
-            overflowY: "auto",
-          }}
-        >
-          {activePage ? (
-            <>
-              <h2
-                style={{ fontSize: 20, fontWeight: 600, marginBottom: 4 }}
-              >
-                {activePage.title}
-              </h2>
-              <MarkdownViewer
-                content={activePage.content}
-                filePath={activePage.filePath}
-                author={activePage.author}
-                lastModified={activePage.lastModified}
-              />
-            </>
-          ) : (
-            <p style={{ color: colors.muted }}>Select a document</p>
-          )}
-        </div>
+        <Card className="flex-1">
+          <CardContent className="p-6">
+            {activePage ? (
+              <>
+                <h2 className="mb-1 text-xl font-semibold">
+                  {activePage.title}
+                </h2>
+                <MarkdownViewer
+                  content={activePage.content}
+                  filePath={activePage.filePath}
+                  author={activePage.author}
+                  lastModified={activePage.lastModified}
+                />
+              </>
+            ) : (
+              <p className="text-muted-foreground">Select a document</p>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

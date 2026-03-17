@@ -1,61 +1,35 @@
 "use client";
 
 import type { AgentProfile, AgentStatus } from "@foundry-x/shared";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
-const colors = {
-  bg: "#0a0a0a",
-  text: "#ededed",
-  card: "#1a1a1a",
-  border: "#333",
-  accent: "#3b82f6",
-  muted: "#888",
-  green: "#22c55e",
-  yellow: "#eab308",
-  red: "#ef4444",
-};
-
-const cardStyle: React.CSSProperties = {
-  background: colors.card,
-  border: `1px solid ${colors.border}`,
-  borderRadius: 8,
-  padding: 20,
-};
-
-const statusColor = (s: AgentStatus): string => {
+const statusVariant = (s: AgentStatus) => {
   switch (s) {
     case "idle":
     case "completed":
-      return colors.green;
+      return "secondary" as const;
     case "running":
     case "waiting":
-      return colors.accent;
+      return "default" as const;
     case "error":
-      return colors.red;
+      return "destructive" as const;
     default:
-      return colors.muted;
+      return "outline" as const;
   }
 };
 
-const tierColor = (tier: "always" | "ask" | "never"): string => {
+const tierVariant = (tier: "always" | "ask" | "never") => {
   switch (tier) {
     case "always":
-      return colors.green;
+      return "secondary" as const;
     case "ask":
-      return colors.yellow;
+      return "outline" as const;
     case "never":
-      return colors.red;
+      return "destructive" as const;
   }
 };
-
-const badgeStyle = (color: string): React.CSSProperties => ({
-  display: "inline-block",
-  padding: "2px 10px",
-  borderRadius: 12,
-  fontSize: 11,
-  fontWeight: 600,
-  color: "#fff",
-  background: color,
-});
 
 export interface AgentCardProps {
   agent: AgentProfile;
@@ -65,195 +39,120 @@ export default function AgentCard({ agent }: AgentCardProps) {
   const status = agent.activity?.status ?? "idle";
 
   return (
-    <div style={cardStyle}>
-      {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-        }}
-      >
-        <h3
-          style={{
-            margin: 0,
-            fontSize: 16,
-            fontWeight: 600,
-            color: colors.text,
-          }}
-        >
-          {agent.name}
-        </h3>
-        <span style={badgeStyle(statusColor(status))}>{status}</span>
-      </div>
-
-      {/* Capabilities */}
-      {agent.capabilities.length > 0 && (
-        <div style={{ marginBottom: 14 }}>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: colors.accent,
-              marginBottom: 8,
-              textTransform: "uppercase",
-              letterSpacing: 0.5,
-            }}
-          >
-            Capabilities
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {agent.capabilities.map((cap, i) => (
-              <div
-                key={i}
-                style={{
-                  padding: "8px 12px",
-                  background: colors.bg,
-                  borderRadius: 6,
-                  fontSize: 13,
-                }}
-              >
-                <div style={{ display: "flex", gap: 8, marginBottom: 4 }}>
-                  <span style={{ color: colors.accent, fontWeight: 600 }}>
-                    {cap.action}
-                  </span>
-                  <span style={{ color: colors.muted }}>-&gt; {cap.scope}</span>
-                </div>
-                {cap.tools.length > 0 && (
-                  <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-                    {cap.tools.map((tool) => (
-                      <span
-                        key={tool}
-                        style={{
-                          padding: "1px 6px",
-                          background: colors.border,
-                          borderRadius: 4,
-                          fontSize: 11,
-                          color: colors.muted,
-                        }}
-                      >
-                        {tool}
-                      </span>
-                    ))}
+    <Card>
+      <CardHeader className="flex-row items-center justify-between">
+        <CardTitle>{agent.name}</CardTitle>
+        <Badge variant={statusVariant(status)}>{status}</Badge>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Capabilities */}
+        {agent.capabilities.length > 0 && (
+          <div>
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">
+              Capabilities
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {agent.capabilities.map((cap, i) => (
+                <div
+                  key={i}
+                  className="rounded-md bg-muted p-2 text-sm"
+                >
+                  <div className="mb-1 flex gap-2">
+                    <span className="font-semibold text-primary">
+                      {cap.action}
+                    </span>
+                    <span className="text-muted-foreground">
+                      -&gt; {cap.scope}
+                    </span>
                   </div>
-                )}
-              </div>
-            ))}
+                  {cap.tools.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {cap.tools.map((tool) => (
+                        <span
+                          key={tool}
+                          className="rounded bg-border px-1.5 py-0.5 text-[11px] text-muted-foreground"
+                        >
+                          {tool}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Constraints */}
-      {agent.constraints.length > 0 && (
-        <div style={{ marginBottom: 14 }}>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: colors.accent,
-              marginBottom: 8,
-              textTransform: "uppercase",
-              letterSpacing: 0.5,
-            }}
-          >
-            Constraints
+        {/* Constraints */}
+        {agent.constraints.length > 0 && (
+          <div>
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">
+              Constraints
+            </div>
+            <div className="flex flex-col gap-1">
+              {agent.constraints.map((c, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-2 border-b border-border py-1.5 text-sm last:border-0"
+                >
+                  <Badge variant={tierVariant(c.tier)}>{c.tier}</Badge>
+                  <div>
+                    <div className="text-foreground">{c.rule}</div>
+                    <div className="mt-0.5 text-[11px] text-muted-foreground">
+                      {c.reason}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            {agent.constraints.map((c, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 8,
-                  padding: "6px 0",
-                  borderBottom: `1px solid ${colors.border}`,
-                  fontSize: 13,
-                }}
-              >
-                <span style={badgeStyle(tierColor(c.tier))}>{c.tier}</span>
+        )}
+
+        {/* Activity */}
+        {agent.activity && (
+          <div>
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">
+              Activity
+            </div>
+            <div className="space-y-1.5 text-sm">
+              {agent.activity.currentTask && (
                 <div>
-                  <div style={{ color: colors.text }}>{c.rule}</div>
-                  <div style={{ color: colors.muted, fontSize: 11, marginTop: 2 }}>
-                    {c.reason}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Activity */}
-      {agent.activity && (
-        <div>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: colors.accent,
-              marginBottom: 8,
-              textTransform: "uppercase",
-              letterSpacing: 0.5,
-            }}
-          >
-            Activity
-          </div>
-          <div style={{ fontSize: 13 }}>
-            {agent.activity.currentTask && (
-              <div style={{ marginBottom: 6 }}>
-                <span style={{ color: colors.muted }}>Task: </span>
-                <span style={{ color: colors.text }}>
-                  {agent.activity.currentTask}
-                </span>
-              </div>
-            )}
-            {agent.activity.progress != null && (
-              <div style={{ marginBottom: 6 }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginBottom: 4,
-                  }}
-                >
-                  <span style={{ color: colors.muted }}>Progress</span>
-                  <span style={{ color: colors.text }}>
-                    {agent.activity.progress}%
+                  <span className="text-muted-foreground">Task: </span>
+                  <span className="text-foreground">
+                    {agent.activity.currentTask}
                   </span>
                 </div>
-                <div
-                  style={{
-                    height: 6,
-                    background: colors.border,
-                    borderRadius: 3,
-                    overflow: "hidden",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: `${agent.activity.progress}%`,
-                      height: "100%",
-                      background: colors.accent,
-                      borderRadius: 3,
-                      transition: "width 0.3s",
-                    }}
-                  />
+              )}
+              {agent.activity.progress != null && (
+                <div>
+                  <div className="mb-1 flex justify-between">
+                    <span className="text-muted-foreground">Progress</span>
+                    <span className="text-foreground">
+                      {agent.activity.progress}%
+                    </span>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className={cn(
+                        "h-full rounded-full bg-primary transition-all",
+                      )}
+                      style={{ width: `${agent.activity.progress}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
-            {agent.activity.tokenUsed != null && (
-              <div>
-                <span style={{ color: colors.muted }}>Tokens: </span>
-                <span style={{ color: colors.text }}>
-                  {agent.activity.tokenUsed.toLocaleString()}
-                </span>
-              </div>
-            )}
+              )}
+              {agent.activity.tokenUsed != null && (
+                <div>
+                  <span className="text-muted-foreground">Tokens: </span>
+                  <span className="text-foreground">
+                    {agent.activity.tokenUsed.toLocaleString()}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

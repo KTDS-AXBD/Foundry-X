@@ -10,28 +10,8 @@ import type {
 } from "@foundry-x/shared";
 import DashboardCard from "../components/feature/DashboardCard";
 import HarnessHealth from "../components/feature/HarnessHealth";
+import { cn } from "@/lib/utils";
 
-/* ─── Styles ─── */
-const colors = {
-  bg: "#0a0a0a",
-  text: "#ededed",
-  card: "#1a1a1a",
-  border: "#333",
-  accent: "#3b82f6",
-  muted: "#888",
-  green: "#22c55e",
-  yellow: "#eab308",
-  red: "#ef4444",
-};
-
-const gradeColor = (grade: string) => {
-  if (grade === "A") return colors.green;
-  if (grade === "B") return colors.accent;
-  if (grade === "C") return colors.yellow;
-  return colors.red;
-};
-
-/* ─── State helper ─── */
 interface AsyncState<T> {
   data: T | null;
   loading: boolean;
@@ -63,7 +43,13 @@ function useApi<T>(path: string): AsyncState<T> {
   return state;
 }
 
-/* ─── Dashboard Page ─── */
+const gradeClass = (grade: string) => {
+  if (grade === "A") return "text-green-500";
+  if (grade === "B") return "text-blue-500";
+  if (grade === "C") return "text-yellow-500";
+  return "text-destructive";
+};
+
 export default function DashboardPage() {
   const health = useApi<HealthScore>("/health");
   const reqs = useApi<RequirementItem[]>("/requirements");
@@ -79,18 +65,10 @@ export default function DashboardPage() {
     : null;
 
   return (
-    <div style={{ color: colors.text }}>
-      <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>
-        Foundry-X Dashboard
-      </h1>
+    <div>
+      <h1 className="mb-6 text-2xl font-bold">Foundry-X Dashboard</h1>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, 1fr)",
-          gap: 16,
-        }}
-      >
+      <div className="grid gap-4 md:grid-cols-2">
         {/* SDD Triangle */}
         <DashboardCard
           title="SDD Triangle"
@@ -99,49 +77,28 @@ export default function DashboardPage() {
         >
           {health.data && (
             <>
-              <div
-                style={{
-                  fontSize: 48,
-                  fontWeight: 700,
-                  color: gradeColor(health.data.grade),
-                }}
-              >
+              <div className={cn("text-5xl font-bold", gradeClass(health.data.grade))}>
                 {health.data.overall}%
               </div>
-              <div
-                style={{
-                  fontSize: 20,
-                  fontWeight: 600,
-                  color: gradeColor(health.data.grade),
-                  marginBottom: 16,
-                }}
-              >
+              <div className={cn("mb-4 text-xl font-semibold", gradeClass(health.data.grade))}>
                 Grade {health.data.grade}
               </div>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr 1fr",
-                  gap: 8,
-                  fontSize: 13,
-                  color: colors.muted,
-                }}
-              >
+              <div className="grid grid-cols-3 gap-2 text-sm text-muted-foreground">
                 <div>
                   Spec↔Code{" "}
-                  <strong style={{ color: colors.text }}>
+                  <strong className="text-foreground">
                     {health.data.specToCode}%
                   </strong>
                 </div>
                 <div>
                   Code↔Test{" "}
-                  <strong style={{ color: colors.text }}>
+                  <strong className="text-foreground">
                     {health.data.codeToTest}%
                   </strong>
                 </div>
                 <div>
                   Spec↔Test{" "}
-                  <strong style={{ color: colors.text }}>
+                  <strong className="text-foreground">
                     {health.data.specToTest}%
                   </strong>
                 </div>
@@ -157,46 +114,24 @@ export default function DashboardPage() {
           error={reqs.error}
         >
           {reqCounts && (
-            <div style={{ display: "flex", gap: 24 }}>
-              <div style={{ textAlign: "center" }}>
-                <div
-                  style={{
-                    fontSize: 36,
-                    fontWeight: 700,
-                    color: colors.green,
-                  }}
-                >
+            <div className="flex gap-6">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-green-500">
                   {reqCounts.done}
                 </div>
-                <div style={{ fontSize: 13, color: colors.muted }}>Done</div>
+                <div className="text-sm text-muted-foreground">Done</div>
               </div>
-              <div style={{ textAlign: "center" }}>
-                <div
-                  style={{
-                    fontSize: 36,
-                    fontWeight: 700,
-                    color: colors.yellow,
-                  }}
-                >
+              <div className="text-center">
+                <div className="text-4xl font-bold text-yellow-500">
                   {reqCounts.inProgress}
                 </div>
-                <div style={{ fontSize: 13, color: colors.muted }}>
-                  In Progress
-                </div>
+                <div className="text-sm text-muted-foreground">In Progress</div>
               </div>
-              <div style={{ textAlign: "center" }}>
-                <div
-                  style={{
-                    fontSize: 36,
-                    fontWeight: 700,
-                    color: colors.muted,
-                  }}
-                >
+              <div className="text-center">
+                <div className="text-4xl font-bold text-muted-foreground">
                   {reqCounts.planned}
                 </div>
-                <div style={{ fontSize: 13, color: colors.muted }}>
-                  Planned
-                </div>
+                <div className="text-sm text-muted-foreground">Planned</div>
               </div>
             </div>
           )}
@@ -220,56 +155,34 @@ export default function DashboardPage() {
           {freshness.data && (
             <>
               <div
-                style={{
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: freshness.data.overallStale
-                    ? colors.red
-                    : colors.green,
-                  marginBottom: 12,
-                }}
+                className={cn(
+                  "mb-3 text-sm font-semibold",
+                  freshness.data.overallStale
+                    ? "text-destructive"
+                    : "text-green-500",
+                )}
               >
                 {freshness.data.overallStale ? "Stale detected" : "All fresh"}
               </div>
-              <div style={{ fontSize: 13 }}>
+              <div className="text-sm">
                 {freshness.data.documents.map((doc) => (
                   <div
                     key={doc.file}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      padding: "4px 0",
-                      borderBottom: `1px solid ${colors.border}`,
-                    }}
+                    className="flex justify-between border-b border-border py-1"
                   >
+                    <span className="max-w-[60%] truncate">{doc.file}</span>
                     <span
-                      style={{
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        maxWidth: "60%",
-                      }}
-                    >
-                      {doc.file}
-                    </span>
-                    <span
-                      style={{
-                        color: doc.stale ? colors.red : colors.green,
-                        fontWeight: 600,
-                      }}
+                      className={cn(
+                        "font-semibold",
+                        doc.stale ? "text-destructive" : "text-green-500",
+                      )}
                     >
                       {doc.stale ? `${doc.staleDays}d stale` : "Fresh"}
                     </span>
                   </div>
                 ))}
               </div>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: colors.muted,
-                  marginTop: 8,
-                }}
-              >
+              <div className="mt-2 text-xs text-muted-foreground">
                 Checked: {freshness.data.checkedAt}
               </div>
             </>

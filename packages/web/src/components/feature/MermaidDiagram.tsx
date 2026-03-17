@@ -1,12 +1,5 @@
 "use client";
 
-const colors = {
-  bg: "#0a0a0a",
-  text: "#ededed",
-  border: "#333",
-  muted: "#888",
-};
-
 export interface MermaidDiagramProps {
   code: string;
   caption?: string;
@@ -15,25 +8,11 @@ export interface MermaidDiagramProps {
 export default function MermaidDiagram({ code, caption }: MermaidDiagramProps) {
   return (
     <div>
-      <p style={{ fontSize: 13, color: colors.muted, marginBottom: 16, marginTop: 0 }}>
+      <p className="mb-4 mt-0 text-sm text-muted-foreground">
         {caption ??
           "Architecture diagram (Mermaid source — install mermaid library to render):"}
       </p>
-      <pre
-        style={{
-          background: colors.bg,
-          border: `1px solid ${colors.border}`,
-          borderRadius: 6,
-          padding: 20,
-          fontFamily: "monospace",
-          fontSize: 13,
-          lineHeight: 1.6,
-          color: colors.text,
-          whiteSpace: "pre-wrap",
-          wordBreak: "break-word",
-          margin: 0,
-        }}
-      >
+      <pre className="m-0 whitespace-pre-wrap break-words rounded-md border border-border bg-muted p-5 font-mono text-sm leading-relaxed text-foreground">
         {code}
       </pre>
     </div>

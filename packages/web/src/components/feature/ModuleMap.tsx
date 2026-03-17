@@ -1,13 +1,14 @@
 "use client";
 
 import type { RepoProfile } from "@foundry-x/shared";
-
-const colors = {
-  text: "#ededed",
-  border: "#333",
-  accent: "#3b82f6",
-  muted: "#888",
-};
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 
 export interface ModuleMapProps {
   profile: RepoProfile;
@@ -16,95 +17,49 @@ export interface ModuleMapProps {
 export default function ModuleMap({ profile }: ModuleMapProps) {
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          gap: 24,
-          marginBottom: 20,
-          fontSize: 13,
-          color: colors.muted,
-        }}
-      >
+      <div className="mb-5 flex flex-wrap gap-6 text-sm text-muted-foreground">
         <span>
-          Mode:{" "}
-          <strong style={{ color: colors.text }}>{profile.mode}</strong>
+          Mode: <strong className="text-foreground">{profile.mode}</strong>
         </span>
         <span>
           Pattern:{" "}
-          <strong style={{ color: colors.text }}>
+          <strong className="text-foreground">
             {profile.architecturePattern}
           </strong>
         </span>
         <span>
           Languages:{" "}
-          <strong style={{ color: colors.text }}>
+          <strong className="text-foreground">
             {profile.languages.join(", ")}
           </strong>
         </span>
       </div>
 
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          fontSize: 14,
-        }}
-      >
-        <thead>
-          <tr
-            style={{
-              borderBottom: `2px solid ${colors.border}`,
-              textAlign: "left",
-            }}
-          >
-            <th style={{ padding: "8px 12px", color: colors.muted }}>
-              Module
-            </th>
-            <th style={{ padding: "8px 12px", color: colors.muted }}>
-              Path
-            </th>
-            <th style={{ padding: "8px 12px", color: colors.muted }}>
-              Role
-            </th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Module</TableHead>
+            <TableHead>Path</TableHead>
+            <TableHead>Role</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {profile.modules.map((mod) => (
-            <tr
-              key={mod.path}
-              style={{
-                borderBottom: `1px solid ${colors.border}`,
-              }}
-            >
-              <td
-                style={{
-                  padding: "8px 12px",
-                  fontWeight: 500,
-                  color: colors.accent,
-                }}
-              >
+            <TableRow key={mod.path}>
+              <TableCell className="font-medium text-primary">
                 {mod.name}
-              </td>
-              <td
-                style={{
-                  padding: "8px 12px",
-                  fontFamily: "monospace",
-                  fontSize: 13,
-                  color: colors.text,
-                }}
-              >
+              </TableCell>
+              <TableCell className="font-mono text-sm">
                 {mod.path}
-              </td>
-              <td style={{ padding: "8px 12px", color: colors.text }}>
-                {mod.role}
-              </td>
-            </tr>
+              </TableCell>
+              <TableCell>{mod.role}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
 
       {profile.modules.length === 0 && (
-        <p style={{ color: colors.muted, textAlign: "center", marginTop: 20 }}>
+        <p className="mt-5 text-center text-muted-foreground">
           No modules detected
         </p>
       )}

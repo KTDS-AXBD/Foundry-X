@@ -1,13 +1,7 @@
 "use client";
 
-const colors = {
-  text: "#ededed",
-  card: "#1a1a1a",
-  border: "#333",
-  accent: "#3b82f6",
-  muted: "#888",
-  red: "#ef4444",
-};
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export interface DashboardCardProps {
   title: string;
@@ -23,31 +17,22 @@ export default function DashboardCard({
   children,
 }: DashboardCardProps) {
   return (
-    <div
-      style={{
-        background: colors.card,
-        border: `1px solid ${colors.border}`,
-        borderRadius: 8,
-        padding: 24,
-      }}
-    >
-      <h2
-        style={{
-          margin: "0 0 16px",
-          fontSize: 16,
-          fontWeight: 600,
-          color: colors.accent,
-        }}
-      >
-        {title}
-      </h2>
-      {loading ? (
-        <p style={{ color: colors.muted }}>Loading...</p>
-      ) : error ? (
-        <p style={{ color: colors.red, fontSize: 13 }}>{error}</p>
-      ) : (
-        children
-      )}
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-primary">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {loading ? (
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-24" />
+            <Skeleton className="h-4 w-full" />
+          </div>
+        ) : error ? (
+          <p className="text-sm text-destructive">{error}</p>
+        ) : (
+          children
+        )}
+      </CardContent>
+    </Card>
   );
 }

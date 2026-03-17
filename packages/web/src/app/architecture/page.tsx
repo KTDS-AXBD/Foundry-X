@@ -3,27 +3,27 @@
 import { useEffect, useState } from "react";
 import { fetchApi } from "../../lib/api-client";
 import type { RepoProfile, RequirementItem } from "@foundry-x/shared";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 import ModuleMap from "../../components/feature/ModuleMap";
 import MermaidDiagram from "../../components/feature/MermaidDiagram";
-
-const colors = {
-  bg: "#0a0a0a",
-  text: "#ededed",
-  card: "#1a1a1a",
-  border: "#333",
-  accent: "#3b82f6",
-  muted: "#888",
-  green: "#22c55e",
-  yellow: "#eab308",
-  red: "#ef4444",
-};
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 type Tab = "modules" | "diagram" | "roadmap" | "requirements";
 
-const statusColor = (status: string) => {
-  if (status === "done") return colors.green;
-  if (status === "in_progress") return colors.yellow;
-  return colors.muted;
+const statusVariant = (status: string) => {
+  if (status === "done") return "default" as const;
+  if (status === "in_progress") return "secondary" as const;
+  return "outline" as const;
 };
 
 const statusLabel = (status: string) => {
@@ -32,7 +32,6 @@ const statusLabel = (status: string) => {
   return "Planned";
 };
 
-// ─── Roadmap mock data (SPEC.md §3 마일스톤) ───
 const ROADMAP_MILESTONES = [
   {
     version: "v0.1.0",
@@ -96,7 +95,6 @@ const ROADMAP_MILESTONES = [
   },
 ];
 
-// ─── Mermaid diagram mock (from ARCHITECTURE.md) ───
 const MERMAID_CODE = `graph TB
   subgraph CLI["packages/cli"]
     init["foundry-x init"]
@@ -168,225 +166,136 @@ export default function ArchitecturePage() {
       });
   }, []);
 
-  const tabButton = (t: Tab, label: string): React.CSSProperties => ({
-    padding: "8px 20px",
-    background: tab === t ? colors.accent : "transparent",
-    color: tab === t ? "#fff" : colors.muted,
-    border: `1px solid ${tab === t ? colors.accent : colors.border}`,
-    borderRadius: 6,
-    cursor: "pointer",
-    fontWeight: 600,
-    fontSize: 14,
-  });
-
-  const cardWrap: React.CSSProperties = {
-    background: colors.card,
-    border: `1px solid ${colors.border}`,
-    borderRadius: 8,
-    padding: 24,
-  };
+  const tabs: { key: Tab; label: string }[] = [
+    { key: "modules", label: "Module Map" },
+    { key: "diagram", label: "Diagram" },
+    { key: "roadmap", label: "Roadmap" },
+    { key: "requirements", label: "Requirements" },
+  ];
 
   return (
-    <div style={{ color: colors.text }}>
-      <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>
-        Architecture
-      </h1>
+    <div>
+      <h1 className="mb-6 text-2xl font-bold">Architecture</h1>
 
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
-        <button style={tabButton("modules", "Module Map")} onClick={() => setTab("modules")}>
-          Module Map
-        </button>
-        <button style={tabButton("diagram", "Diagram")} onClick={() => setTab("diagram")}>
-          Diagram
-        </button>
-        <button style={tabButton("roadmap", "Roadmap")} onClick={() => setTab("roadmap")}>
-          Roadmap
-        </button>
-        <button style={tabButton("requirements", "Requirements")} onClick={() => setTab("requirements")}>
-          Requirements
-        </button>
+      <div className="mb-5 flex flex-wrap gap-2">
+        {tabs.map((t) => (
+          <Button
+            key={t.key}
+            variant={tab === t.key ? "default" : "outline"}
+            size="sm"
+            onClick={() => setTab(t.key)}
+          >
+            {t.label}
+          </Button>
+        ))}
       </div>
 
       {/* Module Map Tab */}
       {tab === "modules" && (
-        <div style={cardWrap}>
-          {profileLoading ? (
-            <p style={{ color: colors.muted }}>Loading...</p>
-          ) : profileError ? (
-            <p style={{ color: colors.red, fontSize: 13 }}>{profileError}</p>
-          ) : profile ? (
-            <ModuleMap profile={profile} />
-          ) : null}
-        </div>
+        <Card>
+          <CardContent className="pt-6">
+            {profileLoading ? (
+              <p className="text-muted-foreground">Loading...</p>
+            ) : profileError ? (
+              <p className="text-sm text-destructive">{profileError}</p>
+            ) : profile ? (
+              <ModuleMap profile={profile} />
+            ) : null}
+          </CardContent>
+        </Card>
       )}
 
       {/* Diagram Tab */}
       {tab === "diagram" && (
-        <div style={cardWrap}>
-          <MermaidDiagram code={MERMAID_CODE} />
-        </div>
+        <Card>
+          <CardContent className="pt-6">
+            <MermaidDiagram code={MERMAID_CODE} />
+          </CardContent>
+        </Card>
       )}
 
       {/* Roadmap Tab */}
       {tab === "roadmap" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div className="flex flex-col gap-3">
           {ROADMAP_MILESTONES.map((milestone) => (
-            <div key={milestone.version} style={cardWrap}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  marginBottom: 12,
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: "monospace",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: colors.accent,
-                    background: colors.bg,
-                    padding: "2px 10px",
-                    borderRadius: 4,
-                    border: `1px solid ${colors.border}`,
-                  }}
-                >
-                  {milestone.version}
-                </span>
-                <span style={{ fontWeight: 600, fontSize: 15 }}>
-                  {milestone.title}
-                </span>
-                <span
-                  style={{
-                    marginLeft: "auto",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "#fff",
-                    background: statusColor(milestone.status),
-                    padding: "2px 10px",
-                    borderRadius: 12,
-                  }}
-                >
-                  {statusLabel(milestone.status)}
-                </span>
-              </div>
-              <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: colors.muted }}>
-                {milestone.items.map((item, i) => (
-                  <li key={i} style={{ marginBottom: 4 }}>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <Card key={milestone.version}>
+              <CardContent className="pt-6">
+                <div className="mb-3 flex flex-wrap items-center gap-3">
+                  <span className="rounded border border-border bg-muted px-2.5 py-0.5 font-mono text-sm font-bold text-primary">
+                    {milestone.version}
+                  </span>
+                  <span className="font-semibold">{milestone.title}</span>
+                  <Badge
+                    variant={statusVariant(milestone.status)}
+                    className="ml-auto"
+                  >
+                    {statusLabel(milestone.status)}
+                  </Badge>
+                </div>
+                <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                  {milestone.items.map((item, i) => (
+                    <li key={i} className="mb-1">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}
 
       {/* Requirements Tab */}
       {tab === "requirements" && (
-        <div style={cardWrap}>
-          {reqsLoading ? (
-            <p style={{ color: colors.muted }}>Loading...</p>
-          ) : reqsError ? (
-            <p style={{ color: colors.red, fontSize: 13 }}>{reqsError}</p>
-          ) : reqs ? (
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                fontSize: 14,
-              }}
-            >
-              <thead>
-                <tr
-                  style={{
-                    borderBottom: `2px solid ${colors.border}`,
-                    textAlign: "left",
-                  }}
-                >
-                  <th style={{ padding: "8px 12px", color: colors.muted }}>
-                    ID
-                  </th>
-                  <th style={{ padding: "8px 12px", color: colors.muted }}>
-                    REQ
-                  </th>
-                  <th style={{ padding: "8px 12px", color: colors.muted }}>
-                    Title
-                  </th>
-                  <th style={{ padding: "8px 12px", color: colors.muted }}>
-                    Version
-                  </th>
-                  <th style={{ padding: "8px 12px", color: colors.muted }}>
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {reqs.map((req) => (
-                  <tr
-                    key={req.id}
-                    style={{
-                      borderBottom: `1px solid ${colors.border}`,
-                    }}
-                  >
-                    <td
-                      style={{
-                        padding: "8px 12px",
-                        fontFamily: "monospace",
-                        fontSize: 13,
-                      }}
-                    >
-                      {req.id}
-                    </td>
-                    <td
-                      style={{
-                        padding: "8px 12px",
-                        fontFamily: "monospace",
-                        fontSize: 13,
-                        color: colors.accent,
-                      }}
-                    >
-                      {req.reqCode}
-                    </td>
-                    <td style={{ padding: "8px 12px" }}>{req.title}</td>
-                    <td
-                      style={{
-                        padding: "8px 12px",
-                        fontSize: 13,
-                        color: colors.muted,
-                      }}
-                    >
-                      {req.version}
-                    </td>
-                    <td style={{ padding: "8px 12px" }}>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          padding: "2px 10px",
-                          borderRadius: 12,
-                          fontSize: 12,
-                          fontWeight: 600,
-                          color: "#fff",
-                          background: statusColor(req.status),
-                        }}
-                      >
-                        {statusLabel(req.status)}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : null}
+        <Card>
+          <CardContent className="pt-6">
+            {reqsLoading ? (
+              <p className="text-muted-foreground">Loading...</p>
+            ) : reqsError ? (
+              <p className="text-sm text-destructive">{reqsError}</p>
+            ) : reqs ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>REQ</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Version</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {reqs.map((req) => (
+                    <TableRow key={req.id}>
+                      <TableCell className="font-mono text-sm">
+                        {req.id}
+                      </TableCell>
+                      <TableCell className="font-mono text-sm text-primary">
+                        {req.reqCode}
+                      </TableCell>
+                      <TableCell>{req.title}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {req.version}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={statusVariant(req.status)}>
+                          {statusLabel(req.status)}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : null}
 
-          {reqs && reqs.length === 0 && (
-            <p style={{ color: colors.muted, textAlign: "center", marginTop: 20 }}>
-              No requirements found
-            </p>
-          )}
-        </div>
+            {reqs && reqs.length === 0 && (
+              <p className="mt-5 text-center text-muted-foreground">
+                No requirements found
+              </p>
+            )}
+          </CardContent>
+        </Card>
       )}
     </div>
   );

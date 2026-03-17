@@ -1,28 +1,13 @@
 "use client";
 
-const colors = {
-  text: "#ededed",
-  border: "#333",
-  accent: "#3b82f6",
-  muted: "#888",
-};
-
-const thStyle: React.CSSProperties = {
-  textAlign: "left",
-  padding: "8px 12px",
-  fontSize: 12,
-  fontWeight: 600,
-  color: colors.accent,
-  textTransform: "uppercase",
-  letterSpacing: 0.5,
-  borderBottom: `2px solid ${colors.border}`,
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: "8px 12px",
-  fontSize: 13,
-  borderBottom: `1px solid ${colors.border}`,
-};
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 
 function formatCost(cost: number): string {
   return `$${cost.toFixed(4)}`;
@@ -45,17 +30,8 @@ export default function TokenUsageChart({ title, data }: TokenUsageChartProps) {
   if (entries.length === 0) {
     return (
       <div>
-        <h2
-          style={{
-            margin: "0 0 16px",
-            fontSize: 16,
-            fontWeight: 600,
-            color: colors.accent,
-          }}
-        >
-          {title}
-        </h2>
-        <p style={{ color: colors.muted, fontSize: 13 }}>No data available.</p>
+        <h2 className="mb-4 text-base font-semibold text-primary">{title}</h2>
+        <p className="text-sm text-muted-foreground">No data available.</p>
       </div>
     );
   }
@@ -64,84 +40,44 @@ export default function TokenUsageChart({ title, data }: TokenUsageChartProps) {
 
   return (
     <div>
-      <h2
-        style={{
-          margin: "0 0 16px",
-          fontSize: 16,
-          fontWeight: 600,
-          color: colors.accent,
-        }}
-      >
-        {title}
-      </h2>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={thStyle}>Name</th>
-            <th style={{ ...thStyle, textAlign: "right" }}>Tokens</th>
-            <th style={{ ...thStyle, textAlign: "right" }}>Cost</th>
-            <th style={{ ...thStyle, textAlign: "right" }}>Share</th>
-          </tr>
-        </thead>
-        <tbody>
+      <h2 className="mb-4 text-base font-semibold text-primary">{title}</h2>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead className="text-right">Tokens</TableHead>
+            <TableHead className="text-right">Cost</TableHead>
+            <TableHead className="text-right">Share</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {entries.map(([name, val]) => {
             const share = totalCost > 0 ? (val.cost / totalCost) * 100 : 0;
             return (
-              <tr key={name}>
-                <td style={{ ...tdStyle, color: colors.text, fontWeight: 500 }}>
-                  {name}
-                </td>
-                <td
-                  style={{ ...tdStyle, textAlign: "right", color: colors.muted }}
-                >
+              <TableRow key={name}>
+                <TableCell className="font-medium">{name}</TableCell>
+                <TableCell className="text-right text-muted-foreground">
                   {formatTokens(val.tokens)}
-                </td>
-                <td style={{ ...tdStyle, textAlign: "right", color: colors.text }}>
-                  {formatCost(val.cost)}
-                </td>
-                <td style={{ ...tdStyle, textAlign: "right" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "flex-end",
-                      gap: 8,
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 60,
-                        height: 6,
-                        background: colors.border,
-                        borderRadius: 3,
-                        overflow: "hidden",
-                      }}
-                    >
+                </TableCell>
+                <TableCell className="text-right">{formatCost(val.cost)}</TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <div className="h-1.5 w-15 overflow-hidden rounded-full bg-muted">
                       <div
-                        style={{
-                          width: `${share}%`,
-                          height: "100%",
-                          background: colors.accent,
-                          borderRadius: 3,
-                        }}
+                        className="h-full rounded-full bg-primary"
+                        style={{ width: `${share}%` }}
                       />
                     </div>
-                    <span
-                      style={{
-                        fontSize: 12,
-                        color: colors.muted,
-                        minWidth: 36,
-                      }}
-                    >
+                    <span className="min-w-[36px] text-xs text-muted-foreground">
                       {share.toFixed(1)}%
                     </span>
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             );
           })}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }

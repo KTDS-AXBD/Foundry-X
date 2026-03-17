@@ -1,10 +1,5 @@
 "use client";
 
-const colors = {
-  text: "#ededed",
-  muted: "#888",
-};
-
 const AUTO_START = "<!-- foundry-x:auto start -->";
 const AUTO_END = "<!-- foundry-x:auto end -->";
 
@@ -24,14 +19,12 @@ function parseOwnershipMarkers(content: string): ContentSegment[] {
       break;
     }
 
-    // text before the marker
     if (startIdx > 0) {
       segments.push({ type: "normal", text: remaining.slice(0, startIdx) });
     }
 
     const endIdx = remaining.indexOf(AUTO_END, startIdx + AUTO_START.length);
     if (endIdx === -1) {
-      // no closing marker — treat rest as auto section
       const autoText = remaining.slice(startIdx + AUTO_START.length);
       segments.push({ type: "auto", text: autoText });
       break;
@@ -47,7 +40,6 @@ function parseOwnershipMarkers(content: string): ContentSegment[] {
 
 export interface MarkdownViewerProps {
   content: string;
-  /** Optional: display filename/author/date metadata above the content */
   filePath?: string;
   author?: string;
   lastModified?: string;
@@ -64,13 +56,7 @@ export default function MarkdownViewer({
   return (
     <div>
       {(filePath || author || lastModified) && (
-        <div
-          style={{
-            fontSize: 12,
-            color: colors.muted,
-            marginBottom: 16,
-          }}
-        >
+        <div className="mb-4 text-xs text-muted-foreground">
           {[filePath, author, lastModified].filter(Boolean).join(" · ")}
         </div>
       )}
@@ -79,61 +65,23 @@ export default function MarkdownViewer({
           seg.type === "auto" ? (
             <div
               key={i}
-              style={{
-                background: "#2a2a2a",
-                border: "1px solid #555",
-                borderRadius: 6,
-                padding: "12px 16px",
-                margin: "8px 0",
-                position: "relative",
-              }}
+              className="relative my-2 rounded-md border border-border bg-muted p-3"
             >
-              <span
-                style={{
-                  display: "inline-block",
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: "#aaa",
-                  background: "#555",
-                  borderRadius: 4,
-                  padding: "2px 8px",
-                  marginBottom: 8,
-                  letterSpacing: 0.5,
-                  textTransform: "uppercase",
-                }}
-              >
+              <span className="mb-2 inline-block rounded bg-border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                 Auto-generated
               </span>
-              <pre
-                style={{
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-word",
-                  fontFamily: "monospace",
-                  fontSize: 14,
-                  lineHeight: 1.6,
-                  color: "#ccc",
-                  margin: 0,
-                }}
-              >
+              <pre className="m-0 whitespace-pre-wrap break-words font-mono text-sm leading-relaxed text-muted-foreground">
                 {seg.text}
               </pre>
             </div>
           ) : (
             <pre
               key={i}
-              style={{
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-                fontFamily: "monospace",
-                fontSize: 14,
-                lineHeight: 1.6,
-                color: colors.text,
-                margin: 0,
-              }}
+              className="m-0 whitespace-pre-wrap break-words font-mono text-sm leading-relaxed text-foreground"
             >
               {seg.text}
             </pre>
-          )
+          ),
         )}
       </div>
     </div>

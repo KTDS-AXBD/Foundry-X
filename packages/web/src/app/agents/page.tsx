@@ -5,13 +5,6 @@ import { fetchApi } from "../../lib/api-client";
 import type { AgentProfile, AgentActivity } from "@foundry-x/shared";
 import AgentCard from "../../components/feature/AgentCard";
 
-const colors = {
-  text: "#ededed",
-  muted: "#888",
-  red: "#ef4444",
-};
-
-/* ─── Agents Page ─── */
 export default function AgentsPage() {
   const [agents, setAgents] = useState<AgentProfile[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -20,7 +13,6 @@ export default function AgentsPage() {
   useEffect(() => {
     let cancelled = false;
 
-    // Initial load via REST
     fetchApi<AgentProfile[]>("/agents")
       .then((data) => {
         if (!cancelled) {
@@ -35,7 +27,6 @@ export default function AgentsPage() {
         }
       });
 
-    // Gap 5: SSE EventSource — real-time activity updates
     const es = new EventSource("/api/agents/stream");
     es.addEventListener("activity", (e: MessageEvent) => {
       if (cancelled) return;
@@ -62,26 +53,20 @@ export default function AgentsPage() {
   }, []);
 
   return (
-    <div style={{ color: colors.text }}>
-      <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>
-        Agent Transparency
-      </h1>
+    <div>
+      <h1 className="mb-6 text-2xl font-bold">Agent Transparency</h1>
 
-      {loading && <p style={{ color: colors.muted }}>Loading agents...</p>}
-      {error && <p style={{ color: colors.red, fontSize: 13 }}>{error}</p>}
+      {loading && (
+        <p className="text-muted-foreground">Loading agents...</p>
+      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       {agents && agents.length === 0 && (
-        <p style={{ color: colors.muted }}>No agents registered.</p>
+        <p className="text-muted-foreground">No agents registered.</p>
       )}
 
       {agents && agents.length > 0 && (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))",
-            gap: 16,
-          }}
-        >
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {agents.map((a) => (
             <AgentCard key={a.id} agent={a} />
           ))}
