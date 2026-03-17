@@ -1,15 +1,14 @@
-import { Hono } from "hono";
-import type {
-  AgentProfile,
-  AgentCapability,
-  AgentConstraint,
-  AgentActivity,
-} from "@foundry-x/shared";
-import { readJsonFile, foundryXPath } from "../services/data-reader.js";
+import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
+import { z } from "@hono/zod-openapi";
+import { AgentProfileSchema } from "../schemas/agent.js";
+import type { AgentProfile, AgentActivity } from "@foundry-x/shared";
+import { getDb } from "../db/index.js";
+import { agentSessions } from "../db/schema.js";
+import type { Env } from "../env.js";
 
-export const agentRoute = new Hono();
+export const agentRoute = new OpenAPIHono<{ Bindings: Env }>();
 
-// ─── Mock Data ───
+// ─── Mock Data (fallback when DB is empty) ───
 
 const MOCK_AGENTS: AgentProfile[] = [
   {
@@ -48,15 +47,74 @@ const MOCK_AGENTS: AgentProfile[] = [
   },
 ];
 
-// ─── Routes ───
+const SESSION_STATUS_MAP: Record<string, AgentActivity["status"]> = {
+  active: "running",
+  completed: "completed",
+  failed: "error",
+  escalated: "waiting",
+};
 
-agentRoute.get("/agents", async (c) => {
-  const agents = await readJsonFile<AgentProfile[]>(
-    foundryXPath("agents.json"),
-    MOCK_AGENTS,
-  );
-  return c.json(agents);
+// ─── OpenAPI Routes ───
+
+const getAgents = createRoute({
+  method: "get",
+  path: "/agents",
+  tags: ["Agents"],
+  summary: "List all agents",
+  responses: {
+    200: {
+      content: { "application/json": { schema: z.array(AgentProfileSchema) } },
+      description: "Agent profiles with capabilities, constraints, and activity",
+    },
+  },
 });
+
+agentRoute.openapi(getAgents, async (c) => {
+  let sessions: (typeof agentSessions.$inferSelect)[] = [];
+  try {
+    if (c.env?.DB) {
+      const db = getDb(c.env.DB);
+      sessions = await db.select().from(agentSessions);
+    }
+  } catch {
+    // D1 not available — fall through to mock
+  }
+
+  if (sessions.length === 0) {
+    return c.json(MOCK_AGENTS);
+  }
+
+  // Group by agentName, keep latest session per agent
+  const latestByAgent = new Map<string, (typeof sessions)[number]>();
+  for (const s of sessions) {
+    const prev = latestByAgent.get(s.agentName);
+    if (!prev || s.startedAt > prev.startedAt) {
+      latestByAgent.set(s.agentName, s);
+    }
+  }
+
+  const profiles: AgentProfile[] = [];
+  for (const [name, session] of latestByAgent) {
+    profiles.push({
+      id: name,
+      name: name
+        .replace(/^agent-/, "")
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (ch) => ch.toUpperCase()) + " Agent",
+      capabilities: [],
+      constraints: [],
+      activity: {
+        status: SESSION_STATUS_MAP[session.status] ?? "idle",
+        currentTask: session.status === "active" ? session.branch ?? undefined : undefined,
+        startedAt: session.startedAt,
+      },
+    });
+  }
+
+  return c.json(profiles);
+});
+
+// ─── SSE Stream (non-OpenAPI — SSE is not well-represented in OpenAPI) ───
 
 agentRoute.get("/agents/stream", (c) => {
   const encoder = new TextEncoder();

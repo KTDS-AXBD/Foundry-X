@@ -28,19 +28,20 @@ export async function createAccessToken(
 export async function createRefreshToken(
   userId: string,
   secret: string,
-): Promise<string> {
+): Promise<{ token: string; jti: string }> {
   const now = Math.floor(Date.now() / 1000);
   const jti = crypto.randomUUID();
-  return sign({ sub: userId, jti, iat: now, exp: now + 7 * 24 * 3600 }, secret);
+  const token = await sign({ sub: userId, jti, iat: now, exp: now + 7 * 24 * 3600 }, secret);
+  return { token, jti };
 }
 
 export async function createTokenPair(
   user: { id: string; email: string; role: "admin" | "member" | "viewer" },
   secret: string,
-): Promise<{ accessToken: string; refreshToken: string; expiresIn: number }> {
-  const [accessToken, refreshToken] = await Promise.all([
+): Promise<{ accessToken: string; refreshToken: string; expiresIn: number; _refreshJti: string }> {
+  const [accessToken, refreshResult] = await Promise.all([
     createAccessToken({ sub: user.id, email: user.email, role: user.role }, secret),
     createRefreshToken(user.id, secret),
   ]);
-  return { accessToken, refreshToken, expiresIn: 3600 };
+  return { accessToken, refreshToken: refreshResult.token, expiresIn: 3600, _refreshJti: refreshResult.jti };
 }

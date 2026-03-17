@@ -1,44 +1,15 @@
-import { Hono } from "hono";
+import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
+import { z } from "@hono/zod-openapi";
+import { desc } from "drizzle-orm";
+import { TokenSummarySchema, TokenUsageRecordSchema } from "../schemas/token.js";
 import type { TokenUsage, TokenSummary } from "@foundry-x/shared";
-import { foundryXPath, readTextFile } from "../services/data-reader.js";
+import { getDb } from "../db/index.js";
+import { tokenUsage } from "../db/schema.js";
+import type { Env } from "../env.js";
 
-export const tokenRoute = new Hono();
+export const tokenRoute = new OpenAPIHono<{ Bindings: Env }>();
 
-// ─── JSONL Parser ───
-
-function parseJsonl(raw: string): TokenUsage[] {
-  return raw
-    .split("\n")
-    .filter((line) => line.trim().length > 0)
-    .map((line) => JSON.parse(line) as TokenUsage);
-}
-
-function summarize(records: TokenUsage[], period: string): TokenSummary {
-  const byModel: Record<string, { tokens: number; cost: number }> = {};
-  const byAgent: Record<string, { tokens: number; cost: number }> = {};
-  let totalCost = 0;
-
-  for (const r of records) {
-    totalCost += r.cost;
-    const tokens = r.inputTokens + r.outputTokens;
-
-    const m = byModel[r.model] ?? { tokens: 0, cost: 0 };
-    m.tokens += tokens;
-    m.cost += r.cost;
-    byModel[r.model] = m;
-
-    if (r.agentId) {
-      const a = byAgent[r.agentId] ?? { tokens: 0, cost: 0 };
-      a.tokens += tokens;
-      a.cost += r.cost;
-      byAgent[r.agentId] = a;
-    }
-  }
-
-  return { period, totalCost: Math.round(totalCost * 100) / 100, byModel, byAgent };
-}
-
-// ─── Mock Data ───
+// ─── Mock Data (fallback when DB is empty) ───
 
 const MOCK_USAGE: TokenUsage[] = [
   { model: "claude-opus-4", inputTokens: 8200, outputTokens: 3100, cost: 4.80, timestamp: "2026-03-17T10:00:00Z", agentId: "agent-code-review" },
@@ -60,28 +31,109 @@ const MOCK_SUMMARY: TokenSummary = {
   },
 };
 
+// ─── Helpers ───
+
+function summarizeRecords(
+  records: { model: string; inputTokens: number; outputTokens: number; costUsd: number; agentName: string }[],
+  period: string,
+): TokenSummary {
+  const byModel: Record<string, { tokens: number; cost: number }> = {};
+  const byAgent: Record<string, { tokens: number; cost: number }> = {};
+  let totalCost = 0;
+
+  for (const r of records) {
+    totalCost += r.costUsd;
+    const tokens = r.inputTokens + r.outputTokens;
+
+    const m = byModel[r.model] ?? { tokens: 0, cost: 0 };
+    m.tokens += tokens;
+    m.cost += r.costUsd;
+    byModel[r.model] = m;
+
+    const a = byAgent[r.agentName] ?? { tokens: 0, cost: 0 };
+    a.tokens += tokens;
+    a.cost += r.costUsd;
+    byAgent[r.agentName] = a;
+  }
+
+  return { period, totalCost: Math.round(totalCost * 100) / 100, byModel, byAgent };
+}
+
 // ─── Routes ───
 
-tokenRoute.get("/tokens/summary", async (c) => {
-  const raw = await readTextFile(foundryXPath("token-usage.jsonl"), "");
+const getTokenSummary = createRoute({
+  method: "get",
+  path: "/tokens/summary",
+  tags: ["Tokens"],
+  summary: "Token usage summary",
+  responses: {
+    200: {
+      content: { "application/json": { schema: TokenSummarySchema } },
+      description: "Aggregated token usage by model and agent",
+    },
+  },
+});
 
-  if (raw.length === 0) {
+tokenRoute.openapi(getTokenSummary, async (c) => {
+  let records: (typeof tokenUsage.$inferSelect)[] = [];
+  try {
+    if (c.env?.DB) {
+      const db = getDb(c.env.DB);
+      records = await db.select().from(tokenUsage);
+    }
+  } catch {
+    // D1 not available — fall through to mock
+  }
+
+  if (records.length === 0) {
     return c.json(MOCK_SUMMARY);
   }
 
-  const records = parseJsonl(raw);
   const now = new Date();
   const period = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  return c.json(summarize(records, period));
+  return c.json(summarizeRecords(records, period));
 });
 
-tokenRoute.get("/tokens/usage", async (c) => {
-  const raw = await readTextFile(foundryXPath("token-usage.jsonl"), "");
+const getTokenUsage = createRoute({
+  method: "get",
+  path: "/tokens/usage",
+  tags: ["Tokens"],
+  summary: "Recent token usage records",
+  responses: {
+    200: {
+      content: { "application/json": { schema: z.array(TokenUsageRecordSchema) } },
+      description: "Last 20 token usage records",
+    },
+  },
+});
 
-  if (raw.length === 0) {
+tokenRoute.openapi(getTokenUsage, async (c) => {
+  let records: (typeof tokenUsage.$inferSelect)[] = [];
+  try {
+    if (c.env?.DB) {
+      const db = getDb(c.env.DB);
+      records = await db
+        .select()
+        .from(tokenUsage)
+        .orderBy(desc(tokenUsage.recordedAt))
+        .limit(20);
+    }
+  } catch {
+    // D1 not available — fall through to mock
+  }
+
+  if (records.length === 0) {
     return c.json(MOCK_USAGE);
   }
 
-  const records = parseJsonl(raw);
-  return c.json(records.slice(-20));
+  return c.json(
+    records.map((r) => ({
+      model: r.model,
+      inputTokens: r.inputTokens,
+      outputTokens: r.outputTokens,
+      cost: r.costUsd,
+      timestamp: r.recordedAt,
+      agentId: r.agentName,
+    })),
+  );
 });

@@ -2,12 +2,7 @@ import { app } from "./app.js";
 
 export default app;
 
-export type Env = {
-  DB: D1Database;
-  GITHUB_TOKEN: string;
-  JWT_SECRET: string;
-  GITHUB_REPO: string;
-};
+export type { Env } from "./env.js";
 
 // ── Local dev (node-server) ────────────────────
 // import { serve } from "@hono/node-server";
