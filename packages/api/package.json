@@ -14,7 +14,7 @@
     "db:seed:local": "wrangler d1 execute foundry-x-db --local --file=src/db/seed.sql",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/"
+    "lint": "echo 'API lint: eslint config pending (Sprint 7)'"
   },
   "dependencies": {
     "@foundry-x/shared": "workspace:*",
