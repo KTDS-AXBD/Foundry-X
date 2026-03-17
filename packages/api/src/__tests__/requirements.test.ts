@@ -1,16 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// NOTE: parseSpecRequirements regex expects 6 columns:
-// | F# | REQ | Title | Version | Status | Note |
-// (Real SPEC.md uses 5 columns — Phase 2 DB 전환 시 수정 예정)
+// Real SPEC.md 5-column format:
+// | F# | 제목 (FX-REQ-NNN, P#) | 버전 | 상태(이모지) | 비고 |
 const MOCK_SPEC_CONTENT = vi.hoisted(() => `
 ## §5 기능 항목 (F-items)
 
-| F# | REQ | Title | Version | Status | Note |
-|----|-----|-------|---------|--------|------|
-| F1 | FX-REQ-001 | 모노리포 scaffolding | v0.1 | DONE | pnpm workspace |
-| F2 | FX-REQ-002 | 공유 타입 모듈 | v0.1 | DONE | packages/shared |
-| F3 | FX-REQ-003 | Harness 모듈 | v0.1 | in_progress | detect, discover |
+| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
+|----|----------------------|:----:|:----:|------|
+| F1 | 모노리포 scaffolding (FX-REQ-001, P1) | v0.1 | ✅ | pnpm workspace + Turborepo |
+| F2 | 공유 타입 모듈 (FX-REQ-002, P1) | v0.1 | ✅ | packages/shared |
+| F3 | Harness 모듈 (FX-REQ-003, P1) | v0.1 | 🔧 | detect, discover |
+| F4 | PlumbBridge (FX-REQ-004, P1) | v0.1 | 📋 | bridge, errors |
 `);
 
 // Mock data-reader to provide controlled SPEC.md content
@@ -37,29 +37,40 @@ describe("requirements routes", () => {
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(Array.isArray(data)).toBe(true);
-    expect(data.length).toBe(3);
+    expect(data.length).toBe(4);
   });
 
-  it("parsed items have correct structure", async () => {
+  it("extracts reqCode from title parentheses", async () => {
     const res = await requirementsRoute.request("/requirements");
     const data = await res.json();
-    const item = data[0];
+    const f1 = data[0];
 
-    expect(item.id).toBe("F1");
-    expect(item.reqCode).toBe("FX-REQ-001");
-    expect(item.title).toContain("모노리포");
-    expect(item.version).toBe("v0.1");
-    expect(item.status).toBe("done");
-    expect(item.note).toBe("pnpm workspace");
+    expect(f1.id).toBe("F1");
+    expect(f1.reqCode).toBe("FX-REQ-001");
+    expect(f1.title).toBe("모노리포 scaffolding");
+    expect(f1.version).toBe("v0.1");
+    expect(f1.note).toBe("pnpm workspace + Turborepo");
   });
 
-  // ─── PUT /requirements/:id ───
+  it("parses ✅ emoji as done status", async () => {
+    const res = await requirementsRoute.request("/requirements");
+    const data = await res.json();
+    expect(data[0].status).toBe("done");
+    expect(data[1].status).toBe("done");
+  });
 
-  it("parses in_progress status correctly", async () => {
+  it("parses 🔧 emoji as in_progress status", async () => {
     const res = await requirementsRoute.request("/requirements");
     const data = await res.json();
     const f3 = data.find((d: any) => d.id === "F3");
     expect(f3.status).toBe("in_progress");
+  });
+
+  it("parses 📋 emoji as planned status", async () => {
+    const res = await requirementsRoute.request("/requirements");
+    const data = await res.json();
+    const f4 = data.find((d: any) => d.id === "F4");
+    expect(f4.status).toBe("planned");
   });
 
   // ─── PUT /requirements/:id ───

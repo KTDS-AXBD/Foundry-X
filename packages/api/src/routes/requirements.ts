@@ -5,43 +5,46 @@ import { getProjectRoot, readTextFile } from "../services/data-reader.js";
 
 export const requirementsRoute = new Hono();
 
+function parseStatusEmoji(raw: string): RequirementItem["status"] {
+  const s = raw.trim().toLowerCase();
+  if (s === "✅" || s === "done" || s === "completed") return "done";
+  if (s === "🔧" || s === "in_progress" || s === "in progress" || s === "wip") return "in_progress";
+  if (s === "📋" || s === "planned") return "planned";
+  return "planned";
+}
+
 function parseSpecRequirements(specContent: string): RequirementItem[] {
   const items: RequirementItem[] = [];
   const lines = specContent.split("\n");
 
-  // Match table rows like: | F1 | REQ-001 | Title | v0.1.0 | DONE | note |
-  const rowPattern = /^\|\s*(F\d+)\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|/;
+  // SPEC.md 5-column format:
+  // | F1 | 제목 (FX-REQ-001, P1) | v0.1 | ✅ | 비고 |
+  const rowPattern = /^\|\s*(F\d+)\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|/;
+  // Extract REQ code from title: "제목 (FX-REQ-001, P1)" → "FX-REQ-001"
+  const reqPattern = /\((FX-REQ-\d+)[^)]*\)/;
 
   for (const line of lines) {
     const match = rowPattern.exec(line);
     if (!match) continue;
 
-    const id = match[1] ?? "";
-    const reqCode = match[2] ?? "";
-    const title = match[3] ?? "";
-    const version = match[4] ?? "";
-    const rawStatus = match[5] ?? "";
-    const note = match[6] ?? "";
-    const statusLower = rawStatus.trim().toLowerCase();
+    const id = (match[1] ?? "").trim();
+    const rawTitle = (match[2] ?? "").trim();
+    const version = (match[3] ?? "").trim();
+    const rawStatus = (match[4] ?? "").trim();
+    const note = (match[5] ?? "").trim();
 
-    let status: RequirementItem["status"] = "planned";
-    if (statusLower === "done" || statusLower === "completed") {
-      status = "done";
-    } else if (
-      statusLower === "in_progress" ||
-      statusLower === "in progress" ||
-      statusLower === "wip"
-    ) {
-      status = "in_progress";
-    }
+    // Extract reqCode and clean title
+    const reqMatch = reqPattern.exec(rawTitle);
+    const reqCode = reqMatch?.[1] ?? "";
+    const title = rawTitle.replace(/\s*\([^)]*\)\s*$/, "").trim();
 
     items.push({
-      id: id.trim(),
-      reqCode: reqCode.trim(),
-      title: title.trim(),
-      version: version.trim(),
-      status,
-      note: note.trim(),
+      id,
+      reqCode,
+      title,
+      version,
+      status: parseStatusEmoji(rawStatus),
+      note,
     });
   }
 
