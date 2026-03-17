@@ -1,11 +1,13 @@
 name = "foundry-x-api"
 main = "src/index.ts"
 compatibility_date = "2026-03-17"
+compatibility_flags = ["nodejs_compat"]
 
 [[d1_databases]]
 binding = "DB"
 database_name = "foundry-x-db"
-database_id = "TODO"
+database_id = "6338688e-b050-4835-98a2-7101f9215c76"
+migrations_dir = "src/db/migrations"
 
 [vars]
 GITHUB_REPO = "KTDS-AXBD/Foundry-X"
@@ -17,4 +19,5 @@ name = "foundry-x-api-dev"
 [[env.dev.d1_databases]]
 binding = "DB"
 database_name = "foundry-x-db"
-database_id = "TODO"
+database_id = "6338688e-b050-4835-98a2-7101f9215c76"
+migrations_dir = "src/db/migrations"
