@@ -7,30 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased] — towards v0.7.0
+## [Unreleased] — towards v0.8.0
+
+### Pending (Sprint 8)
+- F44 SSE 실시간 통신
+- F45 NL→Spec 변환
+- F46 Wiki Git 동기화
+- F41 잔여: requirements GitHub API + KV 캐시
+
+---
+
+## [0.7.0] - 2026-03-17
+
+### Summary
+**Sprint 7 완료** — OpenAPI 3.1 전환(F38, 98%) + D1 실데이터 연동(F41, 72%) + shadcn/ui(F42, 95%) + 테스트 강화(F43, 90%). Agent Teams 병렬 실행. Overall Match Rate 89%.
 
 ### Added
-- **F38 OpenAPI 전환** (Session 20, Match Rate 98%)
+- **F38 OpenAPI 전환** (Match Rate 98%)
   - OpenAPIHono + createRoute: 9개 라우트 17 endpoints 전환
   - Zod 스키마 10파일 21개 (`packages/api/src/schemas/`)
   - `app.doc("/api/openapi.json")` 자동 스펙 생성
   - validationHook: Zod 에러 → `{ error: "message" }` 정규화
-  - SSE stream (`/agents/stream`) — OpenAPI 미적합으로 일반 라우트 유지
+
+- **F41 D1 실데이터 연동** (Match Rate 72%)
+  - auth/wiki/token/agent 라우트 D1 전환
+  - data-reader.ts 제거, env.ts 추가
+  - requirements는 mock 유지 (Sprint 8 잔여)
+
+- **F42 shadcn/ui 디자인 시스템** (Match Rate 95%)
+  - shadcn/ui 9개 컴포넌트, 다크모드, 반응형 사이드바
+  - globals.css + theme-provider + theme-toggle
+
+- **F43 테스트 스위트 강화** (Match Rate 90%)
+  - D1 mock 인프라 (better-sqlite3 MockD1Database shim)
+  - auth.test.ts (8), middleware.test.ts (7) 신규
+  - Web 컴포넌트 테스트 21개로 확장
 
 - **D1 프로덕션 배포 검증** (Session 19)
   - D1 `foundry-x-db` 생성 (APAC/ICN)
-  - D1 마이그레이션 적용 (0001_initial.sql — 6테이블 + 6인덱스)
-  - GitHub Secret: CLOUDFLARE_API_TOKEN 등록
-  - Workers 배포 성공: `https://foundry-x-api.ktds-axbd.workers.dev`
+  - Workers 배포: `https://foundry-x-api.ktds-axbd.workers.dev`
 
 ### Changed
-- wrangler.toml: migrations_dir + nodejs_compat 플래그 추가
-- 165/165 테스트 pass (CLI 106 + API 41 + Web 18)
+- deploy.yml: deploy-web 잡 제거 (Pages 토큰 권한 미확보, 나중에 재추가)
+- 176/176 테스트 pass (CLI 106 + API 43 + Web 27)
+- CHANGELOG.md 통합: 세션 기반 + 릴리스 기반 → 릴리스 단위 통합본
 
-### Pending (Sprint 7)
-- F41 실데이터 연동 (D1 전환)
-- F42 shadcn/ui + 웹 고도화
-- F43 테스트 스위트 강화
+### Notes
+- PDCA: Agent Teams(W1:API + W2:Web) 병렬, 1회 iteration (76%→89%)
+- SPEC.md v1.8→v1.9: Sprint 7 완료 + Sprint 8 계획
 
 ---
 
