@@ -25,7 +25,7 @@ migrations_dir = "src/db/migrations"
 # Sprint 8: KV Cache
 [[kv_namespaces]]
 binding = "CACHE"
-id = "7e5290234e744f9193f61d1b3800d041"
+id = "030b30d47a98485ea3af95b3347163d6"
 
 # Sprint 8: Workers AI
 [ai]
