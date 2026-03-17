@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** v0.7.0-dev — Phase 2 Sprint 7 진행 중 (F38 OpenAPI 98%, F41 실데이터 병행)
+**현재 상태:** v0.7.0 — Phase 2 Sprint 7 완료 (OpenAPI+D1실데이터+shadcn/ui, Match Rate 89%, 176 tests)
 
 ## Architecture
 
@@ -133,7 +133,7 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
   - CLI 3개 커맨드 + Ink TUI + 4개 Builder + 160 테스트 (CLI 106 + API 36 + Web 18)
 - **Phase 2 Sprint 6:** ✅ 완료 — 인프라 + D1 + JWT 인증
   - Cloudflare Workers + D1 6테이블 + JWT 인증 + RBAC, Match Rate 84%
-- **Phase 2 Sprint 7:** 🔧 진행 중 — OpenAPI + 실데이터 + Web 고도화
+- **Phase 2 Sprint 7:** ✅ 완료 — OpenAPI 17 endpoints + D1 실데이터 + shadcn/ui + 176 tests (Match Rate 89%)
   - F38 OpenAPI 전환 ✅ (98%) — createRoute 17 endpoints + Zod 21스키마
   - F41 실데이터 연동 🔧 (병행 세션)
   - F42 shadcn/ui 🔧, F43 테스트 스위트 🔧
