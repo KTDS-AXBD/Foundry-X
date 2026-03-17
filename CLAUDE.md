@@ -122,7 +122,11 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
   - 하네스 신선도 검사 (`foundry-x status`)
   - Plan: `docs/01-plan/features/sprint-5.plan.md`
   - Design: `docs/02-design/features/sprint-5.design.md`
-- **Sprint 5 Part A:** 미착수 — Frontend Design (F26~F31)
+- **Sprint 5 Part A:** 완료 — Frontend Design (F26~F31), Match Rate ~90%
+  - packages/api: Hono API 서버 (8 routes, 15 endpoints)
+  - packages/web: Next.js 14 대시보드 (6 pages, 7 components)
+  - packages/shared: web.ts + agent.ts (15 신규 타입)
+  - PDCA: 72% → 84% → ~90% (2 iterations)
 - **미완료 Sprint 1 과제:** `.plumb` 출력 형식 문서화, subprocess 오류 처리 계약 (Phase 2 시점에 재검토)
 
 ## Git Workflow

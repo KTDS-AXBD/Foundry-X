@@ -5,6 +5,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Session 15 (2026-03-17)
+**Sprint 5 Part A — Frontend Design 웹 대시보드 + API 서버 (F26~F31)**:
+- packages/api: Hono API 서버 (8 routes, 15 endpoints, data-reader 서비스)
+- packages/web: Next.js 14 대시보드 (6 pages, 7 Feature 컴포넌트)
+- packages/shared: web.ts(6) + agent.ts(9) = 15 신규 타입
+- F26 대시보드: SDD Triangle + Sprint + Harness Health 위젯
+- F27 Wiki: CRUD + D3 소유권 마커 보호 (foundry-x:auto 읽기 전용)
+- F28 아키텍처 뷰: ModuleMap + Diagram + Roadmap + Requirements 4탭
+- F29 워크스페이스: ToDo + Messages + Settings (localStorage)
+- F30 Agent 투명성: AgentCard 3소스 통합 + SSE EventSource
+- F31 Token 관리: Summary + 모델/Agent별 비용 테이블
+- PDCA: Plan → Design → Do(Agent Teams ×3) → Check(72%) → Iterate ×2(~90%) → Report
+- 모노리포 4 패키지: cli + shared + api + web
+
 ### Session 14 (2026-03-17)
 **Sprint 5 Part B — 하네스 산출물 동적 생성 (F32~F36)**:
 - ✅ Builder 패턴 도입: architecture/constitution/claude/agents 4개 builder
