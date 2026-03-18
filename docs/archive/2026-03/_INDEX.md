@@ -6,6 +6,7 @@
 | adr-000 | 100% | 2026-03-16 (1 session) | 2026-03-16 |
 | sprint-12 | 90% | 2026-03-18 (1 session) | 2026-03-18 |
 | sprint-12-stabilization | 95% | 2026-03-18 (2 sessions) | 2026-03-18 |
+| sprint-13 | 93% | 2026-03-18 (1 session) | 2026-03-18 |
 
 ## foundry-x-cli
 
@@ -34,3 +35,10 @@
 - [Design (FX-DSGN-013)](sprint-12-stabilization/sprint-12-stabilization.design.md)
 - [Analysis v0.2 (FX-ANLS-012)](sprint-12-stabilization/sprint-12-stabilization.analysis.md)
 - [Report v1.0 (FX-RPRT-014)](sprint-12-stabilization/sprint-12-stabilization.report.md)
+
+## sprint-13
+
+- [Plan (FX-PLAN-014)](sprint-13/sprint-13.plan.md)
+- [Design (FX-DSGN-014)](sprint-13/sprint-13.design.md)
+- [Analysis (FX-ANLS-013)](sprint-13/sprint-13.analysis.md)
+- [Report (FX-RPRT-015)](sprint-13/sprint-13.report.md)
