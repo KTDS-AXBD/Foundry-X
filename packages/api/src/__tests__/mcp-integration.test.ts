@@ -99,6 +99,46 @@ describe("MCP Integration (F61)", () => {
     expect(selected.type).toBe("mock");
   });
 
+  it("McpRunner.execute returns failed on MCP error response", async () => {
+    const errorTransport: McpTransport = {
+      type: "http",
+      connect: vi.fn().mockResolvedValue(undefined),
+      disconnect: vi.fn().mockResolvedValue(undefined),
+      isConnected: vi.fn().mockReturnValue(true),
+      send: vi.fn().mockResolvedValue({
+        jsonrpc: "2.0",
+        id: "err-1",
+        error: { code: -32600, message: "Invalid tool name" },
+      } as McpResponse),
+    };
+    const runner = new McpRunner(errorTransport, "error-server");
+
+    const result = await runner.execute({
+      taskId: "task-err",
+      agentId: "agent-1",
+      taskType: "code-review",
+      context: { repoUrl: "https://github.com/test/repo", branch: "main" },
+      constraints: [],
+    });
+
+    expect(result.status).toBe("failed");
+    expect(result.output.analysis).toContain("MCP error");
+    expect(result.model).toBe("mcp:error-server");
+  });
+
+  it("McpRunner.listTools returns tool list from server", async () => {
+    const transport = createMockTransport([
+      { name: "foundry_code_review", description: "Review" },
+      { name: "foundry_test_gen", description: "Test gen" },
+    ]);
+    const runner = new McpRunner(transport, "tools-server");
+
+    const tools = await runner.listTools();
+    expect(tools).toHaveLength(2);
+    expect(tools[0]!.name).toBe("foundry_code_review");
+    expect(tools[1]!.name).toBe("foundry_test_gen");
+  });
+
   it("McpRunner.execute calls tools/call and returns result", async () => {
     const transport = createMockTransport();
     const runner = new McpRunner(transport, "test-server");
