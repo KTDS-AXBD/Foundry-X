@@ -90,3 +90,30 @@ jobs:
         env:
           API_URL: https://foundry-x-api.ktds-axbd.workers.dev
           WEB_URL: https://fx.minu.best
+
+  # F78: Production E2E — Playwright 브라우저 테스트 (배포 후)
+  prod-e2e:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    needs: smoke-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright Chromium
+        run: pnpm -F @foundry-x/web exec playwright install --with-deps chromium
+      - name: Run production E2E tests
+        run: pnpm -F @foundry-x/web e2e:prod
+        env:
+          PROD_WEB_URL: https://fx.minu.best
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: prod-e2e-report
+          path: packages/web/playwright-report/
+          retention-days: 14
