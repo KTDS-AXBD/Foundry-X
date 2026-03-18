@@ -11,7 +11,19 @@ export interface JwtPayload {
   jti?: string;
 }
 
+// Public paths that skip JWT verification
+const PUBLIC_PATHS = [
+  "/api/auth/",
+  "/api/webhook/",
+  "/api/openapi.json",
+  "/api/docs",
+];
+
 export const authMiddleware: MiddlewareHandler = async (c, next) => {
+  const path = c.req.path;
+  if (PUBLIC_PATHS.some((p) => path.startsWith(p))) {
+    return next();
+  }
   const secret = c.env?.JWT_SECRET ?? "dev-secret";
   const handler = jwt({ secret, alg: "HS256" });
   return handler(c, next);
