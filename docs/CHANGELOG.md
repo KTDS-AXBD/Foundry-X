@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.0] - 2026-03-18
+
+### Summary
+**Sprint 9 완료** — 프로덕션 배포 파이프라인(F48, 97%) + Playwright E2E(F49, 92%) + 에이전트 오케스트레이션 기초(F50, 91%) + 옵저버빌리티(F51, 95%). Overall Match Rate 94%.
+
+### Added
+- **F48 프로덕션 배포 파이프라인** (Match Rate 97%)
+  - deploy.yml: Pages deploy job + smoke-test job 추가 (4-job CI/CD)
+  - `scripts/smoke-test.sh`: 배포 후 자동 검증 5 checks (API health, requirements, agents, web landing, dashboard)
+  - `docs/guides/deployment-runbook.md`: 8섹션 배포 가이드 (secrets, migration, rollback, troubleshooting)
+- **F49 E2E 테스트 인프라** (Match Rate 92%)
+  - Playwright config + 5 E2E specs (landing, auth-flow, dashboard, agents, spec-generator)
+  - Auth fixture: JWT 기반 인증 테스트 헬퍼
+  - API 통합 테스트 4개 (auth-profile, wiki-git, spec-generate, agent-sse)
+  - `.github/workflows/e2e.yml`: PR 트리거 E2E CI
+- **F50 에이전트 오케스트레이션 기초** (Match Rate 91%)
+  - D1 migration 0004: agents, agent_capabilities, agent_constraints, agent_tasks 4테이블
+  - 11 seed constraint rules (PRD §7.2-C Always/Ask/Never 기반)
+  - AgentOrchestrator service: checkConstraint, listAgents, getCapabilities, createTask, listTasks
+  - ConstraintGuard middleware: X-Agent-Id/X-Agent-Action 헤더 기반 제약 검증
+  - 4 API endpoints: capabilities, tasks GET/POST, constraints/check
+  - 6 orchestration 타입 (shared/agent.ts)
+- **F51 옵저버빌리티** (Match Rate 95%)
+  - `/health/detailed`: D1/KV/GitHub 인프라 상태 상세 체크
+  - Logger service: 구조화 JSON 로깅 (level, message, context, timestamp, requestId)
+  - DetailedHealth Zod schema
+  - GitHubService.getRateLimit() 추가
+- API 테스트 +25 (76→101), 합계 241 (CLI 106 + API 101 + Web 34)
+- D1 테이블 +3 (6→9), API 엔드포인트 +4 (19→23)
+
+### Changed
+- OpenAPI info version: 0.8.0 → 0.9.0
+- CLAUDE.md: Sprint 9 완료 상태 반영
+
+---
+
 ## [0.8.0] - 2026-03-18
 
 ### Summary
