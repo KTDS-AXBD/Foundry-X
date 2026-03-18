@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { fetchApi, getAgentPr, approvePlan, rejectPlan, type AgentExecutionResult } from "@/lib/api-client";
+import { fetchApi, getAgentPr, approvePlan, rejectPlan, BASE_URL, type AgentExecutionResult } from "@/lib/api-client";
 import type { AgentProfile, AgentActivity, AgentPr, AgentPlan } from "@foundry-x/shared";
 import AgentCard from "@/components/feature/AgentCard";
 import { AgentExecuteModal } from "@/components/feature/AgentExecuteModal";
@@ -60,7 +60,7 @@ export default function AgentsPage() {
       });
 
     const client = new SSEClient({
-      url: "/api/agents/stream",
+      url: `${BASE_URL}/agents/stream`,
       onActivity: (data) => {
         if (cancelled) return;
         const payload = data as { agentId: string; activity: AgentActivity };

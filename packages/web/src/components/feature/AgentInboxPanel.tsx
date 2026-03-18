@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import type { AgentMessage, MessageType } from "@foundry-x/shared";
-import { listInboxMessages, acknowledgeMessage } from "@/lib/api-client";
+import { listInboxMessages, acknowledgeMessage, BASE_URL } from "@/lib/api-client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -141,7 +141,7 @@ export function AgentInboxPanel({ agentId, className }: AgentInboxPanelProps) {
 
   // SSE: 새 메시지 수신 시 리로드
   useEffect(() => {
-    const es = new EventSource("/api/agents/stream");
+    const es = new EventSource(`${BASE_URL}/agents/stream`);
 
     const handleMessage = (event: MessageEvent) => {
       try {

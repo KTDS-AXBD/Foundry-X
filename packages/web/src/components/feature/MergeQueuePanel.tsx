@@ -7,6 +7,7 @@ import {
   updateQueuePriority,
   type MergeQueueEntry,
   type ConflictReport,
+  BASE_URL,
 } from "@/lib/api-client";
 import { SSEClient } from "@/lib/sse-client";
 
@@ -36,7 +37,7 @@ export function MergeQueuePanel() {
 
     // SSE 실시간 업데이트 (F68 Gap G6 fix)
     const client = new SSEClient({
-      url: "/api/agents/stream",
+      url: `${BASE_URL}/agents/stream`,
       onStatus: (data) => {
         const raw = data as Record<string, unknown>;
 
