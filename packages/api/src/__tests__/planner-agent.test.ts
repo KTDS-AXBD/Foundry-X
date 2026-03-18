@@ -213,4 +213,131 @@ describe("PlannerAgent", () => {
     const plans = await planner.listPlans();
     expect(plans).toHaveLength(0);
   });
+
+  // ─── LLM Integration (F75) ───
+
+  it("T1: uses LLM analysis when apiKey is provided and response is valid JSON", async () => {
+    const llmResponse = {
+      content: [{
+        type: "text",
+        text: JSON.stringify({
+          codebaseAnalysis: "LLM이 분석한 코드베이스",
+          proposedSteps: [
+            { description: "서비스 수정", type: "modify", targetFile: "src/service.ts", estimatedLines: 30 },
+          ],
+          risks: ["타입 호환성 문제"],
+          estimatedTokens: 3000,
+        }),
+      }],
+    };
+
+    const fetchMock = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(llmResponse),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const llmPlanner = new PlannerAgent({ db, sse, apiKey: "test-key" });
+    const plan = await llmPlanner.createPlan("agent-llm", "code-generation", {
+      repoUrl: "https://github.com/test/repo",
+      branch: "master",
+      targetFiles: ["src/service.ts"],
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.anthropic.com/v1/messages",
+      expect.objectContaining({ method: "POST" }),
+    );
+    expect(plan.codebaseAnalysis).toBe("LLM이 분석한 코드베이스");
+    expect(plan.proposedSteps[0]!.description).toBe("서비스 수정");
+    expect(plan.risks).toContain("타입 호환성 문제");
+    expect(plan.estimatedTokens).toBe(3000);
+
+    vi.unstubAllGlobals();
+  });
+
+  it("T2: falls back to mock when LLM returns invalid JSON", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({
+        content: [{ type: "text", text: "This is not valid JSON at all" }],
+      }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const llmPlanner = new PlannerAgent({ db, sse, apiKey: "test-key" });
+    const plan = await llmPlanner.createPlan("agent-llm", "code-generation", {
+      repoUrl: "https://github.com/test/repo",
+      branch: "master",
+      targetFiles: ["src/a.ts"],
+    });
+
+    // Should fall back to mock analysis
+    expect(plan.codebaseAnalysis).toContain("대상 파일 1개 분석");
+    expect(plan.proposedSteps[0]!.description).toBe("src/a.ts 수정");
+
+    vi.unstubAllGlobals();
+  });
+
+  it("T3: falls back to mock when API returns 500 error", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const llmPlanner = new PlannerAgent({ db, sse, apiKey: "test-key" });
+    const plan = await llmPlanner.createPlan("agent-llm", "code-generation", {
+      repoUrl: "https://github.com/test/repo",
+      branch: "master",
+      targetFiles: ["src/b.ts"],
+    });
+
+    expect(plan.codebaseAnalysis).toContain("대상 파일 1개 분석");
+
+    vi.unstubAllGlobals();
+  });
+
+  it("T4: uses mock directly when no apiKey", async () => {
+    // Default planner has no apiKey
+    const plan = await planner.createPlan("agent-no-key", "code-generation", {
+      repoUrl: "https://github.com/test/repo",
+      branch: "master",
+      targetFiles: ["src/c.ts"],
+    });
+
+    expect(plan.codebaseAnalysis).toContain("대상 파일 1개 분석");
+    expect(plan.proposedSteps[0]!.description).toBe("src/c.ts 수정");
+  });
+
+  it("T5: parseAnalysisResponse parses valid JSON", () => {
+    const json = JSON.stringify({
+      codebaseAnalysis: "분석 결과",
+      proposedSteps: [{ description: "step1", type: "modify" }],
+      risks: ["risk1"],
+      estimatedTokens: 5000,
+    });
+
+    const result = planner.parseAnalysisResponse(json, {
+      repoUrl: "https://github.com/test/repo",
+      branch: "master",
+    });
+
+    expect(result.codebaseAnalysis).toBe("분석 결과");
+    expect(result.proposedSteps).toHaveLength(1);
+    expect(result.risks).toEqual(["risk1"]);
+    expect(result.estimatedTokens).toBe(5000);
+  });
+
+  it("T6: parseAnalysisResponse extracts JSON from ```json wrapper", () => {
+    const wrapped = '```json\n{"codebaseAnalysis":"래핑된 분석","proposedSteps":[],"risks":[],"estimatedTokens":1000}\n```';
+
+    const result = planner.parseAnalysisResponse(wrapped, {
+      repoUrl: "https://github.com/test/repo",
+      branch: "master",
+    });
+
+    expect(result.codebaseAnalysis).toBe("래핑된 분석");
+    expect(result.estimatedTokens).toBe(1000);
+  });
 });

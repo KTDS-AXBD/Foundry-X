@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { fetchApi, getAgentPr, type AgentExecutionResult } from "@/lib/api-client";
-import type { AgentProfile, AgentActivity, AgentPr } from "@foundry-x/shared";
+import { fetchApi, getAgentPr, approvePlan, rejectPlan, type AgentExecutionResult } from "@/lib/api-client";
+import type { AgentProfile, AgentActivity, AgentPr, AgentPlan } from "@foundry-x/shared";
 import AgentCard from "@/components/feature/AgentCard";
 import { AgentExecuteModal } from "@/components/feature/AgentExecuteModal";
 import { AgentTaskResult } from "@/components/feature/AgentTaskResult";
@@ -11,12 +11,14 @@ import { SSEClient } from "@/lib/sse-client";
 import { MergeQueuePanel } from "@/components/feature/MergeQueuePanel";
 import { ConflictDiagram } from "@/components/feature/ConflictDiagram";
 import { ParallelExecutionForm } from "@/components/feature/ParallelExecutionForm";
+import { AgentPlanCard } from "@/components/feature/AgentPlanCard";
+import { AgentInboxPanel } from "@/components/feature/AgentInboxPanel";
 
 // F55: 에이전트별 task 상태 추적
 type AgentTaskStatus = "pending" | "running" | "completed" | "failed";
 
 // F68: 탭 타입
-type AgentsTab = "agents" | "prs" | "queue" | "parallel";
+type AgentsTab = "agents" | "plans" | "inbox" | "prs" | "queue" | "parallel";
 
 interface AgentTaskState {
   taskId: string;
@@ -37,6 +39,8 @@ export default function AgentsPage() {
   const [sseConnected, setSseConnected] = useState(false);
   const [agentPrs, setAgentPrs] = useState<AgentPr[]>([]);
   const [activeTab, setActiveTab] = useState<AgentsTab>("agents");
+  const [plans, setPlans] = useState<AgentPlan[]>([]);
+  const [plansLoading, setPlansLoading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -159,8 +163,30 @@ export default function AgentsPage() {
     };
   }, []);
 
+  // Plans 로드
+  useEffect(() => {
+    if (activeTab !== "plans") return;
+    setPlansLoading(true);
+    fetchApi<{ plans: AgentPlan[] }>("/agents/plans")
+      .then((data) => setPlans(data.plans ?? []))
+      .catch(() => setPlans([]))
+      .finally(() => setPlansLoading(false));
+  }, [activeTab]);
+
+  const handleApprovePlan = async (planId: string) => {
+    await approvePlan(planId);
+    setPlans((prev) => prev.map((p) => p.id === planId ? { ...p, status: "approved" as const } : p));
+  };
+
+  const handleRejectPlan = async (planId: string, reason: string) => {
+    await rejectPlan(planId, reason);
+    setPlans((prev) => prev.map((p) => p.id === planId ? { ...p, status: "rejected" as const } : p));
+  };
+
   const tabs: { key: AgentsTab; label: string }[] = [
     { key: "agents", label: "Agents" },
+    { key: "plans", label: "Plans" },
+    { key: "inbox", label: "Inbox" },
     { key: "prs", label: `PRs${agentPrs.length ? ` (${agentPrs.length})` : ""}` },
     { key: "queue", label: "Merge Queue" },
     { key: "parallel", label: "Parallel" },
@@ -233,6 +259,43 @@ export default function AgentsPage() {
             </div>
           )}
         </>
+      )}
+
+      {/* Plans 탭 (F76) */}
+      {activeTab === "plans" && (
+        <div>
+          {plansLoading ? (
+            <p className="text-sm text-muted-foreground">계획 로딩 중...</p>
+          ) : plans.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              등록된 계획이 없어요. 에이전트가 작업을 실행하면 실행 계획이 여기에 표시돼요.
+            </p>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {plans.map((plan) => (
+                <AgentPlanCard
+                  key={plan.id}
+                  plan={plan}
+                  onApprove={handleApprovePlan}
+                  onReject={handleRejectPlan}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Inbox 탭 (F76) */}
+      {activeTab === "inbox" && (
+        <div>
+          {agents && agents.length > 0 ? (
+            <AgentInboxPanel agentId={agents[0].id} />
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              에이전트를 먼저 등록해주세요.
+            </p>
+          )}
+        </div>
       )}
 
       {/* PRs 탭 */}

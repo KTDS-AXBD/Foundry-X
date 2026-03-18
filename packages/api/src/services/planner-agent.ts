@@ -9,6 +9,8 @@ import type { SSEManager } from "./sse-manager.js";
 interface PlannerAgentDeps {
   db: D1Database;
   sse?: SSEManager;
+  apiKey?: string;
+  model?: string;
 }
 
 interface PlanRow {
@@ -45,25 +47,44 @@ function mapRow(r: PlanRow): AgentPlan {
   };
 }
 
+const PLANNER_SYSTEM_PROMPT = `You are a PlannerAgent for the Foundry-X project.
+Your job is to analyze the given codebase context and create an execution plan.
+
+You MUST respond with valid JSON in this exact schema:
+{
+  "codebaseAnalysis": "2-3 sentence analysis of the target codebase area",
+  "proposedSteps": [
+    {
+      "description": "What to do in this step",
+      "type": "create" | "modify" | "delete" | "test",
+      "targetFile": "optional/file/path.ts",
+      "estimatedLines": 20
+    }
+  ],
+  "risks": ["Risk description 1"],
+  "estimatedTokens": 5000
+}
+
+Guidelines:
+- Analyze the target files and their relationships
+- Break down the task into atomic, ordered steps
+- Each step should modify at most 1-2 files
+- Identify risks: dependency changes, breaking changes, test coverage gaps
+- Estimate tokens conservatively (lines * 10 + overhead)
+- Respond in Korean for analysis text, English for technical terms`;
+
 export class PlannerAgent {
   constructor(private deps: PlannerAgentDeps) {}
 
-  async createPlan(
-    agentId: string,
-    taskType: AgentTaskType,
+  private mockAnalysis(
+    _taskType: AgentTaskType,
     context: AgentExecutionRequest["context"],
-  ): Promise<AgentPlan> {
-    const id = `plan-${crypto.randomUUID().slice(0, 8)}`;
-    const taskId = `task-${crypto.randomUUID().slice(0, 8)}`;
-    const now = new Date().toISOString();
-
-    // 코드베이스 분석 (Mock — LLM 없이 context 기반 자동 생성)
+  ): { codebaseAnalysis: string; proposedSteps: ProposedStep[]; risks: string[]; estimatedTokens: number } {
     const targetFiles = context.targetFiles ?? [];
     const codebaseAnalysis = targetFiles.length > 0
       ? `대상 파일 ${targetFiles.length}개 분석: ${targetFiles.join(", ")}`
       : `${context.repoUrl} 리포지토리 ${context.branch} 브랜치 분석`;
 
-    // 실행 단계 생성
     const proposedSteps: ProposedStep[] = targetFiles.map((file) => ({
       description: `${file} 수정`,
       type: "modify" as const,
@@ -79,14 +100,108 @@ export class PlannerAgent {
       });
     }
 
-    // 리스크 평가
     const risks: string[] = [];
     if (targetFiles.length > 5) {
       risks.push(`영향 범위가 넓음: ${targetFiles.length}개 파일 수정`);
     }
 
-    const estimatedFiles = targetFiles.length || 1;
-    const estimatedTokens = estimatedFiles * 2000;
+    const estimatedTokens = (targetFiles.length || 1) * 2000;
+
+    return { codebaseAnalysis, proposedSteps, risks, estimatedTokens };
+  }
+
+  parseAnalysisResponse(
+    text: string,
+    context: AgentExecutionRequest["context"],
+  ): { codebaseAnalysis: string; proposedSteps: ProposedStep[]; risks: string[]; estimatedTokens: number } {
+    try {
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        return this.mockAnalysis("code-generation", context);
+      }
+      const parsed = JSON.parse(jsonMatch[0]);
+      return {
+        codebaseAnalysis: parsed.codebaseAnalysis ?? "",
+        proposedSteps: Array.isArray(parsed.proposedSteps) ? parsed.proposedSteps : [],
+        risks: Array.isArray(parsed.risks) ? parsed.risks : [],
+        estimatedTokens: typeof parsed.estimatedTokens === "number" ? parsed.estimatedTokens : 2000,
+      };
+    } catch {
+      return this.mockAnalysis("code-generation", context);
+    }
+  }
+
+  private buildPlannerPrompt(
+    taskType: AgentTaskType,
+    context: AgentExecutionRequest["context"],
+  ): string {
+    const lines = [
+      `Task Type: ${taskType}`,
+      `Repository: ${context.repoUrl}`,
+      `Branch: ${context.branch}`,
+    ];
+    if (context.targetFiles?.length) {
+      lines.push(`Target Files: ${context.targetFiles.join(", ")}`);
+    }
+    if (context.instructions) {
+      lines.push(`Instructions: ${context.instructions}`);
+    }
+    if (context.spec) {
+      lines.push(`Spec Context: ${context.spec}`);
+    }
+    return lines.join("\n");
+  }
+
+  private async analyzeCodebase(
+    taskType: AgentTaskType,
+    context: AgentExecutionRequest["context"],
+  ): Promise<{ codebaseAnalysis: string; proposedSteps: ProposedStep[]; risks: string[]; estimatedTokens: number }> {
+    if (!this.deps.apiKey) {
+      return this.mockAnalysis(taskType, context);
+    }
+
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": this.deps.apiKey,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model: this.deps.model ?? "claude-haiku-4-5-20250714",
+          max_tokens: 4096,
+          system: PLANNER_SYSTEM_PROMPT,
+          messages: [{ role: "user", content: this.buildPlannerPrompt(taskType, context) }],
+        }),
+      });
+
+      if (!res.ok) {
+        return this.mockAnalysis(taskType, context);
+      }
+
+      const body = await res.json() as { content: Array<{ type: string; text?: string }> };
+      const text = body.content?.find((c) => c.type === "text")?.text ?? "";
+      return this.parseAnalysisResponse(text, context);
+    } catch {
+      return this.mockAnalysis(taskType, context);
+    }
+  }
+
+  async createPlan(
+    agentId: string,
+    taskType: AgentTaskType,
+    context: AgentExecutionRequest["context"],
+  ): Promise<AgentPlan> {
+    const id = `plan-${crypto.randomUUID().slice(0, 8)}`;
+    const taskId = `task-${crypto.randomUUID().slice(0, 8)}`;
+    const now = new Date().toISOString();
+
+    const analysis = await this.analyzeCodebase(taskType, context);
+    const estimatedFiles = analysis.proposedSteps.filter((s) => s.targetFile).length
+      || context.targetFiles?.length || 1;
+
+    const { codebaseAnalysis, proposedSteps, risks, estimatedTokens } = analysis;
 
     await this.deps.db
       .prepare(

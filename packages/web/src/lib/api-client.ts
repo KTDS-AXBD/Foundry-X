@@ -503,6 +503,139 @@ export async function getParallelExecution(
   return fetchApi(`/agents/parallel/${id}`);
 }
 
+// ─── Agent Plan (F75/F76) ───
+
+export interface AgentPlanResponse {
+  id: string;
+  taskId: string;
+  agentId: string;
+  codebaseAnalysis: string;
+  proposedSteps: Array<{ description: string; type: string; targetFile?: string; estimatedLines?: number }>;
+  estimatedFiles: number;
+  risks: string[];
+  estimatedTokens: number;
+  status: string;
+  humanFeedback?: string;
+  createdAt: string;
+}
+
+export async function createPlan(
+  agentId: string,
+  taskType: string,
+  context: {
+    repoUrl?: string;
+    branch?: string;
+    targetFiles?: string[];
+    instructions?: string;
+  },
+): Promise<AgentPlanResponse> {
+  const url = `${BASE_URL}/agents/plan`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({
+      agentId,
+      taskType,
+      context: {
+        repoUrl: context.repoUrl ?? "https://github.com/KTDS-AXBD/Foundry-X",
+        branch: context.branch ?? "master",
+        ...context,
+      },
+    }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<AgentPlanResponse>;
+}
+
+export async function approvePlan(planId: string): Promise<AgentPlanResponse> {
+  const url = `${BASE_URL}/agents/plan/${planId}/approve`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<AgentPlanResponse>;
+}
+
+export async function rejectPlan(planId: string, reason: string): Promise<AgentPlanResponse> {
+  const url = `${BASE_URL}/agents/plan/${planId}/reject`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ reason }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<AgentPlanResponse>;
+}
+
+// ─── Agent Inbox (F76) ───
+
+export interface InboxMessage {
+  id: string;
+  fromAgentId: string;
+  toAgentId: string;
+  type: string;
+  subject: string;
+  payload: Record<string, unknown>;
+  acknowledged: boolean;
+  parentMessageId?: string;
+  createdAt: string;
+  acknowledgedAt?: string;
+}
+
+export async function listInboxMessages(
+  agentId: string,
+  unreadOnly?: boolean,
+  limit?: number,
+): Promise<{ messages: InboxMessage[] }> {
+  const params = new URLSearchParams();
+  if (unreadOnly) params.set("unreadOnly", "true");
+  if (limit) params.set("limit", String(limit));
+  const qs = params.toString();
+  return fetchApi(`/agents/inbox/${agentId}${qs ? `?${qs}` : ""}`);
+}
+
+export async function sendInboxMessage(
+  fromAgentId: string,
+  toAgentId: string,
+  type: string,
+  subject: string,
+  payload: Record<string, unknown>,
+  parentMessageId?: string,
+): Promise<InboxMessage> {
+  const url = `${BASE_URL}/agents/inbox/send`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ fromAgentId, toAgentId, type, subject, payload, parentMessageId }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<InboxMessage>;
+}
+
+export async function acknowledgeMessage(messageId: string): Promise<void> {
+  const url = `${BASE_URL}/agents/inbox/${messageId}/ack`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+}
+
 // ─── Conflict Resolution ───
 
 export async function resolveConflict(
