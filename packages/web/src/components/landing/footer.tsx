@@ -35,9 +35,9 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              소프트웨어 팀의 AI 에이전트 통제 렌즈.
+              사람과 AI가 함께 만드는 협업 플랫폼.
               <br />
-              Git이 진실, Foundry-X는 렌즈.
+              명세부터 배포까지, 한 곳에서.
             </p>
           </div>
 

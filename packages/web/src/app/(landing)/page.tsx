@@ -175,7 +175,7 @@ function EcosystemDiagram() {
           </div>
         </div>
         <span className="mt-2 font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
-          AI 에이전트 통제 렌즈
+          AI 협업 플랫폼
         </span>
       </div>
 
@@ -368,19 +368,19 @@ export default function LandingPage() {
 
           {/* Headline */}
           <h1 className="animate-fade-in-up stagger-1 font-display text-5xl leading-[1.08] font-bold tracking-tight sm:text-6xl md:text-7xl">
-            AI 에이전트의
+            사람과 AI가
             <br />
             <span className="bg-gradient-to-r from-forge-amber via-forge-ember to-forge-copper bg-clip-text text-transparent">
-              통제 렌즈
+              함께 만드는 곳
             </span>
           </h1>
 
           {/* Subheading */}
           <p className="animate-fade-in-up stagger-2 mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            에이전트가 코드를 제안하고, 사람이 검증하고, Git이 기록해요.
+            AI가 코드를 생성하고, 팀 전체가 확인하고, 함께 결정해요.
             <br className="hidden sm:block" />
             <span className="text-foreground/80">
-              Git이 진실, Foundry-X는 렌즈.
+              하나의 협업 플랫폼에서 명세부터 배포까지.
             </span>
           </p>
 
@@ -672,14 +672,13 @@ export default function LandingPage() {
             <Bot className="size-7 text-axis-blue/50" />
           </div>
           <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            에이전트를{" "}
+            함께{" "}
             <span className="bg-gradient-to-r from-forge-amber to-forge-copper bg-clip-text text-transparent">
-              통제
+              만들어요
             </span>
-            하세요
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-            AI가 코드를 쓰는 시대. 중요한 건 누가 검증하고 기록하느냐예요.
+            AI가 코드를 생성하고, 팀이 함께 검토하고, 모든 과정이 기록돼요.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
