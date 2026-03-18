@@ -12,9 +12,9 @@ test.describe("Production Critical Path", () => {
     // Features 링크 클릭
     await page.getByRole("link", { name: "Features" }).first().click();
 
-    // Features 섹션이 뷰포트에 보이는지 확인
+    // Core Pillars 섹션이 뷰포트에 보이는지 확인 (F74 개편 후)
     await expect(
-      page.getByRole("heading", { name: /Features|핵심 기능/i }),
+      page.getByRole("heading", { name: /차별점|Core Pillars/i }),
     ).toBeVisible();
   });
 
