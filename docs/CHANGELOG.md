@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## v1.4.0 릴리스 (2026-03-18)
+**Sprint 16: PlannerAgent LLM 실 연동 + AgentInboxPanel UI + 프로덕션 배포**
+- ✅ F75: PlannerAgent Mock→Claude API 전환 — analyzeCodebase() + 3단계 폴백 + 6 신규 테스트
+- ✅ F76: AgentInboxPanel.tsx 신규 161 LOC + AgentPlanCard shared import + api-client 6함수 + Plans/Inbox 탭
+- ✅ F77: D1 migration 0009 remote 확인 (22 테이블) + CI/CD deploy 성공 + v1.4.0 bump
+- ✅ Agent Teams 병렬 실행 (W1: F75 backend, W2: F76 frontend)
+- ✅ PDCA 전주기 완료 (Match Rate 91%, FX-RPRT-018)
+- ✅ 313 API tests 통과, typecheck 5/5
+
+---
+
 ## v1.3.0 릴리스 (2026-03-18)
 **Sprint 15: PlannerAgent + AgentInbox + WorktreeManager**
 - ✅ D1 migration 0009 remote 적용 (agent_plans + agent_messages + agent_worktrees)
