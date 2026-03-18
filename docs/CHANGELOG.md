@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## v1.5.0 릴리스 (2026-03-19)
+**Sprint 17: AI Foundry MCP 연동 + AgentInbox 스레드 뷰 + PlannerAgent Orchestrator 통합**
+- ✅ F80: McpRegistry.createServerPreset() AI Foundry 프리셋 + ProposedStep.externalTool 타입
+- ✅ F81: inbox 스레드 라우트 GET /:parentMessageId/thread + AgentInboxPanel 스레드 UI (groupByThread + flat/threaded 토글)
+- ✅ F82: createPlanAndWait() 폴링 승인 대기 + executePlan() executing→completed/failed 라이프사이클
+- ✅ F82: PlanTimeoutError/PlanRejectedError/PlanCancelledError 에러 클래스
+- ✅ F82: SSEEvent 4종 (waiting/executing/completed/failed) + Plan API 2 endpoints (get/execute)
+- ✅ F82: D1 migration 0010 (agent_plans execution_* 5컬럼)
+- ✅ PDCA 전주기 완료 (Match Rate 98%, FX-RPRT-019)
+- ✅ 313 API tests 통과, typecheck 5/5
+
+---
+
 ## v1.4.0 릴리스 (2026-03-18)
 **Sprint 16: PlannerAgent LLM 실 연동 + AgentInboxPanel UI + 프로덕션 배포**
 - ✅ F75: PlannerAgent Mock→Claude API 전환 — analyzeCodebase() + 3단계 폴백 + 6 신규 테스트
