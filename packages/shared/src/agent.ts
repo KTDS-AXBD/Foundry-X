@@ -92,6 +92,30 @@ export interface AgentRegistration {
   createdAt: string;
 }
 
+// ─── Sprint 12: Generative UI Types (F60) ───
+
+export type SectionType = 'text' | 'code' | 'diff' | 'chart' | 'diagram' | 'table' | 'timeline';
+
+export interface UISection {
+  type: SectionType;
+  title: string;
+  data: unknown;
+  interactive?: boolean;
+}
+
+export interface UIAction {
+  type: 'approve' | 'reject' | 'edit' | 'expand';
+  label: string;
+  targetSection?: number;
+}
+
+export interface UIHint {
+  layout: 'card' | 'tabs' | 'accordion' | 'flow' | 'iframe';
+  sections: UISection[];
+  html?: string;
+  actions?: UIAction[];
+}
+
 // ─── Sprint 10: Agent Execution Types (F53) ───
 
 /** F53: 에이전트 실행 작업 유형 */
@@ -136,6 +160,7 @@ export interface AgentExecutionResult {
       comment: string;
       severity: 'error' | 'warning' | 'info';
     }>;
+    uiHint?: UIHint;  // F60: Generative UI rendering hint
   };
   tokensUsed: number;
   model: string;
@@ -209,3 +234,26 @@ export interface TaskCompletedData {
 }
 
 export type AgentTaskStatus = 'pending' | 'running' | 'completed' | 'failed';
+
+// ─── Sprint 12: MCP Server Types (F61) ───
+
+/** F61: MCP 서버 정보 (Web 대시보드 표시용) */
+export interface McpServerInfo {
+  id: string;
+  name: string;
+  serverUrl: string;
+  transportType: 'sse' | 'http';
+  status: 'active' | 'inactive' | 'error';
+  lastConnectedAt: string | null;
+  errorMessage: string | null;
+  toolCount: number;
+  createdAt: string;
+}
+
+/** F61: MCP 서버 연결 테스트 결과 */
+export interface McpTestResult {
+  status: 'connected' | 'error';
+  tools?: Array<{ name: string; description?: string }>;
+  toolCount?: number;
+  error?: string;
+}

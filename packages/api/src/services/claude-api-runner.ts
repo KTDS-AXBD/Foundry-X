@@ -5,27 +5,40 @@ import type {
 } from "./execution-types.js";
 import type { AgentRunner } from "./agent-runner.js";
 
+// F60: Generative UI — instruct LLM to include rendering hints
+const UIHINT_INSTRUCTION = `\n\nAdditionally, include a "uiHint" field in your JSON response to suggest rendering.
+Format: { "layout": "card"|"tabs"|"accordion"|"iframe", "sections": [{ "type": "text"|"code"|"diff"|"chart"|"table", "title": string, "data": any }] }
+If the result contains HTML visualizations, include an "html" field with self-contained HTML.`;
+
 const TASK_SYSTEM_PROMPTS: Record<AgentTaskType, string> = {
   "code-review": `You are a code review agent for the Foundry-X project.
 Analyze the provided code files against the spec requirements.
 Return a JSON object with "reviewComments" array.
-Each comment: { "file": string, "line": number, "comment": string, "severity": "error"|"warning"|"info" }`,
+Each comment: { "file": string, "line": number, "comment": string, "severity": "error"|"warning"|"info" }` + UIHINT_INSTRUCTION,
 
   "code-generation": `You are a code generation agent for the Foundry-X project.
 Generate TypeScript code based on the spec requirements.
 Return a JSON object with "generatedCode" array.
-Each item: { "path": string, "content": string, "action": "create"|"modify" }`,
+Each item: { "path": string, "content": string, "action": "create"|"modify" }` + UIHINT_INSTRUCTION,
 
   "spec-analysis": `You are a spec analysis agent for the Foundry-X project.
 Analyze the provided spec for completeness, consistency, and feasibility.
-Return a JSON object with "analysis" field containing your assessment.`,
+Return a JSON object with "analysis" field containing your assessment.` + UIHINT_INSTRUCTION,
 
   "test-generation": `You are a test generation agent for the Foundry-X project.
 Generate vitest test cases for the provided code and spec.
-Return a JSON object with "generatedCode" array containing test files.`,
+Return a JSON object with "generatedCode" array containing test files.` + UIHINT_INSTRUCTION,
 };
 
-export { TASK_SYSTEM_PROMPTS };
+export { UIHINT_INSTRUCTION, TASK_SYSTEM_PROMPTS };
+
+/** F60: Default layout per task type — client fallback when uiHint is absent */
+export const DEFAULT_LAYOUT_MAP: Record<AgentTaskType, string> = {
+  "code-review": "tabs",
+  "code-generation": "accordion",
+  "spec-analysis": "card",
+  "test-generation": "accordion",
+};
 
 export class ClaudeApiRunner implements AgentRunner {
   readonly type = "claude-api" as const;
@@ -88,6 +101,7 @@ export class ClaudeApiRunner implements AgentRunner {
           analysis: parsed.analysis,
           generatedCode: parsed.generatedCode,
           reviewComments: parsed.reviewComments,
+          uiHint: parsed.uiHint,  // F60
         },
         tokensUsed,
         model: this.model,

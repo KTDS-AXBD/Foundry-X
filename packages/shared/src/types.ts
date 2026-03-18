@@ -144,3 +144,32 @@ export interface FoundryXConfig {
     remote?: string;
   };
 }
+
+// ─── Sprint 12: Ambiguity Score (F59) ───
+
+export interface AmbiguityDimension {
+  name: 'goal' | 'constraint' | 'success' | 'context';
+  clarity: number;
+  weight: number;
+}
+
+export interface AmbiguityScore {
+  dimensions: AmbiguityDimension[];
+  totalClarity: number;
+  ambiguity: number;
+  ready: boolean;
+  projectType: 'greenfield' | 'brownfield';
+}
+
+export function calculateAmbiguity(dimensions: AmbiguityDimension[]): number {
+  const totalClarity = dimensions.reduce((sum, d) => sum + d.clarity * d.weight, 0);
+  return parseFloat((1 - totalClarity).toFixed(4));
+}
+
+export const GREENFIELD_WEIGHTS: Record<string, number> = {
+  goal: 0.4, constraint: 0.3, success: 0.3,
+};
+
+export const BROWNFIELD_WEIGHTS: Record<string, number> = {
+  goal: 0.35, constraint: 0.25, success: 0.25, context: 0.15,
+};

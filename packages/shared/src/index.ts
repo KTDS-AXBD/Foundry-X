@@ -16,6 +16,14 @@ export type {
   CommandLog,
   HealthScore,
   FoundryXConfig,
+  AmbiguityDimension,
+  AmbiguityScore,
+} from './types.js';
+
+export {
+  calculateAmbiguity,
+  GREENFIELD_WEIGHTS,
+  BROWNFIELD_WEIGHTS,
 } from './types.js';
 
 // Web Dashboard types (Sprint 5 Part A)
@@ -39,4 +47,8 @@ export type {
   TokenSummary,
   LLMFallbackConfig,
   LLMProvider,
+  SectionType,
+  UISection,
+  UIAction,
+  UIHint,
 } from './agent.js';

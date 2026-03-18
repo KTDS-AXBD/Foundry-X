@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { ClaudeApiRunner, MockRunner, TASK_SYSTEM_PROMPTS } from "../../services/claude-api-runner.js";
+import { ClaudeApiRunner, MockRunner, TASK_SYSTEM_PROMPTS, UIHINT_INSTRUCTION, DEFAULT_LAYOUT_MAP } from "../../services/claude-api-runner.js";
 import type { AgentExecutionRequest } from "../../services/execution-types.js";
+import { uiHintSchema } from "../../schemas/agent.js";
 
 const makeRequest = (overrides?: Partial<AgentExecutionRequest>): AgentExecutionRequest => ({
   taskId: "task-abc123",
@@ -138,6 +139,78 @@ describe("ClaudeApiRunner", () => {
     expect(body.model).toBe("claude-haiku-4-5-20250714");
     expect(body.system).toBe(TASK_SYSTEM_PROMPTS["spec-analysis"]);
   });
+
+  // ─── F60: Generative UI Tests ───
+
+  it("UIHINT_INSTRUCTION is appended to all task prompts", () => {
+    const taskTypes = ["code-review", "code-generation", "spec-analysis", "test-generation"] as const;
+    for (const taskType of taskTypes) {
+      expect(TASK_SYSTEM_PROMPTS[taskType]).toContain("uiHint");
+      expect(TASK_SYSTEM_PROMPTS[taskType]).toContain(UIHINT_INSTRUCTION);
+    }
+  });
+
+  it("execute() extracts uiHint from JSON response", async () => {
+    const mockResponse = {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify({
+            analysis: "Spec is complete",
+            uiHint: {
+              layout: "card",
+              sections: [{ type: "text", title: "Summary", data: "All good" }],
+            },
+          }),
+        },
+      ],
+      usage: { input_tokens: 40, output_tokens: 20 },
+    };
+
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockResponse),
+    });
+
+    const result = await runner.execute(makeRequest({ taskType: "spec-analysis" }));
+
+    expect(result.status).toBe("success");
+    expect(result.output.uiHint).toBeDefined();
+    expect(result.output.uiHint!.layout).toBe("card");
+    expect(result.output.uiHint!.sections).toHaveLength(1);
+  });
+
+  it("execute() works without uiHint (backward compat)", async () => {
+    const mockResponse = {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify({
+            analysis: "No hints here",
+          }),
+        },
+      ],
+      usage: { input_tokens: 20, output_tokens: 10 },
+    };
+
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockResponse),
+    });
+
+    const result = await runner.execute(makeRequest({ taskType: "spec-analysis" }));
+
+    expect(result.status).toBe("success");
+    expect(result.output.uiHint).toBeUndefined();
+    expect(result.output.analysis).toBe("No hints here");
+  });
+
+  it("DEFAULT_LAYOUT_MAP covers all task types", () => {
+    expect(DEFAULT_LAYOUT_MAP["code-review"]).toBe("tabs");
+    expect(DEFAULT_LAYOUT_MAP["code-generation"]).toBe("accordion");
+    expect(DEFAULT_LAYOUT_MAP["spec-analysis"]).toBe("card");
+    expect(DEFAULT_LAYOUT_MAP["test-generation"]).toBe("accordion");
+  });
 });
 
 describe("MockRunner", () => {
@@ -165,5 +238,52 @@ describe("MockRunner", () => {
 
   it("type is mock", () => {
     expect(runner.type).toBe("mock");
+  });
+});
+
+// ─── F60: uiHintSchema Zod Validation (3건) ───
+
+describe("uiHintSchema", () => {
+  it("validates a valid UIHint object", () => {
+    const validHint = {
+      layout: "card",
+      sections: [
+        { type: "text", title: "Summary", data: "All checks passed" },
+        { type: "code", title: "Output", data: "const x = 1;", interactive: false },
+      ],
+    };
+    const result = uiHintSchema.safeParse(validHint);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.layout).toBe("card");
+      expect(result.data.sections).toHaveLength(2);
+    }
+  });
+
+  it("rejects invalid layout type", () => {
+    const invalid = {
+      layout: "grid",
+      sections: [{ type: "text", title: "T", data: "D" }],
+    };
+    const result = uiHintSchema.safeParse(invalid);
+    expect(result.success).toBe(false);
+  });
+
+  it("validates UIHint with optional html and actions", () => {
+    const hintWithExtras = {
+      layout: "iframe",
+      sections: [{ type: "chart", title: "Graph", data: { labels: [1, 2] } }],
+      html: "<canvas id='chart'></canvas>",
+      actions: [
+        { type: "approve", label: "Accept" },
+        { type: "edit", label: "Modify", targetSection: 0 },
+      ],
+    };
+    const result = uiHintSchema.safeParse(hintWithExtras);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.html).toContain("canvas");
+      expect(result.data.actions).toHaveLength(2);
+    }
   });
 });

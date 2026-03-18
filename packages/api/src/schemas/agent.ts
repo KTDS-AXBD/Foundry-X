@@ -98,6 +98,30 @@ export const AgentRegistrationSchema = z
   })
   .openapi("AgentRegistration");
 
+// ─── Sprint 12: Generative UI Schemas (F60) ───
+
+const uiSectionSchema = z.object({
+  type: z.enum(["text", "code", "diff", "chart", "diagram", "table", "timeline"]),
+  title: z.string(),
+  data: z.unknown(),
+  interactive: z.boolean().optional(),
+});
+
+const uiActionSchema = z.object({
+  type: z.enum(["approve", "reject", "edit", "expand"]),
+  label: z.string(),
+  targetSection: z.number().optional(),
+});
+
+export const uiHintSchema = z
+  .object({
+    layout: z.enum(["card", "tabs", "accordion", "flow", "iframe"]),
+    sections: z.array(uiSectionSchema),
+    html: z.string().optional(),
+    actions: z.array(uiActionSchema).optional(),
+  })
+  .openapi("UIHint");
+
 // ─── Sprint 10: Agent Execution Schemas (F53) ───
 
 export const AgentExecuteRequestSchema = z
@@ -147,6 +171,7 @@ export const AgentExecutionResultSchema = z
           }),
         )
         .optional(),
+      uiHint: uiHintSchema.optional(),
     }),
     tokensUsed: z.number(),
     model: z.string(),

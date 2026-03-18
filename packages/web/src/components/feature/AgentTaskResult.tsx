@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import type { AgentExecutionResult } from "@/lib/api-client";
+import { DynamicRenderer } from "./DynamicRenderer";
 
 interface AgentTaskResultProps {
   result: AgentExecutionResult;
@@ -32,68 +33,83 @@ export function AgentTaskResult({ result }: AgentTaskResultProps) {
           <span>Duration: {(result.duration / 1000).toFixed(1)}s</span>
         </div>
 
-        {result.output.analysis && (
-          <div>
-            <h4 className="mb-1 text-xs font-medium">분석</h4>
-            <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded bg-muted p-3 text-xs">
-              {result.output.analysis}
-            </pre>
-          </div>
+        {/* F60: uiHint 분기 — 있으면 DynamicRenderer, 없으면 기존 레이아웃 */}
+        {result.output.uiHint ? (
+          <DynamicRenderer uiHint={result.output.uiHint} />
+        ) : (
+          <LegacyContent output={result.output} />
         )}
-
-        {result.output.reviewComments &&
-          result.output.reviewComments.length > 0 && (
-            <div>
-              <h4 className="mb-1 text-xs font-medium">
-                리뷰 코멘트 ({result.output.reviewComments.length}건)
-              </h4>
-              <div className="space-y-2">
-                {result.output.reviewComments.map((comment, i) => (
-                  <div
-                    key={i}
-                    className="rounded border p-2 text-xs"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono">{comment.file}:{comment.line}</span>
-                      <span
-                        className={`rounded px-1 ${
-                          comment.severity === "error"
-                            ? "bg-red-100 text-red-700"
-                            : comment.severity === "warning"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-blue-100 text-blue-700"
-                        }`}
-                      >
-                        {comment.severity}
-                      </span>
-                    </div>
-                    <p className="mt-1">{comment.comment}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-        {result.output.generatedCode &&
-          result.output.generatedCode.length > 0 && (
-            <div>
-              <h4 className="mb-1 text-xs font-medium">
-                생성된 코드 ({result.output.generatedCode.length}파일)
-              </h4>
-              {result.output.generatedCode.map((file, i) => (
-                <div key={i} className="mb-2">
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="font-mono">{file.path}</span>
-                    <span className="rounded bg-muted px-1">{file.action}</span>
-                  </div>
-                  <pre className="mt-1 max-h-32 overflow-auto rounded bg-muted p-2 text-xs">
-                    {file.content}
-                  </pre>
-                </div>
-              ))}
-            </div>
-          )}
       </CardContent>
     </Card>
+  );
+}
+
+/** 기존 3섹션 레이아웃 — uiHint가 없는 결과용 하위 호환 */
+function LegacyContent({
+  output,
+}: {
+  output: AgentExecutionResult["output"];
+}) {
+  return (
+    <>
+      {output.analysis && (
+        <div>
+          <h4 className="mb-1 text-xs font-medium">분석</h4>
+          <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded bg-muted p-3 text-xs">
+            {output.analysis}
+          </pre>
+        </div>
+      )}
+
+      {output.reviewComments && output.reviewComments.length > 0 && (
+        <div>
+          <h4 className="mb-1 text-xs font-medium">
+            리뷰 코멘트 ({output.reviewComments.length}건)
+          </h4>
+          <div className="space-y-2">
+            {output.reviewComments.map((comment, i) => (
+              <div key={i} className="rounded border p-2 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono">
+                    {comment.file}:{comment.line}
+                  </span>
+                  <span
+                    className={`rounded px-1 ${
+                      comment.severity === "error"
+                        ? "bg-red-100 text-red-700"
+                        : comment.severity === "warning"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-blue-100 text-blue-700"
+                    }`}
+                  >
+                    {comment.severity}
+                  </span>
+                </div>
+                <p className="mt-1">{comment.comment}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {output.generatedCode && output.generatedCode.length > 0 && (
+        <div>
+          <h4 className="mb-1 text-xs font-medium">
+            생성된 코드 ({output.generatedCode.length}파일)
+          </h4>
+          {output.generatedCode.map((file, i) => (
+            <div key={i} className="mb-2">
+              <div className="flex items-center gap-2 text-xs">
+                <span className="font-mono">{file.path}</span>
+                <span className="rounded bg-muted px-1">{file.action}</span>
+              </div>
+              <pre className="mt-1 max-h-32 overflow-auto rounded bg-muted p-2 text-xs">
+                {file.content}
+              </pre>
+            </div>
+          ))}
+        </div>
+      )}
+    </>
   );
 }
