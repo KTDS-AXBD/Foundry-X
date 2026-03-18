@@ -257,3 +257,135 @@ export interface McpTestResult {
   toolCount?: number;
   error?: string;
 }
+
+// ─── Sprint 13: MCP Sampling/Prompts Types (F64) ───
+
+/** F64: MCP 프롬프트 정의 */
+export interface McpPrompt {
+  name: string;
+  description?: string;
+  arguments?: McpPromptArgument[];
+}
+
+export interface McpPromptArgument {
+  name: string;
+  description?: string;
+  required?: boolean;
+}
+
+/** F64: MCP 프롬프트 실행 결과 메시지 */
+export interface McpPromptMessage {
+  role: 'user' | 'assistant';
+  content:
+    | { type: 'text'; text: string }
+    | { type: 'resource'; resource: { uri: string; text: string; mimeType?: string } };
+}
+
+/** F64: MCP Sampling 요청 메시지 */
+export interface McpSamplingMessage {
+  role: 'user' | 'assistant';
+  content: { type: 'text'; text: string } | { type: 'image'; data: string; mimeType: string };
+}
+
+/** F64: MCP Sampling 이력 레코드 */
+export interface McpSamplingLog {
+  id: string;
+  serverId: string;
+  model: string;
+  maxTokens: number;
+  tokensUsed: number | null;
+  durationMs: number | null;
+  status: string;
+  createdAt: string;
+}
+
+// ─── Sprint 13: Agent PR Pipeline Types (F65) ───
+
+/** F65: 에이전트 PR 상태 */
+export type AgentPrStatus =
+  | 'creating'
+  | 'open'
+  | 'reviewing'
+  | 'approved'
+  | 'merged'
+  | 'closed'
+  | 'needs_human';
+
+/** F65: 에이전트 PR 레코드 */
+export interface AgentPr {
+  id: string;
+  agentId: string;
+  taskId: string;
+  repo: string;
+  branch: string;
+  prNumber: number | null;
+  prUrl: string | null;
+  status: AgentPrStatus;
+  reviewAgentId: string | null;
+  reviewDecision: string | null;
+  sddScore: number | null;
+  qualityScore: number | null;
+  securityIssues: string[];
+  mergeStrategy: string;
+  mergedAt: string | null;
+  commitSha: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** F65: PR 리뷰 결과 */
+export interface PrReviewResult {
+  decision: 'approve' | 'request_changes' | 'comment';
+  summary: string;
+  comments: PrReviewComment[];
+  sddScore: number;
+  qualityScore: number;
+  securityIssues: string[];
+}
+
+/** F65: PR 리뷰 코멘트 */
+export interface PrReviewComment {
+  file: string;
+  line: number;
+  comment: string;
+  severity: 'error' | 'warning' | 'info';
+}
+
+/** F65: PR 파이프라인 설정 */
+export interface PrPipelineConfig {
+  autoMerge: boolean;
+  requireHumanApproval: boolean;
+  maxAutoMergePerDay: number;
+  branchPrefix: string;
+  mergeStrategy: 'squash' | 'merge' | 'rebase';
+  sddScoreThreshold: number;
+  qualityScoreThreshold: number;
+}
+
+// ─── Sprint 13: SSE PR Event Types (F65) ───
+
+export interface PrCreatedData {
+  prNumber: number;
+  branch: string;
+  agentId: string;
+  taskId: string;
+}
+
+export interface PrReviewedData {
+  prNumber: number;
+  decision: 'approve' | 'request_changes' | 'comment';
+  sddScore: number;
+  reviewerAgentId: string;
+}
+
+export interface PrMergedData {
+  prNumber: number;
+  mergedAt: string;
+  commitSha: string;
+}
+
+export interface PrReviewNeededData {
+  prNumber: number;
+  reason: string;
+  blockers: string[];
+}

@@ -19,12 +19,43 @@ export interface TaskCompletedData {
   completedAt: string;
 }
 
+// ─── Sprint 13: PR Event Data Types (F65) ───
+export interface PrCreatedData {
+  prNumber: number;
+  branch: string;
+  agentId: string;
+  taskId: string;
+}
+
+export interface PrReviewedData {
+  prNumber: number;
+  decision: "approve" | "request_changes" | "comment";
+  sddScore: number;
+  reviewerAgentId: string;
+}
+
+export interface PrMergedData {
+  prNumber: number;
+  mergedAt: string;
+  commitSha: string;
+}
+
+export interface PrReviewNeededData {
+  prNumber: number;
+  reason: string;
+  blockers: string[];
+}
+
 export type SSEEvent =
   | { event: "activity"; data: { agentId: string; status: string; currentTask?: string; progress?: number; timestamp: string } }
   | { event: "status"; data: { agentId: string; previousStatus: string; newStatus: string; result?: string; timestamp: string } }
   | { event: "error"; data: { agentId: string; error: string; message: string; timestamp: string } }
   | { event: "agent.task.started"; data: TaskStartedData }
-  | { event: "agent.task.completed"; data: TaskCompletedData };
+  | { event: "agent.task.completed"; data: TaskCompletedData }
+  | { event: "agent.pr.created"; data: PrCreatedData }
+  | { event: "agent.pr.reviewed"; data: PrReviewedData }
+  | { event: "agent.pr.merged"; data: PrMergedData }
+  | { event: "agent.pr.review_needed"; data: PrReviewNeededData };
 
 const DEDUP_TTL_MS = 60_000;
 
@@ -54,9 +85,9 @@ export class SSEManager {
       this.recentTaskIds.set(dedupKey, Date.now());
     }
 
-    // agent.task.* events → wrap as "status" so SSEClient's onStatus handler receives them
+    // agent.task.* and agent.pr.* events → wrap as "status" so SSEClient's onStatus handler receives them
     // SSEClient uses EventSource.addEventListener("status", ...) which requires exact name match
-    const eventName = event.event.startsWith("agent.task.") ? "status" : event.event;
+    const eventName = event.event.startsWith("agent.") ? "status" : event.event;
     const payload = `event: ${eventName}\ndata: ${JSON.stringify(event.data)}\n\n`;
 
     for (const send of this.subscribers) {
