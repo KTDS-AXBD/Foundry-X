@@ -29,7 +29,7 @@ const pillars = [
     label: "에이전트 통제",
     desc: "AI가 코드를 쓰기 전에 계획을 세우고, 사람이 승인해요. 자율성과 통제의 균형.",
     detail: "코드베이스 리서치 → 계획 수립 → 인간 승인 → 실행",
-    color: "forge-amber",
+    color: "axis-primary",
   },
   {
     icon: Network,
@@ -166,10 +166,10 @@ function EcosystemDiagram() {
     <div className="relative mx-auto w-full max-w-2xl py-8">
       {/* Center node — Foundry-X */}
       <div className="relative z-10 mx-auto flex w-fit flex-col items-center">
-        <div className="animate-pulse-ring flex size-28 items-center justify-center rounded-2xl border-2 border-forge-amber/40 bg-forge-amber/10 backdrop-blur-sm">
+        <div className="animate-pulse-ring flex size-28 items-center justify-center rounded-2xl border-2 border-axis-primary/40 bg-axis-primary/10 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-1">
-            <Anvil className="size-8 text-forge-amber" />
-            <span className="font-display text-xs font-bold text-forge-amber">
+            <Anvil className="size-8 text-axis-primary" />
+            <span className="font-display text-xs font-bold text-axis-primary">
               Foundry-X
             </span>
           </div>
@@ -185,11 +185,11 @@ function EcosystemDiagram() {
           <div key={svc.name} className="flex flex-col items-center gap-3">
             {/* Arrow label */}
             <div className="flex flex-col items-center gap-1">
-              <div className="h-6 w-px bg-gradient-to-b from-transparent via-forge-amber/30 to-forge-amber/60" />
+              <div className="h-6 w-px bg-gradient-to-b from-transparent via-axis-primary/30 to-axis-primary/60" />
               <span className="font-mono text-[9px] text-muted-foreground/70">
                 {svc.arrow}
               </span>
-              <div className="h-3 w-px bg-forge-amber/40" />
+              <div className="h-3 w-px bg-axis-primary/40" />
             </div>
             {/* Node */}
             <div
@@ -221,16 +221,16 @@ function ArchitectureBlueprint() {
         {architecture.map((layer, i) => (
           <div
             key={layer.layer}
-            className="group relative overflow-hidden rounded-xl border border-border/30 bg-background/80 backdrop-blur-sm transition-all hover:border-forge-amber/20"
+            className="group relative overflow-hidden rounded-xl border border-border/30 bg-background/80 backdrop-blur-sm transition-all hover:border-axis-primary/20"
           >
             {/* Layer depth indicator */}
             <div
-              className="absolute top-0 left-0 h-full w-1 bg-gradient-to-b from-forge-amber/80 to-forge-copper/40"
+              className="absolute top-0 left-0 h-full w-1 bg-gradient-to-b from-axis-primary/80 to-axis-accent/40"
               style={{ opacity: 1 - i * 0.2 }}
             />
             <div className="flex items-start gap-4 p-4 pl-5">
               <div className="flex min-w-[120px] flex-col">
-                <span className="font-display text-sm font-bold text-forge-amber">
+                <span className="font-display text-sm font-bold text-axis-primary">
                   {layer.layer}
                 </span>
                 <span className="font-mono text-[10px] text-muted-foreground/60">
@@ -241,7 +241,7 @@ function ArchitectureBlueprint() {
                 {layer.items.map((item) => (
                   <span
                     key={item}
-                    className="rounded-md border border-border/40 bg-muted/30 px-2.5 py-1 font-mono text-[11px] text-muted-foreground transition-colors group-hover:border-forge-amber/20 group-hover:text-foreground"
+                    className="rounded-md border border-border/40 bg-muted/30 px-2.5 py-1 font-mono text-[11px] text-muted-foreground transition-colors group-hover:border-axis-primary/20 group-hover:text-foreground"
                   >
                     {item}
                   </span>
@@ -270,7 +270,7 @@ function RoadmapTimeline() {
             <div
               className={`h-full rounded-xl border p-5 transition-all ${
                 isCurrent
-                  ? "border-forge-amber/30 bg-forge-amber/5"
+                  ? "border-axis-primary/30 bg-axis-primary/5"
                   : isDone
                     ? "border-border/30 bg-muted/20"
                     : "border-dashed border-border/20 bg-transparent"
@@ -281,7 +281,7 @@ function RoadmapTimeline() {
                 <span
                   className={`inline-flex items-center rounded-md px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider ${
                     isCurrent
-                      ? "bg-forge-amber/20 text-forge-amber"
+                      ? "bg-axis-primary/20 text-axis-primary"
                       : isDone
                         ? "bg-muted text-muted-foreground"
                         : "bg-muted/50 text-muted-foreground/50"
@@ -293,12 +293,12 @@ function RoadmapTimeline() {
                   {phase.version}
                 </span>
                 {isDone && (
-                  <span className="ml-auto text-[10px] text-forge-amber">
+                  <span className="ml-auto text-[10px] text-axis-primary">
                     ✓
                   </span>
                 )}
                 {isCurrent && (
-                  <span className="ml-auto size-1.5 animate-pulse rounded-full bg-forge-amber" />
+                  <span className="ml-auto size-1.5 animate-pulse rounded-full bg-axis-primary" />
                 )}
               </div>
               <h4
@@ -323,9 +323,9 @@ function RoadmapTimeline() {
                     <span
                       className={`size-1 rounded-full ${
                         isDone
-                          ? "bg-forge-amber/60"
+                          ? "bg-axis-primary/60"
                           : isCurrent
-                            ? "bg-forge-amber"
+                            ? "bg-axis-primary"
                             : "bg-muted-foreground/20"
                       }`}
                     />
@@ -349,19 +349,19 @@ export default function LandingPage() {
   return (
     <div className="grain-overlay relative overflow-hidden">
       {/* ═══ HERO ═══ */}
-      <section className="forge-grid relative flex min-h-[92vh] items-center justify-center px-6 pt-16">
+      <section className="axis-grid relative flex min-h-[92vh] items-center justify-center px-6 pt-16">
         {/* Background effects */}
         <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div className="absolute top-1/4 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-forge-amber/5 blur-[120px]" />
+          <div className="absolute top-1/4 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-axis-primary/5 blur-[120px]" />
           <div className="absolute right-0 bottom-0 h-[400px] w-[400px] rounded-full bg-axis-blue/3 blur-[100px]" />
-          <div className="absolute top-0 left-0 h-[300px] w-[300px] rounded-full bg-forge-copper/4 blur-[80px]" />
+          <div className="absolute top-0 left-0 h-[300px] w-[300px] rounded-full bg-axis-accent/4 blur-[80px]" />
         </div>
 
         <div className="relative z-10 mx-auto max-w-4xl text-center">
           {/* Version badge */}
-          <div className="animate-fade-in-up mb-8 inline-flex items-center gap-2 rounded-full border border-forge-amber/20 bg-forge-amber/5 px-4 py-1.5">
-            <Sparkles className="size-3.5 text-forge-amber" />
-            <span className="font-mono text-xs font-medium text-forge-amber">
+          <div className="animate-fade-in-up mb-8 inline-flex items-center gap-2 rounded-full border border-axis-primary/20 bg-axis-primary/5 px-4 py-1.5">
+            <Sparkles className="size-3.5 text-axis-primary" />
+            <span className="font-mono text-xs font-medium text-axis-primary">
               v1.3.0 &middot; Phase 2 Complete
             </span>
           </div>
@@ -370,7 +370,7 @@ export default function LandingPage() {
           <h1 className="animate-fade-in-up stagger-1 font-display text-5xl leading-[1.08] font-bold tracking-tight sm:text-6xl md:text-7xl">
             사람과 AI가
             <br />
-            <span className="bg-gradient-to-r from-forge-amber via-forge-ember to-forge-copper bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-axis-primary via-axis-primary-hover to-axis-accent bg-clip-text text-transparent">
               함께 만드는 곳
             </span>
           </h1>
@@ -395,8 +395,8 @@ export default function LandingPage() {
                 key={step.text}
                 className="flex items-center gap-3 rounded-lg border border-border/20 bg-background/40 px-4 py-2.5 backdrop-blur-sm"
               >
-                <step.icon className="size-4 shrink-0 text-forge-amber" />
-                <span className="w-20 font-display text-sm font-bold text-forge-amber">
+                <step.icon className="size-4 shrink-0 text-axis-primary" />
+                <span className="w-20 font-display text-sm font-bold text-axis-primary">
                   {step.text}
                 </span>
                 <span className="text-left text-sm text-muted-foreground">
@@ -410,7 +410,7 @@ export default function LandingPage() {
           <div className="animate-fade-in-up stagger-4 mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/dashboard"
-              className="forge-glow-strong group inline-flex h-12 items-center gap-2 rounded-xl bg-forge-amber px-7 text-sm font-bold text-forge-charcoal transition-all hover:bg-forge-ember"
+              className="axis-glow-strong group inline-flex h-12 items-center gap-2 rounded-xl bg-axis-primary px-7 text-sm font-bold text-white transition-all hover:bg-axis-primary-hover"
             >
               Dashboard 열기
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
@@ -419,9 +419,9 @@ export default function LandingPage() {
               href="https://github.com/KTDS-AXBD/Foundry-X"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-12 items-center gap-2 rounded-xl border border-border/50 bg-background/50 px-7 text-sm font-medium backdrop-blur transition-all hover:border-forge-amber/30 hover:bg-forge-amber/5"
+              className="inline-flex h-12 items-center gap-2 rounded-xl border border-border/50 bg-background/50 px-7 text-sm font-medium backdrop-blur transition-all hover:border-axis-primary/30 hover:bg-axis-primary/5"
             >
-              <GitBranch className="size-4 text-forge-amber" />
+              <GitBranch className="size-4 text-axis-primary" />
               GitHub에서 보기
             </a>
           </div>
@@ -433,7 +433,7 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-6">
           {stats.map((stat) => (
             <div key={stat.label} className="flex flex-col items-center gap-0.5">
-              <span className="font-display text-2xl font-bold text-forge-amber sm:text-3xl">
+              <span className="font-display text-2xl font-bold text-axis-primary sm:text-3xl">
                 {stat.value}
               </span>
               <span className="font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
@@ -448,12 +448,12 @@ export default function LandingPage() {
       <section id="features" className="relative px-6 py-24 md:py-32">
         <div className="mx-auto max-w-5xl">
           <div className="mb-16 text-center">
-            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-forge-amber uppercase">
+            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">
               Core Pillars
             </span>
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
               세 가지{" "}
-              <span className="text-forge-amber">차별점</span>
+              <span className="text-axis-primary">차별점</span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
               에이전트 통제, 조직 지식, 실험-코드 연결.
@@ -464,12 +464,12 @@ export default function LandingPage() {
             {pillars.map((p, i) => (
               <div
                 key={p.title}
-                className={`animate-fade-in-up stagger-${i + 1} forge-glass group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:border-forge-amber/20 hover:bg-forge-amber/5`}
+                className={`animate-fade-in-up stagger-${i + 1} axis-glass group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:border-axis-primary/20 hover:bg-axis-primary/5`}
               >
                 {/* Icon */}
                 <div className="mb-4 flex items-center gap-3">
-                  <div className="flex size-11 items-center justify-center rounded-xl bg-forge-amber/10 transition-colors group-hover:bg-forge-amber/20">
-                    <p.icon className="size-5 text-forge-amber" />
+                  <div className="flex size-11 items-center justify-center rounded-xl bg-axis-primary/10 transition-colors group-hover:bg-axis-primary/20">
+                    <p.icon className="size-5 text-axis-primary" />
                   </div>
                   <span className="rounded-md border border-border/30 bg-muted/30 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
                     {p.label}
@@ -524,16 +524,16 @@ export default function LandingPage() {
       {/* ═══ ARCHITECTURE ═══ */}
       <section
         id="architecture"
-        className="forge-grid relative px-6 py-24 md:py-32"
+        className="axis-grid relative px-6 py-24 md:py-32"
       >
         <div className="mx-auto max-w-4xl">
           <div className="mb-12 text-center">
-            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-forge-amber uppercase">
+            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">
               System Architecture
             </span>
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
               4-Layer{" "}
-              <span className="text-forge-amber">아키텍처</span>
+              <span className="text-axis-primary">아키텍처</span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
               CLI → API → Agent → Data, 각 레이어가 독립 확장돼요.
@@ -556,7 +556,7 @@ export default function LandingPage() {
             ].map((tech) => (
               <span
                 key={tech}
-                className="rounded-lg border border-border/30 bg-muted/20 px-3 py-1.5 font-mono text-[11px] text-muted-foreground transition-colors hover:border-forge-amber/20 hover:text-foreground"
+                className="rounded-lg border border-border/30 bg-muted/20 px-3 py-1.5 font-mono text-[11px] text-muted-foreground transition-colors hover:border-axis-primary/20 hover:text-foreground"
               >
                 {tech}
               </span>
@@ -569,12 +569,12 @@ export default function LandingPage() {
       <section id="roadmap" className="relative px-6 py-24 md:py-32">
         <div className="mx-auto max-w-5xl">
           <div className="mb-12 text-center">
-            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-forge-amber uppercase">
+            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">
               Roadmap
             </span>
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
               서비스{" "}
-              <span className="text-forge-amber">로드맵</span>
+              <span className="text-axis-primary">로드맵</span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
               CLI에서 시작해, 생태계 통합까지.
@@ -586,23 +586,23 @@ export default function LandingPage() {
       </section>
 
       {/* ═══ HOW IT WORKS ═══ */}
-      <section className="forge-grid relative px-6 py-24 md:py-32">
+      <section className="axis-grid relative px-6 py-24 md:py-32">
         <div className="mx-auto max-w-3xl">
           <div className="mb-12 text-center">
-            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-forge-amber uppercase">
+            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">
               Quick Start
             </span>
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
               3분이면{" "}
-              <span className="text-forge-amber">시작</span>
+              <span className="text-axis-primary">시작</span>
             </h2>
           </div>
 
           {/* Terminal card */}
-          <div className="forge-glass overflow-hidden rounded-2xl">
+          <div className="axis-glass overflow-hidden rounded-2xl">
             <div className="flex items-center gap-2 border-b border-border/30 px-5 py-3">
-              <div className="size-3 rounded-full bg-forge-copper/40" />
-              <div className="size-3 rounded-full bg-forge-amber/40" />
+              <div className="size-3 rounded-full bg-axis-accent/40" />
+              <div className="size-3 rounded-full bg-axis-primary/40" />
               <div className="size-3 rounded-full bg-green-500/40" />
               <span className="ml-2 font-mono text-xs text-muted-foreground">
                 terminal
@@ -615,7 +615,7 @@ export default function LandingPage() {
                   01 &mdash; 설치 &amp; 초기화
                 </div>
                 <div>
-                  <span className="text-forge-amber">$</span>{" "}
+                  <span className="text-axis-primary">$</span>{" "}
                   <span className="text-foreground">npx foundry-x init</span>
                 </div>
                 <div className="ml-4 mt-1 space-y-0.5 text-muted-foreground">
@@ -635,7 +635,7 @@ export default function LandingPage() {
                   02 &mdash; 동기화 검증
                 </div>
                 <div>
-                  <span className="text-forge-amber">$</span>{" "}
+                  <span className="text-axis-primary">$</span>{" "}
                   <span className="text-foreground">foundry-x sync</span>
                 </div>
                 <div className="ml-4 mt-1 text-muted-foreground">
@@ -649,13 +649,13 @@ export default function LandingPage() {
                   03 &mdash; 대시보드
                 </div>
                 <div>
-                  <span className="text-forge-amber">$</span>{" "}
+                  <span className="text-axis-primary">$</span>{" "}
                   <span className="text-foreground">
                     open fx.minu.best/dashboard
                   </span>
                 </div>
                 <div className="ml-4 mt-1 text-muted-foreground">
-                  <span className="text-forge-amber">&#9670;</span> 에이전트 상태, Spec↔Code↔Test 건강도 한눈에
+                  <span className="text-axis-primary">&#9670;</span> 에이전트 상태, Spec↔Code↔Test 건강도 한눈에
                 </div>
               </div>
             </div>
@@ -667,13 +667,13 @@ export default function LandingPage() {
       <section className="px-6 py-24 md:py-32">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-6 inline-flex items-center justify-center gap-3">
-            <Anvil className="size-8 text-forge-amber" />
-            <Shield className="size-7 text-forge-amber/50" />
+            <Anvil className="size-8 text-axis-primary" />
+            <Shield className="size-7 text-axis-primary/50" />
             <Bot className="size-7 text-axis-blue/50" />
           </div>
           <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
             함께{" "}
-            <span className="bg-gradient-to-r from-forge-amber to-forge-copper bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-axis-primary to-axis-accent bg-clip-text text-transparent">
               만들어요
             </span>
           </h2>
@@ -683,7 +683,7 @@ export default function LandingPage() {
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/dashboard"
-              className="forge-glow-strong group inline-flex h-12 items-center gap-2 rounded-xl bg-forge-amber px-8 text-sm font-bold text-forge-charcoal transition-all hover:bg-forge-ember"
+              className="axis-glow-strong group inline-flex h-12 items-center gap-2 rounded-xl bg-axis-primary px-8 text-sm font-bold text-white transition-all hover:bg-axis-primary-hover"
             >
               Dashboard 열기
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
@@ -692,9 +692,9 @@ export default function LandingPage() {
               href="https://www.npmjs.com/package/foundry-x"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-12 items-center gap-2 rounded-xl border border-border/50 bg-background/50 px-8 text-sm font-medium backdrop-blur transition-all hover:border-forge-amber/30 hover:bg-forge-amber/5"
+              className="inline-flex h-12 items-center gap-2 rounded-xl border border-border/50 bg-background/50 px-8 text-sm font-medium backdrop-blur transition-all hover:border-axis-primary/30 hover:bg-axis-primary/5"
             >
-              <Terminal className="size-4 text-forge-amber" />
+              <Terminal className="size-4 text-axis-primary" />
               npm i -g foundry-x
             </a>
           </div>

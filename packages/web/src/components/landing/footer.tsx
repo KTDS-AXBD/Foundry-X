@@ -27,8 +27,8 @@ export function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href="/" className="mb-4 flex items-center gap-2.5">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-forge-amber/10">
-                <Anvil className="size-4 text-forge-amber" />
+              <div className="flex size-8 items-center justify-center rounded-lg bg-axis-primary/10">
+                <Anvil className="size-4 text-axis-primary" />
               </div>
               <span className="font-display text-lg font-bold tracking-tight">
                 Foundry-X
@@ -52,7 +52,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-muted-foreground transition-colors hover:text-forge-amber"
+                      className="text-sm text-muted-foreground transition-colors hover:text-axis-primary"
                     >
                       {link.label}
                     </Link>

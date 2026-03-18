@@ -11,7 +11,7 @@
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
+    --primary: oklch(0.623 0.214 259.815);
     --primary-foreground: oklch(0.985 0 0);
     --secondary: oklch(0.97 0 0);
     --secondary-foreground: oklch(0.205 0 0);
@@ -22,35 +22,35 @@
     --destructive: oklch(0.577 0.245 27.325);
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.809 0.105 251.813);
-    --chart-2: oklch(0.623 0.214 259.815);
+    --ring: oklch(0.623 0.214 259.815);
+    --chart-1: oklch(0.623 0.214 259.815);
+    --chart-2: oklch(0.723 0.219 149.579);
     --chart-3: oklch(0.546 0.245 262.881);
-    --chart-4: oklch(0.488 0.243 264.376);
-    --chart-5: oklch(0.424 0.199 265.638);
+    --chart-4: oklch(0.769 0.140 60.0);
+    --chart-5: oklch(0.809 0.105 251.813);
     --radius: 0.625rem;
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary: oklch(0.623 0.214 259.815);
     --sidebar-primary-foreground: oklch(0.985 0 0);
     --sidebar-accent: oklch(0.97 0 0);
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
 
-    /* Digital Forge brand */
-    --forge-amber: oklch(0.769 0.188 70.08);
-    --forge-ember: oklch(0.828 0.189 84.429);
-    --forge-copper: oklch(0.646 0.222 41.116);
-    --forge-slate: oklch(0.554 0.046 257.417);
-    --forge-charcoal: oklch(0.21 0.006 285.885);
-    --forge-cream: oklch(0.968 0.007 90.0);
-
-    /* AXIS Ecosystem accents */
+    /* AXIS Design System tokens */
+    --axis-primary: oklch(0.623 0.214 259.815);
+    --axis-primary-light: oklch(0.809 0.105 251.813);
+    --axis-primary-hover: oklch(0.546 0.245 262.881);
+    --axis-secondary: oklch(0.723 0.219 149.579);
+    --axis-accent: oklch(0.546 0.245 262.881);
     --axis-blue: oklch(0.623 0.214 259.815);
     --axis-blue-light: oklch(0.809 0.105 251.813);
     --axis-green: oklch(0.723 0.219 149.579);
     --axis-violet: oklch(0.546 0.245 262.881);
+    --axis-warm: oklch(0.769 0.140 60.0);
+    --axis-neutral: oklch(0.554 0.020 260.0);
+    --axis-surface: oklch(0.968 0.005 260.0);
 }
 
 .dark {
@@ -60,8 +60,8 @@
     --card-foreground: oklch(0.985 0 0);
     --popover: oklch(0.205 0 0);
     --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
+    --primary: oklch(0.723 0.180 259.815);
+    --primary-foreground: oklch(0.145 0 0);
     --secondary: oklch(0.269 0 0);
     --secondary-foreground: oklch(0.985 0 0);
     --muted: oklch(0.269 0 0);
@@ -71,12 +71,22 @@
     --destructive: oklch(0.704 0.191 22.216);
     --border: oklch(1 0 0 / 10%);
     --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.809 0.105 251.813);
-    --chart-2: oklch(0.623 0.214 259.815);
-    --chart-3: oklch(0.546 0.245 262.881);
-    --chart-4: oklch(0.488 0.243 264.376);
-    --chart-5: oklch(0.424 0.199 265.638);
+    --ring: oklch(0.556 0.180 259.815);
+    --chart-1: oklch(0.723 0.180 259.815);
+    --chart-2: oklch(0.780 0.180 149.579);
+    --chart-3: oklch(0.620 0.220 262.881);
+    --chart-4: oklch(0.700 0.120 60.0);
+    --chart-5: oklch(0.809 0.105 251.813);
+
+    /* AXIS DS dark palette */
+    --axis-primary: oklch(0.723 0.180 259.815);
+    --axis-primary-light: oklch(0.809 0.105 251.813);
+    --axis-primary-hover: oklch(0.650 0.200 262.881);
+    --axis-secondary: oklch(0.780 0.180 149.579);
+    --axis-accent: oklch(0.620 0.220 262.881);
+    --axis-warm: oklch(0.700 0.120 60.0);
+    --axis-neutral: oklch(0.600 0.015 260.0);
+    --axis-surface: oklch(0.210 0.006 260.0);
     --sidebar: oklch(0.205 0 0);
     --sidebar-foreground: oklch(0.985 0 0);
     --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -91,16 +101,18 @@
     --font-sans: var(--font-sans);
     --font-display: var(--font-display);
     --font-mono: var(--font-mono);
-    --color-forge-amber: var(--forge-amber);
-    --color-forge-ember: var(--forge-ember);
-    --color-forge-copper: var(--forge-copper);
-    --color-forge-slate: var(--forge-slate);
-    --color-forge-charcoal: var(--forge-charcoal);
-    --color-forge-cream: var(--forge-cream);
+    --color-axis-primary: var(--axis-primary);
+    --color-axis-primary-light: var(--axis-primary-light);
+    --color-axis-primary-hover: var(--axis-primary-hover);
+    --color-axis-secondary: var(--axis-secondary);
+    --color-axis-accent: var(--axis-accent);
     --color-axis-blue: var(--axis-blue);
     --color-axis-blue-light: var(--axis-blue-light);
     --color-axis-green: var(--axis-green);
     --color-axis-violet: var(--axis-violet);
+    --color-axis-warm: var(--axis-warm);
+    --color-axis-neutral: var(--axis-neutral);
+    --color-axis-surface: var(--axis-surface);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -153,41 +165,41 @@
   }
 }
 
-/* Forge grid background pattern */
-.forge-grid {
+/* AXIS grid background pattern */
+.axis-grid {
   background-image:
     linear-gradient(to right, oklch(1 0 0 / 3%) 1px, transparent 1px),
     linear-gradient(to bottom, oklch(1 0 0 / 3%) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
-.dark .forge-grid {
+.dark .axis-grid {
   background-image:
     linear-gradient(to right, oklch(1 0 0 / 4%) 1px, transparent 1px),
     linear-gradient(to bottom, oklch(1 0 0 / 4%) 1px, transparent 1px);
 }
 
-/* Ember glow effect */
-.forge-glow {
+/* AXIS glow effect */
+.axis-glow {
   box-shadow:
-    0 0 20px oklch(0.769 0.188 70.08 / 15%),
-    0 0 60px oklch(0.769 0.188 70.08 / 5%);
+    0 0 20px oklch(0.623 0.214 259.815 / 15%),
+    0 0 60px oklch(0.623 0.214 259.815 / 5%);
 }
 
-.forge-glow-strong {
+.axis-glow-strong {
   box-shadow:
-    0 0 30px oklch(0.769 0.188 70.08 / 30%),
-    0 0 80px oklch(0.769 0.188 70.08 / 10%);
+    0 0 30px oklch(0.623 0.214 259.815 / 30%),
+    0 0 80px oklch(0.623 0.214 259.815 / 10%);
 }
 
-/* Glass card effect */
-.forge-glass {
+/* AXIS glass card effect */
+.axis-glass {
   background: oklch(1 0 0 / 5%);
   backdrop-filter: blur(12px);
   border: 1px solid oklch(1 0 0 / 8%);
 }
 
-.dark .forge-glass {
+.dark .axis-glass {
   background: oklch(1 0 0 / 5%);
   border: 1px solid oklch(1 0 0 / 8%);
 }
@@ -223,9 +235,9 @@
 
 /* Pulse ring for ecosystem nodes */
 @keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 oklch(0.769 0.188 70.08 / 40%); }
-  70% { box-shadow: 0 0 0 12px oklch(0.769 0.188 70.08 / 0%); }
-  100% { box-shadow: 0 0 0 0 oklch(0.769 0.188 70.08 / 0%); }
+  0% { box-shadow: 0 0 0 0 oklch(0.623 0.214 259.815 / 40%); }
+  70% { box-shadow: 0 0 0 12px oklch(0.623 0.214 259.815 / 0%); }
+  100% { box-shadow: 0 0 0 0 oklch(0.623 0.214 259.815 / 0%); }
 }
 
 .animate-pulse-ring {
