@@ -20,7 +20,7 @@
 
 | 파일 | 내용 |
 |------|------|
-| `Foundry-X/docs/02-design/features/tech-stack-review.md` | 기술 스택 검토서 (TS+Python, 모노리포, Git SSOT) |
+| `Foundry-X/docs/02-design/features/tech-stack-review.design.md` | 기술 스택 검토서 (TS+Python, 모노리포, Git SSOT) |
 | `Foundry-X/dev-transparency-spec.md` | 투명성 스펙 (GitHub Projects + Wiki + Discussions + BluePrint + WBS) |
 
 ### 진화 이력

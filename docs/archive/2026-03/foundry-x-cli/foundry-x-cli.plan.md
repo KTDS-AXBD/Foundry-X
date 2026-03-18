@@ -50,7 +50,7 @@ author: Sinclair Seo
 ### 1.3 Related Documents
 
 - PRD: `prd-v4.md` §7.2(축 1 하네스 강화), §7.9(리포 구조), §7.11(progress.md)
-- 기술 스택: `tech-stack-review.md` §3.3 CLI
+- 기술 스택: `tech-stack-review.design.md` §3.3 CLI
 - 착수 체크리스트: `review/round-2/review-synthesis.md` §4
 - 외부 레퍼런스: [synthnoosh/agentic-harness-bootstrap](https://github.com/synthnoosh/agentic-harness-bootstrap)
 

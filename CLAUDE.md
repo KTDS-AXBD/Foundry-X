@@ -94,7 +94,7 @@ foundry-x/
 | `docs/specs/prd-v4.md` | 현행 PRD (권위 문서, v4: synthnoosh harness bootstrap 반영) |
 | `docs/specs/dev-transparency-spec.md` | 개발 투명성 스펙 |
 | `docs/specs/interview-log.md` | 요구사항 인터뷰 종합 (Part 1-5) |
-| `docs/02-design/features/tech-stack-review.md` | 기술 스택 결정 근거 |
+| `docs/02-design/features/tech-stack-review.design.md` | 기술 스택 결정 근거 |
 | `docs/review/round-1/` | 1차 다중 AI 검토 (ChatGPT, Gemini, Claude, Grok) |
 | `docs/review/round-2/` | 2차 검토 및 최종 착수 판정 |
 | `docs/01-plan/features/sprint-5.plan.md` | Sprint 5 Plan (Frontend Design + 하네스 확장) |
