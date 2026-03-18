@@ -36,6 +36,23 @@ export interface AgentExecutionRequest {
   constraints: AgentConstraintRule[];
 }
 
+/** F60: Generative UI rendering hint (mirrors shared/agent.ts UIHint) */
+export interface UIHint {
+  layout: "card" | "tabs" | "accordion" | "flow" | "iframe";
+  sections: Array<{
+    type: "text" | "code" | "diff" | "chart" | "diagram" | "table" | "timeline";
+    title: string;
+    data: unknown;
+    interactive?: boolean;
+  }>;
+  html?: string;
+  actions?: Array<{
+    type: "approve" | "reject" | "edit" | "expand";
+    label: string;
+    targetSection?: number;
+  }>;
+}
+
 export interface AgentExecutionResult {
   status: "success" | "partial" | "failed";
   output: {
@@ -51,6 +68,7 @@ export interface AgentExecutionResult {
       comment: string;
       severity: "error" | "warning" | "info";
     }>;
+    uiHint?: UIHint;  // F60: Generative UI
   };
   tokensUsed: number;
   model: string;

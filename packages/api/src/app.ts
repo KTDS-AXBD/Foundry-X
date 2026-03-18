@@ -11,6 +11,7 @@ import { tokenRoute } from "./routes/token.js";
 import { authRoute } from "./routes/auth.js";
 import { specRoute } from "./routes/spec.js";
 import { webhookRoute } from "./routes/webhook.js";
+import mcpRoute from "./routes/mcp.js";
 import { authMiddleware } from "./middleware/auth.js";
 import type { Env } from "./env.js";
 
@@ -40,6 +41,7 @@ app.doc("/api/openapi.json", {
     { name: "Tokens", description: "Token usage and cost tracking" },
     { name: "Spec", description: "NL→Spec 변환" },
     { name: "Webhook", description: "외부 Webhook 수신" },
+    { name: "MCP", description: "MCP Server management" },
   ],
 });
 app.get("/api/docs", swaggerUI({ url: "/api/openapi.json" }));
@@ -61,3 +63,4 @@ app.route("/api", requirementsRoute);
 app.route("/api", agentRoute);
 app.route("/api", tokenRoute);
 app.route("/api", specRoute);
+app.route("/api", mcpRoute);

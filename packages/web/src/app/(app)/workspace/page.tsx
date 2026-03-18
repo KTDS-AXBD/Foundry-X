@@ -5,13 +5,19 @@ import type { TodoItem, Message } from "@foundry-x/shared";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { McpServerCard } from "@/components/feature/McpServerCard";
+import {
+  listMcpServers,
+  createMcpServer,
+  type McpServerInfo,
+} from "@/lib/api-client";
 
 interface Settings {
   theme: "dark" | "light";
   notifications: boolean;
 }
 
-type Tab = "todo" | "messages" | "settings";
+type Tab = "todo" | "messages" | "settings" | "mcp";
 
 function loadJson<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -272,6 +278,146 @@ function SettingsTab() {
   );
 }
 
+function McpServersTab() {
+  const [servers, setServers] = useState<McpServerInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    serverUrl: "",
+    transportType: "sse" as "sse" | "http",
+    apiKey: "",
+  });
+  const [creating, setCreating] = useState(false);
+
+  const loadServers = useCallback(async () => {
+    try {
+      const data = await listMcpServers();
+      setServers(data);
+    } catch {
+      // API not available yet
+      setServers([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadServers();
+  }, [loadServers]);
+
+  async function handleCreate(e: React.FormEvent) {
+    e.preventDefault();
+    if (!formData.name || !formData.serverUrl) return;
+    setCreating(true);
+    try {
+      await createMcpServer({
+        name: formData.name,
+        serverUrl: formData.serverUrl,
+        transportType: formData.transportType,
+        apiKey: formData.apiKey || undefined,
+      });
+      setFormData({ name: "", serverUrl: "", transportType: "sse", apiKey: "" });
+      setShowForm(false);
+      loadServers();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "서버 등록 실패");
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  if (loading) return <p className="text-sm text-muted-foreground">로딩 중...</p>;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          외부 MCP 서버를 등록하여 AI 에이전트를 연동해요.
+        </p>
+        <Button size="sm" onClick={() => setShowForm(!showForm)}>
+          {showForm ? "취소" : "서버 추가"}
+        </Button>
+      </div>
+
+      {showForm && (
+        <Card className="border-dashed">
+          <CardContent className="p-4">
+            <form onSubmit={handleCreate} className="space-y-3">
+              <div>
+                <label className="text-xs font-medium">이름</label>
+                <input
+                  className="mt-1 w-full rounded border border-input bg-background px-3 py-1.5 text-sm"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="My MCP Server"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium">Server URL</label>
+                <input
+                  className="mt-1 w-full rounded border border-input bg-background px-3 py-1.5 text-sm font-mono"
+                  value={formData.serverUrl}
+                  onChange={(e) => setFormData({ ...formData, serverUrl: e.target.value })}
+                  placeholder="https://mcp.example.com/sse"
+                  type="url"
+                  required
+                />
+              </div>
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="text-xs font-medium">Transport</label>
+                  <select
+                    className="mt-1 w-full rounded border border-input bg-background px-3 py-1.5 text-sm"
+                    value={formData.transportType}
+                    onChange={(e) => setFormData({ ...formData, transportType: e.target.value as "sse" | "http" })}
+                  >
+                    <option value="sse">SSE (권장)</option>
+                    <option value="http">HTTP</option>
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <label className="text-xs font-medium">API Key (선택)</label>
+                  <input
+                    className="mt-1 w-full rounded border border-input bg-background px-3 py-1.5 text-sm"
+                    value={formData.apiKey}
+                    onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
+                    type="password"
+                    placeholder="sk-..."
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <Button type="submit" size="sm" disabled={creating}>
+                  {creating ? "등록 중..." : "등록"}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      {servers.length === 0 && !showForm ? (
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          등록된 MCP 서버가 없어요. &quot;서버 추가&quot;를 클릭하여 시작하세요.
+        </p>
+      ) : (
+        <div className="space-y-3">
+          {servers.map((server) => (
+            <McpServerCard
+              key={server.id}
+              server={server}
+              onDeleted={loadServers}
+              onUpdated={loadServers}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function WorkspacePage() {
   const [tab, setTab] = useState<Tab>("todo");
 
@@ -280,14 +426,14 @@ export default function WorkspacePage() {
       <h1 className="mb-6 text-2xl font-bold">Workspace</h1>
 
       <div className="mb-5 flex gap-2">
-        {(["todo", "messages", "settings"] as Tab[]).map((t) => (
+        {(["todo", "messages", "settings", "mcp"] as Tab[]).map((t) => (
           <Button
             key={t}
             variant={tab === t ? "default" : "outline"}
             size="sm"
             onClick={() => setTab(t)}
           >
-            {t === "todo" ? "ToDo" : t === "messages" ? "Messages" : "Settings"}
+            {t === "todo" ? "ToDo" : t === "messages" ? "Messages" : t === "settings" ? "Settings" : "MCP Servers"}
           </Button>
         ))}
       </div>
@@ -297,6 +443,7 @@ export default function WorkspacePage() {
           {tab === "todo" && <TodoTab />}
           {tab === "messages" && <MessagesTab />}
           {tab === "settings" && <SettingsTab />}
+          {tab === "mcp" && <McpServersTab />}
         </CardContent>
       </Card>
     </div>

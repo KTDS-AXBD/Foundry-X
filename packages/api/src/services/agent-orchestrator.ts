@@ -5,6 +5,10 @@ import type {
 } from "./execution-types.js";
 import type { AgentRunner } from "./agent-runner.js";
 import type { SSEManager } from "./sse-manager.js";
+import type { McpServerRegistry } from "./mcp-registry.js";
+import { McpRunner } from "./mcp-runner.js";
+import { createTransport } from "./mcp-transport.js";
+import { TASK_TYPE_TO_MCP_TOOL } from "./mcp-adapter.js";
 
 // Local types — mirrors @foundry-x/shared F50 types (will import from shared once exported)
 interface AgentRegistration {
@@ -60,7 +64,41 @@ export type {
 };
 
 export class AgentOrchestrator {
-  constructor(private db: D1Database, private sse?: SSEManager) {}
+  constructor(
+    private db: D1Database,
+    private sse?: SSEManager,
+    private mcpRegistry?: McpServerRegistry,
+  ) {}
+
+  /**
+   * F61: MCP 서버가 해당 taskType의 tool을 지원하면 McpRunner 사용,
+   * 아니면 fallback runner(ClaudeApiRunner/MockRunner) 반환.
+   */
+  async selectRunner(
+    taskType: AgentTaskType,
+    fallbackRunner: AgentRunner,
+  ): Promise<AgentRunner> {
+    if (!this.mcpRegistry) return fallbackRunner;
+
+    const toolName = TASK_TYPE_TO_MCP_TOOL[taskType];
+    if (!toolName) return fallbackRunner;
+
+    const server = await this.mcpRegistry.findServerForTool(toolName);
+    if (!server) return fallbackRunner;
+
+    try {
+      const apiKey = server.apiKeyEncrypted
+        ? await this.mcpRegistry.decryptApiKey(server.apiKeyEncrypted)
+        : undefined;
+      const transport = createTransport(
+        server.transportType as "sse" | "http",
+        { serverUrl: server.serverUrl, apiKey },
+      );
+      return new McpRunner(transport, server.name);
+    } catch {
+      return fallbackRunner;
+    }
+  }
 
   async checkConstraint(action: string): Promise<ConstraintCheckResult> {
     const { results } = await this.db
@@ -291,14 +329,17 @@ export class AgentOrchestrator {
       enforcementMode: r.enforcement_mode,
     }));
 
-    // 3.5 SSE: task started
+    // 3.5 F61: MCP runner 자동 선택
+    const selectedRunner = await this.selectRunner(taskType, runner);
+
+    // 3.6 SSE: task started
     this.sse?.pushEvent({
       event: "agent.task.started",
       data: {
         taskId,
         agentId,
         taskType,
-        runnerType: runner.type,
+        runnerType: selectedRunner.type,
         startedAt: now,
       },
     });
@@ -312,7 +353,7 @@ export class AgentOrchestrator {
       constraints,
     };
 
-    const result = await runner.execute(request);
+    const result = await selectedRunner.execute(request);
 
     // 5. 결과 기록
     await this.db
