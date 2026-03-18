@@ -22,6 +22,16 @@ import type { Env } from "../env.js";
 
 export const agentRoute = new OpenAPIHono<{ Bindings: Env }>();
 
+// ─── F55: SSEManager 공유 인스턴스 (Workers isolate 내 싱글턴) ───
+let sharedSSEManager: SSEManager | null = null;
+
+function getSSEManager(db: D1Database): SSEManager {
+  if (!sharedSSEManager) {
+    sharedSSEManager = new SSEManager(db);
+  }
+  return sharedSSEManager;
+}
+
 // ─── Mock Data (fallback when DB is empty) ───
 
 const MOCK_AGENTS: AgentProfile[] = [
@@ -161,7 +171,7 @@ agentRoute.openapi(getAgents, async (c) => {
 // ─── SSE Stream (non-OpenAPI — SSE is not well-represented in OpenAPI) ───
 
 agentRoute.get("/agents/stream", (c) => {
-  const sseManager = new SSEManager(c.env.DB);
+  const sseManager = getSSEManager(c.env.DB);
   const stream = sseManager.createStream();
 
   return new Response(stream, {
@@ -331,7 +341,8 @@ const executeAgentTask = createRoute({
 agentRoute.openapi(executeAgentTask, async (c) => {
   const { id } = c.req.valid("param");
   const body = c.req.valid("json");
-  const orchestrator = new AgentOrchestrator(c.env.DB);
+  const sseManager = getSSEManager(c.env.DB);
+  const orchestrator = new AgentOrchestrator(c.env.DB, sseManager);
   const runner = createAgentRunner({ ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY });
 
   if (!(await runner.isAvailable())) {

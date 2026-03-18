@@ -4,6 +4,7 @@ import type {
   AgentTaskType,
 } from "./execution-types.js";
 import type { AgentRunner } from "./agent-runner.js";
+import type { SSEManager } from "./sse-manager.js";
 
 // Local types — mirrors @foundry-x/shared F50 types (will import from shared once exported)
 interface AgentRegistration {
@@ -59,7 +60,7 @@ export type {
 };
 
 export class AgentOrchestrator {
-  constructor(private db: D1Database) {}
+  constructor(private db: D1Database, private sse?: SSEManager) {}
 
   async checkConstraint(action: string): Promise<ConstraintCheckResult> {
     const { results } = await this.db
@@ -290,6 +291,18 @@ export class AgentOrchestrator {
       enforcementMode: r.enforcement_mode,
     }));
 
+    // 3.5 SSE: task started
+    this.sse?.pushEvent({
+      event: "agent.task.started",
+      data: {
+        taskId,
+        agentId,
+        taskType,
+        runnerType: runner.type,
+        startedAt: now,
+      },
+    });
+
     // 4. Runner 실행
     const request: AgentExecutionRequest = {
       taskId,
@@ -327,6 +340,21 @@ export class AgentOrchestrator {
       )
       .bind(sessionStatus, new Date().toISOString(), sessionId)
       .run();
+
+    // 6.5 SSE: task completed
+    this.sse?.pushEvent({
+      event: "agent.task.completed",
+      data: {
+        taskId,
+        agentId,
+        status: result.status,
+        tokensUsed: result.tokensUsed,
+        durationMs: result.duration,
+        resultSummary: result.output.analysis?.slice(0, 200)
+          ?? result.output.reviewComments?.map(c => c.comment).join('; ').slice(0, 200),
+        completedAt: new Date().toISOString(),
+      },
+    });
 
     return result;
   }

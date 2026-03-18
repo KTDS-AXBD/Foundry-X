@@ -31,18 +31,28 @@ const tierVariant = (tier: "always" | "ask" | "never") => {
   }
 };
 
+type AgentTaskStatus = "pending" | "running" | "completed" | "failed";
+
 export interface AgentCardProps {
   agent: AgentProfile;
+  taskStatus?: AgentTaskStatus;
 }
 
-export default function AgentCard({ agent }: AgentCardProps) {
-  const status = agent.activity?.status ?? "idle";
+export default function AgentCard({ agent, taskStatus }: AgentCardProps) {
+  const status = taskStatus === "running" ? "running"
+    : taskStatus === "failed" ? "error"
+    : agent.activity?.status ?? "idle";
 
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between">
         <CardTitle>{agent.name}</CardTitle>
-        <Badge variant={statusVariant(status)}>{status}</Badge>
+        <div className="flex items-center gap-2">
+          {taskStatus === "running" && (
+            <span className="h-3 w-3 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          )}
+          <Badge variant={statusVariant(status)}>{status}</Badge>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Capabilities */}

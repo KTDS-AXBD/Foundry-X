@@ -11,6 +11,7 @@ migrations_dir = "src/db/migrations"
 
 [vars]
 GITHUB_REPO = "KTDS-AXBD/Foundry-X"
+ENVIRONMENT = "production"
 
 # Local development
 [env.dev]
@@ -21,6 +22,27 @@ binding = "DB"
 database_name = "foundry-x-db"
 database_id = "6338688e-b050-4835-98a2-7101f9215c76"
 migrations_dir = "src/db/migrations"
+
+# F57: Staging environment
+[env.staging]
+name = "foundry-x-api-staging"
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "foundry-x-db"
+database_id = "6338688e-b050-4835-98a2-7101f9215c76"
+migrations_dir = "src/db/migrations"
+
+[env.staging.vars]
+GITHUB_REPO = "KTDS-AXBD/Foundry-X"
+ENVIRONMENT = "staging"
+
+[[env.staging.kv_namespaces]]
+binding = "CACHE"
+id = "030b30d47a98485ea3af95b3347163d6"
+
+[env.staging.ai]
+binding = "AI"
 
 # Sprint 8: KV Cache
 [[kv_namespaces]]

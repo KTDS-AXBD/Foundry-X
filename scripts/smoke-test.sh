@@ -31,6 +31,12 @@ check "GET /health"             curl -sf "$API_URL/health"
 check "GET /api/requirements"   curl -sf "$API_URL/api/requirements"
 check "GET /api/agents"         curl -sf "$API_URL/api/agents"
 
+# F57: Agent Runner + SSE checks
+echo ""
+echo "Agent Checks:"
+check "GET /api/agents/runners"   curl -sf "$API_URL/api/agents/runners"
+check "SSE stream (3s timeout)"   timeout 3 curl -sf -N "$API_URL/api/agents/stream" -o /dev/null
+
 echo ""
 echo "Web Checks:"
 check "Landing page"            curl -sf "$WEB_URL"

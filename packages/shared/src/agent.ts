@@ -187,3 +187,25 @@ export interface LLMProvider {
   priority: number;
   healthy: boolean;
 }
+
+// ─── Sprint 11: SSE Task Event Types (F55) ───
+
+export interface TaskStartedData {
+  taskId: string;
+  agentId: string;
+  taskType: AgentTaskType;
+  runnerType: AgentRunnerType;
+  startedAt: string;
+}
+
+export interface TaskCompletedData {
+  taskId: string;
+  agentId: string;
+  status: 'success' | 'partial' | 'failed';
+  tokensUsed: number;
+  durationMs: number;
+  resultSummary?: string;
+  completedAt: string;
+}
+
+export type AgentTaskStatus = 'pending' | 'running' | 'completed' | 'failed';

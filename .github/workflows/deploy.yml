@@ -2,6 +2,8 @@ name: Deploy to Cloudflare
 on:
   push:
     branches: [master]
+  pull_request:
+    types: [opened, synchronize]
   workflow_dispatch:
 
 jobs:
@@ -17,7 +19,29 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo typecheck lint test
 
+  # F57: Staging deploy (PR only)
+  deploy-staging:
+    if: github.event_name == 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @foundry-x/shared build
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: packages/api
+          command: deploy --env staging
+
+  # Production deploy (master push)
   deploy-api:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -35,6 +59,7 @@ jobs:
           workingDirectory: packages/api
 
   deploy-web:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -55,6 +80,7 @@ jobs:
           packageManager: pnpm
 
   smoke-test:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     needs: [deploy-api, deploy-web]
     runs-on: ubuntu-latest
     steps:

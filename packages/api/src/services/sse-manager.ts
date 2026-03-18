@@ -1,15 +1,76 @@
 import type { D1Database } from "@cloudflare/workers-types";
 
+// ─── Sprint 11: SSE Task Event Data Types (F55) ───
+export interface TaskStartedData {
+  taskId: string;
+  agentId: string;
+  taskType: string;
+  runnerType: string;
+  startedAt: string;
+}
+
+export interface TaskCompletedData {
+  taskId: string;
+  agentId: string;
+  status: "success" | "partial" | "failed";
+  tokensUsed: number;
+  durationMs: number;
+  resultSummary?: string;
+  completedAt: string;
+}
+
 export type SSEEvent =
   | { event: "activity"; data: { agentId: string; status: string; currentTask?: string; progress?: number; timestamp: string } }
   | { event: "status"; data: { agentId: string; previousStatus: string; newStatus: string; result?: string; timestamp: string } }
-  | { event: "error"; data: { agentId: string; error: string; message: string; timestamp: string } };
+  | { event: "error"; data: { agentId: string; error: string; message: string; timestamp: string } }
+  | { event: "agent.task.started"; data: TaskStartedData }
+  | { event: "agent.task.completed"; data: TaskCompletedData };
+
+const DEDUP_TTL_MS = 60_000;
 
 export class SSEManager {
   private encoder = new TextEncoder();
   private pollInterval = 10_000;
 
-  constructor(private db: D1Database) {}
+  subscribers = new Set<(payload: string) => boolean>();
+  private recentTaskIds = new Map<string, number>();
+  private dedupTimer?: ReturnType<typeof setInterval>;
+
+  constructor(private db: D1Database) {
+    this.dedupTimer = setInterval(() => {
+      const now = Date.now();
+      for (const [key, ts] of this.recentTaskIds) {
+        if (now - ts > DEDUP_TTL_MS) this.recentTaskIds.delete(key);
+      }
+    }, DEDUP_TTL_MS);
+  }
+
+  pushEvent(event: SSEEvent): void {
+    // Dedup by taskId + event type for task events
+    const data = event.data as Record<string, unknown>;
+    if ("taskId" in data) {
+      const dedupKey = `${data.taskId}:${event.event}`;
+      if (this.recentTaskIds.has(dedupKey)) return;
+      this.recentTaskIds.set(dedupKey, Date.now());
+    }
+
+    // agent.task.* events → wrap as "status" so SSEClient's onStatus handler receives them
+    // SSEClient uses EventSource.addEventListener("status", ...) which requires exact name match
+    const eventName = event.event.startsWith("agent.task.") ? "status" : event.event;
+    const payload = `event: ${eventName}\ndata: ${JSON.stringify(event.data)}\n\n`;
+
+    for (const send of this.subscribers) {
+      if (!send(payload)) {
+        this.subscribers.delete(send);
+      }
+    }
+  }
+
+  dispose(): void {
+    if (this.dedupTimer) clearInterval(this.dedupTimer);
+    this.subscribers.clear();
+    this.recentTaskIds.clear();
+  }
 
   createStream(): ReadableStream {
     let timerId: ReturnType<typeof setInterval> | undefined;
@@ -24,12 +85,18 @@ export class SSEManager {
             controller.enqueue(data);
             return true;
           } catch {
-            // Stream closed/errored — stop polling
             closed = true;
             if (timerId) clearInterval(timerId);
             return false;
           }
         };
+
+        // Register subscriber for push-based events
+        const send = (payload: string): boolean => {
+          if (closed) return false;
+          return safeEnqueue(this.encoder.encode(payload));
+        };
+        this.subscribers.add(send);
 
         const poll = async () => {
           if (closed) return;
