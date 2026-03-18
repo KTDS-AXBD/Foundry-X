@@ -277,6 +277,63 @@ export class GitHubService {
     return res.json() as Promise<{ id: number }>;
   }
 
+  // ─── Sprint 14: Merge Queue Methods (F68) ───
+
+  async getModifiedFiles(prNumber: number): Promise<string[]> {
+    const res = await fetch(
+      `${this.baseUrl}/repos/${this.repo}/pulls/${prNumber}/files`,
+      { headers: this.headers() },
+    );
+    if (!res.ok) throw new GitHubApiError(res.status, `pulls/${prNumber}/files`);
+    const files = (await res.json()) as Array<{ filename: string }>;
+    return files.map((f) => f.filename);
+  }
+
+  async updateBranch(
+    prNumber: number,
+    expectedHeadSha?: string,
+  ): Promise<{ updated: boolean; sha?: string }> {
+    try {
+      const body: Record<string, string> = {};
+      if (expectedHeadSha) body.expected_head_sha = expectedHeadSha;
+
+      const res = await fetch(
+        `${this.baseUrl}/repos/${this.repo}/pulls/${prNumber}/update-branch`,
+        {
+          method: "PUT",
+          headers: { ...this.headers(), "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        },
+      );
+      if (!res.ok) return { updated: false };
+      const data = (await res.json()) as { url: string; message: string };
+      return { updated: true, sha: data.url?.split("/").pop() };
+    } catch {
+      return { updated: false };
+    }
+  }
+
+  async getPrStatuses(
+    prNumbers: number[],
+  ): Promise<Array<{ number: number; mergeable: boolean; state: string }>> {
+    const results = await Promise.all(
+      prNumbers.map(async (num) => {
+        try {
+          const res = await fetch(
+            `${this.baseUrl}/repos/${this.repo}/pulls/${num}`,
+            { headers: this.headers() },
+          );
+          if (!res.ok) return { number: num, mergeable: false, state: "unknown" };
+          const pr = (await res.json()) as { mergeable: boolean | null; state: string };
+          return { number: num, mergeable: pr.mergeable ?? false, state: pr.state };
+        } catch {
+          return { number: num, mergeable: false, state: "error" };
+        }
+      }),
+    );
+    return results;
+  }
+
   async getCheckRuns(ref: string): Promise<{ total: number; conclusion: string | null; checks: Array<{ name: string; status: string; conclusion: string | null }> }> {
     const res = await fetch(
       `${this.baseUrl}/repos/${this.repo}/commits/${ref}/check-runs`,

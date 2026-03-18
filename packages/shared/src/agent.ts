@@ -389,3 +389,154 @@ export interface PrReviewNeededData {
   reason: string;
   blockers: string[];
 }
+
+// ─── Sprint 14: MCP Resources Types (F67) ───
+
+/** F67: MCP 리소스 메타데이터 */
+export interface McpResource {
+  uri: string;
+  name: string;
+  description?: string;
+  mimeType?: string;
+}
+
+/** F67: MCP 리소스 템플릿 (동적 URI) */
+export interface McpResourceTemplate {
+  uriTemplate: string;
+  name: string;
+  description?: string;
+  mimeType?: string;
+}
+
+/** F67: MCP 리소스 내용 */
+export interface McpResourceContent {
+  uri: string;
+  mimeType?: string;
+  text?: string;
+  blob?: string;
+}
+
+/** F67: MCP 리소스 구독 정보 */
+export interface McpResourceSubscription {
+  serverId: string;
+  uri: string;
+  subscribedAt: string;
+  lastUpdated?: string;
+}
+
+// ─── Sprint 14: SSE MCP Resource Event (F67) ───
+
+export interface McpResourceUpdatedData {
+  serverId: string;
+  uri: string;
+  timestamp: string;
+}
+
+// ─── Sprint 14: Merge Queue Types (F68) ───
+
+/** F68: Merge Queue 상태 */
+export type MergeQueueStatus = 'queued' | 'merging' | 'merged' | 'conflict' | 'failed';
+
+/** F68: Merge Queue 엔트리 */
+export interface MergeQueueEntry {
+  id: string;
+  prRecordId: string;
+  prNumber: number;
+  agentId: string;
+  priority: number;
+  position: number;
+  modifiedFiles: string[];
+  status: MergeQueueStatus;
+  conflictsWith: string[];
+  rebaseAttempted: boolean;
+  rebaseSucceeded: boolean;
+  createdAt: string;
+  mergedAt: string | null;
+}
+
+/** F68: 충돌 PR 쌍 */
+export interface ConflictPair {
+  entryA: string;
+  entryB: string;
+  files: string[];
+}
+
+/** F68: 충돌 분석 리포트 */
+export interface ConflictReport {
+  conflicting: ConflictPair[];
+  suggestedOrder: string[];
+  autoResolvable: boolean;
+}
+
+// ─── Sprint 14: Parallel Execution Types (F68) ───
+
+/** F68: 병렬 실행 상태 */
+export type ParallelExecutionStatus = 'running' | 'completed' | 'partially_failed';
+
+/** F68: 병렬 실행 레코드 */
+export interface ParallelExecution {
+  id: string;
+  taskIds: string[];
+  agentIds: string[];
+  status: ParallelExecutionStatus;
+  totalTasks: number;
+  completedTasks: number;
+  failedTasks: number;
+  durationMs: number | null;
+  createdAt: string;
+  completedAt: string | null;
+}
+
+/** F68: 병렬 실행 결과 */
+export interface ParallelExecutionResult {
+  executionId: string;
+  results: Array<{
+    agentId: string;
+    taskId: string;
+    status: 'success' | 'failed';
+    result?: AgentExecutionResult;
+    error?: string;
+  }>;
+  durationMs: number;
+}
+
+/** F68: 병렬 실행 + PR 결과 */
+export interface ParallelPrResult extends ParallelExecutionResult {
+  prs: Array<{
+    agentId: string;
+    prNumber: number | null;
+    prUrl: string | null;
+    queuePosition: number;
+  }>;
+  conflicts: ConflictReport;
+}
+
+// ─── Sprint 14: SSE Queue Event Types (F68) ───
+
+export interface QueueUpdatedData {
+  queue: Array<{
+    id: string;
+    prNumber: number;
+    agentId: string;
+    position: number;
+    status: string;
+  }>;
+  totalPrs: number;
+}
+
+export interface QueueConflictData {
+  conflicts: ConflictReport;
+}
+
+export interface QueueMergedData {
+  entryId: string;
+  prNumber: number;
+  position: number;
+  commitSha: string;
+}
+
+export interface QueueRebaseData {
+  prNumber: number;
+  success: boolean;
+  files: string[];
+}

@@ -46,6 +46,46 @@ export interface PrReviewNeededData {
   blockers: string[];
 }
 
+// ─── Sprint 14: MCP Resource Event (F67) ───
+export interface McpResourceUpdatedData {
+  serverId: string;
+  uri: string;
+  timestamp: string;
+}
+
+// ─── Sprint 14: Queue Event Data Types (F68) ───
+export interface QueueUpdatedData {
+  queue: Array<{
+    id: string;
+    prNumber: number;
+    agentId: string;
+    position: number;
+    status: string;
+  }>;
+  totalPrs: number;
+}
+
+export interface QueueConflictData {
+  conflicts: {
+    conflicting: Array<{ entryA: string; entryB: string; files: string[] }>;
+    suggestedOrder: string[];
+    autoResolvable: boolean;
+  };
+}
+
+export interface QueueMergedData {
+  entryId: string;
+  prNumber: number;
+  position: number;
+  commitSha: string;
+}
+
+export interface QueueRebaseData {
+  prNumber: number;
+  success: boolean;
+  files: string[];
+}
+
 export type SSEEvent =
   | { event: "activity"; data: { agentId: string; status: string; currentTask?: string; progress?: number; timestamp: string } }
   | { event: "status"; data: { agentId: string; previousStatus: string; newStatus: string; result?: string; timestamp: string } }
@@ -55,7 +95,12 @@ export type SSEEvent =
   | { event: "agent.pr.created"; data: PrCreatedData }
   | { event: "agent.pr.reviewed"; data: PrReviewedData }
   | { event: "agent.pr.merged"; data: PrMergedData }
-  | { event: "agent.pr.review_needed"; data: PrReviewNeededData };
+  | { event: "agent.pr.review_needed"; data: PrReviewNeededData }
+  | { event: "mcp.resource.updated"; data: McpResourceUpdatedData }
+  | { event: "agent.queue.updated"; data: QueueUpdatedData }
+  | { event: "agent.queue.conflict"; data: QueueConflictData }
+  | { event: "agent.queue.merged"; data: QueueMergedData }
+  | { event: "agent.queue.rebase"; data: QueueRebaseData };
 
 const DEDUP_TTL_MS = 60_000;
 

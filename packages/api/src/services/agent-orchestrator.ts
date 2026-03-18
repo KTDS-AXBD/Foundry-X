@@ -6,6 +6,8 @@ import type {
 import type { AgentRunner } from "./agent-runner.js";
 import type { SSEManager } from "./sse-manager.js";
 import type { McpServerRegistry } from "./mcp-registry.js";
+import type { MergeQueueService } from "./merge-queue.js";
+import type { ParallelExecutionResult, ParallelPrResult, ConflictReport } from "@foundry-x/shared";
 import { McpRunner } from "./mcp-runner.js";
 import { createTransport } from "./mcp-transport.js";
 import { TASK_TYPE_TO_MCP_TOOL } from "./mcp-adapter.js";
@@ -65,12 +67,18 @@ export type {
 
 export class AgentOrchestrator {
   private prPipeline?: { createAgentPr: (agentId: string, taskId: string, result: AgentExecutionResult) => Promise<unknown> };
+  private mergeQueue?: MergeQueueService;
 
   constructor(
     private db: D1Database,
     private sse?: SSEManager,
     private mcpRegistry?: McpServerRegistry,
   ) {}
+
+  /** F68: Merge Queue 서비스 주입 */
+  setMergeQueue(queue: MergeQueueService): void {
+    this.mergeQueue = queue;
+  }
 
   /** F65: PR Pipeline 서비스 주입 (옵셔널 — 설정 시 executeTaskWithPr 활성화) */
   setPrPipeline(pipeline: { createAgentPr: (agentId: string, taskId: string, result: AgentExecutionResult) => Promise<unknown> }): void {
@@ -430,6 +438,123 @@ export class AgentOrchestrator {
     });
 
     return result;
+  }
+
+  /**
+   * F68: 여러 에이전트 작업을 병렬로 실행
+   */
+  async executeParallel(
+    tasks: Array<{ agentId: string; taskType: AgentTaskType; context: AgentExecutionRequest["context"] }>,
+    runner: AgentRunner,
+  ): Promise<ParallelExecutionResult> {
+    const executionId = `pexec-${crypto.randomUUID().slice(0, 8)}`;
+    const startTime = Date.now();
+
+    // Record parallel execution
+    await this.db
+      .prepare(
+        `INSERT INTO parallel_executions (id, task_ids, agent_ids, status, total_tasks, created_at)
+         VALUES (?, '[]', ?, 'running', ?, ?)`,
+      )
+      .bind(executionId, JSON.stringify(tasks.map((t) => t.agentId)), tasks.length, new Date().toISOString())
+      .run();
+
+    // Execute all tasks in parallel
+    const settled = await Promise.allSettled(
+      tasks.map((t) => this.executeTask(t.agentId, t.taskType, t.context, runner)),
+    );
+
+    const results: ParallelExecutionResult["results"] = [];
+    const taskIds: string[] = [];
+    let completedCount = 0;
+    let failedCount = 0;
+
+    for (let i = 0; i < settled.length; i++) {
+      const outcome = settled[i]!;
+      const task = tasks[i]!;
+
+      if (outcome.status === "fulfilled") {
+        completedCount++;
+        results.push({
+          agentId: task.agentId,
+          taskId: `task-${task.agentId}-${i}`,
+          status: "success",
+          result: outcome.value,
+        });
+        taskIds.push(`task-${task.agentId}-${i}`);
+      } else {
+        failedCount++;
+        results.push({
+          agentId: task.agentId,
+          taskId: `task-${task.agentId}-${i}`,
+          status: "failed",
+          error: outcome.reason instanceof Error ? outcome.reason.message : "Unknown error",
+        });
+        taskIds.push(`task-${task.agentId}-${i}`);
+      }
+    }
+
+    const durationMs = Date.now() - startTime;
+    const status = failedCount === 0 ? "completed" : failedCount === tasks.length ? "partially_failed" : "partially_failed";
+
+    await this.db
+      .prepare(
+        `UPDATE parallel_executions
+         SET task_ids = ?, status = ?, completed_tasks = ?, failed_tasks = ?, duration_ms = ?, completed_at = ?
+         WHERE id = ?`,
+      )
+      .bind(JSON.stringify(taskIds), status, completedCount, failedCount, durationMs, new Date().toISOString(), executionId)
+      .run();
+
+    return { executionId, results, durationMs };
+  }
+
+  /**
+   * F68: 병렬 실행 + PR 생성 + Merge Queue 등록
+   */
+  async executeParallelWithPr(
+    tasks: Array<{ agentId: string; taskType: AgentTaskType; context: AgentExecutionRequest["context"] }>,
+    runner: AgentRunner,
+  ): Promise<ParallelPrResult> {
+    const execResult = await this.executeParallel(tasks, runner);
+
+    const prs: ParallelPrResult["prs"] = [];
+    let conflicts: ConflictReport = { conflicting: [], suggestedOrder: [], autoResolvable: true };
+
+    for (const result of execResult.results) {
+      if (result.status === "success" && result.result?.output.generatedCode?.length && this.prPipeline) {
+        try {
+          const prResult = await this.prPipeline.createAgentPr(result.agentId, result.taskId, result.result) as {
+            id: string;
+            prNumber: number | null;
+            prUrl: string | null;
+          };
+
+          let queuePosition = 0;
+          if (this.mergeQueue && prResult.prNumber) {
+            const entry = await this.mergeQueue.enqueue(prResult.id, prResult.prNumber, result.agentId);
+            queuePosition = entry.position;
+          }
+
+          prs.push({
+            agentId: result.agentId,
+            prNumber: prResult.prNumber,
+            prUrl: prResult.prUrl,
+            queuePosition,
+          });
+        } catch {
+          prs.push({ agentId: result.agentId, prNumber: null, prUrl: null, queuePosition: 0 });
+        }
+      } else {
+        prs.push({ agentId: result.agentId, prNumber: null, prUrl: null, queuePosition: 0 });
+      }
+    }
+
+    if (this.mergeQueue) {
+      conflicts = await this.mergeQueue.detectConflicts();
+    }
+
+    return { ...execResult, prs, conflicts };
   }
 
   async getTaskResult(taskId: string): Promise<{

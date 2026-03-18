@@ -13,11 +13,18 @@ import {
   McpSamplingRequestSchema,
   McpSamplingResponseSchema,
   McpSamplingLogSchema,
+  McpResourceSchema,
+  McpResourceTemplateSchema,
+  McpResourceContentSchema,
+  ReadResourceRequestSchema,
+  SubscribeResourceRequestSchema,
 } from "../schemas/mcp.js";
 import { McpServerRegistry } from "../services/mcp-registry.js";
 import { createTransport } from "../services/mcp-transport.js";
 import { McpRunner } from "../services/mcp-runner.js";
 import { McpSamplingHandler } from "../services/mcp-sampling.js";
+import { McpResourcesClient } from "../services/mcp-resources.js";
+import { SSEManager } from "../services/sse-manager.js";
 import { LLMService } from "../services/llm.js";
 import type { Env } from "../env.js";
 
@@ -503,6 +510,189 @@ app.openapi(getSamplingLog, async (c) => {
   }));
 
   return c.json({ logs });
+});
+
+// ─── GET /mcp/servers/:id/resources ─── (Sprint 14 F67)
+
+const listResources = createRoute({
+  method: "get",
+  path: "/mcp/servers/{id}/resources",
+  tags: ["MCP"],
+  summary: "MCP 서버 리소스 목록 조회",
+  request: {
+    params: z.object({ id: z.string() }),
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: z.object({ resources: z.array(McpResourceSchema) }),
+        },
+      },
+      description: "리소스 목록",
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "서버를 찾을 수 없음",
+    },
+  },
+});
+
+app.openapi(listResources, async (c) => {
+  const { id } = c.req.valid("param");
+  const registry = new McpServerRegistry(c.env.DB);
+  const server = await getServerOrNull(registry, id);
+  if (!server) {
+    return c.json({ error: "Server not found" }, 404);
+  }
+
+  const client = new McpResourcesClient(registry);
+  const resources = await client.listResources(id);
+  return c.json({ resources });
+});
+
+// ─── GET /mcp/servers/:id/resources/templates ─── (Sprint 14 F67)
+
+const listResourceTemplates = createRoute({
+  method: "get",
+  path: "/mcp/servers/{id}/resources/templates",
+  tags: ["MCP"],
+  summary: "MCP 서버 리소스 템플릿 목록 조회",
+  request: {
+    params: z.object({ id: z.string() }),
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: z.object({ resourceTemplates: z.array(McpResourceTemplateSchema) }),
+        },
+      },
+      description: "리소스 템플릿 목록",
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "서버를 찾을 수 없음",
+    },
+  },
+});
+
+app.openapi(listResourceTemplates, async (c) => {
+  const { id } = c.req.valid("param");
+  const registry = new McpServerRegistry(c.env.DB);
+  const server = await getServerOrNull(registry, id);
+  if (!server) {
+    return c.json({ error: "Server not found" }, 404);
+  }
+
+  const client = new McpResourcesClient(registry);
+  const resourceTemplates = await client.listResourceTemplates(id);
+  return c.json({ resourceTemplates });
+});
+
+// ─── POST /mcp/servers/:id/resources/read ─── (Sprint 14 F67)
+
+const readResource = createRoute({
+  method: "post",
+  path: "/mcp/servers/{id}/resources/read",
+  tags: ["MCP"],
+  summary: "MCP 리소스 내용 읽기",
+  request: {
+    params: z.object({ id: z.string() }),
+    body: {
+      content: { "application/json": { schema: ReadResourceRequestSchema } },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: z.object({ contents: z.array(McpResourceContentSchema) }),
+        },
+      },
+      description: "리소스 내용",
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "서버를 찾을 수 없음",
+    },
+    500: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "리소스 읽기 실패",
+    },
+  },
+});
+
+app.openapi(readResource, async (c) => {
+  const { id } = c.req.valid("param");
+  const registry = new McpServerRegistry(c.env.DB);
+  const server = await getServerOrNull(registry, id);
+  if (!server) {
+    return c.json({ error: "Server not found" }, 404);
+  }
+
+  const body = c.req.valid("json");
+  const client = new McpResourcesClient(registry);
+  try {
+    const contents = await client.readResource(id, body.uri);
+    return c.json({ contents });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return c.json({ error: message }, 500);
+  }
+});
+
+// ─── POST /mcp/servers/:id/resources/subscribe ─── (Sprint 14 F67)
+
+const subscribeResource = createRoute({
+  method: "post",
+  path: "/mcp/servers/{id}/resources/subscribe",
+  tags: ["MCP"],
+  summary: "MCP 리소스 구독 (변경 알림)",
+  request: {
+    params: z.object({ id: z.string() }),
+    body: {
+      content: { "application/json": { schema: SubscribeResourceRequestSchema } },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: z.object({ subscribed: z.boolean(), uri: z.string() }),
+        },
+      },
+      description: "구독 결과",
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "서버를 찾을 수 없음",
+    },
+    500: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "구독 실패",
+    },
+  },
+});
+
+app.openapi(subscribeResource, async (c) => {
+  const { id } = c.req.valid("param");
+  const registry = new McpServerRegistry(c.env.DB);
+  const server = await getServerOrNull(registry, id);
+  if (!server) {
+    return c.json({ error: "Server not found" }, 404);
+  }
+
+  const body = c.req.valid("json");
+  const sse = new SSEManager(c.env.DB);
+  const client = new McpResourcesClient(registry, sse);
+  try {
+    await client.subscribeResource(id, body.uri);
+    return c.json({ subscribed: true, uri: body.uri });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return c.json({ error: message }, 500);
+  }
 });
 
 export default app;

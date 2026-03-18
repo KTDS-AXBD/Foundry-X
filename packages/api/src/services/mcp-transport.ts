@@ -1,5 +1,6 @@
 import type {
   McpTransport,
+  McpNotificationHandler,
   McpConnectionConfig,
   McpMessage,
   McpResponse,
@@ -36,12 +37,17 @@ export class SseTransport implements McpTransport {
 
   private sessionId: string | null = null;
   private connected = false;
+  private notificationHandler?: McpNotificationHandler;
 
   constructor(options: SseTransportOptions) {
     this.serverUrl = options.serverUrl;
     this.messageUrl = options.messageUrl;
     this.apiKey = options.apiKey;
     this.timeoutMs = options.timeoutMs ?? 25_000;
+  }
+
+  setNotificationHandler(handler: McpNotificationHandler): void {
+    this.notificationHandler = handler;
   }
 
   async connect(_config: McpConnectionConfig): Promise<void> {
@@ -156,7 +162,15 @@ export class SseTransport implements McpTransport {
       );
     }
 
-    return (await res.json()) as McpResponse;
+    const json = await res.json();
+
+    // Detect JSON-RPC notification: no "id" field means it's a notification
+    if (this.notificationHandler && json && typeof json === "object" && !("id" in json) && "method" in json) {
+      const notification = json as { method: string; params?: Record<string, unknown> };
+      this.notificationHandler(notification.method, notification.params);
+    }
+
+    return json as McpResponse;
   }
 
   async disconnect(): Promise<void> {
@@ -188,6 +202,11 @@ export class HttpTransport implements McpTransport {
     this.serverUrl = options.serverUrl;
     this.apiKey = options.apiKey;
     this.timeoutMs = options.timeoutMs ?? 25_000;
+  }
+
+  // HTTP transport does not support server-initiated notifications
+  setNotificationHandler(_handler: McpNotificationHandler): void {
+    // no-op for HTTP
   }
 
   async connect(_config: McpConnectionConfig): Promise<void> {

@@ -264,3 +264,68 @@ export const CreateAgentPrRequestSchema = z
     config: PrPipelineConfigSchema.optional(),
   })
   .openapi("CreateAgentPrRequest");
+
+// ─── Sprint 14: Merge Queue + Parallel Execution Schemas (F68) ───
+
+export const MergeQueueEntrySchema = z
+  .object({
+    id: z.string(),
+    prRecordId: z.string(),
+    prNumber: z.number(),
+    agentId: z.string(),
+    priority: z.number(),
+    position: z.number(),
+    modifiedFiles: z.array(z.string()),
+    status: z.enum(["queued", "merging", "merged", "conflict", "failed"]),
+    conflictsWith: z.array(z.string()),
+    rebaseAttempted: z.boolean(),
+    rebaseSucceeded: z.boolean(),
+    createdAt: z.string(),
+    mergedAt: z.string().nullable(),
+  })
+  .openapi("MergeQueueEntry");
+
+export const ConflictPairSchema = z.object({
+  entryA: z.string(),
+  entryB: z.string(),
+  files: z.array(z.string()),
+});
+
+export const ConflictReportSchema = z
+  .object({
+    conflicting: z.array(ConflictPairSchema),
+    suggestedOrder: z.array(z.string()),
+    autoResolvable: z.boolean(),
+  })
+  .openapi("ConflictReport");
+
+export const ParallelTaskSchema = z.object({
+  agentId: z.string(),
+  taskType: z.enum(["code-review", "code-generation", "spec-analysis", "test-generation"]),
+  context: z.object({
+    repoUrl: z.string().default("https://github.com/KTDS-AXBD/Foundry-X"),
+    branch: z.string().default("master"),
+    targetFiles: z.array(z.string()).optional(),
+    spec: z
+      .object({
+        title: z.string(),
+        description: z.string(),
+        acceptanceCriteria: z.array(z.string()),
+      })
+      .optional(),
+    instructions: z.string().max(2000).optional(),
+  }),
+});
+
+export const ParallelExecuteRequestSchema = z
+  .object({
+    tasks: z.array(ParallelTaskSchema).min(2).max(5),
+    createPrs: z.boolean().default(false),
+  })
+  .openapi("ParallelExecuteRequest");
+
+export const UpdatePriorityRequestSchema = z
+  .object({
+    priority: z.number().int().min(0).max(10),
+  })
+  .openapi("UpdatePriorityRequest");

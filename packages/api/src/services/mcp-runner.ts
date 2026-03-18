@@ -5,7 +5,7 @@ import type {
   McpResource,
   McpResponse,
 } from "./mcp-adapter.js";
-import type { McpPrompt, McpPromptMessage } from "@foundry-x/shared";
+import type { McpPrompt, McpPromptMessage, McpResourceTemplate, McpResourceContent } from "@foundry-x/shared";
 import { TASK_TYPE_TO_MCP_TOOL } from "./mcp-adapter.js";
 import type {
   AgentExecutionRequest,
@@ -22,10 +22,24 @@ export class McpRunner implements McpAgentRunner {
   readonly type = "mcp" as const;
   private readonly serverName: string;
   private readonly transport: McpTransport;
+  private subscriptions = new Set<string>();
+  private notificationHandlers = new Map<string, Array<(params?: Record<string, unknown>) => void>>();
 
   constructor(transport: McpTransport, serverName: string) {
     this.transport = transport;
     this.serverName = serverName;
+
+    // Wire transport notifications to our handler map
+    if (this.transport.setNotificationHandler) {
+      this.transport.setNotificationHandler((method, params) => {
+        const handlers = this.notificationHandlers.get(method);
+        if (handlers) {
+          for (const handler of handlers) {
+            handler(params);
+          }
+        }
+      });
+    }
   }
 
   async execute(request: AgentExecutionRequest): Promise<AgentExecutionResult> {
@@ -117,6 +131,7 @@ export class McpRunner implements McpAgentRunner {
     const response = await this.transport.send({
       jsonrpc: "2.0",
       method: "resources/list",
+      params: {},
       id: nextId++,
     });
 
@@ -126,6 +141,70 @@ export class McpRunner implements McpAgentRunner {
 
     const result = response.result as { resources?: McpResource[] } | undefined;
     return result?.resources ?? [];
+  }
+
+  async listResourceTemplates(): Promise<McpResourceTemplate[]> {
+    const response = await this.transport.send({
+      jsonrpc: "2.0",
+      method: "resources/templates/list",
+      params: {},
+      id: nextId++,
+    });
+
+    if (response.error) {
+      return [];
+    }
+
+    const result = response.result as { resourceTemplates?: McpResourceTemplate[] } | undefined;
+    return result?.resourceTemplates ?? [];
+  }
+
+  async readResource(uri: string): Promise<McpResourceContent[]> {
+    const response = await this.transport.send({
+      jsonrpc: "2.0",
+      method: "resources/read",
+      params: { uri },
+      id: nextId++,
+    });
+
+    if (response.error) {
+      throw new Error(
+        `MCP resources/read error [${response.error.code}]: ${response.error.message}`,
+      );
+    }
+
+    const result = response.result as { contents?: McpResourceContent[] } | undefined;
+    return result?.contents ?? [];
+  }
+
+  async subscribeResource(uri: string): Promise<void> {
+    await this.transport.send({
+      jsonrpc: "2.0",
+      method: "resources/subscribe",
+      params: { uri },
+      id: nextId++,
+    });
+    this.subscriptions.add(uri);
+  }
+
+  async unsubscribeResource(uri: string): Promise<void> {
+    await this.transport.send({
+      jsonrpc: "2.0",
+      method: "resources/unsubscribe",
+      params: { uri },
+      id: nextId++,
+    });
+    this.subscriptions.delete(uri);
+  }
+
+  onNotification(method: string, handler: (params?: Record<string, unknown>) => void): void {
+    const existing = this.notificationHandlers.get(method) ?? [];
+    existing.push(handler);
+    this.notificationHandlers.set(method, existing);
+  }
+
+  getSubscriptions(): ReadonlySet<string> {
+    return this.subscriptions;
   }
 
   async isAvailable(): Promise<boolean> {

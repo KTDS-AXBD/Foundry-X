@@ -75,3 +75,24 @@ export type {
   AgentRunnerInfo,
   AgentTaskType,
 } from './agent.js';
+
+// Sprint 14: MCP Resources types (F67)
+export type {
+  McpResource,
+  McpResourceTemplate,
+  McpResourceContent,
+  McpResourceSubscription,
+  McpResourceUpdatedData,
+} from './agent.js';
+
+// Sprint 14: Merge Queue types (F68)
+export type {
+  MergeQueueStatus,
+  MergeQueueEntry,
+  ConflictPair,
+  ConflictReport,
+  ParallelExecutionStatus,
+  ParallelExecution,
+  ParallelExecutionResult,
+  ParallelPrResult,
+} from './agent.js';

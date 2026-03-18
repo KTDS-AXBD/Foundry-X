@@ -209,6 +209,34 @@ export class MockD1Database {
         status TEXT NOT NULL DEFAULT 'pending',
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
+      CREATE TABLE IF NOT EXISTS merge_queue (
+        id TEXT PRIMARY KEY,
+        pr_record_id TEXT NOT NULL,
+        pr_number INTEGER NOT NULL,
+        agent_id TEXT NOT NULL,
+        priority INTEGER NOT NULL DEFAULT 1,
+        position INTEGER NOT NULL,
+        modified_files TEXT NOT NULL DEFAULT '[]',
+        status TEXT NOT NULL DEFAULT 'queued',
+        conflicts_with TEXT DEFAULT '[]',
+        rebase_attempted INTEGER DEFAULT 0,
+        rebase_succeeded INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        merged_at TEXT,
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE TABLE IF NOT EXISTS parallel_executions (
+        id TEXT PRIMARY KEY,
+        task_ids TEXT NOT NULL DEFAULT '[]',
+        agent_ids TEXT NOT NULL DEFAULT '[]',
+        status TEXT NOT NULL DEFAULT 'running',
+        total_tasks INTEGER NOT NULL,
+        completed_tasks INTEGER NOT NULL DEFAULT 0,
+        failed_tasks INTEGER NOT NULL DEFAULT 0,
+        duration_ms INTEGER,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        completed_at TEXT
+      );
       CREATE TABLE IF NOT EXISTS spec_conflicts (
         id TEXT PRIMARY KEY,
         new_spec_title TEXT NOT NULL,

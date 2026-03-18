@@ -14,6 +14,10 @@ import {
   AgentPrResultSchema,
   AgentPrRecordSchema,
   PrReviewResultSchema,
+  MergeQueueEntrySchema,
+  ConflictReportSchema,
+  ParallelExecuteRequestSchema,
+  UpdatePriorityRequestSchema,
 } from "../schemas/agent.js";
 import type { AgentProfile, AgentActivity, PrReviewResult } from "@foundry-x/shared";
 import type { AgentRunnerInfo } from "../services/execution-types.js";
@@ -25,6 +29,7 @@ import { AgentOrchestrator } from "../services/agent-orchestrator.js";
 import { GitHubService } from "../services/github.js";
 import { ReviewerAgent } from "../services/reviewer-agent.js";
 import { PrPipelineService } from "../services/pr-pipeline.js";
+import { MergeQueueService } from "../services/merge-queue.js";
 import { LLMService } from "../services/llm.js";
 import type { Env } from "../env.js";
 
@@ -648,5 +653,214 @@ agentRoute.openapi(mergeAgentPr, async (c) => {
   const pipeline = createPrPipeline(c.env, sseManager);
   const result = await pipeline.checkAndMerge(id, row.pr_number, reviewResult);
 
+  return c.json(result);
+});
+
+// ─── Sprint 14: Parallel Execution + Merge Queue Endpoints (F68) ───
+
+function createMergeQueue(env: Env, sseManager?: SSEManager): MergeQueueService {
+  const github = new GitHubService(env.GITHUB_TOKEN, env.GITHUB_REPO);
+  return new MergeQueueService(github, env.DB, sseManager);
+}
+
+const executeParallel = createRoute({
+  method: "post",
+  path: "/agents/parallel",
+  tags: ["Agents"],
+  summary: "에이전트 병렬 실행",
+  request: {
+    body: {
+      content: { "application/json": { schema: ParallelExecuteRequestSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: "병렬 실행 결과",
+      content: { "application/json": { schema: z.object({ executionId: z.string(), results: z.array(z.unknown()), durationMs: z.number() }) } },
+    },
+    503: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "실행 환경 불가",
+    },
+  },
+});
+
+agentRoute.openapi(executeParallel, async (c) => {
+  const { tasks, createPrs } = c.req.valid("json");
+  const sseManager = getSSEManager(c.env.DB);
+  const orchestrator = new AgentOrchestrator(c.env.DB, sseManager);
+  const runner = createAgentRunner({ ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY });
+
+  if (!(await runner.isAvailable())) {
+    return c.json({ error: "No agent runner available" }, 503);
+  }
+
+  if (createPrs) {
+    const pipeline = createPrPipeline(c.env, sseManager);
+    orchestrator.setPrPipeline(pipeline);
+    const mergeQueue = createMergeQueue(c.env, sseManager);
+    orchestrator.setMergeQueue(mergeQueue);
+    const result = await orchestrator.executeParallelWithPr(tasks, runner);
+    return c.json(result);
+  }
+
+  const result = await orchestrator.executeParallel(tasks, runner);
+  return c.json(result);
+});
+
+const getParallelExecution = createRoute({
+  method: "get",
+  path: "/agents/parallel/{id}",
+  tags: ["Agents"],
+  summary: "병렬 실행 상태 조회",
+  request: {
+    params: z.object({ id: z.string() }),
+  },
+  responses: {
+    200: {
+      description: "병렬 실행 상태",
+      content: {
+        "application/json": {
+          schema: z.object({
+            id: z.string(),
+            taskIds: z.array(z.string()),
+            agentIds: z.array(z.string()),
+            status: z.string(),
+            totalTasks: z.number(),
+            completedTasks: z.number(),
+            failedTasks: z.number(),
+            durationMs: z.number().nullable(),
+            createdAt: z.string(),
+            completedAt: z.string().nullable(),
+          }),
+        },
+      },
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "실행을 찾을 수 없음",
+    },
+  },
+});
+
+agentRoute.openapi(getParallelExecution, async (c) => {
+  const { id } = c.req.valid("param");
+  const row = await c.env.DB
+    .prepare("SELECT * FROM parallel_executions WHERE id = ?")
+    .bind(id)
+    .first<{
+      id: string;
+      task_ids: string;
+      agent_ids: string;
+      status: string;
+      total_tasks: number;
+      completed_tasks: number;
+      failed_tasks: number;
+      duration_ms: number | null;
+      created_at: string;
+      completed_at: string | null;
+    }>();
+
+  if (!row) {
+    return c.json({ error: "Parallel execution not found" }, 404);
+  }
+
+  return c.json({
+    id: row.id,
+    taskIds: JSON.parse(row.task_ids),
+    agentIds: JSON.parse(row.agent_ids),
+    status: row.status,
+    totalTasks: row.total_tasks,
+    completedTasks: row.completed_tasks,
+    failedTasks: row.failed_tasks,
+    durationMs: row.duration_ms,
+    createdAt: row.created_at,
+    completedAt: row.completed_at,
+  });
+});
+
+const getQueueStatus = createRoute({
+  method: "get",
+  path: "/agents/queue",
+  tags: ["Agents"],
+  summary: "Merge Queue 상태 + 충돌 감지",
+  responses: {
+    200: {
+      description: "큐 상태",
+      content: {
+        "application/json": {
+          schema: z.object({
+            entries: z.array(MergeQueueEntrySchema),
+            conflicts: ConflictReportSchema,
+          }),
+        },
+      },
+    },
+  },
+});
+
+agentRoute.openapi(getQueueStatus, async (c) => {
+  const sseManager = getSSEManager(c.env.DB);
+  const mergeQueue = createMergeQueue(c.env, sseManager);
+  const entries = await mergeQueue.getQueueStatus();
+  const conflicts = await mergeQueue.detectConflicts();
+  return c.json({ entries, conflicts });
+});
+
+const updateQueuePriority = createRoute({
+  method: "patch",
+  path: "/agents/queue/{id}/priority",
+  tags: ["Agents"],
+  summary: "Merge Queue 우선순위 변경",
+  request: {
+    params: z.object({ id: z.string() }),
+    body: {
+      content: { "application/json": { schema: UpdatePriorityRequestSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: "우선순위 변경 완료",
+      content: { "application/json": { schema: z.object({ updated: z.boolean() }) } },
+    },
+  },
+});
+
+agentRoute.openapi(updateQueuePriority, async (c) => {
+  const { id } = c.req.valid("param");
+  const { priority } = c.req.valid("json");
+  const sseManager = getSSEManager(c.env.DB);
+  const mergeQueue = createMergeQueue(c.env, sseManager);
+  await mergeQueue.updatePriority(id, priority);
+  return c.json({ updated: true });
+});
+
+const processQueue = createRoute({
+  method: "post",
+  path: "/agents/queue/process",
+  tags: ["Agents"],
+  summary: "다음 PR merge 실행",
+  responses: {
+    200: {
+      description: "처리 결과",
+      content: {
+        "application/json": {
+          schema: z.object({
+            merged: z.boolean(),
+            entryId: z.string().optional(),
+            prNumber: z.number().optional(),
+            commitSha: z.string().optional(),
+            error: z.string().optional(),
+          }),
+        },
+      },
+    },
+  },
+});
+
+agentRoute.openapi(processQueue, async (c) => {
+  const sseManager = getSSEManager(c.env.DB);
+  const mergeQueue = createMergeQueue(c.env, sseManager);
+  const result = await mergeQueue.processNext();
   return c.json(result);
 });

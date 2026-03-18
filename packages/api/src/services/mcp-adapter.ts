@@ -1,17 +1,20 @@
 import type { AgentRunner } from "./agent-runner.js";
 import type { AgentTaskType } from "./execution-types.js";
-import type { McpPrompt, McpPromptMessage } from "@foundry-x/shared";
+import type { McpPrompt, McpPromptMessage, McpResourceTemplate, McpResourceContent } from "@foundry-x/shared";
 
 /**
  * MCP Transport 추상화 — 통신 방식 교체 가능
  * Sprint 12 구현 예정: SseTransport (1순위), HttpTransport (2순위)
  */
+export type McpNotificationHandler = (method: string, params?: Record<string, unknown>) => void;
+
 export interface McpTransport {
   type: "stdio" | "sse" | "http";
   connect(config: McpConnectionConfig): Promise<void>;
   disconnect(): Promise<void>;
   isConnected(): boolean;
   send(message: McpMessage): Promise<McpResponse>;
+  setNotificationHandler?(handler: McpNotificationHandler): void;
 }
 
 export interface McpConnectionConfig {
@@ -61,6 +64,11 @@ export interface McpAgentRunner extends AgentRunner {
   readonly type: "mcp";
   listTools(): Promise<McpTool[]>;
   listResources(): Promise<McpResource[]>;
+  listResourceTemplates(): Promise<McpResourceTemplate[]>;
+  readResource(uri: string): Promise<McpResourceContent[]>;
+  subscribeResource(uri: string): Promise<void>;
+  unsubscribeResource(uri: string): Promise<void>;
+  onNotification(method: string, handler: (params?: Record<string, unknown>) => void): void;
   listPrompts?(): Promise<McpPrompt[]>;
   getPrompt?(name: string, args?: Record<string, string>): Promise<McpPromptMessage[]>;
 }

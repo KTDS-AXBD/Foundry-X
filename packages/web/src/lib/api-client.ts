@@ -341,6 +341,168 @@ export async function mergeAgentPr(
   return res.json() as Promise<{ merged: boolean; needsHuman: boolean; reason?: string }>;
 }
 
+// ─── MCP Resources (F67) ───
+
+export interface McpResource {
+  uri: string;
+  name: string;
+  description?: string;
+  mimeType?: string;
+}
+
+export interface McpResourceTemplate {
+  uriTemplate: string;
+  name: string;
+  description?: string;
+  mimeType?: string;
+}
+
+export interface McpResourceContent {
+  uri: string;
+  mimeType?: string;
+  text?: string;
+  blob?: string;
+}
+
+export async function listMcpResources(
+  serverId: string,
+): Promise<{ resources: McpResource[] }> {
+  return fetchApi(`/mcp/servers/${serverId}/resources`);
+}
+
+export async function listMcpResourceTemplates(
+  serverId: string,
+): Promise<{ resourceTemplates: McpResourceTemplate[] }> {
+  return fetchApi(`/mcp/servers/${serverId}/resources/templates`);
+}
+
+export async function readMcpResource(
+  serverId: string,
+  uri: string,
+): Promise<{ contents: McpResourceContent[] }> {
+  const url = `${BASE_URL}/mcp/servers/${serverId}/resources/read`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ uri }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<{ contents: McpResourceContent[] }>;
+}
+
+export async function subscribeMcpResource(
+  serverId: string,
+  uri: string,
+): Promise<void> {
+  const url = `${BASE_URL}/mcp/servers/${serverId}/resources/subscribe`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ uri }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+}
+
+// ─── Merge Queue + Parallel Execution (F68) ───
+
+export interface MergeQueueEntry {
+  id: string;
+  prRecordId: string;
+  prNumber: number;
+  agentId: string;
+  priority: number;
+  position: number;
+  modifiedFiles: string[];
+  status: string;
+  conflictsWith: string[];
+  rebaseAttempted: boolean;
+  rebaseSucceeded: boolean;
+  createdAt: string;
+  mergedAt: string | null;
+}
+
+export interface ConflictReport {
+  conflicting: Array<{ entryA: string; entryB: string; files: string[] }>;
+  suggestedOrder: string[];
+  autoResolvable: boolean;
+}
+
+export async function getMergeQueue(): Promise<{
+  entries: MergeQueueEntry[];
+  conflicts: ConflictReport;
+}> {
+  return fetchApi("/agents/queue");
+}
+
+export async function processQueueNext(): Promise<{
+  merged: boolean;
+  entryId: string;
+  rebaseAttempted?: boolean;
+  conflictResolved?: boolean;
+}> {
+  const url = `${BASE_URL}/agents/queue/process`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<any>;
+}
+
+export async function updateQueuePriority(
+  entryId: string,
+  priority: number,
+): Promise<void> {
+  const url = `${BASE_URL}/agents/queue/${entryId}/priority`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(url, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ priority }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+}
+
+export async function executeParallel(
+  tasks: Array<{
+    agentId: string;
+    taskType: string;
+    context: { repoUrl?: string; branch?: string; targetFiles?: string[]; instructions?: string };
+  }>,
+  createPrs: boolean = false,
+): Promise<Record<string, unknown>> {
+  const url = `${BASE_URL}/agents/parallel`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ tasks, createPrs }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<Record<string, unknown>>;
+}
+
+export async function getParallelExecution(
+  id: string,
+): Promise<Record<string, unknown>> {
+  return fetchApi(`/agents/parallel/${id}`);
+}
+
 // ─── Conflict Resolution ───
 
 export async function resolveConflict(

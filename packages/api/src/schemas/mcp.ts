@@ -32,6 +32,47 @@ export const McpTestResultSchema = z
   })
   .openapi("McpTestResult");
 
+// ─── Sprint 14: MCP Resources Schemas (F67) ───
+
+export const McpResourceSchema = z
+  .object({
+    uri: z.string(),
+    name: z.string(),
+    description: z.string().optional(),
+    mimeType: z.string().optional(),
+  })
+  .openapi("McpResource");
+
+export const McpResourceTemplateSchema = z
+  .object({
+    uriTemplate: z.string(),
+    name: z.string(),
+    description: z.string().optional(),
+    mimeType: z.string().optional(),
+  })
+  .openapi("McpResourceTemplate");
+
+export const McpResourceContentSchema = z
+  .object({
+    uri: z.string(),
+    mimeType: z.string().optional(),
+    text: z.string().optional(),
+    blob: z.string().optional(),
+  })
+  .openapi("McpResourceContent");
+
+export const ReadResourceRequestSchema = z
+  .object({
+    uri: z.string().min(1),
+  })
+  .openapi("ReadResourceRequest");
+
+export const SubscribeResourceRequestSchema = z
+  .object({
+    uri: z.string().min(1),
+  })
+  .openapi("SubscribeResourceRequest");
+
 // ─── Sprint 13: MCP Prompts Schemas (F64) ───
 
 export const McpPromptSchema = z
