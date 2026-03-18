@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 세션 38 (2026-03-18)
+**Sprint 14 PDCA 완료 — MCP Resources + 멀티 에이전트 동시 PR (v1.2.0)**:
+- ✅ F67 MCP Resources (92%): McpResourcesClient + McpRunner resources 실 구현 + notification 수신 + 4 API endpoints + Resources 브라우저 + 15 tests
+- ✅ F68 멀티 에이전트 동시 PR (92.5%): MergeQueueService + executeParallel + 파일 충돌 감지 + rebase 자동 시도 + 5 API endpoints + Queue/Conflict/Parallel UI + SSE 실시간 + 25 tests
+- ✅ Agent Teams: Do(W1 MCP + W2 Queue) + Check(W1 F67 Gap + W2 F68 Gap) 4회 병렬 (충돌 0)
+- ✅ 429 total tests (API 278 + CLI 106 + Web 45), +41 from Sprint 13
+- ✅ 50 API endpoints (+9), 15 D1 tables (+2), 13 SSE events (+5), 23 Web components (+5)
+- ✅ PDCA Match Rate 92%, Iteration 1회 (Must Fix 3건: agents/page 탭 + SSE 연동 + autoResolvable)
+
+**검증 결과**: typecheck ✅ 5/5, tests 429/429 ✅
+
+---
+
 ## 세션 37 (2026-03-18)
 **Sprint 13 PDCA 완료 — MCP Sampling/Prompts + 에이전트 자동 PR**:
 - ✅ F64 MCP Sampling/Prompts (91%): McpSamplingHandler + McpPromptsClient + 4 API endpoints + McpPromptsPanel + 15 tests
