@@ -10,14 +10,22 @@ import {
   AgentExecuteRequestSchema,
   AgentExecutionResultSchema,
   AgentRunnerInfoSchema,
+  CreateAgentPrRequestSchema,
+  AgentPrResultSchema,
+  AgentPrRecordSchema,
+  PrReviewResultSchema,
 } from "../schemas/agent.js";
-import type { AgentProfile, AgentActivity } from "@foundry-x/shared";
+import type { AgentProfile, AgentActivity, PrReviewResult } from "@foundry-x/shared";
 import type { AgentRunnerInfo } from "../services/execution-types.js";
 import { createAgentRunner } from "../services/agent-runner.js";
 import { getDb } from "../db/index.js";
 import { agentSessions } from "../db/schema.js";
 import { SSEManager } from "../services/sse-manager.js";
 import { AgentOrchestrator } from "../services/agent-orchestrator.js";
+import { GitHubService } from "../services/github.js";
+import { ReviewerAgent } from "../services/reviewer-agent.js";
+import { PrPipelineService } from "../services/pr-pipeline.js";
+import { LLMService } from "../services/llm.js";
 import type { Env } from "../env.js";
 
 export const agentRoute = new OpenAPIHono<{ Bindings: Env }>();
@@ -440,4 +448,205 @@ agentRoute.openapi(getTaskResult, async (c) => {
   }
 
   return c.json(taskResult);
+});
+
+// ─── Sprint 13: Agent PR Pipeline Endpoints (F65) ───
+
+function createPrPipeline(env: Env, sseManager?: SSEManager) {
+  const github = new GitHubService(env.GITHUB_TOKEN, env.GITHUB_REPO);
+  const llm = new LLMService(env.AI, env.ANTHROPIC_API_KEY);
+  const reviewer = new ReviewerAgent(llm);
+  return new PrPipelineService(github, reviewer, env.DB, sseManager);
+}
+
+const createAgentPr = createRoute({
+  method: "post",
+  path: "/agents/pr",
+  tags: ["Agents"],
+  summary: "에이전트 PR 생성 파이프라인 실행",
+  request: {
+    body: {
+      content: { "application/json": { schema: CreateAgentPrRequestSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: "PR 파이프라인 결과",
+      content: { "application/json": { schema: AgentPrResultSchema } },
+    },
+    400: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "잘못된 요청",
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "작업 결과를 찾을 수 없음",
+    },
+  },
+});
+
+agentRoute.openapi(createAgentPr, async (c) => {
+  const { agentId, taskId } = c.req.valid("json");
+
+  // Get task result from DB
+  const taskRow = await c.env.DB
+    .prepare("SELECT result FROM agent_tasks WHERE id = ?")
+    .bind(taskId)
+    .first<{ result: string | null }>();
+
+  if (!taskRow?.result) {
+    return c.json({ error: "Task result not found" }, 404);
+  }
+
+  const taskResult = JSON.parse(taskRow.result);
+  const sseManager = getSSEManager(c.env.DB);
+  const pipeline = createPrPipeline(c.env, sseManager);
+
+  try {
+    const result = await pipeline.createAgentPr(agentId, taskId, taskResult);
+    return c.json(result);
+  } catch (err) {
+    return c.json({ error: err instanceof Error ? err.message : "Pipeline failed" }, 400);
+  }
+});
+
+const getAgentPr = createRoute({
+  method: "get",
+  path: "/agents/pr/{id}",
+  tags: ["Agents"],
+  summary: "에이전트 PR 레코드 조회",
+  request: {
+    params: z.object({ id: z.string() }),
+  },
+  responses: {
+    200: {
+      description: "PR 레코드",
+      content: { "application/json": { schema: AgentPrRecordSchema } },
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "PR을 찾을 수 없음",
+    },
+  },
+});
+
+agentRoute.openapi(getAgentPr, async (c) => {
+  const { id } = c.req.valid("param");
+  const row = await c.env.DB
+    .prepare("SELECT * FROM agent_prs WHERE id = ?")
+    .bind(id)
+    .first();
+
+  if (!row) {
+    return c.json({ error: "PR not found" } as const, 404);
+  }
+
+  return c.json(row as Record<string, unknown> as z.infer<typeof AgentPrRecordSchema>);
+});
+
+const reviewAgentPr = createRoute({
+  method: "post",
+  path: "/agents/pr/{id}/review",
+  tags: ["Agents"],
+  summary: "에이전트 PR 재리뷰",
+  request: {
+    params: z.object({ id: z.string() }),
+  },
+  responses: {
+    200: {
+      description: "리뷰 결과",
+      content: { "application/json": { schema: PrReviewResultSchema } },
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "PR을 찾을 수 없음",
+    },
+  },
+});
+
+agentRoute.openapi(reviewAgentPr, async (c) => {
+  const { id } = c.req.valid("param");
+  const row = await c.env.DB
+    .prepare("SELECT pr_number FROM agent_prs WHERE id = ?")
+    .bind(id)
+    .first<{ pr_number: number | null }>();
+
+  if (!row?.pr_number) {
+    return c.json({ error: "PR not found or not yet created" }, 404);
+  }
+
+  const github = new GitHubService(c.env.GITHUB_TOKEN, c.env.GITHUB_REPO);
+  const llm = new LLMService(c.env.AI, c.env.ANTHROPIC_API_KEY);
+  const reviewer = new ReviewerAgent(llm);
+
+  const diff = await github.getPrDiff(row.pr_number);
+  const result = await reviewer.reviewPullRequest(diff, {
+    agentId: "reviewer-agent",
+    taskId: id,
+    taskType: "code-review",
+    prNumber: row.pr_number,
+  });
+
+  return c.json(result);
+});
+
+const mergeAgentPr = createRoute({
+  method: "post",
+  path: "/agents/pr/{id}/merge",
+  tags: ["Agents"],
+  summary: "에이전트 PR 수동 머지",
+  request: {
+    params: z.object({ id: z.string() }),
+  },
+  responses: {
+    200: {
+      description: "머지 결과",
+      content: {
+        "application/json": {
+          schema: z.object({
+            merged: z.boolean(),
+            needsHuman: z.boolean(),
+            reason: z.string().optional(),
+          }),
+        },
+      },
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "PR을 찾을 수 없음",
+    },
+  },
+});
+
+agentRoute.openapi(mergeAgentPr, async (c) => {
+  const { id } = c.req.valid("param");
+  const row = await c.env.DB
+    .prepare("SELECT pr_number, review_decision, sdd_score, quality_score, security_issues FROM agent_prs WHERE id = ?")
+    .bind(id)
+    .first<{
+      pr_number: number | null;
+      review_decision: string | null;
+      sdd_score: number | null;
+      quality_score: number | null;
+      security_issues: string | null;
+    }>();
+
+  if (!row?.pr_number) {
+    return c.json({ error: "PR not found or not yet created" }, 404);
+  }
+
+  const reviewResult: PrReviewResult = {
+    decision: (row.review_decision as "approve" | "request_changes" | "comment") ?? "comment",
+    summary: "",
+    comments: [],
+    sddScore: row.sdd_score ?? 0,
+    qualityScore: row.quality_score ?? 0,
+    securityIssues: row.security_issues ? JSON.parse(row.security_issues) : [],
+  };
+
+  const sseManager = getSSEManager(c.env.DB);
+  const pipeline = createPrPipeline(c.env, sseManager);
+  const result = await pipeline.checkAndMerge(id, row.pr_number, reviewResult);
+
+  return c.json(result);
 });

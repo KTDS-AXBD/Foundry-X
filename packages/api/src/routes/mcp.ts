@@ -1,6 +1,6 @@
 /**
- * MCP Server Management Routes — Sprint 12
- * CRUD + test connection + tools cache
+ * MCP Server Management Routes — Sprint 12 + Sprint 13 (F64)
+ * CRUD + test connection + tools cache + prompts + sampling
  */
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
@@ -8,10 +8,17 @@ import {
   CreateMcpServerSchema,
   McpServerResponseSchema,
   McpTestResultSchema,
+  McpPromptSchema,
+  McpPromptMessageSchema,
+  McpSamplingRequestSchema,
+  McpSamplingResponseSchema,
+  McpSamplingLogSchema,
 } from "../schemas/mcp.js";
 import { McpServerRegistry } from "../services/mcp-registry.js";
 import { createTransport } from "../services/mcp-transport.js";
 import { McpRunner } from "../services/mcp-runner.js";
+import { McpSamplingHandler } from "../services/mcp-sampling.js";
+import { LLMService } from "../services/llm.js";
 import type { Env } from "../env.js";
 
 const app = new OpenAPIHono<{ Bindings: Env }>();
@@ -39,6 +46,28 @@ function toResponse(server: Awaited<ReturnType<McpServerRegistry["getServer"]>>)
     toolCount,
     createdAt: server.createdAt,
   };
+}
+
+// ─── Helper: get server or 404 ───
+
+async function getServerOrNull(registry: McpServerRegistry, id: string) {
+  return registry.getServer(id);
+}
+
+// ─── Helper: create McpRunner from server record ───
+
+function createRunnerFromServer(
+  server: NonNullable<Awaited<ReturnType<McpServerRegistry["getServer"]>>>,
+  registry: McpServerRegistry,
+) {
+  const apiKey = server.apiKeyEncrypted
+    ? registry.decryptApiKey(server.apiKeyEncrypted)
+    : undefined;
+  const transport = createTransport(server.transportType, {
+    serverUrl: server.serverUrl,
+    apiKey,
+  });
+  return new McpRunner(transport, server.name);
 }
 
 // ─── GET /mcp/servers ───
@@ -112,7 +141,7 @@ const deleteServer = createRoute({
 app.openapi(deleteServer, async (c) => {
   const { id } = c.req.valid("param");
   const registry = new McpServerRegistry(c.env.DB);
-  const server = await registry.getServer(id);
+  const server = await getServerOrNull(registry, id);
   if (!server) {
     return c.json({ error: "Server not found" }, 404);
   }
@@ -145,20 +174,13 @@ const testConnection = createRoute({
 app.openapi(testConnection, async (c) => {
   const { id } = c.req.valid("param");
   const registry = new McpServerRegistry(c.env.DB);
-  const server = await registry.getServer(id);
+  const server = await getServerOrNull(registry, id);
   if (!server) {
     return c.json({ error: "Server not found" }, 404);
   }
 
   try {
-    const apiKey = server.apiKeyEncrypted
-      ? registry.decryptApiKey(server.apiKeyEncrypted)
-      : undefined;
-    const transport = createTransport(server.transportType, {
-      serverUrl: server.serverUrl,
-      apiKey,
-    });
-    const runner = new McpRunner(transport, server.name);
+    const runner = createRunnerFromServer(server, registry);
     const tools = await runner.listTools();
 
     await registry.updateStatus(id, "active");
@@ -214,7 +236,7 @@ const getServerTools = createRoute({
 app.openapi(getServerTools, async (c) => {
   const { id } = c.req.valid("param");
   const registry = new McpServerRegistry(c.env.DB);
-  const server = await registry.getServer(id);
+  const server = await getServerOrNull(registry, id);
   if (!server) {
     return c.json({ error: "Server not found" }, 404);
   }
@@ -235,14 +257,7 @@ app.openapi(getServerTools, async (c) => {
 
   // Try live fetch
   try {
-    const apiKey = server.apiKeyEncrypted
-      ? registry.decryptApiKey(server.apiKeyEncrypted)
-      : undefined;
-    const transport = createTransport(server.transportType, {
-      serverUrl: server.serverUrl,
-      apiKey,
-    });
-    const runner = new McpRunner(transport, server.name);
+    const runner = createRunnerFromServer(server, registry);
     const tools = await runner.listTools();
     await registry.cacheTools(id, tools);
     return c.json({ tools, cached: false, cachedAt: new Date().toISOString() });
@@ -258,6 +273,236 @@ app.openapi(getServerTools, async (c) => {
     }
     return c.json({ tools: [], cached: false, cachedAt: null });
   }
+});
+
+// ─── GET /mcp/servers/:id/prompts ─── (Sprint 13 F64)
+
+const listPrompts = createRoute({
+  method: "get",
+  path: "/mcp/servers/{id}/prompts",
+  tags: ["MCP"],
+  summary: "MCP 서버 프롬프트 목록 조회",
+  request: {
+    params: z.object({ id: z.string() }),
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: z.object({ prompts: z.array(McpPromptSchema) }),
+        },
+      },
+      description: "프롬프트 목록",
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "서버를 찾을 수 없음",
+    },
+  },
+});
+
+app.openapi(listPrompts, async (c) => {
+  const { id } = c.req.valid("param");
+  const registry = new McpServerRegistry(c.env.DB);
+  const server = await getServerOrNull(registry, id);
+  if (!server) {
+    return c.json({ error: "Server not found" }, 404);
+  }
+
+  try {
+    const runner = createRunnerFromServer(server, registry);
+    const prompts = await runner.listPrompts();
+    return c.json({ prompts });
+  } catch (err) {
+    return c.json({ prompts: [] });
+  }
+});
+
+// ─── POST /mcp/servers/:id/prompts/:name ─── (Sprint 13 F64)
+
+const getPrompt = createRoute({
+  method: "post",
+  path: "/mcp/servers/{id}/prompts/{name}",
+  tags: ["MCP"],
+  summary: "MCP 프롬프트 실행 (인자 포함)",
+  request: {
+    params: z.object({ id: z.string(), name: z.string() }),
+    body: {
+      content: {
+        "application/json": {
+          schema: z.object({
+            arguments: z.record(z.string()).optional(),
+          }),
+        },
+      },
+      required: false,
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: z.object({ messages: z.array(McpPromptMessageSchema) }),
+        },
+      },
+      description: "프롬프트 실행 결과 메시지",
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "서버를 찾을 수 없음",
+    },
+    500: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "프롬프트 실행 실패",
+    },
+  },
+});
+
+app.openapi(getPrompt, async (c) => {
+  const { id, name } = c.req.valid("param");
+  const registry = new McpServerRegistry(c.env.DB);
+  const server = await getServerOrNull(registry, id);
+  if (!server) {
+    return c.json({ error: "Server not found" }, 404);
+  }
+
+  try {
+    const body = await c.req.json().catch(() => ({})) as { arguments?: Record<string, string> };
+    const runner = createRunnerFromServer(server, registry);
+    const messages = await runner.getPrompt(name, body.arguments);
+    return c.json({ messages });
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    return c.json({ error: errorMessage }, 500);
+  }
+});
+
+// ─── POST /mcp/servers/:id/sampling ─── (Sprint 13 F64)
+
+const handleSampling = createRoute({
+  method: "post",
+  path: "/mcp/servers/{id}/sampling",
+  tags: ["MCP"],
+  summary: "MCP Sampling — 서버 대신 LLM 추론 수행",
+  request: {
+    params: z.object({ id: z.string() }),
+    body: {
+      content: { "application/json": { schema: McpSamplingRequestSchema } },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": { schema: McpSamplingResponseSchema },
+      },
+      description: "LLM 추론 결과",
+    },
+    400: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "유효성 검증 실패",
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "서버를 찾을 수 없음",
+    },
+    429: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "요청 제한 초과",
+    },
+  },
+});
+
+app.openapi(handleSampling, async (c) => {
+  const { id } = c.req.valid("param");
+  const registry = new McpServerRegistry(c.env.DB);
+  const server = await getServerOrNull(registry, id);
+  if (!server) {
+    return c.json({ error: "Server not found" }, 404);
+  }
+
+  const body = c.req.valid("json");
+  const llmService = new LLMService(c.env.AI, c.env.ANTHROPIC_API_KEY);
+  const handler = new McpSamplingHandler(llmService, c.env.DB);
+
+  try {
+    const result = await handler.handleSamplingRequest(id, body);
+    return c.json(result);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    if (message.includes("Rate limit")) {
+      return c.json({ error: message }, 429);
+    }
+    if (message.includes("maxTokens") || message.includes("Image content")) {
+      return c.json({ error: message }, 400);
+    }
+    return c.json({ error: message }, 500);
+  }
+});
+
+// ─── GET /mcp/sampling/log ─── (Sprint 13 F64)
+
+const getSamplingLog = createRoute({
+  method: "get",
+  path: "/mcp/sampling/log",
+  tags: ["MCP"],
+  summary: "MCP Sampling 이력 조회",
+  request: {
+    query: z.object({
+      serverId: z.string().optional(),
+      limit: z.coerce.number().int().min(1).max(100).default(20),
+    }),
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: z.object({ logs: z.array(McpSamplingLogSchema) }),
+        },
+      },
+      description: "Sampling 이력",
+    },
+  },
+});
+
+app.openapi(getSamplingLog, async (c) => {
+  const { serverId, limit } = c.req.valid("query");
+
+  let query: string;
+  const bindings: unknown[] = [];
+
+  if (serverId) {
+    query =
+      "SELECT id, server_id, model, max_tokens, tokens_used, duration_ms, status, created_at FROM mcp_sampling_log WHERE server_id = ? ORDER BY created_at DESC LIMIT ?";
+    bindings.push(serverId, limit);
+  } else {
+    query =
+      "SELECT id, server_id, model, max_tokens, tokens_used, duration_ms, status, created_at FROM mcp_sampling_log ORDER BY created_at DESC LIMIT ?";
+    bindings.push(limit);
+  }
+
+  const { results } = await c.env.DB.prepare(query).bind(...bindings).all<{
+    id: string;
+    server_id: string;
+    model: string;
+    max_tokens: number;
+    tokens_used: number | null;
+    duration_ms: number | null;
+    status: string;
+    created_at: string;
+  }>();
+
+  const logs = results.map((r) => ({
+    id: r.id,
+    serverId: r.server_id,
+    model: r.model,
+    maxTokens: r.max_tokens,
+    tokensUsed: r.tokens_used,
+    durationMs: r.duration_ms,
+    status: r.status,
+    createdAt: r.created_at,
+  }));
+
+  return c.json({ logs });
 });
 
 export default app;

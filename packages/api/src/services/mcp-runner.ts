@@ -5,6 +5,7 @@ import type {
   McpResource,
   McpResponse,
 } from "./mcp-adapter.js";
+import type { McpPrompt, McpPromptMessage } from "@foundry-x/shared";
 import { TASK_TYPE_TO_MCP_TOOL } from "./mcp-adapter.js";
 import type {
   AgentExecutionRequest,
@@ -138,6 +139,42 @@ export class McpRunner implements McpAgentRunner {
 
   supportsTaskType(taskType: string): boolean {
     return taskType in TASK_TYPE_TO_MCP_TOOL;
+  }
+
+  async listPrompts(): Promise<McpPrompt[]> {
+    const response = await this.transport.send({
+      jsonrpc: "2.0",
+      method: "prompts/list",
+      id: nextId++,
+    });
+
+    if (response.error) {
+      return [];
+    }
+
+    const result = response.result as { prompts?: McpPrompt[] } | undefined;
+    return result?.prompts ?? [];
+  }
+
+  async getPrompt(
+    name: string,
+    args?: Record<string, string>,
+  ): Promise<McpPromptMessage[]> {
+    const response = await this.transport.send({
+      jsonrpc: "2.0",
+      method: "prompts/get",
+      params: { name, arguments: args },
+      id: nextId++,
+    });
+
+    if (response.error) {
+      throw new Error(
+        `MCP prompts/get error [${response.error.code}]: ${response.error.message}`,
+      );
+    }
+
+    const result = response.result as { messages?: McpPromptMessage[] } | undefined;
+    return result?.messages ?? [];
   }
 
   private buildToolArguments(

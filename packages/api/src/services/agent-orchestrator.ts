@@ -64,11 +64,43 @@ export type {
 };
 
 export class AgentOrchestrator {
+  private prPipeline?: { createAgentPr: (agentId: string, taskId: string, result: AgentExecutionResult) => Promise<unknown> };
+
   constructor(
     private db: D1Database,
     private sse?: SSEManager,
     private mcpRegistry?: McpServerRegistry,
   ) {}
+
+  /** F65: PR Pipeline 서비스 주입 (옵셔널 — 설정 시 executeTaskWithPr 활성화) */
+  setPrPipeline(pipeline: { createAgentPr: (agentId: string, taskId: string, result: AgentExecutionResult) => Promise<unknown> }): void {
+    this.prPipeline = pipeline;
+  }
+
+  /**
+   * F65: 작업 실행 + PR 생성 (전체 파이프라인)
+   * executeTask() 완료 후 generatedCode가 있으면 자동으로 PR 생성
+   */
+  async executeTaskWithPr(
+    agentId: string,
+    taskType: AgentTaskType,
+    context: AgentExecutionRequest["context"],
+    runner: AgentRunner,
+  ): Promise<{ result: AgentExecutionResult; pr?: unknown }> {
+    const result = await this.executeTask(agentId, taskType, context, runner);
+
+    if (result.output.generatedCode?.length && this.prPipeline) {
+      try {
+        const taskId = `task-${agentId}-${Date.now()}`;
+        const pr = await this.prPipeline.createAgentPr(agentId, taskId, result);
+        return { result, pr };
+      } catch {
+        return { result };
+      }
+    }
+
+    return { result };
+  }
 
   /**
    * F61: MCP 서버가 해당 taskType의 tool을 지원하면 McpRunner 사용,

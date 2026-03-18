@@ -217,6 +217,130 @@ export async function getMcpServerTools(
   return fetchApi(`/mcp/servers/${id}/tools`);
 }
 
+// ─── MCP Prompts & Sampling (F64) ───
+
+export async function listMcpPrompts(
+  serverId: string,
+): Promise<{
+  prompts: Array<{
+    name: string;
+    description?: string;
+    arguments?: Array<{ name: string; description?: string; required?: boolean }>;
+  }>;
+}> {
+  return fetchApi(`/mcp/servers/${serverId}/prompts`);
+}
+
+export async function executeMcpPrompt(
+  serverId: string,
+  name: string,
+  args?: Record<string, string>,
+): Promise<{
+  messages: Array<{
+    role: "user" | "assistant";
+    content:
+      | { type: "text"; text: string }
+      | { type: "resource"; resource: { uri: string; text: string; mimeType?: string } };
+  }>;
+}> {
+  const url = `${BASE_URL}/mcp/servers/${serverId}/prompts/${encodeURIComponent(name)}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ arguments: args }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<{ messages: any[] }>;
+}
+
+export async function getMcpSamplingLog(
+  serverId?: string,
+  limit?: number,
+): Promise<{
+  logs: Array<{
+    id: string;
+    serverId: string;
+    model: string;
+    maxTokens: number;
+    tokensUsed: number | null;
+    durationMs: number | null;
+    status: string;
+    createdAt: string;
+  }>;
+}> {
+  const params = new URLSearchParams();
+  if (serverId) params.set("serverId", serverId);
+  if (limit) params.set("limit", String(limit));
+  const qs = params.toString();
+  return fetchApi(`/mcp/sampling/log${qs ? `?${qs}` : ""}`);
+}
+
+// ─── Agent PR Pipeline (F65) ───
+
+export interface AgentPrResult {
+  id: string;
+  prNumber: number | null;
+  prUrl: string | null;
+  branch: string;
+  status: string;
+  reviewResult?: {
+    decision: string;
+    summary: string;
+    comments: Array<{ file: string; line: number; comment: string; severity: string }>;
+    sddScore: number;
+    qualityScore: number;
+    securityIssues: string[];
+  };
+  merged: boolean;
+}
+
+export async function createAgentPr(
+  agentId: string,
+  taskId: string,
+  config?: Record<string, unknown>,
+): Promise<AgentPrResult> {
+  const url = `${BASE_URL}/agents/pr`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ agentId, taskId, config }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<AgentPrResult>;
+}
+
+export async function getAgentPr(id: string): Promise<Record<string, unknown>> {
+  return fetchApi(`/agents/pr/${id}`);
+}
+
+export async function reviewAgentPr(id: string): Promise<Record<string, unknown>> {
+  const url = `${BASE_URL}/agents/pr/${id}/review`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<Record<string, unknown>>;
+}
+
+export async function mergeAgentPr(
+  id: string,
+): Promise<{ merged: boolean; needsHuman: boolean; reason?: string }> {
+  const url = `${BASE_URL}/agents/pr/${id}/merge`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<{ merged: boolean; needsHuman: boolean; reason?: string }>;
+}
+
 // ─── Conflict Resolution ───
 
 export async function resolveConflict(

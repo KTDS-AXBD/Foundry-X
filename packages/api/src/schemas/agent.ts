@@ -187,3 +187,80 @@ export const AgentRunnerInfoSchema = z
     description: z.string(),
   })
   .openapi("AgentRunnerInfo");
+
+// ─── Sprint 13: PR Pipeline Schemas (F65) ───
+
+export const PrReviewCommentSchema = z
+  .object({
+    file: z.string(),
+    line: z.number(),
+    comment: z.string(),
+    severity: z.enum(["error", "warning", "info"]),
+  })
+  .openapi("PrReviewComment");
+
+export const PrReviewResultSchema = z
+  .object({
+    decision: z.enum(["approve", "request_changes", "comment"]),
+    summary: z.string(),
+    comments: z.array(PrReviewCommentSchema),
+    sddScore: z.number().min(0).max(100),
+    qualityScore: z.number().min(0).max(100),
+    securityIssues: z.array(z.string()),
+  })
+  .openapi("PrReviewResult");
+
+export const PrPipelineConfigSchema = z
+  .object({
+    autoMerge: z.boolean().default(true),
+    requireHumanApproval: z.boolean().default(false),
+    maxAutoMergePerDay: z.number().default(10),
+    branchPrefix: z.string().default("agent/"),
+    mergeStrategy: z.enum(["squash", "merge", "rebase"]).default("squash"),
+    sddScoreThreshold: z.number().default(80),
+    qualityScoreThreshold: z.number().default(70),
+  })
+  .openapi("PrPipelineConfig");
+
+export const AgentPrResultSchema = z
+  .object({
+    id: z.string(),
+    prNumber: z.number().nullable(),
+    prUrl: z.string().nullable(),
+    branch: z.string(),
+    status: z.enum(["creating", "open", "reviewing", "approved", "merged", "closed", "needs_human"]),
+    reviewResult: PrReviewResultSchema.optional(),
+    merged: z.boolean(),
+  })
+  .openapi("AgentPrResult");
+
+export const AgentPrRecordSchema = z
+  .object({
+    id: z.string(),
+    agentId: z.string(),
+    taskId: z.string(),
+    repo: z.string(),
+    branch: z.string(),
+    prNumber: z.number().nullable(),
+    prUrl: z.string().nullable(),
+    status: z.enum(["creating", "open", "reviewing", "approved", "merged", "closed", "needs_human"]),
+    reviewAgentId: z.string().nullable(),
+    reviewDecision: z.string().nullable(),
+    sddScore: z.number().nullable(),
+    qualityScore: z.number().nullable(),
+    securityIssues: z.string().nullable(),
+    mergeStrategy: z.string(),
+    mergedAt: z.string().nullable(),
+    commitSha: z.string().nullable(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+  })
+  .openapi("AgentPrRecord");
+
+export const CreateAgentPrRequestSchema = z
+  .object({
+    agentId: z.string(),
+    taskId: z.string(),
+    config: PrPipelineConfigSchema.optional(),
+  })
+  .openapi("CreateAgentPrRequest");

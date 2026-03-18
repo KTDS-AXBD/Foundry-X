@@ -1,5 +1,6 @@
 import type { AgentRunner } from "./agent-runner.js";
 import type { AgentTaskType } from "./execution-types.js";
+import type { McpPrompt, McpPromptMessage } from "@foundry-x/shared";
 
 /**
  * MCP Transport 추상화 — 통신 방식 교체 가능
@@ -60,6 +61,8 @@ export interface McpAgentRunner extends AgentRunner {
   readonly type: "mcp";
   listTools(): Promise<McpTool[]>;
   listResources(): Promise<McpResource[]>;
+  listPrompts?(): Promise<McpPrompt[]>;
+  getPrompt?(name: string, args?: Record<string, string>): Promise<McpPromptMessage[]>;
 }
 
 // ─── F58: taskType → MCP tool 매핑 ───

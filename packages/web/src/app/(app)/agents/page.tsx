@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { fetchApi, type AgentExecutionResult } from "@/lib/api-client";
-import type { AgentProfile, AgentActivity } from "@foundry-x/shared";
+import { useEffect, useState, useCallback } from "react";
+import { fetchApi, getAgentPr, type AgentExecutionResult } from "@/lib/api-client";
+import type { AgentProfile, AgentActivity, AgentPr } from "@foundry-x/shared";
 import AgentCard from "@/components/feature/AgentCard";
 import { AgentExecuteModal } from "@/components/feature/AgentExecuteModal";
 import { AgentTaskResult } from "@/components/feature/AgentTaskResult";
+import { AgentPrCard } from "@/components/feature/AgentPrCard";
 import { SSEClient } from "@/lib/sse-client";
 
 // F55: 에이전트별 task 상태 추적
@@ -28,6 +29,7 @@ export default function AgentsPage() {
     new Map(),
   );
   const [sseConnected, setSseConnected] = useState(false);
+  const [agentPrs, setAgentPrs] = useState<AgentPr[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -77,6 +79,39 @@ export default function AgentsPage() {
             });
             return next;
           });
+        }
+
+        // agent.pr.created — prNumber + branch 필드로 식별
+        if (raw.prNumber && raw.branch && !raw.decision && !raw.mergedAt && !raw.reason) {
+          const prData: Partial<AgentPr> = {
+            prNumber: raw.prNumber as number,
+            branch: raw.branch as string,
+            agentId: raw.agentId as string,
+            status: 'open',
+          };
+          setAgentPrs((prev) => [...prev, prData as AgentPr]);
+        }
+
+        // agent.pr.reviewed — decision 필드로 식별
+        if (raw.prNumber && raw.decision) {
+          setAgentPrs((prev) =>
+            prev.map((pr) =>
+              pr.prNumber === raw.prNumber
+                ? { ...pr, status: raw.decision === 'approve' ? 'approved' as const : 'needs_human' as const, reviewDecision: raw.decision as string, sddScore: raw.sddScore as number }
+                : pr
+            )
+          );
+        }
+
+        // agent.pr.merged — mergedAt 필드로 식별
+        if (raw.prNumber && raw.mergedAt) {
+          setAgentPrs((prev) =>
+            prev.map((pr) =>
+              pr.prNumber === raw.prNumber
+                ? { ...pr, status: 'merged' as const, mergedAt: raw.mergedAt as string, commitSha: raw.commitSha as string }
+                : pr
+            )
+          );
         }
 
         // agent.task.completed — completedAt 필드로 식별
@@ -155,6 +190,21 @@ export default function AgentsPage() {
               </button>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Agent PRs section */}
+      {agentPrs.length > 0 && (
+        <div className="mt-6">
+          <h2 className="mb-3 text-lg font-semibold">Agent PRs</h2>
+          <div className="grid gap-3 md:grid-cols-2">
+            {agentPrs.map((pr, i) => (
+              <AgentPrCard
+                key={pr.id ?? `pr-${i}`}
+                pr={pr}
+              />
+            ))}
+          </div>
         </div>
       )}
 

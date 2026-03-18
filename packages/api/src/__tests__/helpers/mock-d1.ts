@@ -179,6 +179,36 @@ export class MockD1Database {
         updated_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
       CREATE INDEX IF NOT EXISTS idx_mcp_servers_status ON mcp_servers(status);
+      CREATE TABLE IF NOT EXISTS agent_prs (
+        id TEXT PRIMARY KEY,
+        agent_id TEXT NOT NULL,
+        task_id TEXT REFERENCES agent_tasks(id),
+        repo TEXT NOT NULL,
+        branch TEXT NOT NULL DEFAULT '',
+        pr_number INTEGER,
+        pr_url TEXT,
+        status TEXT NOT NULL DEFAULT 'creating',
+        review_agent_id TEXT,
+        review_decision TEXT,
+        sdd_score INTEGER,
+        quality_score INTEGER,
+        security_issues TEXT,
+        merge_strategy TEXT DEFAULT 'squash',
+        merged_at TEXT,
+        commit_sha TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE TABLE IF NOT EXISTS mcp_sampling_log (
+        id TEXT PRIMARY KEY,
+        server_id TEXT NOT NULL REFERENCES mcp_servers(id),
+        model TEXT NOT NULL,
+        max_tokens INTEGER NOT NULL,
+        tokens_used INTEGER,
+        duration_ms INTEGER,
+        status TEXT NOT NULL DEFAULT 'pending',
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
       CREATE TABLE IF NOT EXISTS spec_conflicts (
         id TEXT PRIMARY KEY,
         new_spec_title TEXT NOT NULL,

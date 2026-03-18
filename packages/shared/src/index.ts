@@ -52,3 +52,26 @@ export type {
   UIAction,
   UIHint,
 } from './agent.js';
+
+// Sprint 13: MCP Sampling/Prompts types (F64)
+export type {
+  McpPrompt,
+  McpPromptArgument,
+  McpPromptMessage,
+  McpSamplingMessage,
+  McpSamplingLog,
+} from './agent.js';
+
+// Sprint 13: Agent PR Pipeline types (F65)
+export type {
+  AgentPrStatus,
+  AgentPr,
+  PrReviewResult,
+  PrReviewComment,
+  PrPipelineConfig,
+  AgentExecutionRequest,
+  AgentExecutionResult,
+  AgentRunnerType,
+  AgentRunnerInfo,
+  AgentTaskType,
+} from './agent.js';

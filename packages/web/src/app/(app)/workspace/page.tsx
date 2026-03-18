@@ -6,9 +6,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { McpServerCard } from "@/components/feature/McpServerCard";
+import { McpPromptsPanel } from "@/components/feature/McpPromptsPanel";
 import {
   listMcpServers,
   createMcpServer,
+  getMcpSamplingLog,
   type McpServerInfo,
 } from "@/lib/api-client";
 
@@ -278,10 +280,27 @@ function SettingsTab() {
   );
 }
 
+interface SamplingLogEntry {
+  id: string;
+  serverId: string;
+  model: string;
+  maxTokens: number;
+  tokensUsed: number | null;
+  durationMs: number | null;
+  status: string;
+  createdAt: string;
+}
+
+type McpSubTab = "servers" | "prompts" | "sampling";
+
 function McpServersTab() {
   const [servers, setServers] = useState<McpServerInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [subTab, setSubTab] = useState<McpSubTab>("servers");
+  const [selectedServer, setSelectedServer] = useState<McpServerInfo | null>(null);
+  const [samplingLogs, setSamplingLogs] = useState<SamplingLogEntry[]>([]);
+  const [logsLoading, setLogsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     serverUrl: "",
@@ -327,10 +346,110 @@ function McpServersTab() {
     }
   }
 
+  const loadSamplingLogs = useCallback(async (serverId?: string) => {
+    setLogsLoading(true);
+    try {
+      const data = await getMcpSamplingLog(serverId);
+      setSamplingLogs(data.logs ?? []);
+    } catch {
+      setSamplingLogs([]);
+    } finally {
+      setLogsLoading(false);
+    }
+  }, []);
+
   if (loading) return <p className="text-sm text-muted-foreground">로딩 중...</p>;
 
   return (
     <div className="space-y-4">
+      {/* Sub-tab navigation */}
+      <div className="flex gap-1 border-b border-border pb-2">
+        {(["servers", "prompts", "sampling"] as McpSubTab[]).map((t) => (
+          <button
+            key={t}
+            onClick={() => {
+              setSubTab(t);
+              if (t === "sampling") loadSamplingLogs(selectedServer?.id);
+            }}
+            className={cn(
+              "rounded-t px-3 py-1.5 text-xs font-medium transition-colors",
+              subTab === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
+            )}
+          >
+            {t === "servers" ? "Servers" : t === "prompts" ? "Prompts" : "Sampling Log"}
+          </button>
+        ))}
+      </div>
+
+      {/* Prompts sub-tab */}
+      {subTab === "prompts" && (
+        <div className="space-y-3">
+          {servers.length === 0 ? (
+            <p className="py-4 text-center text-sm text-muted-foreground">서버를 먼저 등록하세요.</p>
+          ) : (
+            <>
+              <div className="flex gap-2">
+                {servers.map((s) => (
+                  <Button
+                    key={s.id}
+                    size="sm"
+                    variant={selectedServer?.id === s.id ? "default" : "outline"}
+                    onClick={() => setSelectedServer(s)}
+                  >
+                    {s.name}
+                  </Button>
+                ))}
+              </div>
+              {selectedServer && (
+                <McpPromptsPanel serverId={selectedServer.id} serverName={selectedServer.name} />
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Sampling Log sub-tab */}
+      {subTab === "sampling" && (
+        <div className="space-y-3">
+          {logsLoading ? (
+            <p className="text-sm text-muted-foreground">로딩 중...</p>
+          ) : samplingLogs.length === 0 ? (
+            <p className="py-4 text-center text-sm text-muted-foreground">Sampling 이력이 없어요.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-xs text-muted-foreground">
+                    <th className="pb-2 pr-4">Model</th>
+                    <th className="pb-2 pr-4">Tokens</th>
+                    <th className="pb-2 pr-4">Duration</th>
+                    <th className="pb-2 pr-4">Status</th>
+                    <th className="pb-2">Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {samplingLogs.map((log) => (
+                    <tr key={log.id} className="border-b border-border/50">
+                      <td className="py-2 pr-4 font-mono text-xs">{log.model}</td>
+                      <td className="py-2 pr-4">{log.tokensUsed ?? "-"}/{log.maxTokens}</td>
+                      <td className="py-2 pr-4">{log.durationMs ? `${log.durationMs}ms` : "-"}</td>
+                      <td className="py-2 pr-4">
+                        <span className={cn("rounded px-1.5 py-0.5 text-xs", log.status === "completed" ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400")}>
+                          {log.status}
+                        </span>
+                      </td>
+                      <td className="py-2 text-xs text-muted-foreground">{new Date(log.createdAt).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Servers sub-tab (existing content) */}
+      {subTab === "servers" && <>
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
           외부 MCP 서버를 등록하여 AI 에이전트를 연동해요.
@@ -414,6 +533,7 @@ function McpServersTab() {
           ))}
         </div>
       )}
+      </>}
     </div>
   );
 }

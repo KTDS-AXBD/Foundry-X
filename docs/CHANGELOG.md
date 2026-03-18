@@ -7,11 +7,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 세션 37 (2026-03-18)
+**Sprint 13 PDCA 완료 — MCP Sampling/Prompts + 에이전트 자동 PR**:
+- ✅ F64 MCP Sampling/Prompts (91%): McpSamplingHandler + McpPromptsClient + 4 API endpoints + McpPromptsPanel + 15 tests
+- ✅ F65 에이전트 자동 PR (93%): PrPipelineService + ReviewerAgent + GitHubService 확장 + 7-gate auto-merge + 4 API endpoints + 37 tests
+- ✅ Agent Teams W1/W2 병렬 구현 (파일 충돌 0)
+- ✅ 388 total tests (API 237 + CLI 106 + Web 45), +34 from Sprint 12
+- ✅ 41 API endpoints (v0.12.0 33 + Sprint 13 8)
+- ✅ 13 D1 테이블 (v0.12.0 11 + 0007 migration: mcp_sampling_log + agent_prs)
+- ✅ PDCA Report FX-RPRT-015 (Match Rate 93%)
+
+---
+
 ## 세션 36 (2026-03-18)
 **CLAUDE.md 품질 개선 + Sprint 13 계획 커밋**:
 - ✅ CLAUDE.md improver: 파일 카운트 수정, Sprint 이력 압축(35줄→8줄), API/Web/E2E 명령 추가, PostgreSQL→D1 수정
 - ✅ Sprint 13 미커밋 반영: SPEC v3.0, F64~F66 타입 정의, Plan/Design 문서
 - ✅ ax-13-selfcheck 8/8 PASS
+
+---
+
+## [1.1.0] - 2026-03-18
+
+### Summary
+**Sprint 13 완료** — MCP Sampling/Prompts 양방향 통합(F64, 91%) + 에이전트 자동 PR 파이프라인(F65, 93%) + v1.1.0 릴리스. Overall Match Rate 93%. Agent Teams 병렬 구현 (W1 MCP, W2 PR, 파일 충돌 0). 전체 388 tests (API 237 + CLI 106 + Web 45) + 22 E2E. 41 endpoints + 13 D1 tables.
+
+### Added
+- **F64 MCP Sampling + Prompts** (Match Rate 91%)
+  - McpSamplingHandler — sampling/createMessage 처리 + 보안 게이트(모델 화이트리스트, 토큰 한도, rate limit)
+  - McpPromptsClient — prompts/list + prompts/get (McpRunner 확장)
+  - MCP API 4 endpoints: GET/POST /mcp/servers/:id/prompts, POST /mcp/servers/:id/sampling, GET /mcp/sampling/log
+  - McpPromptsPanel.tsx — 프롬프트 브라우저 UI
+  - D1 mcp_sampling_log 테이블 (서버별 Sampling 이력)
+  - shared/agent.ts: McpPrompt, McpPromptArgument, McpSamplingMessage, McpSamplingLog 타입
+  - 테스트 15건: mcp-sampling 6 + mcp-prompts 5 + mcp-routes-prompts 4
+
+- **F65 에이전트 자동 PR 파이프라인** (Match Rate 93%)
+  - PrPipelineService — 8-step 오케스트레이션 (record → branch → commit → PR → check → review → merge 판정)
+  - ReviewerAgent — LLM 기반 PR diff 분석 + SDD/Quality/Security 점수 계산
+  - GitHubService 확장 — 8 메서드 (createBranch, createCommitWithFiles, createPR, getPrDiff, mergePR, createPrReview, getCheckRuns, deleteBranch)
+  - Auto-merge 7-gate: CI + SDD≥80 + Quality≥70 + Security=0(critical/high) + Daily Limit + Human Approval(선택) + autoMerge flag
+  - Agent PR API 4 endpoints: POST /agents/pr, GET /agents/pr/:id, POST /agents/pr/:id/review, POST /agents/pr/:id/merge
+  - AgentPrCard.tsx + PrReviewPanel.tsx + AutoMergeSettings.tsx
+  - SSE 4 이벤트: agent.pr.created, reviewed, merged, review_needed
+  - D1 agent_prs 테이블 (에이전트 PR 추적)
+  - shared/agent.ts: AgentPr, PrReviewResult, PrReviewComment, PrPipelineConfig, SSE event types
+  - 테스트 37건: pr-pipeline 8 + reviewer-agent 6 + github-pr 4 + routes 6 (추가)
+
+- **F66 v1.1.0 릴리스 준비**
+  - D1 migration 0007 (mcp_sampling_log + agent_prs)
+  - SPEC v3.1 갱신 (Sprint 13 F64/F65 등록)
+  - CLAUDE.md 현재 상태 갱신 (v1.1.0)
+  - E2E 4건 예정 (agent-pr-pipeline + mcp-prompts + workspace tabs + agents page integration)
+
+### Changed
+- McpRunner: listPrompts() + getPrompt() 메서드 추가
+- GitHubService: PR 작성 기능 추가 (기존 읽기 → 읽기/쓰기)
+- SSEManager: agent.pr.* 4 이벤트 타입 확장
+- AgentOrchestrator: executeTaskWithPr() 선택 메서드 추가
+
+### Technical Details
+- MCP Sampling: in-memory sliding window rate limit (분당 10회), 허용 모델 화이트리스트, maxTokens 상한
+- PR Pipeline: octokit 재활용, GitHub Tree API 5-step commit, Squash merge 전략
+- ReviewerAgent: JSON 기반 structured output + clamp(0, 100) 점수 정규화
+- Branch naming: agent/{agentId}/{taskType}-{timestamp}
+
+### PDCA Documents
+- FX-PLAN-014: Sprint 13 F64/F65/F66 Plan
+- FX-DSGN-014: Sprint 13 상세 설계 (MCP + PR Pipeline)
+- FX-ANLS-013: Sprint 13 Gap Analysis (F64 91%, F65 93%, Overall 93%)
+- FX-RPRT-015: Sprint 13 Completion Report
 
 ---
 
