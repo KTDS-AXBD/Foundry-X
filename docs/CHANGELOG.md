@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.11.0] - 2026-03-18
+
+### Summary
+**Sprint 11 완료** — SSE 실시간 이벤트(F55, 95%) + E2E 테스트 고도화(F56, 88%) + 배포 자동화(F57, 100%) + MCP 설계(F58, 91%). Overall Match Rate 93%, 14 신규 API 테스트 + 8 E2E specs (총 290 + 18 E2E).
+
+### Added
+- **F55 SSE 이벤트 완성** (Match Rate 95%)
+  - SSEManager.pushEvent() — subscribers Pub/Sub + taskId 기반 dedup (60초 TTL)
+  - agent.task.started/completed 이벤트 → `event: status` 래핑으로 SSEClient 호환
+  - AgentOrchestrator SSEManager 옵셔널 주입 + executeTask() step 3.5/6.5 이벤트 발행
+  - agents/page.tsx onStatus/onError 핸들러 + taskStates Map + SSE 연결 인디케이터
+  - AgentCard taskStatus prop + running 상태 스피너
+  - routes/agent.ts SSEManager 공유 인스턴스 (Workers isolate 싱글턴)
+  - shared/agent.ts TaskStartedData/TaskCompletedData/AgentTaskStatus 타입
+- **F56 E2E 테스트 고도화** (Match Rate 88%)
+  - agent-execute.spec.ts: 에이전트 실행→결과, 비활성화, 에러 E2E 3건
+  - conflict-resolution.spec.ts: 충돌 없음, 감지, 해결 E2E 3건
+  - sse-lifecycle.spec.ts: SSE 연결 UI, 카드 상태 배지 E2E 2건
+  - agent-execute-integration.test.ts: SSE 이벤트 발행 검증 API 통합 5건
+  - conflict-resolution-integration.test.ts: generate→detect→resolve 흐름 4건
+- **F57 프로덕션 배포 자동화** (Match Rate 100%)
+  - wrangler.toml ENVIRONMENT=production var + staging 환경 분리
+  - deploy.yml PR→staging 자동 배포 + master→production 자동 배포
+  - smoke-test.sh 에이전트 runners + SSE 연결 검증 추가
+- **F58 MCP 설계** (Match Rate 91%)
+  - mcp-adapter.ts McpMessage/McpResponse 프로토콜 타입 + TASK_TYPE_TO_MCP_TOOL 매핑 상수
+  - mcp-protocol.design.md MCP 1.0 프로토콜 연동 설계 문서 (FX-DSGN-012)
+  - mcp-adapter.test.ts 매핑+타입 검증 2건
+
+### Changed
+- SSEManager: D1 폴링 + pushEvent() 하이브리드 모드 (기존 폴링은 fallback 유지)
+- AgentOrchestrator: constructor에 SSEManager 옵셔널 주입 (하위 호환)
+- agents/page.tsx: SSE 이벤트 기반 실시간 task 상태 UI (모달 콜백 → SSE 전환)
+
+### PDCA
+- Plan: FX-PLAN-011 | Design: FX-DSGN-011 | Analysis: FX-ANLS-011 | Report: FX-RPRT-013
+- Agent Teams: W1(SSE Backend) + W2(E2E Tests) + Leader — 파일 충돌 0건
+- Gap Analysis: 초기 88% → Iteration 1 → 93%
+
+---
+
 ## [0.10.0] - 2026-03-18
 
 ### Summary
