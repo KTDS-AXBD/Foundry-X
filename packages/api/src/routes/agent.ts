@@ -864,3 +864,43 @@ agentRoute.openapi(processQueue, async (c) => {
   const result = await mergeQueue.processNext();
   return c.json(result);
 });
+
+// ─── Sprint 15: PlannerAgent Endpoints (F70) ───
+
+import { PlannerAgent } from "../services/planner-agent.js";
+import { createPlanSchema, rejectPlanSchema } from "../schemas/plan.js";
+
+agentRoute.post("/plan", async (c) => {
+  const body = createPlanSchema.parse(await c.req.json());
+  const sseManager = getSSEManager(c.env.DB);
+  const planner = new PlannerAgent({ db: c.env.DB, sse: sseManager });
+  const plan = await planner.createPlan(body.agentId, body.taskType, body.context);
+  return c.json(plan, 201);
+});
+
+agentRoute.post("/plan/:id/approve", async (c) => {
+  const planId = c.req.param("id");
+  const sseManager = getSSEManager(c.env.DB);
+  const planner = new PlannerAgent({ db: c.env.DB, sse: sseManager });
+  const plan = await planner.approvePlan(planId);
+  return c.json(plan);
+});
+
+agentRoute.post("/plan/:id/reject", async (c) => {
+  const planId = c.req.param("id");
+  const body = rejectPlanSchema.parse(await c.req.json());
+  const sseManager = getSSEManager(c.env.DB);
+  const planner = new PlannerAgent({ db: c.env.DB, sse: sseManager });
+  const plan = await planner.rejectPlan(planId, body.reason);
+  return c.json(plan);
+});
+
+// ─── Sprint 15: Worktree Endpoint (F72) ───
+
+import { WorktreeManager } from "../services/worktree-manager.js";
+
+agentRoute.get("/worktrees", async (c) => {
+  const manager = new WorktreeManager({ db: c.env.DB });
+  const worktrees = manager.list();
+  return c.json({ worktrees });
+});

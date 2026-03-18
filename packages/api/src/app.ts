@@ -12,6 +12,7 @@ import { authRoute } from "./routes/auth.js";
 import { specRoute } from "./routes/spec.js";
 import { webhookRoute } from "./routes/webhook.js";
 import mcpRoute from "./routes/mcp.js";
+import { inboxRoute } from "./routes/inbox.js";
 import { authMiddleware } from "./middleware/auth.js";
 import type { Env } from "./env.js";
 
@@ -64,3 +65,4 @@ app.route("/api", agentRoute);
 app.route("/api", tokenRoute);
 app.route("/api", specRoute);
 app.route("/api", mcpRoute);
+app.route("/api/agents/inbox", inboxRoute);

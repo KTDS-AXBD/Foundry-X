@@ -100,7 +100,11 @@ export type SSEEvent =
   | { event: "agent.queue.updated"; data: QueueUpdatedData }
   | { event: "agent.queue.conflict"; data: QueueConflictData }
   | { event: "agent.queue.merged"; data: QueueMergedData }
-  | { event: "agent.queue.rebase"; data: QueueRebaseData };
+  | { event: "agent.queue.rebase"; data: QueueRebaseData }
+  | { event: "agent.plan.created"; data: { planId: string; taskId: string; agentId: string; stepsCount: number; estimatedTokens: number } }
+  | { event: "agent.plan.approved"; data: { planId: string; approvedBy: string } }
+  | { event: "agent.plan.rejected"; data: { planId: string; reason?: string } }
+  | { event: "agent.message.received"; data: { messageId: string; fromAgentId: string; toAgentId: string; type: string; subject: string } };
 
 const DEDUP_TTL_MS = 60_000;
 

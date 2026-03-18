@@ -7,6 +7,8 @@ import type { AgentRunner } from "./agent-runner.js";
 import type { SSEManager } from "./sse-manager.js";
 import type { McpServerRegistry } from "./mcp-registry.js";
 import type { MergeQueueService } from "./merge-queue.js";
+import type { PlannerAgent } from "./planner-agent.js";
+import type { WorktreeManager } from "./worktree-manager.js";
 import type { ParallelExecutionResult, ParallelPrResult, ConflictReport } from "@foundry-x/shared";
 import { McpRunner } from "./mcp-runner.js";
 import { createTransport } from "./mcp-transport.js";
@@ -68,6 +70,8 @@ export type {
 export class AgentOrchestrator {
   private prPipeline?: { createAgentPr: (agentId: string, taskId: string, result: AgentExecutionResult) => Promise<unknown> };
   private mergeQueue?: MergeQueueService;
+  private plannerAgent?: PlannerAgent;
+  private worktreeManager?: WorktreeManager;
 
   constructor(
     private db: D1Database,
@@ -78,6 +82,16 @@ export class AgentOrchestrator {
   /** F68: Merge Queue 서비스 주입 */
   setMergeQueue(queue: MergeQueueService): void {
     this.mergeQueue = queue;
+  }
+
+  /** F70: PlannerAgent 서비스 주입 */
+  setPlannerAgent(planner: PlannerAgent): void {
+    this.plannerAgent = planner;
+  }
+
+  /** F72: WorktreeManager 서비스 주입 */
+  setWorktreeManager(manager: WorktreeManager): void {
+    this.worktreeManager = manager;
   }
 
   /** F65: PR Pipeline 서비스 주입 (옵셔널 — 설정 시 executeTaskWithPr 활성화) */
@@ -595,5 +609,72 @@ export class AgentOrchestrator {
       },
       result: row.result ? JSON.parse(row.result) : null,
     };
+  }
+
+  /**
+   * F70: 계획 수립 후 대기 — 인간 승인 후 executePlan()으로 실행
+   */
+  async createPlanAndWait(
+    agentId: string,
+    taskType: AgentTaskType,
+    context: AgentExecutionRequest["context"],
+  ) {
+    if (!this.plannerAgent) {
+      throw new Error("PlannerAgent not configured — call setPlannerAgent() first");
+    }
+    return this.plannerAgent.createPlan(agentId, taskType, context);
+  }
+
+  /**
+   * F70: 승인된 계획을 실행
+   */
+  async executePlan(
+    planId: string,
+    runner: AgentRunner,
+  ): Promise<AgentExecutionResult> {
+    if (!this.plannerAgent) {
+      throw new Error("PlannerAgent not configured");
+    }
+    const plan = await this.plannerAgent.getPlan(planId);
+    if (!plan || plan.status !== "approved") {
+      throw new Error(`Plan ${planId} is not approved (status: ${plan?.status})`);
+    }
+
+    const context: AgentExecutionRequest["context"] = {
+      repoUrl: "",
+      branch: "master",
+      targetFiles: plan.proposedSteps
+        .filter((s: { targetFile?: string }) => s.targetFile)
+        .map((s: { targetFile?: string }) => s.targetFile!),
+      instructions: plan.proposedSteps
+        .map((s: { type: string; description: string }, i: number) => `Step ${i + 1} (${s.type}): ${s.description}`)
+        .join("\n"),
+    };
+
+    return this.executeTask(plan.agentId, "code-generation", context, runner);
+  }
+
+  /**
+   * F72: worktree 격리 모드 실행
+   */
+  async executeTaskIsolated(
+    agentId: string,
+    taskType: AgentTaskType,
+    context: AgentExecutionRequest["context"],
+    runner: AgentRunner,
+  ): Promise<AgentExecutionResult> {
+    if (!this.worktreeManager) {
+      return this.executeTask(agentId, taskType, context, runner);
+    }
+
+    const branchName = `agent/${agentId}/${Date.now()}`;
+    await this.worktreeManager.create(agentId, branchName, context.branch);
+
+    try {
+      const isolatedContext = { ...context, branch: branchName };
+      return await this.executeTask(agentId, taskType, isolatedContext, runner);
+    } finally {
+      await this.worktreeManager.cleanup(agentId);
+    }
   }
 }
