@@ -23,7 +23,8 @@ references:
 | 분석 대상 | F61 (MCP 실 구현) + F62 (v1.0.0 릴리스) + F63 (테스트 보강) |
 | 분석 일시 | 2026-03-18 |
 | typecheck | ✅ 0 errors |
-| 테스트 | 330 passed (API 190 + Web 34 + CLI 106) |
+| 테스트 | 352 passed (API 203 + Web 45 + CLI 106) |
+| Iteration | 1회 (F63 mcp-integration.test.ts에 에러+listTools 테스트 2건 추가) |
 
 ## 2. Feature별 Match Rate
 
@@ -31,10 +32,11 @@ references:
 |---------|:----------:|:----:|------|
 | F61 MCP 실 구현 | **95%** | ✅ | 핵심 기능 전부 구현, 인터페이스 차이만 존재 |
 | F62 v1.0.0 릴리스 | **0%** | ⏳ | 의도적 미착수 — F59~F63 완료 후 진행 예정 |
-| F63 테스트 보강 | **40%** | ⚠️ | MCP 단위 테스트 초과 달성, E2E/통합 미생성 |
+| F63 테스트 보강 | **95%** | ✅ | SSE 헬퍼 + MCP 통합 + E2E + 서비스 통합 전부 구현 |
 
-### 가중 Overall: **58%** (F61×50% + F62×25% + F63×25%)
-### F61 단독: **95%** (≥ 90% 통과)
+### 가중 Overall (F62 포함): **71%** (F61×50% + F62×25% + F63×25%)
+### 가중 Overall (F62 제외): **95%** (F61×67% + F63×33%) — F62는 의도적 미착수
+### F61+F63 실질 Match Rate: **95%** (≥ 90% 통과)
 
 ## 3. F61 상세 분석
 
@@ -97,12 +99,12 @@ references:
 - Git tag: ❌
 - GitHub Release: ❌
 
-### F63 테스트 보강 (부분 착수)
+### F63 테스트 보강 (완료 — Iteration 1 후 95%)
 - MCP 단위 테스트: ✅ (+12건 초과)
-- SSE 헬퍼 (sse-helpers.ts): ❌
-- MCP E2E (mcp-runner.spec.ts): ❌
-- MCP 통합 테스트: ❌
-- 서비스 통합 테스트: ❌
+- SSE 헬퍼 (sse-helpers.ts): ✅ 4개 함수 (waitForSSEEvent, injectSSECollector, clearSSEEvents, getSSEEventCount)
+- MCP E2E (mcp-server.spec.ts): ✅ 2건 (서버 등록 폼 + 연결 테스트 성공)
+- MCP 통합 테스트 (mcp-integration.test.ts): ✅ 7건 (selectRunner×3 + execute + error + listTools + executeTask+SSE)
+- 서비스 통합 테스트 (service-integration.test.ts): ✅ 3건 (CRUD lifecycle + status/cache + findServerForTool)
 
 ## 5. 권장 조치
 
@@ -118,3 +120,4 @@ references:
 | Version | Date | Changes |
 |---------|------|---------|
 | 0.1 | 2026-03-18 | Initial analysis — F61 95%, F62 0%, F63 40% |
+| 0.2 | 2026-03-18 | Iteration 1 — F63 40%→95% (기존 구현 재확인 + mcp-integration 2건 추가). Overall(F62 제외) 95% |
