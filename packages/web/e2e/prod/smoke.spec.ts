@@ -24,13 +24,13 @@ test.describe("Production Smoke", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // Hero headline — 기존 landing.spec.ts와 동일한 선택자
+    // Hero headline — F74 개편 후 한국어 헤드라인
     await expect(
-      page.getByRole("heading", { name: /Where Humans & AI/i }),
+      page.getByRole("heading", { name: /사람과 AI가/i }),
     ).toBeVisible();
 
-    // "Forge Together" 브랜딩 텍스트
-    await expect(page.getByText("Forge Together")).toBeVisible();
+    // Hero 브랜딩 텍스트
+    await expect(page.getByText("함께 만드는 곳")).toBeVisible();
   });
 
   /**
