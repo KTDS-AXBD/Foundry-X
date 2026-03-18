@@ -47,11 +47,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @foundry-x/shared build
       - run: pnpm --filter @foundry-x/web build
-      - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy out --project-name=foundry-x-web
-        working-directory: packages/web
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: packages/web
+          command: pages deploy out --project-name=foundry-x-web
+          packageManager: pnpm
 
   smoke-test:
     needs: [deploy-api, deploy-web]
