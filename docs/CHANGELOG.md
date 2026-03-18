@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.10.0] - 2026-03-18
+
+### Summary
+**Sprint 10 완료** — 프로덕션 실배포(F52, 97%) + 에이전트 실행 엔진(F53, 92%) + NL→Spec 충돌 감지(F54, 94%). Overall Match Rate 93%, 35 신규 테스트 추가 (총 276).
+
+### Added
+- **F52 프로덕션 실배포** (Match Rate 97%)
+  - Cloudflare Workers secrets 4개 설정 (JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY)
+  - D1 migration 0001~0004 remote 적용
+  - Workers 배포 완료: https://foundry-x-api.ktds-axbd.workers.dev
+  - Pages 배포 완료: https://fx.minu.best (커스텀 도메인)
+  - smoke test 전체 통과 (health, auth, spec-generate, SSE)
+- **F53 에이전트 실연동** (Match Rate 92%)
+  - AgentRunner interface + ClaudeApiRunner 구현 (taskType: code-review, code-generation, spec-analysis, test-generation)
+  - createAgentRunner() factory: ANTHROPIC_API_KEY 유무 기반 runner 선택
+  - MCP 어댑터 인터페이스 설계 (Sprint 11+ 구현 대비)
+  - AgentOrchestrator.executeTask() 메서드 추가
+  - 3 API endpoints: POST /agents/{id}/execute, GET /agents/runners, GET /agents/tasks/{taskId}/result
+  - D1 migration 0005: agent_tasks 확장 + spec_conflicts 테이블
+  - AgentExecuteModal + AgentTaskResult 대시보드 컴포넌트
+  - 12 테스트 (ClaudeApiRunner 9 + MockRunner 3)
+- **F54 NL→Spec 충돌 감지** (Match Rate 94%)
+  - ConflictDetector 2-phase: Phase 1 규칙 기반(제목 유사도, 의존성, 우선순위, 범위) + Phase 2 LLM 보강
+  - 4가지 충돌 유형: direct, dependency, priority, scope (severity: critical/warning/info)
+  - Jaccard similarity + 불용어 제거 (영어/한국어)
+  - 2 API endpoints: POST /spec/conflicts/resolve, GET /spec/existing
+  - spec.ts 라우트 확장: POST /spec/generate에 conflicts 필드 추가
+  - ConflictCard + ConflictResolver 대시보드 컴포넌트
+  - type 한국어화 (직접 충돌, 의존성 충돌, 우선순위 충돌, 범위 충돌)
+  - 10 테스트 (detect 5 + overlap 4 + existing 1)
+- API 테스트 +35 (241→276), 합계 276 (CLI 106 + API 136 + Web 34)
+- D1 테이블 +1 (9→10), API 엔드포인트 +5 (23→28)
+
+### Changed
+- OpenAPI info version: 0.9.0 → 0.10.0
+- agent_sessions: project_id 컬럼 추가 (multi-project 대비)
+- agent_tasks: task_type, result, tokens_used, duration_ms, runner_type 컬럼 추가
+- wrangler.toml: 배포 환경 변수 확인 (ENVIRONMENT 추가 예정)
+
+### Deferred to Sprint 11
+- SSE agent.task.started/completed 이벤트 전파
+- agents/page.tsx SSE task 이벤트 핸들링 (task.started → running 상태 업데이트)
+- wrangler.toml ENVIRONMENT var 추가 (Low priority)
+- resolve 핸들러 resolved_by userId 기록 (감사 추적용)
+
+---
+
 ## [0.9.0] - 2026-03-18
 
 ### Summary
