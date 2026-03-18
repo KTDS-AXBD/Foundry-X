@@ -540,3 +540,100 @@ export interface QueueRebaseData {
   success: boolean;
   files: string[];
 }
+
+// ─── Sprint 15: PlannerAgent Types (F70) ───
+
+export type AgentPlanStatus =
+  | 'analyzing'
+  | 'pending_approval'
+  | 'approved'
+  | 'rejected'
+  | 'modified'
+  | 'executing'
+  | 'completed';
+
+export interface ProposedStep {
+  description: string;
+  type: 'create' | 'modify' | 'delete' | 'test';
+  targetFile?: string;
+  estimatedLines?: number;
+}
+
+export interface AgentPlan {
+  id: string;
+  taskId: string;
+  agentId: string;
+  codebaseAnalysis: string;
+  proposedSteps: ProposedStep[];
+  estimatedFiles: number;
+  risks: string[];
+  estimatedTokens: number;
+  status: AgentPlanStatus;
+  humanFeedback?: string;
+  createdAt: string;
+  approvedAt?: string;
+  rejectedAt?: string;
+}
+
+// ─── Sprint 15: Agent Inbox Types (F71) ───
+
+export type MessageType =
+  | 'task_assign'
+  | 'task_result'
+  | 'task_question'
+  | 'task_feedback'
+  | 'status_update';
+
+export interface AgentMessage {
+  id: string;
+  fromAgentId: string;
+  toAgentId: string;
+  type: MessageType;
+  subject: string;
+  payload: Record<string, unknown>;
+  acknowledged: boolean;
+  parentMessageId?: string;
+  createdAt: string;
+  acknowledgedAt?: string;
+}
+
+// ─── Sprint 15: Worktree Types (F72) ───
+
+export interface WorktreeInfo {
+  id: string;
+  agentId: string;
+  branchName: string;
+  worktreePath: string;
+  baseBranch: string;
+  status: 'active' | 'completed' | 'failed' | 'cleaned';
+  createdAt: string;
+  cleanedAt?: string;
+}
+
+// ─── Sprint 15: SSE Event Types (F70+F71) ───
+
+export interface PlanCreatedData {
+  planId: string;
+  taskId: string;
+  agentId: string;
+  stepsCount: number;
+  estimatedTokens: number;
+}
+
+export interface PlanApprovedData {
+  planId: string;
+  approvedBy: string;
+}
+
+export interface PlanRejectedData {
+  planId: string;
+  reason?: string;
+}
+
+export interface MessageReceivedData {
+  messageId: string;
+  fromAgentId: string;
+  toAgentId: string;
+  type: MessageType;
+  subject: string;
+}

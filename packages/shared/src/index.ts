@@ -96,3 +96,25 @@ export type {
   ParallelExecutionResult,
   ParallelPrResult,
 } from './agent.js';
+
+// Sprint 15: PlannerAgent types (F70)
+export type {
+  AgentPlanStatus,
+  ProposedStep,
+  AgentPlan,
+  PlanCreatedData,
+  PlanApprovedData,
+  PlanRejectedData,
+} from './agent.js';
+
+// Sprint 15: Agent Inbox types (F71)
+export type {
+  MessageType,
+  AgentMessage,
+  MessageReceivedData,
+} from './agent.js';
+
+// Sprint 15: Worktree types (F72)
+export type {
+  WorktreeInfo,
+} from './agent.js';
