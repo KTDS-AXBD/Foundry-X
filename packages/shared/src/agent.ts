@@ -550,13 +550,19 @@ export type AgentPlanStatus =
   | 'rejected'
   | 'modified'
   | 'executing'
-  | 'completed';
+  | 'completed'
+  | 'failed';
 
 export interface ProposedStep {
   description: string;
-  type: 'create' | 'modify' | 'delete' | 'test';
+  type: 'create' | 'modify' | 'delete' | 'test' | 'external_tool';
   targetFile?: string;
   estimatedLines?: number;
+  externalTool?: {
+    serverId: string;
+    toolName: string;
+    arguments?: Record<string, unknown>;
+  };
 }
 
 export interface AgentPlan {
@@ -573,7 +579,24 @@ export interface AgentPlan {
   createdAt: string;
   approvedAt?: string;
   rejectedAt?: string;
+  executionStatus?: 'executing' | 'completed' | 'failed';
+  executionStartedAt?: string;
+  executionCompletedAt?: string;
+  executionResult?: AgentExecutionResult;
+  executionError?: string;
 }
+
+// Sprint 17 F82: Plan Execution SSE Events
+export interface PlanWaitingData {
+  planId: string; taskId: string; agentId: string;
+  stepsCount: number; timeoutMs: number;
+}
+export interface PlanExecutingData { planId: string; startedAt: string; }
+export interface PlanCompletedSSEData {
+  planId: string; completedAt: string;
+  tokensUsed: number; duration: number; status: 'success' | 'partial' | 'failed';
+}
+export interface PlanFailedData { planId: string; failedAt: string; error: string; }
 
 // ─── Sprint 15: Agent Inbox Types (F71) ───
 

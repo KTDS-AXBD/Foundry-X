@@ -9,7 +9,26 @@ import type { McpServerRegistry } from "./mcp-registry.js";
 import type { MergeQueueService } from "./merge-queue.js";
 import type { PlannerAgent } from "./planner-agent.js";
 import type { WorktreeManager } from "./worktree-manager.js";
-import type { ParallelExecutionResult, ParallelPrResult, ConflictReport } from "@foundry-x/shared";
+import type { ParallelExecutionResult, ParallelPrResult, ConflictReport, AgentPlan } from "@foundry-x/shared";
+
+export class PlanTimeoutError extends Error {
+  constructor(public readonly planId: string, public readonly timeoutMs: number) {
+    super(`Plan ${planId} approval timed out after ${timeoutMs}ms`);
+    this.name = "PlanTimeoutError";
+  }
+}
+export class PlanRejectedError extends Error {
+  constructor(public readonly planId: string, public readonly reason?: string) {
+    super(`Plan ${planId} was rejected${reason ? `: ${reason}` : ""}`);
+    this.name = "PlanRejectedError";
+  }
+}
+export class PlanCancelledError extends Error {
+  constructor(public readonly planId: string, public readonly reason?: string) {
+    super(`Plan ${planId} was cancelled${reason ? `: ${reason}` : ""}`);
+    this.name = "PlanCancelledError";
+  }
+}
 import { McpRunner } from "./mcp-runner.js";
 import { createTransport } from "./mcp-transport.js";
 import { TASK_TYPE_TO_MCP_TOOL } from "./mcp-adapter.js";
@@ -612,46 +631,79 @@ export class AgentOrchestrator {
   }
 
   /**
-   * F70: 계획 수립 후 대기 — 인간 승인 후 executePlan()으로 실행
+   * F82: 계획 수립 후 승인 대기 — polling loop
    */
   async createPlanAndWait(
     agentId: string,
     taskType: AgentTaskType,
     context: AgentExecutionRequest["context"],
-  ) {
+    options?: { pollIntervalMs?: number; timeoutMs?: number; signal?: AbortSignal },
+  ): Promise<AgentPlan> {
     if (!this.plannerAgent) {
       throw new Error("PlannerAgent not configured — call setPlannerAgent() first");
     }
-    return this.plannerAgent.createPlan(agentId, taskType, context);
+    const pollInterval = options?.pollIntervalMs ?? 1000;
+    const timeout = options?.timeoutMs ?? 300_000;
+    const plan = await this.plannerAgent.createPlan(agentId, taskType, context);
+    this.sse?.pushEvent({
+      event: "agent.plan.waiting",
+      data: { planId: plan.id, taskId: plan.taskId, agentId, stepsCount: plan.proposedSteps.length, timeoutMs: timeout },
+    });
+    const startTime = Date.now();
+    while (true) {
+      if (options?.signal?.aborted) throw new PlanCancelledError(plan.id);
+      if (Date.now() - startTime > timeout) {
+        await this.plannerAgent.rejectPlan(plan.id, "Timeout: 승인 대기 시간 초과");
+        throw new PlanTimeoutError(plan.id, timeout);
+      }
+      const current = await this.plannerAgent.getPlan(plan.id);
+      if (!current) throw new Error(`Plan ${plan.id} not found during polling`);
+      if (current.status === "approved") return current;
+      if (current.status === "rejected") throw new PlanRejectedError(plan.id, current.humanFeedback);
+      await new Promise(resolve => setTimeout(resolve, pollInterval));
+    }
   }
 
   /**
-   * F70: 승인된 계획을 실행
+   * F82: 승인된 계획 실행 — executing→completed/failed 라이프사이클
    */
   async executePlan(
     planId: string,
     runner: AgentRunner,
   ): Promise<AgentExecutionResult> {
-    if (!this.plannerAgent) {
-      throw new Error("PlannerAgent not configured");
-    }
+    if (!this.plannerAgent) throw new Error("PlannerAgent not configured");
     const plan = await this.plannerAgent.getPlan(planId);
-    if (!plan || plan.status !== "approved") {
-      throw new Error(`Plan ${planId} is not approved (status: ${plan?.status})`);
+    if (!plan) throw new Error(`Plan ${planId} not found`);
+    if (plan.status !== "approved" && plan.status !== "failed") {
+      throw new Error(`Plan ${planId} cannot be executed (status: ${plan.status})`);
     }
-
-    const context: AgentExecutionRequest["context"] = {
-      repoUrl: "",
-      branch: "master",
-      targetFiles: plan.proposedSteps
-        .filter((s: { targetFile?: string }) => s.targetFile)
-        .map((s: { targetFile?: string }) => s.targetFile!),
-      instructions: plan.proposedSteps
-        .map((s: { type: string; description: string }, i: number) => `Step ${i + 1} (${s.type}): ${s.description}`)
-        .join("\n"),
-    };
-
-    return this.executeTask(plan.agentId, "code-generation", context, runner);
+    const now = new Date().toISOString();
+    await this.db.prepare(
+      `UPDATE agent_plans SET status = 'executing', execution_status = 'executing', execution_started_at = ?, execution_error = NULL WHERE id = ?`,
+    ).bind(now, planId).run();
+    this.sse?.pushEvent({ event: "agent.plan.executing", data: { planId, startedAt: now } });
+    try {
+      const context: AgentExecutionRequest["context"] = {
+        repoUrl: "", branch: "master",
+        targetFiles: plan.proposedSteps.filter((s: { targetFile?: string }) => s.targetFile).map((s: { targetFile?: string }) => s.targetFile!),
+        instructions: plan.proposedSteps.map((s: { type: string; description: string }, i: number) => `Step ${i + 1} (${s.type}): ${s.description}`).join("\n"),
+      };
+      const result = await this.executeTask(plan.agentId, "code-generation", context, runner);
+      const completedAt = new Date().toISOString();
+      await this.db.prepare(
+        `UPDATE agent_plans SET status = 'completed', execution_status = 'completed', execution_completed_at = ?, execution_result = ? WHERE id = ?`,
+      ).bind(completedAt, JSON.stringify(result), planId).run();
+      this.sse?.pushEvent({ event: "agent.plan.completed", data: { planId, completedAt, tokensUsed: result.tokensUsed, duration: result.duration } });
+      return result;
+    } catch (err) {
+      const failedAt = new Date().toISOString();
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      await this.db.prepare(
+        `UPDATE agent_plans SET status = 'failed', execution_status = 'failed', execution_completed_at = ?, execution_error = ? WHERE id = ?`,
+      ).bind(failedAt, errorMsg, planId).run();
+      this.sse?.pushEvent({ event: "agent.plan.failed", data: { planId, failedAt, error: errorMsg } });
+      throw err;
+    }
   }
 
   /**

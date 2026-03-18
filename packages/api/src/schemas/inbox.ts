@@ -19,3 +19,10 @@ export const listMessagesSchema = z.object({
   unreadOnly: z.coerce.boolean().optional().default(false),
   limit: z.coerce.number().int().min(1).max(100).optional().default(50),
 });
+
+export const threadParamsSchema = z.object({
+  parentMessageId: z.string().min(1),
+});
+export const threadQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(100).optional().default(50),
+});

@@ -329,3 +329,8 @@ export const UpdatePriorityRequestSchema = z
     priority: z.number().int().min(0).max(10),
   })
   .openapi("UpdatePriorityRequest");
+
+// Sprint 17 F82
+export const rejectPlanBodySchema = z.object({
+  reason: z.string().max(1000).optional(),
+});

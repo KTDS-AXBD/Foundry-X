@@ -636,6 +636,23 @@ export async function acknowledgeMessage(messageId: string): Promise<void> {
   if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
 }
 
+// ─── Sprint 17 F81: Inbox Thread ───
+
+export async function getInboxThread(
+  parentMessageId: string,
+  limit?: number,
+): Promise<{ thread: unknown[]; total: number; parentMessageId: string }> {
+  const params = new URLSearchParams();
+  if (limit) params.set("limit", String(limit));
+  const url = `${BASE_URL}/agents/inbox/${parentMessageId}/thread?${params}`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(url, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) throw new ApiError(res.status, `Failed to fetch thread: ${res.status}`);
+  return res.json();
+}
+
 // ─── Conflict Resolution ───
 
 export async function resolveConflict(

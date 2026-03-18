@@ -104,7 +104,11 @@ export type SSEEvent =
   | { event: "agent.plan.created"; data: { planId: string; taskId: string; agentId: string; stepsCount: number; estimatedTokens: number } }
   | { event: "agent.plan.approved"; data: { planId: string; approvedBy: string } }
   | { event: "agent.plan.rejected"; data: { planId: string; reason?: string } }
-  | { event: "agent.message.received"; data: { messageId: string; fromAgentId: string; toAgentId: string; type: string; subject: string } };
+  | { event: "agent.message.received"; data: { messageId: string; fromAgentId: string; toAgentId: string; type: string; subject: string } }
+  | { event: "agent.plan.waiting"; data: { planId: string; taskId: string; agentId: string; stepsCount: number; timeoutMs: number } }
+  | { event: "agent.plan.executing"; data: { planId: string; startedAt: string } }
+  | { event: "agent.plan.completed"; data: { planId: string; completedAt: string; tokensUsed: number; duration: number } }
+  | { event: "agent.plan.failed"; data: { planId: string; failedAt: string; error: string } };
 
 const DEDUP_TTL_MS = 60_000;
 

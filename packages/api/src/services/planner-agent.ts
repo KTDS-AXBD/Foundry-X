@@ -11,6 +11,7 @@ interface PlannerAgentDeps {
   sse?: SSEManager;
   apiKey?: string;
   model?: string;
+  mcpRegistry?: import("./mcp-registry.js").McpServerRegistry;
 }
 
 interface PlanRow {
@@ -27,6 +28,11 @@ interface PlanRow {
   created_at: string;
   approved_at: string | null;
   rejected_at: string | null;
+  execution_status: string | null;
+  execution_started_at: string | null;
+  execution_completed_at: string | null;
+  execution_result: string | null;
+  execution_error: string | null;
 }
 
 function mapRow(r: PlanRow): AgentPlan {
@@ -44,6 +50,11 @@ function mapRow(r: PlanRow): AgentPlan {
     createdAt: r.created_at,
     approvedAt: r.approved_at ?? undefined,
     rejectedAt: r.rejected_at ?? undefined,
+    executionStatus: (r.execution_status as AgentPlan["executionStatus"]) ?? undefined,
+    executionStartedAt: r.execution_started_at ?? undefined,
+    executionCompletedAt: r.execution_completed_at ?? undefined,
+    executionResult: r.execution_result ? JSON.parse(r.execution_result) : undefined,
+    executionError: r.execution_error ?? undefined,
   };
 }
 

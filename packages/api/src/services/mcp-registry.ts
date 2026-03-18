@@ -143,6 +143,30 @@ export class McpServerRegistry {
     return null;
   }
 
+  static readonly PRESET_CONFIGS = {
+    "ai-foundry": {
+      baseUrl: "https://svc-mcp-server-production.sinclair-account.workers.dev",
+      transportType: "http" as const,
+      defaultName: (skillId: string) => `AI Foundry - ${skillId.slice(0, 8)}`,
+    },
+  } as const;
+
+  async createServerPreset(
+    preset: keyof typeof McpServerRegistry.PRESET_CONFIGS,
+    config: { skillId: string; apiKey: string; name?: string; skipHealthCheck?: boolean },
+  ): Promise<McpServerRecord> {
+    const presetDef = McpServerRegistry.PRESET_CONFIGS[preset];
+    if (!presetDef) throw new Error(`Unknown preset: ${String(preset)}`);
+    const serverUrl = `${presetDef.baseUrl}/mcp/${config.skillId}`;
+    const name = config.name ?? presetDef.defaultName(config.skillId);
+    const record = await this.createServer({ name, serverUrl, transportType: presetDef.transportType, apiKey: config.apiKey });
+    if (!config.skipHealthCheck) {
+      try { await this.updateStatus(record.id, "active"); }
+      catch (err) { await this.updateStatus(record.id, "error", err instanceof Error ? err.message : String(err)); }
+    }
+    return (await this.getServer(record.id))!;
+  }
+
   encryptApiKey(key: string): string {
     return btoa(key);
   }

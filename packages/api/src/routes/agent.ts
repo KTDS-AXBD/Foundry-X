@@ -895,6 +895,27 @@ agentRoute.post("/plan/:id/reject", async (c) => {
   return c.json(plan);
 });
 
+// F82: Plan 조회 + 실행
+agentRoute.get("/plan/:id", async (c) => {
+  const planId = c.req.param("id");
+  const planner = new PlannerAgent({ db: c.env.DB });
+  const plan = await planner.getPlan(planId);
+  if (!plan) return c.json({ error: "Plan not found" }, 404);
+  return c.json({ plan });
+});
+
+agentRoute.post("/plan/:id/execute", async (c) => {
+  const planId = c.req.param("id");
+  const sseManager = getSSEManager(c.env.DB);
+  const planner = new PlannerAgent({ db: c.env.DB, sse: sseManager });
+  const orchestrator = new AgentOrchestrator(c.env.DB, sseManager);
+  orchestrator.setPlannerAgent(planner);
+  const { MockRunner } = await import("../services/claude-api-runner.js");
+  const result = await orchestrator.executePlan(planId, new MockRunner());
+  const plan = await planner.getPlan(planId);
+  return c.json({ plan, result });
+});
+
 // ─── Sprint 15: Worktree Endpoint (F72) ───
 
 import { WorktreeManager } from "../services/worktree-manager.js";
