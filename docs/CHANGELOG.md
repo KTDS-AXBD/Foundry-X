@@ -7,6 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2026-03-18
+
+### Summary
+**Sprint 14 완료** — MCP Resources 리소스 발견·읽기·구독(F67, 92%) + 멀티 에이전트 동시 PR Merge Queue(F68, 92.5%) + v1.2.0 릴리스(F69). Overall Match Rate 92%. Agent Teams 병렬 구현 (W1 MCP Resources, W2 Merge Queue, 파일 충돌 0). 전체 429 tests (API 278 + CLI 106 + Web 45) + 20 E2E. 50 endpoints + 15 D1 tables + 19 services.
+
+### Added
+- **F67 MCP Resources + Notifications** (Match Rate 92%)
+  - McpResourcesClient — listResources, readResource, subscribeResource, unsubscribeResource, listResourceTemplates
+  - McpRunner 확장 — listResources 실제 구현 + readResource + listResourceTemplates + onNotification
+  - McpTransport — SseTransport notification 분기 처리
+  - MCP API 4 endpoints: GET /mcp/servers/:id/resources, GET /mcp/servers/:id/resources/templates, POST /mcp/servers/:id/resources/read, POST /mcp/servers/:id/resources/subscribe
+  - McpResourcesPanel.tsx + ResourceViewer.tsx — Resources 브라우저 UI
+  - SSE mcp.resource.updated 이벤트 추가
+  - shared/agent.ts: McpResource, McpResourceTemplate, McpResourceContent, McpResourceSubscription 타입
+  - 테스트 15건: mcp-resources 8 + mcp-runner 4 + mcp-routes-resources 3
+
+- **F68 멀티 에이전트 동시 PR + 충돌 해결** (Match Rate 92.5%)
+  - MergeQueueService — enqueue, detectConflicts, calculateMergeOrder, processNext, getQueueStatus, updatePriority
+  - AgentOrchestrator 확장 — executeParallel + executeParallelWithPr (Promise.allSettled 병렬 실행)
+  - GitHubService 확장 — getModifiedFiles, updateBranch (rebase), getPrStatuses 3 메서드
+  - Agent API 5 endpoints: POST /agents/parallel, GET /agents/parallel/:id, GET /agents/queue, PATCH /agents/queue/:id/priority, POST /agents/queue/process
+  - D1 migration 0008: merge_queue + parallel_executions 테이블
+  - MergeQueuePanel.tsx + ConflictDiagram.tsx + ParallelExecutionForm.tsx — Merge Queue UI
+  - SSE agent.queue.* 4 이벤트 (updated, conflict, merged, rebase)
+  - shared/agent.ts: MergeQueueEntry, ConflictReport, ConflictPair, ParallelExecution, ParallelExecutionResult, ParallelPrResult, SSE 이벤트 타입
+  - 테스트 25건: merge-queue 10 + orchestrator-parallel 6 + github-extended 4 + routes-queue 5
+
+- **F69 v1.2.0 릴리스 + Phase 3 기반**
+  - multitenancy.design.md — Phase 3 멀티테넌시 설계 (FX-DSGN-016)
+  - phase-3-roadmap.md — Phase 3 로드맵 Sprint 15~20 (FX-PLAN-016)
+  - CHANGELOG v1.2.0 + version bump (1.1.0 → 1.2.0)
+  - SPEC v3.3 갱신 (Sprint 14 Execution Plan 보정 + F69 완료)
+
+### Changed
+- McpRunner: listResources() 스텁 → 실제 구현 + readResource + subscribeResource + onNotification
+- McpTransport (SseTransport): notification 메시지 분기 처리
+- AgentOrchestrator: setMergeQueue() + executeParallel() + executeParallelWithPr()
+- GitHubService: 3 메서드 추가 (기존 읽기/쓰기 → merge queue 지원)
+- SSEManager: 5 신규 이벤트 (mcp.resource.updated + agent.queue.* 4종)
+
+### Technical Details
+- MCP Resources: notification 기반 자동 갱신, mimeType 기반 렌더링 (JSON/text/image/binary)
+- Merge Queue: greedy merge order 알고리즘 (충돌 없는 PR 우선 → priority → 생성 시간)
+- Parallel Execution: Promise.allSettled 기반 (일부 실패 시 나머지 유지)
+- Rebase 전략: GitHub updateBranch API (server-side rebase) 시도 → 실패 시 conflict 상태
+
+### PDCA Documents
+- FX-PLAN-015: Sprint 14 F67/F68/F69 Plan
+- FX-DSGN-015: Sprint 14 상세 설계 (MCP Resources + Merge Queue + Phase 3)
+- FX-ANLS-014: Sprint 14 Gap Analysis (F67 92%, F68 92.5%, Overall 92%)
+- FX-RPRT-016: Sprint 14 Completion Report
+- FX-DSGN-016: Phase 3 멀티테넌시 설계 (Draft)
+- FX-PLAN-016: Phase 3 로드맵 (Draft)
+
+---
+
 ## 세션 38 (2026-03-18)
 **Sprint 14 PDCA 완료 — MCP Resources + 멀티 에이전트 동시 PR (v1.2.0)**:
 - ✅ F67 MCP Resources (92%): McpResourcesClient + McpRunner resources 실 구현 + notification 수신 + 4 API endpoints + Resources 브라우저 + 15 tests
