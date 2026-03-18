@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 세션 36 (2026-03-18)
+**CLAUDE.md 품질 개선 + Sprint 13 계획 커밋**:
+- ✅ CLAUDE.md improver: 파일 카운트 수정, Sprint 이력 압축(35줄→8줄), API/Web/E2E 명령 추가, PostgreSQL→D1 수정
+- ✅ Sprint 13 미커밋 반영: SPEC v3.0, F64~F66 타입 정의, Plan/Design 문서
+- ✅ ax-13-selfcheck 8/8 PASS
+
+---
+
 ## [0.12.0] - 2026-03-18
 
 ### Summary
