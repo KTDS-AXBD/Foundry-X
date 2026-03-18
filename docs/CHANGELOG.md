@@ -7,7 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-### 세션 33 (2026-03-18)
+## [0.12.0] - 2026-03-18
+
+### Summary
+**Sprint 12 완료** — ouroboros 패턴(F59, 100%) + Generative UI(F60, 95%) + MCP 실 구현(F61, 95%) + 테스트 보강(F63, 85%). Overall Match Rate ~93%. Agent Teams 병렬 구현 (2 Pane × 2 Workers). 전체 352 tests + 20 E2E.
+
+### Added
+- **F59 ouroboros 패턴 차용** (Match Rate 100%)
+  - AmbiguityScore 타입 + calculateAmbiguity 유틸 (shared/agent.ts)
+  - ambiguity-score.md 기준서 (ax-14-req-interview references)
+  - ax-14 Phase 4에 Ambiguity Score 게이트 삽입 (≤0.2 = Green)
+  - plan-plus Ontological Question 단계 추가
+  - gap-detector Semantic 검증 가이드
+- **F60 Generative UI 도입** (Match Rate 95%)
+  - UIHint 타입 (layout, sections[], html?, actions[])
+  - DynamicRenderer — UIHint 기반 레이아웃 분기
+  - SectionRenderer — type별 렌더러 (text/code/diff/chart/diagram/table)
+  - WidgetRenderer — sandboxed iframe + ResizeObserver
+  - AgentTaskResult 리팩토링 — uiHint 분기 + LegacyRenderer 하위 호환
+  - ClaudeApiRunner UIHint 생성 프롬프트 확장
+  - generative-ui.test.tsx 11건
+- **F61 MCP 실 구현** (Match Rate 95%)
+  - SseTransport — fetch+ReadableStream SSE 파싱 (Workers 호환)
+  - HttpTransport — 범용 fetch 기반 (fallback)
+  - McpRunner — McpAgentRunner 구현 (tools/call + 결과 변환)
+  - McpServerRegistry — D1 CRUD + findServerForTool + 도구 캐시
+  - 0006_mcp_servers.sql D1 migration
+  - routes/mcp.ts 5 endpoints (CRUD + test + tools)
+  - schemas/mcp.ts Zod 스키마
+  - McpServerCard.tsx 대시보드 UI
+  - workspace/page.tsx MCP Servers 탭
+  - api-client.ts MCP API 함수 5개
+  - mcp-transport.test.ts 12건 + mcp-runner.test.ts 11건 + mcp-registry.test.ts 4건 + mcp-routes.test.ts 5건
+- **F63 테스트 커버리지 강화** (Match Rate 85%)
+  - mcp-integration.test.ts 5건 (selectRunner + executeTask MCP 통합)
+  - service-integration.test.ts 3건 (CRUD lifecycle + findServerForTool)
+  - e2e/helpers/sse-helpers.ts (waitForSSEEvent + injectSSECollector)
+  - e2e/mcp-server.spec.ts 2건 (등록 폼 + 연결 테스트)
+
+### Changed
+- AgentOrchestrator: mcpRegistry 옵셔널 주입 + selectRunner() MCP 자동 선택
+- app.ts: MCP 라우트 등록 + OpenAPI "MCP" 태그
+- shared/agent.ts: McpServerInfo + McpTestResult + UIHint + SectionType 타입
+
+### PDCA Documents
+- FX-PLAN-012: Sprint 12 F59/F60 Plan
+- FX-PLAN-013: Sprint 12 Stabilization F61/F62/F63 Plan
+- FX-DSGN-013: Sprint 12 Stabilization Design
+- FX-ANLS-012: Sprint 12 Stabilization Gap Analysis (F61 95%, F63 85%)
+- FX-RPRT-014: Sprint 12 Completion Report (× 2: F59/F60 + F61/F63)
+
+---
+
+### 세션 33~34 (2026-03-18)
 **Sprint 12 F59+F60 구현 — ouroboros 패턴 + Generative UI PDCA 전주기**:
 - ✅ F59: AmbiguityScore 타입 + calculateAmbiguity + ambiguity-score.md 기준서 + ax-14 Phase 4-B/C
 - ✅ F60: UIHint 타입 + ClaudeApiRunner 확장 + WidgetRenderer + SectionRenderer + DynamicRenderer + AgentTaskResult 리팩토링
