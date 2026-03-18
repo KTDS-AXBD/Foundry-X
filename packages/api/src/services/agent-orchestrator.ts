@@ -1,3 +1,10 @@
+import type {
+  AgentExecutionRequest,
+  AgentExecutionResult,
+  AgentTaskType,
+} from "./execution-types.js";
+import type { AgentRunner } from "./agent-runner.js";
+
 // Local types — mirrors @foundry-x/shared F50 types (will import from shared once exported)
 interface AgentRegistration {
   id: string;
@@ -231,5 +238,136 @@ export class AgentOrchestrator {
       allowedPaths: JSON.parse(r.allowed_paths || "[]"),
       maxConcurrency: r.max_concurrency,
     }));
+  }
+
+  async executeTask(
+    agentId: string,
+    taskType: AgentTaskType,
+    context: AgentExecutionRequest["context"],
+    runner: AgentRunner,
+  ): Promise<AgentExecutionResult> {
+    // 1. agent_sessions 생성 (status: active)
+    const sessionId = `sess-${crypto.randomUUID().slice(0, 8)}`;
+    const now = new Date().toISOString();
+
+    await this.db
+      .prepare(
+        `INSERT INTO agent_sessions (id, project_id, agent_name, status, started_at)
+         VALUES (?, ?, ?, 'active', ?)`,
+      )
+      .bind(sessionId, "default", agentId, now)
+      .run();
+
+    // 2. agent_tasks 생성 (task_type, runner_type 포함)
+    const taskId = `task-${crypto.randomUUID().slice(0, 8)}`;
+    const branch = `feature/${agentId}/${taskId}`;
+
+    await this.db
+      .prepare(
+        `INSERT INTO agent_tasks
+         (id, agent_session_id, branch, task_type, runner_type, pr_status, sdd_verified, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, 'draft', 0, ?, ?)`,
+      )
+      .bind(taskId, sessionId, branch, taskType, runner.type, now, now)
+      .run();
+
+    // 3. Constraint 수집
+    const { results: constraintRows } = await this.db
+      .prepare("SELECT * FROM agent_constraints")
+      .all<{
+        id: string;
+        tier: "always" | "ask" | "never";
+        action: string;
+        description: string;
+        enforcement_mode: "block" | "warn" | "log";
+      }>();
+
+    const constraints = constraintRows.map((r) => ({
+      id: r.id,
+      tier: r.tier,
+      action: r.action,
+      description: r.description,
+      enforcementMode: r.enforcement_mode,
+    }));
+
+    // 4. Runner 실행
+    const request: AgentExecutionRequest = {
+      taskId,
+      agentId,
+      taskType,
+      context,
+      constraints,
+    };
+
+    const result = await runner.execute(request);
+
+    // 5. 결과 기록
+    await this.db
+      .prepare(
+        `UPDATE agent_tasks
+         SET result = ?, tokens_used = ?, duration_ms = ?, updated_at = ?
+         WHERE id = ?`,
+      )
+      .bind(
+        JSON.stringify(result.output),
+        result.tokensUsed,
+        result.duration,
+        new Date().toISOString(),
+        taskId,
+      )
+      .run();
+
+    // 6. session 상태 업데이트
+    const sessionStatus = result.status === "failed" ? "failed" : "completed";
+    await this.db
+      .prepare(
+        `UPDATE agent_sessions
+         SET status = ?, ended_at = ?
+         WHERE id = ?`,
+      )
+      .bind(sessionStatus, new Date().toISOString(), sessionId)
+      .run();
+
+    return result;
+  }
+
+  async getTaskResult(taskId: string): Promise<{
+    task: AgentTask;
+    result: AgentExecutionResult["output"] | null;
+  } | null> {
+    const row = await this.db
+      .prepare("SELECT * FROM agent_tasks WHERE id = ?")
+      .bind(taskId)
+      .first<{
+        id: string;
+        agent_session_id: string;
+        branch: string;
+        pr_number: number | null;
+        pr_status: "draft" | "open" | "merged" | "closed";
+        sdd_verified: number;
+        task_type: string | null;
+        result: string | null;
+        tokens_used: number | null;
+        duration_ms: number | null;
+        runner_type: string | null;
+        created_at: string;
+        updated_at: string;
+      }>();
+
+    if (!row) return null;
+
+    return {
+      task: {
+        id: row.id,
+        agentSessionId: row.agent_session_id,
+        branch: row.branch,
+        prNumber: row.pr_number ?? undefined,
+        prStatus: row.pr_status,
+        sddVerified: row.sdd_verified === 1,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      },
+      result: row.result ? JSON.parse(row.result) : null,
+    };
   }
 }

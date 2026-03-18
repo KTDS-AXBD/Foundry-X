@@ -43,4 +43,113 @@ describe("agent routes", () => {
       expect(constraint).toHaveProperty("reason");
     }
   });
+
+  // ─── Sprint 10: Agent Execution Endpoints (F53) ───
+
+  it("POST /agents/{id}/execute runs task via MockRunner", async () => {
+    const env = createTestEnv();
+    // No ANTHROPIC_API_KEY → falls back to MockRunner
+    const res = await agentRoute.request(
+      "/agents/agent-code-review/execute",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          taskType: "code-review",
+          context: {
+            repoUrl: "https://github.com/KTDS-AXBD/Foundry-X",
+            branch: "feat/test",
+            targetFiles: ["src/index.ts"],
+          },
+        }),
+      },
+      env,
+    );
+
+    expect(res.status).toBe(200);
+    const data = await res.json() as any;
+    expect(data.status).toBe("success");
+    expect(data.output.analysis).toContain("[Mock]");
+    expect(data.model).toBe("mock");
+    expect(data.tokensUsed).toBe(0);
+    expect(data.duration).toBeGreaterThanOrEqual(0);
+  });
+
+  it("GET /agents/runners returns runner info list", async () => {
+    const env = createTestEnv();
+    const res = await agentRoute.request("/agents/runners", {}, env);
+
+    expect(res.status).toBe(200);
+    const data = await res.json() as any;
+    expect(Array.isArray(data)).toBe(true);
+    expect(data).toHaveLength(3);
+
+    const types = data.map((r: any) => r.type);
+    expect(types).toContain("claude-api");
+    expect(types).toContain("mcp");
+    expect(types).toContain("mock");
+
+    // mock is always available
+    const mockRunner = data.find((r: any) => r.type === "mock");
+    expect(mockRunner.available).toBe(true);
+
+    // mcp is not yet available
+    const mcpRunner = data.find((r: any) => r.type === "mcp");
+    expect(mcpRunner.available).toBe(false);
+  });
+
+  it("GET /agents/tasks/{taskId}/result returns 404 for non-existent task", async () => {
+    const env = createTestEnv();
+    const res = await agentRoute.request(
+      "/agents/tasks/non-existent/result",
+      {},
+      env,
+    );
+
+    expect(res.status).toBe(404);
+    const data = await res.json() as any;
+    expect(data.error).toBe("Task not found");
+  });
+
+  it("GET /agents/tasks/{taskId}/result returns result after execution", async () => {
+    const env = createTestEnv();
+
+    // First execute a task
+    const execRes = await agentRoute.request(
+      "/agents/agent-test/execute",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          taskType: "spec-analysis",
+          context: {
+            repoUrl: "https://github.com/KTDS-AXBD/Foundry-X",
+            branch: "feat/test",
+          },
+        }),
+      },
+      env,
+    );
+    expect(execRes.status).toBe(200);
+
+    // Find the task ID from DB directly
+    const { results } = await (env.DB as any)
+      .prepare("SELECT id FROM agent_tasks ORDER BY created_at DESC LIMIT 1")
+      .all();
+    const taskId = results[0].id;
+
+    // Now get the result
+    const res = await agentRoute.request(
+      `/agents/tasks/${taskId}/result`,
+      {},
+      env,
+    );
+
+    expect(res.status).toBe(200);
+    const data = await res.json() as any;
+    expect(data.task).toBeDefined();
+    expect(data.task.id).toBe(taskId);
+    expect(data.result).toBeDefined();
+    expect(data.result.analysis).toContain("[Mock]");
+  });
 });

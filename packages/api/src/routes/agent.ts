@@ -7,8 +7,13 @@ import {
   AgentTaskSchema,
   CreateTaskRequestSchema,
   AgentCapabilityDefinitionSchema,
+  AgentExecuteRequestSchema,
+  AgentExecutionResultSchema,
+  AgentRunnerInfoSchema,
 } from "../schemas/agent.js";
 import type { AgentProfile, AgentActivity } from "@foundry-x/shared";
+import type { AgentRunnerInfo } from "../services/execution-types.js";
+import { createAgentRunner } from "../services/agent-runner.js";
 import { getDb } from "../db/index.js";
 import { agentSessions } from "../db/schema.js";
 import { SSEManager } from "../services/sse-manager.js";
@@ -292,4 +297,136 @@ agentRoute.openapi(checkConstraint, async (c) => {
   const orchestrator = new AgentOrchestrator(c.env.DB);
   const result = await orchestrator.checkConstraint(action);
   return c.json(result);
+});
+
+// ─── Sprint 10: Agent Execution Endpoints (F53) ───
+
+const executeAgentTask = createRoute({
+  method: "post",
+  path: "/agents/{id}/execute",
+  tags: ["Agents"],
+  summary: "에이전트 작업 실행 요청",
+  request: {
+    params: z.object({ id: z.string() }),
+    body: {
+      content: { "application/json": { schema: AgentExecuteRequestSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: "실행 결과",
+      content: { "application/json": { schema: AgentExecutionResultSchema } },
+    },
+    503: {
+      content: {
+        "application/json": {
+          schema: z.object({ error: z.string() }),
+        },
+      },
+      description: "실행 환경 불가",
+    },
+  },
+});
+
+agentRoute.openapi(executeAgentTask, async (c) => {
+  const { id } = c.req.valid("param");
+  const body = c.req.valid("json");
+  const orchestrator = new AgentOrchestrator(c.env.DB);
+  const runner = createAgentRunner({ ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY });
+
+  if (!(await runner.isAvailable())) {
+    return c.json({ error: "No agent runner available" }, 503);
+  }
+
+  const result = await orchestrator.executeTask(
+    id,
+    body.taskType,
+    body.context,
+    runner,
+  );
+
+  return c.json(result);
+});
+
+const getRunners = createRoute({
+  method: "get",
+  path: "/agents/runners",
+  tags: ["Agents"],
+  summary: "사용 가능한 AgentRunner 목록",
+  responses: {
+    200: {
+      description: "Runner 목록",
+      content: {
+        "application/json": {
+          schema: z.array(AgentRunnerInfoSchema),
+        },
+      },
+    },
+  },
+});
+
+agentRoute.openapi(getRunners, async (c) => {
+  const runners: AgentRunnerInfo[] = [
+    {
+      type: "claude-api",
+      available: !!c.env.ANTHROPIC_API_KEY,
+      model: "claude-haiku-4-5-20250714",
+      description: "Anthropic Claude API — 코드 리뷰, 생성, 분석",
+    },
+    {
+      type: "mcp",
+      available: false,
+      description: "MCP Protocol — Sprint 11+ 구현 예정",
+    },
+    {
+      type: "mock",
+      available: true,
+      description: "Mock Runner — 테스트/데모용",
+    },
+  ];
+
+  return c.json(runners);
+});
+
+const getTaskResult = createRoute({
+  method: "get",
+  path: "/agents/tasks/{taskId}/result",
+  tags: ["Agents"],
+  summary: "작업 실행 결과 조회",
+  request: {
+    params: z.object({ taskId: z.string() }),
+  },
+  responses: {
+    200: {
+      description: "작업 결과",
+      content: {
+        "application/json": {
+          schema: z.object({
+            task: AgentTaskSchema,
+            result: z.unknown().nullable(),
+          }),
+        },
+      },
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: z.object({ error: z.string() }),
+        },
+      },
+      description: "작업을 찾을 수 없음",
+    },
+  },
+});
+
+agentRoute.openapi(getTaskResult, async (c) => {
+  const { taskId } = c.req.valid("param");
+  const orchestrator = new AgentOrchestrator(c.env.DB);
+  const taskResult = await orchestrator.getTaskResult(taskId);
+
+  if (!taskResult) {
+    return c.json({ error: "Task not found" }, 404);
+  }
+
+  return c.json(taskResult);
 });

@@ -92,6 +92,67 @@ export interface AgentRegistration {
   createdAt: string;
 }
 
+// ─── Sprint 10: Agent Execution Types (F53) ───
+
+/** F53: 에이전트 실행 작업 유형 */
+export type AgentTaskType =
+  | 'code-review'
+  | 'code-generation'
+  | 'spec-analysis'
+  | 'test-generation';
+
+/** F53: 에이전트 실행 요청 */
+export interface AgentExecutionRequest {
+  taskId: string;
+  agentId: string;
+  taskType: AgentTaskType;
+  context: {
+    repoUrl: string;
+    branch: string;
+    targetFiles?: string[];
+    spec?: {
+      title: string;
+      description: string;
+      acceptanceCriteria: string[];
+    };
+    instructions?: string;
+  };
+  constraints: AgentConstraintRule[];
+}
+
+/** F53: 에이전트 실행 결과 */
+export interface AgentExecutionResult {
+  status: 'success' | 'partial' | 'failed';
+  output: {
+    analysis?: string;
+    generatedCode?: Array<{
+      path: string;
+      content: string;
+      action: 'create' | 'modify';
+    }>;
+    reviewComments?: Array<{
+      file: string;
+      line: number;
+      comment: string;
+      severity: 'error' | 'warning' | 'info';
+    }>;
+  };
+  tokensUsed: number;
+  model: string;
+  duration: number;
+}
+
+/** F53: AgentRunner 타입 식별 */
+export type AgentRunnerType = 'claude-api' | 'mcp' | 'mock';
+
+/** F53: 사용 가능한 Runner 정보 */
+export interface AgentRunnerInfo {
+  type: AgentRunnerType;
+  available: boolean;
+  model?: string;
+  description: string;
+}
+
 // ─── Token Management Types (F31) ───
 
 /** F31: 개별 Token 사용 레코드 */

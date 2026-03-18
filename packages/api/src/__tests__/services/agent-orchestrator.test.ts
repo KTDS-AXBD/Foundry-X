@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "../helpers/mock-d1.js";
 import { AgentOrchestrator } from "../../services/agent-orchestrator.js";
+import { MockRunner } from "../../services/claude-api-runner.js";
 
 describe("AgentOrchestrator", () => {
   let db: ReturnType<typeof createMockD1>;
@@ -127,5 +128,109 @@ describe("AgentOrchestrator", () => {
     expect(tasks[0]!.branch).toBe("feat/review");
     expect(tasks[0]!.prStatus).toBe("open");
     expect(tasks[0]!.sddVerified).toBe(true);
+  });
+
+  // ─── Sprint 10: executeTask / getTaskResult tests ───
+
+  it("executeTask creates session + task, runs runner, and records result", async () => {
+    const runner = new MockRunner();
+
+    const result = await orchestrator.executeTask(
+      "agent-code-review",
+      "code-review",
+      {
+        repoUrl: "https://github.com/KTDS-AXBD/Foundry-X",
+        branch: "feat/test",
+        targetFiles: ["src/index.ts"],
+      },
+      runner,
+    );
+
+    expect(result.status).toBe("success");
+    expect(result.output.analysis).toContain("[Mock]");
+    expect(result.model).toBe("mock");
+
+    // Verify session was created
+    const { results: sessions } = await db
+      .prepare("SELECT * FROM agent_sessions WHERE agent_name = ?")
+      .bind("agent-code-review")
+      .all();
+    expect(sessions.length).toBeGreaterThanOrEqual(1);
+    const session = sessions[sessions.length - 1] as any;
+    expect(session.status).toBe("completed");
+
+    // Verify task was created with result
+    const { results: tasks } = await db
+      .prepare("SELECT * FROM agent_tasks WHERE agent_session_id = ?")
+      .bind(session.id)
+      .all();
+    expect(tasks).toHaveLength(1);
+    const task = tasks[0] as any;
+    expect(task.task_type).toBe("code-review");
+    expect(task.runner_type).toBe("mock");
+    expect(task.result).toBeTruthy();
+  });
+
+  it("executeTask records failed status on runner failure", async () => {
+    const failRunner = new MockRunner();
+    // Override execute to simulate failure
+    failRunner.execute = async () => ({
+      status: "failed" as const,
+      output: { analysis: "Error occurred" },
+      tokensUsed: 0,
+      model: "mock",
+      duration: 50,
+    });
+
+    const result = await orchestrator.executeTask(
+      "agent-broken",
+      "code-review",
+      {
+        repoUrl: "https://github.com/KTDS-AXBD/Foundry-X",
+        branch: "feat/fail",
+      },
+      failRunner,
+    );
+
+    expect(result.status).toBe("failed");
+
+    // Verify session status is "failed"
+    const { results: sessions } = await db
+      .prepare("SELECT * FROM agent_sessions WHERE agent_name = ?")
+      .bind("agent-broken")
+      .all();
+    const session = sessions[sessions.length - 1] as any;
+    expect(session.status).toBe("failed");
+  });
+
+  it("getTaskResult returns task and result for existing task", async () => {
+    const runner = new MockRunner();
+    await orchestrator.executeTask(
+      "agent-result-test",
+      "spec-analysis",
+      {
+        repoUrl: "https://github.com/KTDS-AXBD/Foundry-X",
+        branch: "feat/result",
+      },
+      runner,
+    );
+
+    // Find the created task
+    const { results: tasks } = await db
+      .prepare("SELECT id FROM agent_tasks ORDER BY created_at DESC LIMIT 1")
+      .all();
+    const taskId = (tasks[0] as any).id;
+
+    const taskResult = await orchestrator.getTaskResult(taskId);
+    expect(taskResult).not.toBeNull();
+    expect(taskResult!.task.id).toBe(taskId);
+    expect(taskResult!.task.prStatus).toBe("draft");
+    expect(taskResult!.result).toBeTruthy();
+    expect((taskResult!.result as any).analysis).toContain("[Mock]");
+  });
+
+  it("getTaskResult returns null for non-existent task", async () => {
+    const taskResult = await orchestrator.getTaskResult("non-existent-task");
+    expect(taskResult).toBeNull();
   });
 });

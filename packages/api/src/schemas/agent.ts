@@ -97,3 +97,68 @@ export const AgentRegistrationSchema = z
     createdAt: z.string(),
   })
   .openapi("AgentRegistration");
+
+// ─── Sprint 10: Agent Execution Schemas (F53) ───
+
+export const AgentExecuteRequestSchema = z
+  .object({
+    taskType: z
+      .enum(["code-review", "code-generation", "spec-analysis", "test-generation"])
+      .describe("실행할 작업 유형"),
+    context: z
+      .object({
+        repoUrl: z.string().default("https://github.com/KTDS-AXBD/Foundry-X"),
+        branch: z.string().default("master"),
+        targetFiles: z.array(z.string()).optional(),
+        spec: z
+          .object({
+            title: z.string(),
+            description: z.string(),
+            acceptanceCriteria: z.array(z.string()),
+          })
+          .optional(),
+        instructions: z.string().max(2000).optional(),
+      })
+      .describe("실행 컨텍스트"),
+  })
+  .openapi("AgentExecuteRequest");
+
+export const AgentExecutionResultSchema = z
+  .object({
+    status: z.enum(["success", "partial", "failed"]),
+    output: z.object({
+      analysis: z.string().optional(),
+      generatedCode: z
+        .array(
+          z.object({
+            path: z.string(),
+            content: z.string(),
+            action: z.enum(["create", "modify"]),
+          }),
+        )
+        .optional(),
+      reviewComments: z
+        .array(
+          z.object({
+            file: z.string(),
+            line: z.number(),
+            comment: z.string(),
+            severity: z.enum(["error", "warning", "info"]),
+          }),
+        )
+        .optional(),
+    }),
+    tokensUsed: z.number(),
+    model: z.string(),
+    duration: z.number(),
+  })
+  .openapi("AgentExecutionResult");
+
+export const AgentRunnerInfoSchema = z
+  .object({
+    type: z.enum(["claude-api", "mcp", "mock"]),
+    available: z.boolean(),
+    model: z.string().optional(),
+    description: z.string(),
+  })
+  .openapi("AgentRunnerInfo");

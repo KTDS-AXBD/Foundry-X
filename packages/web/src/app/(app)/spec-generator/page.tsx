@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { generateSpec, type SpecGenerateResult } from "@/lib/api-client";
+import { generateSpec, resolveConflict, type SpecGenerateResult } from "@/lib/api-client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { ConflictCard } from "@/components/feature/ConflictCard";
 
 export default function SpecGeneratorPage() {
   const [text, setText] = useState("");
@@ -14,6 +15,9 @@ export default function SpecGeneratorPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [resolvedConflicts, setResolvedConflicts] = useState<Set<number>>(
+    new Set(),
+  );
 
   const handleGenerate = async () => {
     if (text.length < 10) {
@@ -25,6 +29,7 @@ export default function SpecGeneratorPage() {
     setError(null);
     setResult(null);
 
+    setResolvedConflicts(new Set());
     try {
       const data = await generateSpec(text, context || undefined);
       setResult(data);
@@ -127,6 +132,36 @@ export default function SpecGeneratorPage() {
                 <pre className="max-h-64 overflow-auto rounded bg-muted p-3 text-xs">
                   {result.markdown}
                 </pre>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        {/* Conflicts */}
+        {result?.conflicts && result.conflicts.length > 0 && (
+          <Card className="lg:col-span-2">
+            <CardContent className="space-y-4 p-6">
+              <h2 className="text-lg font-semibold">
+                ⚠️ {result.conflicts.length}건의 충돌이 감지되었습니다
+              </h2>
+              <div className="space-y-3">
+                {result.conflicts.map((conflict, i) => (
+                  <ConflictCard
+                    key={i}
+                    conflict={conflict}
+                    index={i}
+                    resolved={resolvedConflicts.has(i)}
+                    onResolve={(resolution) => {
+                      resolveConflict(`conflict-${i}`, resolution).catch(
+                        () => {},
+                      );
+                      setResolvedConflicts((prev) => {
+                        const next = new Set(prev);
+                        next.add(i);
+                        return next;
+                      });
+                    }}
+                  />
+                ))}
               </div>
             </CardContent>
           </Card>

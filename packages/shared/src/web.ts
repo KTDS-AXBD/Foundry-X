@@ -39,6 +39,47 @@ export interface Message {
   sentAt: string;
 }
 
+// ─── Sprint 10: Spec Conflict Types (F54) ───
+
+/** F54: Spec 충돌 유형 */
+export type SpecConflictType = 'direct' | 'dependency' | 'priority' | 'scope';
+
+/** F54: Spec 충돌 정보 */
+export interface SpecConflict {
+  type: SpecConflictType;
+  severity: 'critical' | 'warning' | 'info';
+  existingSpec: {
+    id: string;
+    title: string;
+    field: string;
+    value: string;
+  };
+  newSpec: {
+    field: string;
+    value: string;
+  };
+  description: string;
+  suggestion?: string;
+}
+
+/** F54: 기존 Spec (D1 또는 SPEC.md 파싱) */
+export interface ExistingSpec {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  priority: string;
+  dependencies: string[];
+  status: 'planned' | 'in_progress' | 'done';
+}
+
+/** F54: 충돌 해결 요청 */
+export interface ConflictResolution {
+  conflictId: string;
+  resolution: 'accept' | 'reject' | 'modify';
+  modifiedValue?: string;
+}
+
 /** F36: 하네스 신선도 리포트 */
 export interface FreshnessReport {
   documents: FreshnessItem[];

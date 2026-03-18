@@ -156,8 +156,26 @@ export class MockD1Database {
         pr_number INTEGER,
         pr_status TEXT NOT NULL DEFAULT 'draft',
         sdd_verified INTEGER NOT NULL DEFAULT 0,
+        task_type TEXT,
+        result TEXT,
+        tokens_used INTEGER DEFAULT 0,
+        duration_ms INTEGER DEFAULT 0,
+        runner_type TEXT DEFAULT 'claude-api',
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
         updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE TABLE IF NOT EXISTS spec_conflicts (
+        id TEXT PRIMARY KEY,
+        new_spec_title TEXT NOT NULL,
+        existing_spec_id TEXT,
+        conflict_type TEXT NOT NULL CHECK(conflict_type IN ('direct', 'dependency', 'priority', 'scope')),
+        severity TEXT NOT NULL CHECK(severity IN ('critical', 'warning', 'info')),
+        description TEXT NOT NULL,
+        suggestion TEXT,
+        resolution TEXT CHECK(resolution IN ('accept', 'reject', 'modify')),
+        resolved_by TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        resolved_at TEXT
       );
     `);
   }
