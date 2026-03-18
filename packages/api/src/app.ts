@@ -1,5 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
+import { cors } from "hono/cors";
 import { profileRoute } from "./routes/profile.js";
 import { integrityRoute } from "./routes/integrity.js";
 import { healthRoute } from "./routes/health.js";
@@ -17,6 +18,15 @@ import { authMiddleware } from "./middleware/auth.js";
 import type { Env } from "./env.js";
 
 export const app = new OpenAPIHono<{ Bindings: Env }>();
+
+// CORS — allow fx.minu.best and local dev
+app.use("*", cors({
+  origin: ["https://fx.minu.best", "https://foundry-x-web.pages.dev", "http://localhost:3000"],
+  allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowHeaders: ["Content-Type", "Authorization"],
+  exposeHeaders: ["Content-Length"],
+  maxAge: 86400,
+}));
 
 // Health check (public)
 app.get("/", (c) => c.json({ status: "ok", service: "foundry-x-api" }));
