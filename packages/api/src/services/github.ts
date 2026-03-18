@@ -67,6 +67,17 @@ export class GitHubService {
     return res.json() as Promise<{ sha: string; commit: { sha: string } }>;
   }
 
+  async getRateLimit(): Promise<{ remaining: number; limit: number }> {
+    const res = await fetch(`${this.baseUrl}/rate_limit`, {
+      headers: this.headers(),
+    });
+    if (!res.ok) throw new GitHubApiError(res.status, "rate_limit");
+    const data = (await res.json()) as {
+      rate: { remaining: number; limit: number };
+    };
+    return { remaining: data.rate.remaining, limit: data.rate.limit };
+  }
+
   async fileExists(path: string): Promise<boolean> {
     const res = await fetch(
       `${this.baseUrl}/repos/${this.repo}/contents/${path}`,

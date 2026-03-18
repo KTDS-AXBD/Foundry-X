@@ -1,5 +1,5 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
-import { HealthResponseSchema } from "../schemas/health.js";
+import { HealthResponseSchema, DetailedHealthSchema } from "../schemas/health.js";
 import type { HealthScore } from "@foundry-x/shared";
 import type { Env } from "../env.js";
 import { GitHubService } from "../services/github.js";
@@ -17,6 +17,8 @@ const MOCK_HEALTH: HealthScore = {
   specToTest: 80,
   grade: "B",
 };
+
+// ─── SDD Triangle Health (original) ───
 
 const getHealth = createRoute({
   method: "get",
@@ -42,4 +44,58 @@ healthRoute.openapi(getHealth, async (c) => {
   } catch {
     return c.json(MOCK_HEALTH);
   }
+});
+
+// ─── Detailed Infrastructure Health (Sprint 9 F51) ───
+
+const getDetailedHealth = createRoute({
+  method: "get",
+  path: "/health/detailed",
+  tags: ["Health"],
+  summary: "Detailed infrastructure health check",
+  responses: {
+    200: {
+      content: { "application/json": { schema: DetailedHealthSchema } },
+      description: "Infrastructure health with D1/KV/GitHub status",
+    },
+  },
+});
+
+healthRoute.openapi(getDetailedHealth, async (c) => {
+  const checks: Record<string, { status: "ok" | "error"; latency?: number; error?: string; rateLimit?: { remaining: number; limit: number } }> = {};
+
+  // D1 check
+  try {
+    const start = Date.now();
+    await c.env.DB.prepare("SELECT 1").first();
+    checks.d1 = { status: "ok", latency: Date.now() - start };
+  } catch (e) {
+    checks.d1 = { status: "error", error: e instanceof Error ? e.message : "Unknown" };
+  }
+
+  // KV check
+  try {
+    const start = Date.now();
+    await c.env.CACHE.get("__health_check__");
+    checks.kv = { status: "ok", latency: Date.now() - start };
+  } catch (e) {
+    checks.kv = { status: "error", error: e instanceof Error ? e.message : "Unknown" };
+  }
+
+  // GitHub API check
+  try {
+    const github = new GitHubService(c.env.GITHUB_TOKEN, c.env.GITHUB_REPO);
+    const rateLimit = await github.getRateLimit();
+    checks.github = { status: "ok", rateLimit };
+  } catch (e) {
+    checks.github = { status: "error", error: e instanceof Error ? e.message : "Unknown" };
+  }
+
+  const hasError = Object.values(checks).some((ch) => ch.status === "error");
+
+  return c.json({
+    status: hasError ? "degraded" : "ok",
+    version: "0.9.0",
+    checks,
+  });
 });

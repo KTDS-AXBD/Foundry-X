@@ -114,6 +114,8 @@ export class MockD1Database {
         agent_name TEXT NOT NULL,
         branch TEXT,
         status TEXT NOT NULL DEFAULT 'active',
+        progress REAL DEFAULT 0,
+        current_task TEXT,
         started_at TEXT NOT NULL,
         ended_at TEXT
       );
@@ -122,6 +124,40 @@ export class MockD1Database {
         user_id TEXT NOT NULL,
         expires_at TEXT NOT NULL,
         revoked_at TEXT
+      );
+      CREATE TABLE IF NOT EXISTS agents (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'active',
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE TABLE IF NOT EXISTS agent_capabilities (
+        id TEXT PRIMARY KEY,
+        agent_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        tools TEXT NOT NULL DEFAULT '[]',
+        allowed_paths TEXT NOT NULL DEFAULT '[]',
+        max_concurrency INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE TABLE IF NOT EXISTS agent_constraints (
+        id TEXT PRIMARY KEY,
+        tier TEXT NOT NULL,
+        action TEXT NOT NULL UNIQUE,
+        description TEXT NOT NULL,
+        enforcement_mode TEXT NOT NULL DEFAULT 'block'
+      );
+      CREATE TABLE IF NOT EXISTS agent_tasks (
+        id TEXT PRIMARY KEY,
+        agent_session_id TEXT NOT NULL,
+        branch TEXT NOT NULL,
+        pr_number INTEGER,
+        pr_status TEXT NOT NULL DEFAULT 'draft',
+        sdd_verified INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
     `);
   }

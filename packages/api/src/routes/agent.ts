@@ -1,10 +1,18 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
-import { AgentProfileSchema } from "../schemas/agent.js";
+import {
+  AgentProfileSchema,
+  ConstraintCheckRequestSchema,
+  ConstraintCheckResultSchema,
+  AgentTaskSchema,
+  CreateTaskRequestSchema,
+  AgentCapabilityDefinitionSchema,
+} from "../schemas/agent.js";
 import type { AgentProfile, AgentActivity } from "@foundry-x/shared";
 import { getDb } from "../db/index.js";
 import { agentSessions } from "../db/schema.js";
 import { SSEManager } from "../services/sse-manager.js";
+import { AgentOrchestrator } from "../services/agent-orchestrator.js";
 import type { Env } from "../env.js";
 
 export const agentRoute = new OpenAPIHono<{ Bindings: Env }>();
@@ -71,6 +79,36 @@ const getAgents = createRoute({
 });
 
 agentRoute.openapi(getAgents, async (c) => {
+  // Try D1 agents table first (Sprint 9 orchestration)
+  try {
+    if (c.env?.DB) {
+      const orchestrator = new AgentOrchestrator(c.env.DB);
+      const registeredAgents = await orchestrator.listAgents();
+
+      if (registeredAgents.length > 0) {
+        const profiles: AgentProfile[] = [];
+        for (const agent of registeredAgents) {
+          const caps = await orchestrator.getCapabilities(agent.id);
+          profiles.push({
+            id: agent.id,
+            name: agent.name,
+            capabilities: caps.map((cap) => ({
+              action: cap.name,
+              scope: cap.description,
+              tools: cap.tools,
+            })),
+            constraints: [],
+            activity: { status: "idle" },
+          });
+        }
+        return c.json(profiles);
+      }
+    }
+  } catch {
+    // agents table may not exist yet — fall through
+  }
+
+  // Fallback: check agent_sessions table
   let sessions: (typeof agentSessions.$inferSelect)[] = [];
   try {
     if (c.env?.DB) {
@@ -128,4 +166,130 @@ agentRoute.get("/agents/stream", (c) => {
       Connection: "keep-alive",
     },
   });
+});
+
+// ─── Sprint 9: Orchestration Endpoints (F50) ───
+
+const getCapabilities = createRoute({
+  method: "get",
+  path: "/agents/capabilities",
+  tags: ["Agents"],
+  summary: "List all agent capabilities",
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: z.array(AgentCapabilityDefinitionSchema),
+        },
+      },
+      description: "All agent capabilities across all agents",
+    },
+  },
+});
+
+agentRoute.openapi(getCapabilities, async (c) => {
+  const orchestrator = new AgentOrchestrator(c.env.DB);
+  const capabilities = await orchestrator.listAllCapabilities();
+  return c.json(capabilities);
+});
+
+const getAgentTasks = createRoute({
+  method: "get",
+  path: "/agents/{id}/tasks",
+  tags: ["Agents"],
+  summary: "List tasks for an agent",
+  request: {
+    params: z.object({ id: z.string() }),
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: z.array(AgentTaskSchema) } },
+      description: "Tasks assigned to the agent",
+    },
+  },
+});
+
+agentRoute.openapi(getAgentTasks, async (c) => {
+  const { id } = c.req.valid("param");
+  const orchestrator = new AgentOrchestrator(c.env.DB);
+  const tasks = await orchestrator.listTasks(id);
+  return c.json(tasks);
+});
+
+const createAgentTask = createRoute({
+  method: "post",
+  path: "/agents/{id}/tasks",
+  tags: ["Agents"],
+  summary: "Create a task for an agent",
+  request: {
+    params: z.object({ id: z.string() }),
+    body: {
+      content: {
+        "application/json": { schema: CreateTaskRequestSchema },
+      },
+    },
+  },
+  responses: {
+    201: {
+      content: { "application/json": { schema: AgentTaskSchema } },
+      description: "Created task",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: z.object({ error: z.string() }),
+        },
+      },
+      description: "Agent session not found",
+    },
+  },
+});
+
+agentRoute.openapi(createAgentTask, async (c) => {
+  const { id } = c.req.valid("param");
+  const { branch } = c.req.valid("json");
+
+  // Find latest session for this agent
+  const { results } = await c.env.DB.prepare(
+    "SELECT id FROM agent_sessions WHERE agent_name = ? ORDER BY started_at DESC LIMIT 1",
+  )
+    .bind(id)
+    .all<{ id: string }>();
+
+  if (results.length === 0) {
+    return c.json({ error: `No session found for agent '${id}'` }, 404);
+  }
+
+  const orchestrator = new AgentOrchestrator(c.env.DB);
+  const task = await orchestrator.createTask(results[0]!.id, branch);
+  return c.json(task, 201);
+});
+
+const checkConstraint = createRoute({
+  method: "post",
+  path: "/agents/constraints/check",
+  tags: ["Agents"],
+  summary: "Check if an action is allowed by constraints",
+  request: {
+    body: {
+      content: {
+        "application/json": { schema: ConstraintCheckRequestSchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": { schema: ConstraintCheckResultSchema },
+      },
+      description: "Constraint check result",
+    },
+  },
+});
+
+agentRoute.openapi(checkConstraint, async (c) => {
+  const { action } = c.req.valid("json");
+  const orchestrator = new AgentOrchestrator(c.env.DB);
+  const result = await orchestrator.checkConstraint(action);
+  return c.json(result);
 });

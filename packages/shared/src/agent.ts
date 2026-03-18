@@ -34,6 +34,64 @@ export interface AgentActivity {
   tokenUsed?: number;
 }
 
+// ─── Sprint 9: Orchestration Types (F50) ───
+
+/** F50: 에이전트 Capability 상세 정의 (D1 저장용) */
+export interface AgentCapabilityDefinition {
+  id: string;
+  agentId: string;
+  name: string;
+  description: string;
+  tools: string[];
+  allowedPaths: string[];
+  maxConcurrency: number;
+}
+
+/** F50: Constraint 강제 규칙 */
+export interface AgentConstraintRule {
+  id: string;
+  tier: 'always' | 'ask' | 'never';
+  action: string;
+  description: string;
+  enforcementMode: 'block' | 'warn' | 'log';
+}
+
+/** F50: Constraint 검증 요청 */
+export interface ConstraintCheckRequest {
+  agentId: string;
+  action: string;
+  context?: Record<string, unknown>;
+}
+
+/** F50: Constraint 검증 결과 */
+export interface ConstraintCheckResult {
+  allowed: boolean;
+  tier: 'always' | 'ask' | 'never';
+  rule: AgentConstraintRule;
+  reason: string;
+}
+
+/** F50: 에이전트 브랜치 기반 작업 */
+export interface AgentTask {
+  id: string;
+  agentSessionId: string;
+  branch: string;
+  prNumber?: number;
+  prStatus: 'draft' | 'open' | 'merged' | 'closed';
+  sddVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** F50: 에이전트 등록 정보 */
+export interface AgentRegistration {
+  id: string;
+  name: string;
+  description: string;
+  status: 'active' | 'inactive';
+  createdAt: string;
+}
+
 // ─── Token Management Types (F31) ───
 
 /** F31: 개별 Token 사용 레코드 */

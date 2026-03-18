@@ -82,3 +82,59 @@ export const refreshTokens = sqliteTable("refresh_tokens", {
   expiresAt: text("expires_at").notNull(),
   revokedAt: text("revoked_at"),
 });
+
+// ── Agents (Sprint 9 F50) ─────────────────────
+export const agents = sqliteTable("agents", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").default(""),
+  status: text("status", { enum: ["active", "inactive"] })
+    .notNull()
+    .default("active"),
+  createdAt: text("created_at").notNull(),
+});
+
+// ── Agent Capabilities ────────────────────────
+export const agentCapabilities = sqliteTable("agent_capabilities", {
+  id: text("id").primaryKey(),
+  agentId: text("agent_id")
+    .notNull()
+    .references(() => agents.id),
+  name: text("name").notNull(),
+  description: text("description").default(""),
+  tools: text("tools").notNull().default("[]"),
+  allowedPaths: text("allowed_paths").notNull().default("[]"),
+  maxConcurrency: integer("max_concurrency").notNull().default(1),
+  createdAt: text("created_at").notNull(),
+});
+
+// ── Agent Constraints ─────────────────────────
+export const agentConstraints = sqliteTable("agent_constraints", {
+  id: text("id").primaryKey(),
+  tier: text("tier", { enum: ["always", "ask", "never"] }).notNull(),
+  action: text("action").notNull(),
+  description: text("description").notNull(),
+  enforcementMode: text("enforcement_mode", {
+    enum: ["block", "warn", "log"],
+  })
+    .notNull()
+    .default("block"),
+});
+
+// ── Agent Tasks ───────────────────────────────
+export const agentTasks = sqliteTable("agent_tasks", {
+  id: text("id").primaryKey(),
+  agentSessionId: text("agent_session_id")
+    .notNull()
+    .references(() => agentSessions.id),
+  branch: text("branch").notNull(),
+  prNumber: integer("pr_number"),
+  prStatus: text("pr_status", {
+    enum: ["draft", "open", "merged", "closed"],
+  })
+    .notNull()
+    .default("draft"),
+  sddVerified: integer("sdd_verified").notNull().default(0),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
