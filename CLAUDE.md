@@ -64,9 +64,9 @@ foundry-x/
 │   │       └── index.ts
 │   ├── api/                # Hono API Server (Phase 2)
 │   │   └── src/
-│   │       ├── routes/     # 11개: agent, auth, freshness, health, integrity, profile, requirements, spec, token, webhook, wiki
-│   │       ├── services/   # 9개: github, kv-cache, spec-parser, health-calc, integrity-checker, freshness-checker, sse-manager, llm, wiki-sync
-│   │       ├── schemas/    # 11개 Zod 스키마
+│   │       ├── routes/     # 12개: agent, auth, freshness, health, integrity, mcp, profile, requirements, spec, token, webhook, wiki
+│   │       ├── services/   # 19개: github, kv-cache, spec-parser, health-calc, integrity-checker, freshness-checker, sse-manager, llm, wiki-sync, agent-orchestrator, agent-runner, claude-api-runner, conflict-detector, mcp-adapter, mcp-registry, mcp-runner, mcp-transport, execution-types, logger
+│   │       ├── schemas/    # 12개 Zod 스키마
 │   │       └── index.ts
 │   ├── web/                # Next.js 14 Dashboard + Landing (Phase 2)
 │   │   └── src/
@@ -96,12 +96,11 @@ foundry-x/
 | `docs/specs/dev-transparency-spec.md` | 개발 투명성 스펙 |
 | `docs/specs/interview-log.md` | 요구사항 인터뷰 종합 (Part 1-5) |
 | `docs/02-design/features/tech-stack-review.design.md` | 기술 스택 결정 근거 |
+| `docs/02-design/features/mcp-protocol.design.md` | MCP 프로토콜 설계 |
+| `docs/01-plan/features/sprint-{N}.plan.md` | Sprint별 Plan (3~12) |
+| `docs/02-design/features/sprint-{N}.design.md` | Sprint별 Design (3~12) |
 | `docs/review/round-1/` | 1차 다중 AI 검토 (ChatGPT, Gemini, Claude, Grok) |
 | `docs/review/round-2/` | 2차 검토 및 최종 착수 판정 |
-| `docs/01-plan/features/sprint-5.plan.md` | Sprint 5 Plan (Frontend Design + 하네스 확장) |
-| `docs/02-design/features/sprint-5.design.md` | Sprint 5 Design |
-| `docs/03-analysis/features/sprint-5.analysis.md` | Sprint 5B Gap Analysis (93%) |
-| `docs/03-analysis/features/sprint-5-part-a.analysis.md` | Sprint 5A Gap Analysis (~90%) |
 
 ## Development Commands
 
@@ -119,6 +118,20 @@ pnpm test -- --grep "Header"      # 특정 테스트 필터
 pnpm lint                         # eslint src/ (flat config)
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # tsx src/index.ts (개발 실행)
+
+# API 패키지 단독
+cd packages/api
+pnpm test                         # vitest run (203 tests)
+pnpm test -- --grep "agent"       # 특정 테스트 필터
+pnpm typecheck                    # tsc --noEmit
+pnpm dev                          # 로컬 서버 실행
+
+# Web 패키지 단독
+cd packages/web
+pnpm test                         # vitest run (45 tests)
+pnpm typecheck                    # tsc --noEmit
+pnpm dev                          # Next.js dev server (localhost:3000)
+pnpm e2e                          # Playwright E2E (20 specs)
 ```
 
 ## Testing
@@ -128,43 +141,20 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 - **Test Data:** `packages/cli/src/ui/__tests__/test-data.ts` — 중앙 fixture factory (`make*()` + spread override)
 - **TSX 지원:** vitest.config에 `.test.tsx` 패턴 포함, tsconfig에 `jsx: "react-jsx"`
 - **Mock 전략:** Ink 컴포넌트는 실제 렌더링, 외부 서비스만 mock
+- **API 테스트:** Hono `app.request()` 직접 호출 방식, D1 mock은 in-memory SQLite
+- **E2E 테스트:** Playwright (`packages/web/e2e/`), 20 specs, `pnpm e2e`로 실행
 
 ## Current Phase
 
 - **Phase 1:** ✅ 완료 — Go 판정 (2026-03-17), v0.5.0
   - Sprint 1~5 전체 완료, F-item 36/36 DONE, PDCA 93~97%
-  - CLI 3개 커맨드 + Ink TUI + 4개 Builder + 176 테스트 (CLI 106 + API 43 + Web 27)
-- **Phase 2 Sprint 6:** ✅ 완료 — 인프라 + D1 + JWT 인증
-  - Cloudflare Workers + D1 6테이블 + JWT 인증 + RBAC, Match Rate 84%
-- **Phase 2 Sprint 7:** ✅ 완료 — OpenAPI 17 endpoints + D1 실데이터 + shadcn/ui + 176 tests (Match Rate 89%)
-  - F38 OpenAPI ✅ (98%), F41 실데이터 ✅ (72%), F42 shadcn/ui ✅ (95%), F43 테스트 ✅ (90%)
-  - Plan: `docs/01-plan/features/sprint-7.plan.md`
-  - Design: `docs/02-design/features/sprint-7.design.md`
-- **Phase 2 Sprint 8:** ✅ 완료 — 서비스 레이어 + SSE + NL→Spec + Production Site (Match Rate 93%)
-  - F41 실데이터 95%, F44 SSE 92%, F45 NL→Spec 96%, F46 Wiki Git 94%, F47 Production Site 90%
-  - 9 services + 19 endpoints + 216 tests (CLI 106 + API 76 + Web 34)
-  - Plan: `docs/01-plan/features/sprint-8.plan.md`
-  - Design: `docs/02-design/features/sprint-8.design.md`
-- **Phase 2 Sprint 9:** ✅ 완료 — 프로덕션 배포 + E2E + 에이전트 오케스트레이션 (Match Rate 94%)
-  - F48 배포 97%, F49 E2E 92%, F50 오케스트레이션 91%, F51 옵저버빌리티 95%
-  - 10 services + 23 endpoints + 241 tests (CLI 106 + API 101 + Web 34)
-  - Plan: `docs/01-plan/features/sprint-9.plan.md`
-  - Design: `docs/02-design/features/sprint-9.design.md`
-- **Phase 2 Sprint 10:** ✅ 완료 — 에이전트 실연동 + NL→Spec 충돌 감지 (Match Rate 93%)
-  - F52 프로덕션 실배포 97%, F53 에이전트 실연동 92%, F54 충돌 감지 94%
-  - 14 services + 28 endpoints + 276 tests (CLI 106 + API 136 + Web 34)
-  - Plan: `docs/01-plan/features/sprint-10.plan.md`
-  - Design: `docs/02-design/features/sprint-10.design.md`
-- **Phase 2 Sprint 11:** ✅ 완료 — SSE 실시간 + E2E 고도화 + 배포 자동화 + MCP 설계 (Match Rate 93%)
-  - F55 SSE 95%, F56 E2E 88%, F57 배포 100%, F58 MCP 91%
-  - 290 tests (CLI 106 + API 150 + Web 34) + 18 E2E specs
-  - Plan: `docs/01-plan/features/sprint-11.plan.md`
-  - Design: `docs/02-design/features/sprint-11.design.md`
-- **Phase 2 Sprint 12:** ✅ 완료 — ouroboros 패턴 + Generative UI + MCP 실 구현 + 테스트 보강 (Match Rate ~93%)
-  - F59 ouroboros 100%, F60 Generative UI 95%, F61 MCP 95%, F63 테스트 85%
-  - 14 services + 33 endpoints + 352 tests (CLI 106 + API 201 + Web 45) + 20 E2E specs
-  - Plan: `docs/01-plan/features/sprint-12.plan.md` + `sprint-12-stabilization.plan.md`
-  - Design: `docs/02-design/features/sprint-12.design.md` + `sprint-12-stabilization.design.md`
+- **Phase 2:** ✅ 완료 (Sprint 6~12) — v1.0.0
+  - Sprint 6: 인프라+D1+JWT (84%) → Sprint 7: OpenAPI+shadcn (89%) → Sprint 8: 서비스+SSE+NL→Spec (93%)
+  - Sprint 9: 프로덕션+E2E+오케스트레이션 (94%) → Sprint 10: 에이전트 실연동+충돌감지 (93%)
+  - Sprint 11: SSE실시간+E2E고도화+배포자동화+MCP설계 (93%) → Sprint 12: ouroboros+GenUI+MCP실구현 (~93%)
+  - 최종: 19 services, 33 endpoints, 354 tests (CLI 106 + API 203 + Web 45) + 20 E2E
+  - PDCA 문서: `docs/01-plan/features/sprint-{N}.plan.md` 등 (Sprint 3~12)
+- **다음:** Sprint 13 계획 (MCP Sampling/Prompts + 에이전트 자동 PR + v1.1.0)
 
 ## Git Workflow
 
@@ -176,9 +166,9 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 
 - **모노리포 (v3 확정)**: TS+Python 공존, Turborepo + Python 독립 빌드 단위. 안정화 후 분리 가능
 - **Phase 1 Go 판정 완료**: 2026-03-17 Go 확정. Phase 2(API+Web) 착수
-- **Phase 2 범위**: API Server(Hono) + Web Dashboard(Next.js) + DB(PostgreSQL) + 인증 + 에이전트 오케스트레이션
+- **Phase 2 범위**: API Server(Hono) + Web Dashboard(Next.js) + DB(Cloudflare D1/SQLite) + 인증 + 에이전트 오케스트레이션
 - **Git hook 우회 금지**: `--no-verify` 비율 < 20% 목표. hook 실패 시 human escalation
-- **NL→Spec 변환은 Phase 2**: Phase 1에서는 수동 명세 작성
+- **NL→Spec 변환**: ✅ 구현 완료 (Sprint 8, POST /spec/generate + 충돌 감지)
 - **메타데이터 저장**: Phase 1은 DB 없이 `.foundry-x/` 디렉토리에 JSON 파일로 저장
 - **status Triangle Health Score**: `foundry-x status`에 Spec↔Code↔Test 건강도 점수 표시 (Gemini 권고)
 - **자동 커밋 절대 금지**: NL→Spec 변환 결과는 반드시 사람이 확인 후 커밋
