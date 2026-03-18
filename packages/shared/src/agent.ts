@@ -637,3 +637,51 @@ export interface MessageReceivedData {
   type: MessageType;
   subject: string;
 }
+
+// ─── AI Foundry Integration Types (AIF-REQ-026 Phase 1) ───
+
+/** AI Foundry MCP Adapter 응답 — Skill → MCP 도구 변환 결과 */
+export interface AifMcpAdapterResponse {
+  protocolVersion: string;
+  capabilities: { tools: { listChanged: boolean } };
+  serverInfo: { name: string; version: string };
+  instructions: string;
+  name: string;
+  version: string;
+  description: string;
+  tools: AifMcpTool[];
+  metadata: {
+    skillId: string;
+    domain: string;
+    trustLevel: string;
+    trustScore: number;
+    generatedAt: string;
+  };
+}
+
+/** AI Foundry MCP 도구 정의 */
+export interface AifMcpTool {
+  name: string;
+  description: string;
+  inputSchema: {
+    type: 'object';
+    properties: Record<string, { type: string; description: string }>;
+    required: string[];
+  };
+  annotations?: {
+    title: string;
+    readOnlyHint: boolean;
+    openWorldHint: boolean;
+  };
+}
+
+/** AI Foundry 정책 평가 결과 (tools/call 응답) */
+export interface AifPolicyEvalResult {
+  result: string;
+  confidence: number;
+  reasoning: string;
+  policyCode: string;
+  provider: string;
+  model: string;
+  latencyMs: number;
+}

@@ -118,3 +118,10 @@ export type {
 export type {
   WorktreeInfo,
 } from './agent.js';
+
+// AI Foundry Integration types (AIF-REQ-026)
+export type {
+  AifMcpAdapterResponse,
+  AifMcpTool,
+  AifPolicyEvalResult,
+} from './agent.js';
