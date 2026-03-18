@@ -2,196 +2,412 @@
 
 import Link from "next/link";
 import {
-  Triangle,
-  Bot,
-  GitBranch,
-  BookOpen,
-  Wrench,
-  Coins,
-  Terminal,
-  ArrowRight,
-  Zap,
-  Shield,
-  Check,
   Anvil,
+  ArrowRight,
+  Bot,
+  Brain,
+  Eye,
+  GitBranch,
+  Layers,
+  Network,
+  Rocket,
+  Scan,
+  Shield,
   Sparkles,
+  Terminal,
+  Workflow,
 } from "lucide-react";
 
-/* ─── Feature data ─── */
-const features = [
+/* ═══════════════════════════════════════════════
+   DATA
+   ═══════════════════════════════════════════════ */
+
+const pillars = [
   {
-    icon: Triangle,
-    title: "SDD Triangle",
-    desc: "Spec, Code, Test 세 축의 동기화 상태를 실시간으로 추적해요. 불일치가 생기면 즉시 경고.",
-    route: "/dashboard",
+    icon: Brain,
+    title: "PlannerAgent",
+    label: "에이전트 통제",
+    desc: "AI가 코드를 쓰기 전에 계획을 세우고, 사람이 승인해요. 자율성과 통제의 균형.",
+    detail: "코드베이스 리서치 → 계획 수립 → 인간 승인 → 실행",
+    color: "forge-amber",
   },
   {
-    icon: Bot,
-    title: "AI Agent 투명성",
-    desc: "에이전트가 무슨 작업을 하는지, 어떤 제약 조건 아래 있는지 팀 전체가 볼 수 있어요.",
-    route: "/agents",
+    icon: Network,
+    title: "조직 지식 연결",
+    label: "MCP Skill 소비",
+    desc: "AI Foundry의 도메인 Skill을 에이전트가 MCP로 직접 활용해요.",
+    detail: "3,924 Skills → MCP Server → Foundry-X 에이전트 도구로 소비",
+    color: "axis-blue",
   },
   {
-    icon: GitBranch,
-    title: "Git-First 아키텍처",
-    desc: "Git이 단일 진실 공급원. 모든 명세, 코드, 테스트, 결정 이력이 Git에 존재해요.",
-    route: "/architecture",
-  },
-  {
-    icon: BookOpen,
-    title: "팀 지식 허브",
-    desc: "Wiki와 문서를 Git과 동기화. 소유권 마커로 AI 자동 생성 구간을 명확히 구분해요.",
-    route: "/wiki",
-  },
-  {
-    icon: Wrench,
-    title: "하네스 자동화",
-    desc: "CLAUDE.md, ARCHITECTURE.md, CONSTITUTION.md를 프로젝트 구조에서 자동 생성해요.",
-    route: "/dashboard",
-  },
-  {
-    icon: Coins,
-    title: "비용 투명성",
-    desc: "모델별, 에이전트별 토큰 사용량과 비용을 추적. 예산 초과를 사전에 감지해요.",
-    route: "/tokens",
+    icon: Workflow,
+    title: "실험-코드 연결",
+    label: "Discovery-X HANDOFF",
+    desc: "실험이 코드 프로젝트로 전환될 때, 하네스가 자동 부트스트랩돼요.",
+    detail: "Discovery-X 실험 → HANDOFF → Foundry-X 자동 초기화",
+    color: "axis-green",
   },
 ];
 
-/* ─── How It Works ─── */
-const steps = [
+const ecosystem = [
   {
-    num: "01",
-    title: "설치 & 초기화",
-    desc: "npx foundry-x init 한 줄이면 프로젝트에 맞는 하네스가 자동 구성돼요.",
-    code: "npx foundry-x init",
+    name: "Discovery-X",
+    role: "실험 관리",
+    desc: "관찰 → 행동 → 근거 → 자산",
+    color: "axis-green",
+    arrow: "실험 컨텍스트",
   },
   {
-    num: "02",
-    title: "동기화 & 검증",
-    desc: "foundry-x sync로 Spec↔Code↔Test 정합성을 검사하고, 자동으로 보정 제안을 받아요.",
-    code: "foundry-x sync",
+    name: "AI Foundry",
+    role: "지식 추출",
+    desc: "SI 산출물 → AI Skill 자산",
+    color: "axis-violet",
+    arrow: "MCP Skill tools",
   },
   {
-    num: "03",
-    title: "모니터링 & 협업",
-    desc: "웹 대시보드에서 팀 전체가 프로젝트 건강도, 에이전트 상태, 비용을 한눈에 봐요.",
-    code: "open fx.minu.best/dashboard",
-  },
-];
-
-/* ─── Testimonials ─── */
-const testimonials = [
-  {
-    quote:
-      "AI 에이전트가 뭘 하고 있는지 처음으로 투명하게 보였어요. 코드 리뷰 시간이 절반으로 줄었습니다.",
-    author: "Tech Lead",
-    role: "AX BD팀",
-  },
-  {
-    quote:
-      "Git-First 접근이 정말 맞았어요. CLAUDE.md 자동 생성만으로도 온보딩 시간이 크게 줄었어요.",
-    author: "Backend Engineer",
-    role: "AX BD팀",
-  },
-  {
-    quote:
-      "SDD Triangle 점수 보면서 코드 품질 유지가 훨씬 쉬워졌어요. 명세 없는 코드가 눈에 바로 보여요.",
-    author: "Frontend Developer",
-    role: "AX BD팀",
+    name: "AXIS DS",
+    role: "공유 UI",
+    desc: "디자인 토큰 + React 컴포넌트",
+    color: "axis-blue",
+    arrow: "@axis-ds/* 컴포넌트",
   },
 ];
 
-/* ─── Pricing ─── */
-const plans = [
+const architecture = [
   {
-    name: "Open Source",
-    price: "Free",
-    desc: "CLI + 핵심 기능",
-    features: [
-      "foundry-x init / sync / status",
-      "하네스 자동 생성 (4 builders)",
-      "SDD Triangle 건강도",
-      "Git 연동 + 로컬 분석",
+    layer: "CLI Layer",
+    items: ["foundry-x init", "foundry-x sync", "foundry-x status"],
+    tech: "TypeScript + Commander + Ink TUI",
+  },
+  {
+    layer: "API Layer",
+    items: [
+      "57 Endpoints (OpenAPI)",
+      "19 Services",
+      "MCP Protocol",
     ],
-    cta: "npm install",
-    highlighted: false,
+    tech: "Hono on Cloudflare Workers",
   },
   {
-    name: "Team",
-    price: "Coming Soon",
-    desc: "웹 대시보드 + 팀 협업",
-    features: [
-      "Open Source 기능 전부",
-      "웹 대시보드 (6 pages)",
-      "AI Agent 투명성 + SSE",
-      "Wiki Git 동기화",
-      "Token/비용 관리",
-      "NL→Spec 변환",
+    layer: "Agent Layer",
+    items: [
+      "PlannerAgent (계획 수립)",
+      "AgentInbox (비동기 메시지)",
+      "WorktreeManager (격리 실행)",
     ],
-    cta: "Request Access",
-    highlighted: true,
+    tech: "Orchestrator + Runner + Claude API",
   },
   {
-    name: "Enterprise",
-    price: "Contact",
-    desc: "맞춤형 배포 + 전용 지원",
-    features: [
-      "Team 기능 전부",
-      "On-premise 배포",
-      "SSO / RBAC 고급 권한",
-      "전용 지원 채널",
-      "커스텀 에이전트 통합",
-    ],
-    cta: "Contact Us",
-    highlighted: false,
+    layer: "Data Layer",
+    items: ["D1 SQLite (12 Tables)", "KV Cache", "Git (SSOT)"],
+    tech: "Cloudflare D1 + simple-git",
   },
 ];
 
-/* ─── Landing Page ─── */
+const roadmap = [
+  {
+    phase: "Phase 1",
+    title: "CLI + Plumb Engine",
+    version: "v0.1 → v0.5",
+    status: "done" as const,
+    items: ["CLI 3커맨드", "Ink TUI", "4 Builders", "106 테스트"],
+  },
+  {
+    phase: "Phase 2",
+    title: "API + Web + Agent",
+    version: "v0.6 → v1.3",
+    status: "done" as const,
+    items: [
+      "57 API 엔드포인트",
+      "MCP 프로토콜",
+      "PlannerAgent",
+      "에이전트 자동 PR",
+    ],
+  },
+  {
+    phase: "Phase 3",
+    title: "멀티테넌시 + 외부 연동",
+    version: "v2.0",
+    status: "current" as const,
+    items: [
+      "AI Foundry MCP 연동",
+      "AXIS DS UI 전환",
+      "멀티테넌시",
+      "팀 온보딩",
+    ],
+  },
+  {
+    phase: "Phase 4",
+    title: "생태계 통합",
+    version: "v3.0",
+    status: "planned" as const,
+    items: [
+      "Discovery-X HANDOFF",
+      "에이전트 마켓플레이스",
+      "엔터프라이즈 SSO",
+      "온프레미스 배포",
+    ],
+  },
+];
+
+const stats = [
+  { value: "57", label: "API Endpoints" },
+  { value: "19", label: "Services" },
+  { value: "450+", label: "Tests" },
+  { value: "15", label: "Sprints" },
+];
+
+/* ═══════════════════════════════════════════════
+   COMPONENTS
+   ═══════════════════════════════════════════════ */
+
+function EcosystemDiagram() {
+  return (
+    <div className="relative mx-auto w-full max-w-2xl py-8">
+      {/* Center node — Foundry-X */}
+      <div className="relative z-10 mx-auto flex w-fit flex-col items-center">
+        <div className="animate-pulse-ring flex size-28 items-center justify-center rounded-2xl border-2 border-forge-amber/40 bg-forge-amber/10 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-1">
+            <Anvil className="size-8 text-forge-amber" />
+            <span className="font-display text-xs font-bold text-forge-amber">
+              Foundry-X
+            </span>
+          </div>
+        </div>
+        <span className="mt-2 font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
+          AI 에이전트 통제 렌즈
+        </span>
+      </div>
+
+      {/* Satellite nodes */}
+      <div className="mt-10 grid grid-cols-3 gap-4">
+        {ecosystem.map((svc) => (
+          <div key={svc.name} className="flex flex-col items-center gap-3">
+            {/* Arrow label */}
+            <div className="flex flex-col items-center gap-1">
+              <div className="h-6 w-px bg-gradient-to-b from-transparent via-forge-amber/30 to-forge-amber/60" />
+              <span className="font-mono text-[9px] text-muted-foreground/70">
+                {svc.arrow}
+              </span>
+              <div className="h-3 w-px bg-forge-amber/40" />
+            </div>
+            {/* Node */}
+            <div
+              className="flex w-full flex-col items-center rounded-xl border p-4 transition-all"
+              style={{
+                borderColor: `color-mix(in oklch, var(--${svc.color}) 20%, transparent)`,
+                backgroundColor: `color-mix(in oklch, var(--${svc.color}) 5%, transparent)`,
+              }}
+            >
+              <span className="font-display text-sm font-bold">{svc.name}</span>
+              <span className="font-mono text-[10px] text-muted-foreground">
+                {svc.role}
+              </span>
+              <span className="mt-1 text-center text-[11px] leading-tight text-muted-foreground/70">
+                {svc.desc}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ArchitectureBlueprint() {
+  return (
+    <div className="blueprint-grid relative overflow-hidden rounded-2xl border border-axis-blue/10 p-1">
+      <div className="relative z-10 space-y-1">
+        {architecture.map((layer, i) => (
+          <div
+            key={layer.layer}
+            className="group relative overflow-hidden rounded-xl border border-border/30 bg-background/80 backdrop-blur-sm transition-all hover:border-forge-amber/20"
+          >
+            {/* Layer depth indicator */}
+            <div
+              className="absolute top-0 left-0 h-full w-1 bg-gradient-to-b from-forge-amber/80 to-forge-copper/40"
+              style={{ opacity: 1 - i * 0.2 }}
+            />
+            <div className="flex items-start gap-4 p-4 pl-5">
+              <div className="flex min-w-[120px] flex-col">
+                <span className="font-display text-sm font-bold text-forge-amber">
+                  {layer.layer}
+                </span>
+                <span className="font-mono text-[10px] text-muted-foreground/60">
+                  {layer.tech}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {layer.items.map((item) => (
+                  <span
+                    key={item}
+                    className="rounded-md border border-border/40 bg-muted/30 px-2.5 py-1 font-mono text-[11px] text-muted-foreground transition-colors group-hover:border-forge-amber/20 group-hover:text-foreground"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RoadmapTimeline() {
+  return (
+    <div className="grid gap-4 md:grid-cols-4">
+      {roadmap.map((phase, i) => {
+        const isDone = phase.status === "done";
+        const isCurrent = phase.status === "current";
+        return (
+          <div key={phase.phase} className="relative">
+            {/* Connector line */}
+            {i < roadmap.length - 1 && (
+              <div className="absolute top-5 right-0 hidden h-px w-4 bg-border/40 translate-x-full md:block" />
+            )}
+            <div
+              className={`h-full rounded-xl border p-5 transition-all ${
+                isCurrent
+                  ? "border-forge-amber/30 bg-forge-amber/5"
+                  : isDone
+                    ? "border-border/30 bg-muted/20"
+                    : "border-dashed border-border/20 bg-transparent"
+              }`}
+            >
+              {/* Phase badge */}
+              <div className="mb-3 flex items-center gap-2">
+                <span
+                  className={`inline-flex items-center rounded-md px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider ${
+                    isCurrent
+                      ? "bg-forge-amber/20 text-forge-amber"
+                      : isDone
+                        ? "bg-muted text-muted-foreground"
+                        : "bg-muted/50 text-muted-foreground/50"
+                  }`}
+                >
+                  {phase.phase}
+                </span>
+                <span className="font-mono text-[10px] text-muted-foreground/50">
+                  {phase.version}
+                </span>
+                {isDone && (
+                  <span className="ml-auto text-[10px] text-forge-amber">
+                    ✓
+                  </span>
+                )}
+                {isCurrent && (
+                  <span className="ml-auto size-1.5 animate-pulse rounded-full bg-forge-amber" />
+                )}
+              </div>
+              <h4
+                className={`font-display text-sm font-bold ${
+                  phase.status === "planned"
+                    ? "text-muted-foreground/50"
+                    : "text-foreground"
+                }`}
+              >
+                {phase.title}
+              </h4>
+              <ul className="mt-3 space-y-1.5">
+                {phase.items.map((item) => (
+                  <li
+                    key={item}
+                    className={`flex items-center gap-2 text-[12px] ${
+                      phase.status === "planned"
+                        ? "text-muted-foreground/40"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    <span
+                      className={`size-1 rounded-full ${
+                        isDone
+                          ? "bg-forge-amber/60"
+                          : isCurrent
+                            ? "bg-forge-amber"
+                            : "bg-muted-foreground/20"
+                      }`}
+                    />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════
+   PAGE
+   ═══════════════════════════════════════════════ */
+
 export default function LandingPage() {
   return (
-    <div className="relative overflow-hidden">
+    <div className="grain-overlay relative overflow-hidden">
       {/* ═══ HERO ═══ */}
-      <section className="forge-grid relative flex min-h-[90vh] items-center justify-center px-6 pt-16">
-        {/* Gradient mesh background */}
-        <div
-          className="pointer-events-none absolute inset-0"
-          aria-hidden="true"
-        >
+      <section className="forge-grid relative flex min-h-[92vh] items-center justify-center px-6 pt-16">
+        {/* Background effects */}
+        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
           <div className="absolute top-1/4 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-forge-amber/5 blur-[120px]" />
-          <div className="absolute right-0 bottom-0 h-[400px] w-[400px] rounded-full bg-forge-copper/5 blur-[100px]" />
-          <div className="absolute top-0 left-0 h-[300px] w-[300px] rounded-full bg-forge-slate/5 blur-[80px]" />
+          <div className="absolute right-0 bottom-0 h-[400px] w-[400px] rounded-full bg-axis-blue/3 blur-[100px]" />
+          <div className="absolute top-0 left-0 h-[300px] w-[300px] rounded-full bg-forge-copper/4 blur-[80px]" />
         </div>
 
         <div className="relative z-10 mx-auto max-w-4xl text-center">
-          {/* Badge */}
-          <div className="animate-fade-in mb-8 inline-flex items-center gap-2 rounded-full border border-forge-amber/20 bg-forge-amber/5 px-4 py-1.5">
+          {/* Version badge */}
+          <div className="animate-fade-in-up mb-8 inline-flex items-center gap-2 rounded-full border border-forge-amber/20 bg-forge-amber/5 px-4 py-1.5">
             <Sparkles className="size-3.5 text-forge-amber" />
             <span className="font-mono text-xs font-medium text-forge-amber">
-              v0.7.0 &middot; Phase 2
+              v1.3.0 &middot; Phase 2 Complete
             </span>
           </div>
 
           {/* Headline */}
-          <h1 className="animate-fade-in stagger-1 font-display text-5xl leading-[1.1] font-bold tracking-tight sm:text-6xl md:text-7xl [animation-fill-mode:both]">
-            Where Humans & AI
+          <h1 className="animate-fade-in-up stagger-1 font-display text-5xl leading-[1.08] font-bold tracking-tight sm:text-6xl md:text-7xl">
+            AI 에이전트의
             <br />
             <span className="bg-gradient-to-r from-forge-amber via-forge-ember to-forge-copper bg-clip-text text-transparent">
-              Forge Together
+              통제 렌즈
             </span>
           </h1>
 
           {/* Subheading */}
-          <p className="animate-fade-in stagger-2 mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground [animation-fill-mode:both]">
-            Git이 진실, Foundry-X는 렌즈.
+          <p className="animate-fade-in-up stagger-2 mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+            에이전트가 코드를 제안하고, 사람이 검증하고, Git이 기록해요.
             <br className="hidden sm:block" />
-            Spec↔Code↔Test 삼각 동기화로 사람과 AI 에이전트가
-            <br className="hidden sm:block" />
-            동등한 팀원으로 협업하는 플랫폼.
+            <span className="text-foreground/80">
+              Git이 진실, Foundry-X는 렌즈.
+            </span>
           </p>
 
+          {/* 3-line formula */}
+          <div className="animate-fade-in-up stagger-3 mx-auto mt-8 flex max-w-md flex-col gap-2">
+            {[
+              { icon: Scan, text: "Plan", desc: "에이전트가 코드베이스를 분석하고 계획을 세워요" },
+              { icon: Eye, text: "Approve", desc: "사람이 계획을 검토하고 승인해요" },
+              { icon: Rocket, text: "Execute", desc: "승인된 계획을 Git worktree에서 격리 실행해요" },
+            ].map((step) => (
+              <div
+                key={step.text}
+                className="flex items-center gap-3 rounded-lg border border-border/20 bg-background/40 px-4 py-2.5 backdrop-blur-sm"
+              >
+                <step.icon className="size-4 shrink-0 text-forge-amber" />
+                <span className="w-20 font-display text-sm font-bold text-forge-amber">
+                  {step.text}
+                </span>
+                <span className="text-left text-sm text-muted-foreground">
+                  {step.desc}
+                </span>
+              </div>
+            ))}
+          </div>
+
           {/* CTAs */}
-          <div className="animate-fade-in stagger-3 mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row [animation-fill-mode:both]">
+          <div className="animate-fade-in-up stagger-4 mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/dashboard"
               className="forge-glow-strong group inline-flex h-12 items-center gap-2 rounded-xl bg-forge-amber px-7 text-sm font-bold text-forge-charcoal transition-all hover:bg-forge-ember"
@@ -200,61 +416,246 @@ export default function LandingPage() {
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <a
-              href="https://www.npmjs.com/package/foundry-x"
+              href="https://github.com/KTDS-AXBD/Foundry-X"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex h-12 items-center gap-2 rounded-xl border border-border/50 bg-background/50 px-7 text-sm font-medium backdrop-blur transition-all hover:border-forge-amber/30 hover:bg-forge-amber/5"
             >
-              <Terminal className="size-4 text-forge-amber" />
-              npm i -g foundry-x
+              <GitBranch className="size-4 text-forge-amber" />
+              GitHub에서 보기
             </a>
           </div>
+        </div>
+      </section>
 
-          {/* Terminal preview */}
-          <div className="animate-fade-in stagger-4 mx-auto mt-16 max-w-xl [animation-fill-mode:both]">
-            <div className="forge-glass overflow-hidden rounded-xl">
-              <div className="flex items-center gap-2 border-b border-border/30 px-4 py-3">
-                <div className="size-3 rounded-full bg-forge-copper/40" />
-                <div className="size-3 rounded-full bg-forge-amber/40" />
-                <div className="size-3 rounded-full bg-green-500/40" />
-                <span className="ml-2 font-mono text-xs text-muted-foreground">
-                  terminal
-                </span>
+      {/* ═══ STATS BAR ═══ */}
+      <section className="border-y border-border/30 bg-muted/20">
+        <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-6">
+          {stats.map((stat) => (
+            <div key={stat.label} className="flex flex-col items-center gap-0.5">
+              <span className="font-display text-2xl font-bold text-forge-amber sm:text-3xl">
+                {stat.value}
+              </span>
+              <span className="font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
+                {stat.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══ 3 PILLARS ═══ */}
+      <section id="features" className="relative px-6 py-24 md:py-32">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-16 text-center">
+            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-forge-amber uppercase">
+              Core Pillars
+            </span>
+            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+              세 가지{" "}
+              <span className="text-forge-amber">차별점</span>
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              에이전트 통제, 조직 지식, 실험-코드 연결.
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {pillars.map((p, i) => (
+              <div
+                key={p.title}
+                className={`animate-fade-in-up stagger-${i + 1} forge-glass group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:border-forge-amber/20 hover:bg-forge-amber/5`}
+              >
+                {/* Icon */}
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex size-11 items-center justify-center rounded-xl bg-forge-amber/10 transition-colors group-hover:bg-forge-amber/20">
+                    <p.icon className="size-5 text-forge-amber" />
+                  </div>
+                  <span className="rounded-md border border-border/30 bg-muted/30 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
+                    {p.label}
+                  </span>
+                </div>
+                <h3 className="mb-2 font-display text-lg font-semibold">
+                  {p.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {p.desc}
+                </p>
+                {/* Detail strip */}
+                <div className="mt-4 rounded-lg border border-border/20 bg-muted/20 px-3 py-2">
+                  <span className="font-mono text-[11px] leading-relaxed text-muted-foreground/80">
+                    {p.detail}
+                  </span>
+                </div>
               </div>
-              <div className="space-y-2 p-5 font-mono text-sm">
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ ECOSYSTEM — BluePrint ═══ */}
+      <section
+        id="ecosystem"
+        className="relative px-6 py-24 md:py-32"
+      >
+        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+          <div className="absolute top-1/2 left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-axis-blue/3 blur-[150px]" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <div className="mb-12 text-center">
+            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-blue uppercase">
+              Ecosystem BluePrint
+            </span>
+            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+              AX BD팀{" "}
+              <span className="bg-gradient-to-r from-axis-blue to-axis-violet bg-clip-text text-transparent">
+                제품 생태계
+              </span>
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              세 서비스의 지식과 자산이 Foundry-X로 수렴해요.
+            </p>
+          </div>
+
+          <EcosystemDiagram />
+        </div>
+      </section>
+
+      {/* ═══ ARCHITECTURE ═══ */}
+      <section
+        id="architecture"
+        className="forge-grid relative px-6 py-24 md:py-32"
+      >
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-12 text-center">
+            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-forge-amber uppercase">
+              System Architecture
+            </span>
+            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+              4-Layer{" "}
+              <span className="text-forge-amber">아키텍처</span>
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              CLI → API → Agent → Data, 각 레이어가 독립 확장돼요.
+            </p>
+          </div>
+
+          <ArchitectureBlueprint />
+
+          {/* Tech badges */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            {[
+              "TypeScript",
+              "Hono",
+              "Cloudflare Workers",
+              "D1 SQLite",
+              "Next.js 14",
+              "MCP Protocol",
+              "Turborepo",
+              "Vitest",
+            ].map((tech) => (
+              <span
+                key={tech}
+                className="rounded-lg border border-border/30 bg-muted/20 px-3 py-1.5 font-mono text-[11px] text-muted-foreground transition-colors hover:border-forge-amber/20 hover:text-foreground"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ ROADMAP ═══ */}
+      <section id="roadmap" className="relative px-6 py-24 md:py-32">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-12 text-center">
+            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-forge-amber uppercase">
+              Roadmap
+            </span>
+            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+              서비스{" "}
+              <span className="text-forge-amber">로드맵</span>
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              CLI에서 시작해, 생태계 통합까지.
+            </p>
+          </div>
+
+          <RoadmapTimeline />
+        </div>
+      </section>
+
+      {/* ═══ HOW IT WORKS ═══ */}
+      <section className="forge-grid relative px-6 py-24 md:py-32">
+        <div className="mx-auto max-w-3xl">
+          <div className="mb-12 text-center">
+            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-forge-amber uppercase">
+              Quick Start
+            </span>
+            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+              3분이면{" "}
+              <span className="text-forge-amber">시작</span>
+            </h2>
+          </div>
+
+          {/* Terminal card */}
+          <div className="forge-glass overflow-hidden rounded-2xl">
+            <div className="flex items-center gap-2 border-b border-border/30 px-5 py-3">
+              <div className="size-3 rounded-full bg-forge-copper/40" />
+              <div className="size-3 rounded-full bg-forge-amber/40" />
+              <div className="size-3 rounded-full bg-green-500/40" />
+              <span className="ml-2 font-mono text-xs text-muted-foreground">
+                terminal
+              </span>
+            </div>
+            <div className="space-y-4 p-6 font-mono text-sm">
+              {/* Step 1 */}
+              <div>
+                <div className="mb-1 text-[10px] uppercase tracking-wider text-muted-foreground/50">
+                  01 &mdash; 설치 &amp; 초기화
+                </div>
                 <div>
                   <span className="text-forge-amber">$</span>{" "}
                   <span className="text-foreground">npx foundry-x init</span>
                 </div>
-                <div className="text-muted-foreground">
-                  Detecting project structure...
+                <div className="ml-4 mt-1 space-y-0.5 text-muted-foreground">
+                  <div>
+                    <span className="text-green-400">&#10003;</span> Node.js +
+                    TypeScript detected
+                  </div>
+                  <div>
+                    <span className="text-green-400">&#10003;</span>{" "}
+                    CLAUDE.md, ARCHITECTURE.md 자동 생성
+                  </div>
                 </div>
-                <div className="text-muted-foreground">
-                  <span className="text-green-400">&#10003;</span> Node.js +
-                  TypeScript + React detected
+              </div>
+              {/* Step 2 */}
+              <div>
+                <div className="mb-1 text-[10px] uppercase tracking-wider text-muted-foreground/50">
+                  02 &mdash; 동기화 검증
                 </div>
-                <div className="text-muted-foreground">
-                  <span className="text-green-400">&#10003;</span>{" "}
-                  CLAUDE.md generated
+                <div>
+                  <span className="text-forge-amber">$</span>{" "}
+                  <span className="text-foreground">foundry-x sync</span>
                 </div>
-                <div className="text-muted-foreground">
-                  <span className="text-green-400">&#10003;</span>{" "}
-                  ARCHITECTURE.md generated
+                <div className="ml-4 mt-1 text-muted-foreground">
+                  SDD Triangle:{" "}
+                  <span className="font-bold text-green-400">92%</span> (Grade A)
                 </div>
-                <div className="text-muted-foreground">
-                  <span className="text-green-400">&#10003;</span>{" "}
-                  CONSTITUTION.md generated
+              </div>
+              {/* Step 3 */}
+              <div>
+                <div className="mb-1 text-[10px] uppercase tracking-wider text-muted-foreground/50">
+                  03 &mdash; 대시보드
                 </div>
-                <div className="mt-2">
+                <div>
                   <span className="text-forge-amber">$</span>{" "}
                   <span className="text-foreground">
-                    foundry-x status
+                    open fx.minu.best/dashboard
                   </span>
                 </div>
-                <div className="text-muted-foreground">
-                  SDD Triangle:{" "}
-                  <span className="font-bold text-green-400">92%</span> (Grade
-                  A)
+                <div className="ml-4 mt-1 text-muted-foreground">
+                  <span className="text-forge-amber">&#9670;</span> 에이전트 상태, Spec↔Code↔Test 건강도 한눈에
                 </div>
               </div>
             </div>
@@ -262,198 +663,23 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ FEATURES ═══ */}
-      <section id="features" className="relative px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-16 text-center">
-            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              하나의 플랫폼, 완전한{" "}
-              <span className="text-forge-amber">투명성</span>
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              코드, 명세, 테스트, 에이전트 — 모든 것이 연결되고 추적돼요.
-            </p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {features.map((feat, i) => (
-              <Link
-                key={feat.title}
-                href={feat.route}
-                className={`forge-glass group relative rounded-2xl p-6 transition-all duration-300 hover:border-forge-amber/20 hover:bg-forge-amber/5 stagger-${i + 1}`}
-              >
-                <div className="mb-4 flex size-11 items-center justify-center rounded-xl bg-forge-amber/10 transition-colors group-hover:bg-forge-amber/20">
-                  <feat.icon className="size-5 text-forge-amber" />
-                </div>
-                <h3 className="mb-2 font-display text-lg font-semibold">
-                  {feat.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {feat.desc}
-                </p>
-                <ArrowRight className="mt-4 size-4 text-forge-amber/0 transition-all group-hover:text-forge-amber" />
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ HOW IT WORKS ═══ */}
-      <section
-        id="how-it-works"
-        className="forge-grid relative px-6 py-24 md:py-32"
-      >
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-16 text-center">
-            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              3단계로{" "}
-              <span className="text-forge-amber">시작</span>
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              CLI 한 줄로 시작, 웹 대시보드로 확장.
-            </p>
-          </div>
-
-          <div className="grid gap-8 md:grid-cols-3">
-            {steps.map((step) => (
-              <div key={step.num} className="relative">
-                {/* Step number */}
-                <div className="mb-6 font-display text-5xl font-bold text-forge-amber/15">
-                  {step.num}
-                </div>
-                <h3 className="mb-2 font-display text-xl font-semibold">
-                  {step.title}
-                </h3>
-                <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
-                  {step.desc}
-                </p>
-                {/* Code snippet */}
-                <div className="rounded-lg border border-border/30 bg-forge-charcoal/50 px-4 py-3 dark:bg-forge-charcoal/30">
-                  <code className="font-mono text-xs text-forge-amber">
-                    $ {step.code}
-                  </code>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ TESTIMONIALS ═══ */}
-      <section className="px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-16 text-center">
-            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              팀의{" "}
-              <span className="text-forge-amber">이야기</span>
-            </h2>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            {testimonials.map((t, i) => (
-              <div
-                key={i}
-                className="forge-glass rounded-2xl p-6"
-              >
-                <p className="mb-6 text-sm leading-relaxed text-muted-foreground italic">
-                  &ldquo;{t.quote}&rdquo;
-                </p>
-                <div className="flex items-center gap-3 border-t border-border/30 pt-4">
-                  <div className="flex size-9 items-center justify-center rounded-full bg-forge-amber/10">
-                    <span className="font-display text-xs font-bold text-forge-amber">
-                      {t.author[0]}
-                    </span>
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold">{t.author}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {t.role}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ PRICING ═══ */}
-      <section id="pricing" className="forge-grid relative px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-16 text-center">
-            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              심플한{" "}
-              <span className="text-forge-amber">가격 정책</span>
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              오픈소스 CLI는 무료. 팀 기능은 곧 공개돼요.
-            </p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            {plans.map((plan) => (
-              <div
-                key={plan.name}
-                className={`relative rounded-2xl p-6 transition-all ${
-                  plan.highlighted
-                    ? "forge-glow border-2 border-forge-amber/30 bg-forge-amber/5"
-                    : "forge-glass"
-                }`}
-              >
-                {plan.highlighted && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-forge-amber px-3 py-0.5 text-xs font-bold text-forge-charcoal">
-                      <Zap className="size-3" />
-                      Recommended
-                    </span>
-                  </div>
-                )}
-                <h3 className="font-display text-xl font-bold">{plan.name}</h3>
-                <div className="mt-2 font-display text-3xl font-bold text-forge-amber">
-                  {plan.price}
-                </div>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {plan.desc}
-                </p>
-                <ul className="mt-6 space-y-2.5">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2.5 text-sm">
-                      <Check className="mt-0.5 size-4 shrink-0 text-forge-amber" />
-                      <span className="text-muted-foreground">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  className={`mt-8 flex h-10 w-full items-center justify-center rounded-xl text-sm font-semibold transition-all ${
-                    plan.highlighted
-                      ? "bg-forge-amber text-forge-charcoal hover:bg-forge-ember"
-                      : "border border-border/50 hover:border-forge-amber/30 hover:bg-forge-amber/5"
-                  }`}
-                >
-                  {plan.cta}
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ═══ FINAL CTA ═══ */}
       <section className="px-6 py-24 md:py-32">
         <div className="mx-auto max-w-3xl text-center">
-          <div className="mb-6 inline-flex items-center justify-center gap-2">
+          <div className="mb-6 inline-flex items-center justify-center gap-3">
             <Anvil className="size-8 text-forge-amber" />
-            <Shield className="size-8 text-forge-amber/60" />
+            <Shield className="size-7 text-forge-amber/50" />
+            <Bot className="size-7 text-axis-blue/50" />
           </div>
           <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            지금 바로{" "}
+            에이전트를{" "}
             <span className="bg-gradient-to-r from-forge-amber to-forge-copper bg-clip-text text-transparent">
-              Forge
+              통제
             </span>
-            를 시작하세요
+            하세요
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-            CLI 설치 한 줄이면 프로젝트의 명세-코드-테스트 동기화가 시작돼요.
+            AI가 코드를 쓰는 시대. 중요한 건 누가 검증하고 기록하느냐예요.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
@@ -464,13 +690,13 @@ export default function LandingPage() {
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <a
-              href="https://github.com/KTDS-AXBD/Foundry-X"
+              href="https://www.npmjs.com/package/foundry-x"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-12 items-center gap-2 rounded-xl border border-border/50 bg-background/50 px-8 text-sm font-medium backdrop-blur transition-all hover:border-forge-amber/30"
+              className="inline-flex h-12 items-center gap-2 rounded-xl border border-border/50 bg-background/50 px-8 text-sm font-medium backdrop-blur transition-all hover:border-forge-amber/30 hover:bg-forge-amber/5"
             >
-              <GitBranch className="size-4 text-forge-amber" />
-              GitHub에서 보기
+              <Terminal className="size-4 text-forge-amber" />
+              npm i -g foundry-x
             </a>
           </div>
         </div>

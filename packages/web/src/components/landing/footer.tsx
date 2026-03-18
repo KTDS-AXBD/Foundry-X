@@ -4,14 +4,14 @@ import { Anvil } from "lucide-react";
 const footerLinks = {
   Product: [
     { label: "Dashboard", href: "/dashboard" },
-    { label: "Wiki", href: "/wiki" },
-    { label: "Architecture", href: "/architecture" },
     { label: "Agents", href: "/agents" },
+    { label: "Architecture", href: "/architecture" },
+    { label: "Wiki", href: "/wiki" },
   ],
-  Resources: [
-    { label: "Documentation", href: "#" },
-    { label: "CLI Reference", href: "#" },
-    { label: "Changelog", href: "#" },
+  Ecosystem: [
+    { label: "AI Foundry", href: "https://github.com/IDEA-on-Action/AI-Foundry" },
+    { label: "AXIS Design System", href: "https://github.com/IDEA-on-Action/AXIS-Design-System" },
+    { label: "Discovery-X", href: "#" },
   ],
   Community: [
     { label: "GitHub", href: "https://github.com/KTDS-AXBD/Foundry-X" },
@@ -35,7 +35,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              사람과 AI 에이전트가 동등한 팀원으로 협업하는 플랫폼.
+              소프트웨어 팀의 AI 에이전트 통제 렌즈.
               <br />
               Git이 진실, Foundry-X는 렌즈.
             </p>
@@ -69,7 +69,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} KTDS AX BD. All rights reserved.
           </p>
           <p className="font-mono text-xs text-muted-foreground/60">
-            v0.7.0 &middot; Phase 2
+            v1.3.0 &middot; Phase 3
           </p>
         </div>
       </div>
