@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## v1.3.0 릴리스 (2026-03-18)
+**Sprint 15: PlannerAgent + AgentInbox + WorktreeManager**
+- ✅ D1 migration 0009 remote 적용 (agent_plans + agent_messages + agent_worktrees)
+- ✅ Workers 재배포 (v1.3.0 코드, 57 endpoints)
+- ✅ Pages 재배포 (fx.minu.best)
+- ✅ version bump 1.2.0 → 1.3.0 (5 packages)
+- ✅ SPEC system-version 1.3.0 + F69 DONE
+- ✅ git tag v1.3.0
+
+---
+
 ## 세션 42 (2026-03-18)
 **Sprint 15 PDCA 전주기 — F70 PlannerAgent + F71 Agent Inbox + F72 git worktree (v1.3.0, Match Rate 92%)**:
 - ✅ SPEC 보정: Sprint 14 §6 체크박스 + v1.2.0 마일스톤 + frontmatter 동기화
