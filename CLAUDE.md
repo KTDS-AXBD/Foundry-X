@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** v1.0.0 — Phase 2 Complete (Sprint 12: ouroboros+Generative UI+MCP+테스트 보강, Match Rate 95%, 354 tests + 20 E2E)
+**현재 상태:** v1.1.0 — Phase 2 Sprint 13 완료 (MCP Sampling/Prompts+에이전트 자동 PR, Match Rate 93%, 388 tests + 20 E2E)
 
 ## Architecture
 
@@ -148,13 +148,11 @@ pnpm e2e                          # Playwright E2E (20 specs)
 
 - **Phase 1:** ✅ 완료 — Go 판정 (2026-03-17), v0.5.0
   - Sprint 1~5 전체 완료, F-item 36/36 DONE, PDCA 93~97%
-- **Phase 2:** ✅ 완료 (Sprint 6~12) — v1.0.0
-  - Sprint 6: 인프라+D1+JWT (84%) → Sprint 7: OpenAPI+shadcn (89%) → Sprint 8: 서비스+SSE+NL→Spec (93%)
-  - Sprint 9: 프로덕션+E2E+오케스트레이션 (94%) → Sprint 10: 에이전트 실연동+충돌감지 (93%)
-  - Sprint 11: SSE실시간+E2E고도화+배포자동화+MCP설계 (93%) → Sprint 12: ouroboros+GenUI+MCP실구현 (~93%)
-  - 최종: 19 services, 33 endpoints, 354 tests (CLI 106 + API 203 + Web 45) + 20 E2E
-  - PDCA 문서: `docs/01-plan/features/sprint-{N}.plan.md` 등 (Sprint 3~12)
-- **다음:** Sprint 13 계획 (MCP Sampling/Prompts + 에이전트 자동 PR + v1.1.0)
+- **Phase 2:** ✅ 완료 (Sprint 6~13) — v1.1.0
+  - Sprint 6~12: 인프라→OpenAPI→서비스→SSE→프로덕션→에이전트→MCP→ouroboros→GenUI (84%→93%)
+  - Sprint 13: MCP Sampling/Prompts(91%) + 에이전트 자동 PR(93%), Agent Teams W1+W2, v1.1.0
+  - 최종: 17 services, 41 endpoints, 388 tests (CLI 106 + API 237 + Web 45) + 20 E2E
+  - PDCA 문서: `docs/archive/2026-03/sprint-{N}/` (Sprint 3~13 archived)
 
 ## Git Workflow
 
