@@ -686,3 +686,144 @@ export async function resolveConflict(
     throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
   }
 }
+
+// ─── Org API (F92) ───
+
+type OrgRole = "owner" | "admin" | "member" | "viewer";
+
+export interface OrgResponse {
+  id: string;
+  name: string;
+  slug: string;
+  plan: "free" | "pro" | "enterprise";
+  settings: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrgMemberResponse {
+  orgId: string;
+  userId: string;
+  email: string;
+  name: string;
+  role: OrgRole;
+  joinedAt: string;
+}
+
+export interface OrgInvitationResponse {
+  id: string;
+  orgId: string;
+  email: string;
+  role: string;
+  token: string;
+  expiresAt: string;
+  createdAt: string;
+  acceptedAt: string | null;
+  invitedBy: string;
+}
+
+function authHeaders(): Record<string, string> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
+export async function getMyOrgs(): Promise<OrgResponse[]> {
+  const res = await fetch(`${BASE_URL}/orgs`, { headers: authHeaders() });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function createOrg(params: { name: string; slug?: string }): Promise<OrgResponse> {
+  const res = await fetch(`${BASE_URL}/orgs`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function getOrg(orgId: string): Promise<OrgResponse> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}`, { headers: authHeaders() });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function updateOrg(orgId: string, patch: { name?: string }): Promise<OrgResponse> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}`, {
+    method: "PATCH",
+    headers: authHeaders(),
+    body: JSON.stringify(patch),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function switchOrg(orgId: string): Promise<{ accessToken: string; refreshToken: string; expiresIn: number }> {
+  const res = await fetch(`${BASE_URL}/auth/switch-org`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ orgId }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function getOrgMembers(orgId: string): Promise<OrgMemberResponse[]> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/members`, { headers: authHeaders() });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function updateMemberRole(orgId: string, userId: string, role: string): Promise<void> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/members/${userId}`, {
+    method: "PATCH",
+    headers: authHeaders(),
+    body: JSON.stringify({ role }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+}
+
+export async function removeMember(orgId: string, userId: string): Promise<void> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/members/${userId}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+}
+
+export async function createInvitation(orgId: string, data: { email: string; role: string }): Promise<OrgInvitationResponse> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/invitations`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function getOrgInvitations(orgId: string): Promise<OrgInvitationResponse[]> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/invitations`, { headers: authHeaders() });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function acceptInvitation(token: string): Promise<{ accessToken: string; refreshToken: string }> {
+  const res = await fetch(`${BASE_URL}/auth/invitations/${token}/accept`, {
+    method: "POST",
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function deleteInvitation(orgId: string, invitationId: string): Promise<void> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/invitations/${invitationId}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+}

@@ -22,6 +22,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { OrgSwitcher } from "@/components/feature/OrgSwitcher";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -77,6 +78,7 @@ export function Sidebar() {
               <SheetTitle className="text-base font-bold">Foundry-X</SheetTitle>
             </SheetHeader>
             <div className="p-3">
+              <OrgSwitcher />
               <NavLinks onSelect={() => setOpen(false)} />
             </div>
           </SheetContent>
@@ -99,6 +101,7 @@ export function Sidebar() {
           </div>
         </div>
         <div className="flex-1 overflow-auto p-3">
+          <OrgSwitcher />
           <NavLinks />
         </div>
       </aside>
