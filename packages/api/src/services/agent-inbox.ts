@@ -66,6 +66,13 @@ export class AgentInbox {
       data: { messageId: id, fromAgentId, toAgentId, type, subject },
     });
 
+    if (parentMessageId) {
+      this.deps.sse?.pushEvent({
+        event: "agent.message.thread_reply",
+        data: { messageId: id, parentMessageId, fromAgentId, toAgentId, subject },
+      });
+    }
+
     return {
       id, fromAgentId, toAgentId, type, subject, payload,
       acknowledged: false, parentMessageId, createdAt: now,
@@ -119,5 +126,18 @@ export class AgentInbox {
       .all<MessageRow>();
 
     return results.map(mapRow);
+  }
+
+  async ackThread(parentMessageId: string): Promise<number> {
+    const result = await this.deps.db
+      .prepare(
+        `UPDATE agent_messages
+         SET acknowledged = 1, acknowledged_at = ?
+         WHERE (parent_message_id = ? OR id = ?) AND acknowledged = 0`,
+      )
+      .bind(new Date().toISOString(), parentMessageId, parentMessageId)
+      .run();
+
+    return result.meta?.changes ?? 0;
   }
 }

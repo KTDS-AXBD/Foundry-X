@@ -1,35 +1,21 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import type { AgentMessage, MessageType } from "@foundry-x/shared";
+import type { AgentMessage } from "@foundry-x/shared";
 import { listInboxMessages, acknowledgeMessage, BASE_URL } from "@/lib/api-client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { MessageItem } from "./MessageItem";
+import { ThreadDetailView } from "./ThreadDetailView";
 
 interface AgentInboxPanelProps {
   agentId: string;
   className?: string;
 }
 
-const messageTypeIcons: Record<MessageType, string> = {
-  task_assign: "\u{1F4CB}",
-  task_result: "\u2705",
-  task_question: "\u2753",
-  task_feedback: "\u{1F4AC}",
-  status_update: "\u{1F4CA}",
-};
-
-const messageTypeBg: Record<MessageType, string> = {
-  task_assign: "bg-blue-50 dark:bg-blue-900/20",
-  task_result: "bg-green-50 dark:bg-green-900/20",
-  task_question: "bg-yellow-50 dark:bg-yellow-900/20",
-  task_feedback: "bg-purple-50 dark:bg-purple-900/20",
-  status_update: "bg-gray-50 dark:bg-gray-900/20",
-};
-
-// F81: Thread grouping
-type ViewMode = "flat" | "threaded";
+// F81: Thread grouping + F87: Thread detail view
+type ViewMode = "flat" | "threaded" | "detail";
 
 interface ThreadGroup {
   root: AgentMessage;
@@ -75,53 +61,13 @@ function groupByThread(messages: AgentMessage[]): {
   return { threads, orphans };
 }
 
-function MessageItem({
-  msg,
-  indent,
-  onAck,
-}: {
-  msg: AgentMessage;
-  indent?: boolean;
-  onAck: (id: string) => void;
-}) {
-  return (
-    <li
-      className={`rounded-md border p-3 text-sm transition-opacity ${
-        indent ? "ml-6 border-l-2 border-muted" : ""
-      } ${msg.acknowledged ? "opacity-60" : messageTypeBg[msg.type] ?? ""}`}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-start gap-2">
-          <span className="mt-0.5">{messageTypeIcons[msg.type] ?? "\u{1F4E8}"}</span>
-          <div>
-            <p className="font-medium">{msg.subject}</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              from: {msg.fromAgentId} &middot;{" "}
-              {new Date(msg.createdAt).toLocaleString("ko-KR")}
-            </p>
-          </div>
-        </div>
-        {!msg.acknowledged && (
-          <Button
-            size="sm"
-            variant="ghost"
-            className="shrink-0 text-xs"
-            onClick={() => onAck(msg.id)}
-          >
-            확인
-          </Button>
-        )}
-      </div>
-    </li>
-  );
-}
-
 export function AgentInboxPanel({ agentId, className }: AgentInboxPanelProps) {
   const [messages, setMessages] = useState<AgentMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("flat");
   const [expandedThreads, setExpandedThreads] = useState<Set<string>>(new Set());
+  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
 
   const loadMessages = useCallback(async () => {
     try {
@@ -186,6 +132,16 @@ export function AgentInboxPanel({ agentId, className }: AgentInboxPanelProps) {
     });
   };
 
+  const handleThreadClick = (rootMessageId: string) => {
+    setSelectedThreadId(rootMessageId);
+    setViewMode("detail");
+  };
+
+  const handleBackToThreads = () => {
+    setSelectedThreadId(null);
+    setViewMode("threaded");
+  };
+
   const unreadCount = messages.filter((m) => !m.acknowledged).length;
   const { threads, orphans } = groupByThread(messages);
 
@@ -232,6 +188,13 @@ export function AgentInboxPanel({ agentId, className }: AgentInboxPanelProps) {
           <p className="text-sm text-muted-foreground">로딩 중...</p>
         ) : messages.length === 0 ? (
           <p className="text-sm text-muted-foreground">메시지가 없어요.</p>
+        ) : viewMode === "detail" && selectedThreadId ? (
+          <ThreadDetailView
+            parentMessageId={selectedThreadId}
+            agentId={agentId}
+            onBack={handleBackToThreads}
+            onAck={handleAcknowledge}
+          />
         ) : viewMode === "flat" ? (
           <ul className="space-y-2">
             {messages.map((msg) => (
@@ -247,7 +210,7 @@ export function AgentInboxPanel({ agentId, className }: AgentInboxPanelProps) {
                   {/* Root message */}
                   <div
                     className="flex cursor-pointer items-center gap-1"
-                    onClick={() => children.length > 0 && handleToggleThread(root.id)}
+                    onClick={() => children.length > 0 ? handleThreadClick(root.id) : handleToggleThread(root.id)}
                   >
                     {children.length > 0 && (
                       <span className="text-xs text-muted-foreground">

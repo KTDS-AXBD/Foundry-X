@@ -130,4 +130,78 @@ describe("AgentInbox", () => {
     expect(thread[0]!.id).toBe("msg-parent");
     expect(thread[1]!.parentMessageId).toBe("msg-parent");
   });
+
+  // ─── ackThread ───
+
+  describe("ackThread", () => {
+    it("acknowledges all messages in thread", async () => {
+      db.run.mockResolvedValueOnce({ meta: { changes: 3 } });
+      db.all.mockResolvedValueOnce({
+        results: [
+          {
+            id: "msg-parent", from_agent_id: "a", to_agent_id: "b",
+            type: "task_assign", subject: "Root", payload: "{}",
+            acknowledged: 1, parent_message_id: null,
+            created_at: "2026-03-18T00:00:00Z", acknowledged_at: "2026-03-18T00:01:00Z",
+          },
+          {
+            id: "msg-r1", from_agent_id: "b", to_agent_id: "a",
+            type: "task_result", subject: "Reply1", payload: "{}",
+            acknowledged: 1, parent_message_id: "msg-parent",
+            created_at: "2026-03-18T00:01:00Z", acknowledged_at: "2026-03-18T00:01:00Z",
+          },
+          {
+            id: "msg-r2", from_agent_id: "a", to_agent_id: "b",
+            type: "task_question", subject: "Reply2", payload: "{}",
+            acknowledged: 1, parent_message_id: "msg-parent",
+            created_at: "2026-03-18T00:02:00Z", acknowledged_at: "2026-03-18T00:01:00Z",
+          },
+        ],
+      });
+
+      const count = await inbox.ackThread("msg-parent");
+      expect(count).toBe(3);
+
+      const thread = await inbox.getThread("msg-parent");
+      expect(thread.every(m => m.acknowledged)).toBe(true);
+    });
+
+    it("returns 0 when all already acknowledged", async () => {
+      db.run.mockResolvedValueOnce({ meta: { changes: 0 } });
+      const count = await inbox.ackThread("msg-parent");
+      expect(count).toBe(0);
+    });
+  });
+
+  // ─── SSE thread_reply ───
+
+  it("emits thread_reply SSE event for threaded messages", async () => {
+    await inbox.send(
+      "worker-1", "leader", "task_result",
+      "Reply", { result: "ok" }, "msg-parent",
+    );
+
+    expect(sse.pushEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: "agent.message.thread_reply",
+        data: expect.objectContaining({
+          parentMessageId: "msg-parent",
+          fromAgentId: "worker-1",
+          toAgentId: "leader",
+        }),
+      }),
+    );
+  });
+
+  it("does not emit thread_reply for root messages", async () => {
+    await inbox.send(
+      "leader", "worker-1", "task_assign", "Root", {},
+    );
+
+    const calls = sse.pushEvent.mock.calls;
+    const threadReplyCalls = calls.filter(
+      (c: any) => c[0]?.event === "agent.message.thread_reply",
+    );
+    expect(threadReplyCalls).toHaveLength(0);
+  });
 });

@@ -641,7 +641,7 @@ export async function acknowledgeMessage(messageId: string): Promise<void> {
 export async function getInboxThread(
   parentMessageId: string,
   limit?: number,
-): Promise<{ thread: unknown[]; total: number; parentMessageId: string }> {
+): Promise<{ thread: InboxMessage[]; total: number; parentMessageId: string }> {
   const params = new URLSearchParams();
   if (limit) params.set("limit", String(limit));
   const url = `${BASE_URL}/agents/inbox/${parentMessageId}/thread?${params}`;
@@ -651,6 +651,17 @@ export async function getInboxThread(
   });
   if (!res.ok) throw new ApiError(res.status, `Failed to fetch thread: ${res.status}`);
   return res.json();
+}
+
+export async function ackThread(parentMessageId: string): Promise<{ acknowledged: boolean; count: number }> {
+  const url = `${BASE_URL}/agents/inbox/${parentMessageId}/ack-thread`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<{ acknowledged: boolean; count: number }>;
 }
 
 // ─── Conflict Resolution ───

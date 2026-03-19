@@ -269,6 +269,49 @@ export class MockD1Database {
         joined_at TEXT NOT NULL DEFAULT (datetime('now')),
         PRIMARY KEY (org_id, user_id)
       );
+
+      CREATE TABLE IF NOT EXISTS agent_messages (
+        id TEXT PRIMARY KEY,
+        from_agent_id TEXT NOT NULL,
+        to_agent_id TEXT NOT NULL,
+        type TEXT NOT NULL,
+        subject TEXT NOT NULL,
+        payload TEXT NOT NULL DEFAULT '{}',
+        acknowledged INTEGER NOT NULL DEFAULT 0,
+        parent_message_id TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        acknowledged_at TEXT
+      );
+      CREATE INDEX IF NOT EXISTS idx_messages_to_agent ON agent_messages(to_agent_id, acknowledged);
+      CREATE INDEX IF NOT EXISTS idx_messages_thread ON agent_messages(parent_message_id);
+
+      CREATE TABLE IF NOT EXISTS agent_plans (
+        id TEXT PRIMARY KEY,
+        agent_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL DEFAULT '',
+        steps TEXT NOT NULL DEFAULT '[]',
+        status TEXT NOT NULL DEFAULT 'pending'
+          CHECK(status IN ('pending','approved','rejected','executing','completed','failed','cancelled')),
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        approved_at TEXT,
+        execution_status TEXT,
+        execution_started_at TEXT,
+        execution_completed_at TEXT,
+        execution_result TEXT,
+        execution_error TEXT
+      );
+
+      CREATE TABLE IF NOT EXISTS agent_worktrees (
+        id TEXT PRIMARY KEY,
+        agent_id TEXT NOT NULL,
+        branch TEXT NOT NULL,
+        path TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'active'
+          CHECK(status IN ('active','merged','abandoned')),
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        merged_at TEXT
+      );
     `);
     this.db.prepare("INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)").run("org_test", "Test Org", "test");
   }

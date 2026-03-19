@@ -26,3 +26,7 @@ export const threadParamsSchema = z.object({
 export const threadQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional().default(50),
 });
+
+export const ackThreadParamsSchema = z.object({
+  parentMessageId: z.string().min(1),
+});

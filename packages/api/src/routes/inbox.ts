@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { AgentInbox } from "../services/agent-inbox.js";
-import { sendMessageSchema, listMessagesSchema, threadParamsSchema, threadQuerySchema } from "../schemas/inbox.js";
+import { sendMessageSchema, listMessagesSchema, threadParamsSchema, threadQuerySchema, ackThreadParamsSchema } from "../schemas/inbox.js";
 import type { Env } from "../env.js";
 
 export const inboxRoute = new Hono<{ Bindings: Env }>();
@@ -13,6 +13,13 @@ inboxRoute.get("/:parentMessageId/thread", async (c) => {
   if (thread.length === 0) return c.json({ error: "Thread not found" }, 404);
   const limited = thread.slice(0, query.limit);
   return c.json({ thread: limited, total: thread.length, parentMessageId });
+});
+
+inboxRoute.post("/:parentMessageId/ack-thread", async (c) => {
+  const { parentMessageId } = ackThreadParamsSchema.parse(c.req.param());
+  const inbox = new AgentInbox({ db: c.env.DB });
+  const count = await inbox.ackThread(parentMessageId);
+  return c.json({ acknowledged: true, count });
 });
 
 inboxRoute.post("/send", async (c) => {
