@@ -9,6 +9,7 @@
 | sprint-13 | 93% | 2026-03-18 (1 session) | 2026-03-18 |
 | sprint-17 | 98% | 2026-03-18~19 (1 session) | 2026-03-19 |
 | sprint-18 | 93% | 2026-03-19 (1 session) | 2026-03-19 |
+| sprint-19 | 100% | 2026-03-19 (1 session) | 2026-03-19 |
 
 ## foundry-x-cli
 
@@ -58,3 +59,10 @@
 - [Design (FX-DSGN-019)](sprint-18/sprint-18.design.md)
 - [Analysis (FX-ANLS-019)](sprint-18/sprint-18.analysis.md)
 - [Report (FX-RPRT-020)](sprint-18/sprint-18.report.md)
+
+## sprint-19
+
+- [Plan (FX-PLAN-020)](sprint-19/sprint-19.plan.md)
+- [Design (FX-DSGN-020)](sprint-19/sprint-19.design.md)
+- [Analysis (FX-ANLS-018)](sprint-19/sprint-19.analysis.md)
+- [Report (FX-RPRT-021)](sprint-19/sprint-19.report.md)
