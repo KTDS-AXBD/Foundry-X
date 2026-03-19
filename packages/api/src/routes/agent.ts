@@ -881,13 +881,16 @@ agentRoute.openapi(processQueue, async (c) => {
 // ─── Sprint 15: PlannerAgent Endpoints (F70) ───
 
 import { PlannerAgent } from "../services/planner-agent.js";
+import type { AgentTaskType } from "../services/execution-types.js";
 import { createPlanSchema, rejectPlanSchema } from "../schemas/plan.js";
 
 agentRoute.post("/plan", async (c) => {
   const body = createPlanSchema.parse(await c.req.json());
   const sseManager = getSSEManager(c.env.DB);
-  const planner = new PlannerAgent({ db: c.env.DB, sse: sseManager });
-  const plan = await planner.createPlan(body.agentId, body.taskType, body.context);
+  const githubSvc = c.env.GITHUB_TOKEN ? new GitHubService(c.env.GITHUB_TOKEN, c.env.GITHUB_REPO) : undefined;
+  const planner = new PlannerAgent({ db: c.env.DB, sse: sseManager, apiKey: c.env.ANTHROPIC_API_KEY, githubService: githubSvc });
+  const context = { ...body.context, spec: body.context.spec ? { title: "", description: body.context.spec, acceptanceCriteria: [] } : undefined };
+  const plan = await planner.createPlan(body.agentId, body.taskType as AgentTaskType, context, body.model);
   return c.json(plan, 201);
 });
 

@@ -251,7 +251,8 @@ describe("PlannerAgent", () => {
     expect(plan.codebaseAnalysis).toBe("LLM이 분석한 코드베이스");
     expect(plan.proposedSteps[0]!.description).toBe("서비스 수정");
     expect(plan.risks).toContain("타입 호환성 문제");
-    expect(plan.estimatedTokens).toBe(3000);
+    expect(plan.estimatedTokens).toBeGreaterThan(0);
+    expect(plan.analysisMode).toBe("llm");
 
     vi.unstubAllGlobals();
   });

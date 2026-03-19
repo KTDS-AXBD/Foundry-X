@@ -319,7 +319,12 @@ export class MockD1Database {
         execution_started_at TEXT,
         execution_completed_at TEXT,
         execution_result TEXT,
-        execution_error TEXT
+        execution_error TEXT,
+        analysis_mode TEXT DEFAULT 'mock',
+        analysis_model TEXT,
+        analysis_tokens_used INTEGER,
+        analysis_duration_ms INTEGER,
+        file_context_count INTEGER DEFAULT 0
       );
 
       CREATE TABLE IF NOT EXISTS agent_worktrees (
