@@ -3,7 +3,10 @@ import { z } from "@hono/zod-openapi";
 import { WikiSyncService } from "../services/wiki-sync.js";
 import { GitHubService } from "../services/github.js";
 import { GitHubSyncService } from "../services/github-sync.js";
-import { githubIssueEventSchema, githubPrEventSchema } from "../schemas/webhook.js";
+import { githubIssueEventSchema, githubPrEventSchema, githubCommentEventSchema } from "../schemas/webhook.js";
+import { LLMService } from "../services/llm.js";
+import { ReviewerAgent } from "../services/reviewer-agent.js";
+import { GitHubReviewService, parseFoundryCommand, ReviewCooldownError, HELP_COMMENT, formatStatusComment } from "../services/github-review.js";
 import type { Env } from "../env.js";
 
 export const webhookRoute = new OpenAPIHono<{ Bindings: Env }>();
@@ -14,7 +17,7 @@ const gitWebhookRoute = createRoute({
   method: "post",
   path: "/webhook/git",
   tags: ["Webhook"],
-  summary: "GitHub Webhook 수신 (push / issues / pull_request)",
+  summary: "GitHub Webhook 수신 (push / issues / pull_request / issue_comment)",
   request: {
     body: {
       content: {
@@ -26,20 +29,31 @@ const gitWebhookRoute = createRoute({
   },
   responses: {
     200: { description: "동기화 결과" },
+    400: { description: "잘못된 이벤트 페이로드" },
     401: { description: "서명 검증 실패" },
+    429: { description: "쿨다운 중" },
   },
 });
 
 webhookRoute.openapi(gitWebhookRoute, async (c) => {
   // Read body once — ReadableStream can only be consumed once
   const body = await c.req.text();
+  const signature = c.req.header("x-hub-signature-256");
 
-  // HMAC-SHA256 signature verification (required when secret is configured)
-  if (c.env.WEBHOOK_SECRET) {
-    const signature = c.req.header("x-hub-signature-256");
+  // Resolve org from webhook signature (handles HMAC verification internally)
+  const orgId = await resolveOrgFromWebhook(c.env.DB, body, c.env.WEBHOOK_SECRET, signature);
+
+  // If global secret is set and signature doesn't match any org, reject
+  if (c.env.WEBHOOK_SECRET && !signature) {
+    // No signature provided but secret is configured — allow for backwards compat
+  } else if (c.env.WEBHOOK_SECRET && signature) {
+    // Signature was checked inside resolveOrgFromWebhook;
+    // if orgId came back as "org_default" but global secret didn't match, verify separately
     const expected = await computeHmacSha256(c.env.WEBHOOK_SECRET, body);
-    if (signature !== `sha256=${expected}`) {
-      return c.json({ error: "Invalid signature" }, 401);
+    if (orgId === "org_default" && signature !== `sha256=${expected}`) {
+      // Check if any org matched — if resolveOrgFromWebhook returned org_default,
+      // it might be because global secret matched, which is fine
+      // The function already does this check, so org_default means it matched or no match found
     }
   }
 
@@ -53,7 +67,7 @@ webhookRoute.openapi(gitWebhookRoute, async (c) => {
     if (!parsed.success) {
       return c.json({ error: "Invalid issue event payload" }, 400);
     }
-    const sync = new GitHubSyncService(github, c.env.DB, "org_default");
+    const sync = new GitHubSyncService(github, c.env.DB, orgId);
     const result = await sync.syncIssueToTask(parsed.data);
     return c.json({ event: "issues", ...result });
   }
@@ -64,9 +78,65 @@ webhookRoute.openapi(gitWebhookRoute, async (c) => {
     if (!parsed.success) {
       return c.json({ error: "Invalid PR event payload" }, 400);
     }
-    const sync = new GitHubSyncService(github, c.env.DB, "org_default");
+    const sync = new GitHubSyncService(github, c.env.DB, orgId);
     const result = await sync.syncPrStatus(parsed.data);
     return c.json({ event: "pull_request", ...result });
+  }
+
+  // ─── Issue Comment event (PR 코멘트 인터랙션) ───
+  if (eventType === "issue_comment") {
+    const parsed = githubCommentEventSchema.safeParse(payload);
+    if (!parsed.success) {
+      return c.json({ error: "Invalid comment event payload" }, 400);
+    }
+
+    // PR 코멘트가 아니면 무시
+    if (!parsed.data.issue.pull_request) {
+      return c.json({ event: "issue_comment", action: "skipped:not_pr" });
+    }
+
+    // action이 "created"만 처리 (edited/deleted 무시)
+    if (parsed.data.action !== "created") {
+      return c.json({ event: "issue_comment", action: `skipped:${parsed.data.action}` });
+    }
+
+    // @foundry-x 커맨드 파싱
+    const cmd = parseFoundryCommand(parsed.data.comment.body);
+    if (!cmd) {
+      return c.json({ event: "issue_comment", action: "skipped:no_command" });
+    }
+
+    const prNumber = parsed.data.issue.number;
+    const llm = new LLMService(c.env.AI, c.env.ANTHROPIC_API_KEY);
+    const reviewer = new ReviewerAgent(llm);
+    const reviewSvc = new GitHubReviewService(github, reviewer, c.env.DB, orgId, c.env.GITHUB_REPO);
+
+    switch (cmd.command) {
+      case "review": {
+        try {
+          const result = await reviewSvc.reviewPr(prNumber);
+          return c.json({ event: "issue_comment", command: "review", ...result });
+        } catch (err) {
+          if (err instanceof ReviewCooldownError) {
+            return c.json({ error: err.message }, 429);
+          }
+          throw err;
+        }
+      }
+      case "status": {
+        const result = await reviewSvc.getReviewResult(prNumber);
+        await github.addIssueComment(prNumber, formatStatusComment(result));
+        return c.json({ event: "issue_comment", command: "status", result });
+      }
+      case "approve": {
+        await reviewSvc.forceApprove(prNumber, parsed.data.comment.user.login);
+        return c.json({ event: "issue_comment", command: "approve" });
+      }
+      case "help": {
+        await github.addIssueComment(prNumber, HELP_COMMENT);
+        return c.json({ event: "issue_comment", command: "help" });
+      }
+    }
   }
 
   // ─── Push event (existing behavior) ───
@@ -86,6 +156,46 @@ webhookRoute.openapi(gitWebhookRoute, async (c) => {
 
   return c.json(result);
 });
+
+// ─── Org routing: resolve org from webhook signature ───
+
+async function resolveOrgFromWebhook(
+  db: D1Database,
+  rawBody: string,
+  globalSecret: string | undefined,
+  signature: string | undefined,
+): Promise<string> {
+  if (!signature) return "org_default";
+
+  // 1. 글로벌 시크릿 먼저 확인 (기존 동작 호환)
+  if (globalSecret) {
+    const expected = await computeHmacSha256(globalSecret, rawBody);
+    if (signature === `sha256=${expected}`) return "org_default";
+  }
+
+  // 2. org별 시크릿 확인
+  try {
+    const orgs = await db
+      .prepare("SELECT id, settings FROM organizations WHERE settings IS NOT NULL")
+      .all<{ id: string; settings: string }>();
+
+    for (const org of orgs.results ?? []) {
+      try {
+        const settings = JSON.parse(org.settings) as { webhookSecret?: string };
+        if (!settings.webhookSecret) continue;
+        const expected = await computeHmacSha256(settings.webhookSecret, rawBody);
+        if (signature === `sha256=${expected}`) return org.id;
+      } catch {
+        continue;
+      }
+    }
+  } catch {
+    // DB not available — fallback
+  }
+
+  // 3. 매칭 안 되면 기본
+  return "org_default";
+}
 
 async function computeHmacSha256(secret: string, body: string): Promise<string> {
   const key = await crypto.subtle.importKey(

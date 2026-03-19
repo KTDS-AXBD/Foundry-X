@@ -34,3 +34,26 @@ export const githubPrEventSchema = z.object({
   }),
 });
 export type GitHubPrEvent = z.infer<typeof githubPrEventSchema>;
+
+// ─── GitHub Issue Comment Event (PR 코멘트 포함) ───
+
+export const githubCommentEventSchema = z.object({
+  action: z.enum(["created", "edited", "deleted"]),
+  comment: z.object({
+    id: z.number(),
+    body: z.string(),
+    user: z.object({ login: z.string() }),
+    created_at: z.string(),
+  }),
+  issue: z.object({
+    number: z.number(),
+    title: z.string(),
+    pull_request: z.object({
+      url: z.string(),
+    }).optional(),
+  }),
+  repository: z.object({
+    full_name: z.string(),
+  }),
+});
+export type GitHubCommentEvent = z.infer<typeof githubCommentEventSchema>;

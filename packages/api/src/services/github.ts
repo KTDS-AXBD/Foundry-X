@@ -124,7 +124,6 @@ export class GitHubService {
     files: Array<{ path: string; content: string; action: string }>,
     message: string,
   ): Promise<{ sha: string; url: string }> {
-    // 1. Get branch ref → commit SHA
     const refRes = await fetch(
       `${this.baseUrl}/repos/${this.repo}/git/ref/heads/${branch}`,
       { headers: this.headers() },
@@ -133,7 +132,6 @@ export class GitHubService {
     const refData = (await refRes.json()) as { object: { sha: string } };
     const commitSha = refData.object.sha;
 
-    // 2. Get commit → tree SHA
     const commitRes = await fetch(
       `${this.baseUrl}/repos/${this.repo}/git/commits/${commitSha}`,
       { headers: this.headers() },
@@ -142,7 +140,6 @@ export class GitHubService {
     const commitData = (await commitRes.json()) as { tree: { sha: string } };
     const baseTree = commitData.tree.sha;
 
-    // 3. Create tree with blobs
     const tree = files.map((f) => ({
       path: f.path,
       mode: "100644" as const,
@@ -161,7 +158,6 @@ export class GitHubService {
     if (!treeRes.ok) throw new GitHubApiError(treeRes.status, "git/trees");
     const treeData = (await treeRes.json()) as { sha: string };
 
-    // 4. Create commit
     const newCommitRes = await fetch(
       `${this.baseUrl}/repos/${this.repo}/git/commits`,
       {
@@ -177,7 +173,6 @@ export class GitHubService {
     if (!newCommitRes.ok) throw new GitHubApiError(newCommitRes.status, "git/commits");
     const newCommit = (await newCommitRes.json()) as { sha: string; html_url: string };
 
-    // 5. Update branch ref
     const updateRes = await fetch(
       `${this.baseUrl}/repos/${this.repo}/git/refs/heads/${branch}`,
       {
@@ -412,6 +407,37 @@ export class GitHubService {
         conclusion: c.conclusion,
       })),
     };
+  }
+
+  // ─── Sprint 21: Label Management Methods (F93) ───
+
+  async addLabels(
+    issueOrPrNumber: number,
+    labels: string[],
+  ): Promise<void> {
+    const res = await fetch(
+      `${this.baseUrl}/repos/${this.repo}/issues/${issueOrPrNumber}/labels`,
+      {
+        method: "POST",
+        headers: { ...this.headers(), "Content-Type": "application/json" },
+        body: JSON.stringify({ labels }),
+      },
+    );
+    if (!res.ok) throw new GitHubApiError(res.status, `issues/${issueOrPrNumber}/labels`);
+  }
+
+  async removeLabel(
+    issueOrPrNumber: number,
+    label: string,
+  ): Promise<void> {
+    const res = await fetch(
+      `${this.baseUrl}/repos/${this.repo}/issues/${issueOrPrNumber}/labels/${encodeURIComponent(label)}`,
+      { method: "DELETE", headers: this.headers() },
+    );
+    // 404는 무시 (라벨이 없는 경우)
+    if (!res.ok && res.status !== 404) {
+      throw new GitHubApiError(res.status, `issues/${issueOrPrNumber}/labels/${label}`);
+    }
   }
 }
 

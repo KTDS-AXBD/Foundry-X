@@ -12,6 +12,7 @@ import { tokenRoute } from "./routes/token.js";
 import { authRoute } from "./routes/auth.js";
 import { specRoute } from "./routes/spec.js";
 import { webhookRoute } from "./routes/webhook.js";
+import { githubRoute } from "./routes/github.js";
 import mcpRoute from "./routes/mcp.js";
 import { inboxRoute } from "./routes/inbox.js";
 import { slackRoute } from "./routes/slack.js";
@@ -57,6 +58,7 @@ app.doc("/api/openapi.json", {
     { name: "Webhook", description: "외부 Webhook 수신" },
     { name: "MCP", description: "MCP Server management" },
     { name: "Org", description: "Organization management (CRUD, members, invitations)" },
+    { name: "GitHub", description: "GitHub PR review and sync" },
   ],
 });
 app.get("/api/docs", swaggerUI({ url: "/api/openapi.json" }));
@@ -74,6 +76,11 @@ app.route("/api", slackRoute);
 app.use("/api/orgs", authMiddleware);
 app.use("/api/orgs/*", authMiddleware);
 app.route("/api", orgRoute);
+
+// GitHub API (auth + tenant required)
+app.use("/api/github/*", authMiddleware);
+app.use("/api/github/*", tenantGuard);
+app.route("/api", githubRoute);
 
 // Protected API routes — JWT required + tenant isolation
 app.use("/api/*", authMiddleware);
