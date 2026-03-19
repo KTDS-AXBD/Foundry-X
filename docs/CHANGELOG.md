@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## v1.6.0 릴리스 (2026-03-19)
+**Sprint 18: 멀티테넌시 기초 + GitHub/Slack 외부 도구 연동**
+- ✅ F83: organizations + org_members 테이블 + tenantGuard 미들웨어 + JWT orgId 확장 (D1 migration 0011~0012)
+- ✅ F84: GitHubSyncService — Issues/PR 양방향 동기화 + webhook 확장 + 17 tests
+- ✅ F85: SlackService — Block Kit 알림 + /foundry-x 슬래시 커맨드 + SSE→Slack 브릿지 + 12 tests
+- ✅ F86: D1 0001~0012 remote 전부 적용 + Workers v1.6.0 배포 완료
+- ✅ PDCA 전주기 완료 (Match Rate 93%, FX-RPRT-020)
+- ✅ 342 API tests 통과, typecheck 5/5
+- ✅ SPEC 소급 등록 — squash merge(#89) 유실 복구, SPEC v4.7
+
+---
+
 ## v1.5.0 릴리스 (2026-03-19)
 **Sprint 17: AI Foundry MCP 연동 + AgentInbox 스레드 뷰 + PlannerAgent Orchestrator 통합**
 - ✅ F80: McpRegistry.createServerPreset() AI Foundry 프리셋 + ProposedStep.externalTool 타입
