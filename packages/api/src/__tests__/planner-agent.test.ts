@@ -340,4 +340,146 @@ describe("PlannerAgent", () => {
     expect(result.codebaseAnalysis).toBe("래핑된 분석");
     expect(result.estimatedTokens).toBe(1000);
   });
+
+  // ─── gatherExternalToolInfo (F90) ───
+
+  it("ET-01: gathers tools from active servers with toolsCache", async () => {
+    const mcpRegistry = {
+      listServers: vi.fn().mockResolvedValue([
+        {
+          id: "srv-1", name: "AI Foundry", status: "active",
+          toolsCache: JSON.stringify([
+            { name: "analyze-code", description: "Analyze code quality" },
+            { name: "gen-test", description: "Generate unit tests" },
+          ]),
+        },
+        {
+          id: "srv-2", name: "Code Tools", status: "active",
+          toolsCache: JSON.stringify([
+            { name: "lint-fix", description: "Auto-fix lint issues" },
+          ]),
+        },
+      ]),
+    } as any;
+
+    const p = new PlannerAgent({ db, sse, mcpRegistry });
+    const tools = await p.gatherExternalToolInfo();
+
+    expect(tools).toHaveLength(2);
+    expect(tools[0]!.serverId).toBe("srv-1");
+    expect(tools[0]!.serverName).toBe("AI Foundry");
+    expect(tools[0]!.tools).toHaveLength(2);
+    expect(tools[1]!.tools[0]!.name).toBe("lint-fix");
+  });
+
+  it("ET-02: returns empty array when mcpRegistry is undefined", async () => {
+    const p = new PlannerAgent({ db, sse });
+    const tools = await p.gatherExternalToolInfo();
+    expect(tools).toEqual([]);
+  });
+
+  it("ET-03: skips inactive servers", async () => {
+    const mcpRegistry = {
+      listServers: vi.fn().mockResolvedValue([
+        { id: "srv-1", name: "Inactive", status: "inactive", toolsCache: '[{"name":"tool1"}]' },
+        { id: "srv-2", name: "Error", status: "error", toolsCache: '[{"name":"tool2"}]' },
+      ]),
+    } as any;
+
+    const p = new PlannerAgent({ db, sse, mcpRegistry });
+    const tools = await p.gatherExternalToolInfo();
+    expect(tools).toEqual([]);
+  });
+
+  it("ET-04: skips servers with invalid toolsCache JSON", async () => {
+    const mcpRegistry = {
+      listServers: vi.fn().mockResolvedValue([
+        { id: "srv-1", name: "Good", status: "active", toolsCache: '[{"name":"ok","description":"works"}]' },
+        { id: "srv-2", name: "Bad JSON", status: "active", toolsCache: "not-json{{{" },
+      ]),
+    } as any;
+
+    const p = new PlannerAgent({ db, sse, mcpRegistry });
+    const tools = await p.gatherExternalToolInfo();
+    expect(tools).toHaveLength(1);
+    expect(tools[0]!.serverName).toBe("Good");
+  });
+
+  it("ET-05: parseAnalysisResponse handles external_tool steps", () => {
+    const json = JSON.stringify({
+      codebaseAnalysis: "외부 도구 사용 필요",
+      proposedSteps: [
+        { description: "코드 분석", type: "external_tool", externalTool: { serverId: "srv-1", toolName: "analyze-code", arguments: { path: "src/" } } },
+        { description: "파일 수정", type: "modify", targetFile: "src/index.ts", estimatedLines: 10 },
+      ],
+      risks: [],
+      estimatedTokens: 3000,
+    });
+
+    const result = planner.parseAnalysisResponse(json, {
+      repoUrl: "https://github.com/test/repo",
+      branch: "master",
+    });
+
+    expect(result.proposedSteps).toHaveLength(2);
+    expect(result.proposedSteps[0]!.type).toBe("external_tool");
+    expect(result.proposedSteps[0]!.externalTool).toEqual({
+      serverId: "srv-1", toolName: "analyze-code", arguments: { path: "src/" },
+    });
+    expect(result.proposedSteps[1]!.type).toBe("modify");
+  });
+
+  it("ET-06: truncates tools to 10 per server", async () => {
+    const tools = Array.from({ length: 15 }, (_, i) => ({ name: `tool-${i}`, description: `Desc ${i}` }));
+    const mcpRegistry = {
+      listServers: vi.fn().mockResolvedValue([
+        { id: "srv-1", name: "Many Tools", status: "active", toolsCache: JSON.stringify(tools) },
+      ]),
+    } as any;
+
+    const p = new PlannerAgent({ db, sse, mcpRegistry });
+    const result = await p.gatherExternalToolInfo();
+    expect(result[0]!.tools).toHaveLength(10);
+    expect(result[0]!.tools[9]!.name).toBe("tool-9");
+  });
+
+  it("ET-07: LLM prompt includes external tools when available", async () => {
+    const mcpRegistry = {
+      listServers: vi.fn().mockResolvedValue([
+        { id: "srv-1", name: "AI Foundry", status: "active", toolsCache: '[{"name":"analyze","description":"Analyze code"}]' },
+      ]),
+    } as any;
+
+    const fetchMock = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({
+        content: [{ type: "text", text: JSON.stringify({
+          codebaseAnalysis: "외부 도구 포함 분석",
+          proposedSteps: [{ description: "분석 실행", type: "external_tool", externalTool: { serverId: "srv-1", toolName: "analyze" } }],
+          risks: [],
+          estimatedTokens: 2000,
+        }) }],
+      }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const p = new PlannerAgent({ db, sse, apiKey: "test-key", mcpRegistry });
+    const plan = await p.createPlan("agent-et", "code-generation", {
+      repoUrl: "https://github.com/test/repo",
+      branch: "master",
+      targetFiles: ["src/service.ts"],
+    });
+
+    // Verify prompt includes external tools
+    const callBody = JSON.parse(fetchMock.mock.calls[0]![1]!.body as string);
+    expect(callBody.messages[0].content).toContain("Available External Tools:");
+    expect(callBody.messages[0].content).toContain("AI Foundry");
+    expect(callBody.messages[0].content).toContain("analyze: Analyze code");
+
+    // Verify plan includes external_tool step
+    expect(plan.proposedSteps[0]!.type).toBe("external_tool");
+    expect(plan.proposedSteps[0]!.externalTool?.toolName).toBe("analyze");
+
+    vi.unstubAllGlobals();
+  });
 });

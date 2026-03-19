@@ -6,6 +6,12 @@ import type {
 import type { AgentTaskType, AgentExecutionRequest } from "./execution-types.js";
 import type { SSEManager } from "./sse-manager.js";
 
+interface ExternalToolInfo {
+  serverId: string;
+  serverName: string;
+  tools: { name: string; description: string }[];
+}
+
 interface PlannerAgentDeps {
   db: D1Database;
   sse?: SSEManager;
@@ -67,9 +73,14 @@ You MUST respond with valid JSON in this exact schema:
   "proposedSteps": [
     {
       "description": "What to do in this step",
-      "type": "create" | "modify" | "delete" | "test",
+      "type": "create" | "modify" | "delete" | "test" | "external_tool",
       "targetFile": "optional/file/path.ts",
-      "estimatedLines": 20
+      "estimatedLines": 20,
+      "externalTool": {
+        "serverId": "server-id (from Available External Tools)",
+        "toolName": "tool-name (from Available External Tools)",
+        "arguments": { "key": "value" }
+      }
     }
   ],
   "risks": ["Risk description 1"],
@@ -82,7 +93,10 @@ Guidelines:
 - Each step should modify at most 1-2 files
 - Identify risks: dependency changes, breaking changes, test coverage gaps
 - Estimate tokens conservatively (lines * 10 + overhead)
-- Respond in Korean for analysis text, English for technical terms`;
+- Respond in Korean for analysis text, English for technical terms
+- For "external_tool" type: ONLY use when the task cannot be accomplished by code changes alone.
+  Include the externalTool field with serverId and toolName from the Available External Tools list.
+  If no external tools are available or relevant, do NOT use this type.`;
 
 export class PlannerAgent {
   constructor(private deps: PlannerAgentDeps) {}
@@ -142,6 +156,39 @@ export class PlannerAgent {
     }
   }
 
+  async gatherExternalToolInfo(): Promise<ExternalToolInfo[]> {
+    if (!this.deps.mcpRegistry) return [];
+
+    try {
+      const servers = await this.deps.mcpRegistry.listServers();
+      const result: ExternalToolInfo[] = [];
+
+      for (const server of servers) {
+        if (server.status !== "active" || !server.toolsCache) continue;
+        try {
+          const tools = JSON.parse(server.toolsCache) as { name: string; description?: string }[];
+          const limited = tools.slice(0, 10).map((t) => ({
+            name: t.name,
+            description: (t.description ?? "").slice(0, 80),
+          }));
+          if (limited.length > 0) {
+            result.push({
+              serverId: server.id,
+              serverName: server.name,
+              tools: limited,
+            });
+          }
+        } catch {
+          // invalid toolsCache JSON — skip this server
+        }
+      }
+
+      return result;
+    } catch {
+      return [];
+    }
+  }
+
   private buildPlannerPrompt(
     taskType: AgentTaskType,
     context: AgentExecutionRequest["context"],
@@ -171,7 +218,21 @@ export class PlannerAgent {
       return this.mockAnalysis(taskType, context);
     }
 
+    const externalTools = await this.gatherExternalToolInfo();
+
     try {
+      let prompt = this.buildPlannerPrompt(taskType, context);
+
+      if (externalTools.length > 0) {
+        prompt += "\n\nAvailable External Tools:";
+        for (const server of externalTools) {
+          prompt += `\n[Server: ${server.serverName} (id: ${server.serverId})]`;
+          for (const tool of server.tools) {
+            prompt += `\n  - ${tool.name}: ${tool.description}`;
+          }
+        }
+      }
+
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -183,7 +244,7 @@ export class PlannerAgent {
           model: this.deps.model ?? "claude-haiku-4-5-20250714",
           max_tokens: 4096,
           system: PLANNER_SYSTEM_PROMPT,
-          messages: [{ role: "user", content: this.buildPlannerPrompt(taskType, context) }],
+          messages: [{ role: "user", content: prompt }],
         }),
       });
 
