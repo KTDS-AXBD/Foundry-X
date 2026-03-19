@@ -8,7 +8,10 @@ export type AgentTaskType =
   | "code-review"
   | "code-generation"
   | "spec-analysis"
-  | "test-generation";
+  | "test-generation"
+  | "policy-evaluation"
+  | "skill-query"
+  | "ontology-lookup";
 
 export interface AgentConstraintRule {
   id: string;

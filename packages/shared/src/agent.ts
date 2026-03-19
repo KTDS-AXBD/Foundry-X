@@ -123,7 +123,10 @@ export type AgentTaskType =
   | 'code-review'
   | 'code-generation'
   | 'spec-analysis'
-  | 'test-generation';
+  | 'test-generation'
+  | 'policy-evaluation'
+  | 'skill-query'
+  | 'ontology-lookup';
 
 /** F53: 에이전트 실행 요청 */
 export interface AgentExecutionRequest {

@@ -298,6 +298,34 @@ export class McpRunner implements McpAgentRunner {
           existing: request.context.targetFiles ?? [],
         };
 
+      case "policy-evaluation": {
+        if (!request.context.instructions) return { context: "" };
+        try {
+          const parsed = JSON.parse(request.context.instructions);
+          return {
+            policyCode: parsed.policyCode ?? "",
+            context: parsed.context ?? "",
+            parameters: parsed.parameters ? JSON.stringify(parsed.parameters) : undefined,
+          };
+        } catch {
+          return { context: request.context.instructions };
+        }
+      }
+
+      case "skill-query":
+        return {
+          query: request.context.instructions ?? "",
+          organizationId: request.context.spec?.title ?? "",
+          limit: "10",
+        };
+
+      case "ontology-lookup":
+        return {
+          term: request.context.instructions ?? "",
+          organizationId: request.context.spec?.title ?? "",
+          includeRelated: "true",
+        };
+
       default:
         return {};
     }

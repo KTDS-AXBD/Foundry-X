@@ -80,14 +80,20 @@ export interface McpAgentRunner extends AgentRunner {
  *
  * | AgentTaskType     | MCP Tool Name        | MCP Input               |
  * |-------------------|----------------------|-------------------------|
- * | code-review       | foundry_code_review  | { files, spec }         |
- * | code-generation   | foundry_code_gen     | { spec, instructions }  |
- * | spec-analysis     | foundry_spec_analyze | { newSpec, existing }   |
- * | test-generation   | foundry_test_gen     | { files, spec }         |
+ * | code-review       | foundry_code_review    | { files, spec }                      |
+ * | code-generation   | foundry_code_gen       | { spec, instructions }               |
+ * | spec-analysis     | foundry_spec_analyze   | { newSpec, existing }                |
+ * | test-generation   | foundry_test_gen       | { files, spec }                      |
+ * | policy-evaluation | foundry_policy_eval    | { policyCode, context, parameters? } |
+ * | skill-query       | foundry_skill_query    | { query, organizationId, limit }     |
+ * | ontology-lookup   | foundry_ontology_lookup| { term, organizationId }             |
  */
 export const TASK_TYPE_TO_MCP_TOOL: Record<AgentTaskType, string> = {
   "code-review": "foundry_code_review",
   "code-generation": "foundry_code_gen",
   "spec-analysis": "foundry_spec_analyze",
   "test-generation": "foundry_test_gen",
+  "policy-evaluation": "foundry_policy_eval",
+  "skill-query": "foundry_skill_query",
+  "ontology-lookup": "foundry_ontology_lookup",
 };
