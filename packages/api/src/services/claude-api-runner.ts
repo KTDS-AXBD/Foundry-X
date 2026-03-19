@@ -28,6 +28,18 @@ Return a JSON object with "analysis" field containing your assessment.` + UIHINT
   "test-generation": `You are a test generation agent for the Foundry-X project.
 Generate vitest test cases for the provided code and spec.
 Return a JSON object with "generatedCode" array containing test files.` + UIHINT_INSTRUCTION,
+
+  "policy-evaluation": `You are a policy evaluation agent for the Foundry-X project.
+Evaluate the provided code or configuration against organizational policies and governance rules.
+Return a JSON object with "evaluation" field containing compliance assessment.` + UIHINT_INSTRUCTION,
+
+  "skill-query": `You are a skill query agent for the Foundry-X project.
+Search and retrieve relevant skills, capabilities, or knowledge from the AI Foundry asset registry.
+Return a JSON object with "results" array of matching skills.` + UIHINT_INSTRUCTION,
+
+  "ontology-lookup": `You are an ontology lookup agent for the Foundry-X project.
+Look up domain concepts, relationships, and definitions from the project ontology.
+Return a JSON object with "concepts" array of matching ontology entries.` + UIHINT_INSTRUCTION,
 };
 
 export { UIHINT_INSTRUCTION, TASK_SYSTEM_PROMPTS };
@@ -38,6 +50,9 @@ export const DEFAULT_LAYOUT_MAP: Record<AgentTaskType, string> = {
   "code-generation": "accordion",
   "spec-analysis": "card",
   "test-generation": "accordion",
+  "policy-evaluation": "card",
+  "skill-query": "tabs",
+  "ontology-lookup": "card",
 };
 
 export class ClaudeApiRunner implements AgentRunner {
