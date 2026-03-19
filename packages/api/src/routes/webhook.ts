@@ -2,28 +2,24 @@ import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { WikiSyncService } from "../services/wiki-sync.js";
 import { GitHubService } from "../services/github.js";
+import { GitHubSyncService } from "../services/github-sync.js";
+import { githubIssueEventSchema, githubPrEventSchema } from "../schemas/webhook.js";
 import type { Env } from "../env.js";
 
 export const webhookRoute = new OpenAPIHono<{ Bindings: Env }>();
+
+// ─── Unified GitHub Webhook Endpoint ───
 
 const gitWebhookRoute = createRoute({
   method: "post",
   path: "/webhook/git",
   tags: ["Webhook"],
-  summary: "GitHub Push Webhook 수신",
+  summary: "GitHub Webhook 수신 (push / issues / pull_request)",
   request: {
     body: {
       content: {
         "application/json": {
-          schema: z.object({
-            ref: z.string(),
-            commits: z.array(
-              z.object({
-                modified: z.array(z.string()),
-                added: z.array(z.string()),
-              }),
-            ),
-          }),
+          schema: z.object({}).passthrough(),
         },
       },
     },
@@ -48,7 +44,32 @@ webhookRoute.openapi(gitWebhookRoute, async (c) => {
   }
 
   const payload = JSON.parse(body);
+  const eventType = c.req.header("x-github-event") ?? "push";
+  const github = new GitHubService(c.env.GITHUB_TOKEN, c.env.GITHUB_REPO);
 
+  // ─── Issues event ───
+  if (eventType === "issues") {
+    const parsed = githubIssueEventSchema.safeParse(payload);
+    if (!parsed.success) {
+      return c.json({ error: "Invalid issue event payload" }, 400);
+    }
+    const sync = new GitHubSyncService(github, c.env.DB, "org_default");
+    const result = await sync.syncIssueToTask(parsed.data);
+    return c.json({ event: "issues", ...result });
+  }
+
+  // ─── Pull Request event ───
+  if (eventType === "pull_request") {
+    const parsed = githubPrEventSchema.safeParse(payload);
+    if (!parsed.success) {
+      return c.json({ error: "Invalid PR event payload" }, 400);
+    }
+    const sync = new GitHubSyncService(github, c.env.DB, "org_default");
+    const result = await sync.syncPrStatus(parsed.data);
+    return c.json({ event: "pull_request", ...result });
+  }
+
+  // ─── Push event (existing behavior) ───
   if (payload.ref !== "refs/heads/master") {
     return c.json({ message: "Skipped: not master branch" });
   }
@@ -60,9 +81,8 @@ webhookRoute.openapi(gitWebhookRoute, async (c) => {
     ],
   );
 
-  const github = new GitHubService(c.env.GITHUB_TOKEN, c.env.GITHUB_REPO);
-  const sync = new WikiSyncService(github, c.env.DB);
-  const result = await sync.pullFromGit(modifiedFiles);
+  const wikiSync = new WikiSyncService(github, c.env.DB);
+  const result = await wikiSync.pullFromGit(modifiedFiles);
 
   return c.json(result);
 });

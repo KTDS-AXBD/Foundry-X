@@ -129,7 +129,7 @@ export class SSEManager {
     }, DEDUP_TTL_MS);
   }
 
-  pushEvent(event: SSEEvent): void {
+  pushEvent(event: SSEEvent, orgId?: string): void {
     // Dedup by taskId + event type for task events
     const data = event.data as Record<string, unknown>;
     if ("taskId" in data) {
@@ -148,6 +148,35 @@ export class SSEManager {
         this.subscribers.delete(send);
       }
     }
+
+    // Slack bridge — forward eligible events to Slack webhook
+    if (orgId && this.isSlackEligible(event.event)) {
+      this.forwardToSlack(orgId, event).catch(() => {});
+    }
+  }
+
+  private isSlackEligible(eventType: string): boolean {
+    return ["agent.task.completed", "agent.pr.merged", "agent.plan.waiting"].includes(eventType);
+  }
+
+  private async forwardToSlack(orgId: string, event: SSEEvent): Promise<void> {
+    const org = await this.db.prepare(
+      "SELECT settings FROM organizations WHERE id = ?"
+    ).bind(orgId).first<{ settings: string }>();
+    if (!org) return;
+
+    const settings = JSON.parse(org.settings || "{}");
+    if (!settings.slack_webhook_url) return;
+
+    const { SlackService } = await import("./slack.js");
+    const slack = new SlackService({ webhookUrl: settings.slack_webhook_url });
+    const data = event.data as Record<string, unknown>;
+    await slack.sendNotification({
+      type: event.event.replace("agent.", "") as "task.completed" | "pr.merged" | "plan.waiting",
+      title: String(data.agentId ?? event.event),
+      body: String(data.resultSummary ?? data.reason ?? ""),
+      planId: String(data.planId ?? ""),
+    });
   }
 
   dispose(): void {

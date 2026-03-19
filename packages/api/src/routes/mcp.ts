@@ -94,7 +94,8 @@ const listServers = createRoute({
 
 app.openapi(listServers, async (c) => {
   const registry = new McpServerRegistry(c.env.DB);
-  const servers = await registry.listServers();
+  const orgId = (c.get("jwtPayload") as Record<string, unknown> | undefined)?.orgId as string | undefined;
+  const servers = await registry.listServers(orgId);
   return c.json(servers.map((s) => toResponse(s)!));
 });
 

@@ -277,6 +277,61 @@ export class GitHubService {
     return res.json() as Promise<{ id: number }>;
   }
 
+  // ─── Sprint 18: Issue Sync Methods (F84) ───
+
+  async createIssue(params: {
+    title: string;
+    body?: string;
+    labels?: string[];
+  }): Promise<{ number: number; url: string }> {
+    const res = await fetch(
+      `${this.baseUrl}/repos/${this.repo}/issues`,
+      {
+        method: "POST",
+        headers: { ...this.headers(), "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: params.title,
+          body: params.body ?? "",
+          labels: params.labels ?? [],
+        }),
+      },
+    );
+    if (!res.ok) throw new GitHubApiError(res.status, "issues");
+    const issue = (await res.json()) as { number: number; html_url: string };
+    return { number: issue.number, url: issue.html_url };
+  }
+
+  async updateIssue(
+    number: number,
+    params: { state?: "open" | "closed"; labels?: string[] },
+  ): Promise<void> {
+    const res = await fetch(
+      `${this.baseUrl}/repos/${this.repo}/issues/${number}`,
+      {
+        method: "PATCH",
+        headers: { ...this.headers(), "Content-Type": "application/json" },
+        body: JSON.stringify(params),
+      },
+    );
+    if (!res.ok) throw new GitHubApiError(res.status, `issues/${number}`);
+  }
+
+  async addIssueComment(
+    number: number,
+    body: string,
+  ): Promise<{ id: number }> {
+    const res = await fetch(
+      `${this.baseUrl}/repos/${this.repo}/issues/${number}/comments`,
+      {
+        method: "POST",
+        headers: { ...this.headers(), "Content-Type": "application/json" },
+        body: JSON.stringify({ body }),
+      },
+    );
+    if (!res.ok) throw new GitHubApiError(res.status, `issues/${number}/comments`);
+    return res.json() as Promise<{ id: number }>;
+  }
+
   // ─── Sprint 14: Merge Queue Methods (F68) ───
 
   async getModifiedFiles(prNumber: number): Promise<string[]> {

@@ -34,6 +34,8 @@ class MockKVNamespace {
 
 export function createTestEnv() {
   const mockDb = createMockD1();
+  // Default test user -> org_test member (sync via D1 exec)
+  void mockDb.exec("INSERT OR IGNORE INTO org_members (org_id, user_id, role) VALUES ('org_test', 'test-user', 'owner')");
   return {
     DB: mockDb as unknown as D1Database,
     JWT_SECRET: TEST_SECRET,
@@ -45,13 +47,15 @@ export function createTestEnv() {
 }
 
 export async function createAuthHeaders(
-  payload?: { sub?: string; email?: string; role?: "admin" | "member" | "viewer" },
+  payload?: { sub?: string; email?: string; role?: "admin" | "member" | "viewer"; orgId?: string; orgRole?: "owner" | "admin" | "member" | "viewer" },
 ) {
   const token = await createAccessToken(
     {
       sub: payload?.sub ?? "test-user",
       email: payload?.email ?? "test@example.com",
       role: payload?.role ?? "admin",
+      orgId: payload?.orgId ?? "org_test",
+      orgRole: payload?.orgRole ?? "owner",
     },
     TEST_SECRET,
   );

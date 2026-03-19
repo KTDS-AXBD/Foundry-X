@@ -6,6 +6,8 @@ export interface JwtPayload {
   sub: string;
   email: string;
   role: "admin" | "member" | "viewer";
+  orgId?: string;
+  orgRole?: "owner" | "admin" | "member" | "viewer";
   iat: number;
   exp: number;
   jti?: string;
@@ -15,6 +17,7 @@ export interface JwtPayload {
 const PUBLIC_PATHS = [
   "/api/auth/",
   "/api/webhook/",
+  "/api/slack/",
   "/api/openapi.json",
   "/api/docs",
 ];
@@ -48,11 +51,17 @@ export async function createRefreshToken(
 }
 
 export async function createTokenPair(
-  user: { id: string; email: string; role: "admin" | "member" | "viewer" },
+  user: { id: string; email: string; role: "admin" | "member" | "viewer"; orgId?: string; orgRole?: "owner" | "admin" | "member" | "viewer" },
   secret: string,
 ): Promise<{ accessToken: string; refreshToken: string; expiresIn: number; _refreshJti: string }> {
   const [accessToken, refreshResult] = await Promise.all([
-    createAccessToken({ sub: user.id, email: user.email, role: user.role }, secret),
+    createAccessToken({
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      orgId: user.orgId ?? "",
+      orgRole: user.orgRole ?? "member",
+    }, secret),
     createRefreshToken(user.id, secret),
   ]);
   return { accessToken, refreshToken: refreshResult.token, expiresIn: 3600, _refreshJti: refreshResult.jti };

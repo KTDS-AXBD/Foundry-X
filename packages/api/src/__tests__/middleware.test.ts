@@ -19,7 +19,7 @@ describe("JWT middleware", () => {
 
   it("accepts requests with valid JWT", async () => {
     const token = await createAccessToken(
-      { sub: "u1", email: "a@b.com", role: "admin" },
+      { sub: "u1", email: "a@b.com", role: "admin", orgId: "org_test", orgRole: "owner" },
       TEST_SECRET,
     );
     const res = await app.request("/api/health", {
@@ -50,19 +50,19 @@ describe("RBAC middleware", () => {
 
   beforeAll(async () => {
     const adminToken = await createAccessToken(
-      { sub: "admin-1", email: "admin@test.com", role: "admin" },
+      { sub: "admin-1", email: "admin@test.com", role: "admin", orgId: "org_test", orgRole: "owner" },
       TEST_SECRET,
     );
     adminHeaders = { Authorization: `Bearer ${adminToken}` };
 
     const memberToken = await createAccessToken(
-      { sub: "member-1", email: "member@test.com", role: "member" },
+      { sub: "member-1", email: "member@test.com", role: "member", orgId: "org_test", orgRole: "member" },
       TEST_SECRET,
     );
     memberHeaders = { Authorization: `Bearer ${memberToken}` };
 
     const viewerToken = await createAccessToken(
-      { sub: "viewer-1", email: "viewer@test.com", role: "viewer" },
+      { sub: "viewer-1", email: "viewer@test.com", role: "viewer", orgId: "org_test", orgRole: "viewer" },
       TEST_SECRET,
     );
     viewerHeaders = { Authorization: `Bearer ${viewerToken}` };
