@@ -315,3 +315,201 @@ orgRoute.openapi(deleteInvitationRoute, async (c) => {
     throw e;
   }
 });
+
+// ─── Slack Notification Config CRUD (F94) ───
+
+const VALID_CATEGORIES = ["agent", "pr", "plan", "queue", "message"] as const;
+type SlackCategory = (typeof VALID_CATEGORIES)[number];
+
+function isValidCategory(v: string): v is SlackCategory {
+  return (VALID_CATEGORIES as readonly string[]).includes(v);
+}
+
+function isValidWebhookUrl(url: string): boolean {
+  return url.startsWith("https://hooks.slack.com/");
+}
+
+// ─── GET /orgs/:orgId/slack/configs ───
+
+const listSlackConfigsRoute = createRoute({
+  method: "get",
+  path: "/orgs/{orgId}/slack/configs",
+  tags: ["Org"],
+  summary: "List Slack notification configs",
+  request: { params: OrgParamsSchema },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ configs: z.array(z.any()) }) } }, description: "Config list" },
+  },
+});
+
+orgRoute.openapi(listSlackConfigsRoute, async (c) => {
+  const { orgId } = c.req.valid("param");
+  const db = c.env.DB;
+  const { results } = await db.prepare(
+    "SELECT id, category, webhook_url, enabled, created_at, updated_at FROM slack_notification_configs WHERE org_id = ? ORDER BY category",
+  ).bind(orgId).all();
+
+  const configs = (results ?? []).map((r: any) => ({
+    ...r,
+    enabled: !!r.enabled,
+  }));
+  return c.json({ configs }, 200);
+});
+
+// ─── PUT /orgs/:orgId/slack/configs/:category ───
+
+const upsertSlackConfigRoute = createRoute({
+  method: "put",
+  path: "/orgs/{orgId}/slack/configs/{category}",
+  tags: ["Org"],
+  summary: "Upsert Slack notification config (admin+)",
+  request: {
+    params: z.object({ orgId: z.string(), category: z.string() }).openapi("SlackConfigParams"),
+    body: { content: { "application/json": { schema: z.object({ webhook_url: z.string(), enabled: z.boolean().default(true) }) } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.any() } }, description: "Config upserted" },
+    400: { content: { "application/json": { schema: ErrorSchema } }, description: "Validation error" },
+    403: { content: { "application/json": { schema: ErrorSchema } }, description: "Forbidden" },
+  },
+});
+
+orgRoute.openapi(upsertSlackConfigRoute, async (c) => {
+  const orgRole = c.get("orgRole") as string;
+  if (!orgRole || (orgRole !== "owner" && orgRole !== "admin")) {
+    return c.json({ error: "Requires admin role or higher" }, 403);
+  }
+
+  const { orgId, category } = c.req.valid("param");
+  if (!isValidCategory(category)) {
+    return c.json({ error: `Invalid category: ${category}. Must be one of: ${VALID_CATEGORIES.join(", ")}` }, 400);
+  }
+
+  const { webhook_url, enabled } = c.req.valid("json");
+  if (!isValidWebhookUrl(webhook_url)) {
+    return c.json({ error: "webhook_url must start with https://hooks.slack.com/" }, 400);
+  }
+
+  const db = c.env.DB;
+  const id = `snc_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
+  const now = new Date().toISOString();
+
+  await db.prepare(
+    `INSERT INTO slack_notification_configs (id, org_id, category, webhook_url, enabled, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(org_id, category) DO UPDATE SET webhook_url = excluded.webhook_url, enabled = excluded.enabled, updated_at = excluded.updated_at`,
+  ).bind(id, orgId, category, webhook_url, enabled ? 1 : 0, now, now).run();
+
+  const row = await db.prepare(
+    "SELECT id, category, webhook_url, enabled, created_at, updated_at FROM slack_notification_configs WHERE org_id = ? AND category = ?",
+  ).bind(orgId, category).first();
+
+  return c.json({ ...(row as any), enabled: !!(row as any).enabled }, 200);
+});
+
+// ─── DELETE /orgs/:orgId/slack/configs/:category ───
+
+const deleteSlackConfigRoute = createRoute({
+  method: "delete",
+  path: "/orgs/{orgId}/slack/configs/{category}",
+  tags: ["Org"],
+  summary: "Delete Slack notification config (admin+)",
+  request: {
+    params: z.object({ orgId: z.string(), category: z.string() }).openapi("SlackConfigDeleteParams"),
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ deleted: z.boolean() }) } }, description: "Deleted" },
+    403: { content: { "application/json": { schema: ErrorSchema } }, description: "Forbidden" },
+    404: { content: { "application/json": { schema: ErrorSchema } }, description: "Not found" },
+  },
+});
+
+orgRoute.openapi(deleteSlackConfigRoute, async (c) => {
+  const orgRole = c.get("orgRole") as string;
+  if (!orgRole || (orgRole !== "owner" && orgRole !== "admin")) {
+    return c.json({ error: "Requires admin role or higher" }, 403);
+  }
+
+  const { orgId, category } = c.req.valid("param");
+  const db = c.env.DB;
+
+  const result = await db.prepare(
+    "DELETE FROM slack_notification_configs WHERE org_id = ? AND category = ?",
+  ).bind(orgId, category).run();
+
+  if (!result.meta.changes) {
+    return c.json({ error: "Config not found" }, 404);
+  }
+
+  return c.json({ deleted: true }, 200);
+});
+
+// ─── POST /orgs/:orgId/slack/test ───
+
+const testSlackRoute = createRoute({
+  method: "post",
+  path: "/orgs/{orgId}/slack/test",
+  tags: ["Org"],
+  summary: "Send test Slack notification (admin+)",
+  request: {
+    params: OrgParamsSchema,
+    body: { content: { "application/json": { schema: z.object({ category: z.string().optional() }) } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ sent: z.boolean() }) } }, description: "Test sent" },
+    400: { content: { "application/json": { schema: ErrorSchema } }, description: "No webhook configured" },
+    403: { content: { "application/json": { schema: ErrorSchema } }, description: "Forbidden" },
+  },
+});
+
+orgRoute.openapi(testSlackRoute, async (c) => {
+  const orgRole = c.get("orgRole") as string;
+  if (!orgRole || (orgRole !== "owner" && orgRole !== "admin")) {
+    return c.json({ error: "Requires admin role or higher" }, 403);
+  }
+
+  const { orgId } = c.req.valid("param");
+  const { category } = c.req.valid("json");
+  const db = c.env.DB;
+
+  let webhookUrl: string | null = null;
+  const label = category ?? "default";
+
+  if (category) {
+    const config = await db.prepare(
+      "SELECT webhook_url, enabled FROM slack_notification_configs WHERE org_id = ? AND category = ?",
+    ).bind(orgId, category).first<{ webhook_url: string; enabled: number }>();
+
+    if (config && config.enabled) {
+      webhookUrl = config.webhook_url;
+    }
+  }
+
+  if (!webhookUrl) {
+    const org = await db.prepare(
+      "SELECT settings FROM organizations WHERE id = ?",
+    ).bind(orgId).first<{ settings: string }>();
+
+    if (org) {
+      const settings = JSON.parse(org.settings || "{}");
+      webhookUrl = settings.slack_webhook_url || null;
+    }
+  }
+
+  if (!webhookUrl) {
+    return c.json({ error: `No webhook configured for category: ${label}` }, 400);
+  }
+
+  await fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      blocks: [
+        { type: "header", text: { type: "plain_text", text: `🔔 Foundry-X 알림 테스트`, emoji: true } },
+        { type: "section", text: { type: "mrkdwn", text: `*${label}* 채널 연결 확인 — 이 메시지가 보이면 정상이에요.` } },
+      ],
+    }),
+  });
+
+  return c.json({ sent: true }, 200);
+});

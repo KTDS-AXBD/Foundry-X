@@ -108,7 +108,10 @@ slackRoute.openapi(interactionRoute, async (c) => {
   const params = new URLSearchParams(result.body);
   const rawPayload = params.get("payload") ?? "{}";
 
-  let payload: { actions?: Array<{ action_id: string; value?: string }> };
+  let payload: {
+    actions?: Array<{ action_id: string; value?: string }>;
+    user?: { id: string; name: string };
+  };
   try {
     payload = JSON.parse(rawPayload);
   } catch {
@@ -120,18 +123,65 @@ slackRoute.openapi(interactionRoute, async (c) => {
     return c.json({ text: "액션을 찾을 수 없어요." });
   }
 
-  const planId = action.value ?? "unknown";
+  const planId = action.value ?? "";
+  const slackUserId = payload.user?.id ?? "unknown";
+  const db = (c.env as any)?.DB;
 
-  if (action.action_id === "plan_approve") {
+  // ─── plan_approve ───
+  if (action.action_id === "plan_approve" && planId) {
+    if (!db) {
+      return c.json({ text: `✅ 계획 \`${planId}\`을(를) 승인했어요.` });
+    }
+
+    const now = new Date().toISOString();
+    const updated = await db.prepare(
+      `UPDATE agent_plans SET status = 'approved', approved_at = ?, human_feedback = ? WHERE id = ? AND status = 'pending_approval'`,
+    ).bind(now, `Slack 승인 by ${slackUserId}`, planId).run();
+
+    if (!updated.meta.changes) {
+      return c.json({
+        replace_original: true,
+        text: `⚠️ 계획 \`${planId}\`은(는) 이미 처리되었어요.`,
+      });
+    }
+
     return c.json({
-      text: `✅ 계획 \`${planId}\`을(를) 승인했어요.`,
+      replace_original: true,
+      blocks: [
+        { type: "section", text: { type: "mrkdwn", text: `✅ *계획 승인 완료*\n계획 \`${planId}\`을(를) <@${slackUserId}>님이 승인했어요. 실행을 시작해요.` } },
+      ],
     });
   }
 
-  if (action.action_id === "plan_reject") {
+  // ─── plan_reject ───
+  if (action.action_id === "plan_reject" && planId) {
+    if (!db) {
+      return c.json({ text: `❌ 계획 \`${planId}\`을(를) 거절했어요.` });
+    }
+
+    const now = new Date().toISOString();
+    const updated = await db.prepare(
+      `UPDATE agent_plans SET status = 'rejected', rejected_at = ?, human_feedback = ? WHERE id = ? AND status = 'pending_approval'`,
+    ).bind(now, `Slack 거절 by ${slackUserId}`, planId).run();
+
+    if (!updated.meta.changes) {
+      return c.json({
+        replace_original: true,
+        text: `⚠️ 계획 \`${planId}\`은(는) 이미 처리되었어요.`,
+      });
+    }
+
     return c.json({
-      text: `❌ 계획 \`${planId}\`을(를) 거절했어요.`,
+      replace_original: true,
+      blocks: [
+        { type: "section", text: { type: "mrkdwn", text: `❌ *계획 거절됨*\n계획 \`${planId}\`을(를) <@${slackUserId}>님이 거절했어요.` } },
+      ],
     });
+  }
+
+  // ─── view_dashboard (기존) ───
+  if (action.action_id === "view_dashboard") {
+    return c.json({ text: "대시보드로 이동해요." });
   }
 
   return c.json({ text: "알 수 없는 액션이에요." });

@@ -1,6 +1,15 @@
 // ─── Slack Event Types ───
 
-export type SlackEventType = "task.completed" | "pr.merged" | "plan.waiting";
+export type SlackEventType =
+  | "task.completed"
+  | "pr.merged"
+  | "plan.waiting"
+  // F94 신규
+  | "queue.conflict"
+  | "message.received"
+  | "plan.executing"
+  | "plan.completed"
+  | "plan.failed";
 
 export interface SlackEvent {
   type: SlackEventType;
@@ -77,6 +86,16 @@ export class SlackService {
         return this.prMergedBlocks(event);
       case "plan.waiting":
         return this.planWaitingBlocks(event);
+      case "queue.conflict":
+        return this.queueConflictBlocks(event);
+      case "message.received":
+        return this.messageReceivedBlocks(event);
+      case "plan.executing":
+        return this.planExecutingBlocks(event);
+      case "plan.completed":
+        return this.planCompletedBlocks(event);
+      case "plan.failed":
+        return this.planFailedBlocks(event);
     }
   }
 
@@ -154,6 +173,138 @@ export class SlackService {
     }
     return blocks;
   }
+
+  private queueConflictBlocks(event: SlackEvent): Block[] {
+    const blocks: Block[] = [
+      {
+        type: "header",
+        text: { type: "plain_text", text: `⚠️ ${event.title}`, emoji: true },
+      },
+      {
+        type: "section",
+        text: { type: "mrkdwn", text: event.body },
+      },
+    ];
+    if (event.url) {
+      blocks.push({
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            text: { type: "plain_text", text: "대시보드에서 보기", emoji: true },
+            action_id: "view_dashboard",
+            url: event.url,
+          },
+        ],
+      });
+    }
+    return blocks;
+  }
+
+  private messageReceivedBlocks(event: SlackEvent): Block[] {
+    const blocks: Block[] = [
+      {
+        type: "header",
+        text: { type: "plain_text", text: `💬 ${event.title}`, emoji: true },
+      },
+      {
+        type: "section",
+        text: { type: "mrkdwn", text: event.body },
+      },
+    ];
+    if (event.url) {
+      blocks.push({
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            text: { type: "plain_text", text: "답장하기", emoji: true },
+            action_id: "view_dashboard",
+            url: event.url,
+          },
+        ],
+      });
+    }
+    return blocks;
+  }
+
+  private planExecutingBlocks(event: SlackEvent): Block[] {
+    return [
+      {
+        type: "header",
+        text: { type: "plain_text", text: `🚀 ${event.title}`, emoji: true },
+      },
+      {
+        type: "section",
+        text: { type: "mrkdwn", text: event.body },
+      },
+    ];
+  }
+
+  private planCompletedBlocks(event: SlackEvent): Block[] {
+    const blocks: Block[] = [
+      {
+        type: "header",
+        text: { type: "plain_text", text: `✅ ${event.title}`, emoji: true },
+      },
+      {
+        type: "section",
+        text: { type: "mrkdwn", text: event.body },
+      },
+    ];
+    if (event.url) {
+      blocks.push({
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            text: { type: "plain_text", text: "결과 보기", emoji: true },
+            action_id: "view_dashboard",
+            url: event.url,
+          },
+        ],
+      });
+    }
+    return blocks;
+  }
+
+  private planFailedBlocks(event: SlackEvent): Block[] {
+    const blocks: Block[] = [
+      {
+        type: "header",
+        text: { type: "plain_text", text: `❌ ${event.title}`, emoji: true },
+      },
+      {
+        type: "section",
+        text: { type: "mrkdwn", text: event.body },
+      },
+    ];
+    if (event.url) {
+      blocks.push({
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            text: { type: "plain_text", text: "상세 보기", emoji: true },
+            action_id: "view_dashboard",
+            url: event.url,
+          },
+        ],
+      });
+    }
+    return blocks;
+  }
+}
+
+// ─── Category Mapping ───
+
+export function eventToCategory(eventType: string): string | null {
+  if (eventType.startsWith("agent.task."))    return "agent";
+  if (eventType.startsWith("agent.pr."))      return "pr";
+  if (eventType.startsWith("agent.plan."))    return "plan";
+  if (eventType.startsWith("agent.queue."))   return "queue";
+  if (eventType.startsWith("agent.message.")) return "message";
+  return null;
 }
 
 // ─── Signature Verification ───

@@ -157,25 +157,54 @@ export class SSEManager {
   }
 
   private isSlackEligible(eventType: string): boolean {
-    return ["agent.task.completed", "agent.pr.merged", "agent.plan.waiting"].includes(eventType);
+    // F94: 카테고리 기반 — agent.task.*, agent.pr.*, agent.plan.*, agent.queue.*, agent.message.*
+    if (eventType.startsWith("agent.task."))    return true;
+    if (eventType.startsWith("agent.pr."))      return true;
+    if (eventType.startsWith("agent.plan."))    return true;
+    if (eventType.startsWith("agent.queue."))   return true;
+    if (eventType.startsWith("agent.message.")) return true;
+    return false;
   }
 
   private async forwardToSlack(orgId: string, event: SSEEvent): Promise<void> {
-    const org = await this.db.prepare(
-      "SELECT settings FROM organizations WHERE id = ?"
-    ).bind(orgId).first<{ settings: string }>();
-    if (!org) return;
+    const { eventToCategory, SlackService } = await import("./slack.js");
+    const category = eventToCategory(event.event);
+    if (!category) return;
 
-    const settings = JSON.parse(org.settings || "{}");
-    if (!settings.slack_webhook_url) return;
+    // 1) 카테고리별 설정 조회
+    const config = await this.db.prepare(
+      "SELECT webhook_url, enabled FROM slack_notification_configs WHERE org_id = ? AND category = ?"
+    ).bind(orgId, category).first<{ webhook_url: string; enabled: number }>();
 
-    const { SlackService } = await import("./slack.js");
-    const slack = new SlackService({ webhookUrl: settings.slack_webhook_url });
+    let webhookUrl: string | null = null;
+
+    if (config) {
+      if (!config.enabled) return;           // 명시적 비활성화
+      webhookUrl = config.webhook_url;
+    } else {
+      // 2) fallback: org.settings.slack_webhook_url
+      const org = await this.db.prepare(
+        "SELECT settings FROM organizations WHERE id = ?"
+      ).bind(orgId).first<{ settings: string }>();
+      if (!org) return;
+      const settings = JSON.parse(org.settings || "{}");
+      webhookUrl = settings.slack_webhook_url || null;
+    }
+
+    if (!webhookUrl) return;
+
+    // 3) 전송
+    const slack = new SlackService({ webhookUrl });
     const data = event.data as Record<string, unknown>;
+
+    // SSE event type → SlackEventType 변환 (agent. prefix 제거)
+    const slackType = event.event.replace("agent.", "");
+
     await slack.sendNotification({
-      type: event.event.replace("agent.", "") as "task.completed" | "pr.merged" | "plan.waiting",
+      type: slackType as import("./slack.js").SlackEventType,
       title: String(data.agentId ?? event.event),
-      body: String(data.resultSummary ?? data.reason ?? ""),
+      body: String(data.resultSummary ?? data.reason ?? data.error ?? ""),
+      url: String(data.url ?? ""),
       planId: String(data.planId ?? ""),
     });
   }

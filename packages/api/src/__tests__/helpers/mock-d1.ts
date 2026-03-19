@@ -332,6 +332,17 @@ export class MockD1Database {
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
         merged_at TEXT
       );
+
+      CREATE TABLE IF NOT EXISTS slack_notification_configs (
+        id TEXT PRIMARY KEY,
+        org_id TEXT NOT NULL,
+        category TEXT NOT NULL CHECK(category IN ('agent', 'pr', 'plan', 'queue', 'message')),
+        webhook_url TEXT NOT NULL,
+        enabled INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(org_id, category)
+      );
     `);
     this.db.prepare("INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)").run("org_test", "Test Org", "test");
   }
