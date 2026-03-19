@@ -141,7 +141,20 @@ agentRoute.openapi(getAgents, async (c) => {
   try {
     if (c.env?.DB) {
       const db = getDb(c.env.DB);
-      sessions = await db.select().from(agentSessions);
+      const orgId = (c.get("jwtPayload") as Record<string, unknown> | undefined)?.orgId as string | undefined;
+      if (orgId) {
+        // Tenant-filtered: sessions from projects belonging to this org
+        const { results } = await c.env.DB.prepare(
+          "SELECT s.* FROM agent_sessions s JOIN projects p ON s.project_id = p.id WHERE p.org_id = ?"
+        ).bind(orgId).all();
+        sessions = (results ?? []) as (typeof agentSessions.$inferSelect)[];
+        // Fallback: if no projects linked yet, show all sessions (migration transition)
+        if (sessions.length === 0) {
+          sessions = await db.select().from(agentSessions);
+        }
+      } else {
+        sessions = await db.select().from(agentSessions);
+      }
     }
   } catch {
     // D1 not available — fall through to mock

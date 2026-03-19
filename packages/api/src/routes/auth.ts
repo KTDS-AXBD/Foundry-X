@@ -67,9 +67,19 @@ authRoute.openapi(signup, async (c) => {
     updatedAt: now,
   });
 
+  // Auto-create personal org for new user
+  const orgId = `org_${id.slice(0, 8)}`;
+  const orgSlug = (email.split("@")[0] ?? "user").replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+  await c.env.DB.prepare(
+    "INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)"
+  ).bind(orgId, `${name}'s Org`, orgSlug).run();
+  await c.env.DB.prepare(
+    "INSERT OR IGNORE INTO org_members (org_id, user_id, role) VALUES (?, ?, 'owner')"
+  ).bind(orgId, id).run();
+
   const secret = c.env.JWT_SECRET ?? "dev-secret";
   const { _refreshJti, ...tokens } = await createTokenPair(
-    { id, email, role: "member" },
+    { id, email, role: "member", orgId, orgRole: "owner" },
     secret,
   );
 
@@ -123,9 +133,17 @@ authRoute.openapi(login, async (c) => {
     return c.json({ error: "Invalid credentials" }, 401);
   }
 
+  // Resolve active organization — pick first membership
+  const orgMembership = await c.env.DB.prepare(
+    "SELECT org_id, role FROM org_members WHERE user_id = ? ORDER BY joined_at ASC LIMIT 1"
+  ).bind(user.id).first<{ org_id: string; role: string }>();
+
+  const orgId = orgMembership?.org_id ?? "";
+  const orgRole = (orgMembership?.role ?? "member") as "owner" | "admin" | "member" | "viewer";
+
   const secret = c.env.JWT_SECRET ?? "dev-secret";
   const { _refreshJti, ...tokens } = await createTokenPair(
-    { id: user.id, email: user.email, role: user.role },
+    { id: user.id, email: user.email, role: user.role, orgId, orgRole },
     secret,
   );
 
@@ -197,8 +215,19 @@ authRoute.openapi(refresh, async (c) => {
       .where(eq(refreshTokens.jti, payload.jti));
   }
 
+  // Resolve org for refreshed token
+  const orgMembership = await c.env.DB.prepare(
+    "SELECT org_id, role FROM org_members WHERE user_id = ? ORDER BY joined_at ASC LIMIT 1"
+  ).bind(user.id).first<{ org_id: string; role: string }>();
+
   const { _refreshJti, ...tokens } = await createTokenPair(
-    { id: user.id, email: user.email, role: user.role },
+    {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      orgId: orgMembership?.org_id ?? "",
+      orgRole: (orgMembership?.role ?? "member") as "owner" | "admin" | "member" | "viewer",
+    },
     secret,
   );
 

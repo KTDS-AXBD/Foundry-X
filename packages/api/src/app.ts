@@ -14,10 +14,12 @@ import { specRoute } from "./routes/spec.js";
 import { webhookRoute } from "./routes/webhook.js";
 import mcpRoute from "./routes/mcp.js";
 import { inboxRoute } from "./routes/inbox.js";
+import { slackRoute } from "./routes/slack.js";
 import { authMiddleware } from "./middleware/auth.js";
+import { tenantGuard, type TenantVariables } from "./middleware/tenant.js";
 import type { Env } from "./env.js";
 
-export const app = new OpenAPIHono<{ Bindings: Env }>();
+export const app = new OpenAPIHono<{ Bindings: Env; Variables: TenantVariables }>();
 
 // CORS — allow fx.minu.best and local dev
 app.use("*", cors({
@@ -63,8 +65,12 @@ app.route("/api", authRoute);
 // Webhook (public — HMAC-SHA256 서명으로 보호)
 app.route("/api", webhookRoute);
 
-// Protected API routes — JWT required
+// Slack (public — Slack 자체 서명으로 보호)
+app.route("/api", slackRoute);
+
+// Protected API routes — JWT required + tenant isolation
 app.use("/api/*", authMiddleware);
+app.use("/api/*", tenantGuard);
 app.route("/api", profileRoute);
 app.route("/api", integrityRoute);
 app.route("/api", healthRoute);

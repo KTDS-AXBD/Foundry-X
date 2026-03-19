@@ -84,6 +84,7 @@ export class MockD1Database {
         name TEXT NOT NULL,
         repo_url TEXT NOT NULL,
         owner_id TEXT NOT NULL,
+        org_id TEXT DEFAULT '',
         last_sync_at TEXT,
         created_at TEXT NOT NULL
       );
@@ -130,6 +131,7 @@ export class MockD1Database {
         name TEXT NOT NULL,
         description TEXT DEFAULT '',
         status TEXT NOT NULL DEFAULT 'active',
+        org_id TEXT DEFAULT '',
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
       CREATE TABLE IF NOT EXISTS agent_capabilities (
@@ -169,6 +171,7 @@ export class MockD1Database {
         name TEXT NOT NULL,
         server_url TEXT NOT NULL,
         transport_type TEXT NOT NULL DEFAULT 'sse' CHECK (transport_type IN ('sse', 'http')),
+        org_id TEXT DEFAULT '',
         api_key_encrypted TEXT,
         status TEXT NOT NULL DEFAULT 'inactive' CHECK (status IN ('active', 'inactive', 'error')),
         last_connected_at TEXT,
@@ -250,7 +253,24 @@ export class MockD1Database {
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
         resolved_at TEXT
       );
+      CREATE TABLE IF NOT EXISTS organizations (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        slug TEXT NOT NULL UNIQUE,
+        plan TEXT NOT NULL DEFAULT 'free',
+        settings TEXT NOT NULL DEFAULT '{}',
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE TABLE IF NOT EXISTS org_members (
+        org_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        role TEXT NOT NULL DEFAULT 'member',
+        joined_at TEXT NOT NULL DEFAULT (datetime('now')),
+        PRIMARY KEY (org_id, user_id)
+      );
     `);
+    this.db.prepare("INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)").run("org_test", "Test Org", "test");
   }
 
   prepare(query: string) {

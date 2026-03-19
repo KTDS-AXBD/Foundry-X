@@ -7,7 +7,7 @@ let authHeader: Record<string, string>;
 
 beforeAll(async () => {
   const token = await createAccessToken(
-    { sub: "test-user", email: "test@example.com", role: "admin" },
+    { sub: "test-user", email: "test@example.com", role: "admin", orgId: "org_test", orgRole: "owner" },
     TEST_SECRET,
   );
   authHeader = { Authorization: `Bearer ${token}` };

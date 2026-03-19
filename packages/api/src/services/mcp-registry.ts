@@ -53,10 +53,11 @@ function rowToRecord(row: McpServerRow): McpServerRecord {
 export class McpServerRegistry {
   constructor(private db: D1Database) {}
 
-  async listServers(): Promise<McpServerRecord[]> {
-    const { results } = await this.db
-      .prepare("SELECT * FROM mcp_servers ORDER BY created_at DESC")
-      .all<McpServerRow>();
+  async listServers(orgId?: string): Promise<McpServerRecord[]> {
+    const query = orgId
+      ? this.db.prepare("SELECT * FROM mcp_servers WHERE org_id = ? ORDER BY created_at DESC").bind(orgId)
+      : this.db.prepare("SELECT * FROM mcp_servers ORDER BY created_at DESC");
+    const { results } = await query.all<McpServerRow>();
     return results.map(rowToRecord);
   }
 
