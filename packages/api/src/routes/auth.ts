@@ -15,6 +15,8 @@ import {
   TokenPairSchema,
 } from "../schemas/auth.js";
 import { ErrorSchema, validationHook } from "../schemas/common.js";
+import { SwitchOrgSchema, InvitationTokenSchema } from "../schemas/org.js";
+import { OrgService, OrgError } from "../services/org.js";
 
 export const authRoute = new OpenAPIHono<{ Bindings: Env }>({
   defaultHook: validationHook as any,
@@ -238,4 +240,119 @@ authRoute.openapi(refresh, async (c) => {
   });
 
   return c.json(tokens);
+});
+
+// ─── POST /auth/switch-org ───
+
+const switchOrg = createRoute({
+  method: "post",
+  path: "/auth/switch-org",
+  tags: ["Auth"],
+  summary: "Switch active organization (requires login)",
+  request: {
+    body: { content: { "application/json": { schema: SwitchOrgSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: TokenPairSchema } }, description: "New token pair for switched org" },
+    403: { content: { "application/json": { schema: ErrorSchema } }, description: "Not a member" },
+  },
+});
+
+authRoute.openapi(switchOrg, async (c) => {
+  const { orgId } = c.req.valid("json");
+
+  // Verify JWT manually (this is a public route but requires auth)
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return c.json({ error: "Authorization required" }, 401);
+  }
+  const secret = c.env.JWT_SECRET ?? "dev-secret";
+  let payload: JwtPayload;
+  try {
+    payload = (await verify(authHeader.slice(7), secret, "HS256")) as unknown as JwtPayload;
+  } catch {
+    return c.json({ error: "Invalid token" }, 401);
+  }
+
+  const member = await c.env.DB.prepare(
+    "SELECT role FROM org_members WHERE org_id = ? AND user_id = ?"
+  ).bind(orgId, payload.sub).first();
+
+  if (!member) {
+    return c.json({ error: "Not a member of this organization" }, 403);
+  }
+
+  const db = getDb(c.env.DB);
+  const { _refreshJti, ...tokens } = await createTokenPair({
+    id: payload.sub,
+    email: payload.email,
+    role: payload.role,
+    orgId,
+    orgRole: (member as Record<string, unknown>).role as "owner" | "admin" | "member" | "viewer",
+  }, secret);
+
+  await db.insert(refreshTokens).values({
+    jti: _refreshJti,
+    userId: payload.sub,
+    expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
+  });
+
+  return c.json(tokens);
+});
+
+// ─── POST /auth/invitations/:token/accept ───
+
+const acceptInvitation = createRoute({
+  method: "post",
+  path: "/auth/invitations/{token}/accept",
+  tags: ["Auth"],
+  summary: "Accept an organization invitation",
+  request: { params: InvitationTokenSchema },
+  responses: {
+    200: { content: { "application/json": { schema: TokenPairSchema } }, description: "Joined org, new token pair" },
+    403: { content: { "application/json": { schema: ErrorSchema } }, description: "Email mismatch" },
+    410: { content: { "application/json": { schema: ErrorSchema } }, description: "Expired" },
+  },
+});
+
+authRoute.openapi(acceptInvitation, async (c) => {
+  const { token } = c.req.valid("param");
+
+  // Verify JWT manually
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return c.json({ error: "Authorization required" }, 401);
+  }
+  const secret = c.env.JWT_SECRET ?? "dev-secret";
+  let payload: JwtPayload;
+  try {
+    payload = (await verify(authHeader.slice(7), secret, "HS256")) as unknown as JwtPayload;
+  } catch {
+    return c.json({ error: "Invalid token" }, 401);
+  }
+
+  const orgService = new OrgService(c.env.DB);
+  try {
+    const { orgId, role } = await orgService.acceptInvitation(token, payload.sub, payload.email);
+
+    const db = getDb(c.env.DB);
+    const { _refreshJti, ...tokens } = await createTokenPair({
+      id: payload.sub,
+      email: payload.email,
+      role: payload.role,
+      orgId,
+      orgRole: role,
+    }, secret);
+
+    await db.insert(refreshTokens).values({
+      jti: _refreshJti,
+      userId: payload.sub,
+      expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
+    });
+
+    return c.json(tokens);
+  } catch (e) {
+    if (e instanceof OrgError) return c.json({ error: e.message }, e.status as any);
+    throw e;
+  }
 });

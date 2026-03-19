@@ -15,6 +15,7 @@ import { webhookRoute } from "./routes/webhook.js";
 import mcpRoute from "./routes/mcp.js";
 import { inboxRoute } from "./routes/inbox.js";
 import { slackRoute } from "./routes/slack.js";
+import { orgRoute } from "./routes/org.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { tenantGuard, type TenantVariables } from "./middleware/tenant.js";
 import type { Env } from "./env.js";
@@ -55,6 +56,7 @@ app.doc("/api/openapi.json", {
     { name: "Spec", description: "NL→Spec 변환" },
     { name: "Webhook", description: "외부 Webhook 수신" },
     { name: "MCP", description: "MCP Server management" },
+    { name: "Org", description: "Organization management (CRUD, members, invitations)" },
   ],
 });
 app.get("/api/docs", swaggerUI({ url: "/api/openapi.json" }));
@@ -67,6 +69,11 @@ app.route("/api", webhookRoute);
 
 // Slack (public — Slack 자체 서명으로 보호)
 app.route("/api", slackRoute);
+
+// Org routes — auth middleware applied internally, tenantGuard selective per-route
+app.use("/api/orgs", authMiddleware);
+app.use("/api/orgs/*", authMiddleware);
+app.route("/api", orgRoute);
 
 // Protected API routes — JWT required + tenant isolation
 app.use("/api/*", authMiddleware);

@@ -173,3 +173,47 @@ export const GREENFIELD_WEIGHTS: Record<string, number> = {
 export const BROWNFIELD_WEIGHTS: Record<string, number> = {
   goal: 0.35, constraint: 0.25, success: 0.25, context: 0.15,
 };
+
+// ─── Multi-tenancy Types (F92) ───
+
+export type OrgRole = 'owner' | 'admin' | 'member' | 'viewer';
+
+export type OrgPlan = 'free' | 'pro' | 'enterprise';
+
+export interface Organization {
+  id: string;
+  name: string;
+  slug: string;
+  plan: OrgPlan;
+  settings: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrgMember {
+  orgId: string;
+  userId: string;
+  email: string;
+  name: string;
+  role: OrgRole;
+  joinedAt: string;
+}
+
+export interface OrgInvitation {
+  id: string;
+  orgId: string;
+  email: string;
+  role: OrgRole;
+  token: string;
+  expiresAt: string;
+  createdAt: string;
+  acceptedAt: string | null;
+  invitedBy: string;
+}
+
+export const ORG_ROLE_HIERARCHY: Record<OrgRole, number> = {
+  viewer: 1,
+  member: 2,
+  admin: 3,
+  owner: 4,
+};

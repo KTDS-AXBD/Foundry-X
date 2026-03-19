@@ -270,6 +270,21 @@ export class MockD1Database {
         PRIMARY KEY (org_id, user_id)
       );
 
+      CREATE TABLE IF NOT EXISTS org_invitations (
+        id TEXT PRIMARY KEY,
+        org_id TEXT NOT NULL,
+        email TEXT NOT NULL,
+        role TEXT NOT NULL DEFAULT 'member',
+        token TEXT NOT NULL UNIQUE,
+        expires_at TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        accepted_at TEXT,
+        invited_by TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_invitation_token ON org_invitations(token);
+      CREATE INDEX IF NOT EXISTS idx_invitation_org ON org_invitations(org_id);
+      CREATE INDEX IF NOT EXISTS idx_invitation_email ON org_invitations(email);
+
       CREATE TABLE IF NOT EXISTS agent_messages (
         id TEXT PRIMARY KEY,
         from_agent_id TEXT NOT NULL,
