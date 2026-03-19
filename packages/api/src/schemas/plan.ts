@@ -23,3 +23,9 @@ export const rejectPlanSchema = z.object({
 export const modifyPlanSchema = z.object({
   feedback: z.string().min(1),
 });
+
+export const executePlanSchema = z.object({
+  repoUrl: z.string().optional(),
+  branch: z.string().optional(),
+  projectId: z.string().optional(),
+});

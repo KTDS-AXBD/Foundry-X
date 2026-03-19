@@ -919,12 +919,24 @@ agentRoute.get("/plan/:id", async (c) => {
 
 agentRoute.post("/plan/:id/execute", async (c) => {
   const planId = c.req.param("id");
+  const body = await c.req.json().catch(() => ({}));
+  const { repoUrl, branch, projectId } = body as { repoUrl?: string; branch?: string; projectId?: string };
+
+  let resolvedRepoUrl = repoUrl || "";
+  if (!resolvedRepoUrl && projectId) {
+    const row = await c.env.DB.prepare("SELECT repo_url FROM projects WHERE id = ?").bind(projectId).first<{ repo_url: string }>();
+    if (row) resolvedRepoUrl = row.repo_url;
+  }
+
   const sseManager = getSSEManager(c.env.DB);
   const planner = new PlannerAgent({ db: c.env.DB, sse: sseManager });
   const orchestrator = new AgentOrchestrator(c.env.DB, sseManager);
   orchestrator.setPlannerAgent(planner);
   const { MockRunner } = await import("../services/claude-api-runner.js");
-  const result = await orchestrator.executePlan(planId, new MockRunner());
+  const result = await orchestrator.executePlan(planId, new MockRunner(), {
+    repoUrl: resolvedRepoUrl,
+    branch: branch || "master",
+  });
   const plan = await planner.getPlan(planId);
   return c.json({ plan, result });
 });

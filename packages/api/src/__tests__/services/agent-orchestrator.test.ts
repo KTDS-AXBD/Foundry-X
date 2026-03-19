@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "../helpers/mock-d1.js";
 import { AgentOrchestrator } from "../../services/agent-orchestrator.js";
+import { PlannerAgent } from "../../services/planner-agent.js";
 import { MockRunner } from "../../services/claude-api-runner.js";
 
 describe("AgentOrchestrator", () => {
@@ -232,5 +233,55 @@ describe("AgentOrchestrator", () => {
   it("getTaskResult returns null for non-existent task", async () => {
     const taskResult = await orchestrator.getTaskResult("non-existent-task");
     expect(taskResult).toBeNull();
+  });
+
+  describe("executePlan repoUrl", () => {
+    let planner: PlannerAgent;
+
+    beforeEach(() => {
+      planner = new PlannerAgent({ db: db as any });
+      orchestrator.setPlannerAgent(planner);
+    });
+
+    async function seedApprovedPlan(planId: string, agentId: string) {
+      const now = new Date().toISOString();
+      await db.prepare(
+        `INSERT INTO agent_plans (id, task_id, agent_id, codebase_analysis, proposed_steps, estimated_files, risks, estimated_tokens, status, created_at, approved_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'approved', ?, ?)`,
+      ).bind(
+        planId, "task-1", agentId, "analysis",
+        JSON.stringify([{ type: "create", description: "Create file", targetFile: "src/foo.ts" }]),
+        1, "[]", 500, now, now,
+      ).run();
+    }
+
+    it("passes repoUrl from options to execution context", async () => {
+      await seedApprovedPlan("plan-url-1", "agent-url-1");
+      const runner = new MockRunner();
+      const result = await orchestrator.executePlan("plan-url-1", runner, {
+        repoUrl: "https://github.com/KTDS-AXBD/Foundry-X",
+        branch: "feat/test",
+      });
+      expect(result.status).toBe("success");
+      // Verify plan status updated
+      const plan = await planner.getPlan("plan-url-1");
+      expect(plan?.status).toBe("completed");
+    });
+
+    it("uses empty repoUrl when options not provided (backward compat)", async () => {
+      await seedApprovedPlan("plan-url-2", "agent-url-2");
+      const runner = new MockRunner();
+      const result = await orchestrator.executePlan("plan-url-2", runner);
+      expect(result.status).toBe("success");
+    });
+
+    it("uses provided branch from options", async () => {
+      await seedApprovedPlan("plan-url-3", "agent-url-3");
+      const runner = new MockRunner();
+      const result = await orchestrator.executePlan("plan-url-3", runner, {
+        branch: "develop",
+      });
+      expect(result.status).toBe("success");
+    });
   });
 });

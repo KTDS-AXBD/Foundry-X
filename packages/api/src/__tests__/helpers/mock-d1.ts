@@ -287,14 +287,19 @@ export class MockD1Database {
 
       CREATE TABLE IF NOT EXISTS agent_plans (
         id TEXT PRIMARY KEY,
+        task_id TEXT NOT NULL,
         agent_id TEXT NOT NULL,
-        title TEXT NOT NULL,
-        description TEXT NOT NULL DEFAULT '',
-        steps TEXT NOT NULL DEFAULT '[]',
-        status TEXT NOT NULL DEFAULT 'pending'
-          CHECK(status IN ('pending','approved','rejected','executing','completed','failed','cancelled')),
+        codebase_analysis TEXT NOT NULL DEFAULT '',
+        proposed_steps TEXT NOT NULL DEFAULT '[]',
+        estimated_files INTEGER DEFAULT 0,
+        risks TEXT DEFAULT '[]',
+        estimated_tokens INTEGER DEFAULT 0,
+        status TEXT NOT NULL DEFAULT 'analyzing'
+          CHECK(status IN ('analyzing','pending_approval','approved','modified','rejected','executing','completed','failed','cancelled')),
+        human_feedback TEXT,
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
         approved_at TEXT,
+        rejected_at TEXT,
         execution_status TEXT,
         execution_started_at TEXT,
         execution_completed_at TEXT,

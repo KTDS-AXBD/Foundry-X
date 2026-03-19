@@ -670,6 +670,7 @@ export class AgentOrchestrator {
   async executePlan(
     planId: string,
     runner: AgentRunner,
+    options?: { repoUrl?: string; branch?: string },
   ): Promise<AgentExecutionResult> {
     if (!this.plannerAgent) throw new Error("PlannerAgent not configured");
     const plan = await this.plannerAgent.getPlan(planId);
@@ -684,7 +685,7 @@ export class AgentOrchestrator {
     this.sse?.pushEvent({ event: "agent.plan.executing", data: { planId, startedAt: now } });
     try {
       const context: AgentExecutionRequest["context"] = {
-        repoUrl: "", branch: "master",
+        repoUrl: options?.repoUrl || "", branch: options?.branch || "master",
         targetFiles: plan.proposedSteps.filter((s: { targetFile?: string }) => s.targetFile).map((s: { targetFile?: string }) => s.targetFile!),
         instructions: plan.proposedSteps.map((s: { type: string; description: string }, i: number) => `Step ${i + 1} (${s.type}): ${s.description}`).join("\n"),
       };
