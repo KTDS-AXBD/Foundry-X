@@ -212,6 +212,87 @@ describe("McpRunner", () => {
     expect(runner.supportsTaskType("code-generation")).toBe(true);
     expect(runner.supportsTaskType("spec-analysis")).toBe(true);
     expect(runner.supportsTaskType("test-generation")).toBe(true);
+    // Phase 1-3
+    expect(runner.supportsTaskType("policy-evaluation")).toBe(true);
+    expect(runner.supportsTaskType("skill-query")).toBe(true);
+    expect(runner.supportsTaskType("ontology-lookup")).toBe(true);
     expect(runner.supportsTaskType("unknown")).toBe(false);
+  });
+
+  // ─── Phase 1-3: AI Foundry TaskType buildToolArguments ───
+
+  it("execute() builds correct args for policy-evaluation (JSON instructions)", async () => {
+    await runner.execute(
+      makeRequest({
+        taskType: "policy-evaluation",
+        context: {
+          repoUrl: "",
+          branch: "",
+          instructions: JSON.stringify({ policyCode: "POL-GV-CHARGE-001", context: "충전 요청" }),
+        },
+      }),
+    );
+
+    const sendCall = (transport.send as ReturnType<typeof vi.fn>).mock.calls[0]![0];
+    expect(sendCall.params.name).toBe("foundry_policy_eval");
+    expect(sendCall.params.arguments.policyCode).toBe("POL-GV-CHARGE-001");
+    expect(sendCall.params.arguments.context).toBe("충전 요청");
+  });
+
+  it("execute() builds correct args for policy-evaluation (plain text fallback)", async () => {
+    await runner.execute(
+      makeRequest({
+        taskType: "policy-evaluation",
+        context: {
+          repoUrl: "",
+          branch: "",
+          instructions: "사용자가 5만원 충전 요청",
+        },
+      }),
+    );
+
+    const sendCall = (transport.send as ReturnType<typeof vi.fn>).mock.calls[0]![0];
+    expect(sendCall.params.name).toBe("foundry_policy_eval");
+    expect(sendCall.params.arguments.context).toBe("사용자가 5만원 충전 요청");
+  });
+
+  it("execute() builds correct args for skill-query", async () => {
+    await runner.execute(
+      makeRequest({
+        taskType: "skill-query",
+        context: {
+          repoUrl: "",
+          branch: "",
+          instructions: "충전",
+          spec: { title: "LPON", description: "", acceptanceCriteria: [] },
+        },
+      }),
+    );
+
+    const sendCall = (transport.send as ReturnType<typeof vi.fn>).mock.calls[0]![0];
+    expect(sendCall.params.name).toBe("foundry_skill_query");
+    expect(sendCall.params.arguments.query).toBe("충전");
+    expect(sendCall.params.arguments.organizationId).toBe("LPON");
+    expect(sendCall.params.arguments.limit).toBe("10");
+  });
+
+  it("execute() builds correct args for ontology-lookup", async () => {
+    await runner.execute(
+      makeRequest({
+        taskType: "ontology-lookup",
+        context: {
+          repoUrl: "",
+          branch: "",
+          instructions: "온누리상품권",
+          spec: { title: "LPON", description: "", acceptanceCriteria: [] },
+        },
+      }),
+    );
+
+    const sendCall = (transport.send as ReturnType<typeof vi.fn>).mock.calls[0]![0];
+    expect(sendCall.params.name).toBe("foundry_ontology_lookup");
+    expect(sendCall.params.arguments.term).toBe("온누리상품권");
+    expect(sendCall.params.arguments.organizationId).toBe("LPON");
+    expect(sendCall.params.arguments.includeRelated).toBe("true");
   });
 });
