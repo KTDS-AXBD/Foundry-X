@@ -13,7 +13,10 @@ export const createPlanSchema = z.object({
     branch: z.string(),
     targetFiles: z.array(z.string()).optional(),
     instructions: z.string().optional(),
+    spec: z.string().optional(),
+    fileContents: z.record(z.string(), z.string()).optional(),
   }),
+  model: z.enum(["claude-sonnet-4-5-20250514", "claude-haiku-4-5-20250714"]).optional(),
 });
 
 export const rejectPlanSchema = z.object({

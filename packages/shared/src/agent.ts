@@ -587,6 +587,12 @@ export interface AgentPlan {
   executionCompletedAt?: string;
   executionResult?: AgentExecutionResult;
   executionError?: string;
+  // Sprint 22 F95: Analysis metadata
+  analysisMode?: "llm" | "mock";
+  analysisModel?: string;
+  analysisTokensUsed?: number;
+  analysisDurationMs?: number;
+  fileContextCount?: number;
 }
 
 // Sprint 17 F82: Plan Execution SSE Events

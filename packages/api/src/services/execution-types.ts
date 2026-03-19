@@ -35,6 +35,7 @@ export interface AgentExecutionRequest {
       acceptanceCriteria: string[];
     };
     instructions?: string;
+    fileContents?: Record<string, string>;
   };
   constraints: AgentConstraintRule[];
 }

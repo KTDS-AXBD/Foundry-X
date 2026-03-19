@@ -439,6 +439,65 @@ export class GitHubService {
       throw new GitHubApiError(res.status, `issues/${issueOrPrNumber}/labels/${label}`);
     }
   }
+
+  // ─── Sprint 22 F95: File Content Methods for PlannerAgent ───
+
+  async getFileContentRaw(
+    repo: string, path: string, ref?: string,
+  ): Promise<string | null> {
+    try {
+      const url = `${this.baseUrl}/repos/${repo}/contents/${encodeURIComponent(path)}${ref ? "?ref=" + ref : ""}`;
+      const res = await fetch(url, { headers: this.headers() });
+      if (!res.ok) return null;
+      const data = (await res.json()) as { content: string };
+      return atob(data.content.replace(/\n/g, ""));
+    } catch {
+      return null;
+    }
+  }
+
+  async getMultipleFiles(
+    repo: string, paths: string[], ref?: string,
+  ): Promise<Map<string, string>> {
+    const result = new Map<string, string>();
+    if (paths.length <= 10) {
+      await Promise.all(paths.map(async (p) => {
+        const content = await this.getFileContentRaw(repo, p, ref);
+        if (content !== null) result.set(p, content);
+      }));
+      return result;
+    }
+    try {
+      const treeRes = await fetch(
+        `${this.baseUrl}/repos/${repo}/git/trees/${ref ?? "HEAD"}?recursive=1`,
+        { headers: this.headers() },
+      );
+      if (!treeRes.ok) throw new Error("trees API failed");
+      const treeData = (await treeRes.json()) as {
+        tree: Array<{ path: string; sha: string; type: string }>;
+      };
+      const pathSet = new Set(paths);
+      const blobs = treeData.tree.filter((t) => t.type === "blob" && pathSet.has(t.path));
+      await Promise.all(blobs.map(async (blob) => {
+        try {
+          const blobRes = await fetch(
+            `${this.baseUrl}/repos/${repo}/git/blobs/${blob.sha}`,
+            { headers: this.headers() },
+          );
+          if (!blobRes.ok) return;
+          const blobData = (await blobRes.json()) as { content: string };
+          result.set(blob.path, atob(blobData.content.replace(/\n/g, "")));
+        } catch { /* skip */ }
+      }));
+    } catch {
+      const limited = paths.slice(0, 10);
+      await Promise.all(limited.map(async (p) => {
+        const content = await this.getFileContentRaw(repo, p, ref);
+        if (content !== null) result.set(p, content);
+      }));
+    }
+    return result;
+  }
 }
 
 export class GitHubApiError extends Error {
