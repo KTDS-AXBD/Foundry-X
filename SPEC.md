@@ -1,7 +1,7 @@
 ---
 code: FX-SPEC-001
 title: Foundry-X Project Specification
-version: 4.3
+version: 4.4
 status: Active
 category: SPEC
 system-version: 1.5.0
@@ -88,6 +88,8 @@ Foundry-X CLI — 사람과 AI 에이전트가 동등한 팀원으로 협업하�
 | v1.3.0 | Sprint 15: PlannerAgent + 에이전트 inbox + git worktree 격리 (57 endpoints, 307 API tests) | ✅ |
 | v1.4.0 | Sprint 16: PlannerAgent LLM 실 연동 + AgentInboxPanel UI + 프로덕션 배포 (57 endpoints, 313 API tests) | ✅ |
 | v1.5.0 | Sprint 17: AI Foundry MCP 연동 + AgentInbox 스레드 뷰 + PlannerAgent Orchestrator 통합 | ✅ |
+| v1.6.0 | Sprint 18: 멀티테넌시 설계 + GitHub/Slack 외부 도구 연동 | 📋 |
+| v1.7.0 | Sprint 19: AgentInbox 스레드 답장 — ThreadReplyForm + API 보강 + 통합 테스트 | 📋 |
 
 ## §4 성공 지표
 
@@ -305,6 +307,14 @@ Foundry-X CLI — 사람과 AI 에이전트가 동등한 팀원으로 협업하�
 | F80 | AI Foundry MCP 연동 — 설계 문서 + 서비스 등록 흐름 + 외부 MCP 호출 경로 (FX-REQ-080, P1) | v1.5 | ✅ | McpServerRegistry.createServerPreset("ai-foundry") + PRESET_CONFIGS + externalTool type, Match 100% |
 | F81 | AgentInboxPanel 스레드 뷰 — parentMessageId 기반 대화 맥락 UI + 스레드 라우트 (FX-REQ-081, P1) | v1.5 | ✅ | GET /agents/inbox/:parentMessageId/thread + viewMode(flat/threaded) + groupByThread(), Match 100% |
 | F82 | PlannerAgent → Orchestrator 실 연동 — createPlanAndWait 승인 대기 + executePlan 라이프사이클 (FX-REQ-082, P1) | v1.5 | ✅ | createPlanAndWait() 폴링 + executePlan() lifecycle + D1 migration 0010 + Plan API 2 endpoints, Match 97% |
+
+**Sprint 19 — AgentInbox 스레드 답장 (v1.7.0)**
+
+| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
+|----|----------------------|:----:|:----:|------|
+| F87 | ThreadReplyForm UI — 스레드 상세 뷰 + 답장 폼 + getInboxThread 연동 (FX-REQ-087, P1) | v1.7 | 📋 | AgentInboxPanel 확장, ThreadDetailView 신규 |
+| F88 | 스레드 답장 API 보강 — 답장 알림 + 읽음 처리 확장 + mock-d1 보완 (FX-REQ-088, P1) | v1.7 | 📋 | agent-inbox 서비스 확장, SSE thread 이벤트 |
+| F89 | 스레드 통합 테스트 + E2E — API 라우트 테스트 + Playwright 스레드 흐름 (FX-REQ-089, P2) | v1.7 | 📋 | mock-d1 agent_messages 추가, E2E 스레드 시나리오 |
 
 ### 단독 작업 — Production E2E + AXIS Design System 리디자인
 
@@ -530,6 +540,17 @@ Foundry-X CLI — 사람과 AI 에이전트가 동등한 팀원으로 협업하�
 - [x] Plan 관리 API 2 endpoints — get/execute (FX-REQ-082 DONE)
 - [x] typecheck + build + tests 313건 통과 (PDCA 98%)
 
+### Sprint 19 (v1.7.0) — AgentInbox 스레드 답장
+- [ ] ThreadReplyForm 컴포넌트 — 답장 입력 폼 + type/subject/payload 필드 (FX-REQ-087)
+- [ ] ThreadDetailView — getInboxThread() 연동 + 스레드 전체 대화 표시 (FX-REQ-087)
+- [ ] AgentInboxPanel 스레드 클릭 → ThreadDetailView 전환 UX (FX-REQ-087)
+- [ ] 답장 알림 SSE 이벤트 — agent.message.thread_reply 전파 (FX-REQ-088)
+- [ ] 스레드 읽음 처리 — ackThread() 일괄 확인 메서드 (FX-REQ-088)
+- [ ] mock-d1 agent_messages 테이블 추가 + 인덱스 (FX-REQ-089)
+- [ ] inbox 라우트 통합 테스트 — 4 endpoints 전체 커버리지 (FX-REQ-089)
+- [ ] Playwright E2E — 스레드 답장 흐름 시나리오 (FX-REQ-089)
+- [ ] typecheck + build + tests 통과
+
 ### 단독: F78 Production 사이트 E2E 테스트 ✅
 - [x] Playwright 프로덕션 config — baseURL: fx.minu.best (FX-REQ-078 DONE)
 - [x] smoke test E2E — health check + 랜딩 페이지 로딩 검증 (FX-REQ-078 DONE)
@@ -602,3 +623,4 @@ Foundry-X CLI — 사람과 AI 에이전트가 동등한 팀원으로 협업하�
 | 4.1 | 2026-03-18 | Sprint 17 계획 — F80(AI Foundry MCP, P1) + F81(AgentInbox 스레드, P1) + F82(PlannerAgent Orchestrator, P1) 등록 |
 | 4.2 | 2026-03-19 | F78+F79 완료 — F78 Production E2E(94%) + F79 AXIS DS 리디자인(96%) ✅, PDCA 전주기 Agent Teams ×5 |
 | 4.3 | 2026-03-19 | Sprint 17 완료 보정 — F80(100%)+F81(100%)+F82(97%) ✅, §1/§2/§3/§5/§6 갱신, REQ sync 82건, GitHub Issues+Project 일괄 동기화 |
+| 4.4 | 2026-03-19 | Sprint 19 계획 — F87(ThreadReplyForm UI, P1) + F88(스레드 API 보강, P1) + F89(통합 테스트+E2E, P2) 등록, v1.7.0 마일스톤 |
