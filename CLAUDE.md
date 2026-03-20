@@ -87,7 +87,7 @@ foundry-x/
 │   ├── 02-design/          # DSGN 문서
 │   ├── 03-analysis/        # 갭 분석 문서
 │   ├── 04-report/          # PDCA 완료 보고서
-│   ├── specs/              # PRD v4, dev-transparency-spec, interview-log
+│   ├── specs/              # PRD v5, dev-transparency-spec, interview-log
 │   ├── review/             # AI 검토 (round-1, round-2)
 │   └── archive/            # 구버전 PRD (v1~v3)
 ├── package.json            # 루트 (pnpm workspace)
@@ -99,7 +99,7 @@ foundry-x/
 
 | 문서 | 용도 |
 |------|------|
-| `docs/specs/prd-v4.md` | 현행 PRD (권위 문서, v4: synthnoosh harness bootstrap 반영) |
+| `docs/specs/prd-v5.md` | 현행 PRD (권위 문서, v5: 통합 플랫폼 비전 + Phase 3 현황 반영) |
 | `docs/specs/dev-transparency-spec.md` | 개발 투명성 스펙 |
 | `docs/specs/interview-log.md` | 요구사항 인터뷰 종합 (Part 1-5) |
 | `docs/02-design/features/tech-stack-review.design.md` | 기술 스택 결정 근거 |
