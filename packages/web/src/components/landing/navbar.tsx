@@ -12,6 +12,7 @@ const navLinks = [
   { href: "#ecosystem", label: "Ecosystem" },
   { href: "#architecture", label: "Architecture" },
   { href: "#roadmap", label: "Roadmap" },
+  { href: "#plugin", label: "Plugin" },
 ];
 
 export function Navbar() {

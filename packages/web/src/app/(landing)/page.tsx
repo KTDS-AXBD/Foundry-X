@@ -9,15 +9,21 @@ import {
   Brain,
   Compass,
   Cpu,
+  Download,
   Eye,
   GitBranch,
   Layers,
   Palette,
+  Play,
+  Puzzle,
+  RefreshCw,
   Rocket,
   Scan,
+  Search,
   Shield,
   Sparkles,
   Terminal,
+  Wrench,
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════
@@ -181,6 +187,30 @@ const roadmap = [
     version: "v3.0",
     status: "planned" as const,
     items: ["SR 시나리오", "외부 파일럿", "엔터프라이즈"],
+  },
+];
+
+const pluginCommands = [
+  {
+    cmd: "/sf-scan",
+    flag: "--auto-classify",
+    icon: Scan,
+    title: "Scan & Classify",
+    desc: "프로젝트의 모든 스킬을 탐지하고 Workflow·Capability·Hybrid로 자동 분류해요.",
+  },
+  {
+    cmd: "/sf-lint",
+    flag: "--fix",
+    icon: Wrench,
+    title: "Lint & Fix",
+    desc: "스킬 파일의 구조·frontmatter·트리거 품질을 검사하고, --fix로 자동 수정해요.",
+  },
+  {
+    cmd: "/sf-search",
+    flag: '"deploy"',
+    icon: Search,
+    title: "Search",
+    desc: "키워드로 등록된 스킬을 검색해요. 이름·설명·트리거에서 매칭돼요.",
   },
 ];
 
@@ -778,6 +808,151 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ TEAM PLUGIN ═══ */}
+      <section id="plugin" className="relative px-6 py-24 md:py-32">
+        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+          <div className="absolute top-1/3 right-1/4 h-[400px] w-[400px] rounded-full bg-axis-violet/4 blur-[120px]" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-4xl">
+          <div className="mb-12 text-center">
+            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-violet uppercase">
+              Team Plugin
+            </span>
+            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+              팀 도구를{" "}
+              <span className="bg-gradient-to-r from-axis-violet to-axis-blue bg-clip-text text-transparent">
+                한 줄로 설치
+              </span>
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              skill-framework 플러그인으로 Claude Code에 팀 전용 스킬을 추가해요.
+            </p>
+          </div>
+
+          {/* Install steps — terminal card */}
+          <div className="axis-glass overflow-hidden rounded-2xl">
+            <div className="flex items-center gap-2 border-b border-border/30 px-5 py-3">
+              <div className="size-3 rounded-full bg-axis-accent/40" />
+              <div className="size-3 rounded-full bg-axis-violet/40" />
+              <div className="size-3 rounded-full bg-green-500/40" />
+              <span className="ml-2 font-mono text-xs text-muted-foreground">
+                terminal
+              </span>
+              <span className="ml-auto rounded-md bg-axis-violet/10 px-2 py-0.5 font-mono text-[10px] text-axis-violet">
+                1회 설정
+              </span>
+            </div>
+            <div className="space-y-5 p-6 font-mono text-sm">
+              {/* Step 1 */}
+              <div>
+                <div className="mb-1.5 flex items-center gap-2">
+                  <span className="flex size-5 items-center justify-center rounded-md bg-axis-violet/15 text-[10px] font-bold text-axis-violet">
+                    1
+                  </span>
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/50">
+                    마켓플레이스 등록
+                  </span>
+                </div>
+                <div>
+                  <span className="text-axis-violet">$</span>{" "}
+                  <span className="text-foreground">
+                    claude plugin marketplace add{" "}
+                    <span className="text-axis-blue">
+                      KTDS-AXBD/skill-framework
+                    </span>
+                  </span>
+                </div>
+                <div className="ml-4 mt-1 text-muted-foreground">
+                  <span className="text-green-400">&#10003;</span> 팀 마켓플레이스에 리포를 등록해요
+                </div>
+              </div>
+              {/* Step 2 */}
+              <div>
+                <div className="mb-1.5 flex items-center gap-2">
+                  <span className="flex size-5 items-center justify-center rounded-md bg-axis-violet/15 text-[10px] font-bold text-axis-violet">
+                    2
+                  </span>
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/50">
+                    플러그인 설치
+                  </span>
+                </div>
+                <div>
+                  <span className="text-axis-violet">$</span>{" "}
+                  <span className="text-foreground">
+                    claude plugin install{" "}
+                    <span className="text-axis-blue">skill-framework</span>
+                  </span>
+                </div>
+                <div className="ml-4 mt-1 text-muted-foreground">
+                  <span className="text-green-400">&#10003;</span> user scope로 설치 — 어느 프로젝트에서든 사용 가능
+                </div>
+              </div>
+              {/* Step 3 */}
+              <div>
+                <div className="mb-1.5 flex items-center gap-2">
+                  <span className="flex size-5 items-center justify-center rounded-md bg-axis-violet/15 text-[10px] font-bold text-axis-violet">
+                    3
+                  </span>
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/50">
+                    바로 사용
+                  </span>
+                </div>
+                <div>
+                  <span className="text-axis-violet">$</span>{" "}
+                  <span className="text-foreground">
+                    /sf-scan{" "}
+                    <span className="text-muted-foreground">
+                      --auto-classify
+                    </span>
+                  </span>
+                </div>
+                <div className="ml-4 mt-1 text-muted-foreground">
+                  <span className="text-axis-primary">&#9670;</span> 8개 슬래시 커맨드가 Claude Code에 추가돼요
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Slash commands grid */}
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {pluginCommands.map((c) => (
+              <div
+                key={c.cmd}
+                className="axis-glass group relative overflow-hidden rounded-xl p-5 transition-all duration-300 hover:border-axis-violet/20 hover:bg-axis-violet/5"
+              >
+                <div className="mb-3 flex items-center gap-3">
+                  <div className="flex size-9 items-center justify-center rounded-lg bg-axis-violet/10 transition-colors group-hover:bg-axis-violet/20">
+                    <c.icon className="size-4 text-axis-violet" />
+                  </div>
+                  <div>
+                    <span className="font-mono text-sm font-bold text-foreground">
+                      {c.cmd}
+                    </span>
+                    <span className="ml-1.5 font-mono text-xs text-muted-foreground/60">
+                      {c.flag}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-[13px] leading-relaxed text-muted-foreground">
+                  {c.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Update one-liner */}
+          <div className="mt-6 flex items-center justify-center gap-3 rounded-xl border border-border/20 bg-muted/10 px-5 py-3">
+            <RefreshCw className="size-4 text-muted-foreground/50" />
+            <span className="font-mono text-sm text-muted-foreground">
+              업데이트:{" "}
+              <span className="text-foreground">
+                claude plugin update skill-framework
+              </span>
+            </span>
           </div>
         </div>
       </section>
