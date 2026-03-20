@@ -38,20 +38,18 @@ export function OrgSwitcher() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button
-            variant="outline"
-            className="mb-2 w-full justify-between text-left"
-            size="sm"
-          />
-        }
-      >
-        <span className="flex items-center gap-2 truncate">
-          <Building2 className="size-4 shrink-0" />
-          <span className="truncate text-sm">{activeOrg?.name ?? "Select org"}</span>
-        </span>
-        <ChevronDown className="size-3 shrink-0 text-muted-foreground" />
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          className="mb-2 w-full justify-between text-left"
+          size="sm"
+        >
+          <span className="flex items-center gap-2 truncate">
+            <Building2 className="size-4 shrink-0" />
+            <span className="truncate text-sm">{activeOrg?.name ?? "Select org"}</span>
+          </span>
+          <ChevronDown className="size-3 shrink-0 text-muted-foreground" />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-56">
         {orgs.map((org) => (

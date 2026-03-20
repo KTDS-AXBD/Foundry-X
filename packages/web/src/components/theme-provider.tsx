@@ -1,10 +1,17 @@
 "use client";
 
-import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { ThemeProvider as AxisThemeProvider } from "@axis-ds/theme";
 
 export function ThemeProvider({
   children,
-  ...props
-}: React.ComponentProps<typeof NextThemesProvider>) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+  defaultTheme = "dark",
+}: {
+  children: React.ReactNode;
+  defaultTheme?: "light" | "dark" | "system";
+}) {
+  return (
+    <AxisThemeProvider defaultTheme={defaultTheme} storageKey="foundry-x-theme">
+      {children}
+    </AxisThemeProvider>
+  );
 }

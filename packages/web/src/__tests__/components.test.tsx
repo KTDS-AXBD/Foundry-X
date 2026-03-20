@@ -26,7 +26,7 @@ describe("DashboardCard", () => {
         <span>Hidden</span>
       </DashboardCard>,
     );
-    expect(container.querySelector("[data-slot='skeleton']")).toBeInTheDocument();
+    expect(container.querySelector(".animate-pulse")).toBeInTheDocument();
     expect(screen.queryByText("Hidden")).not.toBeInTheDocument();
   });
 

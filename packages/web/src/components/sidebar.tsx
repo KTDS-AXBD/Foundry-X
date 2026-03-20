@@ -69,9 +69,11 @@ export function Sidebar() {
       {/* Mobile header */}
       <header className="fixed top-0 left-0 right-0 z-40 flex h-14 items-center gap-2 border-b bg-background px-4 lg:hidden">
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger render={<Button variant="ghost" size="icon" className="size-9" />}>
-            <Menu className="size-5" />
-            <span className="sr-only">Toggle menu</span>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="size-9">
+              <Menu className="size-5" />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-60 p-0">
             <SheetHeader className="border-b px-4 py-3">
