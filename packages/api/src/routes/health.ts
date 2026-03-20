@@ -1,10 +1,12 @@
-import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
+import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { HealthResponseSchema, DetailedHealthSchema } from "../schemas/health.js";
 import type { HealthScore } from "@foundry-x/shared";
 import type { Env } from "../env.js";
+import type { TenantVariables } from "../middleware/tenant.js";
 import { GitHubService } from "../services/github.js";
 import { KVCacheService } from "../services/kv-cache.js";
 import { HealthCalculator } from "../services/health-calc.js";
+import { MonitoringService } from "../services/monitoring.js";
 
 type EnvWithCache = Env & { CACHE: KVNamespace };
 
@@ -98,4 +100,37 @@ healthRoute.openapi(getDetailedHealth, async (c) => {
     version: "0.9.0",
     checks,
   });
+});
+
+// ─── Worker Stats (Sprint 24 F100) ───
+
+const WorkerStatsSchema = z.object({
+  requestsPerMinute: z.number(),
+  avgResponseTimeMs: z.number(),
+  errorRate: z.number(),
+  activeConnections: z.number(),
+  cpuTimeMs: z.number(),
+  timestamp: z.string(),
+});
+
+const getMonitoringStats = createRoute({
+  method: "get",
+  path: "/orgs/{orgId}/monitoring/stats",
+  tags: ["Health"],
+  summary: "Workers 통계 (KV 캐시)",
+  request: {
+    params: z.object({ orgId: z.string() }),
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: WorkerStatsSchema } },
+      description: "Worker performance stats (cached 5min)",
+    },
+  },
+});
+
+healthRoute.openapi(getMonitoringStats, async (c) => {
+  const monitoring = new MonitoringService(c.env.CACHE, c.env.DB);
+  const stats = await monitoring.getWorkerStats();
+  return c.json(stats);
 });

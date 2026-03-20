@@ -57,3 +57,34 @@ export const githubCommentEventSchema = z.object({
   }),
 });
 export type GitHubCommentEvent = z.infer<typeof githubCommentEventSchema>;
+
+// ─── Webhook Registry (F99) ───
+
+export const webhookCreateSchema = z
+  .object({
+    provider: z.enum(["github", "jira", "slack", "custom"]),
+    event_types: z.array(z.string()),
+    target_url: z.string().url(),
+    direction: z.enum(["inbound", "outbound"]).default("inbound"),
+    secret: z.string().optional(),
+    config: z.record(z.unknown()).optional(),
+  })
+  .openapi("WebhookCreate");
+
+export const webhookResponseSchema = z
+  .object({
+    id: z.string(),
+    org_id: z.string(),
+    provider: z.string(),
+    event_types: z.array(z.string()),
+    target_url: z.string(),
+    direction: z.string(),
+    enabled: z.boolean(),
+    config: z.record(z.unknown()).nullable(),
+    created_at: z.string(),
+    updated_at: z.string(),
+  })
+  .openapi("WebhookResponse");
+
+export type WebhookCreate = z.input<typeof webhookCreateSchema>;
+export type WebhookResponse = z.infer<typeof webhookResponseSchema>;
