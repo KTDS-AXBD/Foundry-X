@@ -1,6 +1,7 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 import { cors } from "hono/cors";
+import { Toucan } from "toucan-js";
 import { profileRoute } from "./routes/profile.js";
 import { integrityRoute } from "./routes/integrity.js";
 import { healthRoute } from "./routes/health.js";
@@ -17,6 +18,10 @@ import mcpRoute from "./routes/mcp.js";
 import { inboxRoute } from "./routes/inbox.js";
 import { slackRoute } from "./routes/slack.js";
 import { orgRoute } from "./routes/org.js";
+import { projectOverviewRoute } from "./routes/project-overview.js";
+import { webhookRegistryRoute, webhookInboundRoute } from "./routes/webhook-registry.js";
+import { jiraRoute } from "./routes/jira.js";
+import { workflowRoute } from "./routes/workflow.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { tenantGuard, type TenantVariables } from "./middleware/tenant.js";
 import type { Env } from "./env.js";
@@ -31,6 +36,25 @@ app.use("*", cors({
   exposeHeaders: ["Content-Length"],
   maxAge: 86400,
 }));
+
+// Sentry error tracking (F100 — toucan-js for Workers)
+app.use("*", async (c, next) => {
+  if (c.env?.SENTRY_DSN && c.executionCtx) {
+    const sentry = new Toucan({
+      dsn: c.env.SENTRY_DSN,
+      context: c.executionCtx,
+      request: c.req.raw,
+    });
+    try {
+      await next();
+    } catch (e) {
+      sentry.captureException(e);
+      throw e;
+    }
+  } else {
+    await next();
+  }
+});
 
 // Health check (public)
 app.get("/", (c) => c.json({ status: "ok", service: "foundry-x-api" }));
@@ -59,6 +83,10 @@ app.doc("/api/openapi.json", {
     { name: "MCP", description: "MCP Server management" },
     { name: "Org", description: "Organization management (CRUD, members, invitations)" },
     { name: "GitHub", description: "GitHub PR review and sync" },
+    { name: "Projects", description: "Multi-project overview and health" },
+    { name: "Webhooks", description: "Webhook registry and delivery" },
+    { name: "Jira", description: "Jira integration and sync" },
+    { name: "Workflows", description: "Workflow engine CRUD and execution" },
   ],
 });
 app.get("/api/docs", swaggerUI({ url: "/api/openapi.json" }));
@@ -68,6 +96,9 @@ app.route("/api", authRoute);
 
 // Webhook (public — HMAC-SHA256 서명으로 보호)
 app.route("/api", webhookRoute);
+
+// Webhook inbound (public — signature-verified)
+app.route("/api", webhookInboundRoute);
 
 // Slack (public — Slack 자체 서명으로 보호)
 app.route("/api", slackRoute);
@@ -96,3 +127,9 @@ app.route("/api", tokenRoute);
 app.route("/api", specRoute);
 app.route("/api", mcpRoute);
 app.route("/api/agents/inbox", inboxRoute);
+
+// Sprint 24 routes (auth + tenant required — registered under /api/* middleware)
+app.route("/api", projectOverviewRoute);
+app.route("/api", webhookRegistryRoute);
+app.route("/api", jiraRoute);
+app.route("/api", workflowRoute);

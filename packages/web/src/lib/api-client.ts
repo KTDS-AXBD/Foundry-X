@@ -827,3 +827,192 @@ export async function deleteInvitation(orgId: string, invitationId: string): Pro
   });
   if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
 }
+
+// ─── Sprint 24: Project Overview (F98) ───
+
+export interface ProjectInfo {
+  id: string;
+  name: string;
+  healthScore: number;
+  grade: string;
+  activeAgents: number;
+  openTasks: number;
+  recentPrCount: number;
+  lastActivity: string;
+}
+
+export interface AgentActivityStats {
+  tasksCompleted: number;
+  prsCreated: number;
+  messagesSent: number;
+}
+
+export interface ProjectsOverview {
+  totalProjects: number;
+  overallHealth: number;
+  projects: ProjectInfo[];
+  agentActivity: {
+    last24h: AgentActivityStats;
+    last7d: AgentActivityStats;
+  };
+}
+
+export async function getProjectsOverview(orgId: string): Promise<ProjectsOverview> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/projects/overview`, { headers: authHeaders() });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+// ─── Sprint 24: Monitoring (F100) ───
+
+export interface MonitoringStats {
+  requests: number;
+  errorRate: number;
+  avgResponseMs: number;
+  uptime: number;
+  period: string;
+}
+
+export async function getMonitoringStats(orgId: string): Promise<MonitoringStats> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/monitoring/stats`, { headers: authHeaders() });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+// ─── Sprint 24: Workflow Engine (F101) ───
+
+export interface WorkflowNode {
+  id: string;
+  type: "trigger" | "action" | "condition" | "end";
+  label: string;
+  position: { x: number; y: number };
+  data: {
+    actionType?: "run_agent" | "create_pr" | "send_notification" | "run_analysis" | "wait_approval";
+    config?: Record<string, unknown>;
+  };
+}
+
+export interface WorkflowEdge {
+  id: string;
+  source: string;
+  target: string;
+  label?: string;
+  condition?: string;
+}
+
+export interface WorkflowDefinition {
+  nodes: WorkflowNode[];
+  edges: WorkflowEdge[];
+}
+
+export interface Workflow {
+  id: string;
+  orgId: string;
+  name: string;
+  description: string | null;
+  definition: WorkflowDefinition;
+  templateId: string | null;
+  enabled: boolean;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkflowExecution {
+  id: string;
+  workflowId: string;
+  status: string;
+  currentStep: string | null;
+  result: unknown;
+  error: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  createdAt: string;
+}
+
+export async function getWorkflows(orgId: string): Promise<Workflow[]> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/workflows`, { headers: authHeaders() });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function createWorkflow(
+  orgId: string,
+  data: { name: string; description?: string; definition: WorkflowDefinition; template_id?: string },
+): Promise<Workflow> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/workflows`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function getWorkflow(orgId: string, id: string): Promise<Workflow> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/workflows/${id}`, { headers: authHeaders() });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function updateWorkflow(
+  orgId: string,
+  id: string,
+  data: { name?: string; description?: string; definition?: WorkflowDefinition; enabled?: boolean },
+): Promise<Workflow> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/workflows/${id}`, {
+    method: "PUT",
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function deleteWorkflow(orgId: string, id: string): Promise<void> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/workflows/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+}
+
+export async function executeWorkflow(orgId: string, id: string): Promise<WorkflowExecution> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/workflows/${id}/execute`, {
+    method: "POST",
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+// ─── Sprint 24: Jira Integration (F99) ───
+
+export interface JiraProject {
+  id: string;
+  key: string;
+  name: string;
+  projectTypeKey: string;
+}
+
+export interface JiraConfig {
+  api_url: string;
+  email: string;
+  api_token: string;
+  project_key?: string;
+}
+
+export async function getJiraProjects(orgId: string): Promise<JiraProject[]> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/jira/projects`, { headers: authHeaders() });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function updateJiraConfig(orgId: string, config: JiraConfig): Promise<void> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/jira/config`, {
+    method: "PUT",
+    headers: authHeaders(),
+    body: JSON.stringify(config),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+}

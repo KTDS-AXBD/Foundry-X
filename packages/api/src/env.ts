@@ -8,4 +8,5 @@ export type Env = {
   AI: Ai;
   ANTHROPIC_API_KEY?: string;
   WEBHOOK_SECRET?: string;
+  SENTRY_DSN?: string;
 };
