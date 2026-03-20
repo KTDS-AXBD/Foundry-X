@@ -69,7 +69,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} KTDS AX BD. All rights reserved.
           </p>
           <p className="font-mono text-xs text-muted-foreground/60">
-            v1.3.0 &middot; Phase 3
+            v2.0.0 &middot; Phase 3
           </p>
         </div>
       </div>

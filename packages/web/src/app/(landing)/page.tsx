@@ -4,23 +4,32 @@ import Link from "next/link";
 import {
   Anvil,
   ArrowRight,
+  ArrowUpRight,
   Bot,
   Brain,
+  Compass,
+  Cpu,
   Eye,
   GitBranch,
   Layers,
-  Network,
+  Palette,
   Rocket,
   Scan,
   Shield,
   Sparkles,
   Terminal,
-  Workflow,
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════
    DATA
    ═══════════════════════════════════════════════ */
+
+const SITE_META = {
+  version: "v2.0.0",
+  phase: "Phase 3",
+  phaseStatus: "진행 중",
+  tagline: "통합 플랫폼",
+} as const;
 
 const pillars = [
   {
@@ -28,23 +37,23 @@ const pillars = [
     title: "PlannerAgent",
     label: "에이전트 통제",
     desc: "AI가 코드를 쓰기 전에 계획을 세우고, 사람이 승인해요. 자율성과 통제의 균형.",
-    detail: "코드베이스 리서치 → 계획 수립 → 인간 승인 → 실행",
+    detail: "코드베이스 리서치 → 계획 수립 → 인간 승인 → 격리 실행",
     color: "axis-primary",
   },
   {
-    icon: Network,
-    title: "조직 지식 연결",
-    label: "MCP Skill 소비",
-    desc: "AI Foundry의 도메인 Skill을 에이전트가 MCP로 직접 활용해요.",
-    detail: "3,924 Skills → MCP Server → Foundry-X 에이전트 도구로 소비",
+    icon: Layers,
+    title: "통합 플랫폼",
+    label: "루트 앱 통합",
+    desc: "탐색·구축·동기화를 하나의 플랫폼에서. 서비스 간 전환 없이 전 과정을 관리해요.",
+    detail: "Discovery-X + AI Foundry + AXIS DS → Foundry-X 통합",
     color: "axis-blue",
   },
   {
-    icon: Workflow,
-    title: "실험-코드 연결",
-    label: "Discovery-X HANDOFF",
-    desc: "실험이 코드 프로젝트로 전환될 때, 하네스가 자동 부트스트랩돼요.",
-    detail: "Discovery-X 실험 → HANDOFF → Foundry-X 자동 초기화",
+    icon: Shield,
+    title: "SDD Triangle",
+    label: "명세↔코드↔테스트",
+    desc: "Spec, Code, Test가 항상 동기화돼요. Git이 진실, Foundry-X는 렌즈.",
+    detail: "Plumb 엔진 기반 자동 정합성 검증 + 건강도 점수",
     color: "axis-green",
   },
 ];
@@ -52,24 +61,57 @@ const pillars = [
 const ecosystem = [
   {
     name: "Discovery-X",
-    role: "실험 관리",
-    desc: "관찰 → 행동 → 근거 → 자산",
+    role: "탐색 · 실험",
+    desc: "관찰 → 실험 → 기록 → 자산화",
     color: "axis-green",
-    arrow: "실험 컨텍스트",
+    arrow: "실험 → 프로젝트 전환",
   },
   {
     name: "AI Foundry",
-    role: "지식 추출",
+    role: "지식 · 구축",
     desc: "SI 산출물 → AI Skill 자산",
     color: "axis-violet",
-    arrow: "MCP Skill tools",
+    arrow: "MCP Skill 도구 제공",
   },
   {
     name: "AXIS DS",
-    role: "공유 UI",
+    role: "UI · 일관성",
     desc: "디자인 토큰 + React 컴포넌트",
     color: "axis-blue",
-    arrow: "@axis-ds/* 컴포넌트",
+    arrow: "@axis-ds 컴포넌트",
+  },
+];
+
+const services = [
+  {
+    name: "Discovery-X",
+    tagline: "관찰 → 실험 → 기록",
+    desc: "데이터 기반으로 기회를 발견하고 검증하는 신사업 발굴 플랫폼이에요. 실험 결과가 Foundry-X 프로젝트로 자동 연결돼요.",
+    status: "개발 중 · 80%",
+    statusColor: "axis-warm",
+    color: "axis-green",
+    link: null as string | null,
+    icon: Compass,
+  },
+  {
+    name: "AI Foundry",
+    tagline: "요구사항 → 스펙 → 코드",
+    desc: "SI 산출물을 AI Skill로 전환하는 파이프라인. 3,924개 스킬을 MCP로 Foundry-X 에이전트에 도구로 제공해요.",
+    status: "개발 중 · 90%",
+    statusColor: "axis-blue",
+    color: "axis-violet",
+    link: "https://github.com/IDEA-on-Action/AI-Foundry",
+    icon: Cpu,
+  },
+  {
+    name: "AXIS Design System",
+    tagline: "디자인 토큰 + React 컴포넌트",
+    desc: "팀 공통 UI/UX 체계. OKLch 색공간 기반 토큰과 React 컴포넌트로 일관된 사용자 경험을 보장해요.",
+    status: "준비 완료",
+    statusColor: "axis-green",
+    color: "axis-blue",
+    link: "https://github.com/IDEA-on-Action/AXIS-Design-System",
+    icon: Palette,
   },
 ];
 
@@ -82,8 +124,8 @@ const architecture = [
   {
     layer: "API Layer",
     items: [
-      "57 Endpoints (OpenAPI)",
-      "19 Services",
+      "97 Endpoints (OpenAPI)",
+      "39 Services",
       "MCP Protocol",
     ],
     tech: "Hono on Cloudflare Workers",
@@ -99,7 +141,7 @@ const architecture = [
   },
   {
     layer: "Data Layer",
-    items: ["D1 SQLite (12 Tables)", "KV Cache", "Git (SSOT)"],
+    items: ["D1 SQLite (27 Tables)", "KV Cache", "Git (SSOT)"],
     tech: "Cloudflare D1 + simple-git",
   },
 ];
@@ -107,7 +149,7 @@ const architecture = [
 const roadmap = [
   {
     phase: "Phase 1",
-    title: "CLI + Plumb Engine",
+    title: "CLI + Plumb",
     version: "v0.1 → v0.5",
     status: "done" as const,
     items: ["CLI 3커맨드", "Ink TUI", "4 Builders", "106 테스트"],
@@ -115,46 +157,38 @@ const roadmap = [
   {
     phase: "Phase 2",
     title: "API + Web + Agent",
-    version: "v0.6 → v1.3",
+    version: "v0.6 → v1.5",
     status: "done" as const,
-    items: [
-      "57 API 엔드포인트",
-      "MCP 프로토콜",
-      "PlannerAgent",
-      "에이전트 자동 PR",
-    ],
+    items: ["79 엔드포인트", "MCP 프로토콜", "PlannerAgent", "자동 PR"],
   },
   {
     phase: "Phase 3",
-    title: "멀티테넌시 + 외부 연동",
-    version: "v2.0",
+    title: "통합 준비",
+    version: "v1.6 → v2.0",
     status: "current" as const,
-    items: [
-      "AI Foundry MCP 연동",
-      "AXIS DS UI 전환",
-      "멀티테넌시",
-      "팀 온보딩",
-    ],
+    items: ["멀티테넌시", "GitHub/Slack", "AXIS DS 전환", "기술 스택 점검"],
   },
   {
     phase: "Phase 4",
-    title: "생태계 통합",
+    title: "통합 실행",
+    version: "v2.1 → v2.2",
+    status: "planned" as const,
+    items: ["프론트엔드 통합", "인증 SSO", "API 통합", "데이터 통합"],
+  },
+  {
+    phase: "Phase 5",
+    title: "고객 파일럿",
     version: "v3.0",
     status: "planned" as const,
-    items: [
-      "Discovery-X HANDOFF",
-      "에이전트 마켓플레이스",
-      "엔터프라이즈 SSO",
-      "온프레미스 배포",
-    ],
+    items: ["SR 시나리오", "외부 파일럿", "엔터프라이즈"],
   },
 ];
 
 const stats = [
-  { value: "57", label: "API Endpoints" },
-  { value: "19", label: "Services" },
-  { value: "450+", label: "Tests" },
-  { value: "15", label: "Sprints" },
+  { value: "97", label: "API Endpoints" },
+  { value: "39", label: "Services" },
+  { value: "689+", label: "Tests" },
+  { value: "24", label: "Sprints" },
 ];
 
 /* ═══════════════════════════════════════════════
@@ -175,7 +209,7 @@ function EcosystemDiagram() {
           </div>
         </div>
         <span className="mt-2 font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
-          AI 협업 플랫폼
+          통합 플랫폼
         </span>
       </div>
 
@@ -255,9 +289,74 @@ function ArchitectureBlueprint() {
   );
 }
 
+function ServiceCards() {
+  return (
+    <div className="grid gap-6 md:grid-cols-3">
+      {services.map((svc) => (
+        <div
+          key={svc.name}
+          className="axis-glass group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:border-axis-primary/20 hover:bg-axis-primary/5"
+        >
+          {/* Icon + Name */}
+          <div className="mb-4 flex items-center gap-3">
+            <div
+              className="flex size-11 items-center justify-center rounded-xl transition-colors group-hover:bg-axis-primary/20"
+              style={{
+                backgroundColor: `color-mix(in oklch, var(--${svc.color}) 10%, transparent)`,
+              }}
+            >
+              <svc.icon
+                className="size-5"
+                style={{ color: `var(--${svc.color})` }}
+              />
+            </div>
+            <div>
+              <h3 className="font-display text-lg font-semibold">
+                {svc.name}
+              </h3>
+              <span className="font-mono text-[10px] text-muted-foreground">
+                {svc.tagline}
+              </span>
+            </div>
+          </div>
+
+          {/* Description */}
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {svc.desc}
+          </p>
+
+          {/* Status badge + Link */}
+          <div className="mt-4 flex items-center justify-between">
+            <span
+              className="rounded-md px-2 py-0.5 font-mono text-[10px] font-medium"
+              style={{
+                backgroundColor: `color-mix(in oklch, var(--${svc.statusColor}) 10%, transparent)`,
+                color: `var(--${svc.statusColor})`,
+              }}
+            >
+              {svc.status}
+            </span>
+            {svc.link && (
+              <a
+                href={svc.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-axis-primary"
+              >
+                GitHub
+                <ArrowUpRight className="size-3" />
+              </a>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function RoadmapTimeline() {
   return (
-    <div className="grid gap-4 md:grid-cols-4">
+    <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
       {roadmap.map((phase, i) => {
         const isDone = phase.status === "done";
         const isCurrent = phase.status === "current";
@@ -362,7 +461,7 @@ export default function LandingPage() {
           <div className="animate-fade-in-up mb-8 inline-flex items-center gap-2 rounded-full border border-axis-primary/20 bg-axis-primary/5 px-4 py-1.5">
             <Sparkles className="size-3.5 text-axis-primary" />
             <span className="font-mono text-xs font-medium text-axis-primary">
-              v1.3.0 &middot; Phase 2 Complete
+              {SITE_META.version} &middot; {SITE_META.phase} {SITE_META.phaseStatus}
             </span>
           </div>
 
@@ -513,11 +612,31 @@ export default function LandingPage() {
               </span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              세 서비스의 지식과 자산이 Foundry-X로 수렴해요.
+              세 서비스가 Foundry-X 통합 플랫폼으로 하나가 돼요.
             </p>
           </div>
 
           <EcosystemDiagram />
+        </div>
+      </section>
+
+      {/* ═══ SERVICES ═══ */}
+      <section id="services" className="relative px-6 py-24 md:py-32">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-16 text-center">
+            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">
+              Our Services
+            </span>
+            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+              생태계를 구성하는{" "}
+              <span className="text-axis-primary">서비스들</span>
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              각 서비스가 Foundry-X 통합 플랫폼의 한 축을 담당해요.
+            </p>
+          </div>
+
+          <ServiceCards />
         </div>
       </section>
 
