@@ -10,14 +10,62 @@ export class ApiError extends Error {
   }
 }
 
+function getAuthHeaders(): Record<string, string> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+function jsonAuthHeaders(): Record<string, string> {
+  return { "Content-Type": "application/json", ...getAuthHeaders() };
+}
+
 export async function fetchApi<T>(path: string): Promise<T> {
   const url = `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
-  const res = await fetch(url);
+  const res = await fetch(url, { headers: getAuthHeaders() });
 
   if (!res.ok) {
     throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
   }
 
+  return res.json() as Promise<T>;
+}
+
+export async function postApi<T>(path: string, body?: unknown): Promise<T> {
+  const url = `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: body !== undefined ? jsonAuthHeaders() : { ...getAuthHeaders() },
+    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<T>;
+}
+
+export async function deleteApi(path: string): Promise<void> {
+  const url = `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  const res = await fetch(url, { method: "DELETE", headers: getAuthHeaders() });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+}
+
+export async function patchApi<T>(path: string, body: unknown): Promise<T> {
+  const url = `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  const res = await fetch(url, {
+    method: "PATCH",
+    headers: jsonAuthHeaders(),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<T>;
+}
+
+export async function putApi<T>(path: string, body: unknown): Promise<T> {
+  const url = `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: jsonAuthHeaders(),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
   return res.json() as Promise<T>;
 }
 
@@ -96,18 +144,7 @@ export async function generateSpec(
   text: string,
   context?: string,
 ): Promise<SpecGenerateResult> {
-  const url = `${BASE_URL}/spec/generate`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text, context }),
-  });
-
-  if (!res.ok) {
-    throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  }
-
-  return res.json() as Promise<SpecGenerateResult>;
+  return postApi<SpecGenerateResult>("/spec/generate", { text, context });
 }
 
 export async function executeAgentTask(
@@ -120,29 +157,14 @@ export async function executeAgentTask(
     instructions?: string;
   },
 ): Promise<AgentExecutionResult> {
-  const url = `${BASE_URL}/agents/${agentId}/execute`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  return postApi<AgentExecutionResult>(`/agents/${agentId}/execute`, {
+    taskType,
+    context: {
+      repoUrl: context.repoUrl ?? "https://github.com/KTDS-AXBD/Foundry-X",
+      branch: context.branch ?? "master",
+      ...context,
     },
-    body: JSON.stringify({
-      taskType,
-      context: {
-        repoUrl: context.repoUrl ?? "https://github.com/KTDS-AXBD/Foundry-X",
-        branch: context.branch ?? "master",
-        ...context,
-      },
-    }),
   });
-
-  if (!res.ok) {
-    throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  }
-
-  return res.json() as Promise<AgentExecutionResult>;
 }
 
 // ─── MCP Server Types (F61) ───
@@ -176,39 +198,15 @@ export async function createMcpServer(params: {
   transportType: "sse" | "http";
   apiKey?: string;
 }): Promise<McpServerInfo> {
-  const url = `${BASE_URL}/mcp/servers`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify(params),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  return res.json() as Promise<McpServerInfo>;
+  return postApi<McpServerInfo>("/mcp/servers", params);
 }
 
 export async function deleteMcpServer(id: string): Promise<void> {
-  const url = `${BASE_URL}/mcp/servers/${id}`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "DELETE",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return deleteApi(`/mcp/servers/${id}`);
 }
 
 export async function testMcpServer(id: string): Promise<McpTestResult> {
-  const url = `${BASE_URL}/mcp/servers/${id}/test`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  return res.json() as Promise<McpTestResult>;
+  return postApi<McpTestResult>(`/mcp/servers/${id}/test`);
 }
 
 export async function getMcpServerTools(
@@ -243,14 +241,7 @@ export async function executeMcpPrompt(
       | { type: "resource"; resource: { uri: string; text: string; mimeType?: string } };
   }>;
 }> {
-  const url = `${BASE_URL}/mcp/servers/${serverId}/prompts/${encodeURIComponent(name)}`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ arguments: args }),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  return res.json() as Promise<{ messages: any[] }>;
+  return postApi(`/mcp/servers/${serverId}/prompts/${encodeURIComponent(name)}`, { arguments: args });
 }
 
 export async function getMcpSamplingLog(
@@ -299,18 +290,7 @@ export async function createAgentPr(
   taskId: string,
   config?: Record<string, unknown>,
 ): Promise<AgentPrResult> {
-  const url = `${BASE_URL}/agents/pr`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ agentId, taskId, config }),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  return res.json() as Promise<AgentPrResult>;
+  return postApi<AgentPrResult>("/agents/pr", { agentId, taskId, config });
 }
 
 export async function getAgentPr(id: string): Promise<Record<string, unknown>> {
@@ -318,27 +298,13 @@ export async function getAgentPr(id: string): Promise<Record<string, unknown>> {
 }
 
 export async function reviewAgentPr(id: string): Promise<Record<string, unknown>> {
-  const url = `${BASE_URL}/agents/pr/${id}/review`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  return res.json() as Promise<Record<string, unknown>>;
+  return postApi<Record<string, unknown>>(`/agents/pr/${id}/review`);
 }
 
 export async function mergeAgentPr(
   id: string,
 ): Promise<{ merged: boolean; needsHuman: boolean; reason?: string }> {
-  const url = `${BASE_URL}/agents/pr/${id}/merge`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  return res.json() as Promise<{ merged: boolean; needsHuman: boolean; reason?: string }>;
+  return postApi(`/agents/pr/${id}/merge`);
 }
 
 // ─── MCP Resources (F67) ───
@@ -380,35 +346,14 @@ export async function readMcpResource(
   serverId: string,
   uri: string,
 ): Promise<{ contents: McpResourceContent[] }> {
-  const url = `${BASE_URL}/mcp/servers/${serverId}/resources/read`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ uri }),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  return res.json() as Promise<{ contents: McpResourceContent[] }>;
+  return postApi(`/mcp/servers/${serverId}/resources/read`, { uri });
 }
 
 export async function subscribeMcpResource(
   serverId: string,
   uri: string,
 ): Promise<void> {
-  const url = `${BASE_URL}/mcp/servers/${serverId}/resources/subscribe`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ uri }),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  await postApi(`/mcp/servers/${serverId}/resources/subscribe`, { uri });
 }
 
 // ─── Merge Queue + Parallel Execution (F68) ───
@@ -448,31 +393,14 @@ export async function processQueueNext(): Promise<{
   rebaseAttempted?: boolean;
   conflictResolved?: boolean;
 }> {
-  const url = `${BASE_URL}/agents/queue/process`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  return res.json() as Promise<any>;
+  return postApi("/agents/queue/process");
 }
 
 export async function updateQueuePriority(
   entryId: string,
   priority: number,
 ): Promise<void> {
-  const url = `${BASE_URL}/agents/queue/${entryId}/priority`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ priority }),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  await patchApi(`/agents/queue/${entryId}/priority`, { priority });
 }
 
 export async function executeParallel(
@@ -483,18 +411,7 @@ export async function executeParallel(
   }>,
   createPrs: boolean = false,
 ): Promise<Record<string, unknown>> {
-  const url = `${BASE_URL}/agents/parallel`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ tasks, createPrs }),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  return res.json() as Promise<Record<string, unknown>>;
+  return postApi("/agents/parallel", { tasks, createPrs });
 }
 
 export async function getParallelExecution(
@@ -529,52 +446,23 @@ export async function createPlan(
     instructions?: string;
   },
 ): Promise<AgentPlanResponse> {
-  const url = `${BASE_URL}/agents/plan`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  return postApi<AgentPlanResponse>("/agents/plan", {
+    agentId,
+    taskType,
+    context: {
+      repoUrl: context.repoUrl ?? "https://github.com/KTDS-AXBD/Foundry-X",
+      branch: context.branch ?? "master",
+      ...context,
     },
-    body: JSON.stringify({
-      agentId,
-      taskType,
-      context: {
-        repoUrl: context.repoUrl ?? "https://github.com/KTDS-AXBD/Foundry-X",
-        branch: context.branch ?? "master",
-        ...context,
-      },
-    }),
   });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  return res.json() as Promise<AgentPlanResponse>;
 }
 
 export async function approvePlan(planId: string): Promise<AgentPlanResponse> {
-  const url = `${BASE_URL}/agents/plan/${planId}/approve`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  return res.json() as Promise<AgentPlanResponse>;
+  return postApi<AgentPlanResponse>(`/agents/plan/${planId}/approve`);
 }
 
 export async function rejectPlan(planId: string, reason: string): Promise<AgentPlanResponse> {
-  const url = `${BASE_URL}/agents/plan/${planId}/reject`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ reason }),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  return res.json() as Promise<AgentPlanResponse>;
+  return postApi<AgentPlanResponse>(`/agents/plan/${planId}/reject`, { reason });
 }
 
 // ─── Agent Inbox (F76) ───
@@ -612,28 +500,11 @@ export async function sendInboxMessage(
   payload: Record<string, unknown>,
   parentMessageId?: string,
 ): Promise<InboxMessage> {
-  const url = `${BASE_URL}/agents/inbox/send`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ fromAgentId, toAgentId, type, subject, payload, parentMessageId }),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  return res.json() as Promise<InboxMessage>;
+  return postApi<InboxMessage>("/agents/inbox/send", { fromAgentId, toAgentId, type, subject, payload, parentMessageId });
 }
 
 export async function acknowledgeMessage(messageId: string): Promise<void> {
-  const url = `${BASE_URL}/agents/inbox/${messageId}/ack`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  await postApi(`/agents/inbox/${messageId}/ack`);
 }
 
 // ─── Sprint 17 F81: Inbox Thread ───
@@ -644,24 +515,12 @@ export async function getInboxThread(
 ): Promise<{ thread: InboxMessage[]; total: number; parentMessageId: string }> {
   const params = new URLSearchParams();
   if (limit) params.set("limit", String(limit));
-  const url = `${BASE_URL}/agents/inbox/${parentMessageId}/thread?${params}`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) throw new ApiError(res.status, `Failed to fetch thread: ${res.status}`);
-  return res.json();
+  const qs = params.toString();
+  return fetchApi(`/agents/inbox/${parentMessageId}/thread${qs ? `?${qs}` : ""}`);
 }
 
 export async function ackThread(parentMessageId: string): Promise<{ acknowledged: boolean; count: number }> {
-  const url = `${BASE_URL}/agents/inbox/${parentMessageId}/ack-thread`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  return res.json() as Promise<{ acknowledged: boolean; count: number }>;
+  return postApi(`/agents/inbox/${parentMessageId}/ack-thread`);
 }
 
 // ─── Conflict Resolution ───
@@ -671,20 +530,7 @@ export async function resolveConflict(
   resolution: "accept" | "reject" | "modify",
   modifiedValue?: string,
 ): Promise<void> {
-  const url = `${BASE_URL}/spec/conflicts/resolve`;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ conflictId, resolution, modifiedValue }),
-  });
-
-  if (!res.ok) {
-    throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
-  }
+  await postApi("/spec/conflicts/resolve", { conflictId, resolution, modifiedValue });
 }
 
 // ─── Org API (F92) ───
@@ -722,110 +568,52 @@ export interface OrgInvitationResponse {
   invitedBy: string;
 }
 
-function authHeaders(): Record<string, string> {
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  return {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-}
-
 export async function getMyOrgs(): Promise<OrgResponse[]> {
-  const res = await fetch(`${BASE_URL}/orgs`, { headers: authHeaders() });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return fetchApi<OrgResponse[]>("/orgs");
 }
 
 export async function createOrg(params: { name: string; slug?: string }): Promise<OrgResponse> {
-  const res = await fetch(`${BASE_URL}/orgs`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify(params),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return postApi<OrgResponse>("/orgs", params);
 }
 
 export async function getOrg(orgId: string): Promise<OrgResponse> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}`, { headers: authHeaders() });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return fetchApi<OrgResponse>(`/orgs/${orgId}`);
 }
 
 export async function updateOrg(orgId: string, patch: { name?: string }): Promise<OrgResponse> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}`, {
-    method: "PATCH",
-    headers: authHeaders(),
-    body: JSON.stringify(patch),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return patchApi<OrgResponse>(`/orgs/${orgId}`, patch);
 }
 
 export async function switchOrg(orgId: string): Promise<{ accessToken: string; refreshToken: string; expiresIn: number }> {
-  const res = await fetch(`${BASE_URL}/auth/switch-org`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify({ orgId }),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return postApi("/auth/switch-org", { orgId });
 }
 
 export async function getOrgMembers(orgId: string): Promise<OrgMemberResponse[]> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/members`, { headers: authHeaders() });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return fetchApi<OrgMemberResponse[]>(`/orgs/${orgId}/members`);
 }
 
 export async function updateMemberRole(orgId: string, userId: string, role: string): Promise<void> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/members/${userId}`, {
-    method: "PATCH",
-    headers: authHeaders(),
-    body: JSON.stringify({ role }),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  await patchApi(`/orgs/${orgId}/members/${userId}`, { role });
 }
 
 export async function removeMember(orgId: string, userId: string): Promise<void> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/members/${userId}`, {
-    method: "DELETE",
-    headers: authHeaders(),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return deleteApi(`/orgs/${orgId}/members/${userId}`);
 }
 
 export async function createInvitation(orgId: string, data: { email: string; role: string }): Promise<OrgInvitationResponse> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/invitations`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return postApi<OrgInvitationResponse>(`/orgs/${orgId}/invitations`, data);
 }
 
 export async function getOrgInvitations(orgId: string): Promise<OrgInvitationResponse[]> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/invitations`, { headers: authHeaders() });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return fetchApi<OrgInvitationResponse[]>(`/orgs/${orgId}/invitations`);
 }
 
 export async function acceptInvitation(token: string): Promise<{ accessToken: string; refreshToken: string }> {
-  const res = await fetch(`${BASE_URL}/auth/invitations/${token}/accept`, {
-    method: "POST",
-    headers: authHeaders(),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return postApi(`/auth/invitations/${token}/accept`);
 }
 
 export async function deleteInvitation(orgId: string, invitationId: string): Promise<void> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/invitations/${invitationId}`, {
-    method: "DELETE",
-    headers: authHeaders(),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return deleteApi(`/orgs/${orgId}/invitations/${invitationId}`);
 }
 
 // ─── Sprint 24: Project Overview (F98) ───
@@ -858,9 +646,7 @@ export interface ProjectsOverview {
 }
 
 export async function getProjectsOverview(orgId: string): Promise<ProjectsOverview> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/projects/overview`, { headers: authHeaders() });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return fetchApi<ProjectsOverview>(`/orgs/${orgId}/projects/overview`);
 }
 
 // ─── Sprint 24: Monitoring (F100) ───
@@ -874,9 +660,7 @@ export interface MonitoringStats {
 }
 
 export async function getMonitoringStats(orgId: string): Promise<MonitoringStats> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/monitoring/stats`, { headers: authHeaders() });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return fetchApi<MonitoringStats>(`/orgs/${orgId}/monitoring/stats`);
 }
 
 // ─── Sprint 24: Workflow Engine (F101) ───
@@ -931,28 +715,18 @@ export interface WorkflowExecution {
 }
 
 export async function getWorkflows(orgId: string): Promise<Workflow[]> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/workflows`, { headers: authHeaders() });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return fetchApi<Workflow[]>(`/orgs/${orgId}/workflows`);
 }
 
 export async function createWorkflow(
   orgId: string,
   data: { name: string; description?: string; definition: WorkflowDefinition; template_id?: string },
 ): Promise<Workflow> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/workflows`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return postApi<Workflow>(`/orgs/${orgId}/workflows`, data);
 }
 
 export async function getWorkflow(orgId: string, id: string): Promise<Workflow> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/workflows/${id}`, { headers: authHeaders() });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return fetchApi<Workflow>(`/orgs/${orgId}/workflows/${id}`);
 }
 
 export async function updateWorkflow(
@@ -960,30 +734,15 @@ export async function updateWorkflow(
   id: string,
   data: { name?: string; description?: string; definition?: WorkflowDefinition; enabled?: boolean },
 ): Promise<Workflow> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/workflows/${id}`, {
-    method: "PUT",
-    headers: authHeaders(),
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return putApi<Workflow>(`/orgs/${orgId}/workflows/${id}`, data);
 }
 
 export async function deleteWorkflow(orgId: string, id: string): Promise<void> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/workflows/${id}`, {
-    method: "DELETE",
-    headers: authHeaders(),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return deleteApi(`/orgs/${orgId}/workflows/${id}`);
 }
 
 export async function executeWorkflow(orgId: string, id: string): Promise<WorkflowExecution> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/workflows/${id}/execute`, {
-    method: "POST",
-    headers: authHeaders(),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return postApi<WorkflowExecution>(`/orgs/${orgId}/workflows/${id}/execute`);
 }
 
 // ─── Sprint 24: Jira Integration (F99) ───
@@ -1003,30 +762,17 @@ export interface JiraConfig {
 }
 
 export async function getJiraProjects(orgId: string): Promise<JiraProject[]> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/jira/projects`, { headers: authHeaders() });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return fetchApi<JiraProject[]>(`/orgs/${orgId}/jira/projects`);
 }
 
 export async function updateJiraConfig(orgId: string, config: JiraConfig): Promise<void> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/jira/config`, {
-    method: "PUT",
-    headers: authHeaders(),
-    body: JSON.stringify(config),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  await putApi(`/orgs/${orgId}/jira/config`, config);
 }
 
 // ─── Sprint 26: SSO & Services (F106) ───
 
 export async function fetchHubToken(orgId: string): Promise<{ hubToken: string; expiresIn: number }> {
-  const res = await fetch(`${BASE_URL}/auth/sso/token`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify({ orgId }),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return postApi("/auth/sso/token", { orgId });
 }
 
 export interface OrgService {
@@ -1038,9 +784,7 @@ export interface OrgService {
 }
 
 export async function getOrgServices(orgId: string): Promise<OrgService[]> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/services`, { headers: authHeaders() });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return fetchApi<OrgService[]>(`/orgs/${orgId}/services`);
 }
 
 export async function updateOrgService(
@@ -1048,13 +792,7 @@ export async function updateOrgService(
   serviceId: string,
   enabled: boolean,
 ): Promise<OrgService> {
-  const res = await fetch(`${BASE_URL}/orgs/${orgId}/services/${serviceId}`, {
-    method: "PUT",
-    headers: authHeaders(),
-    body: JSON.stringify({ enabled }),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return putApi<OrgService>(`/orgs/${orgId}/services/${serviceId}`, { enabled });
 }
 
 // ─── Sprint 27: KPI Analytics (F100) ───
@@ -1089,24 +827,14 @@ export async function trackKpiEvent(
   eventType: string,
   metadata?: Record<string, unknown>,
 ): Promise<{ id: string; recorded: boolean }> {
-  const res = await fetch(`${BASE_URL}/kpi/track`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify({ eventType, metadata }),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return postApi("/kpi/track", { eventType, metadata });
 }
 
 export async function getKpiSummary(days?: number): Promise<KpiSummary> {
   const params = new URLSearchParams();
   if (days) params.set("days", String(days));
   const qs = params.toString();
-  const res = await fetch(`${BASE_URL}/kpi/summary${qs ? `?${qs}` : ""}`, {
-    headers: authHeaders(),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return fetchApi(`/kpi/summary${qs ? `?${qs}` : ""}`);
 }
 
 export async function getKpiTrends(
@@ -1117,11 +845,7 @@ export async function getKpiTrends(
   if (days) params.set("days", String(days));
   if (groupBy) params.set("groupBy", groupBy);
   const qs = params.toString();
-  const res = await fetch(`${BASE_URL}/kpi/trends${qs ? `?${qs}` : ""}`, {
-    headers: authHeaders(),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return fetchApi(`/kpi/trends${qs ? `?${qs}` : ""}`);
 }
 
 export async function getKpiEvents(
@@ -1134,11 +858,7 @@ export async function getKpiEvents(
   if (limit) params.set("limit", String(limit));
   if (offset) params.set("offset", String(offset));
   const qs = params.toString();
-  const res = await fetch(`${BASE_URL}/kpi/events${qs ? `?${qs}` : ""}`, {
-    headers: authHeaders(),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return fetchApi(`/kpi/events${qs ? `?${qs}` : ""}`);
 }
 
 // ─── Onboarding Types (F114) ───
@@ -1176,14 +896,7 @@ export async function completeOnboardingStep(stepId: string): Promise<{
   progressPercent: number;
   allComplete: boolean;
 }> {
-  const url = `${BASE_URL}/onboarding/progress`;
-  const res = await fetch(url, {
-    method: "PATCH",
-    headers: { ...authHeaders(), "Content-Type": "application/json" },
-    body: JSON.stringify({ stepId, completed: true }),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return patchApi("/onboarding/progress", { stepId, completed: true });
 }
 
 export async function submitFeedback(data: { npsScore: number; comment?: string }): Promise<{
@@ -1191,14 +904,7 @@ export async function submitFeedback(data: { npsScore: number; comment?: string 
   id: string;
   npsScore: number;
 }> {
-  const url = `${BASE_URL}/feedback`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { ...authHeaders(), "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return postApi("/feedback", data);
 }
 
 export async function getFeedbackSummary(): Promise<FeedbackSummary> {
@@ -1215,9 +921,5 @@ export interface Phase4Kpi {
 }
 
 export async function fetchPhase4Kpi(days = 28): Promise<Phase4Kpi> {
-  const res = await fetch(`${BASE_URL}/kpi/phase4?days=${days}`, {
-    headers: authHeaders(),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
-  return res.json();
+  return fetchApi<Phase4Kpi>(`/kpi/phase4?days=${days}`);
 }

@@ -28,7 +28,9 @@ export default function DashboardCard({
             <Skeleton className="h-4 w-full" />
           </div>
         ) : error ? (
-          <p className="text-sm text-destructive">{error}</p>
+          <p className="text-sm text-muted-foreground">
+            {error.includes("401") ? "로그인이 필요해요" : error}
+          </p>
         ) : (
           children
         )}
