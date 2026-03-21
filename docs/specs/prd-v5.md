@@ -133,12 +133,12 @@ v5 추가: 통합 플랫폼은 SR 처리뿐 아니라 **신사업 탐색(Discove
 
 ### MVP 최소 기준 (Phase 3 완료 기준) <!-- CHANGED: R1 반영 — MVP 기준 누락 -->
 
-- [ ] 기술 스택 점검 스프린트(Sprint 0) 완료 + 호환성 매트릭스 작성
-- [ ] KPI 측정 인프라 구축 (K7 WAU, K8 에이전트 완료율 최소 측정 가능)
-- [ ] AXIS DS UI 전환 완료 (Foundry-X 웹 대시보드)
-- [ ] Plumb Track B 판정 완료
-- [ ] 에이전트 자동 수정/rebase 구현 (G7, G8)
-- [ ] Git↔D1 Reconciliation 동작 (G1)
+- [x] 기술 스택 점검 스프린트(Sprint 0) 완료 + 호환성 매트릭스 작성 — F98, Sprint 25 (Kill→Go)
+- [x] KPI 측정 인프라 구축 (K7 WAU, K8 에이전트 완료율 최소 측정 가능) — F100, Sprint 27
+- [x] AXIS DS UI 전환 완료 (Foundry-X 웹 대시보드) — F104, Sprint 25 (11 컴포넌트)
+- [x] Plumb Track B 판정 완료 — F105, Sprint 28 (Stay Track A, ADR-001)
+- [x] 에이전트 자동 수정/rebase 구현 (G7, G8) — F101 Sprint 27 + F102 Sprint 28
+- [x] Git↔D1 Reconciliation 동작 (G1) — F99, Sprint 27 (Cron 6h)
 
 ### 실패/중단 조건 <!-- CHANGED: R1 반영 — Kill 조건 Phase별 명확화 -->
 

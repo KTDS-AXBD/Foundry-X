@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** v2.1.0 — Sprint 26 완료 (108 endpoints, 41 services, 535 API tests + 51 E2E)
+**현재 상태:** v2.4.0 — Sprint 30 완료 (111 endpoints, 45 services, 583 API tests + 51 E2E)
 
 ## Architecture
 
@@ -163,9 +163,12 @@ pnpm e2e                          # Playwright E2E (15 specs)
   - Sprint 24: Phase 3 마무리 — 멀티 프로젝트 + Jira + 모니터링 + 워크플로우 (95%)
   - Sprint 25: 기술 스택 점검(F98) + AXIS DS UI 전환(F104) (97%)
   - 최종: 39 services, 97 endpoints, 535 API tests, D1 27 테이블
-- **Phase 4:** 🔧 진행 중 (Sprint 26~) — v2.1.0
+- **Phase 4:** 🔧 진행 중 (Sprint 26~30) — v2.4.0
   - Sprint 26: Phase 4 통합 — SSO Hub Token + BFF 프록시 + 프론트엔드 iframe 통합 + D1 엔티티 레지스트리 (94%)
-  - 현재: 41 services, 108 endpoints, 535 API tests, D1 30 테이블
+  - Sprint 27~28: Phase 3 완결 — KPI + Reconciliation + AutoFix + AutoRebase + Semantic Linting + Plumb 판정
+  - Sprint 29: 온보딩 기반 — 가이드 UI + 피드백 API + 체크리스트
+  - Sprint 30: 배포 동기화 + Phase 4 Go 판정(Conditional) + 품질 강화 (93%)
+  - 현재: 45 services, 111 endpoints, 583 API tests, D1 32 테이블
   - PDCA 문서: `docs/archive/2026-03/sprint-{N}/` (Sprint 3~13, 17~23 archived)
 
 ## Git Workflow
