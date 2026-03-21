@@ -109,7 +109,9 @@ export type SSEEvent =
   | { event: "agent.plan.waiting"; data: { planId: string; taskId: string; agentId: string; stepsCount: number; timeoutMs: number } }
   | { event: "agent.plan.executing"; data: { planId: string; startedAt: string } }
   | { event: "agent.plan.completed"; data: { planId: string; completedAt: string; tokensUsed: number; duration: number } }
-  | { event: "agent.plan.failed"; data: { planId: string; failedAt: string; error: string } };
+  | { event: "agent.plan.failed"; data: { planId: string; failedAt: string; error: string } }
+  | { event: "reconciliation.completed"; data: { runId: string; tenantId: string; driftCount: number; fixedCount: number; skippedCount: number; completedAt: string } }
+  | { event: "agent.hook.escalated"; data: { taskId: string; hookType: string; error: string; attempts: number; escalatedAt: string } };
 
 const DEDUP_TTL_MS = 60_000;
 

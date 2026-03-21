@@ -1,6 +1,9 @@
-import { app } from "./app.js";
+import { app, handleScheduled } from "./app.js";
 
-export default app;
+export default {
+  fetch: app.fetch,
+  scheduled: handleScheduled,
+};
 
 export type { Env } from "./env.js";
 

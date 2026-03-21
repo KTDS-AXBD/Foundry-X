@@ -9,6 +9,7 @@ import type { McpServerRegistry } from "./mcp-registry.js";
 import type { MergeQueueService } from "./merge-queue.js";
 import type { PlannerAgent } from "./planner-agent.js";
 import type { WorktreeManager } from "./worktree-manager.js";
+import type { AutoFixService } from "./auto-fix.js";
 import type { ParallelExecutionResult, ParallelPrResult, ConflictReport, AgentPlan } from "@foundry-x/shared";
 
 export class PlanTimeoutError extends Error {
@@ -91,6 +92,7 @@ export class AgentOrchestrator {
   private mergeQueue?: MergeQueueService;
   private plannerAgent?: PlannerAgent;
   private worktreeManager?: WorktreeManager;
+  private autoFix?: AutoFixService;
 
   constructor(
     private db: D1Database,
@@ -729,5 +731,50 @@ export class AgentOrchestrator {
     } finally {
       await this.worktreeManager.cleanup(agentId);
     }
+  }
+
+  /** F101: AutoFix 서비스 주입 */
+  setAutoFix(service: AutoFixService): void {
+    this.autoFix = service;
+  }
+
+  /**
+   * F101: 작업 실행 + Hook 실패 시 AutoFix 재시도
+   * executeTask() 완료 후 result.status=failed이고 hook 관련 에러면 autoFix.retryWithFix 호출
+   */
+  async executeTaskWithAutoFix(
+    agentId: string,
+    taskType: AgentTaskType,
+    context: AgentExecutionRequest["context"],
+    runner: AgentRunner,
+  ): Promise<{ result: AgentExecutionResult; autoFixResult?: { fixed: boolean; attempts: number; escalated: boolean } }> {
+    const result = await this.executeTask(agentId, taskType, context, runner);
+
+    if (
+      result.status === "failed" &&
+      this.autoFix &&
+      result.output.analysis?.toLowerCase().includes("hook")
+    ) {
+      const taskId = `task-${agentId}-${Date.now()}`;
+      const fileContext = context.targetFiles?.join(", ") ?? "";
+      const fixResult = await this.autoFix.retryWithFix(
+        taskId,
+        "pre-commit",
+        result.output.analysis ?? "Hook failure",
+        fileContext,
+        context.targetFiles,
+      );
+
+      return {
+        result,
+        autoFixResult: {
+          fixed: fixResult.fixed,
+          attempts: fixResult.attempts.length,
+          escalated: fixResult.escalated,
+        },
+      };
+    }
+
+    return { result };
   }
 }
