@@ -5,10 +5,13 @@ import {
   getKpiSummary,
   getKpiTrends,
   getKpiEvents,
+  fetchPhase4Kpi,
   type KpiSummary,
   type KpiTrendPoint,
   type KpiEventItem,
+  type Phase4Kpi,
 } from "@/lib/api-client";
+import { NpsSummaryWidget } from "@/components/feature/NpsSummaryWidget";
 
 interface AsyncState<T> {
   data: T | null;
@@ -58,6 +61,95 @@ function Card({
       {error && <div className="text-sm text-destructive">{error}</div>}
       {!loading && !error && children}
     </div>
+  );
+}
+
+function KpiTargetCard({
+  title,
+  value,
+  target,
+  met,
+}: {
+  title: string;
+  value: string;
+  target: string;
+  met: boolean;
+}) {
+  return (
+    <div className="rounded-lg border border-border bg-card p-4">
+      <div className="mb-1 text-xs font-medium text-muted-foreground">{title}</div>
+      <div className={`text-2xl font-bold ${met ? "text-green-500" : "text-yellow-500"}`}>
+        {value}
+      </div>
+      <div className="mt-1 text-xs text-muted-foreground">
+        목표: {target} {met ? "✓" : "—"}
+      </div>
+    </div>
+  );
+}
+
+function Phase4KpiSection() {
+  const kpi = useAsync<Phase4Kpi>(() => fetchPhase4Kpi(28));
+  const latestWau = kpi.data?.wauTrend.length ? kpi.data.wauTrend[kpi.data.wauTrend.length - 1].wau : 0;
+  const maxWau = kpi.data?.wauTrend.length ? Math.max(...kpi.data.wauTrend.map((w) => w.wau), 1) : 1;
+
+  return (
+    <section className="rounded-lg border border-border bg-card p-6">
+      <h2 className="mb-4 text-lg font-semibold">Phase 4 Go 판정 KPI</h2>
+      {kpi.loading && <div className="text-sm text-muted-foreground">Loading...</div>}
+      {kpi.error && <div className="text-sm text-destructive">{kpi.error}</div>}
+      {kpi.data && (
+        <>
+          <div className="mb-6 grid gap-4 md:grid-cols-3">
+            <KpiTargetCard
+              title="K7 Weekly Active Users"
+              value={`${latestWau}명`}
+              target="5명+"
+              met={latestWau >= 5}
+            />
+            <KpiTargetCard
+              title="K8 에이전트 완료율"
+              value={`${kpi.data.agentCompletionRate}%`}
+              target=">70%"
+              met={kpi.data.agentCompletionRate > 70}
+            />
+            <KpiTargetCard
+              title="K9 통합 워크플로우"
+              value={`${kpi.data.serviceIntegrationRate}%`}
+              target=">80%"
+              met={kpi.data.serviceIntegrationRate > 80}
+            />
+          </div>
+          {/* WAU 주간 트렌드 */}
+          {kpi.data.wauTrend.length > 0 && (
+            <div>
+              <h3 className="mb-2 text-sm font-medium text-muted-foreground">주간 WAU 트렌드</h3>
+              <div className="flex items-end gap-2" style={{ height: 120 }}>
+                {kpi.data.wauTrend.map((w) => {
+                  const heightPct = (w.wau / maxWau) * 100;
+                  return (
+                    <div
+                      key={w.week}
+                      className="flex flex-1 flex-col items-center gap-1"
+                      style={{ height: "100%" }}
+                    >
+                      <div className="flex flex-1 flex-col justify-end w-full">
+                        <div
+                          className="w-full rounded-t bg-blue-500"
+                          style={{ height: `${heightPct}%`, minHeight: w.wau > 0 ? 4 : 0 }}
+                          title={`${w.week}: ${w.wau}명`}
+                        />
+                      </div>
+                      <span className="text-[10px] text-muted-foreground">{w.week.slice(-3)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </section>
   );
 }
 
@@ -248,6 +340,16 @@ export default function AnalyticsPage() {
             </>
           )}
         </div>
+      </div>
+
+      {/* Phase 4 KPI */}
+      <div className="mt-8">
+        <Phase4KpiSection />
+      </div>
+
+      {/* NPS Feedback Summary */}
+      <div className="mt-8">
+        <NpsSummaryWidget />
       </div>
     </div>
   );

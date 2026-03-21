@@ -348,6 +348,42 @@ export class MockD1Database {
         updated_at TEXT NOT NULL DEFAULT (datetime('now')),
         UNIQUE(org_id, category)
       );
+
+      CREATE TABLE IF NOT EXISTS kpi_events (
+        id TEXT PRIMARY KEY,
+        tenant_id TEXT NOT NULL,
+        event_type TEXT NOT NULL CHECK(event_type IN ('page_view', 'api_call', 'agent_task', 'cli_invoke', 'sdd_check')),
+        user_id TEXT,
+        agent_id TEXT,
+        metadata TEXT DEFAULT '{}',
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (tenant_id) REFERENCES organizations(id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_kpi_events_tenant_type
+        ON kpi_events(tenant_id, event_type, created_at);
+
+      CREATE TABLE IF NOT EXISTS onboarding_feedback (
+        id TEXT PRIMARY KEY,
+        tenant_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        nps_score INTEGER NOT NULL CHECK(nps_score >= 1 AND nps_score <= 10),
+        comment TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (tenant_id) REFERENCES organizations(id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_feedback_tenant ON onboarding_feedback(tenant_id, created_at DESC);
+
+      CREATE TABLE IF NOT EXISTS onboarding_progress (
+        id TEXT PRIMARY KEY,
+        tenant_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        step_id TEXT NOT NULL,
+        completed INTEGER NOT NULL DEFAULT 0,
+        completed_at TEXT,
+        FOREIGN KEY (tenant_id) REFERENCES organizations(id),
+        UNIQUE(tenant_id, user_id, step_id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_progress_user ON onboarding_progress(tenant_id, user_id);
     `);
     this.db.prepare("INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)").run("org_test", "Test Org", "test");
   }

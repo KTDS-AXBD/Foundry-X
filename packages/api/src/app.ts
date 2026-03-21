@@ -27,6 +27,8 @@ import { proxyRoute } from "./routes/proxy.js";
 import { entitiesRoute } from "./routes/entities.js";
 import { kpiRoute } from "./routes/kpi.js";
 import { reconciliationRoute } from "./routes/reconciliation.js";
+import { feedbackRoute } from "./routes/feedback.js";
+import { onboardingRoute } from "./routes/onboarding.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { tenantGuard, type TenantVariables } from "./middleware/tenant.js";
@@ -97,6 +99,8 @@ app.doc("/api/openapi.json", {
     { name: "Entities", description: "Cross-service entity registry and links" },
     { name: "KPI", description: "KPI event tracking and analytics" },
     { name: "Reconciliation", description: "Git↔D1 reconciliation" },
+    { name: "Feedback", description: "NPS feedback collection" },
+    { name: "Onboarding", description: "Onboarding progress tracking" },
   ],
 });
 app.get("/api/docs", swaggerUI({ url: "/api/openapi.json" }));
@@ -156,6 +160,10 @@ app.route("/api", entitiesRoute);
 
 // Sprint 27: Reconciliation (auth + tenant required)
 app.route("/api", reconciliationRoute);
+
+// Sprint 29: Onboarding feedback + progress (auth + tenant required)
+app.route("/api", feedbackRoute);
+app.route("/api", onboardingRoute);
 
 // Cron Trigger scheduled handler
 export { handleScheduled };

@@ -1140,3 +1140,84 @@ export async function getKpiEvents(
   if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
   return res.json();
 }
+
+// ─── Onboarding Types (F114) ───
+
+export interface OnboardingStep {
+  id: string;
+  label: string;
+  completed: boolean;
+  completedAt: string | null;
+}
+
+export interface OnboardingProgress {
+  userId: string;
+  completedSteps: string[];
+  totalSteps: number;
+  progressPercent: number;
+  steps: OnboardingStep[];
+}
+
+export interface FeedbackSummary {
+  averageNps: number;
+  totalResponses: number;
+  recentFeedback: { npsScore: number; comment: string | null; createdAt: string }[];
+}
+
+// ─── Onboarding API Functions (F114) ───
+
+export async function getOnboardingProgress(): Promise<OnboardingProgress> {
+  return fetchApi<OnboardingProgress>("/onboarding/progress");
+}
+
+export async function completeOnboardingStep(stepId: string): Promise<{
+  success: boolean;
+  stepId: string;
+  progressPercent: number;
+  allComplete: boolean;
+}> {
+  const url = `${BASE_URL}/onboarding/progress`;
+  const res = await fetch(url, {
+    method: "PATCH",
+    headers: { ...authHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify({ stepId, completed: true }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function submitFeedback(data: { npsScore: number; comment?: string }): Promise<{
+  success: boolean;
+  id: string;
+  npsScore: number;
+}> {
+  const url = `${BASE_URL}/feedback`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { ...authHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function getFeedbackSummary(): Promise<FeedbackSummary> {
+  return fetchApi<FeedbackSummary>("/feedback/summary");
+}
+
+// ─── Sprint 30: Phase 4 KPI (F125) ───
+
+export interface Phase4Kpi {
+  wauTrend: { week: string; wau: number }[];
+  agentCompletionRate: number;
+  serviceIntegrationRate: number;
+  period: { from: string; to: string };
+}
+
+export async function fetchPhase4Kpi(days = 28): Promise<Phase4Kpi> {
+  const res = await fetch(`${BASE_URL}/kpi/phase4?days=${days}`, {
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
