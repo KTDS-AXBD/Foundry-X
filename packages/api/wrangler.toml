@@ -50,15 +50,14 @@ binding = "AI"
 crons = ["0 */6 * * *"]
 
 # Sprint 26: Service Bindings
-[[services]]
-binding = "DX_WORKER"
-service = "discovery-x-radar-worker"
-environment = "production"
-
-[[services]]
-binding = "AIF_WORKER"
-service = "ai-foundry-svc-gateway"
-environment = "production"
+## Sprint 26: Service Bindings — disabled until target Workers are deployed
+## [[services]]
+## binding = "DX_WORKER"
+## service = "discovery-x-radar-worker"
+##
+## [[services]]
+## binding = "AIF_WORKER"
+## service = "ai-foundry-svc-gateway"
 
 # Sprint 8: KV Cache
 [[kv_namespaces]]
