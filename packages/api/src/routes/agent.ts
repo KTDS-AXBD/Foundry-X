@@ -298,7 +298,7 @@ agentRoute.openapi(createAgentTask, async (c) => {
     .all<{ id: string }>();
 
   if (results.length === 0) {
-    return c.json({ error: `No session found for agent '${id}'` }, 404);
+    return c.json({ error: `No session found for agent '${id}'`, errorCode: "RESOURCE_001" }, 404);
   }
 
   const orchestrator = new AgentOrchestrator(c.env.DB);
@@ -372,7 +372,7 @@ agentRoute.openapi(executeAgentTask, async (c) => {
   const runner = createAgentRunner({ ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY });
 
   if (!(await runner.isAvailable())) {
-    return c.json({ error: "No agent runner available" }, 503);
+    return c.json({ error: "No agent runner available", errorCode: "INTEGRATION_003" }, 503);
   }
 
   const result = await orchestrator.executeTask(
@@ -462,7 +462,7 @@ agentRoute.openapi(getTaskResult, async (c) => {
   const taskResult = await orchestrator.getTaskResult(taskId);
 
   if (!taskResult) {
-    return c.json({ error: "Task not found" }, 404);
+    return c.json({ error: "Task not found", errorCode: "RESOURCE_001" }, 404);
   }
 
   return c.json(taskResult);
@@ -513,7 +513,7 @@ agentRoute.openapi(createAgentPr, async (c) => {
     .first<{ result: string | null }>();
 
   if (!taskRow?.result) {
-    return c.json({ error: "Task result not found" }, 404);
+    return c.json({ error: "Task result not found", errorCode: "RESOURCE_001" }, 404);
   }
 
   const taskResult = JSON.parse(taskRow.result);

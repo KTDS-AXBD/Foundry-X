@@ -6,6 +6,10 @@ export const ErrorSchema = z
   })
   .openapi("ErrorResponse");
 
+// F128: Re-export structured error utilities for convenience
+export { structuredErrorSchema, errorResponse, ERROR_CODES } from "./error.js";
+export type { ErrorCode } from "./error.js";
+
 export const SuccessSchema = z
   .object({
     ok: z.boolean(),

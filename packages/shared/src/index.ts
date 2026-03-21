@@ -125,3 +125,15 @@ export type {
   AifMcpTool,
   AifPolicyEvalResult,
 } from './agent.js';
+
+// Sprint 26: SSO types (F108)
+export type {
+  ServiceAccess,
+  HubTokenPayload,
+} from './sso.js';
+
+// Sprint 30: postMessage protocol types (F124)
+export type {
+  FoundryToSubAppMessage,
+  SubAppToFoundryMessage,
+} from './sso.js';

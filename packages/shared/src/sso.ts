@@ -15,3 +15,15 @@ export interface HubTokenPayload {
   iat: number;
   exp: number;
 }
+
+/** Sprint 30: F124 postMessage 프로토콜 타입 */
+
+export type FoundryToSubAppMessage =
+  | { type: "FX_SSO_TOKEN"; token: string; serviceId: string }
+  | { type: "FX_CONTEXT_SYNC"; projectId: string; orgId: string }
+  | { type: "FX_THEME_SYNC"; theme: "light" | "dark" };
+
+export type SubAppToFoundryMessage =
+  | { type: "FX_READY" }
+  | { type: "FX_NAVIGATE"; path: string }
+  | { type: "FX_ERROR"; message: string };

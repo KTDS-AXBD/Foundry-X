@@ -60,14 +60,14 @@ specRoute.openapi(generateSpecRoute, async (c) => {
   try {
     response = await llm.generate(systemPrompt, buildUserPrompt(text, context));
   } catch {
-    return c.json({ error: "LLM service unavailable" }, 503);
+    return c.json({ error: "LLM service unavailable", errorCode: "INTEGRATION_003" }, 503);
   }
 
   let parsed: unknown;
   try {
     parsed = JSON.parse(response.content);
   } catch {
-    return c.json({ error: "LLM output is not valid JSON" }, 422);
+    return c.json({ error: "LLM output is not valid JSON", errorCode: "VALIDATION_002" }, 422);
   }
 
   const result = GeneratedSpecSchema.safeParse(parsed);
@@ -143,7 +143,7 @@ specRoute.openapi(resolveConflictRoute, async (c) => {
     .first<{ id: string }>();
 
   if (!existing) {
-    return c.json({ error: `Conflict '${conflictId}' not found` }, 404);
+    return c.json({ error: `Conflict '${conflictId}' not found`, errorCode: "RESOURCE_001" }, 404);
   }
 
   await c.env.DB

@@ -2,7 +2,7 @@
  * KpiLogger — KPI 이벤트 로깅 + 집계 서비스 (F100)
  */
 
-export type KpiEventType = "page_view" | "api_call" | "agent_task" | "cli_invoke" | "sdd_check";
+export type KpiEventType = "page_view" | "api_call" | "agent_task" | "cli_invoke" | "sdd_check" | "harness_violation" | "service_switch" | "integrated_workflow";
 
 export interface KpiEvent {
   id: string;
@@ -28,6 +28,13 @@ export interface KpiTrendPoint {
   pageViews: number;
   apiCalls: number;
   agentTasks: number;
+}
+
+export interface Phase4Kpi {
+  wauTrend: { week: string; wau: number }[];
+  agentCompletionRate: number;
+  serviceIntegrationRate: number;
+  period: { from: string; to: string };
 }
 
 export class KpiLogger {
@@ -214,6 +221,75 @@ export class KpiLogger {
     }));
 
     return { events, total: countResult?.cnt ?? 0 };
+  }
+
+  async getPhase4Kpi(tenantId: string, days: number = 28): Promise<Phase4Kpi> {
+    const cutoff = new Date(Date.now() - days * 86400_000).toISOString();
+    const now = new Date().toISOString();
+
+    // K7 WAU: weekly unique user count
+    const wauRows = await this.db
+      .prepare(
+        `SELECT strftime('%Y-W%W', created_at) as week, COUNT(DISTINCT user_id) as wau
+         FROM kpi_events
+         WHERE tenant_id = ? AND event_type = 'page_view' AND created_at >= ? AND user_id IS NOT NULL
+         GROUP BY week ORDER BY week`,
+      )
+      .bind(tenantId, cutoff)
+      .all<{ week: string; wau: number }>();
+
+    const wauTrend = (wauRows.results ?? []).map((r) => ({
+      week: r.week,
+      wau: r.wau,
+    }));
+
+    // K8 agent completion rate (from agent_tasks table)
+    const agentTotal = await this.db
+      .prepare(
+        "SELECT COUNT(*) as cnt FROM kpi_events WHERE tenant_id = ? AND event_type = 'agent_task' AND created_at >= ?",
+      )
+      .bind(tenantId, cutoff)
+      .first<{ cnt: number }>();
+
+    const agentCompleted = await this.db
+      .prepare(
+        "SELECT COUNT(*) as cnt FROM kpi_events WHERE tenant_id = ? AND event_type = 'agent_task' AND created_at >= ? AND json_extract(metadata, '$.status') = 'completed'",
+      )
+      .bind(tenantId, cutoff)
+      .first<{ cnt: number }>();
+
+    const agentCompletionRate =
+      (agentTotal?.cnt ?? 0) > 0
+        ? Math.round(((agentCompleted?.cnt ?? 0) / (agentTotal?.cnt ?? 1)) * 100)
+        : 0;
+
+    // K9 service integration rate
+    const switchCount = await this.db
+      .prepare(
+        "SELECT COUNT(*) as cnt FROM kpi_events WHERE tenant_id = ? AND event_type = 'service_switch' AND created_at >= ?",
+      )
+      .bind(tenantId, cutoff)
+      .first<{ cnt: number }>();
+
+    const integratedCount = await this.db
+      .prepare(
+        "SELECT COUNT(*) as cnt FROM kpi_events WHERE tenant_id = ? AND event_type = 'integrated_workflow' AND created_at >= ?",
+      )
+      .bind(tenantId, cutoff)
+      .first<{ cnt: number }>();
+
+    const totalWorkflows = (switchCount?.cnt ?? 0) + (integratedCount?.cnt ?? 0);
+    const serviceIntegrationRate =
+      totalWorkflows > 0
+        ? Math.round(((integratedCount?.cnt ?? 0) / totalWorkflows) * 100)
+        : 0;
+
+    return {
+      wauTrend,
+      agentCompletionRate,
+      serviceIntegrationRate,
+      period: { from: cutoff, to: now },
+    };
   }
 
   async pruneOldEvents(tenantId: string, retentionDays: number = 30): Promise<number> {

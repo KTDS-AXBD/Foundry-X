@@ -52,7 +52,7 @@ authRoute.openapi(signup, async (c) => {
 
   const [existing] = await db.select().from(users).where(eq(users.email, email));
   if (existing) {
-    return c.json({ error: "Email already registered" }, 409);
+    return c.json({ error: "Email already registered", errorCode: "AUTH_004" }, 409);
   }
 
   const passwordHash = await hashPassword(password);
@@ -127,12 +127,12 @@ authRoute.openapi(login, async (c) => {
 
   const [user] = await db.select().from(users).where(eq(users.email, email));
   if (!user?.passwordHash) {
-    return c.json({ error: "Invalid credentials" }, 401);
+    return c.json({ error: "Invalid credentials", errorCode: "AUTH_003" }, 401);
   }
 
   const valid = await verifyPassword(password, user.passwordHash);
   if (!valid) {
-    return c.json({ error: "Invalid credentials" }, 401);
+    return c.json({ error: "Invalid credentials", errorCode: "AUTH_003" }, 401);
   }
 
   // Resolve active organization — pick first membership
@@ -193,14 +193,14 @@ authRoute.openapi(refresh, async (c) => {
   try {
     payload = (await verify(refreshToken, secret, "HS256")) as unknown as JwtPayload;
   } catch {
-    return c.json({ error: "Invalid or expired refresh token" }, 401);
+    return c.json({ error: "Invalid or expired refresh token", errorCode: "AUTH_001" }, 401);
   }
 
   const db = getDb(c.env.DB);
 
   const [user] = await db.select().from(users).where(eq(users.id, payload.sub));
   if (!user) {
-    return c.json({ error: "User not found" }, 401);
+    return c.json({ error: "User not found", errorCode: "RESOURCE_001" }, 401);
   }
 
   if (payload.jti) {
@@ -209,7 +209,7 @@ authRoute.openapi(refresh, async (c) => {
       .from(refreshTokens)
       .where(eq(refreshTokens.jti, payload.jti));
     if (stored?.revokedAt) {
-      return c.json({ error: "Refresh token revoked" }, 401);
+      return c.json({ error: "Refresh token revoked", errorCode: "AUTH_001" }, 401);
     }
     await db
       .update(refreshTokens)
@@ -279,7 +279,7 @@ authRoute.openapi(switchOrg, async (c) => {
   ).bind(orgId, payload.sub).first();
 
   if (!member) {
-    return c.json({ error: "Not a member of this organization" }, 403);
+    return c.json({ error: "Not a member of this organization", errorCode: "AUTH_002" }, 403);
   }
 
   const db = getDb(c.env.DB);

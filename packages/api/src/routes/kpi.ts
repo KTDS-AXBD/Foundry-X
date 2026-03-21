@@ -153,3 +153,39 @@ kpiRoute.openapi(getEvents, async (c) => {
   const result = await logger.getEvents(tenantId, { type, limit, offset });
   return c.json(result);
 });
+
+// ─── GET /api/kpi/phase4 ───
+
+const Phase4KpiResponseSchema = z.object({
+  wauTrend: z.array(z.object({ week: z.string(), wau: z.number() })),
+  agentCompletionRate: z.number(),
+  serviceIntegrationRate: z.number(),
+  period: z.object({ from: z.string(), to: z.string() }),
+}).openapi("Phase4KpiResponse");
+
+const getPhase4Kpi = createRoute({
+  method: "get",
+  path: "/kpi/phase4",
+  tags: ["KPI"],
+  summary: "Phase 4 Go 판정 KPI (K7/K8/K9)",
+  request: {
+    query: z.object({
+      days: z.coerce.number().default(28),
+    }),
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: Phase4KpiResponseSchema } },
+      description: "Phase 4 KPI 데이터 (WAU 트렌드, 에이전트 완료율, 서비스 통합률)",
+    },
+  },
+});
+
+kpiRoute.openapi(getPhase4Kpi, async (c) => {
+  const { days } = c.req.valid("query");
+  const logger = new KpiLogger(c.env.DB);
+  const tenantId = getTenantId(c);
+
+  const result = await logger.getPhase4Kpi(tenantId, days);
+  return c.json(result);
+});
