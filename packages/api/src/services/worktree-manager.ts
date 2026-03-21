@@ -104,6 +104,39 @@ export class WorktreeManager {
     return this.worktrees.get(agentId)?.worktreePath ?? null;
   }
 
+  // ─── F102: Git rebase helpers ───
+
+  async fetchBase(agentId: string, remote = "origin"): Promise<void> {
+    if (!this.gitExecutor) return;
+    const config = this.worktrees.get(agentId);
+    if (!config) throw new Error(`Worktree not found: ${agentId}`);
+    await this.gitExecutor(["fetch", remote, config.baseBranch]);
+  }
+
+  async rebase(agentId: string, onto: string): Promise<{ stdout: string; exitCode: number }> {
+    if (!this.gitExecutor) return { stdout: "", exitCode: 0 };
+    return this.gitExecutor(["rebase", `origin/${onto}`]);
+  }
+
+  async abortRebase(agentId: string): Promise<void> {
+    if (!this.gitExecutor) return;
+    try {
+      await this.gitExecutor(["rebase", "--abort"]);
+    } catch {
+      // Already not in rebase state
+    }
+  }
+
+  async continueRebase(agentId: string): Promise<{ stdout: string; exitCode: number }> {
+    if (!this.gitExecutor) return { stdout: "", exitCode: 0 };
+    return this.gitExecutor(["rebase", "--continue"]);
+  }
+
+  async stageFile(agentId: string, filePath: string): Promise<void> {
+    if (!this.gitExecutor) return;
+    await this.gitExecutor(["add", filePath]);
+  }
+
   async cleanupAll(): Promise<number> {
     let count = 0;
     for (const [agentId, config] of this.worktrees) {

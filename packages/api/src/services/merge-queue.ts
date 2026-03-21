@@ -1,5 +1,6 @@
 import type { GitHubService } from "./github.js";
 import type { SSEManager } from "./sse-manager.js";
+import type { AutoRebaseService } from "./auto-rebase.js";
 import type {
   MergeQueueEntry,
   MergeQueueStatus,
@@ -12,6 +13,7 @@ export class MergeQueueService {
     private github: GitHubService,
     private db: D1Database,
     private sse?: SSEManager,
+    private autoRebase?: AutoRebaseService,
   ) {}
 
   async enqueue(
@@ -131,26 +133,58 @@ export class MergeQueueService {
     // Check PR is mergeable
     const [prStatus] = await this.github.getPrStatuses([entry.prNumber]);
     if (!prStatus?.mergeable) {
-      // Try rebase
       await this.updateEntry(entry.id, { rebase_attempted: 1 });
-      const rebaseResult = await this.github.updateBranch(entry.prNumber);
 
-      this.sse?.pushEvent({
-        event: "agent.queue.rebase",
-        data: {
-          prNumber: entry.prNumber,
-          success: rebaseResult.updated,
-          files: entry.modifiedFiles,
-        },
-      });
+      if (this.autoRebase) {
+        // F102: 3-attempt auto-rebase with LLM conflict resolution
+        const rebaseResult = await this.autoRebase.rebaseWithRetry(
+          entry.agentId,
+          "master",
+          entry.id,
+        );
 
-      if (!rebaseResult.updated) {
-        await this.updateEntryStatus(entry.id, "conflict");
-        await this.updateEntry(entry.id, { rebase_succeeded: 0 });
-        return { merged: false, entryId: entry.id, prNumber: entry.prNumber, error: "Rebase failed" };
+        this.sse?.pushEvent({
+          event: "agent.queue.rebase",
+          data: {
+            prNumber: entry.prNumber,
+            success: rebaseResult.success,
+            files: entry.modifiedFiles,
+          },
+        });
+
+        if (!rebaseResult.success) {
+          await this.updateEntryStatus(entry.id, "conflict");
+          await this.updateEntry(entry.id, { rebase_succeeded: 0 });
+          return {
+            merged: false,
+            entryId: entry.id,
+            prNumber: entry.prNumber,
+            error: rebaseResult.escalated ? "Rebase failed (escalated)" : "Rebase failed",
+          };
+        }
+
+        await this.updateEntry(entry.id, { rebase_succeeded: 1 });
+      } else {
+        // Legacy: single GitHub API rebase attempt
+        const rebaseResult = await this.github.updateBranch(entry.prNumber);
+
+        this.sse?.pushEvent({
+          event: "agent.queue.rebase",
+          data: {
+            prNumber: entry.prNumber,
+            success: rebaseResult.updated,
+            files: entry.modifiedFiles,
+          },
+        });
+
+        if (!rebaseResult.updated) {
+          await this.updateEntryStatus(entry.id, "conflict");
+          await this.updateEntry(entry.id, { rebase_succeeded: 0 });
+          return { merged: false, entryId: entry.id, prNumber: entry.prNumber, error: "Rebase failed" };
+        }
+
+        await this.updateEntry(entry.id, { rebase_succeeded: 1 });
       }
-
-      await this.updateEntry(entry.id, { rebase_succeeded: 1 });
     }
 
     // Merge
