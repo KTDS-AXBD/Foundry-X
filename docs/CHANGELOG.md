@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #71 (2026-03-21)
+**Sprint 29: 실사용자 온보딩 기반 — 가이드 UI + 피드백 시스템 + 체크리스트 (Match Rate 93%)**:
+- ✅ F120 온보딩 가이드 UI: /getting-started 페이지 (기능카드 5개 + 3단계 체크리스트 + FAQ 5항목 + NPS 폼)
+- ✅ F121 피드백 수집: POST/GET /feedback API + D1 onboarding_feedback + /analytics NPS 위젯
+- ✅ F122 온보딩 체크리스트: GET/PATCH /onboarding/progress + D1 onboarding_progress + KpiLogger 연동
+- ✅ D1 migration 0019 (2 tables), +4 endpoints, +2 services, +16 API tests
+- ✅ SPEC drift 보정: Sprint 27 F99/F100/F101 📋→✅, Sprint 25~28 Execution Plan 추가
+- ✅ 사이드바 "시작하기" nav item 추가, shadcn Accordion 컴포넌트
+
+**검증 결과**:
+- ✅ typecheck 5/5 (0 에러) / API 566/566 / Web 48/48
+
 ### 세션 #69 (2026-03-21)
 **Sprint 27: Phase 3-B 기술 기반 완성 — KPI 인프라 + Reconciliation + Hook 자동수정 (Match Rate 94%)**:
 - ✅ F100 KPI 측정 인프라: KpiLogger 서비스 5 메서드 + 4 endpoints (track/summary/trends/events) + Analytics 대시보드 페이지
