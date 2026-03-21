@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #68 (2026-03-21)
+**Sprint 26: Phase 4 통합 — 프론트엔드 + SSO + API BFF + D1 스키마 (Match Rate 94%)**:
+- ✅ F108 SSO 인증 통합: JWT Hub Token (services[] 클레임) + org_services 테이블 + 4 endpoints (token, verify, services GET/PUT)
+- ✅ F109 API BFF 프록시: Service Bindings 설정 + /api/dx/*, /api/aif/* 프록시 라우트 + Hub Token 검증 미들웨어
+- ✅ F106 프론트엔드 통합: ServiceContainer iframe + postMessage SSO 토큰 전달 + discovery/, foundry/ 서브 라우트 + Sidebar 서비스 네비게이션
+- ✅ F111 D1 스키마 통합: service_entities + entity_links 메타데이터 테이블 + EntityRegistry + EntitySyncService + 5 entities API endpoints
+- ✅ D1 migration 0017: 3 테이블 (org_services, service_entities, entity_links) + 인덱스 4개
+- ✅ Agent Teams 2-Worker 병렬 실행: W1(SSO+BFF) 2m45s + W2(Frontend+Data) 2m15s, File Guard 이탈 0건
+- ✅ PDCA 전주기: Plan(FX-PLAN-027) → Design(FX-DSGN-027) → Do → Check(94%) → Report(FX-RPRT-027)
+- ✅ 무 반복 첫 통과: 5개 partial item (all Low-Medium priority, scope 관리 성공)
+
+**신규 산출물**:
+- 신규 파일: 14개 (sso.ts, sso-routes.ts, service-proxy.ts, proxy-routes.ts, ServiceContainer.tsx, discovery/page, foundry/page, entity-registry.ts, entity-sync.ts, entities-routes.ts + 3 schemas)
+- 수정 파일: 9개 (auth.ts, env.ts, app.ts, wrangler.toml, sidebar.tsx, api-client.ts + 테스트 헬퍼)
+- 신규 API endpoints: 11개 (SSO 4 + BFF 2 + Entities 5)
+
+**검증 결과**:
+- ✅ API 535/535 pass (신규 +11 endpoints)
+- ✅ Web 48/48 pass (신규 +3 E2E: service-integration.spec.ts)
+- ✅ typecheck 5/5 clean / Lint 0 warnings
+- ✅ D1 migration 0017 remote 적용 완료 (총 30 테이블)
+
+---
+
+### 세션 #67 (2026-03-20)
+**Sprint 25: 기술 스택 점검 + AXIS DS UI 전환 (Match Rate 97%)**:
+- ✅ F98 기술 스택 감사: 3개 서비스 호환성 매트릭스 + Kill 조건 Go 판정 (Cloudflare 완전 호환)
+- ✅ F104 AXIS DS 전환: @axis-ds/ui-react 11 컴포넌트 + 테마 시스템 + 토큰 표준화 + @base-ui/react 제거
+- ✅ 의존성 최적화: @base-ui/react, next-themes 제거 (-2) + @axis-ds/* 추가 (+3)
+- ✅ PDCA: Plan(FX-PLAN-026) → Design → Do(1m30s) → Check(97%) → Report(FX-RPRT-026)
+- ✅ Agent Teams 2-Worker: CSS/테마 + 컴포넌트 병렬, File Guard 0 이탈
+
+**검증 결과**:
+- ✅ API 535/535, Web 48/48, typecheck 5/5 clean
+- ✅ v2.0.0 workers 배포 완료
+
+---
+
 ### 세션 #57 (2026-03-19)
 **F93 GitHub 양방향 동기화 고도화 — Sprint 21 PDCA 전주기 완료 (Match Rate 93%)**:
 - ✅ Issue→Task 자동 생성: `foundry-x` 라벨 옵트인 + 라벨→taskType/agent 자동 매핑
