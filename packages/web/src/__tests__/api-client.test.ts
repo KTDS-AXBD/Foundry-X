@@ -34,7 +34,7 @@ describe("api-client", () => {
 
       const result = await fetchApi<typeof mockData>("/health");
       expect(result).toEqual(mockData);
-      expect(fetch).toHaveBeenCalledWith("/api/health");
+      expect(fetch).toHaveBeenCalledWith("/api/health", expect.objectContaining({ headers: expect.any(Object) }));
     });
 
     it("normalizes path without leading slash", async () => {
@@ -44,7 +44,7 @@ describe("api-client", () => {
       } as Response);
 
       await fetchApi("agents");
-      expect(fetch).toHaveBeenCalledWith("/api/agents");
+      expect(fetch).toHaveBeenCalledWith("/api/agents", expect.objectContaining({ headers: expect.any(Object) }));
     });
 
     it("throws ApiError for non-ok response", async () => {
