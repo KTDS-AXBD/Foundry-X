@@ -45,6 +45,10 @@ id = "030b30d47a98485ea3af95b3347163d6"
 [env.staging.ai]
 binding = "AI"
 
+# Sprint 27: Cron Trigger — Reconciliation every 6 hours
+[triggers]
+crons = ["0 */6 * * *"]
+
 # Sprint 26: Service Bindings
 [[services]]
 binding = "DX_WORKER"

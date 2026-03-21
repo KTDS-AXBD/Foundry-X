@@ -10,6 +10,7 @@ import {
   FolderKanban,
   Bot,
   Coins,
+  BarChart3,
   Menu,
   Search,
   FlaskConical,
@@ -33,6 +34,7 @@ const fxNavItems = [
   { href: "/workspace", label: "Workspace", icon: FolderKanban },
   { href: "/agents", label: "Agents", icon: Bot },
   { href: "/tokens", label: "Tokens", icon: Coins },
+  { href: "/analytics", label: "Analytics", icon: BarChart3 },
 ];
 
 const serviceNavItems = [

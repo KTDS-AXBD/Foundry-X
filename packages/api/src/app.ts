@@ -25,6 +25,9 @@ import { workflowRoute } from "./routes/workflow.js";
 import { ssoRoute } from "./routes/sso.js";
 import { proxyRoute } from "./routes/proxy.js";
 import { entitiesRoute } from "./routes/entities.js";
+import { kpiRoute } from "./routes/kpi.js";
+import { reconciliationRoute } from "./routes/reconciliation.js";
+import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { tenantGuard, type TenantVariables } from "./middleware/tenant.js";
 import type { Env } from "./env.js";
@@ -92,6 +95,8 @@ app.doc("/api/openapi.json", {
     { name: "Workflows", description: "Workflow engine CRUD and execution" },
     { name: "SSO", description: "Cross-service SSO Hub Token management" },
     { name: "Entities", description: "Cross-service entity registry and links" },
+    { name: "KPI", description: "KPI event tracking and analytics" },
+    { name: "Reconciliation", description: "Git↔D1 reconciliation" },
   ],
 });
 app.get("/api/docs", swaggerUI({ url: "/api/openapi.json" }));
@@ -111,6 +116,9 @@ app.route("/api", webhookInboundRoute);
 
 // Slack (public — Slack 자체 서명으로 보호)
 app.route("/api", slackRoute);
+
+// KPI track (public — 인증 선택적, 비로그인 사용자도 page_view 기록 가능)
+app.route("/api", kpiRoute);
 
 // Org routes — auth middleware applied internally, tenantGuard selective per-route
 app.use("/api/orgs", authMiddleware);
@@ -145,3 +153,9 @@ app.route("/api", workflowRoute);
 
 // Sprint 26: Cross-service entity registry (auth + tenant required)
 app.route("/api", entitiesRoute);
+
+// Sprint 27: Reconciliation (auth + tenant required)
+app.route("/api", reconciliationRoute);
+
+// Cron Trigger scheduled handler
+export { handleScheduled };

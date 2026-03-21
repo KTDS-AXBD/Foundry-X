@@ -1056,3 +1056,87 @@ export async function updateOrgService(
   if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
   return res.json();
 }
+
+// ─── Sprint 27: KPI Analytics (F100) ───
+
+export interface KpiSummary {
+  wau: number;
+  agentCompletionRate: number;
+  sddIntegrityRate: number;
+  totalEvents: number;
+  breakdown: Record<string, number>;
+  period: { from: string; to: string };
+}
+
+export interface KpiTrendPoint {
+  date: string;
+  pageViews: number;
+  apiCalls: number;
+  agentTasks: number;
+}
+
+export interface KpiEventItem {
+  id: string;
+  tenantId: string;
+  eventType: string;
+  userId: string | null;
+  agentId: string | null;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+}
+
+export async function trackKpiEvent(
+  eventType: string,
+  metadata?: Record<string, unknown>,
+): Promise<{ id: string; recorded: boolean }> {
+  const res = await fetch(`${BASE_URL}/kpi/track`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ eventType, metadata }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function getKpiSummary(days?: number): Promise<KpiSummary> {
+  const params = new URLSearchParams();
+  if (days) params.set("days", String(days));
+  const qs = params.toString();
+  const res = await fetch(`${BASE_URL}/kpi/summary${qs ? `?${qs}` : ""}`, {
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function getKpiTrends(
+  days?: number,
+  groupBy?: "day" | "week",
+): Promise<{ trends: KpiTrendPoint[] }> {
+  const params = new URLSearchParams();
+  if (days) params.set("days", String(days));
+  if (groupBy) params.set("groupBy", groupBy);
+  const qs = params.toString();
+  const res = await fetch(`${BASE_URL}/kpi/trends${qs ? `?${qs}` : ""}`, {
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function getKpiEvents(
+  type?: string,
+  limit?: number,
+  offset?: number,
+): Promise<{ events: KpiEventItem[]; total: number }> {
+  const params = new URLSearchParams();
+  if (type) params.set("type", type);
+  if (limit) params.set("limit", String(limit));
+  if (offset) params.set("offset", String(offset));
+  const qs = params.toString();
+  const res = await fetch(`${BASE_URL}/kpi/events${qs ? `?${qs}` : ""}`, {
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
