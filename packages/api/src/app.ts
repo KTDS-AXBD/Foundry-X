@@ -22,6 +22,9 @@ import { projectOverviewRoute } from "./routes/project-overview.js";
 import { webhookRegistryRoute, webhookInboundRoute } from "./routes/webhook-registry.js";
 import { jiraRoute } from "./routes/jira.js";
 import { workflowRoute } from "./routes/workflow.js";
+import { ssoRoute } from "./routes/sso.js";
+import { proxyRoute } from "./routes/proxy.js";
+import { entitiesRoute } from "./routes/entities.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { tenantGuard, type TenantVariables } from "./middleware/tenant.js";
 import type { Env } from "./env.js";
@@ -87,12 +90,18 @@ app.doc("/api/openapi.json", {
     { name: "Webhooks", description: "Webhook registry and delivery" },
     { name: "Jira", description: "Jira integration and sync" },
     { name: "Workflows", description: "Workflow engine CRUD and execution" },
+    { name: "SSO", description: "Cross-service SSO Hub Token management" },
+    { name: "Entities", description: "Cross-service entity registry and links" },
   ],
 });
 app.get("/api/docs", swaggerUI({ url: "/api/openapi.json" }));
 
-// Auth routes (public)
+// Auth routes (public — /auth/sso/verify is public, /auth/sso/token needs auth via JWT)
 app.route("/api", authRoute);
+app.route("/api", ssoRoute);
+
+// BFF Proxy routes (self-authenticated via Hub Token)
+app.route("/api", proxyRoute);
 
 // Webhook (public — HMAC-SHA256 서명으로 보호)
 app.route("/api", webhookRoute);
@@ -133,3 +142,6 @@ app.route("/api", projectOverviewRoute);
 app.route("/api", webhookRegistryRoute);
 app.route("/api", jiraRoute);
 app.route("/api", workflowRoute);
+
+// Sprint 26: Cross-service entity registry (auth + tenant required)
+app.route("/api", entitiesRoute);

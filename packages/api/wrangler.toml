@@ -45,6 +45,17 @@ id = "030b30d47a98485ea3af95b3347163d6"
 [env.staging.ai]
 binding = "AI"
 
+# Sprint 26: Service Bindings
+[[services]]
+binding = "DX_WORKER"
+service = "discovery-x-radar-worker"
+environment = "production"
+
+[[services]]
+binding = "AIF_WORKER"
+service = "ai-foundry-svc-gateway"
+environment = "production"
+
 # Sprint 8: KV Cache
 [[kv_namespaces]]
 binding = "CACHE"

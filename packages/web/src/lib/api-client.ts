@@ -1016,3 +1016,43 @@ export async function updateJiraConfig(orgId: string, config: JiraConfig): Promi
   });
   if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
 }
+
+// ─── Sprint 26: SSO & Services (F106) ───
+
+export async function fetchHubToken(orgId: string): Promise<{ hubToken: string; expiresIn: number }> {
+  const res = await fetch(`${BASE_URL}/auth/sso/token`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ orgId }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export interface OrgService {
+  orgId: string;
+  serviceId: string;
+  enabled: boolean;
+  config: Record<string, unknown> | null;
+  createdAt: string;
+}
+
+export async function getOrgServices(orgId: string): Promise<OrgService[]> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/services`, { headers: authHeaders() });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}
+
+export async function updateOrgService(
+  orgId: string,
+  serviceId: string,
+  enabled: boolean,
+): Promise<OrgService> {
+  const res = await fetch(`${BASE_URL}/orgs/${orgId}/services/${serviceId}`, {
+    method: "PUT",
+    headers: authHeaders(),
+    body: JSON.stringify({ enabled }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}`);
+  return res.json();
+}

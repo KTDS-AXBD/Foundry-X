@@ -2,12 +2,19 @@ import { Hono } from "hono";
 import { jwt, sign } from "hono/jwt";
 import type { MiddlewareHandler } from "hono";
 
+export interface ServiceAccess {
+  id: "foundry-x" | "discovery-x" | "ai-foundry";
+  role: "admin" | "member" | "viewer";
+}
+
 export interface JwtPayload {
   sub: string;
   email: string;
   role: "admin" | "member" | "viewer";
   orgId?: string;
   orgRole?: "owner" | "admin" | "member" | "viewer";
+  // Sprint 26 SSO 확장
+  services?: ServiceAccess[];
   iat: number;
   exp: number;
   jti?: string;
@@ -20,6 +27,8 @@ const PUBLIC_PATHS = [
   "/api/slack/",
   "/api/openapi.json",
   "/api/docs",
+  "/api/dx/",
+  "/api/aif/",
 ];
 
 export const authMiddleware: MiddlewareHandler = async (c, next) => {
@@ -65,4 +74,16 @@ export async function createTokenPair(
     createRefreshToken(user.id, secret),
   ]);
   return { accessToken, refreshToken: refreshResult.token, expiresIn: 3600, _refreshJti: refreshResult.jti };
+}
+
+export async function createHubToken(
+  payload: { sub: string; email: string; role: "admin" | "member" | "viewer"; orgId: string; orgRole: "owner" | "admin" | "member" | "viewer" },
+  services: ServiceAccess[],
+  secret: string,
+): Promise<string> {
+  const now = Math.floor(Date.now() / 1000);
+  return sign(
+    { ...payload, services, iat: now, exp: now + 3600 },
+    secret,
+  );
 }

@@ -11,6 +11,8 @@ import {
   Bot,
   Coins,
   Menu,
+  Search,
+  FlaskConical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -24,7 +26,7 @@ import {
 import { ThemeToggle } from "@/components/theme-toggle";
 import { OrgSwitcher } from "@/components/feature/OrgSwitcher";
 
-const navItems = [
+const fxNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/wiki", label: "Wiki", icon: BookOpen },
   { href: "/architecture", label: "Architecture", icon: Blocks },
@@ -33,30 +35,42 @@ const navItems = [
   { href: "/tokens", label: "Tokens", icon: Coins },
 ];
 
+const serviceNavItems = [
+  { href: "/discovery", label: "Discovery-X", icon: Search },
+  { href: "/foundry", label: "AI Foundry", icon: FlaskConical },
+];
+
 function NavLinks({ onSelect }: { onSelect?: () => void }) {
   const pathname = usePathname();
 
+  const renderItems = (items: typeof fxNavItems) =>
+    items.map((item) => {
+      const active = pathname === item.href;
+      return (
+        <Link
+          key={item.href}
+          href={item.href}
+          onClick={onSelect}
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+            active
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground",
+          )}
+        >
+          <item.icon className="size-4 shrink-0" />
+          {item.label}
+        </Link>
+      );
+    });
+
   return (
     <nav className="flex flex-col gap-1">
-      {navItems.map((item) => {
-        const active = pathname === item.href;
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={onSelect}
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-              active
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
-            )}
-          >
-            <item.icon className="size-4 shrink-0" />
-            {item.label}
-          </Link>
-        );
-      })}
+      {renderItems(fxNavItems)}
+      <span className="mt-3 mb-1 px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+        Services
+      </span>
+      {renderItems(serviceNavItems)}
     </nav>
   );
 }
