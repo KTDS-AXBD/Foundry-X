@@ -14,7 +14,7 @@ describe("MCP Adapter", () => {
     expect(TASK_TYPE_TO_MCP_TOOL["ontology-lookup"]).toBe("foundry_ontology_lookup");
     expect(TASK_TYPE_TO_MCP_TOOL["security-review"]).toBe("foundry_security_review");
     expect(TASK_TYPE_TO_MCP_TOOL["qa-testing"]).toBe("foundry_qa_testing");
-    expect(Object.keys(TASK_TYPE_TO_MCP_TOOL)).toHaveLength(9);
+    expect(Object.keys(TASK_TYPE_TO_MCP_TOOL)).toHaveLength(10);
   });
 
   it("MCP message types have correct structure", () => {

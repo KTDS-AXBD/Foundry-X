@@ -577,7 +577,7 @@ export class AgentOrchestrator {
     }
 
     // 3.5 F61: MCP runner 자동 선택
-    const selectedRunner = await this.selectRunner(taskType, runner);
+    const selectedRunner = await this.selectRunner(taskType as AgentTaskType, runner);
 
     // 3.6 SSE: task started
     this.sse?.pushEvent({
@@ -595,7 +595,7 @@ export class AgentOrchestrator {
     const request: AgentExecutionRequest = {
       taskId,
       agentId,
-      taskType,
+      taskType: taskType as AgentTaskType,
       context,
       constraints,
     };
