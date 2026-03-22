@@ -16,6 +16,7 @@ interface AuthState {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, name: string, password: string) => Promise<void>;
+  googleLogin: (credential: string) => Promise<void>;
   logout: () => void;
   hydrate: () => void;
 }
@@ -59,6 +60,29 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error((body as Record<string, string>).error || `가입 실패 (${res.status})`);
+      }
+      const data = await res.json() as { user: User; accessToken: string; refreshToken: string };
+      localStorage.setItem("token", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      set({ user: data.user, isAuthenticated: true, isLoading: false });
+    } catch (e) {
+      set({ isLoading: false });
+      throw e;
+    }
+  },
+
+  googleLogin: async (credential) => {
+    set({ isLoading: true });
+    try {
+      const res = await fetch(`${BASE_URL}/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ credential }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error((body as Record<string, string>).error || `Google 로그인 실패 (${res.status})`);
       }
       const data = await res.json() as { user: User; accessToken: string; refreshToken: string };
       localStorage.setItem("token", data.accessToken);
