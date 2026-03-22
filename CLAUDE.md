@@ -26,7 +26,7 @@ Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원�
 
 ### Phase 2 (완료, v0.6.0~v1.5.0): API Server + Web Dashboard
 - packages/api: Hono API 서버 (61 endpoints, 29 services, 342 테스트)
-- packages/web: Next.js 14 대시보드+랜딩 (8 pages, 45 테스트, shadcn/ui, Playwright 20 E2E)
+- packages/web: Next.js 14 대시보드+랜딩 (12 pages, 48 테스트, shadcn/ui, Playwright 17 E2E)
 - Sprint 6~17 완료 (상세: Current Phase 섹션 참조)
 
 ### Phase 3 (완료, v1.6.0~v2.0.0): 멀티테넌시 + 외부 도구 연동
@@ -71,9 +71,9 @@ foundry-x/
 │   │       └── index.ts
 │   ├── api/                # Hono API Server (Phase 2)
 │   │   └── src/
-│   │       ├── routes/     # 20개: agent, auth, freshness, github, health, inbox, integrity, jira, mcp, org, profile, project-overview, requirements, slack, spec, token, webhook, webhook-registry, wiki, workflow
-│   │       ├── services/   # 39개 (agent-inbox, agent-orchestrator, agent-runner, claude-api-runner, conflict-detector, execution-types, file-context-collector, freshness-checker, github, github-review, github-sync, health-calc, integrity-checker, jira-adapter, jira-sync, kv-cache, llm, logger, mcp-adapter, mcp-registry, mcp-resources, mcp-runner, mcp-sampling, mcp-transport, merge-queue, monitoring, org, planner-agent, planner-prompts, pr-pipeline, project-overview, reviewer-agent, slack, spec-parser, sse-manager, webhook-registry, wiki-sync, workflow-engine, worktree-manager)
-│   │       ├── schemas/    # 20개 Zod 스키마 (agent, auth, common, freshness, github, health, inbox, integrity, jira, mcp, org, plan, profile, requirements, slack, spec, token, webhook, wiki, workflow)
+│   │       ├── routes/     # 28개: agent, auth, entities, feedback, freshness, github, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, profile, project-overview, proxy, reconciliation, requirements, slack, spec, sso, token, webhook, webhook-registry, wiki, workflow
+│   │       ├── services/   # 50개 (agent-inbox, agent-orchestrator, agent-runner, auto-fix, auto-rebase, claude-api-runner, conflict-detector, entity-registry, entity-sync, execution-types, feedback, file-context-collector, freshness-checker, github, github-review, github-sync, harness-rules, health-calc, integrity-checker, jira-adapter, jira-sync, kpi-logger, kv-cache, llm, logger, mcp-adapter, mcp-registry, mcp-resources, mcp-runner, mcp-sampling, mcp-transport, merge-queue, monitoring, onboarding-progress, org, planner-agent, planner-prompts, pr-pipeline, project-overview, reconciliation, reviewer-agent, service-proxy, slack, spec-parser, sse-manager, sso, webhook-registry, wiki-sync, workflow-engine, worktree-manager)
+│   │       ├── schemas/    # 28개 Zod 스키마 (agent, auth, common, entity, error, feedback, freshness, github, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, plan, profile, reconciliation, requirements, slack, spec, sso, token, webhook, wiki, workflow)
 │   │       └── index.ts
 │   ├── web/                # Next.js 14 Dashboard + Landing (Phase 2)
 │   │   └── src/
@@ -128,7 +128,7 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 
 # API 패키지 단독
 cd packages/api
-pnpm test                         # vitest run (535 tests)
+pnpm test                         # vitest run (583 tests)
 pnpm test -- --grep "agent"       # 특정 테스트 필터
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # 로컬 서버 실행
@@ -138,7 +138,7 @@ cd packages/web
 pnpm test                         # vitest run (48 tests)
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # Next.js dev server (localhost:3000)
-pnpm e2e                          # Playwright E2E (15 specs)
+pnpm e2e                          # Playwright E2E (17 specs)
 ```
 
 ## Testing
@@ -149,7 +149,7 @@ pnpm e2e                          # Playwright E2E (15 specs)
 - **TSX 지원:** vitest.config에 `.test.tsx` 패턴 포함, tsconfig에 `jsx: "react-jsx"`
 - **Mock 전략:** Ink 컴포넌트는 실제 렌더링, 외부 서비스만 mock
 - **API 테스트:** Hono `app.request()` 직접 호출 방식, D1 mock은 in-memory SQLite
-- **E2E 테스트:** Playwright (`packages/web/e2e/`), 15 specs, `pnpm e2e`로 실행
+- **E2E 테스트:** Playwright (`packages/web/e2e/`), 17 specs, `pnpm e2e`로 실행
 
 ## Current Phase
 
@@ -170,7 +170,7 @@ pnpm e2e                          # Playwright E2E (15 specs)
   - Sprint 29: 온보딩 기반 — 가이드 UI + 피드백 API + 체크리스트
   - Sprint 30: 배포 동기화 + Phase 4 Go 판정(Conditional) + 품질 강화 (93%)
   - Sprint 31: 프로덕션 완전 동기화 + SPEC 정합성 + E2E 보강 + 온보딩 킥오프 (95%)
-  - 현재: 45 services, 111 endpoints, 583 API tests, D1 33 테이블
+  - 현재: 50 services, 111 endpoints, 583 API tests, D1 33 테이블
   - PDCA 문서: `docs/archive/2026-03/` (Sprint 3~31 + standalone 전체 archived)
 
 ## Git Workflow
@@ -203,10 +203,10 @@ cd packages/web && npx @cloudflare/next-on-pages && wrangler pages deploy .verce
 
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
 - **Pages**: `fx.minu.best` (Next.js, CNAME → Cloudflare Pages)
-- **D1**: 16개 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
+- **D1**: 20개 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
 - **CORS 주의**: Pages→Workers 크로스오리진 — `packages/api/src/app.ts`에 CORS 미들웨어 필수
 - **API URL**: `NEXT_PUBLIC_API_URL` 환경변수 — Workers URL + `/api` 경로 포함 필수
-- **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY
+- **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 
 ## 성공 지표 (구현 시 참고)
 
