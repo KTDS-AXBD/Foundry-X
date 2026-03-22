@@ -79,7 +79,7 @@ export interface AgentExecutionResult {
   duration: number;
 }
 
-export type AgentRunnerType = "claude-api" | "mcp" | "mock";
+export type AgentRunnerType = "claude-api" | "openrouter" | "mcp" | "mock";
 
 export interface AgentRunnerInfo {
   type: AgentRunnerType;

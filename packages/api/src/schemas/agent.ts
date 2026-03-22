@@ -181,7 +181,7 @@ export const AgentExecutionResultSchema = z
 
 export const AgentRunnerInfoSchema = z
   .object({
-    type: z.enum(["claude-api", "mcp", "mock"]),
+    type: z.enum(["claude-api", "openrouter", "mcp", "mock"]),
     available: z.boolean(),
     model: z.string().optional(),
     description: z.string(),

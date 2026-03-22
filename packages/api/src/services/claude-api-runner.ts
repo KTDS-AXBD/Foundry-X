@@ -1,59 +1,12 @@
 import type {
   AgentExecutionRequest,
   AgentExecutionResult,
-  AgentTaskType,
 } from "./execution-types.js";
 import type { AgentRunner } from "./agent-runner.js";
+import { TASK_SYSTEM_PROMPTS, buildUserPrompt } from "./prompt-utils.js";
 
-// F60: Generative UI — instruct LLM to include rendering hints
-const UIHINT_INSTRUCTION = `\n\nAdditionally, include a "uiHint" field in your JSON response to suggest rendering.
-Format: { "layout": "card"|"tabs"|"accordion"|"iframe", "sections": [{ "type": "text"|"code"|"diff"|"chart"|"table", "title": string, "data": any }] }
-If the result contains HTML visualizations, include an "html" field with self-contained HTML.`;
-
-const TASK_SYSTEM_PROMPTS: Record<AgentTaskType, string> = {
-  "code-review": `You are a code review agent for the Foundry-X project.
-Analyze the provided code files against the spec requirements.
-Return a JSON object with "reviewComments" array.
-Each comment: { "file": string, "line": number, "comment": string, "severity": "error"|"warning"|"info" }` + UIHINT_INSTRUCTION,
-
-  "code-generation": `You are a code generation agent for the Foundry-X project.
-Generate TypeScript code based on the spec requirements.
-Return a JSON object with "generatedCode" array.
-Each item: { "path": string, "content": string, "action": "create"|"modify" }` + UIHINT_INSTRUCTION,
-
-  "spec-analysis": `You are a spec analysis agent for the Foundry-X project.
-Analyze the provided spec for completeness, consistency, and feasibility.
-Return a JSON object with "analysis" field containing your assessment.` + UIHINT_INSTRUCTION,
-
-  "test-generation": `You are a test generation agent for the Foundry-X project.
-Generate vitest test cases for the provided code and spec.
-Return a JSON object with "generatedCode" array containing test files.` + UIHINT_INSTRUCTION,
-
-  "policy-evaluation": `You are a policy evaluation agent for the Foundry-X project.
-Evaluate the provided code or configuration against organizational policies and governance rules.
-Return a JSON object with "evaluation" field containing compliance assessment.` + UIHINT_INSTRUCTION,
-
-  "skill-query": `You are a skill query agent for the Foundry-X project.
-Search and retrieve relevant skills, capabilities, or knowledge from the AI Foundry asset registry.
-Return a JSON object with "results" array of matching skills.` + UIHINT_INSTRUCTION,
-
-  "ontology-lookup": `You are an ontology lookup agent for the Foundry-X project.
-Look up domain concepts, relationships, and definitions from the project ontology.
-Return a JSON object with "concepts" array of matching ontology entries.` + UIHINT_INSTRUCTION,
-};
-
-export { UIHINT_INSTRUCTION, TASK_SYSTEM_PROMPTS };
-
-/** F60: Default layout per task type — client fallback when uiHint is absent */
-export const DEFAULT_LAYOUT_MAP: Record<AgentTaskType, string> = {
-  "code-review": "tabs",
-  "code-generation": "accordion",
-  "spec-analysis": "card",
-  "test-generation": "accordion",
-  "policy-evaluation": "card",
-  "skill-query": "tabs",
-  "ontology-lookup": "card",
-};
+// Re-export for backward compatibility (tests import from this module)
+export { UIHINT_INSTRUCTION, TASK_SYSTEM_PROMPTS, DEFAULT_LAYOUT_MAP, buildUserPrompt } from "./prompt-utils.js";
 
 export class ClaudeApiRunner implements AgentRunner {
   readonly type = "claude-api" as const;
@@ -67,7 +20,7 @@ export class ClaudeApiRunner implements AgentRunner {
     const startTime = Date.now();
 
     const systemPrompt = TASK_SYSTEM_PROMPTS[request.taskType];
-    const userPrompt = this.buildUserPrompt(request);
+    const userPrompt = buildUserPrompt(request);
 
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -139,36 +92,6 @@ export class ClaudeApiRunner implements AgentRunner {
 
   supportsTaskType(taskType: string): boolean {
     return taskType in TASK_SYSTEM_PROMPTS;
-  }
-
-  private buildUserPrompt(request: AgentExecutionRequest): string {
-    const parts: string[] = [];
-
-    if (request.context.spec) {
-      parts.push(
-        `## Spec\nTitle: ${request.context.spec.title}\nDescription: ${request.context.spec.description}`,
-      );
-      if (request.context.spec.acceptanceCriteria.length > 0) {
-        parts.push(
-          `\nAcceptance Criteria:\n${request.context.spec.acceptanceCriteria.map((c) => `- ${c}`).join("\n")}`,
-        );
-      }
-    }
-
-    if (request.context.instructions) {
-      parts.push(`\n## Instructions\n${request.context.instructions}`);
-    }
-
-    if (request.context.targetFiles?.length) {
-      parts.push(
-        `\n## Target Files\n${request.context.targetFiles.join("\n")}`,
-      );
-    }
-
-    parts.push(`\n## Context\nRepo: ${request.context.repoUrl}`);
-    parts.push(`Branch: ${request.context.branch}`);
-
-    return parts.join("\n");
   }
 }
 
