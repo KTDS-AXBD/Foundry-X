@@ -47,6 +47,10 @@ Return a JSON object with vulnerability findings and remediation suggestions.` +
   "qa-testing": `You are a QA testing agent for the Foundry-X project.
 Generate browser test scenarios and validate acceptance criteria.
 Return a JSON object with test scenarios and coverage analysis.` + UIHINT_INSTRUCTION,
+
+  "infra-analysis": `You are an infrastructure analysis agent for the Foundry-X project.
+Analyze Cloudflare Workers, D1, KV, and Pages configurations for health and optimization.
+Return a JSON object with health score, resource status, and optimization suggestions.` + UIHINT_INSTRUCTION,
 };
 
 /** F60: Default layout per task type — client fallback when uiHint is absent */
@@ -60,6 +64,7 @@ export const DEFAULT_LAYOUT_MAP: Record<AgentTaskType, string> = {
   "ontology-lookup": "card",
   "security-review": "tabs",
   "qa-testing": "accordion",
+  "infra-analysis": "card",
 };
 
 /** F146: Get system prompt — custom override or task-type default */

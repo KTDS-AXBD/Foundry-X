@@ -26,6 +26,7 @@ export const DEFAULT_MODEL_MAP: Record<AgentTaskType, string> = {
   "ontology-lookup": "anthropic/claude-haiku-4-5",
   "security-review": "anthropic/claude-sonnet-4-5-20250514",
   "qa-testing": "anthropic/claude-haiku-4-5",
+  "infra-analysis": "anthropic/claude-sonnet-4",
 };
 
 interface D1RoutingRow {
