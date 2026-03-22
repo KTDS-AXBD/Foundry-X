@@ -404,6 +404,33 @@ export const EvaluateOptimizeRequestSchema = z
   })
   .openapi("EvaluateOptimizeRequest");
 
+// ─── Sprint 37: ArchitectAgent Schemas (F138) ───
+
+export const ArchitectAnalyzeRequestSchema = z
+  .object({
+    taskType: z.literal("spec-analysis").describe("아키텍처 분석은 spec-analysis 태스크 사용"),
+    context: z.object({
+      repoUrl: z.string().default("https://github.com/KTDS-AXBD/Foundry-X"),
+      branch: z.string().default("master"),
+      targetFiles: z.array(z.string()).optional(),
+      spec: z.object({
+        title: z.string(),
+        description: z.string(),
+        acceptanceCriteria: z.array(z.string()),
+      }).optional(),
+      instructions: z.string().max(2000).optional(),
+      fileContents: z.record(z.string()).optional(),
+    }),
+  })
+  .openapi("ArchitectAnalyzeRequest");
+
+export const DesignReviewRequestSchema = z
+  .object({
+    document: z.string().max(50000).describe("설계 문서 내용 (Markdown)"),
+    title: z.string().max(200).optional().describe("문서 제목"),
+  })
+  .openapi("DesignReviewRequest");
+
 export const EvaluationLoopResultSchema = z
   .object({
     finalResult: AgentExecutionResultSchema,
@@ -419,3 +446,29 @@ export const EvaluationLoopResultSchema = z
     })),
   })
   .openapi("EvaluationLoopResult");
+
+// ─── Sprint 37: TestAgent Schemas (F139) ───
+
+export const testGenerateSchema = z.object({
+  taskId: z.string(),
+  agentId: z.string().default("test-agent"),
+  taskType: z.literal("test-generation"),
+  context: z.object({
+    repoUrl: z.string(),
+    branch: z.string(),
+    targetFiles: z.array(z.string()).optional(),
+    spec: z.object({
+      title: z.string(),
+      description: z.string(),
+      acceptanceCriteria: z.array(z.string()),
+    }).optional(),
+    instructions: z.string().optional(),
+    fileContents: z.record(z.string()).optional(),
+  }),
+  constraints: z.array(z.any()).default([]),
+});
+
+export const coverageGapsSchema = z.object({
+  sourceFiles: z.record(z.string()),
+  testFiles: z.record(z.string()).default({}),
+});

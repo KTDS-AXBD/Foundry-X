@@ -1008,6 +1008,78 @@ agentRoute.openapi(updateRoutingRule, async (c) => {
   return c.json(rule, 200);
 });
 
+// ─── Sprint 37: ArchitectAgent Endpoints (F138) ───
+
+import { ArchitectAgent } from "../services/architect-agent.js";
+import {
+  ArchitectAnalyzeRequestSchema,
+  DesignReviewRequestSchema,
+} from "../schemas/agent.js";
+
+const architectAnalyze = createRoute({
+  method: "post",
+  path: "/agents/architect/analyze",
+  tags: ["Agents"],
+  summary: "아키텍처 영향 분석",
+  request: {
+    body: { content: { "application/json": { schema: ArchitectAnalyzeRequestSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ impactSummary: z.string(), designScore: z.number(), tokensUsed: z.number(), model: z.string(), duration: z.number() }).passthrough() } }, description: "분석 결과" },
+    400: { content: { "application/json": { schema: z.object({ error: z.string() }) } }, description: "잘못된 요청" },
+  },
+});
+
+agentRoute.openapi(architectAnalyze, async (c) => {
+  const body = c.req.valid("json");
+  const agent = new ArchitectAgent({
+    env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
+    db: c.env.DB,
+  });
+
+  const request = {
+    taskId: `arch_${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`,
+    agentId: "architect-agent",
+    taskType: body.taskType as "spec-analysis",
+    context: {
+      repoUrl: body.context.repoUrl,
+      branch: body.context.branch,
+      targetFiles: body.context.targetFiles,
+      spec: body.context.spec,
+      instructions: body.context.instructions,
+      fileContents: body.context.fileContents,
+    },
+    constraints: [],
+  };
+
+  const result = await agent.analyzeArchitecture(request);
+  return c.json(result);
+});
+
+const architectReviewDesign = createRoute({
+  method: "post",
+  path: "/agents/architect/review-design",
+  tags: ["Agents"],
+  summary: "설계 문서 품질 리뷰",
+  request: {
+    body: { content: { "application/json": { schema: DesignReviewRequestSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ completenessScore: z.number(), consistencyScore: z.number(), feasibilityScore: z.number(), overallScore: z.number() }).passthrough() } }, description: "리뷰 결과" },
+  },
+});
+
+agentRoute.openapi(architectReviewDesign, async (c) => {
+  const { document, title } = c.req.valid("json");
+  const agent = new ArchitectAgent({
+    env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
+    db: c.env.DB,
+  });
+
+  const result = await agent.reviewDesignDoc(document, title);
+  return c.json(result);
+});
+
 // ─── Sprint 36: Evaluator-Optimizer (F137) ───
 
 import { EvaluatorOptimizer } from "../services/evaluator-optimizer.js";
@@ -1088,4 +1160,76 @@ agentRoute.openapi(evaluateOptimize, async (c) => {
       feedback: h.feedback,
     })),
   }, 200);
+});
+
+// ─── Sprint 37: TestAgent Endpoints (F139) ───
+
+import { TestAgent } from "../services/test-agent.js";
+import {
+  testGenerateSchema,
+  coverageGapsSchema,
+} from "../schemas/agent.js";
+
+const testGenerate = createRoute({
+  method: "post",
+  path: "/agents/test/generate",
+  tags: ["Agents"],
+  summary: "vitest 테스트 자동 생성",
+  request: {
+    body: { content: { "application/json": { schema: testGenerateSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ testFiles: z.array(z.any()), totalTestCount: z.number(), coverageEstimate: z.number(), edgeCases: z.array(z.any()), tokensUsed: z.number(), model: z.string(), duration: z.number() }) } }, description: "테스트 생성 결과" },
+    400: { content: { "application/json": { schema: z.object({ error: z.string() }) } }, description: "잘못된 요청" },
+  },
+});
+
+agentRoute.openapi(testGenerate, async (c) => {
+  const body = c.req.valid("json");
+  const agent = new TestAgent({
+    env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
+    db: c.env.DB,
+  });
+
+  const request = {
+    taskId: body.taskId,
+    agentId: body.agentId ?? "test-agent",
+    taskType: "test-generation" as const,
+    context: {
+      repoUrl: body.context.repoUrl,
+      branch: body.context.branch,
+      targetFiles: body.context.targetFiles,
+      spec: body.context.spec,
+      instructions: body.context.instructions,
+      fileContents: body.context.fileContents,
+    },
+    constraints: body.constraints ?? [],
+  };
+
+  const result = await agent.generateTests(request);
+  return c.json(result);
+});
+
+const testCoverageGaps = createRoute({
+  method: "post",
+  path: "/agents/test/coverage-gaps",
+  tags: ["Agents"],
+  summary: "테스트 커버리지 갭 분석",
+  request: {
+    body: { content: { "application/json": { schema: coverageGapsSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ analyzedFiles: z.number(), uncoveredFunctions: z.array(z.any()), missingEdgeCases: z.array(z.any()), overallCoverage: z.number(), tokensUsed: z.number(), model: z.string() }) } }, description: "커버리지 갭 분석 결과" },
+  },
+});
+
+agentRoute.openapi(testCoverageGaps, async (c) => {
+  const body = c.req.valid("json");
+  const agent = new TestAgent({
+    env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
+    db: c.env.DB,
+  });
+
+  const result = await agent.analyzeCoverage(body.sourceFiles, body.testFiles);
+  return c.json(result);
 });

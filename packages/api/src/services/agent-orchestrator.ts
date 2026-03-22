@@ -10,6 +10,8 @@ import type { MergeQueueService } from "./merge-queue.js";
 import type { PlannerAgent } from "./planner-agent.js";
 import type { WorktreeManager } from "./worktree-manager.js";
 import type { AutoFixService } from "./auto-fix.js";
+import type { ArchitectAgent } from "./architect-agent.js";
+import type { TestAgent } from "./test-agent.js";
 import type { ParallelExecutionResult, ParallelPrResult, ConflictReport, AgentPlan } from "@foundry-x/shared";
 
 export class PlanTimeoutError extends Error {
@@ -93,6 +95,8 @@ export class AgentOrchestrator {
   private plannerAgent?: PlannerAgent;
   private worktreeManager?: WorktreeManager;
   private autoFix?: AutoFixService;
+  private architectAgent?: ArchitectAgent;
+  private testAgent?: TestAgent;
 
   constructor(
     private db: D1Database,
@@ -113,6 +117,16 @@ export class AgentOrchestrator {
   /** F72: WorktreeManager 서비스 주입 */
   setWorktreeManager(manager: WorktreeManager): void {
     this.worktreeManager = manager;
+  }
+
+  /** F138: ArchitectAgent 서비스 주입 */
+  setArchitectAgent(agent: ArchitectAgent): void {
+    this.architectAgent = agent;
+  }
+
+  /** F139: TestAgent 서비스 주입 */
+  setTestAgent(agent: TestAgent): void {
+    this.testAgent = agent;
   }
 
   /** F65: PR Pipeline 서비스 주입 (옵셔널 — 설정 시 executeTaskWithPr 활성화) */
@@ -404,6 +418,42 @@ export class AgentOrchestrator {
       enforcementMode: r.enforcement_mode,
     }));
 
+    // 3.5a F138/F139: 역할 에이전트 위임
+    const delegateRequest: AgentExecutionRequest = {
+      taskId, agentId, taskType, context, constraints,
+    };
+    if (taskType === "spec-analysis" && this.architectAgent) {
+      const analysisResult = await this.architectAgent.analyzeArchitecture(delegateRequest);
+      const delegatedResult: AgentExecutionResult = {
+        status: "success",
+        output: { analysis: JSON.stringify(analysisResult) },
+        tokensUsed: analysisResult.tokensUsed,
+        model: analysisResult.model,
+        duration: analysisResult.duration,
+      };
+      await this.recordTaskResult(taskId, sessionId, agentId, delegatedResult);
+      return delegatedResult;
+    }
+    if (taskType === "test-generation" && this.testAgent) {
+      const testResult = await this.testAgent.generateTests(delegateRequest);
+      const delegatedResult: AgentExecutionResult = {
+        status: "success",
+        output: {
+          analysis: JSON.stringify(testResult),
+          generatedCode: testResult.testFiles.map((f: { path: string; content: string }) => ({
+            path: f.path,
+            content: f.content,
+            action: "create" as const,
+          })),
+        },
+        tokensUsed: testResult.tokensUsed,
+        model: testResult.model,
+        duration: testResult.duration,
+      };
+      await this.recordTaskResult(taskId, sessionId, agentId, delegatedResult);
+      return delegatedResult;
+    }
+
     // 3.5 F61: MCP runner 자동 선택
     const selectedRunner = await this.selectRunner(taskType, runner);
 
@@ -473,6 +523,39 @@ export class AgentOrchestrator {
     });
 
     return result;
+  }
+
+  /** F138/F139: 역할 에이전트 위임 결과 기록 헬퍼 */
+  private async recordTaskResult(
+    taskId: string,
+    sessionId: string,
+    agentId: string,
+    result: AgentExecutionResult,
+  ): Promise<void> {
+    const now = new Date().toISOString();
+    await this.db
+      .prepare(
+        `UPDATE agent_tasks SET result = ?, tokens_used = ?, duration_ms = ?, updated_at = ? WHERE id = ?`,
+      )
+      .bind(JSON.stringify(result.output), result.tokensUsed, result.duration, now, taskId)
+      .run();
+    const sessionStatus = result.status === "failed" ? "failed" : "completed";
+    await this.db
+      .prepare(`UPDATE agent_sessions SET status = ?, ended_at = ? WHERE id = ?`)
+      .bind(sessionStatus, now, sessionId)
+      .run();
+    this.sse?.pushEvent({
+      event: "agent.task.completed",
+      data: {
+        taskId,
+        agentId,
+        status: result.status,
+        tokensUsed: result.tokensUsed,
+        durationMs: result.duration,
+        resultSummary: result.output.analysis?.slice(0, 200),
+        completedAt: now,
+      },
+    });
   }
 
   /**
