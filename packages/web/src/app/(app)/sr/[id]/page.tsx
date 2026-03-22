@@ -1,3 +1,8 @@
+// output: "export" 호환 — 동적 라우트는 빈 배열로 빌드 시 생성 건너뜀
+export function generateStaticParams() {
+  return [];
+}
+
 "use client";
 
 import { useEffect, useState } from "react";
