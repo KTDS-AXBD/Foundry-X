@@ -137,3 +137,11 @@ export type {
   FoundryToSubAppMessage,
   SubAppToFoundryMessage,
 } from './sso.js';
+
+// Sprint 43: Model Quality types (F143 UI)
+export type {
+  ModelQualityMetric,
+  AgentModelCell,
+  ModelQualityResponse,
+  AgentModelMatrixResponse,
+} from './web.js';

@@ -94,3 +94,36 @@ export interface FreshnessItem {
   stale: boolean;
   staleDays: number;
 }
+
+// ─── Sprint 43: Model Quality Types (F143 UI) ───
+
+export interface ModelQualityMetric {
+  model: string;
+  totalExecutions: number;
+  successCount: number;
+  failedCount: number;
+  successRate: number;
+  avgDurationMs: number;
+  totalCostUsd: number;
+  avgCostPerExecution: number;
+  tokenEfficiency: number;
+}
+
+export interface AgentModelCell {
+  agentName: string;
+  model: string;
+  executions: number;
+  totalCostUsd: number;
+  avgDurationMs: number;
+  successRate: number;
+}
+
+export interface ModelQualityResponse {
+  metrics: ModelQualityMetric[];
+  period: { from: string; to: string };
+}
+
+export interface AgentModelMatrixResponse {
+  matrix: AgentModelCell[];
+  period: { from: string; to: string };
+}

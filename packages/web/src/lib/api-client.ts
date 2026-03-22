@@ -1,3 +1,5 @@
+import type { ModelQualityResponse, AgentModelMatrixResponse } from "@foundry-x/shared";
+
 export const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 export class ApiError extends Error {
@@ -922,4 +924,24 @@ export interface Phase4Kpi {
 
 export async function fetchPhase4Kpi(days = 28): Promise<Phase4Kpi> {
   return fetchApi<Phase4Kpi>(`/kpi/phase4?days=${days}`);
+}
+
+// ─── Sprint 43: Model Quality API (F143 UI) ───
+
+export async function getModelQuality(
+  days = 30,
+  projectId?: string,
+): Promise<ModelQualityResponse> {
+  const params = new URLSearchParams({ days: String(days) });
+  if (projectId) params.set("projectId", projectId);
+  return fetchApi<ModelQualityResponse>(`/tokens/model-quality?${params}`);
+}
+
+export async function getAgentModelMatrix(
+  days = 30,
+  projectId?: string,
+): Promise<AgentModelMatrixResponse> {
+  const params = new URLSearchParams({ days: String(days) });
+  if (projectId) params.set("projectId", projectId);
+  return fetchApi<AgentModelMatrixResponse>(`/tokens/agent-model-matrix?${params}`);
 }
