@@ -724,3 +724,59 @@ export const CustomRoleSchema = z
     updatedAt: z.string(),
   })
   .openapi("CustomRole");
+
+// ─── Sprint 41: Ensemble Voting Schemas (F147) ───
+
+export const EnsembleRequestSchema = z
+  .object({
+    taskType: allTaskTypes.describe("실행할 작업 유형"),
+    context: z.object({
+      repoUrl: z.string().default("https://github.com/KTDS-AXBD/Foundry-X"),
+      branch: z.string().default("master"),
+      targetFiles: z.array(z.string()).optional(),
+      spec: z.object({
+        title: z.string(),
+        description: z.string(),
+        acceptanceCriteria: z.array(z.string()),
+      }).optional(),
+      instructions: z.string().max(2000).optional(),
+    }),
+    config: z.object({
+      models: z.array(z.string()).min(2).max(5).describe("앙상블에 사용할 모델 ID 배열 (2~5개)"),
+      strategy: z.enum(["majority", "quality-score", "weighted"]).describe("투표 전략"),
+      weights: z.record(z.number()).optional().describe("모델별 가중치 (weighted 전략 시)"),
+      evaluationModel: z.string().optional().describe("품질 평가 모델 (quality-score 전략 시)"),
+      timeoutMs: z.number().optional().describe("타임아웃 (ms)"),
+    }),
+  })
+  .openapi("EnsembleRequest");
+
+export const EnsembleResultSchema = z
+  .object({
+    winner: AgentExecutionResultSchema,
+    winnerModel: z.string(),
+    winnerScore: z.number(),
+    allResults: z.array(z.object({
+      model: z.string(),
+      result: AgentExecutionResultSchema.nullable(),
+      score: z.number(),
+      latencyMs: z.number(),
+      error: z.string().optional(),
+    })),
+    votingDetails: z.object({
+      strategy: z.enum(["majority", "quality-score", "weighted"]),
+      totalModels: z.number(),
+      successfulModels: z.number(),
+      averageLatencyMs: z.number(),
+    }),
+  })
+  .openapi("EnsembleResult");
+
+export const StrategyInfoSchema = z
+  .object({
+    name: z.enum(["majority", "quality-score", "weighted"]),
+    description: z.string(),
+    costMultiplier: z.number(),
+    bestFor: z.string(),
+  })
+  .openapi("StrategyInfo");

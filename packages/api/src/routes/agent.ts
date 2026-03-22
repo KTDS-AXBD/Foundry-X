@@ -1819,3 +1819,69 @@ agentRoute.openapi(deleteCustomRole, async (c) => {
     throw err;
   }
 });
+
+// ─── Sprint 41: Ensemble Voting Endpoints (F147) ───
+
+import { EnsembleVoting, VOTING_STRATEGIES } from "../services/ensemble-voting.js";
+import {
+  EnsembleRequestSchema,
+  EnsembleResultSchema,
+  StrategyInfoSchema,
+} from "../schemas/agent.js";
+
+const ensembleExecute = createRoute({
+  method: "post",
+  path: "/agents/ensemble",
+  tags: ["Agents"],
+  summary: "멀티모델 앙상블 투표 실행",
+  request: {
+    body: { content: { "application/json": { schema: EnsembleRequestSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: EnsembleResultSchema } }, description: "앙상블 투표 결과" },
+    400: { content: { "application/json": { schema: z.object({ error: z.string() }) } }, description: "잘못된 요청" },
+  },
+});
+
+agentRoute.openapi(ensembleExecute, async (c) => {
+  const body = c.req.valid("json");
+  const ensemble = new EnsembleVoting({
+    OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY,
+    OPENROUTER_DEFAULT_MODEL: c.env.OPENROUTER_DEFAULT_MODEL,
+    ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY,
+  });
+
+  const request = {
+    taskId: `ens_${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`,
+    agentId: "ensemble-voting",
+    taskType: body.taskType as AgentTaskType,
+    context: {
+      repoUrl: body.context.repoUrl,
+      branch: body.context.branch,
+      targetFiles: body.context.targetFiles,
+      spec: body.context.spec,
+      instructions: body.context.instructions,
+    },
+    constraints: [],
+  };
+
+  const result = await ensemble.executeEnsemble(request, body.config);
+  return c.json(result);
+});
+
+const ensembleStrategies = createRoute({
+  method: "get",
+  path: "/agents/ensemble/strategies",
+  tags: ["Agents"],
+  summary: "앙상블 투표 전략 목록 조회",
+  responses: {
+    200: {
+      content: { "application/json": { schema: z.object({ strategies: z.array(StrategyInfoSchema) }) } },
+      description: "투표 전략 목록",
+    },
+  },
+});
+
+agentRoute.openapi(ensembleStrategies, async (c) => {
+  return c.json({ strategies: VOTING_STRATEGIES });
+});
