@@ -881,7 +881,6 @@ agentRoute.openapi(processQueue, async (c) => {
 // ─── Sprint 15: PlannerAgent Endpoints (F70) ───
 
 import { PlannerAgent } from "../services/planner-agent.js";
-import type { AgentTaskType } from "../services/execution-types.js";
 import { createPlanSchema, rejectPlanSchema } from "../schemas/plan.js";
 
 agentRoute.post("/plan", async (c) => {
@@ -1370,7 +1369,6 @@ agentRoute.openapi(qaAcceptance, async (c) => {
 // ─── Sprint 39: Fallback Chain Endpoints (F144) ───
 
 import { FallbackChainService } from "../services/fallback-chain.js";
-import { ModelRouter } from "../services/model-router.js";
 import {
   FallbackChainResponseSchema,
   FallbackEventsResponseSchema,

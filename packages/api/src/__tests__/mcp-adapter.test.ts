@@ -12,7 +12,9 @@ describe("MCP Adapter", () => {
     expect(TASK_TYPE_TO_MCP_TOOL["policy-evaluation"]).toBe("foundry_policy_eval");
     expect(TASK_TYPE_TO_MCP_TOOL["skill-query"]).toBe("foundry_skill_query");
     expect(TASK_TYPE_TO_MCP_TOOL["ontology-lookup"]).toBe("foundry_ontology_lookup");
-    expect(Object.keys(TASK_TYPE_TO_MCP_TOOL)).toHaveLength(7);
+    expect(TASK_TYPE_TO_MCP_TOOL["security-review"]).toBe("foundry_security_review");
+    expect(TASK_TYPE_TO_MCP_TOOL["qa-testing"]).toBe("foundry_qa_testing");
+    expect(Object.keys(TASK_TYPE_TO_MCP_TOOL)).toHaveLength(9);
   });
 
   it("MCP message types have correct structure", () => {

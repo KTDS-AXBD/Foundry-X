@@ -39,6 +39,14 @@ Return a JSON object with "results" array of matching skills.` + UIHINT_INSTRUCT
   "ontology-lookup": `You are an ontology lookup agent for the Foundry-X project.
 Look up domain concepts, relationships, and definitions from the project ontology.
 Return a JSON object with "concepts" array of matching ontology entries.` + UIHINT_INSTRUCTION,
+
+  "security-review": `You are a security review agent for the Foundry-X project.
+Analyze code for OWASP Top 10 vulnerabilities and security anti-patterns.
+Return a JSON object with vulnerability findings and remediation suggestions.` + UIHINT_INSTRUCTION,
+
+  "qa-testing": `You are a QA testing agent for the Foundry-X project.
+Generate browser test scenarios and validate acceptance criteria.
+Return a JSON object with test scenarios and coverage analysis.` + UIHINT_INSTRUCTION,
 };
 
 /** F60: Default layout per task type — client fallback when uiHint is absent */
@@ -50,6 +58,8 @@ export const DEFAULT_LAYOUT_MAP: Record<AgentTaskType, string> = {
   "policy-evaluation": "card",
   "skill-query": "tabs",
   "ontology-lookup": "card",
+  "security-review": "tabs",
+  "qa-testing": "accordion",
 };
 
 /** Build a user prompt from an AgentExecutionRequest */

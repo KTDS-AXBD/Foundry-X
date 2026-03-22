@@ -96,4 +96,6 @@ export const TASK_TYPE_TO_MCP_TOOL: Record<AgentTaskType, string> = {
   "policy-evaluation": "foundry_policy_eval",
   "skill-query": "foundry_skill_query",
   "ontology-lookup": "foundry_ontology_lookup",
+  "security-review": "foundry_security_review",
+  "qa-testing": "foundry_qa_testing",
 };
