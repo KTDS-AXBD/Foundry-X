@@ -3,6 +3,7 @@
  * Strips secrets/PII/internal URLs before forwarding prompts to LLM backends.
  */
 import type { AgentTaskType } from "./execution-types.js";
+import { AuditLogService } from "./audit-logger.js";
 
 // ── Interfaces ──────────────────────────────────────────
 
@@ -69,15 +70,34 @@ export class PromptGatewayService {
   ];
 
   private db: D1Database;
+  private auditLogger: AuditLogService;
 
   constructor(db: D1Database) {
     this.db = db;
+    this.auditLogger = new AuditLogService(db);
   }
 
   /** Sanitize a prompt string, removing secrets/PII/internal URLs */
-  async sanitizePrompt(content: string): Promise<SanitizeResult> {
+  async sanitizePrompt(content: string, tenantId?: string): Promise<SanitizeResult> {
     const rules = await this.loadRules();
-    return this.applyRules(content, rules);
+    const result = this.applyRules(content, rules);
+
+    // Sprint 47: 마스킹 발생 시 감사 로그 기록
+    if (result.appliedRules.length > 0 && tenantId) {
+      await this.auditLogger.logEvent({
+        tenantId,
+        eventType: "masking",
+        metadata: {
+          appliedRules: result.appliedRules,
+          originalLength: result.originalLength,
+          sanitizedLength: result.sanitizedLength,
+        },
+      }).catch(() => {
+        // 감사 로그 실패가 마스킹을 차단하면 안 됨
+      });
+    }
+
+    return result;
   }
 
   /** Extract structural abstractions from file contents (imports/exports/signatures only) */

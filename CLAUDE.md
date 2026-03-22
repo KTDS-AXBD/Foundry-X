@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 46 완료 (163 endpoints, 76 services, 961 API tests + Web 68 + ~55 E2E)
+**현재 상태:** Sprint 47 완료 (168 endpoints, 78 services, 999 API tests + Web 68 + ~55 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -71,9 +71,9 @@ foundry-x/
 │   │       └── index.ts
 │   ├── api/                # Hono API Server (Phase 2)
 │   │   └── src/
-│   │       ├── routes/     # 30개: agent, auth, automation-quality, entities, feedback, freshness, github, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, profile, project-overview, proxy, reconciliation, requirements, slack, spec, sr, sso, token, webhook, webhook-registry, wiki, workflow
-│   │       ├── services/   # 76개 (agent-feedback-loop, agent-inbox, agent-marketplace, agent-orchestrator, agent-runner, agent-self-reflection, architect-agent, architect-prompts, auto-fix, auto-rebase, automation-quality-reporter, claude-api-runner, conflict-detector, custom-role-manager, ensemble-voting, entity-registry, entity-sync, evaluation-criteria, evaluator-optimizer, execution-types, fallback-chain, feedback, file-context-collector, freshness-checker, github, github-review, github-sync, harness-rules, health-calc, infra-agent, infra-agent-prompts, integrity-checker, jira-adapter, jira-sync, kpi-logger, kv-cache, llm, logger, mcp-adapter, mcp-registry, mcp-resources, mcp-runner, mcp-sampling, mcp-transport, merge-queue, model-metrics, model-router, monitoring, onboarding-progress, openrouter-runner, org, planner-agent, planner-prompts, pr-pipeline, project-overview, prompt-gateway, prompt-utils, qa-agent, qa-agent-prompts, reconciliation, reviewer-agent, security-agent, security-agent-prompts, service-proxy, slack, spec-parser, sr-classifier, sr-workflow-mapper, sse-manager, sso, test-agent, test-agent-prompts, webhook-registry, wiki-sync, workflow-engine, worktree-manager)
-│   │       ├── schemas/    # 30개 Zod 스키마 (agent, auth, automation-quality, common, entity, error, feedback, freshness, github, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, plan, profile, reconciliation, requirements, slack, spec, sr, sso, token, webhook, wiki, workflow)
+│   │       ├── routes/     # 32개: agent, audit, auth, automation-quality, entities, feedback, freshness, github, governance, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, profile, project-overview, proxy, reconciliation, requirements, slack, spec, sr, sso, token, webhook, webhook-registry, wiki, workflow
+│   │       ├── services/   # 78개 (agent-feedback-loop, agent-inbox, agent-marketplace, agent-orchestrator, agent-runner, agent-self-reflection, architect-agent, architect-prompts, audit-logger, auto-fix, auto-rebase, automation-quality-reporter, claude-api-runner, conflict-detector, custom-role-manager, ensemble-voting, entity-registry, entity-sync, evaluation-criteria, evaluator-optimizer, execution-types, fallback-chain, feedback, file-context-collector, freshness-checker, github, github-review, github-sync, harness-rules, health-calc, infra-agent, infra-agent-prompts, integrity-checker, jira-adapter, jira-sync, kpi-logger, kv-cache, llm, logger, mcp-adapter, mcp-registry, mcp-resources, mcp-runner, mcp-sampling, mcp-transport, merge-queue, model-metrics, model-router, monitoring, onboarding-progress, openrouter-runner, org, pii-masker, planner-agent, planner-prompts, pr-pipeline, project-overview, prompt-gateway, prompt-utils, qa-agent, qa-agent-prompts, reconciliation, reviewer-agent, security-agent, security-agent-prompts, service-proxy, slack, spec-parser, sr-classifier, sr-workflow-mapper, sse-manager, sso, test-agent, test-agent-prompts, webhook-registry, wiki-sync, workflow-engine, worktree-manager)
+│   │       ├── schemas/    # 32개 Zod 스키마 (agent, audit, auth, automation-quality, common, entity, error, feedback, freshness, github, governance, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, plan, profile, reconciliation, requirements, slack, spec, sr, sso, token, webhook, wiki, workflow)
 │   │       └── index.ts
 │   ├── web/                # Next.js 14 Dashboard + Landing (Phase 2)
 │   │   └── src/
@@ -81,7 +81,7 @@ foundry-x/
 │   │       ├── app/(app)/      # 대시보드 (Sidebar): dashboard, agents, architecture, projects, settings, spec-generator, tokens, wiki, workspace
 │   │       ├── components/     # feature + landing + ui 컴포넌트
 │   │       └── lib/            # api-client, sse-client
-│   └── shared/             # 공유 타입 (types.ts, web.ts, agent.ts)
+│   └── shared/             # 공유 타입 (types.ts, web.ts, agent.ts, plugin.ts)
 ├── docs/
 │   ├── 01-plan/            # PLAN 문서
 │   ├── 02-design/          # DSGN 문서
@@ -170,7 +170,7 @@ pnpm e2e                          # Playwright E2E (17 specs)
   - Sprint 29: 온보딩 기반 — 가이드 UI + 피드백 API + 체크리스트
   - Sprint 30: 배포 동기화 + Phase 4 Go 판정(Conditional) + 품질 강화 (93%)
   - Sprint 31: 프로덕션 완전 동기화 + SPEC 정합성 + E2E 보강 + 온보딩 킥오프 (95%)
-  - 현재: 76 services, 163 endpoints, 961 API tests, D1 42 테이블
+  - 현재: 78 services, 168 endpoints, 999 API tests, D1 42 테이블
   - PDCA 문서: `docs/archive/2026-03/` (Sprint 3~31 + standalone 전체 archived)
 - **Sprint 32:** ✅ 완료 — PRD v5 완전성 점검 + Phase 5 로드맵 (F156/F157)
   - G1~G12 갭 매핑 (9완료+1진행+2수요대기), Phase 3 11/11 ✅, Phase 4 11/12 ✅
@@ -217,6 +217,10 @@ pnpm e2e                          # Playwright E2E (17 specs)
 - **Sprint 46:** ✅ 완료 — F162 Azure PoC + F163 SI R&R + F169 데모 환경 (**Phase 5 고객 파일럿 준비**)
   - PRD v8 재정의(인터뷰+3라운드 AI 검토) + 요구사항 8건 등록 + Azure Functions 어댑터 + T-SQL 마이그레이션 + 데모 시드/시나리오 + SI R&R 정의서
   - 2-Worker Agent Team (2m 45s), Match Rate 91%, PRD v8 Conditional 선결 3/5 해소
+- **Sprint 47:** ✅ 완료 — F164 커스터마이징 범위 + F165/F166 정책 수립 (**Phase 5 Conditional 4/5 해소**)
+  - 5-레이어 커스터마이징 범위 + 3-Tier 옵션 매트릭스 + 플러그인 시스템 아키텍처(12 타입)
+  - AuditLogService(3 API) + PiiMaskerService(6종 패턴, 4종 전략) + Hono 미들웨어 + 정책 문서 4건
+  - 2-Worker Agent Team, 999 API tests (+38), Match Rate 93%, PRD v8 Conditional 선결 4/5 해소
 
 ## Git Workflow
 

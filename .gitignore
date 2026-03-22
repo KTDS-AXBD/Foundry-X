@@ -27,3 +27,4 @@ packages/*/src/**/*.js.map
 
 # Next.js export output
 out/
+.gstack/

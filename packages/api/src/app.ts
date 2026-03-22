@@ -31,8 +31,11 @@ import { feedbackRoute } from "./routes/feedback.js";
 import { onboardingRoute } from "./routes/onboarding.js";
 import { automationQualityRoute } from "./routes/automation-quality.js";
 import { srRoute } from "./routes/sr.js";
+import { auditRoute } from "./routes/audit.js";
+import { governanceRoute } from "./routes/governance.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
+import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
 import { tenantGuard, type TenantVariables } from "./middleware/tenant.js";
 import type { Env } from "./env.js";
 
@@ -103,6 +106,8 @@ app.doc("/api/openapi.json", {
     { name: "Reconciliation", description: "Git↔D1 reconciliation" },
     { name: "Feedback", description: "NPS feedback collection" },
     { name: "Onboarding", description: "Onboarding progress tracking" },
+    { name: "Audit", description: "AI generation audit logs" },
+    { name: "Governance", description: "Data classification and governance rules" },
   ],
 });
 app.get("/api/docs", swaggerUI({ url: "/api/openapi.json" }));
@@ -172,6 +177,15 @@ app.route("/api", automationQualityRoute);
 
 // Sprint 44: SR management (auth + tenant required)
 app.route("/api", srRoute);
+
+// Sprint 47: Audit log + Governance (auth + tenant required)
+app.route("/api", auditRoute);
+app.route("/api", governanceRoute);
+
+// Sprint 47: PII masker middleware — AI API 경로에만 적용
+app.use("/api/agents/*", piiMaskerMiddleware);
+app.use("/api/spec/generate", piiMaskerMiddleware);
+app.use("/api/mcp/*", piiMaskerMiddleware);
 
 // Cron Trigger scheduled handler
 export { handleScheduled };

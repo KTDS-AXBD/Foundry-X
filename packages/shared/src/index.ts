@@ -145,3 +145,19 @@ export type {
   ModelQualityResponse,
   AgentModelMatrixResponse,
 } from './web.js';
+
+// Sprint 47: Plugin System types (F164)
+export type {
+  DataClassification,
+  MaskingStrategy,
+  AuditEventType,
+  AuditOutputType,
+  PluginManifest,
+  PluginPermission,
+  PluginHookDeclaration,
+  PluginHookEvent,
+  PluginSlotDeclaration,
+  PluginSlotId,
+  PluginStatus,
+  PluginInstance,
+} from './plugin.js';
