@@ -73,28 +73,31 @@ export default function LoginPage() {
             </p>
           )}
 
-          {/* Google Login */}
-          <div className="mb-4 flex justify-center">
-            <GoogleLogin
-              onSuccess={(res) => {
-                if (res.credential) handleGoogleLogin(res.credential);
-              }}
-              onError={() => setError("Google 로그인에 실패했어요")}
-              theme="outline"
-              size="large"
-              width="320"
-              text="signin_with"
-            />
-          </div>
-
-          <div className="relative mb-4">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">또는</span>
-            </div>
-          </div>
+          {/* Google Login — only render when Client ID is configured */}
+          {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
+            <>
+              <div className="mb-4 flex justify-center">
+                <GoogleLogin
+                  onSuccess={(res) => {
+                    if (res.credential) handleGoogleLogin(res.credential);
+                  }}
+                  onError={() => setError("Google 로그인에 실패했어요")}
+                  theme="outline"
+                  size="large"
+                  width="320"
+                  text="signin_with"
+                />
+              </div>
+              <div className="relative mb-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">또는</span>
+                </div>
+              </div>
+            </>
+          )}
 
           <Tabs defaultValue="login">
             <TabsList className="mb-4 w-full">
