@@ -945,3 +945,25 @@ export async function getAgentModelMatrix(
   if (projectId) params.set("projectId", projectId);
   return fetchApi<AgentModelMatrixResponse>(`/tokens/agent-model-matrix?${params}`);
 }
+
+// ─── Sprint 48: Onboarding Team Summary (F170) ───
+
+export interface TeamMemberProgress {
+  userId: string;
+  name: string;
+  stepsCompleted: number;
+  totalSteps: number;
+  progressPercent: number;
+  lastActivity: string | null;
+}
+
+export interface OnboardingTeamSummary {
+  totalMembers: number;
+  completedMembers: number;
+  averageProgress: number;
+  members: TeamMemberProgress[];
+}
+
+export async function getOnboardingTeamSummary(): Promise<OnboardingTeamSummary> {
+  return fetchApi<OnboardingTeamSummary>("/onboarding/team-summary");
+}

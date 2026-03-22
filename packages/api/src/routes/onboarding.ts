@@ -88,3 +88,84 @@ onboardingRoute.openapi(completeStep, async (c) => {
     return c.json({ error: message }, 400);
   }
 });
+
+// ─── GET /api/onboarding/team-summary ───
+
+const teamSummarySchema = z.object({
+  totalMembers: z.number(),
+  completedMembers: z.number(),
+  averageProgress: z.number(),
+  members: z.array(z.object({
+    userId: z.string(),
+    name: z.string(),
+    stepsCompleted: z.number(),
+    totalSteps: z.number(),
+    progressPercent: z.number(),
+    lastActivity: z.string().nullable(),
+  })),
+}).openapi("OnboardingTeamSummary");
+
+const getTeamSummary = createRoute({
+  method: "get",
+  path: "/onboarding/team-summary",
+  tags: ["Onboarding"],
+  summary: "팀 전체 온보딩 진행률 요약",
+  responses: {
+    200: {
+      content: { "application/json": { schema: teamSummarySchema } },
+      description: "팀원별 온보딩 진행 현황",
+    },
+  },
+});
+
+onboardingRoute.openapi(getTeamSummary, async (c) => {
+  const payload = getPayload(c);
+  const tenantId = payload.orgId ?? "default";
+  const db = c.env.DB;
+
+  // 팀원 목록
+  const { results: membersRaw } = await db.prepare(
+    `SELECT om.user_id, u.name
+     FROM org_members om
+     JOIN users u ON u.id = om.user_id
+     WHERE om.org_id = ?`
+  ).bind(tenantId).all<{ user_id: string; name: string }>();
+
+  const TOTAL_STEPS = 5; // create-account, connect-repo, run-status, run-sync, review-agent
+
+  const members = await Promise.all(
+    (membersRaw ?? []).map(async (m) => {
+      const { results: steps } = await db.prepare(
+        `SELECT step_id, completed, completed_at FROM onboarding_progress
+         WHERE tenant_id = ? AND user_id = ?`
+      ).bind(tenantId, m.user_id).all<{ step_id: string; completed: number; completed_at: string | null }>();
+
+      const stepsCompleted = (steps ?? []).filter(s => s.completed === 1).length;
+      const completedDates = (steps ?? []).filter(s => s.completed_at).map(s => s.completed_at as string);
+      const lastActivity: string | null = completedDates.length > 0
+        ? completedDates.sort().reverse()[0] ?? null
+        : null;
+
+      return {
+        userId: m.user_id,
+        name: m.name,
+        stepsCompleted,
+        totalSteps: TOTAL_STEPS,
+        progressPercent: Math.round((stepsCompleted / TOTAL_STEPS) * 100),
+        lastActivity,
+      };
+    })
+  );
+
+  const completedMembers = members.filter(m => m.progressPercent === 100).length;
+  const averageProgress = members.length > 0
+    ? Math.round(members.reduce((sum, m) => sum + m.progressPercent, 0) / members.length)
+    : 0;
+
+  return c.json({
+    totalMembers: members.length,
+    completedMembers,
+    averageProgress,
+    members: members.sort((a, b) => b.progressPercent - a.progressPercent),
+  });
+});

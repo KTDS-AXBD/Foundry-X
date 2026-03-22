@@ -6,10 +6,12 @@ import {
   getKpiTrends,
   getKpiEvents,
   fetchPhase4Kpi,
+  getOnboardingTeamSummary,
   type KpiSummary,
   type KpiTrendPoint,
   type KpiEventItem,
   type Phase4Kpi,
+  type OnboardingTeamSummary,
 } from "@/lib/api-client";
 import { NpsSummaryWidget } from "@/components/feature/NpsSummaryWidget";
 
@@ -147,6 +149,90 @@ function Phase4KpiSection() {
               </div>
             </div>
           )}
+        </>
+      )}
+    </section>
+  );
+}
+
+function OnboardingTeamSection() {
+  const team = useAsync<OnboardingTeamSummary>(() => getOnboardingTeamSummary());
+
+  return (
+    <section className="rounded-lg border border-border bg-card p-6">
+      <h2 className="mb-4 text-lg font-semibold">Adoption: 온보딩 현황</h2>
+      {team.loading && <div className="text-sm text-muted-foreground">Loading...</div>}
+      {team.error && <div className="text-sm text-destructive">{team.error}</div>}
+      {team.data && (
+        <>
+          {/* Summary Cards */}
+          <div className="mb-6 grid gap-4 md:grid-cols-3">
+            <KpiTargetCard
+              title="등록 팀원"
+              value={`${team.data.totalMembers}명`}
+              target="5명+"
+              met={team.data.totalMembers >= 5}
+            />
+            <KpiTargetCard
+              title="온보딩 완료"
+              value={`${team.data.completedMembers}명`}
+              target="3명+"
+              met={team.data.completedMembers >= 3}
+            />
+            <KpiTargetCard
+              title="평균 진행률"
+              value={`${team.data.averageProgress}%`}
+              target=">60%"
+              met={team.data.averageProgress > 60}
+            />
+          </div>
+
+          {/* Member Progress Table */}
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border text-left text-muted-foreground">
+                <th className="pb-2">이름</th>
+                <th className="pb-2 text-center">진행률</th>
+                <th className="pb-2 text-center">단계</th>
+                <th className="pb-2 text-right">최근 활동</th>
+              </tr>
+            </thead>
+            <tbody>
+              {team.data.members.map((m) => (
+                <tr key={m.userId} className="border-b border-border">
+                  <td className="py-2 font-medium">{m.name}</td>
+                  <td className="py-2">
+                    <div className="mx-auto flex w-32 items-center gap-2">
+                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
+                        <div
+                          className={`h-full rounded-full ${
+                            m.progressPercent === 100
+                              ? "bg-green-500"
+                              : m.progressPercent >= 60
+                                ? "bg-blue-500"
+                                : "bg-yellow-500"
+                          }`}
+                          style={{ width: `${m.progressPercent}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-muted-foreground">{m.progressPercent}%</span>
+                    </div>
+                  </td>
+                  <td className="py-2 text-center text-muted-foreground">
+                    {m.stepsCompleted}/{m.totalSteps}
+                  </td>
+                  <td className="py-2 text-right text-xs text-muted-foreground">
+                    {m.lastActivity
+                      ? new Date(m.lastActivity).toLocaleDateString("ko-KR", {
+                          month: "short",
+                          day: "numeric",
+                        })
+                      : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </>
       )}
     </section>
@@ -340,6 +426,11 @@ export default function AnalyticsPage() {
             </>
           )}
         </div>
+      </div>
+
+      {/* Adoption: Onboarding Team Progress (F170) */}
+      <div className="mt-8">
+        <OnboardingTeamSection />
       </div>
 
       {/* Phase 4 KPI */}
