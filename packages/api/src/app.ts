@@ -30,6 +30,7 @@ import { reconciliationRoute } from "./routes/reconciliation.js";
 import { feedbackRoute } from "./routes/feedback.js";
 import { onboardingRoute } from "./routes/onboarding.js";
 import { automationQualityRoute } from "./routes/automation-quality.js";
+import { srRoute } from "./routes/sr.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { tenantGuard, type TenantVariables } from "./middleware/tenant.js";
@@ -168,6 +169,9 @@ app.route("/api", onboardingRoute);
 
 // Sprint 42: Automation quality reporting (auth + tenant required)
 app.route("/api", automationQualityRoute);
+
+// Sprint 44: SR management (auth + tenant required)
+app.route("/api", srRoute);
 
 // Cron Trigger scheduled handler
 export { handleScheduled };
