@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foundry-X 방향 업데이트</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #0a0a0f;
+    color: #e4e4e7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    padding: 40px 20px;
+  }
+
+  /* ─── Card 1: 비전 전환 ─── */
+  .card {
+    width: 720px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    background: linear-gradient(135deg, #111118 0%, #0d0d14 100%);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(99,102,241,0.05);
+  }
+
+  .card-header {
+    padding: 28px 32px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-header .logo-icon {
+    width: 32px; height: 32px;
+    background: rgba(99,102,241,0.15);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .card-header .logo-text {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .version-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: #818cf8;
+    background: rgba(99,102,241,0.1);
+    border: 1px solid rgba(99,102,241,0.2);
+    padding: 4px 12px;
+    border-radius: 100px;
+  }
+
+  .card-body { padding: 28px 32px; }
+
+  /* Title */
+  .announce-title {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  .announce-title .highlight {
+    background: linear-gradient(90deg, #818cf8, #6366f1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .announce-sub {
+    font-size: 14px;
+    color: #71717a;
+    margin-bottom: 24px;
+  }
+
+  /* Before → After */
+  .transition-row {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .transition-box {
+    flex: 1;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02);
+  }
+  .transition-box.before { opacity: 0.6; }
+  .transition-box.after {
+    border-color: rgba(99,102,241,0.2);
+    background: rgba(99,102,241,0.04);
+  }
+  .transition-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #52525b;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .transition-box.after .transition-label { color: #818cf8; }
+  .transition-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .transition-desc {
+    font-size: 12px;
+    color: #a1a1aa;
+    line-height: 1.5;
+  }
+  .arrow-col {
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    color: #818cf8;
+  }
+
+  /* Services */
+  .services-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .svc-chip {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02);
+    text-align: center;
+  }
+  .svc-icon { font-size: 22px; margin-bottom: 4px; }
+  .svc-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .svc-role { font-size: 10px; color: #71717a; }
+  .svc-status {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-top: 6px;
+  }
+  .svc-status.green { background: rgba(74,222,128,0.1); color: #4ade80; }
+  .svc-status.blue { background: rgba(96,165,250,0.1); color: #60a5fa; }
+  .svc-status.violet { background: rgba(167,139,250,0.1); color: #a78bfa; }
+
+  /* Stats */
+  .stats-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+  .stat {
+    flex: 1;
+    text-align: center;
+    padding: 12px 0;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .stat-val {
+    font-size: 22px;
+    font-weight: 800;
+    color: #818cf8;
+  }
+  .stat-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #52525b;
+    font-weight: 500;
+  }
+
+  /* ─── Card 2: 로드맵 ─── */
+  .roadmap { padding: 24px 32px 28px; }
+  .roadmap-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #a1a1aa;
+  }
+  .roadmap-track {
+    display: flex;
+    gap: 8px;
+  }
+  .phase {
+    flex: 1;
+    padding: 14px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.02);
+    position: relative;
+  }
+  .phase.done { opacity: 0.5; }
+  .phase.current {
+    border-color: rgba(99,102,241,0.3);
+    background: rgba(99,102,241,0.06);
+  }
+  .phase-badge {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .phase.done .phase-badge { color: #52525b; }
+  .phase.current .phase-badge { color: #818cf8; }
+  .phase.planned .phase-badge { color: #3f3f46; }
+  .phase-name {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .phase.planned .phase-name { color: #52525b; }
+  .phase-items {
+    list-style: none;
+    font-size: 10px;
+    color: #71717a;
+    line-height: 1.6;
+  }
+  .phase.current .phase-items { color: #a1a1aa; }
+  .phase.planned .phase-items { color: #3f3f46; }
+  .phase-dot {
+    display: inline-block;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  .phase.done .phase-dot { background: #52525b; }
+  .phase.current .phase-dot { background: #818cf8; }
+  .phase.planned .phase-dot { background: #27272a; }
+
+  .current-indicator {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #818cf8;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Footer */
+  .card-footer {
+    padding: 16px 32px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-link {
+    font-size: 12px;
+    color: #818cf8;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .footer-date {
+    font-size: 11px;
+    color: #3f3f46;
+  }
+</style>
+</head>
+<body>
+
+<!-- Card 1: 비전 전환 + 서비스 + 수치 -->
+<div class="card">
+  <div class="card-header">
+    <div class="logo">
+      <div class="logo-icon">🔨</div>
+      <span class="logo-text">Foundry-X</span>
+    </div>
+    <span class="version-badge">v2.0.0 · Phase 3</span>
+  </div>
+
+  <div class="card-body">
+    <h1 class="announce-title">
+      독립 서비스 연동에서<br/>
+      <span class="highlight">통합 플랫폼</span>으로
+    </h1>
+    <p class="announce-sub">PRD v5 — 탐색 · 구축 · 동기화를 하나의 플랫폼에서</p>
+
+    <!-- Before → After -->
+    <div class="transition-row">
+      <div class="transition-box before">
+        <div class="transition-label">Before (v4)</div>
+        <div class="transition-title">3개 독립 서비스 연동</div>
+        <div class="transition-desc">Discovery-X, AI Foundry, AXIS DS가<br/>각각 독립 운영 → API 연동</div>
+      </div>
+      <div class="arrow-col">→</div>
+      <div class="transition-box after">
+        <div class="transition-label">After (v5)</div>
+        <div class="transition-title">Foundry-X 루트 앱 통합</div>
+        <div class="transition-desc">3개 서비스가 Foundry-X 안의<br/>서브 앱으로 통합</div>
+      </div>
+    </div>
+
+    <!-- Services -->
+    <div class="services-row">
+      <div class="svc-chip">
+        <div class="svc-icon">🧭</div>
+        <div class="svc-name">Discovery-X</div>
+        <div class="svc-role">탐색 · 실험</div>
+        <span class="svc-status violet">개발 중 · 80%</span>
+      </div>
+      <div class="svc-chip">
+        <div class="svc-icon">⚙️</div>
+        <div class="svc-name">AI Foundry</div>
+        <div class="svc-role">지식 · 구축</div>
+        <span class="svc-status blue">개발 중 · 90%</span>
+      </div>
+      <div class="svc-chip">
+        <div class="svc-icon">🎨</div>
+        <div class="svc-name">AXIS DS</div>
+        <div class="svc-role">UI · 일관성</div>
+        <span class="svc-status green">준비 완료</span>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-val">97</div>
+        <div class="stat-label">Endpoints</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">39</div>
+        <div class="stat-label">Services</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">689+</div>
+        <div class="stat-label">Tests</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">24</div>
+        <div class="stat-label">Sprints</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roadmap -->
+  <div class="roadmap">
+    <div class="roadmap-title">📍 Roadmap — 5 Phases</div>
+    <div class="roadmap-track">
+      <div class="phase done">
+        <div class="phase-badge">Phase 1</div>
+        <div class="phase-name">CLI + Plumb</div>
+        <ul class="phase-items">
+          <li><span class="phase-dot"></span>CLI 3커맨드</li>
+          <li><span class="phase-dot"></span>Ink TUI</li>
+          <li><span class="phase-dot"></span>106 테스트</li>
+        </ul>
+      </div>
+      <div class="phase done">
+        <div class="phase-badge">Phase 2</div>
+        <div class="phase-name">API + Agent</div>
+        <ul class="phase-items">
+          <li><span class="phase-dot"></span>79 엔드포인트</li>
+          <li><span class="phase-dot"></span>MCP 프로토콜</li>
+          <li><span class="phase-dot"></span>PlannerAgent</li>
+        </ul>
+      </div>
+      <div class="phase current">
+        <div class="current-indicator"></div>
+        <div class="phase-badge">Phase 3</div>
+        <div class="phase-name">통합 준비</div>
+        <ul class="phase-items">
+          <li><span class="phase-dot"></span>멀티테넌시</li>
+          <li><span class="phase-dot"></span>GitHub/Slack</li>
+          <li><span class="phase-dot"></span>AXIS DS 전환</li>
+        </ul>
+      </div>
+      <div class="phase planned">
+        <div class="phase-badge">Phase 4</div>
+        <div class="phase-name">통합 실행</div>
+        <ul class="phase-items">
+          <li><span class="phase-dot"></span>프론트엔드 통합</li>
+          <li><span class="phase-dot"></span>인증 SSO</li>
+          <li><span class="phase-dot"></span>데이터 통합</li>
+        </ul>
+      </div>
+      <div class="phase planned">
+        <div class="phase-badge">Phase 5</div>
+        <div class="phase-name">고객 파일럿</div>
+        <ul class="phase-items">
+          <li><span class="phase-dot"></span>SR 시나리오</li>
+          <li><span class="phase-dot"></span>외부 파일럿</li>
+          <li><span class="phase-dot"></span>엔터프라이즈</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <a href="https://fx.minu.best" class="footer-link">fx.minu.best →</a>
+    <span class="footer-date">2026-03-20 · AX BD팀</span>
+  </div>
+</div>
+
+</body>
+</html>
