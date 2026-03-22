@@ -780,3 +780,25 @@ export const StrategyInfoSchema = z
     bestFor: z.string(),
   })
   .openapi("StrategyInfo");
+
+// ─── Sprint 42: Agent Marketplace Schemas (F152) ───
+
+export const PublishMarketplaceItemSchema = z.object({
+  roleId: z.string().min(1),
+  tags: z.array(z.string().max(50)).max(10).optional().default([]),
+  category: z.string().optional(),
+});
+
+export const SearchMarketplaceSchema = z.object({
+  q: z.string().max(100).optional(),
+  category: z.string().optional(),
+  tags: z.string().optional(),
+  sortBy: z.enum(["rating", "installs", "recent"]).optional().default("rating"),
+  limit: z.coerce.number().int().min(1).max(50).optional().default(20),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+});
+
+export const RateMarketplaceItemSchema = z.object({
+  score: z.number().int().min(1).max(5),
+  reviewText: z.string().max(500).optional().default(""),
+});

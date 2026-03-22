@@ -18,6 +18,9 @@ import {
   ConflictReportSchema,
   ParallelExecuteRequestSchema,
   UpdatePriorityRequestSchema,
+  PublishMarketplaceItemSchema,
+  SearchMarketplaceSchema,
+  RateMarketplaceItemSchema,
 } from "../schemas/agent.js";
 import type { AgentProfile, AgentActivity, PrReviewResult } from "@foundry-x/shared";
 import type { AgentRunnerInfo, AgentTaskType } from "../services/execution-types.js";
@@ -1884,4 +1887,211 @@ const ensembleStrategies = createRoute({
 
 agentRoute.openapi(ensembleStrategies, async (c) => {
   return c.json({ strategies: VOTING_STRATEGIES });
+});
+
+// ─── F152: Agent Marketplace Routes ───
+
+import { AgentMarketplace } from "../services/agent-marketplace.js";
+
+const publishMarketplaceItem = createRoute({
+  method: "post",
+  path: "/agents/marketplace",
+  tags: ["Agents"],
+  summary: "마켓플레이스에 에이전트 역할 게시",
+  request: {
+    body: { content: { "application/json": { schema: PublishMarketplaceItemSchema } } },
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: z.object({ item: z.any() }) } },
+      description: "게시된 항목",
+    },
+    409: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "중복 게시",
+    },
+  },
+});
+
+agentRoute.openapi(publishMarketplaceItem, async (c) => {
+  const body = c.req.valid("json");
+  const orgId = c.get("orgId" as never) ?? "org_test";
+  const marketplace = new AgentMarketplace(c.env.DB);
+  try {
+    const item = await marketplace.publishItem(body, orgId as string);
+    return c.json({ item });
+  } catch (e: unknown) {
+    const msg = (e as Error).message;
+    if (msg.includes("CONFLICT")) return c.json({ error: msg }, 409);
+    return c.json({ error: msg }, 400);
+  }
+});
+
+const searchMarketplace = createRoute({
+  method: "get",
+  path: "/agents/marketplace",
+  tags: ["Agents"],
+  summary: "마켓플레이스 검색",
+  request: {
+    query: SearchMarketplaceSchema,
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: z.object({ items: z.array(z.any()), total: z.number(), limit: z.number(), offset: z.number() }) } },
+      description: "검색 결과",
+    },
+  },
+});
+
+agentRoute.openapi(searchMarketplace, async (c) => {
+  const query = c.req.valid("query");
+  const marketplace = new AgentMarketplace(c.env.DB);
+  const result = await marketplace.searchItems({
+    query: query.q,
+    category: query.category,
+    tags: query.tags ? query.tags.split(",") : undefined,
+    sortBy: query.sortBy,
+    limit: query.limit,
+    offset: query.offset,
+  });
+  return c.json(result);
+});
+
+const installMarketplaceItem = createRoute({
+  method: "post",
+  path: "/agents/marketplace/{id}/install",
+  tags: ["Agents"],
+  summary: "마켓플레이스 항목 설치",
+  request: {
+    params: z.object({ id: z.string() }),
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: z.object({ install: z.any() }) } },
+      description: "설치 결과",
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "항목 없음",
+    },
+    409: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "이미 설치됨",
+    },
+  },
+});
+
+agentRoute.openapi(installMarketplaceItem, async (c) => {
+  const { id } = c.req.valid("param");
+  const orgId = c.get("orgId" as never) ?? "org_test";
+  const marketplace = new AgentMarketplace(c.env.DB);
+  try {
+    const install = await marketplace.installItem(id, orgId as string);
+    return c.json({ install });
+  } catch (e: unknown) {
+    const msg = (e as Error).message;
+    if (msg.includes("NOT_FOUND")) return c.json({ error: msg }, 404);
+    if (msg.includes("CONFLICT")) return c.json({ error: msg }, 409);
+    return c.json({ error: msg }, 400);
+  }
+});
+
+const rateMarketplaceItem = createRoute({
+  method: "post",
+  path: "/agents/marketplace/{id}/rate",
+  tags: ["Agents"],
+  summary: "마켓플레이스 항목 평점",
+  request: {
+    params: z.object({ id: z.string() }),
+    body: { content: { "application/json": { schema: RateMarketplaceItemSchema } } },
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: z.object({ rating: z.any() }) } },
+      description: "평점 결과",
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "항목 없음",
+    },
+  },
+});
+
+agentRoute.openapi(rateMarketplaceItem, async (c) => {
+  const { id } = c.req.valid("param");
+  const body = c.req.valid("json");
+  const jwtPayload = c.get("jwtPayload" as never) as { sub?: string } | undefined;
+  const userId = jwtPayload?.sub ?? "unknown";
+  const orgId = c.get("orgId" as never) ?? null;
+  const marketplace = new AgentMarketplace(c.env.DB);
+  try {
+    const rating = await marketplace.rateItem(id, userId, orgId as string | null, body.score, body.reviewText);
+    return c.json({ rating });
+  } catch (e: unknown) {
+    const msg = (e as Error).message;
+    if (msg.includes("NOT_FOUND")) return c.json({ error: msg }, 404);
+    return c.json({ error: msg }, 400);
+  }
+});
+
+const deleteMarketplaceItem = createRoute({
+  method: "delete",
+  path: "/agents/marketplace/{id}",
+  tags: ["Agents"],
+  summary: "마켓플레이스 항목 삭제 (소프트)",
+  request: {
+    params: z.object({ id: z.string() }),
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: z.object({ deleted: z.boolean() }) } },
+      description: "삭제 결과",
+    },
+    403: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "권한 없음",
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "항목 없음",
+    },
+  },
+});
+
+agentRoute.openapi(deleteMarketplaceItem, async (c) => {
+  const { id } = c.req.valid("param");
+  const orgId = c.get("orgId" as never) ?? "org_test";
+  const marketplace = new AgentMarketplace(c.env.DB);
+  try {
+    const result = await marketplace.deleteItem(id, orgId as string);
+    return c.json(result);
+  } catch (e: unknown) {
+    const msg = (e as Error).message;
+    if (msg.includes("FORBIDDEN")) return c.json({ error: msg }, 403);
+    if (msg.includes("NOT_FOUND")) return c.json({ error: msg }, 404);
+    return c.json({ error: msg }, 400);
+  }
+});
+
+const getMarketplaceItemStats = createRoute({
+  method: "get",
+  path: "/agents/marketplace/{id}/stats",
+  tags: ["Agents"],
+  summary: "마켓플레이스 항목 통계",
+  request: {
+    params: z.object({ id: z.string() }),
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: z.object({ stats: z.any() }) } },
+      description: "통계 결과",
+    },
+  },
+});
+
+agentRoute.openapi(getMarketplaceItemStats, async (c) => {
+  const { id } = c.req.valid("param");
+  const marketplace = new AgentMarketplace(c.env.DB);
+  const stats = await marketplace.getItemStats(id);
+  return c.json({ stats });
 });

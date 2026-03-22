@@ -29,6 +29,7 @@ import { kpiRoute } from "./routes/kpi.js";
 import { reconciliationRoute } from "./routes/reconciliation.js";
 import { feedbackRoute } from "./routes/feedback.js";
 import { onboardingRoute } from "./routes/onboarding.js";
+import { automationQualityRoute } from "./routes/automation-quality.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { tenantGuard, type TenantVariables } from "./middleware/tenant.js";
@@ -164,6 +165,9 @@ app.route("/api", reconciliationRoute);
 // Sprint 29: Onboarding feedback + progress (auth + tenant required)
 app.route("/api", feedbackRoute);
 app.route("/api", onboardingRoute);
+
+// Sprint 42: Automation quality reporting (auth + tenant required)
+app.route("/api", automationQualityRoute);
 
 // Cron Trigger scheduled handler
 export { handleScheduled };
