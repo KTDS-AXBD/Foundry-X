@@ -4,13 +4,13 @@ test.describe("Landing Page", () => {
   test("renders hero with Foundry-X branding", async ({ page }) => {
     await page.goto("/");
 
-    // Hero headline — 한국어 헤드라인 (F74 이후)
+    // Hero headline — PRD v8 정체성 반영
     await expect(
-      page.getByRole("heading", { name: /사람과 AI가/i }),
+      page.getByRole("heading", { name: /AI 에이전트가/i }),
     ).toBeVisible();
 
     // 그래디언트 텍스트
-    await expect(page.getByText("함께 만드는 곳")).toBeVisible();
+    await expect(page.getByText("일하는 방식을 설계하다")).toBeVisible();
   });
 
   test("navigation links are visible", async ({ page }) => {

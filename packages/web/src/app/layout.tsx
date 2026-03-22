@@ -22,11 +22,11 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Foundry-X — 사람과 AI가 함께 만드는 곳",
+    default: "Foundry-X — AI 에이전트가 일하는 방식을 설계하는 곳",
     template: "%s | Foundry-X",
   },
   description:
-    "에이전트가 코드를 제안하고, 사람이 검증하고, Git이 기록하는 AI 협업 플랫폼.",
+    "AX 사업개발 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼.",
 };
 
 export default function RootLayout({

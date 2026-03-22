@@ -24,13 +24,13 @@ test.describe("Production Smoke", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // Hero headline — F74 개편 후 한국어 헤드라인
+    // Hero headline — PRD v8 정체성 반영
     await expect(
-      page.getByRole("heading", { name: /사람과 AI가/i }),
+      page.getByRole("heading", { name: /AI 에이전트가/i }),
     ).toBeVisible();
 
     // Hero 브랜딩 텍스트
-    await expect(page.getByText("함께 만드는 곳")).toBeVisible();
+    await expect(page.getByText("일하는 방식을 설계하다")).toBeVisible();
   });
 
   /**

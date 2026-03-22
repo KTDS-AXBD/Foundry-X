@@ -150,7 +150,7 @@ export default function LoginPage() {
               Foundry<span style={{ color: "var(--axis-color-blue-500, hsl(var(--primary)))" }}>-X</span>
             </h1>
             <p className="mt-1 text-sm" style={{ color: "var(--axis-color-gray-400, hsl(var(--muted-foreground)))" }}>
-              사람과 AI가 함께 만드는 곳
+              AI 에이전트 오케스트레이션 플랫폼
             </p>
           </div>
         </div>
