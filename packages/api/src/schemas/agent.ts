@@ -620,3 +620,49 @@ export const FeedbackResponseSchema = z
     })),
   })
   .openapi("FeedbackResponse");
+
+// ─── Sprint 41: Custom Agent Role Schemas (F146) ───
+
+export const CreateCustomRoleSchema = z
+  .object({
+    name: z.string().min(1).max(100),
+    description: z.string().max(500).optional(),
+    systemPrompt: z.string().min(1).max(10000),
+    allowedTools: z.array(z.string()).optional(),
+    preferredModel: z.string().optional(),
+    preferredRunnerType: z.enum(["openrouter", "claude-api", "mcp", "mock"]).optional(),
+    taskType: z.string().optional(),
+    orgId: z.string().optional(),
+  })
+  .openapi("CreateCustomRole");
+
+export const UpdateCustomRoleSchema = z
+  .object({
+    name: z.string().min(1).max(100).optional(),
+    description: z.string().max(500).optional(),
+    systemPrompt: z.string().min(1).max(10000).optional(),
+    allowedTools: z.array(z.string()).optional(),
+    preferredModel: z.string().nullable().optional(),
+    preferredRunnerType: z.enum(["openrouter", "claude-api", "mcp", "mock"]).optional(),
+    taskType: z.string().optional(),
+    enabled: z.boolean().optional(),
+  })
+  .openapi("UpdateCustomRole");
+
+export const CustomRoleSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string(),
+    systemPrompt: z.string(),
+    allowedTools: z.array(z.string()),
+    preferredModel: z.string().nullable(),
+    preferredRunnerType: z.string(),
+    taskType: z.string(),
+    orgId: z.string(),
+    isBuiltin: z.boolean(),
+    enabled: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+  })
+  .openapi("CustomRole");
