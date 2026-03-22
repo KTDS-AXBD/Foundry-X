@@ -4,10 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼이에요.
+Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 45 완료 (163 endpoints, 76 services, 961 API tests + Web 68 + ~55 E2E)
+**현재 상태:** Sprint 46 완료 (162 endpoints, 76 services, 953 API tests + Web 64 + ~55 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -99,7 +99,7 @@ foundry-x/
 
 | 문서 | 용도 |
 |------|------|
-| `docs/specs/prd-v5.md` | 현행 PRD (권위 문서, v5: 통합 플랫폼 비전 + Phase 3 현황 반영) |
+| `docs/specs/prd-v8-final.md` | 현행 PRD (권위 문서, v8: AI 에이전트 오케스트레이션 플랫폼 정체성 재정의) |
 | `docs/specs/dev-transparency-spec.md` | 개발 투명성 스펙 |
 | `docs/specs/interview-log.md` | 요구사항 인터뷰 종합 (Part 1-5) |
 | `docs/02-design/features/tech-stack-review.design.md` | 기술 스택 결정 근거 |
@@ -214,6 +214,9 @@ pnpm e2e                          # Playwright E2E (17 specs)
 - **Sprint 45:** ✅ 완료 — F158~F161 KPI 자동 수집 인프라 (**Phase 5 온보딩 데이터 기반**)
   - useKpiTracker(웹 페이지뷰 추적) + KpiReporter(CLI 로깅) + kpi_snapshots(Cron 집계) + snapshot-trend API
   - 2-Worker Agent Team (5m 0s), 961 API tests (+8), CLI 131 (+6), Web 68 (+4), Match Rate 97%
+- **Sprint 46:** ✅ 완료 — F162 Azure PoC + F163 SI R&R + F169 데모 환경 (**Phase 5 고객 파일럿 준비**)
+  - PRD v8 재정의(인터뷰+3라운드 AI 검토) + 요구사항 8건 등록 + Azure Functions 어댑터 + T-SQL 마이그레이션 + 데모 시드/시나리오 + SI R&R 정의서
+  - 2-Worker Agent Team (2m 45s), Match Rate 91%, PRD v8 Conditional 선결 3/5 해소
 
 ## Git Workflow
 

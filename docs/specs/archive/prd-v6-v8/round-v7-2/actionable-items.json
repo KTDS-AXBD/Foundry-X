@@ -1,0 +1,335 @@
+{
+  "generated": "2026-03-22T13:25:33.656Z",
+  "totalItems": 54,
+  "byType": {
+    "flaw": 13,
+    "gap": 13,
+    "risk": 25
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**실증 근거 부족**: PoC/MVP 제작 시간 단축이 실제 수주 성공률로 이어진다는 주장은 “내부/외부 고객 인터뷰, 경쟁사 벤치마크 수집 중” 수준에 머물러 있습니다. 정량적 데이터나 실증적 사례가 아직 부족하므로, 성공 공식의 명확한 입증이 미흡합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**내부 채택률과 외부 확장성 간 논리 연결**: 내부 온보딩이 아직 미흡하고, 사용자 Adoption이 낮은 상황에서 대외 고객 수주 확장의 논리적 비약이 있습니다. 내부 채택이 낮은 원인에 대한 분석과, 이를 어떻게 극복할지 구체적 Roadmap이 더 필요합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**인력 및 역할 분담 체계 명확화:**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**고객사별 배포/운영 시나리오와 기술 검증:**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**내부 Adoption 실적 확보:**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**법적/윤리적 정책 수립:**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**SI/외부 파트너 범위 미정 해소(Q3), 고객사 커스터마이징 범위 정의(Q12) 등 오픈 이슈 해소:**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**논리적 완결성**은 양호하나, 실증 데이터와 내부 채택-외부 확장 연결이 불완전합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**실행 가능성**은 인력/예산/배포/운영 측면에서 과소평가가 뚜렷합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**누락 요소**는 고객사 환경 대응, 지속적 개선 체계, 피드백 기반 우선순위 조정 등입니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**주요 리스크**는 내부/외부 Adoption 실패, 고객사 배포/커스터마이징, 인력/예산, 법적/윤리적/데이터 거버넌스입니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**착수 판단: Conditional**",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**고객사의 실제 도입/배포/운영 시나리오 상세**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**유지보수/지속적 개선 체계**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실제 고객 피드백 루프와 우선순위 조정**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**인력 및 역할 분담 체계 명확화:**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**고객사별 배포/운영 시나리오와 기술 검증:**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**내부 Adoption 실적 확보:**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**법적/윤리적 정책 수립:**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**SI/외부 파트너 범위 미정 해소(Q3), 고객사 커스터마이징 범위 정의(Q12) 등 오픈 이슈 해소:**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**논리적 완결성**은 양호하나, 실증 데이터와 내부 채택-외부 확장 연결이 불완전합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실행 가능성**은 인력/예산/배포/운영 측면에서 과소평가가 뚜렷합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**누락 요소**는 고객사 환경 대응, 지속적 개선 체계, 피드백 기반 우선순위 조정 등입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**주요 리스크**는 내부/외부 Adoption 실패, 고객사 배포/커스터마이징, 인력/예산, 법적/윤리적/데이터 거버넌스입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**착수 판단: Conditional**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**과소평가/리스크**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**인력과 역할 분담의 현실성 미흡**: 핵심 인력이 “AX BD팀 1인 풀타임 + SI 미정”으로 명시되어 있는데, 실제로는 커스터마이징, 고객사 배포, 운영지원, 온보딩 등 추가적/지속적 인력이 반드시 필요합니다. 실 운영 단계에서 1인 체계로는 한계가 명확합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Azure 등 고객사별 배포/마이그레이션 일정**: “최소 2~3개월 소요 예측”이라고만 적시되어 있으나, 실제로는 보안, 인증, 네트워크, 컴플라이언스 등 고객사 현장 이슈가 복합적으로 발생할 가능성이 높습니다. 별도 PoC와 추가 인력/예산 확보 계획 없이 6개월 내 실수주 달성은 낙관적입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**외부 연동/플러그인/커스터마이징 범위 불명확**: 고객별 요구가 다양해질 때 어디까지 신속히 커버 가능한지, 플러그인 시스템의 구체적 로드맵과 책임 주체(내부/외부 개발자, SI 등)가 모호합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**내부/외부 사용자 Adoption 실패**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**고객사 환경/보안/커스터마이징 이슈**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**인력/예산 리스크**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**법적/윤리적/데이터 거버넌스**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**인력 및 역할 분담 체계 명확화:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**고객사별 배포/운영 시나리오와 기술 검증:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**내부 Adoption 실적 확보:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**법적/윤리적 정책 수립:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**SI/외부 파트너 범위 미정 해소(Q3), 고객사 커스터마이징 범위 정의(Q12) 등 오픈 이슈 해소:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**논리적 완결성**은 양호하나, 실증 데이터와 내부 채택-외부 확장 연결이 불완전합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실행 가능성**은 인력/예산/배포/운영 측면에서 과소평가가 뚜렷합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**누락 요소**는 고객사 환경 대응, 지속적 개선 체계, 피드백 기반 우선순위 조정 등입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**주요 리스크**는 내부/외부 Adoption 실패, 고객사 배포/커스터마이징, 인력/예산, 법적/윤리적/데이터 거버넌스입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**착수 판단: Conditional**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "flaw",
+      "source": "Gemini",
+      "text": "사실 확인: PRD에 포함된 가정이나 수치 중 검증이 필요한 것들은?\n\nPRD는 v7에서 논리적 인과관계와 검증 계획을 강화했지만, 여전히 몇 가지 핵심 가정과 수치에 대한 철저한 검증이 필요합니다.\n\n*   **PoC/MVP 제작 소요 시간 단축 효과 (2~4주 → < 3일, 85% 시간 절감):**\n    *   **검증 필요성:** 이 수치는 Foun",
+      "severity": "high"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**핵심 오픈 이슈 (Q3, Q11, Q12, Q13, Q14)에 대한 구체적인 해결 계획 및 책임자, 기한이 명확히 수립되어야 합니다.** 특히 Q3(파트너십), Q11(Azure 마이그레이션), Q12(커스터마이징 범위)는 외부 고객 수주를 위한 필수 선결 과제입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**PoC/MVP 제작 시간 단축 및 수주 성공률 간의 인과관계에 대한 내부 파일럿 검증 결과가 긍정적으로 도출되어야 합니다.** (6개월 내 실증 데이터 수집/분석 계획은 좋으나, 초기 단계에서 중간 결과라도 확인할 필요가 있습니다.)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**내부 사용자 채택률 (WAU 5명+) 목표 달성을 위한 온보딩/교육 프로그램의 초기 성과가 확인되어야 합니다.**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**심각한 인프라 불일치**: Cloudflare Workers/D1은 Azure Functions/Azure SQL과 아키텍처 패러다임이 근본적으로 다름",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**멀티클라우드 지원 미흡**: Hono의 멀티 런타임 지원만으로는 부족",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "구현 복잡도 (과소평가된 요소)\n**고객사별 커스터마이징의 숨겨진 복잡도**\n- \"플러그인 시스템\"으로 단순화했지만, 실제 고객사 요구는:\n  - 업무 프로세스(워크플로우) 자체의 커스터마이징\n  - 기존 시스템(ERP, CRM)과의 심층 연동\n  - 산업별 규정 준수(금융, 의료 등)를 위한 검증 로직 추가\n- 현재 아키텍처는 **폐쇄형 워크플로우 엔진*",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "기술 리스크 (우선순위별)\n**1위: Azure 마이그레이션 실패**\n- Cloudflare 특정 기능에 대한 의존성 발견 시 재설계 필요\n- 마이그레이션 기간 중 **기능 동결** 필요 → 시장 기회 상실 가능성\n\n**2위: 에이전트 신뢰도 부족으로 인한 수동 작업 증가**\n- AI 생성 코드의 품질이 프로덕션 수준에 미치지 못할 경우\n- \"수동 승인 워",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}

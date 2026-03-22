@@ -1,0 +1,197 @@
+{
+  "timestamp": "2026-03-22T13:19:16.548Z",
+  "totalRounds": 20,
+  "model": "ChatGPT",
+  "modelId": "gpt-4.1",
+  "totalElapsed": "144.9",
+  "totalTokens": 137442,
+  "hatStats": {
+    "white": {
+      "count": 4,
+      "tokens": 28487
+    },
+    "red": {
+      "count": 3,
+      "tokens": 18127
+    },
+    "black": {
+      "count": 3,
+      "tokens": 19123
+    },
+    "yellow": {
+      "count": 3,
+      "tokens": 20047
+    },
+    "green": {
+      "count": 3,
+      "tokens": 21107
+    },
+    "blue": {
+      "count": 4,
+      "tokens": 30551
+    }
+  },
+  "turns": [
+    {
+      "turn": 1,
+      "hat": "white",
+      "role": "사실·데이터",
+      "contentLength": 659,
+      "tokens": 5744,
+      "elapsed": "6.1"
+    },
+    {
+      "turn": 2,
+      "hat": "red",
+      "role": "감정·직관",
+      "contentLength": 443,
+      "tokens": 6049,
+      "elapsed": "4.5"
+    },
+    {
+      "turn": 3,
+      "hat": "black",
+      "role": "비판·리스크",
+      "contentLength": 692,
+      "tokens": 6451,
+      "elapsed": "5.8"
+    },
+    {
+      "turn": 4,
+      "hat": "yellow",
+      "role": "기회·가치",
+      "contentLength": 657,
+      "tokens": 6858,
+      "elapsed": "5.9"
+    },
+    {
+      "turn": 5,
+      "hat": "green",
+      "role": "창의·대안",
+      "contentLength": 672,
+      "tokens": 7291,
+      "elapsed": "6.2"
+    },
+    {
+      "turn": 6,
+      "hat": "blue",
+      "role": "종합·프로세스",
+      "contentLength": 629,
+      "tokens": 7659,
+      "elapsed": "4.8"
+    },
+    {
+      "turn": 7,
+      "hat": "white",
+      "role": "사실·데이터",
+      "contentLength": 501,
+      "tokens": 7953,
+      "elapsed": "3.3"
+    },
+    {
+      "turn": 8,
+      "hat": "red",
+      "role": "감정·직관",
+      "contentLength": 300,
+      "tokens": 5229,
+      "elapsed": "10.6"
+    },
+    {
+      "turn": 9,
+      "hat": "black",
+      "role": "비판·리스크",
+      "contentLength": 569,
+      "tokens": 5561,
+      "elapsed": "8.5"
+    },
+    {
+      "turn": 10,
+      "hat": "yellow",
+      "role": "기회·가치",
+      "contentLength": 480,
+      "tokens": 5862,
+      "elapsed": "10.1"
+    },
+    {
+      "turn": 11,
+      "hat": "green",
+      "role": "창의·대안",
+      "contentLength": 415,
+      "tokens": 6156,
+      "elapsed": "10.1"
+    },
+    {
+      "turn": 12,
+      "hat": "blue",
+      "role": "종합·프로세스",
+      "contentLength": 360,
+      "tokens": 6368,
+      "elapsed": "10.4"
+    },
+    {
+      "turn": 13,
+      "hat": "white",
+      "role": "사실·데이터",
+      "contentLength": 445,
+      "tokens": 6653,
+      "elapsed": "3.7"
+    },
+    {
+      "turn": 14,
+      "hat": "red",
+      "role": "감정·직관",
+      "contentLength": 289,
+      "tokens": 6849,
+      "elapsed": "9.3"
+    },
+    {
+      "turn": 15,
+      "hat": "black",
+      "role": "비판·리스크",
+      "contentLength": 445,
+      "tokens": 7111,
+      "elapsed": "3.5"
+    },
+    {
+      "turn": 16,
+      "hat": "yellow",
+      "role": "기회·가치",
+      "contentLength": 332,
+      "tokens": 7327,
+      "elapsed": "10.2"
+    },
+    {
+      "turn": 17,
+      "hat": "green",
+      "role": "창의·대안",
+      "contentLength": 499,
+      "tokens": 7660,
+      "elapsed": "5.4"
+    },
+    {
+      "turn": 18,
+      "hat": "blue",
+      "role": "종합·프로세스",
+      "contentLength": 417,
+      "tokens": 7913,
+      "elapsed": "11.8"
+    },
+    {
+      "turn": 19,
+      "hat": "white",
+      "role": "사실·데이터",
+      "contentLength": 343,
+      "tokens": 8137,
+      "elapsed": "2.3"
+    },
+    {
+      "turn": 20,
+      "hat": "blue",
+      "role": "종합·프로세스",
+      "contentLength": 691,
+      "tokens": 8611,
+      "elapsed": "12.5"
+    }
+  ],
+  "verdict": "Conditional"
+}
