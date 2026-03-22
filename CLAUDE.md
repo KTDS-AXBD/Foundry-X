@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 34 완료 (111 endpoints, 53 services, 603 API tests + ~61 E2E)
+**현재 상태:** Sprint 35 완료 (114 endpoints, 53 services, 630 API tests + ~61 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -170,7 +170,7 @@ pnpm e2e                          # Playwright E2E (17 specs)
   - Sprint 29: 온보딩 기반 — 가이드 UI + 피드백 API + 체크리스트
   - Sprint 30: 배포 동기화 + Phase 4 Go 판정(Conditional) + 품질 강화 (93%)
   - Sprint 31: 프로덕션 완전 동기화 + SPEC 정합성 + E2E 보강 + 온보딩 킥오프 (95%)
-  - 현재: 50 services, 111 endpoints, 583 API tests, D1 33 테이블
+  - 현재: 53 services, 114 endpoints, 630 API tests, D1 34 테이블
   - PDCA 문서: `docs/archive/2026-03/` (Sprint 3~31 + standalone 전체 archived)
 - **Sprint 32:** ✅ 완료 — PRD v5 완전성 점검 + Phase 5 로드맵 (F156/F157)
   - G1~G12 갭 매핑 (9완료+1진행+2수요대기), Phase 3 11/11 ✅, Phase 4 11/12 ✅
@@ -181,6 +181,9 @@ pnpm e2e                          # Playwright E2E (17 specs)
 - **Sprint 34:** ✅ 완료 — F135 OpenRouter 게이트웨이 통합
   - OpenRouterRunner 구현 (AgentRunner 인터페이스), prompt-utils 추출, 3-way 팩토리
   - 2-Worker Agent Team (1m 30s), 603 API tests, Match Rate 97%
+- **Sprint 35:** ✅ 완료 — F143 모델 비용/품질 대시보드 + F142 Sprint 워크플로우 템플릿
+  - ModelMetricsService + D1 0021 + 3 endpoints, Sprint 워크플로우 3종 + 조건 3종
+  - 2-Worker Agent Team (11m 45s), 630 API tests, Match Rate 92%
 
 ## Git Workflow
 
