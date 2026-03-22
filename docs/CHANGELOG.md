@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #98 (2026-03-23)
+**Sprint 48: ML 하이브리드 SR 분류기 + SR 대시보드 UI (F167+F168, Match Rate 95%)**:
+- ✅ F167: HybridSrClassifier — 규칙 기반 confidence < 0.7이면 LLM 폴백, 앙상블 가중 평균, sr_classification_feedback D1 0031, stats/feedback 3 API endpoints
+- ✅ F168: SR Management 대시보드 — 목록/필터/통계카드/워크플로우 DAG/피드백 다이얼로그, Sidebar 메뉴 추가
+- ✅ CLAUDE.md 수치 현행화 (42줄 Sprint 이력 압축, 수치 6건 갱신)
+- ✅ SPEC drift 보정 3건 (F162/F163/F169 📋→✅, PRD v5→v8 참조)
+
+**검증 결과**: typecheck ✅, API 1029/1029 ✅ (+30), Web 74/74 ✅ (+6), D1 0031 remote 적용 ✅
+**Agent Team**: 2-Worker (4m 45s), 범위 이탈 0건
+
+---
+
 ### 세션 #97 (2026-03-23)
 
 **인프라 자율점검 + 정합성 보정**:

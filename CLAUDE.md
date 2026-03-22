@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 47+F170 완료 (169 endpoints, 78 services, 999 API tests + Web 64 + ~55 E2E)
+**현재 상태:** Sprint 48 완료 (172 endpoints, 79 services, 1029 API tests + Web 74 + ~55 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -72,7 +72,7 @@ foundry-x/
 │   ├── api/                # Hono API Server (Phase 2)
 │   │   └── src/
 │   │       ├── routes/     # 32개: agent, audit, auth, automation-quality, entities, feedback, freshness, github, governance, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, profile, project-overview, proxy, reconciliation, requirements, slack, spec, sr, sso, token, webhook, webhook-registry, wiki, workflow
-│   │       ├── services/   # 78개 (agent-feedback-loop, agent-inbox, agent-marketplace, agent-orchestrator, agent-runner, agent-self-reflection, architect-agent, architect-prompts, audit-logger, auto-fix, auto-rebase, automation-quality-reporter, claude-api-runner, conflict-detector, custom-role-manager, ensemble-voting, entity-registry, entity-sync, evaluation-criteria, evaluator-optimizer, execution-types, fallback-chain, feedback, file-context-collector, freshness-checker, github, github-review, github-sync, harness-rules, health-calc, infra-agent, infra-agent-prompts, integrity-checker, jira-adapter, jira-sync, kpi-logger, kv-cache, llm, logger, mcp-adapter, mcp-registry, mcp-resources, mcp-runner, mcp-sampling, mcp-transport, merge-queue, model-metrics, model-router, monitoring, onboarding-progress, openrouter-runner, org, pii-masker, planner-agent, planner-prompts, pr-pipeline, project-overview, prompt-gateway, prompt-utils, qa-agent, qa-agent-prompts, reconciliation, reviewer-agent, security-agent, security-agent-prompts, service-proxy, slack, spec-parser, sr-classifier, sr-workflow-mapper, sse-manager, sso, test-agent, test-agent-prompts, webhook-registry, wiki-sync, workflow-engine, worktree-manager)
+│   │       ├── services/   # 79개 (agent-feedback-loop, agent-inbox, agent-marketplace, agent-orchestrator, agent-runner, agent-self-reflection, architect-agent, architect-prompts, audit-logger, auto-fix, auto-rebase, automation-quality-reporter, claude-api-runner, conflict-detector, custom-role-manager, ensemble-voting, entity-registry, entity-sync, evaluation-criteria, evaluator-optimizer, execution-types, fallback-chain, feedback, file-context-collector, freshness-checker, github, github-review, github-sync, harness-rules, health-calc, hybrid-sr-classifier, infra-agent, infra-agent-prompts, integrity-checker, jira-adapter, jira-sync, kpi-logger, kv-cache, llm, logger, mcp-adapter, mcp-registry, mcp-resources, mcp-runner, mcp-sampling, mcp-transport, merge-queue, model-metrics, model-router, monitoring, onboarding-progress, openrouter-runner, org, pii-masker, planner-agent, planner-prompts, pr-pipeline, project-overview, prompt-gateway, prompt-utils, qa-agent, qa-agent-prompts, reconciliation, reviewer-agent, security-agent, security-agent-prompts, service-proxy, slack, spec-parser, sr-classifier, sr-workflow-mapper, sse-manager, sso, test-agent, test-agent-prompts, webhook-registry, wiki-sync, workflow-engine, worktree-manager)
 │   │       ├── schemas/    # 32개 Zod 스키마 (agent, audit, auth, automation-quality, common, entity, error, feedback, freshness, github, governance, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, plan, profile, reconciliation, requirements, slack, spec, sr, sso, token, webhook, wiki, workflow)
 │   │       └── index.ts
 │   ├── web/                # Next.js 14 Dashboard + Landing (Phase 2)
@@ -128,14 +128,14 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 
 # API 패키지 단독
 cd packages/api
-pnpm test                         # vitest run (999 tests)
+pnpm test                         # vitest run (1029 tests)
 pnpm test -- --grep "agent"       # 특정 테스트 필터
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # 로컬 서버 실행
 
 # Web 패키지 단독
 cd packages/web
-pnpm test                         # vitest run (68 tests)
+pnpm test                         # vitest run (74 tests)
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # Next.js dev server (localhost:3000)
 pnpm e2e                          # Playwright E2E (17 specs)
@@ -170,7 +170,7 @@ pnpm e2e                          # Playwright E2E (17 specs)
   - Sprint 29: 온보딩 기반 — 가이드 UI + 피드백 API + 체크리스트
   - Sprint 30: 배포 동기화 + Phase 4 Go 판정(Conditional) + 품질 강화 (93%)
   - Sprint 31: 프로덕션 완전 동기화 + SPEC 정합성 + E2E 보강 + 온보딩 킥오프 (95%)
-  - 현재: 78 services, 169 endpoints, 999 API tests, D1 49 테이블
+  - 현재: 79 services, 172 endpoints, 1029 API tests, D1 49 테이블
   - PDCA 문서: `docs/archive/2026-03/` (Sprint 3~31 + standalone 전체 archived)
 - **Sprint 32~47:** ✅ 완료 — Agent Evolution Track A 완결(A1~A18) + Phase 5 고객 파일럿 준비
   - Sprint 32~33: PRD v5 갭 매핑 + gstack/claude-code-router/OpenRouter 설치
@@ -179,6 +179,9 @@ pnpm e2e                          # Playwright E2E (17 specs)
   - Sprint 46~47: PRD v8 재정의 + Azure PoC + 정책 수립 + Adoption KPI 대시보드 (999 API tests)
   - Conditional 4/5 해소 (#4 Adoption 데이터 수집 대기)
   - 상세 이력: MEMORY.md 또는 `git log --oneline` 참조
+- **Sprint 48:** ✅ 완료 — F167 ML 하이브리드 SR 분류기 + F168 SR 대시보드 UI
+  - HybridSrClassifier(규칙+LLM 2-pass) + SR 대시보드(목록/통계/DAG/피드백)
+  - 2-Worker Agent Team (4m 45s), 1029 API tests (+30), Web 74 (+6), Match Rate 95%
 
 ## Git Workflow
 
@@ -210,7 +213,7 @@ cd packages/web && npx @cloudflare/next-on-pages && wrangler pages deploy .verce
 
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
 - **Pages**: `fx.minu.best` (Next.js, CNAME → Cloudflare Pages)
-- **D1**: 30개 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
+- **D1**: 31개 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
 - **CORS 주의**: Pages→Workers 크로스오리진 — `packages/api/src/app.ts`에 CORS 미들웨어 필수
 - **API URL**: `NEXT_PUBLIC_API_URL` 환경변수 — Workers URL + `/api` 경로 포함 필수
 - **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
