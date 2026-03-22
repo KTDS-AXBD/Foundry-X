@@ -12,6 +12,9 @@ export type Env = {
   // Google OAuth
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
+  // Sprint 34: OpenRouter
+  OPENROUTER_API_KEY?: string;
+  OPENROUTER_DEFAULT_MODEL?: string;
   // Sprint 26: Service Bindings
   DX_WORKER?: Fetcher;   // Discovery-X Worker
   AIF_WORKER?: Fetcher;  // AI Foundry Worker

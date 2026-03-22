@@ -4,9 +4,11 @@ import type {
   AgentExecutionRequest,
   AgentExecutionResult,
   AgentRunnerType,
+  AgentTaskType,
 } from "./execution-types.js";
 import { ClaudeApiRunner, MockRunner } from "./claude-api-runner.js";
 import { OpenRouterRunner } from "./openrouter-runner.js";
+import { ModelRouter } from "./model-router.js";
 
 /**
  * 에이전트 실행의 추상화 계층.
@@ -44,4 +46,31 @@ export function createAgentRunner(env: {
     return new ClaudeApiRunner(env.ANTHROPIC_API_KEY);
   }
   return new MockRunner();
+}
+
+/**
+ * F136: 태스크별 모델 라우팅 팩토리
+ * D1 규칙 기반으로 taskType에 맞는 최적 모델의 Runner를 생성.
+ * db 미제공 시 기존 createAgentRunner 로직으로 폴백.
+ */
+export async function createRoutedRunner(
+  env: {
+    OPENROUTER_API_KEY?: string;
+    OPENROUTER_DEFAULT_MODEL?: string;
+    ANTHROPIC_API_KEY?: string;
+  },
+  taskType: AgentTaskType,
+  db?: D1Database,
+): Promise<AgentRunner> {
+  if (db) {
+    const router = new ModelRouter(db);
+    const rule = await router.getModelForTask(taskType);
+    if (rule.runnerType === "openrouter" && env.OPENROUTER_API_KEY) {
+      return new OpenRouterRunner(env.OPENROUTER_API_KEY, rule.modelId);
+    }
+    if (rule.runnerType === "claude-api" && env.ANTHROPIC_API_KEY) {
+      return new ClaudeApiRunner(env.ANTHROPIC_API_KEY, rule.modelId);
+    }
+  }
+  return createAgentRunner(env);
 }

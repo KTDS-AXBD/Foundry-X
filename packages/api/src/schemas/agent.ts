@@ -334,3 +334,88 @@ export const UpdatePriorityRequestSchema = z
 export const rejectPlanBodySchema = z.object({
   reason: z.string().max(1000).optional(),
 });
+
+// ─── Sprint 36: Model Routing Schemas (F136) ───
+
+const allTaskTypes = z.enum([
+  "code-review", "code-generation", "spec-analysis",
+  "test-generation", "policy-evaluation", "skill-query", "ontology-lookup",
+]);
+
+export const RoutingRuleSchema = z
+  .object({
+    id: z.string(),
+    taskType: allTaskTypes,
+    modelId: z.string(),
+    runnerType: z.enum(["openrouter", "claude-api", "mcp", "mock"]),
+    priority: z.number().int().min(1),
+    maxCostPerCall: z.number().nullable(),
+    enabled: z.boolean(),
+  })
+  .openapi("RoutingRule");
+
+export const UpdateRoutingRuleRequestSchema = z
+  .object({
+    modelId: z.string().describe("OpenRouter 모델 ID (e.g., anthropic/claude-sonnet-4)"),
+    priority: z.number().int().min(1).default(1).optional(),
+    maxCostPerCall: z.number().nullable().optional(),
+    enabled: z.boolean().default(true).optional(),
+  })
+  .openapi("UpdateRoutingRuleRequest");
+
+export const RoutingRulesResponseSchema = z
+  .object({
+    rules: z.array(RoutingRuleSchema),
+    defaults: z.record(z.string()),
+  })
+  .openapi("RoutingRulesResponse");
+
+// ─── Sprint 36: Evaluator-Optimizer Schemas (F137) ───
+
+export const EvaluationScoreSchema = z
+  .object({
+    criteriaName: z.string(),
+    score: z.number().min(0).max(100),
+    passed: z.boolean(),
+    feedback: z.array(z.string()),
+    details: z.record(z.unknown()),
+  })
+  .openapi("EvaluationScore");
+
+export const EvaluateOptimizeRequestSchema = z
+  .object({
+    taskType: allTaskTypes,
+    context: z.object({
+      repoUrl: z.string().default("https://github.com/KTDS-AXBD/Foundry-X"),
+      branch: z.string().default("master"),
+      targetFiles: z.array(z.string()).optional(),
+      spec: z.object({
+        title: z.string(),
+        description: z.string(),
+        acceptanceCriteria: z.array(z.string()),
+      }).optional(),
+      instructions: z.string().max(2000).optional(),
+    }),
+    config: z.object({
+      maxIterations: z.number().int().min(1).max(5).default(3),
+      qualityThreshold: z.number().min(0).max(100).default(80),
+      criteria: z.array(z.enum(["code-review", "test-coverage", "spec-compliance"])),
+    }),
+  })
+  .openapi("EvaluateOptimizeRequest");
+
+export const EvaluationLoopResultSchema = z
+  .object({
+    finalResult: AgentExecutionResultSchema,
+    finalScore: z.number(),
+    iterations: z.number(),
+    converged: z.boolean(),
+    totalTokensUsed: z.number(),
+    totalDuration: z.number(),
+    history: z.array(z.object({
+      iteration: z.number(),
+      aggregateScore: z.number(),
+      feedback: z.array(z.string()),
+    })),
+  })
+  .openapi("EvaluationLoopResult");

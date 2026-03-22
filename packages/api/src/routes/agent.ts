@@ -953,3 +953,139 @@ agentRoute.get("/worktrees", async (c) => {
   const worktrees = manager.list();
   return c.json({ worktrees });
 });
+
+// ─── Sprint 36: Model Routing (F136) ───
+
+import { ModelRouter, DEFAULT_MODEL_MAP } from "../services/model-router.js";
+import {
+  RoutingRulesResponseSchema,
+  UpdateRoutingRuleRequestSchema,
+  RoutingRuleSchema,
+  EvaluateOptimizeRequestSchema,
+  EvaluationLoopResultSchema,
+} from "../schemas/agent.js";
+
+const getRoutingRules = createRoute({
+  method: "get",
+  path: "/agents/routing-rules",
+  summary: "모델 라우팅 규칙 조회",
+  tags: ["Agent"],
+  responses: {
+    200: { content: { "application/json": { schema: RoutingRulesResponseSchema } }, description: "라우팅 규칙 목록" },
+  },
+});
+
+agentRoute.openapi(getRoutingRules, async (c) => {
+  const router = new ModelRouter(c.env.DB);
+  const rules = await router.listRules();
+  return c.json({ rules, defaults: DEFAULT_MODEL_MAP }, 200);
+});
+
+const updateRoutingRule = createRoute({
+  method: "put",
+  path: "/agents/routing-rules/{taskType}",
+  summary: "모델 라우팅 규칙 변경",
+  tags: ["Agent"],
+  request: {
+    params: z.object({ taskType: z.string() }),
+    body: { content: { "application/json": { schema: UpdateRoutingRuleRequestSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: RoutingRuleSchema } }, description: "갱신된 규칙" },
+    400: { content: { "application/json": { schema: z.object({ error: z.string() }) } }, description: "잘못된 taskType" },
+  },
+});
+
+agentRoute.openapi(updateRoutingRule, async (c) => {
+  const { taskType } = c.req.valid("param");
+  const validTypes = ["code-review", "code-generation", "spec-analysis", "test-generation", "policy-evaluation", "skill-query", "ontology-lookup"];
+  if (!validTypes.includes(taskType)) {
+    return c.json({ error: `Invalid taskType: ${taskType}` }, 400);
+  }
+  const body = c.req.valid("json");
+  const router = new ModelRouter(c.env.DB);
+  const rule = await router.upsertRule(taskType as any, body);
+  return c.json(rule, 200);
+});
+
+// ─── Sprint 36: Evaluator-Optimizer (F137) ───
+
+import { EvaluatorOptimizer } from "../services/evaluator-optimizer.js";
+import { CodeReviewCriteria, TestCoverageCriteria, SpecComplianceCriteria } from "../services/evaluation-criteria.js";
+import { createRoutedRunner } from "../services/agent-runner.js";
+
+const CRITERIA_MAP: Record<string, () => import("../services/evaluation-criteria.js").EvaluationCriteria> = {
+  "code-review": () => new CodeReviewCriteria(),
+  "test-coverage": () => new TestCoverageCriteria(),
+  "spec-compliance": () => new SpecComplianceCriteria(),
+};
+
+const evaluateOptimize = createRoute({
+  method: "post",
+  path: "/agents/evaluate-optimize",
+  summary: "Evaluator-Optimizer 루프 실행",
+  tags: ["Agent"],
+  request: {
+    body: { content: { "application/json": { schema: EvaluateOptimizeRequestSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: EvaluationLoopResultSchema } }, description: "E-O 루프 결과" },
+    400: { content: { "application/json": { schema: z.object({ error: z.string() }) } }, description: "잘못된 요청" },
+  },
+});
+
+agentRoute.openapi(evaluateOptimize, async (c) => {
+  const body = c.req.valid("json");
+  const { taskType, context, config } = body;
+
+  const criteria = config.criteria
+    .map((name) => CRITERIA_MAP[name]?.())
+    .filter(Boolean) as import("../services/evaluation-criteria.js").EvaluationCriteria[];
+
+  if (criteria.length === 0) {
+    return c.json({ error: "No valid criteria specified" }, 400);
+  }
+
+  const runner = await createRoutedRunner(
+    { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
+    taskType as any,
+    c.env.DB,
+  );
+
+  const optimizer = new EvaluatorOptimizer({
+    maxIterations: config.maxIterations ?? 3,
+    qualityThreshold: config.qualityThreshold ?? 80,
+    criteria,
+    generatorRunner: runner,
+  });
+
+  const request = {
+    taskId: `eo_${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`,
+    agentId: "evaluator-optimizer",
+    taskType: taskType as any,
+    context: {
+      repoUrl: context.repoUrl,
+      branch: context.branch,
+      targetFiles: context.targetFiles,
+      spec: context.spec,
+      instructions: context.instructions,
+    },
+    constraints: [],
+  };
+
+  const result = await optimizer.run(request);
+
+  return c.json({
+    finalResult: result.finalResult,
+    finalScore: result.finalScore,
+    iterations: result.iterations,
+    converged: result.converged,
+    totalTokensUsed: result.totalTokensUsed,
+    totalDuration: result.totalDuration,
+    history: result.history.map((h) => ({
+      iteration: h.iteration,
+      aggregateScore: h.aggregateScore,
+      feedback: h.feedback,
+    })),
+  }, 200);
+});
