@@ -22,7 +22,7 @@
 | FX-PLAN-002 | Plumb Internal Contracts | 1.0 | Draft | [01-plan/features/plumb-contracts.plan.md](01-plan/features/plumb-contracts.plan.md) |
 | FX-PLAN-003 | Sprint 3 (v0.3.0) — Ink TUI, eslint, 안정화 | 0.1 | Draft | [01-plan/features/sprint-3.plan.md](01-plan/features/sprint-3.plan.md) |
 | FX-PLAN-004 | F21: 프로젝트 관리 점검 및 개선 | 0.1 | Draft | [01-plan/features/프로젝트-관리-개선.plan.md](01-plan/features/프로젝트-관리-개선.plan.md) |
-| FX-PLAN-134 | F134: 프로젝트 버전 관리 정책 수립 | 1.0 | Active | [01-plan/features/versioning-policy.plan.md](01-plan/features/versioning-policy.plan.md) |
+| FX-PLAN-134 | F134: 프로젝트 버전 관리 정책 수립 | 1.0 | Archived | [archive/2026-03/versioning-policy/versioning-policy.plan.md](archive/2026-03/versioning-policy/versioning-policy.plan.md) |
 
 ## DSGN
 
@@ -31,19 +31,19 @@
 | FX-DSGN-001 | Foundry-X CLI MVP Design | 2.0 | Draft | [02-design/features/foundry-x-cli.design.md](02-design/features/foundry-x-cli.design.md) |
 | FX-DSGN-003 | Sprint 3 (v0.3.0) — Ink TUI + eslint | 0.1 | Draft | [02-design/features/sprint-3.design.md](02-design/features/sprint-3.design.md) |
 | FX-DSGN-004 | F21: 프로젝트 관리 점검 및 개선 | 0.1 | Draft | [02-design/features/프로젝트-관리-개선.design.md](02-design/features/프로젝트-관리-개선.design.md) |
-| FX-DSGN-134 | F134: 버전 관리 정책 수립 — 상세 설계 | 1.0 | Draft | [02-design/features/versioning-policy.design.md](02-design/features/versioning-policy.design.md) |
+| FX-DSGN-134 | F134: 버전 관리 정책 수립 — 상세 설계 | 1.0 | Archived | [archive/2026-03/versioning-policy/versioning-policy.design.md](archive/2026-03/versioning-policy/versioning-policy.design.md) |
 
 ## ANLS
 
 | 코드 | 제목 | 버전 | 상태 | 파일 |
 |------|------|:----:|:----:|------|
-| FX-ANLS-134 | F134: 버전 관리 정책 — Gap Analysis | 1.0 | Active | [03-analysis/features/versioning-policy.analysis.md](03-analysis/features/versioning-policy.analysis.md) |
+| FX-ANLS-134 | F134: 버전 관리 정책 — Gap Analysis | 1.0 | Archived | [archive/2026-03/versioning-policy/versioning-policy.analysis.md](archive/2026-03/versioning-policy/versioning-policy.analysis.md) |
 
 ## RPRT
 
 | 코드 | 제목 | 버전 | 상태 | 파일 |
 |------|------|:----:|:----:|------|
-| FX-RPRT-134 | F134: 버전 관리 정책 완료 보고서 | 1.0 | Active | [04-report/features/versioning-policy.report.md](04-report/features/versioning-policy.report.md) |
+| FX-RPRT-134 | F134: 버전 관리 정책 완료 보고서 | 1.0 | Archived | [archive/2026-03/versioning-policy/versioning-policy.report.md](archive/2026-03/versioning-policy/versioning-policy.report.md) |
 
 ## 기타 설계 참조
 

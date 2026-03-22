@@ -37,6 +37,7 @@
 | f79-axis-ds-redesign | 96% | 2026-03-19 | 2026-03-22 |
 | f119-landing-page-update | 98% | 2026-03-20 | 2026-03-22 |
 | planner-external-tools | 96% | 2026-03-19 | 2026-03-22 |
+| versioning-policy | 96% | 2026-03-22 (1 session) | 2026-03-22 |
 | phase-2 | 84% | 2026-03-17 | 2026-03-22 |
 
 ## foundry-x-cli
