@@ -39,6 +39,7 @@
 | planner-external-tools | 96% | 2026-03-19 | 2026-03-22 |
 | versioning-policy | 96% | 2026-03-22 (1 session) | 2026-03-22 |
 | phase-2 | 84% | 2026-03-17 | 2026-03-22 |
+| track-b-dev-tools | 94% | 2026-03-22 (Sprint 33) | 2026-03-22 |
 
 ## foundry-x-cli
 
