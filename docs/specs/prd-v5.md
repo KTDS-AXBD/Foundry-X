@@ -458,7 +458,7 @@ PRD v4 명세 대비 구현 과정에서 합리적으로 변경된 사항을 공
 > Sprint 6~17. 79 endpoints, 33 services, 502 API tests + 51 E2E.
 > v1.0.0~v1.5.0 릴리스 완료.
 
-### Phase 3: 통합 준비 — 🔧 진행 중 (v1.6.0~v1.8.1+)
+### Phase 3: 통합 준비 — ✅ 완료 (v1.6.0~v2.0.0, Sprint 18~25)
 
 ```
 범위:
@@ -495,7 +495,7 @@ Kill 조건:
   - 3개 서비스 기술 스택 통일 불가 판단
 ```
 
-### Phase 4: 통합 실행 — 📋 계획
+### Phase 4: 통합 실행 — ✅ Go 판정 완료 (v2.1.0~, Sprint 26~31)
 
 ```
 범위:
@@ -593,16 +593,16 @@ Kill 조건:
 
 | # | Question | Owner | Status | 비고 |
 |---|----------|-------|:------:|------|
-| Q1 | Plumb Track B 전환 기준 도달 여부 | 아키텍트 | ⚠️ 미결정 | Phase 3-D에서 판정 예정 |
+| Q1 | Plumb Track B 전환 기준 도달 여부 | 아키텍트 | ✅ 해소 | Stay Track A (ADR-001, Sprint 28 F105, 재판정 2026-09-21) |
 | Q2 | 에이전트 오케스트레이션 프로토콜 (MCP vs REST) | 아키텍트 | ✅ 해소 | MCP 채택 + REST 병행 |
 | Q3 | 외부 파트너/SI 범위 및 역할 분담 | PM | ❌ 미해소 | Phase 5 착수 전 결정 |
-| Q4 | KT DS SR 시나리오 상세 요구사항 | PM | ❌ 미해소 | 템플릿만 존재, 실 SR 유형 미정의 |
+| Q4 | KT DS SR 시나리오 상세 요구사항 | PM | ✅ 해소 | Sprint 44 F116 — SrClassifier 5종 분류 + SrWorkflowMapper 에이전트 DAG 구현 |
 | Q5 | CLAUDE.md ↔ AGENTS.md 동기화 기준 | 아키텍트 | ✅ 해소 | CI 워크플로우 자동 검증 |
 | Q6 | Harness Evolution Rules 위반 시 처리 방식 | 아키텍트 | ⚠️ 부분 | 규칙 문서화 완료, 자동 감지/차단 미구현 |
 | **Q7** | Discovery-X 기술 스택 상세 (Foundry-X 통일 가능 여부) | 아키텍트 | ❌ 미확인 | **v5 신규** — Phase 3 착수 전 점검 필수 |
 | **Q8** | AI Foundry 기술 스택 상세 (Workers 호환 여부) | 아키텍트 | ❌ 미확인 | **v5 신규** — Phase 3 착수 전 점검 필수 |
 | **Q9** | AXIS DS 현재 구현 형태 (npm? Figma? 가이드라인?) | 디자이너 | ❌ 미확인 | **v5 신규** — Phase 3-C 착수 전 점검 필수 |
-| **Q10** | 통합 시 인증 SSO 방식 (토큰 공유? OAuth? 프록시?) | 아키텍트 | ❌ 미확인 | **v5 신규** — Phase 4-B에서 결정 |
+| **Q10** | 통합 시 인증 SSO 방식 (토큰 공유? OAuth? 프록시?) | 아키텍트 | ⚠️ 부분 | SSO Hub Token 방식 구현 완료 (Sprint 26 F109), OAuth 프록시는 미구현 |
 
 ---
 
