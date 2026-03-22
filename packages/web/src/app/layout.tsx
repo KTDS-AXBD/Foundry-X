@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Syne, JetBrains_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { GoogleAuthProvider } from "@/components/google-auth-provider";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -41,7 +42,9 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <ThemeProvider defaultTheme="dark">
-          {children}
+          <GoogleAuthProvider>
+            {children}
+          </GoogleAuthProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -17,6 +17,7 @@
     "@axis-ds/theme": "1.1.1",
     "@axis-ds/tokens": "1.1.1",
     "@axis-ds/ui-react": "1.1.1",
+    "@react-oauth/google": "^0.13.4",
     "@tailwindcss/postcss": "^4.2.1",
     "@xyflow/react": "^12.10.1",
     "autoprefixer": "^10.4.27",

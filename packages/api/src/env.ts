@@ -9,6 +9,9 @@ export type Env = {
   ANTHROPIC_API_KEY?: string;
   WEBHOOK_SECRET?: string;
   SENTRY_DSN?: string;
+  // Google OAuth
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
   // Sprint 26: Service Bindings
   DX_WORKER?: Fetcher;   // Discovery-X Worker
   AIF_WORKER?: Fetcher;  // AI Foundry Worker

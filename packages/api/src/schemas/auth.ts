@@ -44,3 +44,9 @@ export const TokenPairSchema = z
     expiresIn: z.number(),
   })
   .openapi("TokenPair");
+
+export const GoogleAuthSchema = z
+  .object({
+    credential: z.string().min(1, "Google credential is required"),
+  })
+  .openapi("GoogleAuthRequest");

@@ -13,6 +13,7 @@ import {
   RefreshSchema,
   AuthResponseSchema,
   TokenPairSchema,
+  GoogleAuthSchema,
 } from "../schemas/auth.js";
 import { ErrorSchema, validationHook } from "../schemas/common.js";
 import { SwitchOrgSchema, InvitationTokenSchema } from "../schemas/org.js";
@@ -355,4 +356,124 @@ authRoute.openapi(acceptInvitation, async (c) => {
     if (e instanceof OrgError) return c.json({ error: e.message }, e.status as any);
     throw e;
   }
+});
+
+// ─── POST /auth/google ───
+
+interface GoogleTokenPayload {
+  sub: string;
+  email: string;
+  email_verified: boolean;
+  name: string;
+  picture?: string;
+}
+
+const googleAuth = createRoute({
+  method: "post",
+  path: "/auth/google",
+  tags: ["Auth"],
+  summary: "Login or signup with Google ID Token",
+  request: {
+    body: { content: { "application/json": { schema: GoogleAuthSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: AuthResponseSchema } }, description: "Google auth successful" },
+    401: { content: { "application/json": { schema: ErrorSchema } }, description: "Invalid Google token" },
+  },
+});
+
+authRoute.openapi(googleAuth, async (c) => {
+  const { credential } = c.req.valid("json");
+  const clientId = c.env.GOOGLE_CLIENT_ID;
+  if (!clientId) {
+    return c.json({ error: "Google OAuth not configured", errorCode: "AUTH_005" }, 500 as any);
+  }
+
+  // Verify Google ID Token via Google's tokeninfo endpoint
+  const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
+  if (!verifyRes.ok) {
+    return c.json({ error: "Invalid Google token", errorCode: "AUTH_005" }, 401);
+  }
+  const googleUser = await verifyRes.json() as GoogleTokenPayload;
+
+  // Verify audience matches our client ID
+  const tokenData = googleUser as GoogleTokenPayload & { aud?: string };
+  if (tokenData.aud !== clientId) {
+    return c.json({ error: "Token audience mismatch", errorCode: "AUTH_005" }, 401);
+  }
+
+  if (!googleUser.email_verified) {
+    return c.json({ error: "Google email not verified", errorCode: "AUTH_005" }, 401);
+  }
+
+  const db = getDb(c.env.DB);
+
+  // Check if user exists
+  const [existing] = await db.select().from(users).where(eq(users.email, googleUser.email));
+
+  let userId: string;
+  let userName: string;
+  let userRole: "admin" | "member" | "viewer" = "member";
+
+  if (existing) {
+    // Existing user — update provider info if needed
+    userId = existing.id;
+    userName = existing.name;
+    userRole = existing.role as "admin" | "member" | "viewer";
+    if (!existing.authProvider || existing.authProvider === "email") {
+      await c.env.DB.prepare(
+        "UPDATE users SET auth_provider = 'google', provider_id = ?, updated_at = datetime('now') WHERE id = ?"
+      ).bind(googleUser.sub, existing.id).run();
+    }
+  } else {
+    // New user — create account
+    userId = crypto.randomUUID();
+    userName = googleUser.name;
+    const now = new Date().toISOString();
+    await db.insert(users).values({
+      id: userId,
+      email: googleUser.email,
+      name: userName,
+      role: "member",
+      authProvider: "google",
+      providerId: googleUser.sub,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    // Auto-create personal org
+    const orgId = `org_${userId.slice(0, 8)}`;
+    const orgSlug = googleUser.email.split("@")[0]!.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+    await c.env.DB.prepare(
+      "INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)"
+    ).bind(orgId, `${userName}'s Org`, orgSlug).run();
+    await c.env.DB.prepare(
+      "INSERT OR IGNORE INTO org_members (org_id, user_id, role) VALUES (?, ?, 'owner')"
+    ).bind(orgId, userId).run();
+  }
+
+  // Resolve org membership
+  const orgMembership = await c.env.DB.prepare(
+    "SELECT org_id, role FROM org_members WHERE user_id = ? ORDER BY joined_at ASC LIMIT 1"
+  ).bind(userId).first<{ org_id: string; role: string }>();
+
+  const secret = c.env.JWT_SECRET ?? "dev-secret";
+  const { _refreshJti, ...tokens } = await createTokenPair({
+    id: userId,
+    email: googleUser.email,
+    role: userRole,
+    orgId: orgMembership?.org_id ?? "",
+    orgRole: (orgMembership?.role ?? "member") as "owner" | "admin" | "member" | "viewer",
+  }, secret);
+
+  await db.insert(refreshTokens).values({
+    jti: _refreshJti,
+    userId,
+    expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
+  });
+
+  return c.json({
+    user: { id: userId, email: googleUser.email, name: userName, role: userRole },
+    ...tokens,
+  });
 });

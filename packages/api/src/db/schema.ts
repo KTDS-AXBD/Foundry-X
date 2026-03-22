@@ -9,6 +9,8 @@ export const users = sqliteTable("users", {
     .notNull()
     .default("member"),
   passwordHash: text("password_hash"),
+  authProvider: text("auth_provider").default("email"),
+  providerId: text("provider_id"),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });
