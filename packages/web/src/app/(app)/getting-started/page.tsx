@@ -11,6 +11,10 @@ import {
   CheckCircle2,
   Circle,
   Loader2,
+  Inbox,
+  TrendingUp,
+  RotateCcw,
+  ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -29,49 +33,75 @@ import {
   type OnboardingProgress,
   type OnboardingStep,
 } from "@/lib/api-client";
+import { useRestartTour } from "@/components/feature/OnboardingTour";
 
-// ─── Feature Cards Data ───
+// ─── 3대 업무 동선 퀵스타트 ───
 
-const featureCards = [
+const workflowCards = [
   {
-    href: "/dashboard",
-    icon: LayoutDashboard,
-    title: "Dashboard",
-    description: "프로젝트 건강도와 SDD Triangle 상태를 한눈에 확인",
-    color: "text-blue-500",
-    bg: "bg-blue-500/10",
-  },
-  {
-    href: "/agents",
-    icon: Bot,
-    title: "Agents",
-    description: "AI 에이전트의 작업 현황과 PR 파이프라인 관리",
-    color: "text-green-500",
-    bg: "bg-green-500/10",
+    href: "/sr",
+    icon: Inbox,
+    title: "📥 SR 처리하기",
+    subtitle: "SR 접수 → AI 분류 → 제안서",
+    description:
+      "고객 서비스 요청(SR)을 접수하면 AI가 자동으로 유형을 분류하고, 워크플로우를 매핑해요.",
+    cta: "SR 관리로 이동",
+    color: "text-axis-primary",
+    bg: "bg-axis-primary/10",
+    border: "border-axis-primary/20",
   },
   {
     href: "/spec-generator",
     icon: FileText,
-    title: "Spec Generator",
-    description: "자연어를 구조화된 명세로 변환",
-    color: "text-purple-500",
-    bg: "bg-purple-500/10",
+    title: "📝 아이디어 → 명세",
+    subtitle: "아이디어 → Spec 생성 → 에이전트 실행",
+    description:
+      "아이디어를 자연어로 입력하면 구조화된 명세가 자동 생성돼요. 에이전트가 바로 작업을 시작해요.",
+    cta: "Spec 생성으로 이동",
+    color: "text-axis-accent",
+    bg: "bg-axis-accent/10",
+    border: "border-axis-accent/20",
+  },
+  {
+    href: "/dashboard",
+    icon: TrendingUp,
+    title: "📈 현황 확인하기",
+    subtitle: "대시보드 → KPI → 비용",
+    description:
+      "프로젝트 건강도, 스프린트 상태, KPI 지표, 토큰 비용을 한눈에 모니터링하세요.",
+    cta: "대시보드로 이동",
+    color: "text-axis-green",
+    bg: "bg-axis-green/10",
+    border: "border-axis-green/20",
+  },
+];
+
+// ─── Feature Cards Data (기존 — 하단 보조) ───
+
+const featureCards = [
+  {
+    href: "/agents",
+    icon: Bot,
+    title: "에이전트",
+    description: "AI 에이전트의 작업 현황과 PR 파이프라인 관리",
+    color: "text-axis-primary",
+    bg: "bg-axis-primary/10",
   },
   {
     href: "/architecture",
     icon: Blocks,
-    title: "Architecture",
+    title: "아키텍처",
     description: "코드 아키텍처를 4가지 뷰로 시각화",
-    color: "text-orange-500",
-    bg: "bg-orange-500/10",
+    color: "text-axis-warm",
+    bg: "bg-axis-warm/10",
   },
   {
     href: "/wiki",
     icon: BookOpen,
-    title: "Wiki",
+    title: "지식베이스",
     description: "팀 지식을 구조화하고 AI가 자동 업데이트",
-    color: "text-cyan-500",
-    bg: "bg-cyan-500/10",
+    color: "text-axis-violet",
+    bg: "bg-axis-violet/10",
   },
 ];
 
@@ -112,18 +142,38 @@ const faqItems = [
 
 // ─── Welcome Banner ───
 
-function WelcomeBanner({ progressPercent }: { progressPercent: number }) {
+function WelcomeBanner({
+  progressPercent,
+  onRestartTour,
+}: {
+  progressPercent: number;
+  onRestartTour: () => void;
+}) {
   return (
-    <div className="rounded-lg border bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 p-6">
-      <h1 className="mb-2 text-2xl font-bold">Foundry-X 시작하기</h1>
-      <p className="mb-4 text-sm text-muted-foreground">
-        아래 가이드를 따라 Foundry-X의 주요 기능을 살펴보고, 온보딩 체크리스트를
-        완료해 보세요.
-      </p>
+    <div className="rounded-xl border border-axis-primary/20 bg-gradient-to-r from-axis-primary/5 via-axis-primary/10 to-axis-accent/5 p-6">
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="mb-2 text-2xl font-bold font-display">
+            Foundry-X 시작하기
+          </h1>
+          <p className="mb-4 text-sm text-muted-foreground">
+            아래 3가지 업무 동선을 확인하고, 바로 시작해 보세요.
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onRestartTour}
+          className="shrink-0 gap-1.5 text-xs"
+        >
+          <RotateCcw className="size-3" />
+          투어 다시 보기
+        </Button>
+      </div>
       <div className="flex items-center gap-3">
         <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
           <div
-            className="h-full rounded-full bg-primary transition-all duration-500"
+            className="h-full rounded-full bg-axis-primary transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -135,13 +185,64 @@ function WelcomeBanner({ progressPercent }: { progressPercent: number }) {
   );
 }
 
-// ─── Feature Cards ───
+// ─── 3대 동선 퀵스타트 카드 ───
+
+function WorkflowQuickstart() {
+  return (
+    <section>
+      <h2 className="mb-1 text-lg font-semibold font-display">
+        어디서부터 시작할까요?
+      </h2>
+      <p className="mb-4 text-sm text-muted-foreground">
+        아래 3가지 업무 흐름 중 하나를 선택해서 바로 시작하세요.
+      </p>
+      <div className="grid gap-4 md:grid-cols-3">
+        {workflowCards.map((card) => (
+          <Link key={card.href} href={card.href} className="group">
+            <Card
+              className={cn(
+                "flex h-full flex-col border transition-all duration-200 hover:shadow-md",
+                card.border,
+              )}
+            >
+              <CardHeader className="pb-2">
+                <div
+                  className={cn(
+                    "mb-2 flex size-10 items-center justify-center rounded-lg",
+                    card.bg,
+                  )}
+                >
+                  <card.icon className={cn("size-5", card.color)} />
+                </div>
+                <CardTitle className="text-base">{card.title}</CardTitle>
+                <p className="text-xs font-medium text-muted-foreground/80">
+                  {card.subtitle}
+                </p>
+              </CardHeader>
+              <CardContent className="flex flex-1 flex-col pt-0">
+                <CardDescription className="flex-1">
+                  {card.description}
+                </CardDescription>
+                <div className="mt-3 flex items-center gap-1.5 text-sm font-medium text-axis-primary group-hover:underline">
+                  {card.cta}
+                  <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ─── 보조 기능 카드 ───
 
 function FeatureCardsSection() {
   return (
     <section>
-      <h2 className="mb-4 text-lg font-semibold">주요 기능</h2>
-      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <h2 className="mb-4 text-lg font-semibold">더 알아보기</h2>
+      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
         {featureCards.map((card) => (
           <Card key={card.href} className="flex flex-col">
             <CardHeader className="pb-2">
@@ -350,6 +451,7 @@ export default function GettingStartedPage() {
   const [progress, setProgress] = useState<OnboardingProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const restartTour = useRestartTour();
 
   useEffect(() => {
     let cancelled = false;
@@ -412,7 +514,12 @@ export default function GettingStartedPage() {
 
   return (
     <div className="space-y-8">
-      <WelcomeBanner progressPercent={progressPercent} />
+      <WelcomeBanner
+        progressPercent={progressPercent}
+        onRestartTour={restartTour}
+      />
+
+      <WorkflowQuickstart />
 
       <FeatureCardsSection />
 

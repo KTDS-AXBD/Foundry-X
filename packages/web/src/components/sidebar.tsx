@@ -85,7 +85,7 @@ const navGroups: NavGroup[] = [
     label: "현황",
     icon: TrendingUp,
     items: [
-      { href: "/projects", label: "프로젝트", icon: FolderKanban },
+      { href: "/projects", label: "프로젝트 현황", icon: FolderKanban },
       { href: "/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/tokens", label: "토큰 비용", icon: Coins },
     ],
