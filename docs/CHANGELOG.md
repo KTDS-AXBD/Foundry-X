@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #97 (2026-03-23)
+
+**인프라 자율점검 + 정합성 보정**:
+- ✅ `/ax-infra-selfcheck`: 8항목 점검 — 6 PASS + 2 SKIP, ax-req-integrity.md frontmatter 포맷 통일
+- ✅ `/ax-req-integrity check`: SPEC↔GitHub↔MEMORY 5단계 검증 — 10건 불일치 감지
+- ✅ `/ax-req-integrity fix`: GitHub Issues 4건 보정 (F164~F166 close + F170 #160 생성+close)
+- ✅ SPEC.md v5.22→v5.23: §2 수치 갱신 (999/131/68 tests, 169 ep, 78 svc, 49 tables), Sprint 46~47 상태 2행 추가, system-version Sprint 47
+
+---
+
 ### 세션 #96 (2026-03-22~23)
 
 **Sprint 47 — 커스터마이징 범위 + 법적/윤리/거버넌스 정책 (F164+F165+F166, Match Rate 93%) + F170 Adoption KPI 대시보드**:

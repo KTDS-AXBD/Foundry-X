@@ -104,8 +104,8 @@ foundry-x/
 | `docs/specs/interview-log.md` | 요구사항 인터뷰 종합 (Part 1-5) |
 | `docs/02-design/features/tech-stack-review.design.md` | 기술 스택 결정 근거 |
 | `docs/02-design/features/mcp-protocol.design.md` | MCP 프로토콜 설계 |
-| `docs/01-plan/features/sprint-{N}.plan.md` | Sprint별 Plan (3~17, archived: 3~13,17) |
-| `docs/02-design/features/sprint-{N}.design.md` | Sprint별 Design (3~17, archived: 3~13,17) |
+| `docs/01-plan/features/sprint-{N}.plan.md` | Sprint별 Plan (3~47, 대부분 `docs/archive/`로 이관) |
+| `docs/02-design/features/sprint-{N}.design.md` | Sprint별 Design (3~47, 대부분 `docs/archive/`로 이관) |
 | `docs/review/round-1/` | 1차 다중 AI 검토 (ChatGPT, Gemini, Claude, Grok) |
 | `docs/review/round-2/` | 2차 검토 및 최종 착수 판정 |
 
@@ -120,7 +120,7 @@ turbo typecheck                   # 전체 타입체크
 
 # CLI 패키지 단독
 cd packages/cli
-pnpm test                         # vitest run
+pnpm test                         # vitest run (131 tests)
 pnpm test -- --grep "Header"      # 특정 테스트 필터
 pnpm lint                         # eslint src/ (flat config)
 pnpm typecheck                    # tsc --noEmit
@@ -128,14 +128,14 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 
 # API 패키지 단독
 cd packages/api
-pnpm test                         # vitest run (953 tests)
+pnpm test                         # vitest run (999 tests)
 pnpm test -- --grep "agent"       # 특정 테스트 필터
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # 로컬 서버 실행
 
 # Web 패키지 단독
 cd packages/web
-pnpm test                         # vitest run (64 tests)
+pnpm test                         # vitest run (68 tests)
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # Next.js dev server (localhost:3000)
 pnpm e2e                          # Playwright E2E (17 specs)
@@ -170,57 +170,15 @@ pnpm e2e                          # Playwright E2E (17 specs)
   - Sprint 29: 온보딩 기반 — 가이드 UI + 피드백 API + 체크리스트
   - Sprint 30: 배포 동기화 + Phase 4 Go 판정(Conditional) + 품질 강화 (93%)
   - Sprint 31: 프로덕션 완전 동기화 + SPEC 정합성 + E2E 보강 + 온보딩 킥오프 (95%)
-  - 현재: 78 services, 168 endpoints, 999 API tests, D1 42 테이블
+  - 현재: 78 services, 169 endpoints, 999 API tests, D1 49 테이블
   - PDCA 문서: `docs/archive/2026-03/` (Sprint 3~31 + standalone 전체 archived)
-- **Sprint 32:** ✅ 완료 — PRD v5 완전성 점검 + Phase 5 로드맵 (F156/F157)
-  - G1~G12 갭 매핑 (9완료+1진행+2수요대기), Phase 3 11/11 ✅, Phase 4 11/12 ✅
-  - Phase 5 Layer 1~4 분류 + 온보딩 4주 추적 계획
-- **Sprint 33:** ✅ 완료 — Agent Evolution Track B (F153~F155)
-  - gstack 25개 스킬 설치 + claude-code-router + OpenRouter API 키
-  - Match Rate 94%
-- **Sprint 34:** ✅ 완료 — F135 OpenRouter 게이트웨이 통합
-  - OpenRouterRunner 구현 (AgentRunner 인터페이스), prompt-utils 추출, 3-way 팩토리
-  - 2-Worker Agent Team (1m 30s), 603 API tests, Match Rate 97%
-- **Sprint 35:** ✅ 완료 — F143 모델 비용/품질 대시보드 + F142 Sprint 워크플로우 템플릿
-  - ModelMetricsService + D1 0021 + 3 endpoints, Sprint 워크플로우 3종 + 조건 3종
-  - 2-Worker Agent Team (11m 45s), 630 API tests, Match Rate 92%
-- **Sprint 36:** ✅ 완료 — F136 태스크별 모델 라우팅 + F137 Evaluator-Optimizer 패턴
-  - ModelRouter + createRoutedRunner() + D1 0022, EvaluatorOptimizer + 3종 EvaluationCriteria
-  - 2-Worker Agent Team (3m 15s), 666 API tests, Match Rate 96%
-- **Sprint 37:** ✅ 완료 — F138 ArchitectAgent + F139 TestAgent
-  - ArchitectAgent(아키텍처 분석+설계 리뷰+의존성 분석) + TestAgent(테스트 생성+커버리지 갭+엣지 케이스)
-  - 2-Worker Agent Team (4m 45s), 714 API tests (+48), Orchestrator 통합
-- **Sprint 38:** ✅ 완료 — F140 SecurityAgent + F141 QAAgent
-  - SecurityAgent(OWASP 스캔+PR diff 분석) + QAAgent(브라우저 테스트+수용 기준 검증)
-  - 745 API tests, Match Rate 97%, 6종 역할 에이전트 완성
-- **Sprint 39:** ✅ 완료 — F144 Fallback 체인 + F149 프롬프트 게이트웨이 + F150 피드백 루프
-  - FallbackChainService + PromptGatewayService + AgentFeedbackLoopService + D1 0023
-  - 2-Worker Agent Team (2m 15s), 792 API tests (+52), Match Rate 93%
-- **Sprint 40:** ✅ 완료 — F145 InfraAgent + F148 에이전트 자기 평가
-  - InfraAgent(인프라 분석+시뮬레이션+마이그레이션 검증) + AgentSelfReflection(자기 반성 래퍼)
-  - 2-Worker Agent Team, 835 API tests (+43), Match Rate 91%
-- **Sprint 41:** ✅ 완료 — F146 에이전트 역할 커스터마이징 + F147 멀티모델 앙상블 투표
-  - CustomRoleManager(D1 CRUD+systemPromptOverride+custom:*위임) + EnsembleVoting(3종 투표+allSettled)
-  - 2-Worker Agent Team (Worktree Isolation), 877 API tests (+42), Match Rate 94%
-- **Sprint 42:** ✅ 완료 — F151 자동화 품질 리포터 + F152 에이전트 마켓플레이스 (**Track A 완결**)
-  - AutomationQualityReporter(5테이블 집계+6종 개선규칙+스냅샷 캐시) + AgentMarketplace(publish/install/rate+3 D1 테이블)
-  - 2-Worker Agent Team (5m 0s), 925 API tests (+48), Match Rate 97%, **Agent Evolution A1~A18 전체 완료**
-- **Sprint 43:** ✅ 완료 — F143 모델 품질 대시보드 UI (이관 완료)
-  - ModelQualityTab + QualityMetricCard + AgentModelHeatmap (TokensPage Tabs 리팩토링)
-  - 2-Worker Agent Team (2m 0s), Web 64 tests (+16), Match Rate 95%
-- **Sprint 44:** ✅ 완료 — F116 KT DS SR 시나리오 구체화 (**Phase 5 고객 파일럿 준비**)
-  - SrClassifier(규칙 기반 5종 분류) + SrWorkflowMapper(유형별 에이전트 DAG) + 5 endpoints + D1 0027
-  - 2-Worker Agent Team (2m 15s), 953 API tests (+28), Match Rate 95%, PRD Q4 해소
-- **Sprint 45:** ✅ 완료 — F158~F161 KPI 자동 수집 인프라 (**Phase 5 온보딩 데이터 기반**)
-  - useKpiTracker(웹 페이지뷰 추적) + KpiReporter(CLI 로깅) + kpi_snapshots(Cron 집계) + snapshot-trend API
-  - 2-Worker Agent Team (5m 0s), 961 API tests (+8), CLI 131 (+6), Web 68 (+4), Match Rate 97%
-- **Sprint 46:** ✅ 완료 — F162 Azure PoC + F163 SI R&R + F169 데모 환경 (**Phase 5 고객 파일럿 준비**)
-  - PRD v8 재정의(인터뷰+3라운드 AI 검토) + 요구사항 8건 등록 + Azure Functions 어댑터 + T-SQL 마이그레이션 + 데모 시드/시나리오 + SI R&R 정의서
-  - 2-Worker Agent Team (2m 45s), Match Rate 91%, PRD v8 Conditional 선결 3/5 해소
-- **Sprint 47:** ✅ 완료 — F164 커스터마이징 범위 + F165/F166 정책 수립 (**Phase 5 Conditional 4/5 해소**)
-  - 5-레이어 커스터마이징 범위 + 3-Tier 옵션 매트릭스 + 플러그인 시스템 아키텍처(12 타입)
-  - AuditLogService(3 API) + PiiMaskerService(6종 패턴, 4종 전략) + Hono 미들웨어 + 정책 문서 4건
-  - 2-Worker Agent Team, 999 API tests (+38), Match Rate 93%, PRD v8 Conditional 선결 4/5 해소
+- **Sprint 32~47:** ✅ 완료 — Agent Evolution Track A 완결(A1~A18) + Phase 5 고객 파일럿 준비
+  - Sprint 32~33: PRD v5 갭 매핑 + gstack/claude-code-router/OpenRouter 설치
+  - Sprint 34~42: OpenRouter → 모델 라우팅 → 6종 역할 에이전트 → 앙상블 투표 → 자동화 품질 → 마켓플레이스 (603→925 API tests)
+  - Sprint 43~45: 모델 품질 대시보드 UI + SR 시나리오 + KPI 자동 수집 인프라
+  - Sprint 46~47: PRD v8 재정의 + Azure PoC + 정책 수립 + Adoption KPI 대시보드 (999 API tests)
+  - Conditional 4/5 해소 (#4 Adoption 데이터 수집 대기)
+  - 상세 이력: MEMORY.md 또는 `git log --oneline` 참조
 
 ## Git Workflow
 
@@ -252,7 +210,7 @@ cd packages/web && npx @cloudflare/next-on-pages && wrangler pages deploy .verce
 
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
 - **Pages**: `fx.minu.best` (Next.js, CNAME → Cloudflare Pages)
-- **D1**: 27개 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
+- **D1**: 30개 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
 - **CORS 주의**: Pages→Workers 크로스오리진 — `packages/api/src/app.ts`에 CORS 미들웨어 필수
 - **API URL**: `NEXT_PUBLIC_API_URL` 환경변수 — Workers URL + `/api` 경로 포함 필수
 - **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
