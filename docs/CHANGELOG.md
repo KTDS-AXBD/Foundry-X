@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #96 (2026-03-22~23)
+
+**Sprint 47 — 커스터마이징 범위 + 법적/윤리/거버넌스 정책 (F164+F165+F166, Match Rate 93%) + F170 Adoption KPI 대시보드**:
+- ✅ F164: 5-레이어 커스터마이징 범위 정의서 + 3-Tier 옵션 매트릭스 + 플러그인 시스템 아키텍처 (12 타입)
+- ✅ F165: AI 코드 가이드라인 + AuditLogService (3 API endpoints) + D1 0029
+- ✅ F166: 데이터 거버넌스 정책 + PiiMaskerService (6종 PII 패턴, 4종 전략) + Hono 미들웨어 + D1 0030
+- ✅ F166: KT DS 보안 체크리스트 (SC-01~SC-32)
+- ✅ prompt-gateway 감사 로그 연동 (마스킹 시 자동 기록)
+- ✅ PRD v8 Conditional 선결 조건 4/5 해소 (#3 커스터마이징 + #5 법적/윤리)
+- ✅ F170: Adoption KPI 대시보드 — 팀 온보딩 현황 API + Analytics 페이지 UI + AX BD팀 6명 시드 데이터
+- ✅ D1 마이그레이션 0029~0030 프로덕션 적용 완료
+
+**검증 결과**:
+- ✅ typecheck 0 error / API 999/999 / Web 64/64 / CI green / 프로덕션 200 OK
+
+---
+
 ### 세션 #95 (2026-03-22)
 
 **랜딩 페이지 전면 리디자인 + 가독성 점검 — PRD v8 정체성 반영**:

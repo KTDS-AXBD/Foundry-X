@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 47 완료 (168 endpoints, 78 services, 999 API tests + Web 68 + ~55 E2E)
+**현재 상태:** Sprint 47+F170 완료 (169 endpoints, 78 services, 999 API tests + Web 64 + ~55 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
