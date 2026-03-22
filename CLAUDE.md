@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 33 완료 (111 endpoints, 50 services, 583 API tests + ~61 E2E)
+**현재 상태:** Sprint 34 완료 (111 endpoints, 53 services, 603 API tests + ~61 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -72,7 +72,7 @@ foundry-x/
 │   ├── api/                # Hono API Server (Phase 2)
 │   │   └── src/
 │   │       ├── routes/     # 28개: agent, auth, entities, feedback, freshness, github, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, profile, project-overview, proxy, reconciliation, requirements, slack, spec, sso, token, webhook, webhook-registry, wiki, workflow
-│   │       ├── services/   # 50개 (agent-inbox, agent-orchestrator, agent-runner, auto-fix, auto-rebase, claude-api-runner, conflict-detector, entity-registry, entity-sync, execution-types, feedback, file-context-collector, freshness-checker, github, github-review, github-sync, harness-rules, health-calc, integrity-checker, jira-adapter, jira-sync, kpi-logger, kv-cache, llm, logger, mcp-adapter, mcp-registry, mcp-resources, mcp-runner, mcp-sampling, mcp-transport, merge-queue, monitoring, onboarding-progress, org, planner-agent, planner-prompts, pr-pipeline, project-overview, reconciliation, reviewer-agent, service-proxy, slack, spec-parser, sse-manager, sso, webhook-registry, wiki-sync, workflow-engine, worktree-manager)
+│   │       ├── services/   # 53개 (agent-inbox, agent-orchestrator, agent-runner, auto-fix, auto-rebase, claude-api-runner, conflict-detector, entity-registry, entity-sync, execution-types, feedback, file-context-collector, freshness-checker, github, github-review, github-sync, harness-rules, health-calc, integrity-checker, jira-adapter, jira-sync, kpi-logger, kv-cache, llm, logger, mcp-adapter, mcp-registry, mcp-resources, mcp-runner, mcp-sampling, mcp-transport, merge-queue, model-metrics, monitoring, onboarding-progress, openrouter-runner, org, planner-agent, planner-prompts, pr-pipeline, project-overview, prompt-utils, reconciliation, reviewer-agent, service-proxy, slack, spec-parser, sse-manager, sso, webhook-registry, wiki-sync, workflow-engine, worktree-manager)
 │   │       ├── schemas/    # 28개 Zod 스키마 (agent, auth, common, entity, error, feedback, freshness, github, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, plan, profile, reconciliation, requirements, slack, spec, sso, token, webhook, wiki, workflow)
 │   │       └── index.ts
 │   ├── web/                # Next.js 14 Dashboard + Landing (Phase 2)
@@ -178,6 +178,9 @@ pnpm e2e                          # Playwright E2E (17 specs)
 - **Sprint 33:** ✅ 완료 — Agent Evolution Track B (F153~F155)
   - gstack 25개 스킬 설치 + claude-code-router + OpenRouter API 키
   - Match Rate 94%
+- **Sprint 34:** ✅ 완료 — F135 OpenRouter 게이트웨이 통합
+  - OpenRouterRunner 구현 (AgentRunner 인터페이스), prompt-utils 추출, 3-way 팩토리
+  - 2-Worker Agent Team (1m 30s), 603 API tests, Match Rate 97%
 
 ## Git Workflow
 
