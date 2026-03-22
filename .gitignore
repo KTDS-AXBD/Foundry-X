@@ -21,5 +21,9 @@ packages/*/src/**/*.js.map
 .dev.vars
 .playwright-mcp/
 
+# Cloudflare build artifacts
+.wrangler/
+.vercel/
+
 # Next.js export output
 out/
