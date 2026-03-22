@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #93 (2026-03-22)
+
+**Sprint 45 — KPI 자동 수집 인프라 (F158~F161, Match Rate 97%)**:
+- ✅ F158 웹 페이지뷰 자동 추적: useKpiTracker 훅 (usePathname + 300ms throttle + fire-and-forget)
+- ✅ F159 CLI 호출 자동 KPI 로깅: KpiReporter (AbortController 3s + --no-telemetry 옵트아웃)
+- ✅ F160 KPI Cron 집계: kpi_snapshots D1 0028 + generateDailySnapshot() K7/K8/K11/K1
+- ✅ F161 대시보드 실데이터 연결: GET /kpi/snapshot-trend + api-client getKpiSnapshotTrend()
+- ✅ 2-Worker Agent Team (5m 0s), File Guard 0건, 테스트 +18 (API 961, CLI 131, Web 68)
+
+**검증 결과**:
+- ✅ typecheck 0 error / API 961 tests / CLI 131 tests / Web 68 tests / PDCA 전 주기 완료
+
+---
+
 ### 세션 #92 (2026-03-22)
 
 **전체 프로젝트 Gap 분석 — PRD v5 + Agent Evolution PRD ↔ SPEC ↔ 코드 3-way 점검 (Match Rate 92%)**:
