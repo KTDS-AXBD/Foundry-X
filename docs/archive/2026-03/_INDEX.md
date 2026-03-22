@@ -43,6 +43,7 @@
 | sprint-38 | 97% | 2026-03-22 (1 session) | 2026-03-22 |
 | sprint-39 | 93% | 2026-03-22 (1 session) | 2026-03-22 |
 | sprint-42 | 97% | 2026-03-22 (1 session) | 2026-03-22 |
+| sprint-44 | 95% | 2026-03-22 (1 session) | 2026-03-22 |
 
 ## foundry-x-cli
 
@@ -134,3 +135,10 @@
 - [Design (FX-DSGN-039)](sprint-39/sprint-39.design.md)
 - [Analysis (FX-ANLS-039)](sprint-39/sprint-39.analysis.md)
 - [Report (FX-RPRT-039)](sprint-39/sprint-39.report.md)
+
+## sprint-44
+
+- [Plan (FX-PLAN-044)](sprint-44/sprint-44.plan.md)
+- [Design (FX-DSGN-044)](sprint-44/sprint-44.design.md)
+- [Analysis (FX-ANLS-044)](sprint-44/sprint-44.analysis.md)
+- [Report (FX-RPRT-044)](sprint-44/sprint-44.report.md)
