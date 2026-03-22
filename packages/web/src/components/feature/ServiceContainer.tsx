@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { FoundryToSubAppMessage, SubAppToFoundryMessage } from "@foundry-x/shared";
 import { ServiceLoadingSkeleton } from "./ServiceLoadingSkeleton";
 import { ServiceErrorBoundary } from "./ServiceErrorBoundary";
@@ -9,6 +10,7 @@ interface ServiceContainerProps {
   serviceUrl: string;
   serviceId: string;
   title: string;
+  serviceName?: string;
   projectId?: string;
   orgId?: string;
 }
@@ -17,9 +19,11 @@ export function ServiceContainer({
   serviceUrl,
   serviceId,
   title,
+  serviceName,
   projectId,
   orgId,
 }: ServiceContainerProps) {
+  const router = useRouter();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +55,9 @@ export function ServiceContainer({
           setError(null);
           break;
         case "FX_NAVIGATE":
-          // 사이드바 URL 동기화 — 향후 router.push 연동
+          if (data.path && data.path.startsWith("/")) {
+            router.push(data.path);
+          }
           break;
         case "FX_ERROR":
           setError(data.message);
@@ -89,7 +95,9 @@ export function ServiceContainer({
   return (
     <div className="relative flex h-full flex-col" data-testid="service-container">
       <div className="flex h-10 items-center border-b px-4">
-        <span className="text-sm font-medium text-muted-foreground">{title}</span>
+        <span className="text-sm font-medium text-muted-foreground">
+          {serviceName ? `${serviceName} / ${title}` : title}
+        </span>
         <a
           href={serviceUrl}
           target="_blank"

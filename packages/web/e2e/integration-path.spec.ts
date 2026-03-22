@@ -93,4 +93,48 @@ test.describe("Phase 4 Integration Path", () => {
       }
     }
   });
+
+  test("API error responses follow ErrorResponse schema", async ({
+    authenticatedPage: page,
+  }) => {
+    // Call a non-existent API endpoint to trigger error response
+    const response = await page.request.get("/api/nonexistent-route-test");
+    const status = response.status();
+
+    // Verify structured error response format
+    if (status >= 400 && status < 500) {
+      const body = await response.json();
+      expect(body).toHaveProperty("error");
+      expect(typeof body.error).toBe("string");
+    }
+  });
+
+  test("harness rules API returns rule definitions", async ({
+    authenticatedPage: page,
+  }) => {
+    const response = await page.request.get("/api/harness/rules");
+
+    // Should be accessible (200) or require permissions (403)
+    expect([200, 403]).toContain(response.status());
+
+    if (response.status() === 200) {
+      const body = await response.json();
+      expect(body).toHaveProperty("rules");
+      expect(Array.isArray(body.rules)).toBe(true);
+    }
+  });
+
+  test("KPI analytics dashboard renders without critical errors", async ({
+    authenticatedPage: page,
+  }) => {
+    await page.goto("/dashboard");
+    await expect(page.locator("main")).toBeVisible();
+
+    // No 500-level error alerts should be visible
+    const errorAlerts = page.locator("[role='alert']");
+    if ((await errorAlerts.count()) > 0) {
+      const alertText = await errorAlerts.first().textContent();
+      expect(alertText).not.toContain("500");
+    }
+  });
 });
