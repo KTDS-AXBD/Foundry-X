@@ -1511,3 +1511,167 @@ agentRoute.openapi(feedbackGet, async (c) => {
   const records = await service.listByExecution(executionId);
   return c.json({ feedback: records });
 });
+
+// ─── Sprint 40: InfraAgent Endpoints (F145) ───
+
+import { InfraAgent } from "../services/infra-agent.js";
+import {
+  InfraAnalyzeRequestSchema,
+  InfraSimulateRequestSchema,
+  InfraMigrationValidateRequestSchema,
+} from "../schemas/agent.js";
+
+const infraAnalyze = createRoute({
+  method: "post",
+  path: "/agents/infra/analyze",
+  tags: ["Agents"],
+  summary: "Cloudflare 인프라 리소스 분석",
+  request: {
+    body: { content: { "application/json": { schema: InfraAnalyzeRequestSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ healthScore: z.number(), resources: z.array(z.any()), optimizations: z.array(z.any()), compatibilityFlags: z.array(z.string()), tokensUsed: z.number(), model: z.string(), duration: z.number() }) } }, description: "인프라 분석 결과" },
+  },
+});
+
+agentRoute.openapi(infraAnalyze, async (c) => {
+  const body = c.req.valid("json");
+  const agent = new InfraAgent({
+    env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
+    db: c.env.DB,
+  });
+
+  const request = {
+    taskId: `infra_${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`,
+    agentId: "infra-agent",
+    taskType: body.taskType as "infra-analysis",
+    context: {
+      repoUrl: body.context.repoUrl,
+      branch: body.context.branch,
+      targetFiles: body.context.targetFiles,
+      spec: body.context.spec,
+      instructions: body.context.instructions,
+      fileContents: body.context.fileContents,
+    },
+    constraints: [],
+  };
+
+  const result = await agent.analyzeInfra(request);
+  return c.json(result);
+});
+
+const infraSimulate = createRoute({
+  method: "post",
+  path: "/agents/infra/simulate",
+  tags: ["Agents"],
+  summary: "인프라 변경 영향 시뮬레이션",
+  request: {
+    body: { content: { "application/json": { schema: InfraSimulateRequestSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ riskLevel: z.string(), affectedResources: z.array(z.any()), rollbackPlan: z.any(), estimatedDowntime: z.string(), wranglerDiff: z.string(), tokensUsed: z.number(), model: z.string(), duration: z.number() }) } }, description: "시뮬레이션 결과" },
+  },
+});
+
+agentRoute.openapi(infraSimulate, async (c) => {
+  const { description, currentConfig } = c.req.valid("json");
+  const agent = new InfraAgent({
+    env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
+    db: c.env.DB,
+  });
+
+  const result = await agent.simulateChange(description, currentConfig ?? undefined);
+  return c.json(result);
+});
+
+const infraValidateMigration = createRoute({
+  method: "post",
+  path: "/agents/infra/validate-migration",
+  tags: ["Agents"],
+  summary: "D1 마이그레이션 SQL 안전성 검증",
+  request: {
+    body: { content: { "application/json": { schema: InfraMigrationValidateRequestSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ safe: z.boolean(), riskScore: z.number(), issues: z.array(z.any()), schemaChanges: z.array(z.any()), tokensUsed: z.number(), model: z.string(), duration: z.number() }) } }, description: "마이그레이션 검증 결과" },
+  },
+});
+
+agentRoute.openapi(infraValidateMigration, async (c) => {
+  const { sql, existingSchema } = c.req.valid("json");
+  const agent = new InfraAgent({
+    env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
+    db: c.env.DB,
+  });
+
+  const result = await agent.validateMigration(sql, existingSchema ?? undefined);
+  return c.json(result);
+});
+
+// ─── Sprint 40: Self-Reflection Endpoints (F148) ───
+
+import { AgentSelfReflection } from "../services/agent-self-reflection.js";
+import {
+  ReflectRequestSchema,
+  ReflectionConfigSchema,
+} from "../schemas/agent.js";
+
+const reflectExecute = createRoute({
+  method: "post",
+  path: "/agents/reflect",
+  tags: ["Agents"],
+  summary: "에이전트 출력 자기 평가",
+  request: {
+    body: { content: { "application/json": { schema: ReflectRequestSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ score: z.number(), confidence: z.number(), reasoning: z.string(), suggestions: z.array(z.string()) }) } }, description: "반성 결과" },
+  },
+});
+
+agentRoute.openapi(reflectExecute, async (c) => {
+  const { originalRequest, result } = c.req.valid("json");
+  const runner = createAgentRunner(c.env);
+  const reflection = new AgentSelfReflection();
+
+  const execRequest: import("../services/execution-types.js").AgentExecutionRequest = {
+    taskId: originalRequest.taskId,
+    agentId: "self-reflection",
+    taskType: originalRequest.taskType as import("../services/execution-types.js").AgentTaskType,
+    context: {
+      repoUrl: "",
+      branch: "",
+      instructions: originalRequest.instructions,
+    },
+    constraints: [],
+  };
+
+  const execResult: import("../services/execution-types.js").AgentExecutionResult = {
+    status: result.status as "success" | "partial" | "failed",
+    output: { analysis: result.output },
+    tokensUsed: 0,
+    model: "unknown",
+    duration: 0,
+  };
+
+  const reflectionResult = await reflection.reflect(runner, execRequest, execResult);
+  return c.json(reflectionResult);
+});
+
+const reflectConfig = createRoute({
+  method: "get",
+  path: "/agents/reflect/config",
+  tags: ["Agents"],
+  summary: "자기 평가 설정 조회",
+  responses: {
+    200: { content: { "application/json": { schema: ReflectionConfigSchema } }, description: "설정" },
+  },
+});
+
+agentRoute.openapi(reflectConfig, async (c) => {
+  return c.json({
+    threshold: AgentSelfReflection.DEFAULT_THRESHOLD,
+    maxRetries: AgentSelfReflection.DEFAULT_MAX_RETRIES,
+    hardMaxRetries: AgentSelfReflection.HARD_MAX_RETRIES,
+  });
+});

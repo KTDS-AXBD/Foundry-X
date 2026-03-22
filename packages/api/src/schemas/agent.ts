@@ -340,7 +340,7 @@ export const rejectPlanBodySchema = z.object({
 const allTaskTypes = z.enum([
   "code-review", "code-generation", "spec-analysis",
   "test-generation", "security-review", "qa-testing",
-  "policy-evaluation", "skill-query", "ontology-lookup",
+  "infra-analysis", "policy-evaluation", "skill-query", "ontology-lookup",
 ]);
 
 export const RoutingRuleSchema = z
@@ -596,6 +596,40 @@ export const SanitizationRulesResponseSchema = z
   })
   .openapi("SanitizationRulesResponse");
 
+// ─── Sprint 40: InfraAgent Schemas (F145) ───
+
+export const InfraAnalyzeRequestSchema = z
+  .object({
+    taskType: z.literal("infra-analysis").describe("인프라 분석은 infra-analysis 태스크 사용"),
+    context: z.object({
+      repoUrl: z.string().default("https://github.com/KTDS-AXBD/Foundry-X"),
+      branch: z.string().default("master"),
+      targetFiles: z.array(z.string()).optional(),
+      spec: z.object({
+        title: z.string(),
+        description: z.string(),
+        acceptanceCriteria: z.array(z.string()),
+      }).optional(),
+      instructions: z.string().max(2000).optional(),
+      fileContents: z.record(z.string()).optional(),
+    }),
+  })
+  .openapi("InfraAnalyzeRequest");
+
+export const InfraSimulateRequestSchema = z
+  .object({
+    description: z.string().max(5000).describe("변경 설명"),
+    currentConfig: z.string().max(50000).optional().describe("현재 wrangler.toml 등 설정"),
+  })
+  .openapi("InfraSimulateRequest");
+
+export const InfraMigrationValidateRequestSchema = z
+  .object({
+    sql: z.string().min(1).max(100000).describe("마이그레이션 SQL"),
+    existingSchema: z.string().max(100000).optional().describe("기존 스키마 SQL"),
+  })
+  .openapi("InfraMigrationValidateRequest");
+
 // ─── Sprint 39: Agent Feedback Loop Schemas (F150) ───
 
 export const FeedbackSubmitSchema = z
@@ -620,3 +654,27 @@ export const FeedbackResponseSchema = z
     })),
   })
   .openapi("FeedbackResponse");
+
+// ─── Sprint 40: Self-Reflection Schemas (F148) ───
+
+export const ReflectRequestSchema = z
+  .object({
+    originalRequest: z.object({
+      taskId: z.string(),
+      taskType: z.string(),
+      instructions: z.string().max(10000),
+    }),
+    result: z.object({
+      status: z.string(),
+      output: z.string().max(50000),
+    }),
+  })
+  .openapi("ReflectRequest");
+
+export const ReflectionConfigSchema = z
+  .object({
+    threshold: z.number(),
+    maxRetries: z.number(),
+    hardMaxRetries: z.number(),
+  })
+  .openapi("ReflectionConfig");

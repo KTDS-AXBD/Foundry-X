@@ -11,6 +11,7 @@ export type AgentTaskType =
   | "test-generation"
   | "security-review"
   | "qa-testing"
+  | "infra-analysis"
   | "policy-evaluation"
   | "skill-query"
   | "ontology-lookup";
@@ -79,6 +80,18 @@ export interface AgentExecutionResult {
   tokensUsed: number;
   model: string;
   duration: number;
+  reflection?: {             // F148: opt-in self-reflection metadata
+    score: number;
+    confidence: number;
+    reasoning: string;
+    suggestions: string[];
+    retryCount: number;
+    history: Array<{
+      iteration: number;
+      score: number;
+      confidence: number;
+    }>;
+  };
 }
 
 export type AgentRunnerType = "claude-api" | "openrouter" | "mcp" | "mock";

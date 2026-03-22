@@ -14,6 +14,7 @@ import type { ArchitectAgent } from "./architect-agent.js";
 import type { TestAgent } from "./test-agent.js";
 import type { SecurityAgent } from "./security-agent.js";
 import type { QAAgent } from "./qa-agent.js";
+import type { InfraAgent } from "./infra-agent.js";
 import type { ParallelExecutionResult, ParallelPrResult, ConflictReport, AgentPlan } from "@foundry-x/shared";
 
 export class PlanTimeoutError extends Error {
@@ -101,6 +102,7 @@ export class AgentOrchestrator {
   private testAgent?: TestAgent;
   private securityAgent?: SecurityAgent;
   private qaAgent?: QAAgent;
+  private infraAgent?: InfraAgent;
 
   constructor(
     private db: D1Database,
@@ -141,6 +143,11 @@ export class AgentOrchestrator {
   /** F141: QAAgent 서비스 주입 */
   setQAAgent(agent: QAAgent): void {
     this.qaAgent = agent;
+  }
+
+  /** F145: InfraAgent 서비스 주입 */
+  setInfraAgent(agent: InfraAgent): void {
+    this.infraAgent = agent;
   }
 
   /** F65: PR Pipeline 서비스 주입 (옵셔널 — 설정 시 executeTaskWithPr 활성화) */
@@ -494,6 +501,18 @@ export class AgentOrchestrator {
         tokensUsed: qaResult.tokensUsed,
         model: qaResult.model,
         duration: qaResult.duration,
+      };
+      await this.recordTaskResult(taskId, sessionId, agentId, delegatedResult);
+      return delegatedResult;
+    }
+    if (taskType === "infra-analysis" && this.infraAgent) {
+      const infraResult = await this.infraAgent.analyzeInfra(delegateRequest);
+      const delegatedResult: AgentExecutionResult = {
+        status: "success",
+        output: { analysis: JSON.stringify(infraResult) },
+        tokensUsed: infraResult.tokensUsed,
+        model: infraResult.model,
+        duration: infraResult.duration,
       };
       await this.recordTaskResult(taskId, sessionId, agentId, delegatedResult);
       return delegatedResult;
