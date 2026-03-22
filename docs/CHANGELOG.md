@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #99 (2026-03-23)
+**Sprint 49: 대시보드 IA 재설계 + 인터랙티브 온보딩 투어 (F171+F172, Match Rate 95%)**:
+- ✅ F171: 사이드바 10개 플랫 메뉴 → 6개 업무 동선 그룹 재편 (SR관리/개발/현황), 숨겨진 페이지 3개 노출 (spec-generator, projects, getting-started), collapsible + localStorage 영속
+- ✅ F172: 순수 React 온보딩 투어 (SVG spotlight + axis-glass 6스텝), 첫 로그인 자동 시작, 투어 재시작 훅
+- ✅ Getting Started 페이지: 3대 동선 퀵스타트 카드 + "투어 다시 보기" 버튼 + AXIS DS 시맨틱 컬러
+- ✅ E2E dashboard.spec.ts: 사이드바 한국어 레이블 동기화
+- ✅ SPEC.md: F171/F172 📋→✅, Sprint 49 행 추가
+
+**검증 결과**: typecheck ✅, Web 74/74 ✅, 브라우저 확인 ✅ (사이드바 + 투어 + Getting Started)
+
+---
+
 ### 세션 #98 (2026-03-23)
 **Sprint 48: ML 하이브리드 SR 분류기 + SR 대시보드 UI (F167+F168, Match Rate 95%)**:
 - ✅ F167: HybridSrClassifier — 규칙 기반 confidence < 0.7이면 LLM 폴백, 앙상블 가중 평균, sr_classification_feedback D1 0031, stats/feedback 3 API endpoints
