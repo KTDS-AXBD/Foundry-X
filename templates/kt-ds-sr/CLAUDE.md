@@ -15,7 +15,24 @@ This file provides guidance to Claude Code when working in this repository.
 
 ## KT DS SR 워크플로우
 
-### SR 처리 프로세스
+### SR 유형 분류 (Foundry-X 자동화)
+
+| SR 유형 | 에이전트 워크플로우 | SLA |
+|---------|--------------------|----|
+| `security_patch` | Security → Test → Reviewer | 4h / 1일 |
+| `bug_fix` | QA → Planner → Test → Security → Reviewer | 4h / 1일 |
+| `env_config` | Infra → Security → Reviewer | 1일 / 3일 |
+| `doc_update` | Planner → Architect → Reviewer | 1일 / 3일 |
+| `code_change` | Planner → Architect → Test → Reviewer | 2일 / 5일 |
+
+### SR 자동화 프로세스
+1. SR 접수 → `POST /api/sr` (자동 분류 + D1 저장)
+2. 워크플로우 실행 → `POST /api/sr/:id/execute`
+3. 에이전트 순차 실행 → WorkflowEngine DAG 기반
+4. Human Review → 대시보드에서 승인/반려
+5. SR 완료 → `PATCH /api/sr/:id { status: "done" }`
+
+### SR 수동 프로세스 (폴백)
 1. SR 접수 → `specs/sr-template.md` 복사하여 `specs/SR-XXXX.md` 생성
 2. 요구사항 분석 → 영향 범위/검증 기준 작성
 3. 구현 → feature branch에서 작업
