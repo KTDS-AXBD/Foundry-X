@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #76 (2026-03-22)
+
+> **버전 정책 전환 (F134)**: 이후 패키지별 Independent SemVer 적용
+
+**F134 프로젝트 버전 관리 점검 — SemVer 원칙 조사 + 현행 체계 개선 (Match Rate 96%)**:
+- ✅ 온라인 SemVer 2.0 / ZeroVer / 모노리포 버전 전략 조사
+- ✅ package.json 4개 Independent SemVer 리셋: cli 0.5.0, api/web/shared 0.1.0
+- ✅ SPEC.md: system-version→Sprint 31, §10 버전 정책 섹션 신설
+- ✅ CLAUDE.md: Sprint 형식 전환, v2.5 제거
+- ✅ 1.0.0 전환 기준 명문화: 외부 사용자 + API 안정성 선언
+- ✅ PDCA 전주기 완료: Plan→Design→Do→Check(96%)→Report→Archive
+
+**검증 결과**:
+- ✅ typecheck 5/5 / build 4/4 / pnpm install --frozen-lockfile ✅
+- ✅ 코드 로직 변경 0건 (메타데이터만)
+
 ### 세션 #75 (2026-03-22)
 **프로젝트 정합성 점검 + PDCA 문서 배치 아카이브**:
 - ✅ SPEC drift 보정: system-version 2.4.0→2.5, D1 32→33테이블(0020), Sprint 31 반영
