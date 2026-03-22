@@ -39,6 +39,7 @@ export interface AgentExecutionRequest {
     };
     instructions?: string;
     fileContents?: Record<string, string>;
+    systemPromptOverride?: string;
   };
   constraints: AgentConstraintRule[];
 }

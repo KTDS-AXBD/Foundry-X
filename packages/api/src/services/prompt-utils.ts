@@ -62,6 +62,15 @@ export const DEFAULT_LAYOUT_MAP: Record<AgentTaskType, string> = {
   "qa-testing": "accordion",
 };
 
+/** F146: Get system prompt — custom override or task-type default */
+export function getSystemPrompt(request: AgentExecutionRequest): string {
+  if (request.context.systemPromptOverride) {
+    return request.context.systemPromptOverride + UIHINT_INSTRUCTION;
+  }
+  return TASK_SYSTEM_PROMPTS[request.taskType]
+    ?? `You are an AI agent for the Foundry-X project. Task: ${request.taskType}.` + UIHINT_INSTRUCTION;
+}
+
 /** Build a user prompt from an AgentExecutionRequest */
 export function buildUserPrompt(request: AgentExecutionRequest): string {
   const parts: string[] = [];

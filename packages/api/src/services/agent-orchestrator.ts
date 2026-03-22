@@ -15,6 +15,7 @@ import type { TestAgent } from "./test-agent.js";
 import type { SecurityAgent } from "./security-agent.js";
 import type { QAAgent } from "./qa-agent.js";
 import type { InfraAgent } from "./infra-agent.js";
+import type { CustomRoleManager } from "./custom-role-manager.js";
 import type { ParallelExecutionResult, ParallelPrResult, ConflictReport, AgentPlan } from "@foundry-x/shared";
 
 export class PlanTimeoutError extends Error {
@@ -35,6 +36,8 @@ export class PlanCancelledError extends Error {
     this.name = "PlanCancelledError";
   }
 }
+import { OpenRouterRunner } from "./openrouter-runner.js";
+import { createRoutedRunner } from "./agent-runner.js";
 import { McpRunner } from "./mcp-runner.js";
 import { createTransport } from "./mcp-transport.js";
 import { TASK_TYPE_TO_MCP_TOOL } from "./mcp-adapter.js";
@@ -103,6 +106,7 @@ export class AgentOrchestrator {
   private securityAgent?: SecurityAgent;
   private qaAgent?: QAAgent;
   private infraAgent?: InfraAgent;
+  private customRoleManager?: CustomRoleManager;
 
   constructor(
     private db: D1Database,
@@ -148,6 +152,11 @@ export class AgentOrchestrator {
   /** F145: InfraAgent 서비스 주입 */
   setInfraAgent(agent: InfraAgent): void {
     this.infraAgent = agent;
+  }
+
+  /** F146: CustomRoleManager 서비스 주입 */
+  setCustomRoleManager(mgr: CustomRoleManager): void {
+    this.customRoleManager = mgr;
   }
 
   /** F65: PR Pipeline 서비스 주입 (옵셔널 — 설정 시 executeTaskWithPr 활성화) */
@@ -391,7 +400,7 @@ export class AgentOrchestrator {
 
   async executeTask(
     agentId: string,
-    taskType: AgentTaskType,
+    taskType: AgentTaskType | string,
     context: AgentExecutionRequest["context"],
     runner: AgentRunner,
   ): Promise<AgentExecutionResult> {
@@ -439,9 +448,58 @@ export class AgentOrchestrator {
       enforcementMode: r.enforcement_mode,
     }));
 
+    // 3.4 F146: custom:* 역할 위임
+    if (typeof taskType === "string" && taskType.startsWith("custom:") && this.customRoleManager) {
+      const roleId = taskType.slice("custom:".length);
+      const role = await this.customRoleManager.getRole(roleId);
+      if (!role) {
+        const failedResult: AgentExecutionResult = {
+          status: "failed",
+          output: { analysis: `Custom role not found: ${roleId}` },
+          tokensUsed: 0,
+          model: "none",
+          duration: 0,
+        };
+        await this.recordTaskResult(taskId, sessionId, agentId, failedResult);
+        return failedResult;
+      }
+      if (!role.enabled) {
+        const failedResult: AgentExecutionResult = {
+          status: "failed",
+          output: { analysis: `Custom role is disabled: ${role.name}` },
+          tokensUsed: 0,
+          model: "none",
+          duration: 0,
+        };
+        await this.recordTaskResult(taskId, sessionId, agentId, failedResult);
+        return failedResult;
+      }
+      let customRunner: AgentRunner;
+      if (role.preferredModel) {
+        const apiKey = (runner as unknown as { apiKey?: string }).apiKey ?? "";
+        customRunner = new OpenRouterRunner(apiKey, role.preferredModel);
+      } else {
+        customRunner = await createRoutedRunner(
+          {} as { OPENROUTER_API_KEY?: string; ANTHROPIC_API_KEY?: string },
+          role.taskType as AgentTaskType,
+          this.db,
+        );
+      }
+      const customRequest: AgentExecutionRequest = {
+        taskId,
+        agentId,
+        taskType: role.taskType as AgentTaskType,
+        context: { ...context, systemPromptOverride: role.systemPrompt },
+        constraints,
+      };
+      const customResult = await customRunner.execute(customRequest);
+      await this.recordTaskResult(taskId, sessionId, agentId, customResult);
+      return customResult;
+    }
+
     // 3.5a F138/F139: 역할 에이전트 위임
     const delegateRequest: AgentExecutionRequest = {
-      taskId, agentId, taskType, context, constraints,
+      taskId, agentId, taskType: taskType as AgentTaskType, context, constraints,
     };
     if (taskType === "spec-analysis" && this.architectAgent) {
       const analysisResult = await this.architectAgent.analyzeArchitecture(delegateRequest);
