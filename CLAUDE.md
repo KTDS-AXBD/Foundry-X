@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 41 완료 (140 endpoints, 72 services, 877 API tests + ~55 E2E)
+**현재 상태:** Sprint 42 완료 (157 endpoints, 74 services, 925 API tests + ~55 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -202,6 +202,9 @@ pnpm e2e                          # Playwright E2E (17 specs)
 - **Sprint 41:** ✅ 완료 — F146 에이전트 역할 커스터마이징 + F147 멀티모델 앙상블 투표
   - CustomRoleManager(D1 CRUD+systemPromptOverride+custom:*위임) + EnsembleVoting(3종 투표+allSettled)
   - 2-Worker Agent Team (Worktree Isolation), 877 API tests (+42), Match Rate 94%
+- **Sprint 42:** ✅ 완료 — F151 자동화 품질 리포터 + F152 에이전트 마켓플레이스 (**Track A 완결**)
+  - AutomationQualityReporter(5테이블 집계+6종 개선규칙+스냅샷 캐시) + AgentMarketplace(publish/install/rate+3 D1 테이블)
+  - 2-Worker Agent Team (5m 0s), 925 API tests (+48), Match Rate 97%, **Agent Evolution A1~A18 전체 완료**
 
 ## Git Workflow
 
