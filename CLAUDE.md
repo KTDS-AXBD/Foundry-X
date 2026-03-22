@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 31 완료 (111 endpoints, 45 services, 583 API tests + ~61 E2E)
+**현재 상태:** Sprint 33 완료 (111 endpoints, 50 services, 583 API tests + ~61 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -172,6 +172,9 @@ pnpm e2e                          # Playwright E2E (17 specs)
   - Sprint 31: 프로덕션 완전 동기화 + SPEC 정합성 + E2E 보강 + 온보딩 킥오프 (95%)
   - 현재: 50 services, 111 endpoints, 583 API tests, D1 33 테이블
   - PDCA 문서: `docs/archive/2026-03/` (Sprint 3~31 + standalone 전체 archived)
+- **Sprint 33:** ✅ 완료 — Agent Evolution Track B (F153~F155)
+  - gstack 25개 스킬 설치 + claude-code-router + OpenRouter API 키
+  - Match Rate 94%
 
 ## Git Workflow
 
@@ -207,6 +210,43 @@ cd packages/web && npx @cloudflare/next-on-pages && wrangler pages deploy .verce
 - **CORS 주의**: Pages→Workers 크로스오리진 — `packages/api/src/app.ts`에 CORS 미들웨어 필수
 - **API URL**: `NEXT_PUBLIC_API_URL` 환경변수 — Workers URL + `/api` 경로 포함 필수
 - **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+
+## Dev Tools (Track B — Agent Evolution)
+
+### gstack 스킬 (F153)
+`~/.claude/skills/gstack`에 설치된 역할 기반 AI 스킬 팩 (MIT, garrytan/gstack).
+주요 스킬과 용도:
+
+| 스킬 | 역할 | 언제 사용 |
+|------|------|-----------|
+| `/office-hours` | CEO/PM | 아이디어 검토, 문제 재정의 |
+| `/plan-ceo-review` | CEO | 전략 수준 플랜 리뷰 |
+| `/plan-eng-review` | Eng Manager | 아키텍처/실행 계획 리뷰 |
+| `/review` | Code Reviewer | PR 리뷰 (diff 기반) |
+| `/qa` | QA Lead | 브라우저 QA 테스트 + 버그 수정 |
+| `/ship` | Release Engineer | PR 생성 + 테스트 + CHANGELOG |
+| `/retro` | Eng Manager | 주간 개발 통계/회고 |
+| `/codex` | Adversarial Reviewer | 독립적 2nd opinion |
+| `/investigate` | Debugger | 체계적 디버깅 (근본 원인 분석) |
+| `/design-review` | Designer | 시각적 QA (디자인 슬롭 검출) |
+
+**bkit과의 역할 분담:** PDCA/세션/요구사항 관리는 bkit, 코드 품질/QA/설계 검토는 gstack. 배포는 bkit(Cloudflare 특화) 우선.
+
+### claude-code-router (F154)
+`npm install -g @musistudio/claude-code-router`로 설치된 멀티모델 라우팅 프록시.
+설정: `~/.claude-code-router/config.json`
+
+```bash
+ccr start          # 프록시 서버 시작
+ccr status         # 상태 확인
+ccr model          # 모델 선택 UI
+```
+
+라우팅 룰: default→Sonnet, thinking→Sonnet, background→DeepSeek
+프로바이더: OpenRouter(300+ 모델) + Anthropic Direct(Fallback)
+
+### OpenRouter (F155)
+API 키: `.dev.vars`의 `OPENROUTER_API_KEY` (환경변수 인터폴레이션으로 config.json에서 참조)
 
 ## 성공 지표 (구현 시 참고)
 

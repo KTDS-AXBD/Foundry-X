@@ -1,6 +1,6 @@
 ---
 name: npm-release
-description: "foundry-x CLI npm 배포 — version bump, 검증, build, publish 자동화. /npm-release patch|minor|major"
+description: "foundry-x CLI npm 배포 — version bump, 검증, build, publish 자동화. Use when: npm publish, 배포, release, version bump. /npm-release patch|minor|major"
 disable-model-invocation: true
 ---
 
@@ -76,3 +76,10 @@ cd packages/cli && npm publish --access public
 - typecheck/lint/test 중 하나라도 실패하면 즉시 중단
 - `--force` 플래그 사용 금지
 - 이미 publish된 버전으로 bump 시도 시 경고
+
+
+---
+
+## Gotchas
+
+- TODO: 이 스킬 사용 시 주의사항을 작성하세요
