@@ -13,6 +13,15 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+
+    /* AXIS semantic colors (light) */
+    --axis-primary: oklch(0.623 0.214 259.815);
+    --axis-primary-hover: oklch(0.56 0.22 259.815);
+    --axis-accent: oklch(0.65 0.18 290);
+    --axis-blue: oklch(0.623 0.214 259.815);
+    --axis-green: oklch(0.62 0.17 145);
+    --axis-violet: oklch(0.58 0.2 290);
+    --axis-warm: oklch(0.65 0.16 55);
 }
 
 .dark {
@@ -24,6 +33,15 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
+
+    /* AXIS semantic colors (dark — brighter for contrast) */
+    --axis-primary: oklch(0.68 0.19 259.815);
+    --axis-primary-hover: oklch(0.60 0.22 259.815);
+    --axis-accent: oklch(0.70 0.16 290);
+    --axis-blue: oklch(0.68 0.19 259.815);
+    --axis-green: oklch(0.68 0.15 145);
+    --axis-violet: oklch(0.65 0.18 290);
+    --axis-warm: oklch(0.70 0.14 55);
 }
 
 @theme inline {
@@ -68,6 +86,15 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+
+    /* AXIS semantic colors → Tailwind utilities */
+    --color-axis-primary: var(--axis-primary);
+    --color-axis-primary-hover: var(--axis-primary-hover);
+    --color-axis-accent: var(--axis-accent);
+    --color-axis-blue: var(--axis-blue);
+    --color-axis-green: var(--axis-green);
+    --color-axis-violet: var(--axis-violet);
+    --color-axis-warm: var(--axis-warm);
 }
 
 @layer base {
