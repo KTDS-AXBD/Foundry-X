@@ -1,6 +1,6 @@
 {
   "name": "foundry-x",
-  "version": "1.5.0",
+  "version": "0.5.0",
   "description": "AI-human collaboration harness for Git repositories — SDD Triangle sync",
   "type": "module",
   "bin": {
