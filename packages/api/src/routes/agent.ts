@@ -20,7 +20,7 @@ import {
   UpdatePriorityRequestSchema,
 } from "../schemas/agent.js";
 import type { AgentProfile, AgentActivity, PrReviewResult } from "@foundry-x/shared";
-import type { AgentRunnerInfo } from "../services/execution-types.js";
+import type { AgentRunnerInfo, AgentTaskType } from "../services/execution-types.js";
 import { createAgentRunner } from "../services/agent-runner.js";
 import { getDb } from "../db/index.js";
 import { agentSessions } from "../db/schema.js";
@@ -1232,4 +1232,284 @@ agentRoute.openapi(testCoverageGaps, async (c) => {
 
   const result = await agent.analyzeCoverage(body.sourceFiles, body.testFiles);
   return c.json(result);
+});
+
+// ─── Sprint 38: SecurityAgent Endpoints (F140) ───
+
+import { SecurityAgent } from "../services/security-agent.js";
+import {
+  SecurityScanRequestSchema,
+  SecurityPRDiffRequestSchema,
+} from "../schemas/agent.js";
+
+const securityScan = createRoute({
+  method: "post",
+  path: "/agents/security/scan",
+  tags: ["Agents"],
+  summary: "OWASP 취약점 스캔",
+  request: {
+    body: { content: { "application/json": { schema: SecurityScanRequestSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ riskScore: z.number(), vulnerabilities: z.array(z.any()), securePatterns: z.array(z.string()), recommendations: z.array(z.any()), tokensUsed: z.number(), model: z.string(), duration: z.number() }) } }, description: "보안 스캔 결과" },
+  },
+});
+
+agentRoute.openapi(securityScan, async (c) => {
+  const body = c.req.valid("json");
+  const agent = new SecurityAgent({
+    env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
+    db: c.env.DB,
+  });
+
+  const request = {
+    taskId: `sec_${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`,
+    agentId: "security-agent",
+    taskType: body.taskType as "security-review",
+    context: {
+      repoUrl: body.context.repoUrl,
+      branch: body.context.branch,
+      targetFiles: body.context.targetFiles,
+      spec: body.context.spec,
+      instructions: body.context.instructions,
+      fileContents: body.context.fileContents,
+    },
+    constraints: [],
+  };
+
+  const result = await agent.scanVulnerabilities(request);
+  return c.json(result);
+});
+
+const securityPRDiff = createRoute({
+  method: "post",
+  path: "/agents/security/pr-diff",
+  tags: ["Agents"],
+  summary: "PR diff 보안 분석",
+  request: {
+    body: { content: { "application/json": { schema: SecurityPRDiffRequestSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ riskLevel: z.string(), findings: z.array(z.any()), summary: z.string(), tokensUsed: z.number(), model: z.string(), duration: z.number() }) } }, description: "PR diff 보안 분석 결과" },
+  },
+});
+
+agentRoute.openapi(securityPRDiff, async (c) => {
+  const { diff, context } = c.req.valid("json");
+  const agent = new SecurityAgent({
+    env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
+    db: c.env.DB,
+  });
+
+  const result = await agent.analyzePRDiff(diff, context ?? undefined);
+  return c.json(result);
+});
+
+// ─── Sprint 38: QAAgent Endpoints (F141) ───
+
+import { QAAgent } from "../services/qa-agent.js";
+import {
+  QABrowserTestRequestSchema,
+  QAAcceptanceRequestSchema,
+} from "../schemas/agent.js";
+
+const qaBrowserTest = createRoute({
+  method: "post",
+  path: "/agents/qa/browser-test",
+  tags: ["Agents"],
+  summary: "브라우저 테스트 시나리오 생성",
+  request: {
+    body: { content: { "application/json": { schema: QABrowserTestRequestSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ scenarios: z.array(z.any()), coverageEstimate: z.number(), tokensUsed: z.number(), model: z.string(), duration: z.number() }) } }, description: "브라우저 테스트 시나리오" },
+  },
+});
+
+agentRoute.openapi(qaBrowserTest, async (c) => {
+  const body = c.req.valid("json");
+  const agent = new QAAgent({
+    env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
+    db: c.env.DB,
+  });
+
+  const result = await agent.runBrowserTest({
+    taskId: body.taskId,
+    agentId: body.agentId,
+    taskType: "qa-testing",
+    context: body.context,
+    constraints: body.constraints ?? [],
+  });
+  return c.json(result);
+});
+
+const qaAcceptance = createRoute({
+  method: "post",
+  path: "/agents/qa/acceptance",
+  tags: ["Agents"],
+  summary: "수용 기준 검증",
+  request: {
+    body: { content: { "application/json": { schema: QAAcceptanceRequestSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ overallStatus: z.string(), criteria: z.array(z.any()), completenessScore: z.number(), tokensUsed: z.number(), model: z.string(), duration: z.number() }) } }, description: "수용 기준 검증 결과" },
+  },
+});
+
+agentRoute.openapi(qaAcceptance, async (c) => {
+  const { spec, files } = c.req.valid("json");
+  const agent = new QAAgent({
+    env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
+    db: c.env.DB,
+  });
+
+  const result = await agent.validateAcceptanceCriteria(spec, files);
+  return c.json(result);
+});
+
+// ─── Sprint 39: Fallback Chain Endpoints (F144) ───
+
+import { FallbackChainService } from "../services/fallback-chain.js";
+import { ModelRouter } from "../services/model-router.js";
+import {
+  FallbackChainResponseSchema,
+  FallbackEventsResponseSchema,
+  SanitizeRequestSchema,
+  SanitizeResponseSchema,
+  SanitizationRulesResponseSchema,
+  FeedbackSubmitSchema,
+  FeedbackResponseSchema,
+} from "../schemas/agent.js";
+
+const fallbackChainGet = createRoute({
+  method: "get",
+  path: "/agents/fallback/chain/{taskType}",
+  tags: ["Agents"],
+  summary: "Fallback 체인 조회",
+  request: { params: z.object({ taskType: z.string() }) },
+  responses: {
+    200: { content: { "application/json": { schema: FallbackChainResponseSchema } }, description: "폴백 체인 목록" },
+  },
+});
+
+agentRoute.openapi(fallbackChainGet, async (c) => {
+  const { taskType } = c.req.valid("param");
+  const router = new ModelRouter(c.env.DB);
+  const chain = await router.getFallbackChain(taskType as AgentTaskType);
+  return c.json({
+    chain: chain.map((r) => ({
+      id: r.id,
+      taskType: r.taskType,
+      modelId: r.modelId,
+      runnerType: r.runnerType,
+      priority: r.priority,
+    })),
+  });
+});
+
+const fallbackEventsGet = createRoute({
+  method: "get",
+  path: "/agents/fallback/events",
+  tags: ["Agents"],
+  summary: "최근 폴백 이벤트 목록",
+  responses: {
+    200: { content: { "application/json": { schema: FallbackEventsResponseSchema } }, description: "폴백 이벤트" },
+  },
+});
+
+agentRoute.openapi(fallbackEventsGet, async (c) => {
+  const router = new ModelRouter(c.env.DB);
+  const service = new FallbackChainService(router, c.env.DB);
+  const events = await service.listEvents(20);
+  return c.json({ events });
+});
+
+// ─── Sprint 39: Prompt Gateway Endpoints (F149) ───
+
+import { PromptGatewayService } from "../services/prompt-gateway.js";
+
+const gatewaySanitize = createRoute({
+  method: "post",
+  path: "/agents/gateway/sanitize",
+  tags: ["Agents"],
+  summary: "프롬프트 정규화 (dry-run)",
+  request: {
+    body: { content: { "application/json": { schema: SanitizeRequestSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: SanitizeResponseSchema } }, description: "정규화 결과" },
+  },
+});
+
+agentRoute.openapi(gatewaySanitize, async (c) => {
+  const { content } = c.req.valid("json");
+  const gateway = new PromptGatewayService(c.env.DB);
+  const result = await gateway.sanitizePrompt(content);
+  return c.json(result);
+});
+
+const gatewayRulesGet = createRoute({
+  method: "get",
+  path: "/agents/gateway/rules",
+  tags: ["Agents"],
+  summary: "정규화 규칙 목록",
+  responses: {
+    200: { content: { "application/json": { schema: SanitizationRulesResponseSchema } }, description: "규칙 목록" },
+  },
+});
+
+agentRoute.openapi(gatewayRulesGet, async (c) => {
+  const gateway = new PromptGatewayService(c.env.DB);
+  const rules = await gateway.listRules();
+  return c.json({
+    rules: rules.map((r) => ({
+      id: r.id,
+      pattern: r.pattern,
+      replacement: r.replacement,
+      category: r.category,
+      enabled: r.enabled,
+    })),
+  });
+});
+
+// ─── Sprint 39: Agent Feedback Loop Endpoints (F150) ───
+
+import { AgentFeedbackLoopService } from "../services/agent-feedback-loop.js";
+
+const feedbackSubmit = createRoute({
+  method: "post",
+  path: "/agents/feedback",
+  tags: ["Agents"],
+  summary: "에이전트 실패 피드백 제출",
+  request: {
+    body: { content: { "application/json": { schema: FeedbackSubmitSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ id: z.string(), status: z.string() }) } }, description: "피드백 저장 완료" },
+  },
+});
+
+agentRoute.openapi(feedbackSubmit, async (c) => {
+  const { failureId, feedback, expectedOutcome } = c.req.valid("json");
+  const service = new AgentFeedbackLoopService(c.env.DB);
+  const record = await service.submitHumanFeedback(failureId, feedback, expectedOutcome);
+  return c.json({ id: record.id, status: record.status });
+});
+
+const feedbackGet = createRoute({
+  method: "get",
+  path: "/agents/feedback/{executionId}",
+  tags: ["Agents"],
+  summary: "실행별 피드백 조회",
+  request: { params: z.object({ executionId: z.string() }) },
+  responses: {
+    200: { content: { "application/json": { schema: FeedbackResponseSchema } }, description: "피드백 목록" },
+  },
+});
+
+agentRoute.openapi(feedbackGet, async (c) => {
+  const { executionId } = c.req.valid("param");
+  const service = new AgentFeedbackLoopService(c.env.DB);
+  const records = await service.listByExecution(executionId);
+  return c.json({ feedback: records });
 });

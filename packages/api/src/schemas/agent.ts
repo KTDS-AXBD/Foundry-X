@@ -339,7 +339,8 @@ export const rejectPlanBodySchema = z.object({
 
 const allTaskTypes = z.enum([
   "code-review", "code-generation", "spec-analysis",
-  "test-generation", "policy-evaluation", "skill-query", "ontology-lookup",
+  "test-generation", "security-review", "qa-testing",
+  "policy-evaluation", "skill-query", "ontology-lookup",
 ]);
 
 export const RoutingRuleSchema = z
@@ -472,3 +473,150 @@ export const coverageGapsSchema = z.object({
   sourceFiles: z.record(z.string()),
   testFiles: z.record(z.string()).default({}),
 });
+
+// ─── Sprint 38: SecurityAgent Schemas (F140) ───
+
+export const SecurityScanRequestSchema = z
+  .object({
+    taskType: z.literal("security-review").describe("보안 분석은 security-review 태스크 사용"),
+    context: z.object({
+      repoUrl: z.string().default("https://github.com/KTDS-AXBD/Foundry-X"),
+      branch: z.string().default("master"),
+      targetFiles: z.array(z.string()).optional(),
+      spec: z.object({
+        title: z.string(),
+        description: z.string(),
+        acceptanceCriteria: z.array(z.string()),
+      }).optional(),
+      instructions: z.string().max(2000).optional(),
+      fileContents: z.record(z.string()).optional(),
+    }),
+  })
+  .openapi("SecurityScanRequest");
+
+export const SecurityPRDiffRequestSchema = z
+  .object({
+    diff: z.string().max(100000).describe("PR diff 내용"),
+    context: z.string().max(2000).optional().describe("추가 컨텍스트"),
+  })
+  .openapi("SecurityPRDiffRequest");
+
+// ─── Sprint 38: QAAgent Schemas (F141) ───
+
+export const QABrowserTestRequestSchema = z
+  .object({
+    taskId: z.string(),
+    agentId: z.string().default("qa-agent"),
+    taskType: z.literal("qa-testing"),
+    context: z.object({
+      repoUrl: z.string(),
+      branch: z.string(),
+      targetFiles: z.array(z.string()).optional(),
+      spec: z.object({
+        title: z.string(),
+        description: z.string(),
+        acceptanceCriteria: z.array(z.string()),
+      }).optional(),
+      instructions: z.string().optional(),
+      fileContents: z.record(z.string()).optional(),
+    }),
+    constraints: z.array(z.any()).default([]),
+  })
+  .openapi("QABrowserTestRequest");
+
+export const QAAcceptanceRequestSchema = z
+  .object({
+    spec: z.object({
+      title: z.string(),
+      description: z.string(),
+      acceptanceCriteria: z.array(z.string()),
+    }),
+    files: z.record(z.string()),
+  })
+  .openapi("QAAcceptanceRequest");
+
+// ─── Sprint 39: Fallback Chain Schemas (F144) ───
+
+export const FallbackChainResponseSchema = z
+  .object({
+    chain: z.array(z.object({
+      id: z.string(),
+      taskType: allTaskTypes,
+      modelId: z.string(),
+      runnerType: z.enum(["openrouter", "claude-api", "mcp", "mock"]),
+      priority: z.number(),
+    })),
+  })
+  .openapi("FallbackChainResponse");
+
+export const FallbackEventsResponseSchema = z
+  .object({
+    events: z.array(z.object({
+      id: z.string(),
+      taskType: z.string(),
+      fromModel: z.string(),
+      toModel: z.string(),
+      reason: z.string(),
+      latencyMs: z.number(),
+      createdAt: z.string(),
+    })),
+  })
+  .openapi("FallbackEventsResponse");
+
+// ─── Sprint 39: Prompt Gateway Schemas (F149) ───
+
+export const SanitizeRequestSchema = z
+  .object({
+    content: z.string().min(1).max(100_000),
+  })
+  .openapi("SanitizeRequest");
+
+export const SanitizeResponseSchema = z
+  .object({
+    sanitizedContent: z.string(),
+    appliedRules: z.array(z.object({
+      ruleId: z.string(),
+      category: z.string(),
+      matchCount: z.number(),
+    })),
+    originalLength: z.number(),
+    sanitizedLength: z.number(),
+  })
+  .openapi("SanitizeResponse");
+
+export const SanitizationRulesResponseSchema = z
+  .object({
+    rules: z.array(z.object({
+      id: z.string(),
+      pattern: z.string(),
+      replacement: z.string(),
+      category: z.enum(["secret", "url", "pii", "custom"]),
+      enabled: z.boolean(),
+    })),
+  })
+  .openapi("SanitizationRulesResponse");
+
+// ─── Sprint 39: Agent Feedback Loop Schemas (F150) ───
+
+export const FeedbackSubmitSchema = z
+  .object({
+    failureId: z.string(),
+    feedback: z.string().min(1).max(2000),
+    expectedOutcome: z.string().max(1000).optional(),
+  })
+  .openapi("FeedbackSubmitRequest");
+
+export const FeedbackResponseSchema = z
+  .object({
+    feedback: z.array(z.object({
+      id: z.string(),
+      executionId: z.string(),
+      taskType: z.string(),
+      failureReason: z.string().nullable(),
+      humanFeedback: z.string().nullable(),
+      promptHint: z.string().nullable(),
+      status: z.enum(["pending", "reviewed", "applied"]),
+      createdAt: z.string(),
+    })),
+  })
+  .openapi("FeedbackResponse");

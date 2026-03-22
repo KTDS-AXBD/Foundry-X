@@ -9,6 +9,8 @@ export type AgentTaskType =
   | "code-generation"
   | "spec-analysis"
   | "test-generation"
+  | "security-review"
+  | "qa-testing"
   | "policy-evaluation"
   | "skill-query"
   | "ontology-lookup";

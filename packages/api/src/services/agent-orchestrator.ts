@@ -12,6 +12,8 @@ import type { WorktreeManager } from "./worktree-manager.js";
 import type { AutoFixService } from "./auto-fix.js";
 import type { ArchitectAgent } from "./architect-agent.js";
 import type { TestAgent } from "./test-agent.js";
+import type { SecurityAgent } from "./security-agent.js";
+import type { QAAgent } from "./qa-agent.js";
 import type { ParallelExecutionResult, ParallelPrResult, ConflictReport, AgentPlan } from "@foundry-x/shared";
 
 export class PlanTimeoutError extends Error {
@@ -97,6 +99,8 @@ export class AgentOrchestrator {
   private autoFix?: AutoFixService;
   private architectAgent?: ArchitectAgent;
   private testAgent?: TestAgent;
+  private securityAgent?: SecurityAgent;
+  private qaAgent?: QAAgent;
 
   constructor(
     private db: D1Database,
@@ -127,6 +131,16 @@ export class AgentOrchestrator {
   /** F139: TestAgent 서비스 주입 */
   setTestAgent(agent: TestAgent): void {
     this.testAgent = agent;
+  }
+
+  /** F140: SecurityAgent 서비스 주입 */
+  setSecurityAgent(agent: SecurityAgent): void {
+    this.securityAgent = agent;
+  }
+
+  /** F141: QAAgent 서비스 주입 */
+  setQAAgent(agent: QAAgent): void {
+    this.qaAgent = agent;
   }
 
   /** F65: PR Pipeline 서비스 주입 (옵셔널 — 설정 시 executeTaskWithPr 활성화) */
@@ -449,6 +463,37 @@ export class AgentOrchestrator {
         tokensUsed: testResult.tokensUsed,
         model: testResult.model,
         duration: testResult.duration,
+      };
+      await this.recordTaskResult(taskId, sessionId, agentId, delegatedResult);
+      return delegatedResult;
+    }
+    if (taskType === "security-review" && this.securityAgent) {
+      const scanResult = await this.securityAgent.scanVulnerabilities(delegateRequest);
+      const delegatedResult: AgentExecutionResult = {
+        status: "success",
+        output: { analysis: JSON.stringify(scanResult) },
+        tokensUsed: scanResult.tokensUsed,
+        model: scanResult.model,
+        duration: scanResult.duration,
+      };
+      await this.recordTaskResult(taskId, sessionId, agentId, delegatedResult);
+      return delegatedResult;
+    }
+    if (taskType === "qa-testing" && this.qaAgent) {
+      const qaResult = await this.qaAgent.runBrowserTest(delegateRequest);
+      const delegatedResult: AgentExecutionResult = {
+        status: "success",
+        output: {
+          analysis: JSON.stringify(qaResult),
+          generatedCode: qaResult.scenarios.map((s: { name: string; playwrightCode: string }) => ({
+            path: `e2e/${s.name.replace(/\s+/g, "-").toLowerCase()}.spec.ts`,
+            content: s.playwrightCode,
+            action: "create" as const,
+          })),
+        },
+        tokensUsed: qaResult.tokensUsed,
+        model: qaResult.model,
+        duration: qaResult.duration,
       };
       await this.recordTaskResult(taskId, sessionId, agentId, delegatedResult);
       return delegatedResult;

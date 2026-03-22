@@ -24,6 +24,8 @@ export const DEFAULT_MODEL_MAP: Record<AgentTaskType, string> = {
   "policy-evaluation": "anthropic/claude-haiku-4-5",
   "skill-query": "anthropic/claude-haiku-4-5",
   "ontology-lookup": "anthropic/claude-haiku-4-5",
+  "security-review": "anthropic/claude-sonnet-4-5-20250514",
+  "qa-testing": "anthropic/claude-haiku-4-5",
 };
 
 interface D1RoutingRow {
@@ -80,6 +82,24 @@ export class ModelRouter {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
+  }
+
+  /** F144: task_type별 전체 enabled 규칙을 priority ASC로 반환 (Fallback 체인용) */
+  async getFallbackChain(taskType: AgentTaskType): Promise<RoutingRule[]> {
+    const { results } = await this.db
+      .prepare(
+        "SELECT * FROM model_routing_rules WHERE task_type = ? AND enabled = 1 ORDER BY priority ASC",
+      )
+      .bind(taskType)
+      .all<D1RoutingRow>();
+
+    if (results.length > 0) {
+      return results.map(toRoutingRule);
+    }
+
+    // D1 규칙 없으면 getModelForTask() 단일 항목 배열로 폴백
+    const fallback = await this.getModelForTask(taskType);
+    return [fallback];
   }
 
   async listRules(): Promise<RoutingRule[]> {
