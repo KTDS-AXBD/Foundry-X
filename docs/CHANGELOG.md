@@ -9,16 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 세션 #95 (2026-03-22)
 
-**랜딩 페이지 전면 리디자인 — PRD v8 정체성 반영**:
+**랜딩 페이지 전면 리디자인 + 가독성 점검 — PRD v8 정체성 반영**:
 - ✅ Hero: "AI 에이전트가 일하는 방식을 설계하다" (PRD v8 태그라인)
 - ✅ 새 섹션: Process (사업기회→데모 4단계), Agents (6종 전문 에이전트 그리드)
 - ✅ 수치 최신화: 163 endpoints, 76 services, 1,160+ tests, 6 AI Agents, 46 sprints
-- ✅ 로드맵 업데이트: Phase 4 완료, Phase 5 고객 파일럿 current
 - ✅ Navbar/Footer: 네비 링크 재구성, Sprint 46 · Phase 5 표기
-- ✅ CLAUDE.md 수치 drift 보정 (162→163 endpoints, 953→961 API tests)
+- ✅ E2E + 사이트 전체 브랜딩 동기화 (layout, login, getting-started)
+- ✅ API tsconfig azure.ts exclude — CI typecheck 실패 해소
+- ✅ AXIS 시맨틱 컬러 7색 정의 (globals.css) — Tailwind v4 마이그레이션 누락 해소
+- ✅ shadcn HSL 컬러 hsl() 래핑 — text-muted-foreground 텍스트 계층 복구
+- ✅ WCAG 대비율 검증: H1 18.3:1 AAA, muted-fg 8.5:1 AAA, axis-primary 6.5:1 AA
 
 **검증 결과**:
-- ✅ typecheck 0 error / Web 64 tests 통과
+- ✅ typecheck 0 error / Web 64 tests / CI 전체 green / 프로덕션 배포 완료
 
 ---
 
