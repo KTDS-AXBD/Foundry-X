@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #75 (2026-03-22)
+**프로젝트 정합성 점검 + PDCA 문서 배치 아카이브**:
+- ✅ SPEC drift 보정: system-version 2.4.0→2.5, D1 32→33테이블(0020), Sprint 31 반영
+- ✅ .gitignore: .wrangler/, .vercel/ 빌드 아티팩트 제외 추가
+- ✅ sprint-26 문서 삭제 정리 (archive 이동 완료 확인)
+- ✅ PDCA 배치 아카이브: 18 Sprint + 5 standalone → docs/archive/ (98파일 이동)
+- ✅ bkit memory currentFeature 보정: sprint-30 → sprint-31
+- ✅ CLAUDE.md D1 33테이블 + archive 설명 갱신
+
+**검증 결과**:
+- ✅ typecheck 4/4 (0 에러) / API 583/583 / Web 48/48
+
 ### 세션 #71 (2026-03-21)
 **Sprint 29: 실사용자 온보딩 기반 — 가이드 UI + 피드백 시스템 + 체크리스트 (Match Rate 93%)**:
 - ✅ F120 온보딩 가이드 UI: /getting-started 페이지 (기능카드 5개 + 3단계 체크리스트 + FAQ 5항목 + NPS 폼)

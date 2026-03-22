@@ -169,8 +169,8 @@ pnpm e2e                          # Playwright E2E (15 specs)
   - Sprint 29: 온보딩 기반 — 가이드 UI + 피드백 API + 체크리스트
   - Sprint 30: 배포 동기화 + Phase 4 Go 판정(Conditional) + 품질 강화 (93%)
   - Sprint 31: 프로덕션 완전 동기화 + SPEC 정합성 + E2E 보강 + 온보딩 킥오프 (95%)
-  - 현재: 45 services, 111 endpoints, 583 API tests, D1 32 테이블
-  - PDCA 문서: `docs/archive/2026-03/sprint-{N}/` (Sprint 3~13, 17~23, 26, 31 archived)
+  - 현재: 45 services, 111 endpoints, 583 API tests, D1 33 테이블
+  - PDCA 문서: `docs/archive/2026-03/` (Sprint 3~31 + standalone 전체 archived)
 
 ## Git Workflow
 
