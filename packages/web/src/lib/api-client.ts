@@ -967,3 +967,90 @@ export interface OnboardingTeamSummary {
 export async function getOnboardingTeamSummary(): Promise<OnboardingTeamSummary> {
   return fetchApi<OnboardingTeamSummary>("/onboarding/team-summary");
 }
+
+// ─── Sprint 48: SR Management Dashboard (F168) ───
+
+export interface SrItem {
+  id: string;
+  org_id: string;
+  title: string;
+  description: string | null;
+  sr_type: string;
+  priority: string;
+  status: string;
+  confidence: number;
+  matched_keywords: string[];
+  workflow_id: string | null;
+  created_at: string;
+  updated_at: string;
+  closed_at: string | null;
+}
+
+export interface SrStatsResponse {
+  typeDistribution: Array<{ sr_type: string; count: number; avg_confidence: number }>;
+  totalCount: number;
+  feedbackCount: number;
+  misclassificationRate: number;
+}
+
+export interface SrWorkflowNodeClient {
+  id: string;
+  type: "agent" | "condition" | "end";
+  label: string;
+  agentType?: string;
+  dependsOn?: string[];
+  status?: string;
+}
+
+export interface SrDetailItem extends SrItem {
+  workflow_run?: {
+    id: string;
+    workflow_template: string;
+    status: string;
+    steps_completed: number;
+    steps_total: number;
+    result_summary: string | null;
+    started_at: string | null;
+    completed_at: string | null;
+  } | null;
+}
+
+export interface SrFeedbackItem {
+  id: string;
+  sr_id: string;
+  original_type: string;
+  corrected_type: string;
+  reason: string | null;
+  submitted_by: string | null;
+  created_at: string;
+}
+
+export async function fetchSrList(params?: {
+  status?: string;
+  sr_type?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<{ items: SrItem[]; total: number }> {
+  const qs = new URLSearchParams();
+  if (params?.status) qs.set("status", params.status);
+  if (params?.sr_type) qs.set("sr_type", params.sr_type);
+  if (params?.limit) qs.set("limit", String(params.limit));
+  if (params?.offset) qs.set("offset", String(params.offset));
+  const query = qs.toString();
+  return fetchApi(`/sr${query ? `?${query}` : ""}`);
+}
+
+export async function fetchSrStats(): Promise<SrStatsResponse> {
+  return fetchApi<SrStatsResponse>("/sr/stats");
+}
+
+export async function fetchSrDetail(id: string): Promise<SrDetailItem> {
+  return fetchApi<SrDetailItem>(`/sr/${id}`);
+}
+
+export async function submitSrFeedback(
+  srId: string,
+  body: { corrected_type: string; reason?: string },
+): Promise<SrFeedbackItem> {
+  return postApi<SrFeedbackItem>(`/sr/${srId}/feedback`, body);
+}

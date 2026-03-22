@@ -56,6 +56,20 @@ export interface SrResponse {
   closed_at: string | null;
 }
 
+export const srFeedbackRequest = z.object({
+  corrected_type: srTypeEnum,
+  corrected_by: z.string().optional(),
+  reason: z.string().max(1000).optional(),
+});
+export type SrFeedbackRequest = z.infer<typeof srFeedbackRequest>;
+
+export interface SrStatsResponse {
+  typeDistribution: Array<{ sr_type: SrType; count: number; avg_confidence: number }>;
+  totalCount: number;
+  feedbackCount: number;
+  misclassificationRate: number;
+}
+
 export interface SrDetailResponse extends SrResponse {
   workflow_run?: {
     id: string;

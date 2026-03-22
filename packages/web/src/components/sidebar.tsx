@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   LayoutDashboard,
   BookOpen,
   Blocks,
-  FolderKanban,
+  ClipboardList,
   Bot,
   Coins,
   BarChart3,
@@ -16,8 +16,16 @@ import {
   FlaskConical,
   LogIn,
   LogOut,
+  Rocket,
+  FileText,
+  FolderKanban,
+  ChevronRight,
+  HelpCircle,
+  Link2,
+  Inbox,
+  Code2,
+  TrendingUp,
 } from "lucide-react";
-import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/lib/stores/auth-store";
@@ -30,56 +38,275 @@ import {
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { OrgSwitcher } from "@/components/feature/OrgSwitcher";
+import type { LucideIcon } from "lucide-react";
 
-const fxNavItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/wiki", label: "Wiki", icon: BookOpen },
-  { href: "/architecture", label: "Architecture", icon: Blocks },
-  { href: "/workspace", label: "Workspace", icon: FolderKanban },
-  { href: "/agents", label: "Agents", icon: Bot },
-  { href: "/tokens", label: "Tokens", icon: Coins },
-  { href: "/analytics", label: "Analytics", icon: BarChart3 },
+/* ------------------------------------------------------------------ */
+/*  Navigation Structure — 3대 업무 동선 기반 그룹                      */
+/* ------------------------------------------------------------------ */
+
+interface NavItem {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+}
+
+interface NavGroup {
+  key: string;
+  label: string;
+  icon: LucideIcon;
+  items: NavItem[];
+}
+
+const topItems: NavItem[] = [
+  { href: "/getting-started", label: "시작하기", icon: Rocket },
+  { href: "/dashboard", label: "홈", icon: LayoutDashboard },
 ];
 
-const serviceNavItems = [
-  { href: "/discovery", label: "Discovery-X", icon: Search },
-  { href: "/foundry", label: "AI Foundry", icon: FlaskConical },
+const navGroups: NavGroup[] = [
+  {
+    key: "sr",
+    label: "SR 관리",
+    icon: Inbox,
+    items: [
+      { href: "/sr", label: "SR 목록", icon: ClipboardList },
+    ],
+  },
+  {
+    key: "dev",
+    label: "개발",
+    icon: Code2,
+    items: [
+      { href: "/spec-generator", label: "Spec 생성", icon: FileText },
+      { href: "/agents", label: "에이전트", icon: Bot },
+    ],
+  },
+  {
+    key: "status",
+    label: "현황",
+    icon: TrendingUp,
+    items: [
+      { href: "/projects", label: "프로젝트", icon: FolderKanban },
+      { href: "/analytics", label: "Analytics", icon: BarChart3 },
+      { href: "/tokens", label: "토큰 비용", icon: Coins },
+    ],
+  },
 ];
+
+const utilItems: NavItem[] = [
+  { href: "/wiki", label: "지식베이스", icon: BookOpen },
+  { href: "/architecture", label: "아키텍처", icon: Blocks },
+  { href: "/workspace", label: "내 작업", icon: FolderKanban },
+];
+
+const serviceGroup: NavGroup = {
+  key: "services",
+  label: "외부 서비스",
+  icon: Link2,
+  items: [
+    { href: "/discovery", label: "Discovery-X", icon: Search },
+    { href: "/foundry", label: "AI Foundry", icon: FlaskConical },
+  ],
+};
+
+/* ------------------------------------------------------------------ */
+/*  Collapsible Group State (localStorage 영속)                        */
+/* ------------------------------------------------------------------ */
+
+const STORAGE_KEY = "fx-sidebar-groups";
+
+function useGroupState() {
+  const [openGroups, setOpenGroups] = useState<Set<string>>(
+    () => new Set(["sr", "dev", "status"]), // 기본 전체 펼침
+  );
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) setOpenGroups(new Set(JSON.parse(saved)));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const toggle = useCallback((key: string) => {
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(next)));
+      return next;
+    });
+  }, []);
+
+  return { openGroups, toggle };
+}
+
+/* ------------------------------------------------------------------ */
+/*  Nav Components                                                     */
+/* ------------------------------------------------------------------ */
+
+function NavLink({
+  item,
+  pathname,
+  onSelect,
+}: {
+  item: NavItem;
+  pathname: string;
+  onSelect?: () => void;
+}) {
+  const active = pathname === item.href;
+  return (
+    <Link
+      href={item.href}
+      onClick={onSelect}
+      data-tour={item.href.replace("/", "")}
+      className={cn(
+        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+        active
+          ? "bg-primary text-primary-foreground"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+      )}
+    >
+      <item.icon className="size-4 shrink-0" />
+      {item.label}
+    </Link>
+  );
+}
+
+function CollapsibleGroup({
+  group,
+  pathname,
+  isOpen,
+  onToggle,
+  onSelect,
+}: {
+  group: NavGroup;
+  pathname: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  onSelect?: () => void;
+}) {
+  const hasActive = group.items.some((item) => pathname === item.href);
+
+  return (
+    <div data-tour={`group-${group.key}`}>
+      <button
+        type="button"
+        onClick={onToggle}
+        className={cn(
+          "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+          hasActive
+            ? "text-foreground"
+            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+        )}
+      >
+        <group.icon className="size-4 shrink-0" />
+        <span className="flex-1 text-left">{group.label}</span>
+        <ChevronRight
+          className={cn(
+            "size-3.5 shrink-0 text-muted-foreground/60 transition-transform duration-200",
+            isOpen && "rotate-90",
+          )}
+        />
+      </button>
+      {isOpen && (
+        <div className="ml-4 flex flex-col gap-0.5 border-l border-border/40 pl-2">
+          {group.items.map((item) => (
+            <NavLink
+              key={item.href}
+              item={item}
+              pathname={pathname}
+              onSelect={onSelect}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function NavLinks({ onSelect }: { onSelect?: () => void }) {
   const pathname = usePathname();
+  const { openGroups, toggle } = useGroupState();
 
-  const renderItems = (items: typeof fxNavItems) =>
-    items.map((item) => {
-      const active = pathname === item.href;
-      return (
-        <Link
-          key={item.href}
-          href={item.href}
-          onClick={onSelect}
-          className={cn(
-            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-            active
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground",
-          )}
-        >
-          <item.icon className="size-4 shrink-0" />
-          {item.label}
-        </Link>
-      );
-    });
+  // 활성 경로가 포함된 그룹은 자동 펼침
+  useEffect(() => {
+    for (const group of [...navGroups, serviceGroup]) {
+      if (group.items.some((item) => pathname === item.href)) {
+        if (!openGroups.has(group.key)) {
+          toggle(group.key);
+        }
+      }
+    }
+    // pathname 변경 시에만 실행
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   return (
-    <nav className="flex flex-col gap-1">
-      {renderItems(fxNavItems)}
-      <span className="mt-3 mb-1 px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60">
-        Services
-      </span>
-      {renderItems(serviceNavItems)}
+    <nav className="flex flex-col gap-0.5">
+      {/* 시작하기 + 홈 */}
+      {topItems.map((item) => (
+        <NavLink
+          key={item.href}
+          item={item}
+          pathname={pathname}
+          onSelect={onSelect}
+        />
+      ))}
+
+      {/* 구분선 */}
+      <div className="my-2 border-t border-border/40" />
+
+      {/* 3대 업무 동선 그룹 */}
+      {navGroups.map((group) => (
+        <CollapsibleGroup
+          key={group.key}
+          group={group}
+          pathname={pathname}
+          isOpen={openGroups.has(group.key)}
+          onToggle={() => toggle(group.key)}
+          onSelect={onSelect}
+        />
+      ))}
+
+      {/* 구분선 */}
+      <div className="my-2 border-t border-border/40" />
+
+      {/* 유틸리티 메뉴 */}
+      {utilItems.map((item) => (
+        <NavLink
+          key={item.href}
+          item={item}
+          pathname={pathname}
+          onSelect={onSelect}
+        />
+      ))}
+
+      {/* 구분선 */}
+      <div className="my-2 border-t border-border/40" />
+
+      {/* 외부 서비스 그룹 */}
+      <CollapsibleGroup
+        group={serviceGroup}
+        pathname={pathname}
+        isOpen={openGroups.has(serviceGroup.key)}
+        onToggle={() => toggle(serviceGroup.key)}
+        onSelect={onSelect}
+      />
+
+      {/* 도움말 */}
+      <NavLink
+        item={{ href: "/getting-started", label: "도움말", icon: HelpCircle }}
+        pathname={pathname}
+        onSelect={onSelect}
+      />
     </nav>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/*  Auth Section (변경 없음)                                           */
+/* ------------------------------------------------------------------ */
 
 function AuthSection() {
   const { user, isAuthenticated, logout, hydrate } = useAuthStore();
@@ -119,6 +346,10 @@ function AuthSection() {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  Sidebar Shell                                                      */
+/* ------------------------------------------------------------------ */
+
 export function Sidebar() {
   const [open, setOpen] = useState(false);
 
@@ -133,11 +364,13 @@ export function Sidebar() {
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-60 p-0">
+          <SheetContent side="left" className="w-64 p-0">
             <SheetHeader className="border-b px-4 py-3">
-              <SheetTitle className="text-base font-bold">Foundry-X</SheetTitle>
+              <SheetTitle className="text-base font-bold font-display">
+                Foundry-X
+              </SheetTitle>
             </SheetHeader>
-            <div className="flex flex-1 flex-col p-3">
+            <div className="flex flex-1 flex-col overflow-auto p-3">
               <OrgSwitcher />
               <NavLinks onSelect={() => setOpen(false)} />
               <div className="mt-auto border-t pt-3">
@@ -146,7 +379,9 @@ export function Sidebar() {
             </div>
           </SheetContent>
         </Sheet>
-        <Link href="/dashboard" className="text-sm font-bold">Foundry-X</Link>
+        <Link href="/dashboard" className="text-sm font-bold font-display">
+          Foundry-X
+        </Link>
         <div className="ml-auto">
           <ThemeToggle />
         </div>
@@ -158,7 +393,9 @@ export function Sidebar() {
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:w-60 lg:shrink-0 lg:flex-col lg:border-r lg:bg-card">
         <div className="flex h-14 items-center border-b px-4">
-          <Link href="/dashboard" className="text-base font-bold">Foundry-X</Link>
+          <Link href="/dashboard" className="text-base font-bold font-display">
+            Foundry-X
+          </Link>
           <div className="ml-auto">
             <ThemeToggle />
           </div>

@@ -1,15 +1,15 @@
 /**
- * SR (Service Request) Routes — F116 KT DS SR 시나리오 구체화
+ * SR (Service Request) Routes — F116 KT DS SR 시나리오 구체화 + F167 하이브리드 분류기
  */
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
-import { createSrRequest, updateSrRequest, listSrQuery, executeSrRequest, type SrResponse, type SrDetailResponse } from "../schemas/sr.js";
-import { SrClassifier } from "../services/sr-classifier.js";
+import { createSrRequest, updateSrRequest, listSrQuery, executeSrRequest, srFeedbackRequest, type SrResponse, type SrDetailResponse, type SrStatsResponse } from "../schemas/sr.js";
 import { SrWorkflowMapper } from "../services/sr-workflow-mapper.js";
+import { HybridSrClassifier } from "../services/hybrid-sr-classifier.js";
+import { LLMService } from "../services/llm.js";
 
 export const srRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
-const classifier = new SrClassifier();
 const workflowMapper = new SrWorkflowMapper();
 
 function toSrResponse(row: Record<string, unknown>): SrResponse {
@@ -31,12 +31,14 @@ srRoute.post("/sr", async (c) => {
   if (!parsed.success) return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
   const { title, description, priority, requester_id } = parsed.data;
   const orgId = c.get("orgId");
-  const result = classifier.classify(title, description ?? "");
+  const llmService = new LLMService(c.env.AI, c.env.ANTHROPIC_API_KEY);
+  const classifier = new HybridSrClassifier(llmService);
+  const result = await classifier.classify(title, description ?? "");
   const id = crypto.randomUUID();
   await c.env.DB.prepare(
     `INSERT INTO sr_requests (id, org_id, title, description, sr_type, priority, status, confidence, matched_keywords, requester_id) VALUES (?, ?, ?, ?, ?, ?, 'classified', ?, ?, ?)`,
   ).bind(id, orgId, title, description ?? null, result.srType, priority, result.confidence, JSON.stringify(result.matchedKeywords), requester_id ?? null).run();
-  return c.json({ id, sr_type: result.srType, confidence: result.confidence, matched_keywords: result.matchedKeywords, status: "classified", suggestedWorkflow: result.suggestedWorkflow }, 201);
+  return c.json({ id, sr_type: result.srType, confidence: result.confidence, matched_keywords: result.matchedKeywords, status: "classified", suggestedWorkflow: result.suggestedWorkflow, method: result.method }, 201);
 });
 
 srRoute.get("/sr", async (c) => {
@@ -55,6 +57,32 @@ srRoute.get("/sr", async (c) => {
   return c.json({ items: (results ?? []).map((r) => toSrResponse(r as Record<string, unknown>)), total: countResult?.total ?? 0 });
 });
 
+srRoute.get("/sr/stats", async (c) => {
+  const orgId = c.get("orgId");
+  const { results: typeRows } = await c.env.DB.prepare(
+    "SELECT sr_type, COUNT(*) as count, AVG(confidence) as avg_confidence FROM sr_requests WHERE org_id = ? GROUP BY sr_type",
+  ).bind(orgId).all();
+  const totalResult = await c.env.DB.prepare(
+    "SELECT COUNT(*) as total FROM sr_requests WHERE org_id = ?",
+  ).bind(orgId).first<{ total: number }>();
+  const feedbackResult = await c.env.DB.prepare(
+    "SELECT COUNT(*) as count FROM sr_classification_feedback f JOIN sr_requests s ON f.sr_id = s.id WHERE s.org_id = ?",
+  ).bind(orgId).first<{ count: number }>();
+  const totalCount = totalResult?.total ?? 0;
+  const feedbackCount = feedbackResult?.count ?? 0;
+  const stats: SrStatsResponse = {
+    typeDistribution: (typeRows ?? []).map((r: any) => ({
+      sr_type: r.sr_type,
+      count: r.count,
+      avg_confidence: Math.round((r.avg_confidence ?? 0) * 100) / 100,
+    })),
+    totalCount,
+    feedbackCount,
+    misclassificationRate: totalCount > 0 ? Math.round((feedbackCount / totalCount) * 10000) / 10000 : 0,
+  };
+  return c.json(stats);
+});
+
 srRoute.get("/sr/:id", async (c) => {
   const row = await c.env.DB.prepare("SELECT * FROM sr_requests WHERE id = ? AND org_id = ?").bind(c.req.param("id"), c.get("orgId")).first();
   if (!row) return c.json({ error: "SR not found" }, 404);
@@ -62,6 +90,35 @@ srRoute.get("/sr/:id", async (c) => {
   const wr = await c.env.DB.prepare("SELECT * FROM sr_workflow_runs WHERE sr_id = ? ORDER BY started_at DESC LIMIT 1").bind(c.req.param("id")).first();
   const detail: SrDetailResponse = { ...sr, workflow_run: wr ? { id: wr.id as string, workflow_template: wr.workflow_template as string, status: wr.status as string, steps_completed: (wr.steps_completed as number) ?? 0, steps_total: (wr.steps_total as number) ?? 0, result_summary: (wr.result_summary as string) ?? null, started_at: (wr.started_at as string) ?? null, completed_at: (wr.completed_at as string) ?? null } : null };
   return c.json(detail);
+});
+
+srRoute.post("/sr/:id/feedback", async (c) => {
+  const srId = c.req.param("id");
+  const orgId = c.get("orgId");
+  const body = await c.req.json();
+  const parsed = srFeedbackRequest.safeParse(body);
+  if (!parsed.success) return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+  const sr = await c.env.DB.prepare("SELECT * FROM sr_requests WHERE id = ? AND org_id = ?").bind(srId, orgId).first();
+  if (!sr) return c.json({ error: "SR not found" }, 404);
+  const id = crypto.randomUUID();
+  await c.env.DB.prepare(
+    "INSERT INTO sr_classification_feedback (id, sr_id, original_type, corrected_type, corrected_by, reason) VALUES (?, ?, ?, ?, ?, ?)",
+  ).bind(id, srId, sr.sr_type as string, parsed.data.corrected_type, parsed.data.corrected_by ?? null, parsed.data.reason ?? null).run();
+  await c.env.DB.prepare(
+    "UPDATE sr_requests SET sr_type = ?, updated_at = datetime('now') WHERE id = ?",
+  ).bind(parsed.data.corrected_type, srId).run();
+  return c.json({ id, sr_id: srId, original_type: sr.sr_type, corrected_type: parsed.data.corrected_type }, 201);
+});
+
+srRoute.get("/sr/:id/feedback", async (c) => {
+  const srId = c.req.param("id");
+  const orgId = c.get("orgId");
+  const sr = await c.env.DB.prepare("SELECT id FROM sr_requests WHERE id = ? AND org_id = ?").bind(srId, orgId).first();
+  if (!sr) return c.json({ error: "SR not found" }, 404);
+  const { results } = await c.env.DB.prepare(
+    "SELECT * FROM sr_classification_feedback WHERE sr_id = ? ORDER BY created_at DESC",
+  ).bind(srId).all();
+  return c.json({ items: results ?? [] });
 });
 
 srRoute.post("/sr/:id/execute", async (c) => {
