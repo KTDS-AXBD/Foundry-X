@@ -1,8 +1,13 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { GoogleLogin } from "@react-oauth/google";
+
+const GoogleLogin = dynamic(
+  () => import("@react-oauth/google").then((m) => m.GoogleLogin),
+  { ssr: false },
+);
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
