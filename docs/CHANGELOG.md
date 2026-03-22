@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #78 (2026-03-22)
+
+**Sprint 32 — PRD v5 완전성 점검 + Phase 4→5 전환 로드맵 (F156/F157)**:
+- ✅ PRD v5 G1~G12 갭 항목 매핑: 9건 완료, 1건 진행(G10 온보딩), 2건 수요 대기(G2/G5)
+- ✅ Phase 3 산출물 11/11 완료 검증, Phase 4 산출물 11/12 완료 검증
+- ✅ Phase 5 미착수 F-item Layer 1~4 분류: 즉시(Track B) → Go 후(Track A P0) → 보조(SR+P1) → 장기(P2+수요)
+- ✅ 온보딩 4주 추적 계획: W1~W4 활동 + K7/K8/K9/K12 측정 방법 구체화
+- ✅ Phase 4 최종 Go/Pivot/Kill 판정 기준 수치화
+- ✅ SPEC.md v5.14: §2/§3/§5(F156/F157) + §6 Execution Plan + §9 변경이력
+
+**검증 결과**:
+- ✅ 거버넌스 Sprint — 코드 변경 없음, 문서/로드맵 전용
+
 ### 세션 #76 (2026-03-22)
 
 > **버전 정책 전환 (F134)**: 이후 패키지별 Independent SemVer 적용

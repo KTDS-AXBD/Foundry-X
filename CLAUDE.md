@@ -172,6 +172,9 @@ pnpm e2e                          # Playwright E2E (17 specs)
   - Sprint 31: 프로덕션 완전 동기화 + SPEC 정합성 + E2E 보강 + 온보딩 킥오프 (95%)
   - 현재: 50 services, 111 endpoints, 583 API tests, D1 33 테이블
   - PDCA 문서: `docs/archive/2026-03/` (Sprint 3~31 + standalone 전체 archived)
+- **Sprint 32:** ✅ 완료 — PRD v5 완전성 점검 + Phase 5 로드맵 (F156/F157)
+  - G1~G12 갭 매핑 (9완료+1진행+2수요대기), Phase 3 11/11 ✅, Phase 4 11/12 ✅
+  - Phase 5 Layer 1~4 분류 + 온보딩 4주 추적 계획
 - **Sprint 33:** ✅ 완료 — Agent Evolution Track B (F153~F155)
   - gstack 25개 스킬 설치 + claude-code-router + OpenRouter API 키
   - Match Rate 94%
