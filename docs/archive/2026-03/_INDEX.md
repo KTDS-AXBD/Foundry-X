@@ -40,6 +40,7 @@
 | versioning-policy | 96% | 2026-03-22 (1 session) | 2026-03-22 |
 | phase-2 | 84% | 2026-03-17 | 2026-03-22 |
 | track-b-dev-tools | 94% | 2026-03-22 (Sprint 33) | 2026-03-22 |
+| sprint-38 | 97% | 2026-03-22 (1 session) | 2026-03-22 |
 | sprint-39 | 93% | 2026-03-22 (1 session) | 2026-03-22 |
 
 ## foundry-x-cli
@@ -118,6 +119,13 @@
 - [Design (FX-DSGN-031)](sprint-31/sprint-31.design.md)
 - [Analysis (FX-ANLS-031)](sprint-31/sprint-31.analysis.md)
 - [Report (FX-RPRT-032)](sprint-31/sprint-31.report.md)
+
+## sprint-38
+
+- [Plan (FX-PLAN-038)](sprint-38/sprint-38.plan.md)
+- [Design (FX-DSGN-038)](sprint-38/sprint-38.design.md)
+- [Analysis (FX-ANLS-038)](sprint-38/sprint-38.analysis.md)
+- [Report (FX-RPRT-038)](sprint-38/sprint-38.report.md)
 
 ## sprint-39
 
