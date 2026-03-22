@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 37 진행 중 (118 endpoints, 58 services, 714 API tests + ~61 E2E)
+**현재 상태:** Sprint 39 완료 (128 endpoints, 67 services, 792 API tests + ~55 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -72,7 +72,7 @@ foundry-x/
 │   ├── api/                # Hono API Server (Phase 2)
 │   │   └── src/
 │   │       ├── routes/     # 28개: agent, auth, entities, feedback, freshness, github, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, profile, project-overview, proxy, reconciliation, requirements, slack, spec, sso, token, webhook, webhook-registry, wiki, workflow
-│   │       ├── services/   # 64개 (agent-inbox, agent-orchestrator, agent-runner, architect-agent, architect-prompts, auto-fix, auto-rebase, claude-api-runner, conflict-detector, entity-registry, entity-sync, evaluation-criteria, evaluator-optimizer, execution-types, feedback, file-context-collector, freshness-checker, github, github-review, github-sync, harness-rules, health-calc, integrity-checker, jira-adapter, jira-sync, kpi-logger, kv-cache, llm, logger, mcp-adapter, mcp-registry, mcp-resources, mcp-runner, mcp-sampling, mcp-transport, merge-queue, model-metrics, model-router, monitoring, onboarding-progress, openrouter-runner, org, planner-agent, planner-prompts, pr-pipeline, project-overview, prompt-utils, qa-agent, qa-agent-prompts, reconciliation, reviewer-agent, security-agent, security-agent-prompts, service-proxy, slack, spec-parser, sse-manager, sso, test-agent, test-agent-prompts, webhook-registry, wiki-sync, workflow-engine, worktree-manager)
+│   │       ├── services/   # 67개 (agent-feedback-loop, agent-inbox, agent-orchestrator, agent-runner, architect-agent, architect-prompts, auto-fix, auto-rebase, claude-api-runner, conflict-detector, entity-registry, entity-sync, evaluation-criteria, evaluator-optimizer, execution-types, fallback-chain, feedback, file-context-collector, freshness-checker, github, github-review, github-sync, harness-rules, health-calc, integrity-checker, jira-adapter, jira-sync, kpi-logger, kv-cache, llm, logger, mcp-adapter, mcp-registry, mcp-resources, mcp-runner, mcp-sampling, mcp-transport, merge-queue, model-metrics, model-router, monitoring, onboarding-progress, openrouter-runner, org, planner-agent, planner-prompts, pr-pipeline, project-overview, prompt-gateway, prompt-utils, qa-agent, qa-agent-prompts, reconciliation, reviewer-agent, security-agent, security-agent-prompts, service-proxy, slack, spec-parser, sse-manager, sso, test-agent, test-agent-prompts, webhook-registry, wiki-sync, workflow-engine, worktree-manager)
 │   │       ├── schemas/    # 28개 Zod 스키마 (agent, auth, common, entity, error, feedback, freshness, github, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, plan, profile, reconciliation, requirements, slack, spec, sso, token, webhook, wiki, workflow)
 │   │       └── index.ts
 │   ├── web/                # Next.js 14 Dashboard + Landing (Phase 2)
@@ -187,9 +187,14 @@ pnpm e2e                          # Playwright E2E (17 specs)
 - **Sprint 36:** ✅ 완료 — F136 태스크별 모델 라우팅 + F137 Evaluator-Optimizer 패턴
   - ModelRouter + createRoutedRunner() + D1 0022, EvaluatorOptimizer + 3종 EvaluationCriteria
   - 2-Worker Agent Team (3m 15s), 666 API tests, Match Rate 96%
-- **Sprint 37:** 🔧 진행 중 — F138 ArchitectAgent + F139 TestAgent
+- **Sprint 37:** ✅ 완료 — F138 ArchitectAgent + F139 TestAgent
   - ArchitectAgent(아키텍처 분석+설계 리뷰+의존성 분석) + TestAgent(테스트 생성+커버리지 갭+엣지 케이스)
   - 2-Worker Agent Team (4m 45s), 714 API tests (+48), Orchestrator 통합
+- **Sprint 38:** 🔧 진행 중 — F140 SecurityAgent + F141 QAAgent
+  - SecurityAgent(OWASP 스캔+PR diff 분석) + QAAgent(브라우저 테스트+수용 기준 검증)
+- **Sprint 39:** ✅ 완료 — F144 Fallback 체인 + F149 프롬프트 게이트웨이 + F150 피드백 루프
+  - FallbackChainService + PromptGatewayService + AgentFeedbackLoopService + D1 0023
+  - 2-Worker Agent Team (2m 15s), 792 API tests (+52), Match Rate 93%
 
 ## Git Workflow
 
