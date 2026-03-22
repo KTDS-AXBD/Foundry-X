@@ -164,11 +164,14 @@ describe("WorkflowEngine", () => {
 });
 
 describe("WORKFLOW_TEMPLATES", () => {
-  it("includes 3 templates", () => {
-    expect(WORKFLOW_TEMPLATES).toHaveLength(3);
+  it("includes 6 templates (3 general + 3 sprint)", () => {
+    expect(WORKFLOW_TEMPLATES).toHaveLength(6);
     expect(WORKFLOW_TEMPLATES[0]!.id).toBe("tpl_pr_review");
     expect(WORKFLOW_TEMPLATES[1]!.id).toBe("tpl_analysis");
     expect(WORKFLOW_TEMPLATES[2]!.id).toBe("tpl_auto_pr");
+    expect(WORKFLOW_TEMPLATES[3]!.id).toBe("tpl_sprint_standard");
+    expect(WORKFLOW_TEMPLATES[4]!.id).toBe("tpl_sprint_fast");
+    expect(WORKFLOW_TEMPLATES[5]!.id).toBe("tpl_sprint_review_heavy");
   });
 });
 
@@ -194,7 +197,7 @@ describe("Workflow Routes", () => {
     const res = await req("GET", "/api/orgs/org_test/workflows", { headers });
     expect(res.status).toBe(200);
     const data = await res.json() as any;
-    expect(data.templates).toHaveLength(3);
+    expect(data.templates).toHaveLength(6);
   });
 
   it("POST /api/orgs/:orgId/workflows/:id/execute — executes workflow", async () => {

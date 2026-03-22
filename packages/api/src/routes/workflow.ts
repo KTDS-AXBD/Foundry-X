@@ -1,7 +1,7 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { WorkflowEngine, WorkflowError, WORKFLOW_TEMPLATES } from "../services/workflow-engine.js";
-import { workflowCreateSchema, workflowResponseSchema, workflowExecuteSchema, workflowExecutionResponseSchema } from "../schemas/workflow.js";
+import { workflowCreateSchema, workflowResponseSchema, workflowExecuteSchema, workflowExecutionResponseSchema, sprintTemplateResponseSchema } from "../schemas/workflow.js";
 import { ErrorSchema, validationHook } from "../schemas/common.js";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
@@ -75,6 +75,24 @@ workflowRoute.openapi(createWorkflowRoute, async (c) => {
   const input = c.req.valid("json");
   const workflow = await getEngine(c.env).create(orgId, payload.sub, input);
   return c.json({ ...workflow, definition: JSON.parse(workflow.definition), enabled: workflow.enabled }, 201);
+});
+
+// ─── GET /orgs/:orgId/workflows/sprint-templates ───
+
+const sprintTemplatesRoute = createRoute({
+  method: "get",
+  path: "/orgs/{orgId}/workflows/sprint-templates",
+  tags: ["Workflows"],
+  summary: "List sprint workflow templates",
+  request: { params: OrgIdParam },
+  responses: {
+    200: { content: { "application/json": { schema: z.object({ templates: z.array(sprintTemplateResponseSchema) }) } }, description: "Sprint templates" },
+  },
+});
+
+workflowRoute.openapi(sprintTemplatesRoute, async (c) => {
+  const templates = getEngine(c.env).getSprintTemplates();
+  return c.json({ templates }, 200);
 });
 
 // ─── GET /orgs/:orgId/workflows/:id ───

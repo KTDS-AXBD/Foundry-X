@@ -24,3 +24,44 @@ export const TokenSummarySchema = z
     byAgent: z.record(ModelStatsSchema),
   })
   .openapi("TokenSummary");
+
+// ─── Model Metrics (F143) ───
+
+export const ModelQualityMetricSchema = z
+  .object({
+    model: z.string(),
+    totalExecutions: z.number(),
+    successCount: z.number(),
+    failedCount: z.number(),
+    successRate: z.number(),
+    avgDurationMs: z.number(),
+    totalCostUsd: z.number(),
+    avgCostPerExecution: z.number(),
+    tokenEfficiency: z.number(),
+  })
+  .openapi("ModelQualityMetric");
+
+export const ModelQualityResponseSchema = z
+  .object({
+    metrics: z.array(ModelQualityMetricSchema),
+    period: z.object({ from: z.string(), to: z.string() }),
+  })
+  .openapi("ModelQualityResponse");
+
+export const AgentModelCellSchema = z
+  .object({
+    agentName: z.string(),
+    model: z.string(),
+    executions: z.number(),
+    totalCostUsd: z.number(),
+    avgDurationMs: z.number(),
+    successRate: z.number(),
+  })
+  .openapi("AgentModelCell");
+
+export const AgentModelMatrixResponseSchema = z
+  .object({
+    matrix: z.array(AgentModelCellSchema),
+    period: z.object({ from: z.string(), to: z.string() }),
+  })
+  .openapi("AgentModelMatrixResponse");

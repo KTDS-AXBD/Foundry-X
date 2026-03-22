@@ -44,6 +44,17 @@ const CONDITION_EVALUATORS: Record<string, (ctx: ExecutionContext) => boolean> =
   analysis_passed: (ctx) => ((ctx.lastResult?.matchRate as number) ?? 0) >= 90,
   pr_merged: (ctx) => ctx.lastResult?.prState === "merged",
   always: () => true,
+  match_rate_met: (ctx) => {
+    const threshold = (ctx.variables?.sprintContext as any)?.quality_threshold ?? 90;
+    return ((ctx.lastResult?.matchRate as number) ?? 0) >= threshold;
+  },
+  test_coverage_met: (ctx) => {
+    const threshold = (ctx.variables?.sprintContext as any)?.test_coverage_threshold ?? 80;
+    return ((ctx.lastResult?.coverage as number) ?? 0) >= threshold;
+  },
+  peer_review_approved: (ctx) => {
+    return ((ctx.lastResult?.reviewCount as number) ?? 0) >= 1;
+  },
 };
 
 function toWorkflow(row: Record<string, unknown>): Workflow {
@@ -139,6 +150,10 @@ export class WorkflowEngine {
     return this.get(orgId, id);
   }
 
+  getSprintTemplates() {
+    return WORKFLOW_TEMPLATES.filter((t) => t.category === "sprint");
+  }
+
   async delete(orgId: string, id: string): Promise<boolean> {
     const result = await this.db
       .prepare("DELETE FROM workflows WHERE id = ? AND org_id = ?")
@@ -200,6 +215,14 @@ export class WorkflowEngine {
         // Placeholder: record the action was processed
         ctx.lastResult = { actionType: node.data.actionType, processed: true };
         break;
+      case "evaluate_optimize":
+        // F137: Evaluator-Optimizer placeholder — real impl connects to EvaluatorOptimizer service
+        ctx.lastResult = {
+          actionType: "evaluate_optimize",
+          processed: true,
+          config: node.data.config ?? {},
+        };
+        break;
     }
 
     // Follow outgoing edges
@@ -249,6 +272,7 @@ export const WORKFLOW_TEMPLATES = [
     id: "tpl_pr_review",
     name: "PR Review Pipeline",
     description: "코드 리뷰 → 승인 대기 → 머지",
+    category: "general" as const,
     definition: {
       nodes: [
         { id: "trigger", type: "trigger" as const, label: "PR Created", position: { x: 0, y: 0 }, data: {} },
@@ -267,6 +291,7 @@ export const WORKFLOW_TEMPLATES = [
     id: "tpl_analysis",
     name: "Codebase Analysis",
     description: "코드 분석 → 결과 알림",
+    category: "general" as const,
     definition: {
       nodes: [
         { id: "trigger", type: "trigger" as const, label: "Manual Trigger", position: { x: 0, y: 0 }, data: {} },
@@ -285,6 +310,7 @@ export const WORKFLOW_TEMPLATES = [
     id: "tpl_auto_pr",
     name: "Auto PR Creation",
     description: "에이전트 실행 → 분석 통과 시 PR 생성",
+    category: "general" as const,
     definition: {
       nodes: [
         { id: "trigger", type: "trigger" as const, label: "Task Assigned", position: { x: 0, y: 0 }, data: {} },
@@ -299,6 +325,96 @@ export const WORKFLOW_TEMPLATES = [
         { id: "e3", source: "check", target: "pr", condition: "analysis_passed" },
         { id: "e4", source: "check", target: "end" },
         { id: "e5", source: "pr", target: "end" },
+      ],
+    },
+  },
+  // ─── Sprint Templates ───
+  {
+    id: "tpl_sprint_standard",
+    name: "Sprint Standard",
+    description: "Think → Plan → Build → Review → Test → Ship → Reflect (리워크 루프 포함)",
+    category: "sprint" as const,
+    definition: {
+      nodes: [
+        { id: "trigger", type: "trigger" as const, label: "Sprint Start", position: { x: 0, y: 0 }, data: {} },
+        { id: "think", type: "action" as const, label: "Run Analysis", position: { x: 150, y: 0 }, data: { actionType: "run_analysis" as const } },
+        { id: "plan", type: "action" as const, label: "Plan Sprint", position: { x: 300, y: 0 }, data: { actionType: "run_agent" as const, config: { agent: "planner" } } },
+        { id: "build", type: "action" as const, label: "Build Features", position: { x: 450, y: 0 }, data: { actionType: "run_agent" as const, config: { agent: "builder" } } },
+        { id: "review", type: "condition" as const, label: "Peer Review?", position: { x: 600, y: 0 }, data: {} },
+        { id: "test", type: "condition" as const, label: "Match Rate Met?", position: { x: 750, y: 0 }, data: {} },
+        { id: "ship", type: "action" as const, label: "Create PR", position: { x: 900, y: 0 }, data: { actionType: "create_pr" as const } },
+        { id: "reflect", type: "action" as const, label: "Sprint Retro", position: { x: 1050, y: 0 }, data: { actionType: "send_notification" as const, config: { type: "retrospective" } } },
+        { id: "end", type: "end" as const, label: "Done", position: { x: 1200, y: 0 }, data: {} },
+        { id: "rework", type: "action" as const, label: "Rework", position: { x: 600, y: 150 }, data: { actionType: "run_agent" as const, config: { agent: "builder" } } },
+      ],
+      edges: [
+        { id: "e1", source: "trigger", target: "think" },
+        { id: "e2", source: "think", target: "plan" },
+        { id: "e3", source: "plan", target: "build" },
+        { id: "e4", source: "build", target: "review" },
+        { id: "e5", source: "review", target: "test", condition: "peer_review_approved" },
+        { id: "e6", source: "review", target: "rework" },
+        { id: "e7", source: "test", target: "ship", condition: "match_rate_met" },
+        { id: "e8", source: "test", target: "rework" },
+        { id: "e9", source: "rework", target: "review" },
+        { id: "e10", source: "ship", target: "reflect" },
+        { id: "e11", source: "reflect", target: "end" },
+      ],
+    },
+  },
+  {
+    id: "tpl_sprint_fast",
+    name: "Sprint Fast",
+    description: "Plan → Build → Test → Ship (최소 리뷰, 빠른 이터레이션)",
+    category: "sprint" as const,
+    definition: {
+      nodes: [
+        { id: "trigger", type: "trigger" as const, label: "Sprint Start", position: { x: 0, y: 0 }, data: {} },
+        { id: "plan", type: "action" as const, label: "Plan Sprint", position: { x: 200, y: 0 }, data: { actionType: "run_agent" as const, config: { agent: "planner" } } },
+        { id: "build", type: "action" as const, label: "Build Features", position: { x: 400, y: 0 }, data: { actionType: "run_agent" as const, config: { agent: "builder" } } },
+        { id: "test", type: "condition" as const, label: "Coverage Met?", position: { x: 600, y: 0 }, data: {} },
+        { id: "ship", type: "action" as const, label: "Create PR", position: { x: 800, y: 0 }, data: { actionType: "create_pr" as const } },
+        { id: "end", type: "end" as const, label: "Done", position: { x: 1000, y: 0 }, data: {} },
+      ],
+      edges: [
+        { id: "e1", source: "trigger", target: "plan" },
+        { id: "e2", source: "plan", target: "build" },
+        { id: "e3", source: "build", target: "test" },
+        { id: "e4", source: "test", target: "ship", condition: "test_coverage_met" },
+        { id: "e5", source: "test", target: "build" },
+        { id: "e6", source: "ship", target: "end" },
+      ],
+    },
+  },
+  {
+    id: "tpl_sprint_review_heavy",
+    name: "Sprint Review-Heavy",
+    description: "Build → 자동 리뷰 → 피어 리뷰 → 테스트 → Ship (이중 리뷰 게이트)",
+    category: "sprint" as const,
+    definition: {
+      nodes: [
+        { id: "trigger", type: "trigger" as const, label: "Sprint Start", position: { x: 0, y: 0 }, data: {} },
+        { id: "plan", type: "action" as const, label: "Plan Sprint", position: { x: 150, y: 0 }, data: { actionType: "run_agent" as const, config: { agent: "planner" } } },
+        { id: "build", type: "action" as const, label: "Build Features", position: { x: 300, y: 0 }, data: { actionType: "run_agent" as const, config: { agent: "builder" } } },
+        { id: "auto_review", type: "condition" as const, label: "Auto Review?", position: { x: 450, y: 0 }, data: {} },
+        { id: "peer_review", type: "condition" as const, label: "Peer Review?", position: { x: 600, y: 0 }, data: {} },
+        { id: "test", type: "condition" as const, label: "Match Rate Met?", position: { x: 750, y: 0 }, data: {} },
+        { id: "ship", type: "action" as const, label: "Create PR", position: { x: 900, y: 0 }, data: { actionType: "create_pr" as const } },
+        { id: "end", type: "end" as const, label: "Done", position: { x: 1050, y: 0 }, data: {} },
+        { id: "rework", type: "action" as const, label: "Rework", position: { x: 450, y: 150 }, data: { actionType: "run_agent" as const, config: { agent: "builder" } } },
+      ],
+      edges: [
+        { id: "e1", source: "trigger", target: "plan" },
+        { id: "e2", source: "plan", target: "build" },
+        { id: "e3", source: "build", target: "auto_review" },
+        { id: "e4", source: "auto_review", target: "peer_review", condition: "analysis_passed" },
+        { id: "e5", source: "auto_review", target: "rework" },
+        { id: "e6", source: "peer_review", target: "test", condition: "peer_review_approved" },
+        { id: "e7", source: "peer_review", target: "rework" },
+        { id: "e8", source: "test", target: "ship", condition: "match_rate_met" },
+        { id: "e9", source: "test", target: "rework" },
+        { id: "e10", source: "rework", target: "auto_review" },
+        { id: "e11", source: "ship", target: "end" },
       ],
     },
   },

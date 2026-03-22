@@ -7,7 +7,7 @@ export const workflowNodeSchema = z.object({
   position: z.object({ x: z.number(), y: z.number() }),
   data: z.object({
     actionType: z
-      .enum(["run_agent", "create_pr", "send_notification", "run_analysis", "wait_approval"])
+      .enum(["run_agent", "create_pr", "send_notification", "run_analysis", "wait_approval", "evaluate_optimize"])
       .optional(),
     config: z.record(z.unknown()).optional(),
   }),
@@ -71,6 +71,31 @@ export const workflowExecutionResponseSchema = z
     created_at: z.string(),
   })
   .openapi("WorkflowExecutionResponse");
+
+export const sprintContextSchema = z
+  .object({
+    sprint_id: z.string(),
+    phase: z.string(),
+    feature_ids: z.array(z.string()),
+    due_date: z.string().optional(),
+    assignee: z.string().optional(),
+    quality_threshold: z.number().default(90),
+    test_coverage_threshold: z.number().default(80),
+  })
+  .openapi("SprintContext");
+
+export type SprintContext = z.infer<typeof sprintContextSchema>;
+
+export const sprintTemplateResponseSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string(),
+    category: z.literal("sprint"),
+    definition: workflowDefinitionSchema,
+    sprintContext: sprintContextSchema.partial().optional(),
+  })
+  .openapi("SprintTemplateResponse");
 
 export type WorkflowCreate = z.infer<typeof workflowCreateSchema>;
 export type WorkflowNode = z.infer<typeof workflowNodeSchema>;

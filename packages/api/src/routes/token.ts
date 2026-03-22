@@ -1,7 +1,13 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { desc } from "drizzle-orm";
-import { TokenSummarySchema, TokenUsageRecordSchema } from "../schemas/token.js";
+import {
+  TokenSummarySchema,
+  TokenUsageRecordSchema,
+  ModelQualityResponseSchema,
+  AgentModelMatrixResponseSchema,
+} from "../schemas/token.js";
+import { ModelMetricsService } from "../services/model-metrics.js";
 import type { TokenUsage, TokenSummary } from "@foundry-x/shared";
 import { getDb } from "../db/index.js";
 import { tokenUsage } from "../db/schema.js";
@@ -136,4 +142,78 @@ tokenRoute.openapi(getTokenUsage, async (c) => {
       agentId: r.agentName,
     })),
   );
+});
+
+// ─── Model Metrics (F143) ───
+
+const getModelQuality = createRoute({
+  method: "get",
+  path: "/tokens/model-quality",
+  tags: ["Tokens"],
+  summary: "Model quality metrics",
+  request: {
+    query: z.object({
+      projectId: z.string().optional(),
+      days: z.coerce.number().min(1).max(365).optional(),
+    }),
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: ModelQualityResponseSchema } },
+      description: "Quality metrics grouped by model",
+    },
+  },
+});
+
+tokenRoute.openapi(getModelQuality, async (c) => {
+  const { projectId, days } = c.req.valid("query");
+  const d = days ?? 30;
+  const cutoff = new Date(Date.now() - d * 86400_000).toISOString();
+  const now = new Date().toISOString();
+  let metrics: Awaited<ReturnType<ModelMetricsService["getModelQuality"]>> = [];
+  try {
+    if (c.env?.DB) {
+      const service = new ModelMetricsService(c.env.DB);
+      metrics = await service.getModelQuality({ projectId, days: d });
+    }
+  } catch {
+    // D1 not available — return empty
+  }
+  return c.json({ metrics, period: { from: cutoff, to: now } });
+});
+
+const getAgentModelMatrix = createRoute({
+  method: "get",
+  path: "/tokens/agent-model-matrix",
+  tags: ["Tokens"],
+  summary: "Agent-model cross matrix",
+  request: {
+    query: z.object({
+      projectId: z.string().optional(),
+      days: z.coerce.number().min(1).max(365).optional(),
+    }),
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: AgentModelMatrixResponseSchema } },
+      description: "Execution matrix grouped by agent and model",
+    },
+  },
+});
+
+tokenRoute.openapi(getAgentModelMatrix, async (c) => {
+  const { projectId, days } = c.req.valid("query");
+  const d = days ?? 30;
+  const cutoff = new Date(Date.now() - d * 86400_000).toISOString();
+  const now = new Date().toISOString();
+  let matrix: Awaited<ReturnType<ModelMetricsService["getAgentModelMatrix"]>> = [];
+  try {
+    if (c.env?.DB) {
+      const service = new ModelMetricsService(c.env.DB);
+      matrix = await service.getAgentModelMatrix({ projectId, days: d });
+    }
+  } catch {
+    // D1 not available — return empty
+  }
+  return c.json({ matrix, period: { from: cutoff, to: now } });
 });
