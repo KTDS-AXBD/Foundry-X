@@ -42,6 +42,7 @@
 | track-b-dev-tools | 94% | 2026-03-22 (Sprint 33) | 2026-03-22 |
 | sprint-38 | 97% | 2026-03-22 (1 session) | 2026-03-22 |
 | sprint-39 | 93% | 2026-03-22 (1 session) | 2026-03-22 |
+| sprint-42 | 97% | 2026-03-22 (1 session) | 2026-03-22 |
 
 ## foundry-x-cli
 
