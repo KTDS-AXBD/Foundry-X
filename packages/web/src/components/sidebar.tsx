@@ -14,9 +14,13 @@ import {
   Menu,
   Search,
   FlaskConical,
+  LogIn,
+  LogOut,
 } from "lucide-react";
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/lib/stores/auth-store";
 import {
   Sheet,
   SheetTrigger,
@@ -77,6 +81,44 @@ function NavLinks({ onSelect }: { onSelect?: () => void }) {
   );
 }
 
+function AuthSection() {
+  const { user, isAuthenticated, logout, hydrate } = useAuthStore();
+
+  useEffect(() => {
+    hydrate();
+  }, [hydrate]);
+
+  if (!isAuthenticated) {
+    return (
+      <Link
+        href="/login"
+        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+      >
+        <LogIn className="size-4 shrink-0" />
+        로그인
+      </Link>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 px-3 py-2">
+      <div className="flex-1 min-w-0">
+        <p className="truncate text-sm font-medium">{user?.name}</p>
+        <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
+      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="size-8 shrink-0"
+        onClick={logout}
+        title="로그아웃"
+      >
+        <LogOut className="size-4" />
+      </Button>
+    </div>
+  );
+}
+
 export function Sidebar() {
   const [open, setOpen] = useState(false);
 
@@ -95,9 +137,12 @@ export function Sidebar() {
             <SheetHeader className="border-b px-4 py-3">
               <SheetTitle className="text-base font-bold">Foundry-X</SheetTitle>
             </SheetHeader>
-            <div className="p-3">
+            <div className="flex flex-1 flex-col p-3">
               <OrgSwitcher />
               <NavLinks onSelect={() => setOpen(false)} />
+              <div className="mt-auto border-t pt-3">
+                <AuthSection />
+              </div>
             </div>
           </SheetContent>
         </Sheet>
@@ -121,6 +166,9 @@ export function Sidebar() {
         <div className="flex-1 overflow-auto p-3">
           <OrgSwitcher />
           <NavLinks />
+        </div>
+        <div className="border-t p-3">
+          <AuthSection />
         </div>
       </aside>
     </>
