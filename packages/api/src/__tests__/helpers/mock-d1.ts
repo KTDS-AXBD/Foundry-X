@@ -76,6 +76,8 @@ export class MockD1Database {
         name TEXT NOT NULL,
         role TEXT NOT NULL DEFAULT 'member',
         password_hash TEXT,
+        auth_provider TEXT DEFAULT 'email',
+        provider_id TEXT,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
       );
