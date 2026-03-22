@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 39 완료 (128 endpoints, 67 services, 792 API tests + ~55 E2E)
+**현재 상태:** Sprint 40 진행 중 (139 endpoints, 70 services, 835 API tests + ~55 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -72,7 +72,7 @@ foundry-x/
 │   ├── api/                # Hono API Server (Phase 2)
 │   │   └── src/
 │   │       ├── routes/     # 28개: agent, auth, entities, feedback, freshness, github, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, profile, project-overview, proxy, reconciliation, requirements, slack, spec, sso, token, webhook, webhook-registry, wiki, workflow
-│   │       ├── services/   # 67개 (agent-feedback-loop, agent-inbox, agent-orchestrator, agent-runner, architect-agent, architect-prompts, auto-fix, auto-rebase, claude-api-runner, conflict-detector, entity-registry, entity-sync, evaluation-criteria, evaluator-optimizer, execution-types, fallback-chain, feedback, file-context-collector, freshness-checker, github, github-review, github-sync, harness-rules, health-calc, integrity-checker, jira-adapter, jira-sync, kpi-logger, kv-cache, llm, logger, mcp-adapter, mcp-registry, mcp-resources, mcp-runner, mcp-sampling, mcp-transport, merge-queue, model-metrics, model-router, monitoring, onboarding-progress, openrouter-runner, org, planner-agent, planner-prompts, pr-pipeline, project-overview, prompt-gateway, prompt-utils, qa-agent, qa-agent-prompts, reconciliation, reviewer-agent, security-agent, security-agent-prompts, service-proxy, slack, spec-parser, sse-manager, sso, test-agent, test-agent-prompts, webhook-registry, wiki-sync, workflow-engine, worktree-manager)
+│   │       ├── services/   # 70개 (agent-feedback-loop, agent-inbox, agent-orchestrator, agent-runner, agent-self-reflection, architect-agent, architect-prompts, auto-fix, auto-rebase, claude-api-runner, conflict-detector, entity-registry, entity-sync, evaluation-criteria, evaluator-optimizer, execution-types, fallback-chain, feedback, file-context-collector, freshness-checker, github, github-review, github-sync, harness-rules, health-calc, infra-agent, infra-agent-prompts, integrity-checker, jira-adapter, jira-sync, kpi-logger, kv-cache, llm, logger, mcp-adapter, mcp-registry, mcp-resources, mcp-runner, mcp-sampling, mcp-transport, merge-queue, model-metrics, model-router, monitoring, onboarding-progress, openrouter-runner, org, planner-agent, planner-prompts, pr-pipeline, project-overview, prompt-gateway, prompt-utils, qa-agent, qa-agent-prompts, reconciliation, reviewer-agent, security-agent, security-agent-prompts, service-proxy, slack, spec-parser, sse-manager, sso, test-agent, test-agent-prompts, webhook-registry, wiki-sync, workflow-engine, worktree-manager)
 │   │       ├── schemas/    # 28개 Zod 스키마 (agent, auth, common, entity, error, feedback, freshness, github, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, plan, profile, reconciliation, requirements, slack, spec, sso, token, webhook, wiki, workflow)
 │   │       └── index.ts
 │   ├── web/                # Next.js 14 Dashboard + Landing (Phase 2)
@@ -196,6 +196,9 @@ pnpm e2e                          # Playwright E2E (17 specs)
 - **Sprint 39:** ✅ 완료 — F144 Fallback 체인 + F149 프롬프트 게이트웨이 + F150 피드백 루프
   - FallbackChainService + PromptGatewayService + AgentFeedbackLoopService + D1 0023
   - 2-Worker Agent Team (2m 15s), 792 API tests (+52), Match Rate 93%
+- **Sprint 40:** 🔧 진행 중 — F145 InfraAgent + F148 에이전트 자기 평가
+  - InfraAgent(인프라 분석+시뮬레이션+마이그레이션 검증) + AgentSelfReflection(자기 반성 래퍼)
+  - 2-Worker Agent Team (6m 15s), 835 API tests (+43), Match Rate 91%
 
 ## Git Workflow
 
