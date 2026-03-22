@@ -35,9 +35,9 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              사람과 AI가 함께 만드는 협업 플랫폼.
+              AI 에이전트가 일하는 방식을 설계하는 곳.
               <br />
-              명세부터 배포까지, 한 곳에서.
+              사업기회부터 데모까지, 한 곳에서.
             </p>
           </div>
 
@@ -69,7 +69,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} KTDS AX BD. All rights reserved.
           </p>
           <p className="font-mono text-xs text-muted-foreground/60">
-            v2.0.0 &middot; Phase 3
+            Sprint 46 &middot; Phase 5
           </p>
         </div>
       </div>

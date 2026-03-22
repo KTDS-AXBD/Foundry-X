@@ -7,12 +7,12 @@ import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const navLinks = [
+  { href: "#process", label: "Process" },
   { href: "#features", label: "Features" },
-  { href: "#services", label: "Services" },
-  { href: "#ecosystem", label: "Ecosystem" },
+  { href: "#agents", label: "Agents" },
   { href: "#architecture", label: "Architecture" },
+  { href: "#ecosystem", label: "Ecosystem" },
   { href: "#roadmap", label: "Roadmap" },
-  { href: "#plugin", label: "Plugin" },
 ];
 
 export function Navbar() {
