@@ -33,6 +33,7 @@ import { automationQualityRoute } from "./routes/automation-quality.js";
 import { srRoute } from "./routes/sr.js";
 import { auditRoute } from "./routes/audit.js";
 import { governanceRoute } from "./routes/governance.js";
+import { bizItemsRoute } from "./routes/biz-items.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -181,6 +182,9 @@ app.route("/api", srRoute);
 // Sprint 47: Audit log + Governance (auth + tenant required)
 app.route("/api", auditRoute);
 app.route("/api", governanceRoute);
+
+// Sprint 51: BizItems — 사업 아이템 분류 + 멀티 페르소나 평가 (auth + tenant required)
+app.route("/api", bizItemsRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
