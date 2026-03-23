@@ -11,7 +11,7 @@ const footerLinks = {
   Ecosystem: [
     { label: "AI Foundry", href: "https://github.com/IDEA-on-Action/AI-Foundry" },
     { label: "AXIS Design System", href: "https://github.com/IDEA-on-Action/AXIS-Design-System" },
-    { label: "Discovery-X", href: "#" },
+    { label: "Discovery-X", href: "https://dx.minu.best" },
   ],
   Community: [
     { label: "GitHub", href: "https://github.com/KTDS-AXBD/Foundry-X" },
@@ -69,7 +69,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} KTDS AX BD. All rights reserved.
           </p>
           <p className="font-mono text-xs text-muted-foreground/60">
-            Sprint 46 &middot; Phase 5
+            Sprint 50 &middot; Phase 5
           </p>
         </div>
       </div>
