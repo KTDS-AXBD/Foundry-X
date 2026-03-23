@@ -277,7 +277,7 @@ export default function OrgMembersPage() {
                           onClick={async () => {
                             try {
                               await navigator.clipboard.writeText(
-                                `${window.location.origin}/invite/${inv.token}`,
+                                `${window.location.origin}/invite?token=${inv.token}`,
                               );
                             } catch { /* */ }
                           }}

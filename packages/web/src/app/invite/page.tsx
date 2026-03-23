@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,8 +36,35 @@ function LogoMark() {
 type PageState = "loading" | "valid" | "expired" | "already_accepted" | "not_found";
 
 export default function InvitePage() {
-  const params = useParams<{ token: string }>();
-  const token = params.token;
+  return (
+    <Suspense fallback={<InviteLoading />}>
+      <InvitePageInner />
+    </Suspense>
+  );
+}
+
+function InviteLoading() {
+  return (
+    <div
+      className="relative flex min-h-screen items-center justify-center overflow-hidden p-4"
+      style={{ background: "var(--axis-color-gray-950, hsl(var(--background)))" }}
+    >
+      <div className="w-full max-w-[420px]">
+        <Card className="border-border/30 bg-card/80 shadow-2xl shadow-black/30 backdrop-blur-xl">
+          <CardContent className="space-y-4 py-8">
+            <Skeleton className="mx-auto h-6 w-48" />
+            <Skeleton className="mx-auto h-4 w-64" />
+            <Skeleton className="mx-auto h-10 w-full" />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function InvitePageInner() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") ?? "";
   const [state, setState] = useState<PageState>("loading");
   const [info, setInfo] = useState<InvitationInfo | null>(null);
 

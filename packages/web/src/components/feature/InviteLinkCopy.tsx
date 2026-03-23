@@ -11,8 +11,8 @@ export function InviteLinkCopy({ token }: InviteLinkCopyProps) {
   const [copied, setCopied] = useState(false);
   const inviteUrl =
     typeof window !== "undefined"
-      ? `${window.location.origin}/invite/${token}`
-      : `/invite/${token}`;
+      ? `${window.location.origin}/invite?token=${token}`
+      : `/invite?token=${token}`;
 
   async function handleCopy() {
     try {
