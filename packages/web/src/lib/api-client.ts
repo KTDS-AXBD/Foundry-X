@@ -26,7 +26,10 @@ export async function fetchApi<T>(path: string): Promise<T> {
   const res = await fetch(url, { headers: getAuthHeaders() });
 
   if (!res.ok) {
-    throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+    const message = res.status === 401
+      ? "로그인이 필요해요"
+      : `API ${res.status}: ${res.statusText}`;
+    throw new ApiError(res.status, message);
   }
 
   return res.json() as Promise<T>;
@@ -39,14 +42,24 @@ export async function postApi<T>(path: string, body?: unknown): Promise<T> {
     headers: body !== undefined ? jsonAuthHeaders() : { ...getAuthHeaders() },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  if (!res.ok) {
+    const message = res.status === 401
+      ? "로그인이 필요해요"
+      : `API ${res.status}: ${res.statusText}`;
+    throw new ApiError(res.status, message);
+  }
   return res.json() as Promise<T>;
 }
 
 export async function deleteApi(path: string): Promise<void> {
   const url = `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
   const res = await fetch(url, { method: "DELETE", headers: getAuthHeaders() });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  if (!res.ok) {
+    const message = res.status === 401
+      ? "로그인이 필요해요"
+      : `API ${res.status}: ${res.statusText}`;
+    throw new ApiError(res.status, message);
+  }
 }
 
 export async function patchApi<T>(path: string, body: unknown): Promise<T> {
@@ -56,7 +69,12 @@ export async function patchApi<T>(path: string, body: unknown): Promise<T> {
     headers: jsonAuthHeaders(),
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  if (!res.ok) {
+    const message = res.status === 401
+      ? "로그인이 필요해요"
+      : `API ${res.status}: ${res.statusText}`;
+    throw new ApiError(res.status, message);
+  }
   return res.json() as Promise<T>;
 }
 
