@@ -11,9 +11,7 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/lib/api-client", () => ({
   fetchSrList: vi.fn(),
   fetchSrStats: vi.fn(),
-  fetchSrDetail: vi.fn(),
   submitSrFeedback: vi.fn(),
-  fetchApi: vi.fn(),
 }));
 
 import SrStatsCards from "@/components/feature/SrStatsCards";
@@ -21,8 +19,7 @@ import SrListTable from "@/components/feature/SrListTable";
 import SrWorkflowDag from "@/components/feature/SrWorkflowDag";
 import SrFeedbackDialog from "@/components/feature/SrFeedbackDialog";
 import SrPage from "@/app/(app)/sr/page";
-import SrDetailPage from "@/app/(app)/sr/[id]/page";
-import { fetchSrList, fetchSrStats, fetchSrDetail, fetchApi } from "@/lib/api-client";
+import { fetchSrList, fetchSrStats } from "@/lib/api-client";
 import type { SrStatsResponse, SrItem, SrWorkflowNodeClient } from "@/lib/api-client";
 
 // ─── Mock Data ───
@@ -179,33 +176,4 @@ describe("SrPage", () => {
   });
 });
 
-// ─── SR Detail Page ───
-
-describe("SrDetailPage", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(fetchSrDetail).mockResolvedValue({
-      ...mockItems[0],
-      workflow_run: {
-        id: "wf-1",
-        workflow_template: "sr-bug-fix",
-        status: "running",
-        steps_completed: 1,
-        steps_total: 3,
-        result_summary: null,
-        started_at: "2026-03-20T00:00:00Z",
-        completed_at: null,
-      },
-    });
-    vi.mocked(fetchApi).mockResolvedValue({ feedbacks: [] });
-  });
-
-  it("renders SR detail and workflow nodes", async () => {
-    render(<SrDetailPage />);
-    await waitFor(() => {
-      expect(screen.getByText("Fix login timeout")).toBeInTheDocument();
-    });
-    expect(screen.getByText("분류 수정")).toBeInTheDocument();
-    expect(screen.getByText("Feedback History")).toBeInTheDocument();
-  });
-});
+// SR Detail 테스트는 [id] 동적 라우트 제거로 삭제 — 추후 모달 패턴으로 재구현 시 추가
