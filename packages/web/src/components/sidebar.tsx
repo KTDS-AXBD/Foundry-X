@@ -364,18 +364,18 @@ export function Sidebar() {
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0">
+          <SheetContent side="left" className="w-64 p-0 flex flex-col">
             <SheetHeader className="border-b px-4 py-3">
               <SheetTitle className="text-base font-bold font-display">
                 Foundry-X
               </SheetTitle>
             </SheetHeader>
-            <div className="flex flex-1 flex-col overflow-auto p-3">
+            <div className="flex-1 overflow-auto p-3">
               <OrgSwitcher />
               <NavLinks onSelect={() => setOpen(false)} />
-              <div className="mt-auto border-t pt-3">
-                <AuthSection />
-              </div>
+            </div>
+            <div className="border-t p-3">
+              <AuthSection />
             </div>
           </SheetContent>
         </Sheet>
