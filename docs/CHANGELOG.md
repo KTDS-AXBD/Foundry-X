@@ -8,13 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ### 세션 #100 (2026-03-23)
-**프로덕션 QA 디버깅 — gstack /qa (3 issues fixed, health 62→84)**:
+**프로덕션 QA 디버깅 — gstack /qa (4 issues fixed, health 62→88)**:
 - ✅ ISSUE-001: 전체 API 클라이언트(fetchApi/postApi/deleteApi/patchApi)에서 401 응답 시 "로그인이 필요해요" 메시지로 변환 — SR 페이지 등 raw "API 401:" 텍스트 UI 노출 수정
 - ✅ ISSUE-002: Footer Discovery-X 링크 `#` → `https://dx.minu.best` + Sprint 46→50 갱신
 - ✅ ISSUE-003: `/invite/[token]` 동적 라우트를 `/invite?token=xxx` query param으로 전환 — `output: export` 빌드 실패 해결
+- ✅ ISSUE-004: 모바일 사이드바 로그인 버튼 항상 표시 — AuthSection을 스크롤 영역 밖으로 이동
 - ✅ gstack v0.9.9.0 → v0.11.1.0 업그레이드 (/cso, /autoplan, /retro global 등 신규 스킬)
 
-**검증 결과**: Web 73/73 ✅, `next build` ✅ (이전 빌드 실패 → 성공)
+**검증 결과**: Web 73/73 ✅, `next build` ✅, CI/CD 전체 성공
 
 ---
 
