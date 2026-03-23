@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #100 (2026-03-23)
+**프로덕션 QA 디버깅 — gstack /qa (3 issues fixed, health 62→84)**:
+- ✅ ISSUE-001: 전체 API 클라이언트(fetchApi/postApi/deleteApi/patchApi)에서 401 응답 시 "로그인이 필요해요" 메시지로 변환 — SR 페이지 등 raw "API 401:" 텍스트 UI 노출 수정
+- ✅ ISSUE-002: Footer Discovery-X 링크 `#` → `https://dx.minu.best` + Sprint 46→50 갱신
+- ✅ ISSUE-003: `/invite/[token]` 동적 라우트를 `/invite?token=xxx` query param으로 전환 — `output: export` 빌드 실패 해결
+- ✅ gstack v0.9.9.0 → v0.11.1.0 업그레이드 (/cso, /autoplan, /retro global 등 신규 스킬)
+
+**검증 결과**: Web 73/73 ✅, `next build` ✅ (이전 빌드 실패 → 성공)
+
+---
+
 ### 세션 #99b (2026-03-23)
 **Sprint 50: 팀원 셀프 온보딩 플로우 + 인앱 피드백 위젯 (F173+F174, Match Rate 100%)**:
 - ✅ F173: 초대 링크 복사 UI + `/invite/[token]` 비밀번호 설정 페이지 + Google OAuth 듀얼 경로 + 자동 로그인 → Getting Started 리다이렉트
