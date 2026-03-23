@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 48 완료 (172 endpoints, 79 services, 1029 API tests + Web 74 + ~55 E2E)
+**현재 상태:** Sprint 50 완료 (175 endpoints, 79 services, 1051 API tests + Web 73 + ~55 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -128,14 +128,14 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 
 # API 패키지 단독
 cd packages/api
-pnpm test                         # vitest run (1029 tests)
+pnpm test                         # vitest run (1051 tests)
 pnpm test -- --grep "agent"       # 특정 테스트 필터
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # 로컬 서버 실행
 
 # Web 패키지 단독
 cd packages/web
-pnpm test                         # vitest run (74 tests)
+pnpm test                         # vitest run (73 tests)
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # Next.js dev server (localhost:3000)
 pnpm e2e                          # Playwright E2E (17 specs)
@@ -170,7 +170,7 @@ pnpm e2e                          # Playwright E2E (17 specs)
   - Sprint 29: 온보딩 기반 — 가이드 UI + 피드백 API + 체크리스트
   - Sprint 30: 배포 동기화 + Phase 4 Go 판정(Conditional) + 품질 강화 (93%)
   - Sprint 31: 프로덕션 완전 동기화 + SPEC 정합성 + E2E 보강 + 온보딩 킥오프 (95%)
-  - 현재: 79 services, 172 endpoints, 1029 API tests, D1 49 테이블
+  - 현재: 79 services, 175 endpoints, 1051 API tests, D1 50 테이블
   - PDCA 문서: `docs/archive/2026-03/` (Sprint 3~31 + standalone 전체 archived)
 - **Sprint 32~47:** ✅ 완료 — Agent Evolution Track A 완결(A1~A18) + Phase 5 고객 파일럿 준비
   - Sprint 32~33: PRD v5 갭 매핑 + gstack/claude-code-router/OpenRouter 설치
@@ -182,6 +182,10 @@ pnpm e2e                          # Playwright E2E (17 specs)
 - **Sprint 48:** ✅ 완료 — F167 ML 하이브리드 SR 분류기 + F168 SR 대시보드 UI
   - HybridSrClassifier(규칙+LLM 2-pass) + SR 대시보드(목록/통계/DAG/피드백)
   - 2-Worker Agent Team (4m 45s), 1029 API tests (+30), Web 74 (+6), Match Rate 95%
+- **Sprint 49:** ✅ 완료 — F171 대시보드 IA 재설계 + F172 인터랙티브 온보딩 투어 (Match 95%)
+- **Sprint 50:** ✅ 완료 — F173 팀원 셀프 온보딩 플로우 + F174 인앱 피드백 위젯
+  - 초대 링크→비밀번호 설정/Google OAuth→자동 로그인→투어. 전역 피드백 위젯
+  - 2-Worker Agent Team (7m), 1051 API tests (+22), Web 73, D1 0032, Match Rate 100%
 
 ## Git Workflow
 

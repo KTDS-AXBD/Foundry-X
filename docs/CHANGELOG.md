@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #99b (2026-03-23)
+**Sprint 50: 팀원 셀프 온보딩 플로우 + 인앱 피드백 위젯 (F173+F174, Match Rate 100%)**:
+- ✅ F173: 초대 링크 복사 UI + `/invite/[token]` 비밀번호 설정 페이지 + Google OAuth 듀얼 경로 + 자동 로그인 → Getting Started 리다이렉트
+- ✅ F174: 전역 플로팅 피드백 위젯(FeedbackWidget) + pagePath/sessionSeconds 컨텍스트 자동 첨부 + `GET /kpi/weekly-summary` 주간 사용 요약 API
+- ✅ API: `GET /auth/invitations/:token/info` + `POST /auth/setup-password` + Google auth invitationToken 확장 + feedback 컨텍스트 + weekly-summary
+- ✅ Web: InvitePage + InviteForm + FeedbackWidget + InviteLinkCopy + Members 상태 뱃지 + layout FeedbackWidget 삽입
+- ✅ D1 0032 migration (feedback_context 3컬럼) remote 적용 완료
+
+**검증 결과**: typecheck ✅, API 1051/1051 ✅ (+22), Web 73/73 ✅, D1 0032 remote ✅
+**Agent Team**: 2-Worker (7m 0s), 범위 이탈 0건, Match Rate 100%
+
+---
+
 ### 세션 #99 (2026-03-23)
 **Sprint 49: 대시보드 IA 재설계 + 인터랙티브 온보딩 투어 (F171+F172, Match Rate 95%)**:
 - ✅ F171: 사이드바 10개 플랫 메뉴 → 6개 업무 동선 그룹 재편 (SR관리/개발/현황), 숨겨진 페이지 3개 노출 (spec-generator, projects, getting-started), collapsible + localStorage 영속
