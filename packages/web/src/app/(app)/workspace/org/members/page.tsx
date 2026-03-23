@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useOrgStore } from "@/lib/stores/org-store";
+import { InviteLinkCopy } from "@/components/feature/InviteLinkCopy";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
@@ -21,6 +22,7 @@ interface Invitation {
   id: string;
   email: string;
   role: string;
+  token: string;
   expiresAt: string;
   createdAt: string;
   acceptedAt: string | null;
@@ -52,6 +54,7 @@ export default function OrgMembersPage() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<string>("member");
   const [inviting, setInviting] = useState(false);
+  const [lastCreatedToken, setLastCreatedToken] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     if (!activeOrgId) return;
@@ -77,6 +80,7 @@ export default function OrgMembersPage() {
   async function handleInvite() {
     if (!activeOrgId || !inviteEmail.trim()) return;
     setInviting(true);
+    setLastCreatedToken(null);
     try {
       const res = await fetch(`${BASE_URL}/orgs/${activeOrgId}/invitations`, {
         method: "POST",
@@ -84,6 +88,8 @@ export default function OrgMembersPage() {
         body: JSON.stringify({ email: inviteEmail.trim(), role: inviteRole }),
       });
       if (res.ok) {
+        const data = await res.json() as Invitation;
+        setLastCreatedToken(data.token);
         setInviteEmail("");
         loadData();
       }
@@ -168,6 +174,11 @@ export default function OrgMembersPage() {
               {inviting ? "Inviting..." : "Invite"}
             </Button>
           </div>
+          {lastCreatedToken && (
+            <div className="mt-4">
+              <InviteLinkCopy token={lastCreatedToken} />
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -231,32 +242,64 @@ export default function OrgMembersPage() {
         </CardContent>
       </Card>
 
-      {/* Pending Invitations */}
+      {/* Invitations */}
       {invitations.length > 0 && (
         <Card>
           <CardContent className="pt-6">
-            <h2 className="mb-3 text-lg font-semibold">Pending Invitations ({invitations.filter((i) => !i.acceptedAt).length})</h2>
+            <h2 className="mb-3 text-lg font-semibold">초대 목록 ({invitations.length})</h2>
             <div className="space-y-2">
-              {invitations
-                .filter((i) => !i.acceptedAt)
-                .map((inv) => (
-                <div key={inv.id} className="flex items-center justify-between rounded-lg border border-border p-3">
-                  <div>
-                    <span className="text-sm font-medium">{inv.email}</span>
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      as {inv.role} · expires {new Date(inv.expiresAt).toLocaleDateString()}
-                    </span>
+              {invitations.map((inv) => {
+                const isExpired = !inv.acceptedAt && new Date(inv.expiresAt) < new Date();
+                const isAccepted = !!inv.acceptedAt;
+                const isPending = !isAccepted && !isExpired;
+
+                return (
+                  <div key={inv.id} className="flex items-center justify-between rounded-lg border border-border p-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{inv.email}</span>
+                      <Badge variant="secondary" className="text-xs">{inv.role}</Badge>
+                      {isPending && (
+                        <Badge className="bg-yellow-500/20 text-yellow-400 text-xs">대기</Badge>
+                      )}
+                      {isAccepted && (
+                        <Badge className="bg-green-500/20 text-green-400 text-xs">수락</Badge>
+                      )}
+                      {isExpired && (
+                        <Badge className="bg-red-500/20 text-red-400 text-xs">만료</Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {isPending && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={async () => {
+                            try {
+                              await navigator.clipboard.writeText(
+                                `${window.location.origin}/invite/${inv.token}`,
+                              );
+                            } catch { /* */ }
+                          }}
+                          title="초대 링크 복사"
+                        >
+                          📋
+                        </Button>
+                      )}
+                      {!isAccepted && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs text-destructive"
+                          onClick={() => handleCancelInvitation(inv.id)}
+                        >
+                          ✕
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-xs text-destructive"
-                    onClick={() => handleCancelInvitation(inv.id)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>

@@ -1,4 +1,5 @@
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
+import { verify } from "hono/jwt";
 import {
   KpiTrackRequestSchema,
   KpiTrackResponseSchema,
@@ -6,6 +7,7 @@ import {
   KpiTrendsResponseSchema,
   KpiEventsResponseSchema,
 } from "../schemas/kpi.js";
+import { ErrorSchema } from "../schemas/common.js";
 import type { Env } from "../env.js";
 import { KpiLogger } from "../services/kpi-logger.js";
 import type { JwtPayload } from "../middleware/auth.js";
@@ -188,4 +190,113 @@ kpiRoute.openapi(getPhase4Kpi, async (c) => {
 
   const result = await logger.getPhase4Kpi(tenantId, days);
   return c.json(result);
+});
+
+// ─── GET /api/kpi/weekly-summary ───
+
+const WeeklySummaryResponseSchema = z.object({
+  period: z.object({ start: z.string(), end: z.string() }),
+  activeUsers: z.number(),
+  totalPageViews: z.number(),
+  onboardingCompletion: z.object({
+    completed: z.number(),
+    total: z.number(),
+    rate: z.number(),
+  }),
+  averageNps: z.number(),
+  feedbackCount: z.number(),
+  topPages: z.array(z.object({ path: z.string(), views: z.number() })),
+}).openapi("WeeklySummaryResponse");
+
+const getWeeklySummary = createRoute({
+  method: "get",
+  path: "/kpi/weekly-summary",
+  tags: ["KPI"],
+  summary: "주간 사용 요약 (최근 7일, 인증 필수)",
+  responses: {
+    200: {
+      content: { "application/json": { schema: WeeklySummaryResponseSchema } },
+      description: "주간 KPI 요약",
+    },
+    401: {
+      content: { "application/json": { schema: ErrorSchema } },
+      description: "Unauthorized",
+    },
+  },
+});
+
+kpiRoute.openapi(getWeeklySummary, async (c) => {
+  // Manual auth — KPI route is mounted before global auth middleware
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return c.json({ error: "Authorization required" }, 401);
+  }
+  const secret = c.env.JWT_SECRET ?? "dev-secret";
+  let payload: JwtPayload;
+  try {
+    payload = (await verify(authHeader.slice(7), secret, "HS256")) as unknown as JwtPayload;
+  } catch {
+    return c.json({ error: "Invalid token" }, 401);
+  }
+
+  const tenantId = payload.orgId || "default";
+  const DB = c.env.DB;
+
+  const now = new Date();
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 3600 * 1000);
+  const start = weekAgo.toISOString().slice(0, 10);
+  const end = now.toISOString().slice(0, 10);
+  const weekAgoISO = weekAgo.toISOString();
+
+  // Active users
+  const activeResult = await DB.prepare(
+    "SELECT COUNT(DISTINCT user_id) as cnt FROM kpi_events WHERE tenant_id = ? AND created_at >= ? AND user_id IS NOT NULL"
+  ).bind(tenantId, weekAgoISO).first<{ cnt: number }>();
+
+  // Total page views
+  const pvResult = await DB.prepare(
+    "SELECT COUNT(*) as cnt FROM kpi_events WHERE tenant_id = ? AND event_type = 'page_view' AND created_at >= ?"
+  ).bind(tenantId, weekAgoISO).first<{ cnt: number }>();
+
+  // Onboarding completion
+  const completedResult = await DB.prepare(
+    "SELECT COUNT(DISTINCT user_id) as cnt FROM onboarding_progress WHERE tenant_id = ? AND completed = 1"
+  ).bind(tenantId).first<{ cnt: number }>();
+  const totalUsersResult = await DB.prepare(
+    "SELECT COUNT(DISTINCT user_id) as cnt FROM onboarding_progress WHERE tenant_id = ?"
+  ).bind(tenantId).first<{ cnt: number }>();
+
+  const completed = completedResult?.cnt ?? 0;
+  const totalUsers = totalUsersResult?.cnt ?? 0;
+
+  // Average NPS
+  const npsResult = await DB.prepare(
+    "SELECT AVG(nps_score) as avg_nps, COUNT(*) as cnt FROM onboarding_feedback WHERE tenant_id = ? AND created_at >= ?"
+  ).bind(tenantId, weekAgoISO).first<{ avg_nps: number | null; cnt: number }>();
+
+  // Top pages
+  const topPagesResult = await DB.prepare(
+    `SELECT json_extract(metadata, '$.page') as path, COUNT(*) as views
+     FROM kpi_events
+     WHERE tenant_id = ? AND event_type = 'page_view' AND created_at >= ?
+     GROUP BY path
+     ORDER BY views DESC
+     LIMIT 5`
+  ).bind(tenantId, weekAgoISO).all<{ path: string | null; views: number }>();
+
+  return c.json({
+    period: { start, end },
+    activeUsers: activeResult?.cnt ?? 0,
+    totalPageViews: pvResult?.cnt ?? 0,
+    onboardingCompletion: {
+      completed,
+      total: totalUsers,
+      rate: totalUsers > 0 ? Math.round((completed / totalUsers) * 100) / 100 : 0,
+    },
+    averageNps: npsResult?.avg_nps ? Math.round(npsResult.avg_nps * 10) / 10 : 0,
+    feedbackCount: npsResult?.cnt ?? 0,
+    topPages: (topPagesResult.results ?? [])
+      .filter((r) => r.path)
+      .map((r) => ({ path: r.path!, views: r.views })),
+  });
 });

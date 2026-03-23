@@ -48,5 +48,35 @@ export const TokenPairSchema = z
 export const GoogleAuthSchema = z
   .object({
     credential: z.string().min(1, "Google credential is required"),
+    invitationToken: z.string().uuid().optional(),
   })
   .openapi("GoogleAuthRequest");
+
+export const InvitationInfoResponseSchema = z
+  .object({
+    valid: z.boolean(),
+    email: z.string().optional(),
+    orgName: z.string().optional(),
+    orgSlug: z.string().optional(),
+    role: z.enum(["admin", "member", "viewer"]).optional(),
+    expiresAt: z.string().optional(),
+    reason: z.enum(["not_found", "expired", "already_accepted"]).optional(),
+  })
+  .openapi("InvitationInfoResponse");
+
+export const SetupPasswordSchema = z
+  .object({
+    token: z.string().uuid(),
+    name: z.string().min(1).max(100),
+    password: z.string().min(8).max(128),
+  })
+  .openapi("SetupPasswordRequest");
+
+export const SetupPasswordResponseSchema = z
+  .object({
+    accessToken: z.string(),
+    refreshToken: z.string(),
+    orgId: z.string(),
+    orgName: z.string(),
+  })
+  .openapi("SetupPasswordResponse");

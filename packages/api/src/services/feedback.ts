@@ -18,15 +18,35 @@ export class FeedbackService {
     userId: string,
     npsScore: number,
     comment?: string,
+    context?: { pagePath?: string; sessionSeconds?: number; feedbackType?: string },
   ): Promise<{ id: string; npsScore: number }> {
     const id = `fb-${crypto.randomUUID()}`;
+    const hasContext = context?.pagePath != null || context?.sessionSeconds != null || (context?.feedbackType && context.feedbackType !== "nps");
 
-    await this.db
-      .prepare(
-        "INSERT INTO onboarding_feedback (id, tenant_id, user_id, nps_score, comment) VALUES (?, ?, ?, ?, ?)",
-      )
-      .bind(id, tenantId, userId, npsScore, comment ?? null)
-      .run();
+    if (hasContext) {
+      await this.db
+        .prepare(
+          "INSERT INTO onboarding_feedback (id, tenant_id, user_id, nps_score, comment, page_path, session_seconds, feedback_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        )
+        .bind(
+          id,
+          tenantId,
+          userId,
+          npsScore,
+          comment ?? null,
+          context?.pagePath ?? null,
+          context?.sessionSeconds ?? null,
+          context?.feedbackType ?? "nps",
+        )
+        .run();
+    } else {
+      await this.db
+        .prepare(
+          "INSERT INTO onboarding_feedback (id, tenant_id, user_id, nps_score, comment) VALUES (?, ?, ?, ?, ?)",
+        )
+        .bind(id, tenantId, userId, npsScore, comment ?? null)
+        .run();
+    }
 
     return { id, npsScore };
   }

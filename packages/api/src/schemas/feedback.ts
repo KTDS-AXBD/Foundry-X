@@ -4,6 +4,9 @@ export const FeedbackSubmitRequestSchema = z
   .object({
     npsScore: z.number().int().min(1).max(10),
     comment: z.string().max(1000).optional(),
+    pagePath: z.string().max(200).optional(),
+    sessionSeconds: z.number().int().min(0).optional(),
+    feedbackType: z.enum(["nps", "feature", "bug", "general"]).default("nps"),
   })
   .openapi("FeedbackSubmitRequest");
 

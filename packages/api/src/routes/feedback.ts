@@ -35,12 +35,16 @@ const submitFeedback = createRoute({
 });
 
 feedbackRoute.openapi(submitFeedback, async (c) => {
-  const { npsScore, comment } = c.req.valid("json");
+  const { npsScore, comment, pagePath, sessionSeconds, feedbackType } = c.req.valid("json");
   const payload = getPayload(c);
   const service = new FeedbackService(c.env.DB);
 
   const tenantId = payload.orgId ?? "default";
-  const result = await service.submit(tenantId, payload.sub, npsScore, comment);
+  const result = await service.submit(tenantId, payload.sub, npsScore, comment, {
+    pagePath,
+    sessionSeconds,
+    feedbackType,
+  });
 
   return c.json({ success: true, id: result.id, npsScore: result.npsScore });
 });

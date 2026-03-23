@@ -1,5 +1,6 @@
 import { Sidebar } from "@/components/sidebar";
 import { OnboardingTour } from "@/components/feature/OnboardingTour";
+import { FeedbackWidget } from "@/components/feature/FeedbackWidget";
 
 export default function AppLayout({
   children,
@@ -11,6 +12,7 @@ export default function AppLayout({
       <Sidebar />
       <main className="flex-1 overflow-auto p-4 lg:p-6">{children}</main>
       <OnboardingTour />
+      <FeedbackWidget />
     </div>
   );
 }

@@ -227,6 +227,38 @@ export class OrgService {
     }));
   }
 
+  async getInvitationInfo(token: string): Promise<{
+    valid: boolean;
+    email?: string;
+    orgName?: string;
+    orgSlug?: string;
+    role?: InvitationRole;
+    expiresAt?: string;
+    reason?: "not_found" | "expired" | "already_accepted";
+  }> {
+    const inv = await this.db.prepare(
+      `SELECT i.id, i.email, i.role, i.expires_at, i.accepted_at, o.name as org_name, o.slug as org_slug
+       FROM org_invitations i
+       JOIN organizations o ON i.org_id = o.id
+       WHERE i.token = ?`
+    ).bind(token).first();
+
+    if (!inv) return { valid: false, reason: "not_found" };
+    if (inv.accepted_at) return { valid: false, reason: "already_accepted" };
+
+    const expiresAt = new Date(inv.expires_at as string);
+    if (expiresAt < new Date()) return { valid: false, reason: "expired" };
+
+    return {
+      valid: true,
+      email: inv.email as string,
+      orgName: inv.org_name as string,
+      orgSlug: inv.org_slug as string,
+      role: inv.role as InvitationRole,
+      expiresAt: inv.expires_at as string,
+    };
+  }
+
   async acceptInvitation(token: string, userId: string, userEmail: string): Promise<{ orgId: string; role: OrgRole }> {
     const inv = await this.db.prepare(
       "SELECT id, org_id, email, role, expires_at, accepted_at FROM org_invitations WHERE token = ?"

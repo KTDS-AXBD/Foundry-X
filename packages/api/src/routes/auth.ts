@@ -14,6 +14,9 @@ import {
   AuthResponseSchema,
   TokenPairSchema,
   GoogleAuthSchema,
+  InvitationInfoResponseSchema,
+  SetupPasswordSchema,
+  SetupPasswordResponseSchema,
 } from "../schemas/auth.js";
 import { ErrorSchema, validationHook } from "../schemas/common.js";
 import { SwitchOrgSchema, InvitationTokenSchema } from "../schemas/org.js";
@@ -358,6 +361,124 @@ authRoute.openapi(acceptInvitation, async (c) => {
   }
 });
 
+// ─── GET /auth/invitations/:token/info ───
+
+const invitationInfo = createRoute({
+  method: "get",
+  path: "/auth/invitations/{token}/info",
+  tags: ["Auth"],
+  summary: "Get invitation token info (public)",
+  request: { params: InvitationTokenSchema },
+  responses: {
+    200: { content: { "application/json": { schema: InvitationInfoResponseSchema } }, description: "Valid invitation" },
+    404: { content: { "application/json": { schema: InvitationInfoResponseSchema } }, description: "Not found" },
+    409: { content: { "application/json": { schema: InvitationInfoResponseSchema } }, description: "Already accepted" },
+    410: { content: { "application/json": { schema: InvitationInfoResponseSchema } }, description: "Expired" },
+  },
+});
+
+authRoute.openapi(invitationInfo, async (c) => {
+  const { token } = c.req.valid("param");
+  const orgService = new OrgService(c.env.DB);
+  const info = await orgService.getInvitationInfo(token);
+
+  if (!info.valid) {
+    const statusMap = { not_found: 404, expired: 410, already_accepted: 409 } as const;
+    return c.json(info, statusMap[info.reason!] as any);
+  }
+
+  return c.json(info);
+});
+
+// ─── POST /auth/setup-password ───
+
+const setupPassword = createRoute({
+  method: "post",
+  path: "/auth/setup-password",
+  tags: ["Auth"],
+  summary: "Setup password for invited user (public)",
+  request: {
+    body: { content: { "application/json": { schema: SetupPasswordSchema } } },
+  },
+  responses: {
+    201: { content: { "application/json": { schema: SetupPasswordResponseSchema } }, description: "Account created" },
+    404: { content: { "application/json": { schema: ErrorSchema } }, description: "Invitation not found" },
+    409: { content: { "application/json": { schema: ErrorSchema } }, description: "Email already registered" },
+    410: { content: { "application/json": { schema: ErrorSchema } }, description: "Invitation expired" },
+  },
+});
+
+authRoute.openapi(setupPassword, async (c) => {
+  const { token, name, password } = c.req.valid("json");
+  const db = getDb(c.env.DB);
+
+  // 1. Validate invitation token
+  const inv = await c.env.DB.prepare(
+    "SELECT id, org_id, email, role, expires_at, accepted_at FROM org_invitations WHERE token = ?"
+  ).bind(token).first();
+
+  if (!inv) return c.json({ error: "Invitation not found", errorCode: "AUTH_006" }, 404);
+  if (inv.accepted_at) return c.json({ error: "Invitation already accepted", errorCode: "AUTH_006" }, 409);
+
+  const expiresAt = new Date(inv.expires_at as string);
+  if (expiresAt < new Date()) return c.json({ error: "Invitation has expired", errorCode: "AUTH_006" }, 410);
+
+  const invEmail = inv.email as string;
+
+  // 2. Check email duplicate
+  const [existing] = await db.select().from(users).where(eq(users.email, invEmail));
+  if (existing) return c.json({ error: "Email already registered. Please login and accept the invitation.", errorCode: "AUTH_004" }, 409);
+
+  // 3. Create account
+  const userId = crypto.randomUUID();
+  const passwordHash = await hashPassword(password);
+  const now = new Date().toISOString();
+
+  await db.insert(users).values({
+    id: userId,
+    email: invEmail,
+    name,
+    passwordHash,
+    role: "member",
+    createdAt: now,
+    updatedAt: now,
+  });
+
+  // 4. Auto-create personal org
+  const personalOrgId = `org_${userId.slice(0, 8)}`;
+  const orgSlug = invEmail.split("@")[0]!.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+  await c.env.DB.prepare(
+    "INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)"
+  ).bind(personalOrgId, `${name}'s Org`, orgSlug).run();
+  await c.env.DB.prepare(
+    "INSERT OR IGNORE INTO org_members (org_id, user_id, role) VALUES (?, ?, 'owner')"
+  ).bind(personalOrgId, userId).run();
+
+  // 5. Accept invitation — add to org
+  const orgService = new OrgService(c.env.DB);
+  const { orgId } = await orgService.acceptInvitation(token, userId, invEmail);
+
+  // 6. Get org name
+  const org = await c.env.DB.prepare("SELECT name FROM organizations WHERE id = ?").bind(orgId).first();
+  const orgName = (org?.name as string) ?? "";
+
+  // 7. Create token pair (orgId = invited org)
+  const orgRole = inv.role as "admin" | "member" | "viewer";
+  const secret = c.env.JWT_SECRET ?? "dev-secret";
+  const { _refreshJti, ...tokens } = await createTokenPair(
+    { id: userId, email: invEmail, role: "member", orgId, orgRole },
+    secret,
+  );
+
+  await db.insert(refreshTokens).values({
+    jti: _refreshJti,
+    userId,
+    expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
+  });
+
+  return c.json({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, orgId, orgName }, 201);
+});
+
 // ─── POST /auth/google ───
 
 interface GoogleTokenPayload {
@@ -383,7 +504,7 @@ const googleAuth = createRoute({
 });
 
 authRoute.openapi(googleAuth, async (c) => {
-  const { credential } = c.req.valid("json");
+  const { credential, invitationToken } = c.req.valid("json");
   const clientId = c.env.GOOGLE_CLIENT_ID;
   if (!clientId) {
     return c.json({ error: "Google OAuth not configured", errorCode: "AUTH_005" }, 500 as any);
@@ -452,18 +573,39 @@ authRoute.openapi(googleAuth, async (c) => {
     ).bind(orgId, userId).run();
   }
 
-  // Resolve org membership
-  const orgMembership = await c.env.DB.prepare(
-    "SELECT org_id, role FROM org_members WHERE user_id = ? ORDER BY joined_at ASC LIMIT 1"
-  ).bind(userId).first<{ org_id: string; role: string }>();
+  // Accept invitation if token provided
+  let invitedOrgId: string | undefined;
+  let invitedOrgRole: "admin" | "member" | "viewer" | undefined;
+  if (invitationToken) {
+    try {
+      const orgService = new OrgService(c.env.DB);
+      const result = await orgService.acceptInvitation(invitationToken, userId, googleUser.email);
+      invitedOrgId = result.orgId;
+      invitedOrgRole = result.role as "admin" | "member" | "viewer";
+    } catch {
+      // Invitation errors are non-fatal for Google auth — user still logs in
+    }
+  }
+
+  // Resolve org membership — prefer invited org if available
+  let resolvedOrgId = invitedOrgId;
+  let resolvedOrgRole: "owner" | "admin" | "member" | "viewer" = invitedOrgRole ?? "member";
+
+  if (!resolvedOrgId) {
+    const orgMembership = await c.env.DB.prepare(
+      "SELECT org_id, role FROM org_members WHERE user_id = ? ORDER BY joined_at ASC LIMIT 1"
+    ).bind(userId).first<{ org_id: string; role: string }>();
+    resolvedOrgId = orgMembership?.org_id ?? "";
+    resolvedOrgRole = (orgMembership?.role ?? "member") as "owner" | "admin" | "member" | "viewer";
+  }
 
   const secret = c.env.JWT_SECRET ?? "dev-secret";
   const { _refreshJti, ...tokens } = await createTokenPair({
     id: userId,
     email: googleUser.email,
     role: userRole,
-    orgId: orgMembership?.org_id ?? "",
-    orgRole: (orgMembership?.role ?? "member") as "owner" | "admin" | "member" | "viewer",
+    orgId: resolvedOrgId,
+    orgRole: resolvedOrgRole,
   }, secret);
 
   await db.insert(refreshTokens).values({

@@ -946,6 +946,90 @@ export async function getAgentModelMatrix(
   return fetchApi<AgentModelMatrixResponse>(`/tokens/agent-model-matrix?${params}`);
 }
 
+// ─── Sprint 50: Invitation & Feedback (F173/F174) ───
+
+export interface InvitationInfo {
+  valid: boolean;
+  email?: string;
+  orgName?: string;
+  orgSlug?: string;
+  role?: "admin" | "member" | "viewer";
+  expiresAt?: string;
+  reason?: "not_found" | "expired" | "already_accepted";
+}
+
+export interface SetupPasswordResponse {
+  accessToken: string;
+  refreshToken: string;
+  orgId: string;
+  orgName: string;
+}
+
+export interface WeeklySummary {
+  period: { start: string; end: string };
+  activeUsers: number;
+  totalPageViews: number;
+  onboardingCompletion: { completed: number; total: number; rate: number };
+  averageNps: number;
+  feedbackCount: number;
+  topPages: Array<{ path: string; views: number }>;
+}
+
+// Public endpoint (no auth)
+export async function getInvitationInfo(token: string): Promise<InvitationInfo> {
+  const url = `${BASE_URL}/auth/invitations/${token}/info`;
+  const res = await fetch(url);
+  if (!res.ok && res.status !== 404 && res.status !== 409 && res.status !== 410) {
+    throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  }
+  return res.json() as Promise<InvitationInfo>;
+}
+
+// Public endpoint (no auth)
+export async function setupPassword(data: {
+  token: string;
+  name: string;
+  password: string;
+}): Promise<SetupPasswordResponse> {
+  const url = `${BASE_URL}/auth/setup-password`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<SetupPasswordResponse>;
+}
+
+// Public endpoint (no auth) — Google OAuth with invitation token
+export async function googleLoginWithInvitation(
+  credential: string,
+  invitationToken: string,
+): Promise<{ accessToken: string; refreshToken: string; user: { id: string; email: string; name: string } }> {
+  const url = `${BASE_URL}/auth/google`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ credential, invitationToken }),
+  });
+  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  return res.json() as Promise<{ accessToken: string; refreshToken: string; user: { id: string; email: string; name: string } }>;
+}
+
+export async function submitContextFeedback(data: {
+  npsScore: number;
+  comment?: string;
+  pagePath?: string;
+  sessionSeconds?: number;
+  feedbackType?: "nps" | "feature" | "bug" | "general";
+}): Promise<{ success: boolean; id: string; npsScore: number }> {
+  return postApi("/feedback", data);
+}
+
+export async function getWeeklySummary(): Promise<WeeklySummary> {
+  return fetchApi<WeeklySummary>("/kpi/weekly-summary");
+}
+
 // ─── Sprint 48: Onboarding Team Summary (F170) ───
 
 export interface TeamMemberProgress {
