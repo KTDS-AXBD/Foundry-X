@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 50 완료 (175 endpoints, 79 services, 1051 API tests + Web 73 + ~55 E2E)
+**현재 상태:** Sprint 51 완료 (181 endpoints, 84 services, 1104 API tests + Web 73 + ~55 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -71,9 +71,9 @@ foundry-x/
 │   │       └── index.ts
 │   ├── api/                # Hono API Server (Phase 2)
 │   │   └── src/
-│   │       ├── routes/     # 32개: agent, audit, auth, automation-quality, entities, feedback, freshness, github, governance, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, profile, project-overview, proxy, reconciliation, requirements, slack, spec, sr, sso, token, webhook, webhook-registry, wiki, workflow
-│   │       ├── services/   # 79개 (agent-feedback-loop, agent-inbox, agent-marketplace, agent-orchestrator, agent-runner, agent-self-reflection, architect-agent, architect-prompts, audit-logger, auto-fix, auto-rebase, automation-quality-reporter, claude-api-runner, conflict-detector, custom-role-manager, ensemble-voting, entity-registry, entity-sync, evaluation-criteria, evaluator-optimizer, execution-types, fallback-chain, feedback, file-context-collector, freshness-checker, github, github-review, github-sync, harness-rules, health-calc, hybrid-sr-classifier, infra-agent, infra-agent-prompts, integrity-checker, jira-adapter, jira-sync, kpi-logger, kv-cache, llm, logger, mcp-adapter, mcp-registry, mcp-resources, mcp-runner, mcp-sampling, mcp-transport, merge-queue, model-metrics, model-router, monitoring, onboarding-progress, openrouter-runner, org, pii-masker, planner-agent, planner-prompts, pr-pipeline, project-overview, prompt-gateway, prompt-utils, qa-agent, qa-agent-prompts, reconciliation, reviewer-agent, security-agent, security-agent-prompts, service-proxy, slack, spec-parser, sr-classifier, sr-workflow-mapper, sse-manager, sso, test-agent, test-agent-prompts, webhook-registry, wiki-sync, workflow-engine, worktree-manager)
-│   │       ├── schemas/    # 32개 Zod 스키마 (agent, audit, auth, automation-quality, common, entity, error, feedback, freshness, github, governance, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, plan, profile, reconciliation, requirements, slack, spec, sr, sso, token, webhook, wiki, workflow)
+│   │       ├── routes/     # 33개 (agent, audit, auth, automation-quality, biz-items, entities, feedback, freshness, github, governance, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, profile, project-overview, proxy, reconciliation, requirements, slack, spec, sr, sso, token, webhook, webhook-registry, wiki, workflow)
+│   │       ├── services/   # 84개 — 목록은 `ls packages/api/src/services/` 참조
+│   │       ├── schemas/    # 33개 Zod 스키마 — 목록은 `ls packages/api/src/schemas/` 참조
 │   │       └── index.ts
 │   ├── web/                # Next.js 14 Dashboard + Landing (Phase 2)
 │   │   └── src/
@@ -128,7 +128,7 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 
 # API 패키지 단독
 cd packages/api
-pnpm test                         # vitest run (1051 tests)
+pnpm test                         # vitest run (1104 tests)
 pnpm test -- --grep "agent"       # 특정 테스트 필터
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # 로컬 서버 실행
@@ -153,39 +153,15 @@ pnpm e2e                          # Playwright E2E (17 specs)
 
 ## Current Phase
 
-- **Phase 1:** ✅ 완료 — Go 판정 (2026-03-17), v0.5.0
-  - Sprint 1~5 전체 완료, F-item 36/36 DONE, PDCA 93~97%
-- **Phase 2:** ✅ 완료 (Sprint 6~17) — v1.5.0
-  - Sprint 6~12: 인프라→OpenAPI→서비스→SSE→프로덕션→에이전트→MCP→ouroboros→GenUI (84%→93%)
-  - Sprint 13~17: MCP 완성 + 에이전트 자동 PR + PlannerAgent + AgentInbox (91%→98%)
-  - 최종: 27 services, 59 endpoints, 313 API tests + CLI 106 + Web 45 + 20 E2E
-- **Phase 3:** ✅ 완료 (Sprint 18~25) — v2.0.0
-  - Sprint 18~23: 멀티테넌시 + GitHub/Slack + PlannerAgent + 테스트 확장
-  - Sprint 24: Phase 3 마무리 — 멀티 프로젝트 + Jira + 모니터링 + 워크플로우 (95%)
-  - Sprint 25: 기술 스택 점검(F98) + AXIS DS UI 전환(F104) (97%)
-  - 최종: 39 services, 97 endpoints, 535 API tests, D1 27 테이블
-- **Phase 4:** ✅ Conditional Go (Sprint 26~31)
-  - Sprint 26: Phase 4 통합 — SSO Hub Token + BFF 프록시 + 프론트엔드 iframe 통합 + D1 엔티티 레지스트리 (94%)
-  - Sprint 27~28: Phase 3 완결 — KPI + Reconciliation + AutoFix + AutoRebase + Semantic Linting + Plumb 판정
-  - Sprint 29: 온보딩 기반 — 가이드 UI + 피드백 API + 체크리스트
-  - Sprint 30: 배포 동기화 + Phase 4 Go 판정(Conditional) + 품질 강화 (93%)
-  - Sprint 31: 프로덕션 완전 동기화 + SPEC 정합성 + E2E 보강 + 온보딩 킥오프 (95%)
-  - 현재: 79 services, 175 endpoints, 1051 API tests, D1 50 테이블
-  - PDCA 문서: `docs/archive/2026-03/` (Sprint 3~31 + standalone 전체 archived)
-- **Sprint 32~47:** ✅ 완료 — Agent Evolution Track A 완결(A1~A18) + Phase 5 고객 파일럿 준비
-  - Sprint 32~33: PRD v5 갭 매핑 + gstack/claude-code-router/OpenRouter 설치
-  - Sprint 34~42: OpenRouter → 모델 라우팅 → 6종 역할 에이전트 → 앙상블 투표 → 자동화 품질 → 마켓플레이스 (603→925 API tests)
-  - Sprint 43~45: 모델 품질 대시보드 UI + SR 시나리오 + KPI 자동 수집 인프라
-  - Sprint 46~47: PRD v8 재정의 + Azure PoC + 정책 수립 + Adoption KPI 대시보드 (999 API tests)
-  - Conditional 4/5 해소 (#4 Adoption 데이터 수집 대기)
+- **Phase 1:** ✅ 완료 (Sprint 1~5, v0.5.0) — CLI + Plumb, Go 판정 2026-03-17
+- **Phase 2:** ✅ 완료 (Sprint 6~17, v1.5.0) — API Server + Web Dashboard
+- **Phase 3:** ✅ 완료 (Sprint 18~25, v2.0.0) — 멀티테넌시 + GitHub/Slack/Jira 연동
+- **Phase 4:** ✅ Conditional Go (Sprint 26~31) — SSO + BFF + 엔티티 레지스트리 + 온보딩
+- **Sprint 32~47:** ✅ Agent Evolution Track A 완결 + PRD v8 재정의 + Phase 5 준비
+- **Sprint 48~51:** ✅ 현재 — SR 분류기 + 대시보드 IA 재설계 + 온보딩 플로우 + 사업 아이템 분류 Agent
+  - 현재: 84 services, 181 endpoints, 1104 API tests, D1 54 테이블
+  - PDCA 문서: `docs/archive/2026-03/` (Sprint 3~47 archived)
   - 상세 이력: MEMORY.md 또는 `git log --oneline` 참조
-- **Sprint 48:** ✅ 완료 — F167 ML 하이브리드 SR 분류기 + F168 SR 대시보드 UI
-  - HybridSrClassifier(규칙+LLM 2-pass) + SR 대시보드(목록/통계/DAG/피드백)
-  - 2-Worker Agent Team (4m 45s), 1029 API tests (+30), Web 74 (+6), Match Rate 95%
-- **Sprint 49:** ✅ 완료 — F171 대시보드 IA 재설계 + F172 인터랙티브 온보딩 투어 (Match 95%)
-- **Sprint 50:** ✅ 완료 — F173 팀원 셀프 온보딩 플로우 + F174 인앱 피드백 위젯
-  - 초대 링크→비밀번호 설정/Google OAuth→자동 로그인→투어. 전역 피드백 위젯
-  - 2-Worker Agent Team (7m), 1051 API tests (+22), Web 73, D1 0032, Match Rate 100%
 
 ## Git Workflow
 
@@ -217,7 +193,7 @@ cd packages/web && npx @cloudflare/next-on-pages && wrangler pages deploy .verce
 
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
 - **Pages**: `fx.minu.best` (Next.js, CNAME → Cloudflare Pages)
-- **D1**: 31개 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
+- **D1**: 34개 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
 - **CORS 주의**: Pages→Workers 크로스오리진 — `packages/api/src/app.ts`에 CORS 미들웨어 필수
 - **API URL**: `NEXT_PUBLIC_API_URL` 환경변수 — Workers URL + `/api` 경로 포함 필수
 - **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
