@@ -16,7 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ✅ Workers 재배포 — Sprint 31~51 코드 프로덕션 반영 (Version 570efd7c)
 - ✅ BDP-002 PRD Conditional→Go (3조건 해결: 보안/베이스라인/팀합의)
 
-**검증 결과**: typecheck ✅, lint ✅, API 1104/1104 ✅, CLI 125/125 ✅, Web 73/73 ✅
+**추가 (세션 후반)**:
+- ✅ Sprint 52 PR #174 merge + D1 0035 적용 + Workers 재배포 (923948ab)
+- ✅ Worktree alias 프로젝트 공용화 — `~/work/worktrees/{project}/{slot}` 구조로 전환
+- ✅ `wt-claude-worktree.sh` 인터랙티브 프로젝트 선택 UI 추가
+- ✅ GitHub Issues 5건 close (F162, F163, F167, F168, F169)
+
+**검증 결과**: typecheck ✅, lint ✅, API 1132/1132 ✅, CLI 125/125 ✅, Web 73/73 ✅
 
 ---
 
