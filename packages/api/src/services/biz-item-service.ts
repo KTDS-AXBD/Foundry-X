@@ -1,6 +1,9 @@
 /**
  * BizItemService — CRUD + 상태 관리 + 분류/평가 저장 (F175, F178)
+ * + 5시작점 분류 저장/조회/확인 (F182)
  */
+
+import type { StartingPointType, StartingPointResult } from "./analysis-paths.js";
 
 export interface CreateBizItemInput {
   title: string;
@@ -75,6 +78,18 @@ export interface EvaluationWithScores {
     summary: string | null;
     concerns: string[];
   }>;
+}
+
+interface StartingPointRow {
+  id: string;
+  biz_item_id: string;
+  starting_point: string;
+  confidence: number;
+  reasoning: string | null;
+  needs_confirmation: number;
+  confirmed_by: string | null;
+  confirmed_at: string | null;
+  classified_at: string;
 }
 
 interface BizItemRow {
@@ -326,5 +341,79 @@ export class BizItemService {
         concerns: JSON.parse(s.concerns || "[]"),
       })),
     };
+  }
+
+  // ─── F182: 5시작점 분류 저장/조회/확인 ───
+
+  async saveStartingPoint(
+    bizItemId: string,
+    result: { startingPoint: string; confidence: number; reasoning: string; needsConfirmation: boolean },
+  ): Promise<string> {
+    const id = generateId();
+    await this.db
+      .prepare(
+        `INSERT INTO biz_item_starting_points
+           (id, biz_item_id, starting_point, confidence, reasoning, needs_confirmation, classified_at)
+         VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+         ON CONFLICT(biz_item_id) DO UPDATE SET
+           starting_point = excluded.starting_point,
+           confidence = excluded.confidence,
+           reasoning = excluded.reasoning,
+           needs_confirmation = excluded.needs_confirmation,
+           classified_at = datetime('now'),
+           confirmed_by = NULL,
+           confirmed_at = NULL`,
+      )
+      .bind(id, bizItemId, result.startingPoint, result.confidence, result.reasoning, result.needsConfirmation ? 1 : 0)
+      .run();
+    return id;
+  }
+
+  async getStartingPoint(bizItemId: string): Promise<StartingPointResult | null> {
+    const row = await this.db
+      .prepare("SELECT * FROM biz_item_starting_points WHERE biz_item_id = ?")
+      .bind(bizItemId)
+      .first<StartingPointRow>();
+
+    if (!row) return null;
+
+    return {
+      id: row.id,
+      bizItemId: row.biz_item_id,
+      startingPoint: row.starting_point as StartingPointType,
+      confidence: row.confidence,
+      reasoning: row.reasoning ?? "",
+      needsConfirmation: row.needs_confirmation === 1,
+      confirmedBy: row.confirmed_by,
+      confirmedAt: row.confirmed_at,
+      classifiedAt: row.classified_at,
+    };
+  }
+
+  async confirmStartingPoint(
+    bizItemId: string,
+    userId: string,
+    startingPoint?: string,
+  ): Promise<void> {
+    const now = new Date().toISOString();
+    if (startingPoint) {
+      await this.db
+        .prepare(
+          `UPDATE biz_item_starting_points
+           SET starting_point = ?, confirmed_by = ?, confirmed_at = ?, needs_confirmation = 0
+           WHERE biz_item_id = ?`,
+        )
+        .bind(startingPoint, userId, now, bizItemId)
+        .run();
+    } else {
+      await this.db
+        .prepare(
+          `UPDATE biz_item_starting_points
+           SET confirmed_by = ?, confirmed_at = ?, needs_confirmation = 0
+           WHERE biz_item_id = ?`,
+        )
+        .bind(userId, now, bizItemId)
+        .run();
+    }
   }
 }

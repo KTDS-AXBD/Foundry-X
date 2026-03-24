@@ -9,6 +9,9 @@ import { BizItemService } from "../services/biz-item-service.js";
 import { ItemClassifier, ClassificationError } from "../services/item-classifier.js";
 import { BizPersonaEvaluator, EvaluationError } from "../services/biz-persona-evaluator.js";
 import { createAgentRunner } from "../services/agent-runner.js";
+import { StartingPointClassifier, StartingPointError } from "../services/starting-point-classifier.js";
+import { getAnalysisPath, type StartingPointType } from "../services/analysis-paths.js";
+import { ClassifyStartingPointSchema, ConfirmStartingPointSchema } from "../schemas/starting-point.js";
 
 export const bizItemsRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
@@ -203,4 +206,86 @@ bizItemsRoute.get("/biz-items/:id/evaluation", async (c) => {
   }
 
   return c.json(evaluation);
+});
+
+// ─── POST /biz-items/:id/starting-point — 5시작점 분류 실행 (F182) ───
+
+bizItemsRoute.post("/biz-items/:id/starting-point", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const service = new BizItemService(c.env.DB);
+  const item = await service.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = ClassifyStartingPointSchema.safeParse(body);
+  const context = parsed.success ? parsed.data.context : undefined;
+
+  const runner = createAgentRunner(c.env);
+  const classifier = new StartingPointClassifier(runner);
+
+  try {
+    const result = await classifier.classify(
+      { title: item.title, description: item.description, source: item.source },
+      context,
+    );
+
+    await service.saveStartingPoint(id, result);
+
+    return c.json({
+      ...result,
+      analysisPath: getAnalysisPath(result.startingPoint),
+    });
+  } catch (e) {
+    if (e instanceof StartingPointError) {
+      const status = e.code === "LLM_PARSE_ERROR" ? 502 : 500;
+      return c.json({ error: e.code, message: e.message }, status);
+    }
+    throw e;
+  }
+});
+
+// ─── PATCH /biz-items/:id/starting-point — 시작점 확인/수정 (F182) ───
+
+bizItemsRoute.patch("/biz-items/:id/starting-point", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+  const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? "";
+
+  const service = new BizItemService(c.env.DB);
+  const item = await service.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const existing = await service.getStartingPoint(id);
+  if (!existing) return c.json({ error: "STARTING_POINT_NOT_CLASSIFIED" }, 404);
+
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = ConfirmStartingPointSchema.safeParse(body);
+  if (!parsed.success) return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+
+  await service.confirmStartingPoint(id, userId, parsed.data.startingPoint);
+
+  const updated = await service.getStartingPoint(id);
+  return c.json(updated);
+});
+
+// ─── GET /biz-items/:id/analysis-path — 분석 경로 조회 (F182) ───
+
+bizItemsRoute.get("/biz-items/:id/analysis-path", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const service = new BizItemService(c.env.DB);
+  const item = await service.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const sp = await service.getStartingPoint(id);
+  if (!sp) return c.json({ error: "STARTING_POINT_NOT_CLASSIFIED" }, 404);
+
+  const path = getAnalysisPath(sp.startingPoint as StartingPointType);
+  return c.json({
+    startingPoint: sp,
+    analysisPath: path,
+  });
 });
