@@ -15,7 +15,10 @@
       "Bash(npx turbo:*)",
       "Bash(grep -i 'CREATE TABLE' /home/sinclair/work/axbd/Foundry-X/packages/api/src/db/migrations/*.sql)",
       "Bash(grep -c \"app\\\\.\\\\\\(get\\\\|post\\\\|put\\\\|delete\\\\|patch\\\\\\)\" /home/sinclair/work/axbd/Foundry-X/packages/api/src/routes/*.ts)",
-      "Skill(commit-commands:commit)"
+      "Skill(commit-commands:commit)",
+      "Bash(git push:*)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' https://foundry-x-api.ktds-axbd.workers.dev/api/health)",
+      "Bash(tmux kill-window:*)"
     ]
   }
 }
