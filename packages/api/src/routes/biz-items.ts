@@ -19,6 +19,10 @@ import { PrdGeneratorService } from "../services/prd-generator.js";
 import { UpdateCriterionSchema } from "../schemas/discovery-criteria.js";
 import { SaveAnalysisContextSchema } from "../schemas/analysis-context.js";
 import { GeneratePrdSchema } from "../schemas/prd.js";
+// Sprint 57 imports (F179, F190)
+import { TrendDataService, TrendAnalysisError } from "../services/trend-data-service.js";
+import { CompetitorScanner, CompetitorScanError } from "../services/competitor-scanner.js";
+import { TrendReportRequestSchema } from "../schemas/trend.js";
 
 export const bizItemsRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
@@ -498,4 +502,88 @@ bizItemsRoute.get("/biz-items/:id/prd/:version", async (c) => {
   if (!prd) return c.json({ error: "PRD_NOT_FOUND" }, 404);
 
   return c.json(prd);
+});
+
+// ─── POST /biz-items/:id/trend-report — 트렌드 분석 실행 (F190) ───
+
+bizItemsRoute.post("/biz-items/:id/trend-report", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const service = new BizItemService(c.env.DB);
+  const item = await service.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = TrendReportRequestSchema.safeParse(body);
+  const forceRefresh = parsed.success ? parsed.data.forceRefresh : false;
+
+  const runner = createAgentRunner(c.env);
+  const trendService = new TrendDataService(runner, c.env.DB);
+
+  try {
+    // 캐시 히트 여부 확인 (forceRefresh가 아닌 경우)
+    if (!forceRefresh) {
+      const cached = await trendService.getReport(id);
+      if (cached && new Date(cached.expiresAt) > new Date()) {
+        return c.json(cached, 200);
+      }
+    }
+
+    const report = await trendService.analyze(
+      { id: item.id, title: item.title, description: item.description },
+      { forceRefresh: true },
+    );
+
+    return c.json(report, 201);
+  } catch (e) {
+    if (e instanceof TrendAnalysisError) {
+      return c.json({ error: e.code, message: e.message }, 502);
+    }
+    throw e;
+  }
+});
+
+// ─── GET /biz-items/:id/trend-report — 트렌드 리포트 조회 (F190) ───
+
+bizItemsRoute.get("/biz-items/:id/trend-report", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const service = new BizItemService(c.env.DB);
+  const item = await service.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const report = await service.getTrendReport(id);
+  if (!report) return c.json({ error: "TREND_REPORT_NOT_FOUND" }, 404);
+
+  return c.json(report);
+});
+
+// ─── POST /biz-items/:id/competitor-scan — 경쟁사 스캔 (F190) ───
+
+bizItemsRoute.post("/biz-items/:id/competitor-scan", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const service = new BizItemService(c.env.DB);
+  const item = await service.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const runner = createAgentRunner(c.env);
+  const scanner = new CompetitorScanner(runner);
+
+  try {
+    const result = await scanner.scan(
+      { title: item.title, description: item.description },
+      item.classification ? { itemType: item.classification.itemType } : undefined,
+    );
+
+    return c.json(result);
+  } catch (e) {
+    if (e instanceof CompetitorScanError) {
+      return c.json({ error: e.code, message: e.message }, 502);
+    }
+    throw e;
+  }
 });
