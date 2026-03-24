@@ -5,7 +5,17 @@
       "Bash(git config:*)",
       "Bash(git init:*)",
       "Bash(git remote:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(source ~/.bashrc)",
+      "Bash(echo CLAUDE_WT_BASE=$HOME/work/worktrees)",
+      "Bash(chmod:*)",
+      "Bash(tmux show-options:*)",
+      "Bash(tmux source-file:*)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''hooks:'''', list\\(d.get\\(''''hooks'''',{}\\).keys\\(\\)\\)\\)\")",
+      "Bash(npx turbo:*)",
+      "Bash(grep -i 'CREATE TABLE' /home/sinclair/work/axbd/Foundry-X/packages/api/src/db/migrations/*.sql)",
+      "Bash(grep -c \"app\\\\.\\\\\\(get\\\\|post\\\\|put\\\\|delete\\\\|patch\\\\\\)\" /home/sinclair/work/axbd/Foundry-X/packages/api/src/routes/*.ts)",
+      "Skill(commit-commands:commit)"
     ]
   }
 }

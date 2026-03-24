@@ -120,7 +120,7 @@ turbo typecheck                   # 전체 타입체크
 
 # CLI 패키지 단독
 cd packages/cli
-pnpm test                         # vitest run (131 tests)
+pnpm test                         # vitest run (125 tests)
 pnpm test -- --grep "Header"      # 특정 테스트 필터
 pnpm lint                         # eslint src/ (flat config)
 pnpm typecheck                    # tsc --noEmit
