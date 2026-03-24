@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #103 (2026-03-24)
+**인프라 점검 + CLAUDE.md 품질 개선**:
+- ✅ ax-infra-selfcheck 7/7 PASS (Commands, Standards, Hooks, Skills, Memory, Hygiene)
+- ✅ CLAUDE.md 수치 drift 8건 수정 (Sprint 51 반영: routes 33, services 84, schemas 33, tests 1104, D1 34)
+- ✅ CLAUDE.md Current Phase 간결화 (-24줄, 서비스/스키마 인라인 목록 → ls 참조)
+
+**검증 결과**: 코드 변경 없음, 문서만 갱신
+
+---
+
 ### 세션 #100 (2026-03-23)
 **프로덕션 QA 디버깅 — gstack /qa (4 issues fixed, health 62→88)**:
 - ✅ ISSUE-001: 전체 API 클라이언트(fetchApi/postApi/deleteApi/patchApi)에서 401 응답 시 "로그인이 필요해요" 메시지로 변환 — SR 페이지 등 raw "API 401:" 텍스트 UI 노출 수정
