@@ -1,0 +1,151 @@
+{
+  "round": 3,
+  "timestamp": "2026-03-23T23:38:07.272Z",
+  "total": 56,
+  "verdict": "검토 필수",
+  "emoji": "⚠️",
+  "item1": {
+    "score": 0,
+    "max": 20,
+    "reason": "신규 7개 (현재 49, 이전 42)",
+    "totalIssues": 49,
+    "prevIssues": 42,
+    "newIssues": 7
+  },
+  "item2": {
+    "score": 15,
+    "max": 30,
+    "details": [
+      {
+        "name": "ChatGPT",
+        "verdict": "Conditional",
+        "ratio": 0.5
+      },
+      {
+        "name": "Gemini",
+        "verdict": "Conditional",
+        "ratio": 0.5
+      },
+      {
+        "name": "DeepSeek",
+        "verdict": "Conditional",
+        "ratio": 0.5
+      }
+    ],
+    "readyPercent": 50,
+    "count": 3
+  },
+  "item3": {
+    "score": 24,
+    "max": 30,
+    "details": [
+      {
+        "name": "핵심 문제 정의",
+        "max": 5,
+        "grade": "충실",
+        "matchedKeywords": [
+          "as-is",
+          "to-be",
+          "시급",
+          "현재",
+          "목표"
+        ],
+        "score": 5
+      },
+      {
+        "name": "사용자/이해관계자",
+        "max": 5,
+        "grade": "최소",
+        "matchedKeywords": [],
+        "score": 3
+      },
+      {
+        "name": "핵심 기능 범위",
+        "max": 5,
+        "grade": "충실",
+        "matchedKeywords": [
+          "p0",
+          "must",
+          "phase",
+          "핵심"
+        ],
+        "score": 5
+      },
+      {
+        "name": "Out-of-scope",
+        "max": 4,
+        "grade": "최소",
+        "matchedKeywords": [
+          "제외"
+        ],
+        "score": 2
+      },
+      {
+        "name": "KPI/성공 기준",
+        "max": 6,
+        "grade": "충실",
+        "matchedKeywords": [
+          "현재",
+          "목표",
+          "측정",
+          "지표"
+        ],
+        "score": 6
+      },
+      {
+        "name": "MVP 기준",
+        "max": 5,
+        "grade": "최소",
+        "matchedKeywords": [
+          "[ ]",
+          "최소"
+        ],
+        "score": 3
+      }
+    ]
+  },
+  "item4": {
+    "score": 17,
+    "max": 20,
+    "details": [
+      {
+        "name": "사용자 관점",
+        "max": 7,
+        "grade": "충실",
+        "matchedKeywords": [
+          "사용성",
+          "페르소나",
+          "사용 환경",
+          "온보딩"
+        ],
+        "score": 7
+      },
+      {
+        "name": "기술 관점",
+        "max": 7,
+        "grade": "최소",
+        "matchedKeywords": [
+          "기술 스택",
+          "api"
+        ],
+        "score": 4
+      },
+      {
+        "name": "비즈니스 관점",
+        "max": 6,
+        "grade": "충실",
+        "matchedKeywords": [
+          "비용",
+          "수익",
+          "시장",
+          "예산",
+          "경쟁",
+          "차별화",
+          "사업",
+          "가치"
+        ],
+        "score": 6
+      }
+    ]
+  }
+}
