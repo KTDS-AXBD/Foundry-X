@@ -12,6 +12,9 @@ import { createAgentRunner } from "../services/agent-runner.js";
 import { StartingPointClassifier, StartingPointError } from "../services/starting-point-classifier.js";
 import { getAnalysisPath, type StartingPointType } from "../services/analysis-paths.js";
 import { ClassifyStartingPointSchema, ConfirmStartingPointSchema } from "../schemas/starting-point.js";
+// Sprint 55 imports (F186, F187)
+import { PrdReviewPipeline, PipelineError } from "../services/prd-review-pipeline.js";
+import { savePrdPersonaEvaluations, getPrdPersonaEvaluations } from "../services/biz-persona-evaluator.js";
 // Sprint 53 imports (F183, F184, F185)
 import { DiscoveryCriteriaService } from "../services/discovery-criteria.js";
 import { AnalysisContextService } from "../services/analysis-context.js";
@@ -586,4 +589,121 @@ bizItemsRoute.post("/biz-items/:id/competitor-scan", async (c) => {
     }
     throw e;
   }
+});
+
+// ─── POST /biz-items/:id/prd/:prdId/review — 다중 AI 검토 시작 (F186) ───
+
+bizItemsRoute.post("/biz-items/:id/prd/:prdId/review", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+  const prdId = c.req.param("prdId");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const prdService = new PrdGeneratorService(c.env.DB, null as any);
+  const prd = await prdService.getLatest(id);
+  if (!prd || prd.id !== prdId) return c.json({ error: "PRD_NOT_FOUND" }, 404);
+
+  const pipeline = new PrdReviewPipeline(c.env.DB, {
+    OPENAI_API_KEY: c.env.OPENAI_API_KEY,
+    GOOGLE_AI_API_KEY: c.env.GOOGLE_AI_API_KEY,
+    DEEPSEEK_API_KEY: c.env.DEEPSEEK_API_KEY,
+  });
+
+  if (pipeline.availableProviderCount === 0) {
+    return c.json({ error: "NO_REVIEW_PROVIDERS", message: "No AI API keys configured" }, 503);
+  }
+
+  try {
+    const result = await pipeline.execute(prdId, id, prd.content, orgId);
+    return c.json(result, 201);
+  } catch (e) {
+    if (e instanceof PipelineError) {
+      return c.json({ error: e.code, message: e.message }, 502);
+    }
+    throw e;
+  }
+});
+
+// ─── GET /biz-items/:id/prd/:prdId/reviews — 검토 결과 조회 (F186) ───
+
+bizItemsRoute.get("/biz-items/:id/prd/:prdId/reviews", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+  const prdId = c.req.param("prdId");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const pipeline = new PrdReviewPipeline(c.env.DB, {});
+  const result = await pipeline.getReviews(prdId);
+
+  if (result.reviews.length === 0) return c.json({ error: "REVIEWS_NOT_FOUND" }, 404);
+
+  return c.json(result);
+});
+
+// ─── POST /biz-items/:id/prd/:prdId/persona-evaluate — PRD 페르소나 평가 (F187) ───
+
+bizItemsRoute.post("/biz-items/:id/prd/:prdId/persona-evaluate", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+  const prdId = c.req.param("prdId");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const prdService = new PrdGeneratorService(c.env.DB, null as any);
+  const prd = await prdService.getLatest(id);
+  if (!prd || prd.id !== prdId) return c.json({ error: "PRD_NOT_FOUND" }, 404);
+
+  const runner = createAgentRunner(c.env);
+  const evaluator = new BizPersonaEvaluator(runner, c.env.DB);
+
+  try {
+    const result = await evaluator.evaluatePrd(
+      { id: item.id, title: item.title, description: item.description, source: item.source, status: item.status, orgId: item.orgId, createdBy: item.createdBy },
+      prd.content,
+    );
+
+    const verdictId = await savePrdPersonaEvaluations(c.env.DB, prdId, id, orgId, result);
+
+    return c.json({
+      verdictId,
+      prdId,
+      bizItemId: id,
+      verdict: result.verdict,
+      avgScore: result.avgScore,
+      totalConcerns: result.totalConcerns,
+      scores: result.scores,
+      warnings: result.warnings,
+    }, 201);
+  } catch (e) {
+    if (e instanceof EvaluationError) {
+      return c.json({ error: e.code, message: e.message }, 502);
+    }
+    throw e;
+  }
+});
+
+// ─── GET /biz-items/:id/prd/:prdId/persona-evaluations — 페르소나 평가 결과 조회 (F187) ───
+
+bizItemsRoute.get("/biz-items/:id/prd/:prdId/persona-evaluations", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+  const prdId = c.req.param("prdId");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const result = await getPrdPersonaEvaluations(c.env.DB, prdId);
+
+  if (result.evaluations.length === 0) return c.json({ error: "PERSONA_EVALUATIONS_NOT_FOUND" }, 404);
+
+  return c.json(result);
 });

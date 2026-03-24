@@ -139,3 +139,48 @@ export function buildEvaluationPrompt(
   "concerns": ["<주요 쟁점 1>", "<주요 쟁점 2>"]
 }`;
 }
+
+export function buildPrdEvaluationPrompt(
+  persona: BizPersona,
+  item: BizItem,
+  prdContent: string,
+): string {
+  const trimmedPrd = prdContent.length > 6000
+    ? prdContent.slice(0, 3000) + "\n\n[...중략...]\n\n" + prdContent.slice(-3000)
+    : prdContent;
+
+  return `${persona.systemPrompt}
+
+다음 사업 아이템의 PRD를 검토하고 평가해주세요.
+
+[사업 아이템]
+제목: ${item.title}
+설명: ${item.description ?? "(설명 없음)"}
+
+[PRD 전문]
+${trimmedPrd}
+
+[평가 기준 - 각 항목 1~10점]
+1. 사업성/사업타당성 (businessViability)
+2. 전략적합성 (strategicFit)
+3. 고객가치 (customerValue)
+4. 기술시장성 (techMarket)
+5. 실행력/리스크 (execution)
+6. 재무타당성 (financialFeasibility)
+7. 경쟁차별화 (competitiveDiff)
+8. 확장가능성 (scalability)
+
+[출력 형식] 반드시 아래 JSON 형식으로만 응답하세요. JSON 외 텍스트를 포함하지 마세요.
+{
+  "businessViability": <1-10>,
+  "strategicFit": <1-10>,
+  "customerValue": <1-10>,
+  "techMarket": <1-10>,
+  "execution": <1-10>,
+  "financialFeasibility": <1-10>,
+  "competitiveDiff": <1-10>,
+  "scalability": <1-10>,
+  "summary": "<200자 이내 핵심 소견>",
+  "concerns": ["<주요 쟁점 1>", "<주요 쟁점 2>"]
+}`;
+}

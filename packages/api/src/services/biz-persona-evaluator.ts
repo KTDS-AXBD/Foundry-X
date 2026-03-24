@@ -11,6 +11,7 @@ import {
   type BizPersona,
   BIZ_PERSONAS,
   buildEvaluationPrompt,
+  buildPrdEvaluationPrompt,
 } from "./biz-persona-prompts.js";
 
 export type { BizItem, Classification } from "./biz-persona-prompts.js";
@@ -224,6 +225,68 @@ export class BizPersonaEvaluator {
     return { verdict, avgScore, totalConcerns, warnings };
   }
 
+  async evaluatePrd(
+    item: BizItem,
+    prdContent: string,
+  ): Promise<EvaluationResult> {
+    const settled = await Promise.allSettled(
+      BIZ_PERSONAS.map((persona) => this.evaluatePersonaWithPrd(persona, item, prdContent)),
+    );
+
+    const scores: EvaluationScoreData[] = [];
+    const failures: string[] = [];
+
+    for (let i = 0; i < settled.length; i++) {
+      const result = settled[i]!;
+      const persona = BIZ_PERSONAS[i]!;
+      if (result.status === "fulfilled") {
+        scores.push(result.value);
+      } else {
+        failures.push(
+          `${persona.name}(${persona.id}): ${result.reason instanceof Error ? result.reason.message : String(result.reason)}`,
+        );
+      }
+    }
+
+    if (scores.length < MIN_SUCCESS_COUNT) {
+      throw new EvaluationError(
+        `Insufficient PRD evaluations: ${scores.length}/${BIZ_PERSONAS.length} (minimum ${MIN_SUCCESS_COUNT} required). Failures: ${failures.join("; ")}`,
+        "INSUFFICIENT_EVALUATIONS",
+      );
+    }
+
+    const { verdict, avgScore, totalConcerns, warnings } = this.aggregateAndVerdict(scores);
+    return { verdict, avgScore, totalConcerns, scores, warnings };
+  }
+
+  private async evaluatePersonaWithPrd(
+    persona: BizPersona,
+    item: BizItem,
+    prdContent: string,
+  ): Promise<EvaluationScoreData> {
+    const prompt = buildPrdEvaluationPrompt(persona, item, prdContent);
+
+    const result: AgentExecutionResult = await this.runner.execute({
+      taskId: `prd-eval-${persona.id}-${item.id}`,
+      agentId: `biz-persona-${persona.id}`,
+      taskType: "policy-evaluation",
+      context: {
+        repoUrl: "",
+        branch: "",
+        instructions: prompt,
+        systemPromptOverride: persona.systemPrompt,
+      },
+      constraints: [],
+    });
+
+    if (result.status === "failed") {
+      throw new Error(`Persona ${persona.id} PRD evaluation failed`);
+    }
+
+    const rawText = result.output.analysis ?? "";
+    return this.parseScoreResponse(rawText, persona);
+  }
+
   private personaAvg(score: EvaluationScoreData): number {
     let total = 0;
     for (const key of SCORE_KEYS) {
@@ -241,4 +304,104 @@ export class EvaluationError extends Error {
     super(message);
     this.name = "EvaluationError";
   }
+}
+
+function generateId(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+export async function savePrdPersonaEvaluations(
+  db: D1Database,
+  prdId: string,
+  bizItemId: string,
+  orgId: string,
+  result: EvaluationResult,
+): Promise<string> {
+  for (const score of result.scores) {
+    const id = generateId();
+    await db
+      .prepare(
+        `INSERT INTO prd_persona_evaluations
+         (id, prd_id, biz_item_id, persona_id, persona_name,
+          business_viability, strategic_fit, customer_value, tech_market,
+          execution, financial_feasibility, competitive_diff, scalability,
+          summary, concerns, org_id)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .bind(
+        id, prdId, bizItemId, score.personaId, score.personaName,
+        score.businessViability, score.strategicFit, score.customerValue,
+        score.techMarket, score.execution, score.financialFeasibility,
+        score.competitiveDiff, score.scalability,
+        score.summary, JSON.stringify(score.concerns), orgId,
+      )
+      .run();
+  }
+
+  const verdictId = generateId();
+  await db
+    .prepare(
+      `INSERT INTO prd_persona_verdicts
+       (id, prd_id, verdict, avg_score, total_concerns, warnings, evaluation_count)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    )
+    .bind(
+      verdictId, prdId, result.verdict, result.avgScore,
+      result.totalConcerns, JSON.stringify(result.warnings),
+      result.scores.length,
+    )
+    .run();
+
+  return verdictId;
+}
+
+export async function getPrdPersonaEvaluations(
+  db: D1Database,
+  prdId: string,
+): Promise<{
+  evaluations: EvaluationScoreData[];
+  verdict: { verdict: string; avgScore: number; totalConcerns: number; warnings: string[] } | null;
+}> {
+  const { results: evalRows } = await db
+    .prepare(
+      `SELECT persona_id, persona_name,
+              business_viability, strategic_fit, customer_value, tech_market,
+              execution, financial_feasibility, competitive_diff, scalability,
+              summary, concerns
+       FROM prd_persona_evaluations WHERE prd_id = ? ORDER BY persona_id`,
+    )
+    .bind(prdId)
+    .all();
+
+  const verdictRow = await db
+    .prepare("SELECT verdict, avg_score, total_concerns, warnings FROM prd_persona_verdicts WHERE prd_id = ? ORDER BY created_at DESC LIMIT 1")
+    .bind(prdId)
+    .first<{ verdict: string; avg_score: number; total_concerns: number; warnings: string }>();
+
+  return {
+    evaluations: evalRows.map((r: Record<string, unknown>) => ({
+      personaId: r.persona_id as string,
+      personaName: r.persona_name as string,
+      businessViability: r.business_viability as number,
+      strategicFit: r.strategic_fit as number,
+      customerValue: r.customer_value as number,
+      techMarket: r.tech_market as number,
+      execution: r.execution as number,
+      financialFeasibility: r.financial_feasibility as number,
+      competitiveDiff: r.competitive_diff as number,
+      scalability: r.scalability as number,
+      summary: r.summary as string,
+      concerns: JSON.parse(r.concerns as string),
+    })),
+    verdict: verdictRow
+      ? {
+          verdict: verdictRow.verdict,
+          avgScore: verdictRow.avg_score,
+          totalConcerns: verdictRow.total_concerns,
+          warnings: JSON.parse(verdictRow.warnings),
+        }
+      : null,
+  };
 }
