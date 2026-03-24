@@ -416,4 +416,95 @@ export class BizItemService {
         .run();
     }
   }
+
+  // ─── F190: 트렌드 리포트 저장/조회 ───
+
+  async saveTrendReport(
+    bizItemId: string,
+    report: {
+      marketSummary: string;
+      marketSizeEstimate: unknown;
+      competitors: unknown;
+      trends: unknown;
+      keywordsUsed: string[];
+      modelUsed: string;
+      tokensUsed: number;
+      analyzedAt: string;
+    },
+  ): Promise<string> {
+    const id = generateId();
+    const expiresAt = new Date(new Date(report.analyzedAt).getTime() + 24 * 60 * 60 * 1000).toISOString();
+
+    await this.db
+      .prepare(
+        `INSERT INTO biz_item_trend_reports
+           (id, biz_item_id, market_summary, market_size_estimate, competitors, trends, keywords_used, model_used, tokens_used, analyzed_at, expires_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .bind(
+        id,
+        bizItemId,
+        report.marketSummary,
+        JSON.stringify(report.marketSizeEstimate),
+        JSON.stringify(report.competitors),
+        JSON.stringify(report.trends),
+        JSON.stringify(report.keywordsUsed),
+        report.modelUsed,
+        report.tokensUsed,
+        report.analyzedAt,
+        expiresAt,
+      )
+      .run();
+
+    return id;
+  }
+
+  async getTrendReport(bizItemId: string): Promise<{
+    id: string;
+    bizItemId: string;
+    marketSummary: string;
+    marketSizeEstimate: unknown;
+    competitors: unknown;
+    trends: unknown;
+    keywordsUsed: string[];
+    modelUsed: string;
+    tokensUsed: number;
+    analyzedAt: string;
+    expiresAt: string;
+  } | null> {
+    const row = await this.db
+      .prepare(
+        "SELECT * FROM biz_item_trend_reports WHERE biz_item_id = ? ORDER BY analyzed_at DESC LIMIT 1",
+      )
+      .bind(bizItemId)
+      .first<{
+        id: string;
+        biz_item_id: string;
+        market_summary: string | null;
+        market_size_estimate: string | null;
+        competitors: string | null;
+        trends: string | null;
+        keywords_used: string | null;
+        model_used: string | null;
+        tokens_used: number;
+        analyzed_at: string;
+        expires_at: string | null;
+      }>();
+
+    if (!row) return null;
+
+    return {
+      id: row.id,
+      bizItemId: row.biz_item_id,
+      marketSummary: row.market_summary ?? "",
+      marketSizeEstimate: row.market_size_estimate ? JSON.parse(row.market_size_estimate) : null,
+      competitors: row.competitors ? JSON.parse(row.competitors) : [],
+      trends: row.trends ? JSON.parse(row.trends) : [],
+      keywordsUsed: row.keywords_used ? JSON.parse(row.keywords_used) : [],
+      modelUsed: row.model_used ?? "",
+      tokensUsed: row.tokens_used,
+      analyzedAt: row.analyzed_at,
+      expiresAt: row.expires_at ?? "",
+    };
+  }
 }

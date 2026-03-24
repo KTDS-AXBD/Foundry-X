@@ -34,6 +34,7 @@ import { srRoute } from "./routes/sr.js";
 import { auditRoute } from "./routes/audit.js";
 import { governanceRoute } from "./routes/governance.js";
 import { bizItemsRoute } from "./routes/biz-items.js";
+import { collectionRoute, ideaPortalWebhookRoute } from "./routes/collection.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -129,6 +130,9 @@ app.route("/api", webhookInboundRoute);
 // Slack (public — Slack 자체 서명으로 보호)
 app.route("/api", slackRoute);
 
+// Idea Portal Webhook (public — HMAC-SHA256 서명으로 보호)
+app.route("/api", ideaPortalWebhookRoute);
+
 // KPI track (public — 인증 선택적, 비로그인 사용자도 page_view 기록 가능)
 app.route("/api", kpiRoute);
 
@@ -185,6 +189,9 @@ app.route("/api", governanceRoute);
 
 // Sprint 51: BizItems — 사업 아이템 분류 + 멀티 페르소나 평가 (auth + tenant required)
 app.route("/api", bizItemsRoute);
+
+// Sprint 57: Collection — 수집 채널 통합 (auth + tenant required)
+app.route("/api", collectionRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
