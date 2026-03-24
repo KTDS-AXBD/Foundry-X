@@ -1,5 +1,5 @@
 /**
- * Sprint 51: BizItems Routes — 사업 아이템 CRUD + 분류 + 평가 (F175, F178)
+ * Sprint 51~53: BizItems Routes — CRUD + 분류 + 평가 + Discovery 9기준 + 분석 컨텍스트 + PRD 생성
  */
 import { Hono } from "hono";
 import type { Env } from "../env.js";
@@ -12,6 +12,13 @@ import { createAgentRunner } from "../services/agent-runner.js";
 import { StartingPointClassifier, StartingPointError } from "../services/starting-point-classifier.js";
 import { getAnalysisPath, type StartingPointType } from "../services/analysis-paths.js";
 import { ClassifyStartingPointSchema, ConfirmStartingPointSchema } from "../schemas/starting-point.js";
+// Sprint 53 imports (F183, F184, F185)
+import { DiscoveryCriteriaService } from "../services/discovery-criteria.js";
+import { AnalysisContextService } from "../services/analysis-context.js";
+import { PrdGeneratorService } from "../services/prd-generator.js";
+import { UpdateCriterionSchema } from "../schemas/discovery-criteria.js";
+import { SaveAnalysisContextSchema } from "../schemas/analysis-context.js";
+import { GeneratePrdSchema } from "../schemas/prd.js";
 
 export const bizItemsRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
@@ -233,6 +240,14 @@ bizItemsRoute.post("/biz-items/:id/starting-point", async (c) => {
 
     await service.saveStartingPoint(id, result);
 
+    // Sprint 53: 시작점 분류 성공 시 9기준 자동 초기화
+    try {
+      const criteriaService = new DiscoveryCriteriaService(c.env.DB);
+      await criteriaService.initialize(id);
+    } catch {
+      // biz_discovery_criteria 테이블 미존재 시 무시 (마이그레이션 미적용 환경)
+    }
+
     return c.json({
       ...result,
       analysisPath: getAnalysisPath(result.startingPoint),
@@ -288,4 +303,199 @@ bizItemsRoute.get("/biz-items/:id/analysis-path", async (c) => {
     startingPoint: sp,
     analysisPath: path,
   });
+});
+
+// ─── GET /biz-items/:id/discovery-criteria — 9기준 체크리스트 조회 (F183) ───
+
+bizItemsRoute.get("/biz-items/:id/discovery-criteria", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const service = new DiscoveryCriteriaService(c.env.DB);
+  const progress = await service.getAll(id);
+
+  return c.json(progress);
+});
+
+// ─── PATCH /biz-items/:id/discovery-criteria/:criterionId — 기준 상태 업데이트 (F183) ───
+
+bizItemsRoute.patch("/biz-items/:id/discovery-criteria/:criterionId", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+  const criterionId = Number(c.req.param("criterionId"));
+
+  if (isNaN(criterionId) || criterionId < 1 || criterionId > 9) {
+    return c.json({ error: "INVALID_CRITERION_ID" }, 400);
+  }
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const body = await c.req.json();
+  const parsed = UpdateCriterionSchema.safeParse(body);
+  if (!parsed.success) return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+
+  const service = new DiscoveryCriteriaService(c.env.DB);
+  const updated = await service.update(id, criterionId, parsed.data);
+
+  return c.json(updated);
+});
+
+// ─── POST /biz-items/:id/analysis-context — 분석 컨텍스트 저장 (F184) ───
+
+bizItemsRoute.post("/biz-items/:id/analysis-context", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const body = await c.req.json();
+  const parsed = SaveAnalysisContextSchema.safeParse(body);
+  if (!parsed.success) return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+
+  const service = new AnalysisContextService(c.env.DB);
+  const ctx = await service.save(id, parsed.data);
+
+  // discoveryMapping으로 9기준 자동 체크 제안
+  const sp = await bizService.getStartingPoint(id);
+  let suggestedCriteria: number[] = [];
+  if (sp) {
+    const path = getAnalysisPath(sp.startingPoint as StartingPointType);
+    const step = path.steps.find(s => s.order === parsed.data.stepOrder);
+    if (step) {
+      const criteriaService = new DiscoveryCriteriaService(c.env.DB);
+      const suggestions = await criteriaService.suggestFromStep(id, step.discoveryMapping);
+      suggestedCriteria = suggestions.map(s => s.criterionId);
+    }
+  }
+
+  return c.json({ ...ctx, suggestedCriteria }, 201);
+});
+
+// ─── GET /biz-items/:id/analysis-context — 분석 컨텍스트 조회 (F184) ───
+
+bizItemsRoute.get("/biz-items/:id/analysis-context", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const service = new AnalysisContextService(c.env.DB);
+  const contexts = await service.getAll(id);
+
+  return c.json({ contexts });
+});
+
+// ─── GET /biz-items/:id/next-guide — 다음 단계 가이드 (F184) ───
+
+bizItemsRoute.get("/biz-items/:id/next-guide", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const sp = await bizService.getStartingPoint(id);
+  if (!sp) return c.json({ error: "STARTING_POINT_NOT_CLASSIFIED" }, 404);
+
+  const path = getAnalysisPath(sp.startingPoint as StartingPointType);
+  const ctxService = new AnalysisContextService(c.env.DB);
+  const guide = await ctxService.getNextGuide(id, path);
+
+  return c.json(guide);
+});
+
+// ─── POST /biz-items/:id/generate-prd — PRD 자동 생성 (F185) ───
+
+bizItemsRoute.post("/biz-items/:id/generate-prd", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  // 게이트 확인
+  const criteriaService = new DiscoveryCriteriaService(c.env.DB);
+  const gate = await criteriaService.checkGate(id);
+  if (gate.gateStatus === "blocked") {
+    return c.json({
+      error: "DISCOVERY_CRITERIA_NOT_MET",
+      gateStatus: gate.gateStatus,
+      completedCount: gate.completedCount,
+      missingCriteria: gate.missingCriteria,
+    }, 422);
+  }
+
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = GeneratePrdSchema.safeParse(body);
+  const skipLlm = parsed.success ? parsed.data.skipLlmRefine : false;
+
+  const sp = await bizService.getStartingPoint(id);
+  if (!sp) return c.json({ error: "STARTING_POINT_NOT_CLASSIFIED" }, 404);
+
+  const criteria = await criteriaService.getAll(id);
+  const ctxService = new AnalysisContextService(c.env.DB);
+  const contexts = await ctxService.getAll(id);
+
+  const runner = createAgentRunner(c.env);
+  const prdService = new PrdGeneratorService(c.env.DB, runner);
+
+  const prd = await prdService.generate({
+    bizItemId: id,
+    bizItem: { title: item.title, description: item.description, source: item.source },
+    criteria: criteria.criteria,
+    contexts,
+    startingPoint: sp.startingPoint as StartingPointType,
+    skipLlmRefine: skipLlm,
+  });
+
+  return c.json(prd, 201);
+});
+
+// ─── GET /biz-items/:id/prd — 최신 PRD 조회 (F185) ───
+
+bizItemsRoute.get("/biz-items/:id/prd", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const prdService = new PrdGeneratorService(c.env.DB, null as any);
+  const prd = await prdService.getLatest(id);
+  if (!prd) return c.json({ error: "PRD_NOT_FOUND" }, 404);
+
+  return c.json(prd);
+});
+
+// ─── GET /biz-items/:id/prd/:version — PRD 특정 버전 조회 (F185) ───
+
+bizItemsRoute.get("/biz-items/:id/prd/:version", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+  const version = Number(c.req.param("version"));
+
+  if (isNaN(version) || version < 1) return c.json({ error: "INVALID_VERSION" }, 400);
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const prdService = new PrdGeneratorService(c.env.DB, null as any);
+  const prd = await prdService.getByVersion(id, version);
+  if (!prd) return c.json({ error: "PRD_NOT_FOUND" }, 404);
+
+  return c.json(prd);
 });
