@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #104 (2026-03-24)
+**Boris 워크플로우 환경 설정 + 수치 정합성 보정 + Workers 재배포**:
+- ✅ Boris Cherny 워크플로우 반영: worktree alias, 글로벌 권한 19개, PostToolUse 외부 스크립트(eslint --fix + typecheck)
+- ✅ 커스텀 에이전트 3종: deploy-verifier, spec-checker, build-validator (worktree 격리)
+- ✅ tmux bell 알림 + Notification hook (글로벌)
+- ✅ SPEC v5.30 수치 정합성 보정 9건 (Sprint 50→51, CLI 131→125 실측, API 1104, 181 ep, 84 svc, 54 tables)
+- ✅ Workers 재배포 — Sprint 31~51 코드 프로덕션 반영 (Version 570efd7c)
+- ✅ BDP-002 PRD Conditional→Go (3조건 해결: 보안/베이스라인/팀합의)
+
+**검증 결과**: typecheck ✅, lint ✅, API 1104/1104 ✅, CLI 125/125 ✅, Web 73/73 ✅
+
+---
+
 ### 세션 #103 (2026-03-24)
 **인프라 점검 + CLAUDE.md 품질 개선**:
 - ✅ ax-infra-selfcheck 7/7 PASS (Commands, Standards, Hooks, Skills, Memory, Hygiene)
