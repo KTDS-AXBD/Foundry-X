@@ -37,6 +37,8 @@ import { bizItemsRoute } from "./routes/biz-items.js";
 import { collectionRoute, ideaPortalWebhookRoute } from "./routes/collection.js";
 import { discoveryRoute } from "./routes/discovery.js";
 import { methodologyRoute } from "./routes/methodology.js";
+import { axBdBmcRoute } from "./routes/ax-bd-bmc.js";
+import { axBdIdeasRoute } from "./routes/ax-bd-ideas.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -200,6 +202,10 @@ app.route("/api", discoveryRoute);
 
 // Sprint 59: Methodology registry + router (auth + tenant required)
 app.route("/api", methodologyRoute);
+
+// Sprint 61: AX BD Ideation — BMC + Ideas (auth + tenant required)
+app.route("/api", axBdBmcRoute);
+app.route("/api", axBdIdeasRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
