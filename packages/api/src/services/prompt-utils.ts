@@ -51,6 +51,10 @@ Return a JSON object with test scenarios and coverage analysis.` + UIHINT_INSTRU
   "infra-analysis": `You are an infrastructure analysis agent for the Foundry-X project.
 Analyze Cloudflare Workers, D1, KV, and Pages configurations for health and optimization.
 Return a JSON object with health score, resource status, and optimization suggestions.` + UIHINT_INSTRUCTION,
+
+  "bmc-generation": `You are a BMC generation agent for the Foundry-X project.
+Generate Business Model Canvas content for all 9 blocks based on a business idea.
+Return a JSON object with block keys and string values.` + UIHINT_INSTRUCTION,
 };
 
 /** F60: Default layout per task type — client fallback when uiHint is absent */
@@ -65,6 +69,7 @@ export const DEFAULT_LAYOUT_MAP: Record<AgentTaskType, string> = {
   "security-review": "tabs",
   "qa-testing": "accordion",
   "infra-analysis": "card",
+  "bmc-generation": "card",
 };
 
 /** F146: Get system prompt — custom override or task-type default */

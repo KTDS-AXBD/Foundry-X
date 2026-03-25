@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { fetchApi, putApi, postApi } from "@/lib/api-client";
 import BmcBlockEditor from "./BmcBlockEditor";
 import BmcStagingBar from "./BmcStagingBar";
+import BmcVersionHistory from "./BmcVersionHistory";
 
 // ─── 타입 ───
 interface BmcBlock {
@@ -63,6 +64,8 @@ export default function BmcEditorPage({ bmcId }: BmcEditorPageProps) {
   const [creating, setCreating] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"editor" | "history">("editor");
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     if (!bmcId) return;
@@ -102,6 +105,47 @@ export default function BmcEditorPage({ bmcId }: BmcEditorPageProps) {
       setSaving(false);
     }
   };
+
+  const handleGenerateDraft = async () => {
+    if (!bmc) return;
+    setGenerating(true);
+    setError(null);
+    try {
+      const result = await postApi<{ draft: Record<string, string> }>("/ax-bd/bmc/generate", {
+        idea: bmc.title,
+      });
+      setBmc((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          blocks: prev.blocks.map((b) => ({
+            ...b,
+            content: result.draft[b.blockType] ?? b.content,
+          })),
+        };
+      });
+      setDirty(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "초안 생성에 실패했어요.");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handleRestore = useCallback((blocks: Record<string, string | null>) => {
+    setBmc((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        blocks: prev.blocks.map((b) => ({
+          ...b,
+          content: blocks[b.blockType] ?? b.content,
+        })),
+      };
+    });
+    setDirty(true);
+    setActiveTab("editor");
+  }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -173,34 +217,73 @@ export default function BmcEditorPage({ bmcId }: BmcEditorPageProps) {
     <div className="space-y-4 p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{bmc.title}</h1>
-        <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
-          {bmc.syncStatus === "synced" ? "동기화 완료" : bmc.syncStatus === "pending" ? "대기 중" : "실패"}
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleGenerateDraft}
+            disabled={generating}
+            className="rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted disabled:opacity-50"
+          >
+            {generating ? "생성 중..." : "AI 초안 생성"}
+          </button>
+          <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
+            {bmc.syncStatus === "synced" ? "동기화 완료" : bmc.syncStatus === "pending" ? "대기 중" : "실패"}
+          </span>
+        </div>
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      {/* BMC 캔버스 그리드 */}
-      <div className="grid grid-cols-5 grid-rows-3 gap-2" style={{ minHeight: 600 }}>
-        {BMC_GRID_LAYOUT.map(({ type, row, col, rowSpan, colSpan }) => (
-          <div
-            key={type}
-            style={{
-              gridRow: `${row} / span ${rowSpan}`,
-              gridColumn: `${col} / span ${colSpan}`,
-            }}
-          >
-            <BmcBlockEditor
-              label={BMC_BLOCK_LABELS[type]}
-              blockType={type}
-              content={bmc.blocks.find((b) => b.blockType === type)?.content ?? ""}
-              onChange={(content) => handleBlockChange(type, content)}
-            />
-          </div>
-        ))}
+      {/* 탭 */}
+      <div className="flex gap-1 border-b border-border">
+        <button
+          onClick={() => setActiveTab("editor")}
+          className={`px-4 py-2 text-sm font-medium ${
+            activeTab === "editor"
+              ? "border-b-2 border-primary text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          에디터
+        </button>
+        <button
+          onClick={() => setActiveTab("history")}
+          className={`px-4 py-2 text-sm font-medium ${
+            activeTab === "history"
+              ? "border-b-2 border-primary text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          버전 히스토리
+        </button>
       </div>
 
-      <BmcStagingBar dirty={dirty} saving={saving} onSave={handleSave} />
+      {activeTab === "editor" ? (
+        <>
+          {/* BMC 캔버스 그리드 */}
+          <div className="grid grid-cols-5 grid-rows-3 gap-2" style={{ minHeight: 600 }}>
+            {BMC_GRID_LAYOUT.map(({ type, row, col, rowSpan, colSpan }) => (
+              <div
+                key={type}
+                style={{
+                  gridRow: `${row} / span ${rowSpan}`,
+                  gridColumn: `${col} / span ${colSpan}`,
+                }}
+              >
+                <BmcBlockEditor
+                  label={BMC_BLOCK_LABELS[type]}
+                  blockType={type}
+                  content={bmc.blocks.find((b) => b.blockType === type)?.content ?? ""}
+                  onChange={(content) => handleBlockChange(type, content)}
+                />
+              </div>
+            ))}
+          </div>
+
+          <BmcStagingBar dirty={dirty} saving={saving} onSave={handleSave} />
+        </>
+      ) : (
+        <BmcVersionHistory bmcId={bmc.id} onRestore={handleRestore} />
+      )}
     </div>
   );
 }

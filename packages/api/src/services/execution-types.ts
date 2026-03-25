@@ -14,7 +14,8 @@ export type AgentTaskType =
   | "infra-analysis"
   | "policy-evaluation"
   | "skill-query"
-  | "ontology-lookup";
+  | "ontology-lookup"
+  | "bmc-generation";
 
 export interface AgentConstraintRule {
   id: string;
