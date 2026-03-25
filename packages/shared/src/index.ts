@@ -161,3 +161,10 @@ export type {
   PluginStatus,
   PluginInstance,
 } from './plugin.js';
+
+// Sprint 59: Methodology Module types (F191)
+export type {
+  MethodologyModuleSummary,
+  MethodologyRecommendationResult,
+  MethodologySelectionRecord,
+} from './methodology.js';

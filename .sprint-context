@@ -1,3 +1,5 @@
-SPRINT_NUM=58
-F_ITEMS=F180,F181
-DESCRIPTION=사업계획서 초안 자동 생성 + Prototype 자동 생성
+SPRINT_NUM=59
+F_ITEMS=F191,F192
+DESCRIPTION=방법론 레지스트리+라우터 + BDP 모듈화 (Phase 5c 기반)
+WORKER_PLAN=W1:F191(레지스트리+인터페이스+라우터) W2:F192(BDP 서비스 MethodologyModule 래핑)
+DEPENDS_ON=Sprint 56+58 완료
