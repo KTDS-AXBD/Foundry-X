@@ -41,6 +41,8 @@ import { axBdBmcRoute } from "./routes/ax-bd-bmc.js";
 import { axBdIdeasRoute } from "./routes/ax-bd-ideas.js";
 import { axBdAgentRoute } from "./routes/ax-bd-agent.js";
 import { axBdHistoryRoute } from "./routes/ax-bd-history.js";
+import { axBdLinksRoute } from "./routes/ax-bd-links.js";
+import { axBdCommentsRoute } from "./routes/ax-bd-comments.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -212,6 +214,10 @@ app.route("/api", axBdIdeasRoute);
 // Sprint 62: BMCAgent + Version History (auth + tenant required)
 app.route("/api", axBdAgentRoute);
 app.route("/api", axBdHistoryRoute);
+
+// Sprint 64: AX BD — 아이디어-BMC 연결 + BMC 댓글 (auth + tenant required)
+app.route("/api", axBdLinksRoute);
+app.route("/api", axBdCommentsRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
