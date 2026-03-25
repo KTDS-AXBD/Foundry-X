@@ -217,3 +217,28 @@ export const ORG_ROLE_HIERARCHY: Record<OrgRole, number> = {
   admin: 3,
   owner: 4,
 };
+
+// ─── Sprint 58: F180 사업계획서 + F181 Prototype ───
+
+export interface BusinessPlanDraft {
+  id: string;
+  bizItemId: string;
+  version: number;
+  content: string;
+  sectionsSnapshot: string;
+  modelUsed: string | null;
+  tokensUsed: number;
+  generatedAt: string;
+}
+
+export interface Prototype {
+  id: string;
+  bizItemId: string;
+  version: number;
+  format: "html" | "markdown";
+  content: string;
+  templateUsed: string;
+  modelUsed: string | null;
+  tokensUsed: number;
+  generatedAt: string;
+}
