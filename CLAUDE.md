@@ -65,7 +65,7 @@ foundry-x/
 │   ├── web/                # Next.js 14 Dashboard + Landing (Phase 2)
 │   │   └── src/
 │   │       ├── app/(landing)/  # 랜딩 페이지 (Navbar + Footer)
-│   │       ├── app/(app)/      # 대시보드 (Sidebar): dashboard, agents, architecture, projects, settings, spec-generator, tokens, wiki, workspace
+│   │       ├── app/(app)/      # 대시보드 (Sidebar): dashboard, agents, architecture, methodologies, projects, settings, spec-generator, tokens, wiki, workspace
 │   │       ├── components/     # feature + landing + ui 컴포넌트
 │   │       └── lib/            # api-client, sse-client
 │   └── shared/             # 공유 타입 (types.ts, web.ts, agent.ts, plugin.ts, sso.ts)
@@ -151,8 +151,8 @@ pnpm e2e                          # Playwright E2E (17 specs)
 - **Phase 4:** ✅ Conditional Go (Sprint 26~31) — SSO + BFF + 엔티티 레지스트리 + 온보딩
 - **Sprint 32~47:** ✅ Agent Evolution Track A 완결 + PRD v8 재정의 + Phase 5 준비
 - **Sprint 48~53:** ✅ — SR 분류기 + 대시보드 IA 재설계 + 온보딩 플로우 + BDP 자동화 (5시작점→9기준→PRD생성)
-- **Sprint 54~58:** ✅ 현재 — BDP 6단계 자동화 완성 (수집 채널, AI 검토, Six Hats 토론, 사업계획서, Prototype)
-  - 현재: 109 services, ~208 endpoints, ~1400 API tests, D1 ~65 테이블
+- **Sprint 54~60:** ✅ — BDP 6단계 자동화 + 방법론 플러그인 아키텍처 (Phase 5b+5c 완성)
+  - 현재: 116 services, 192 endpoints, 1481 API tests, D1 0001~0045
   - PDCA 문서: `docs/archive/2026-03/` (Sprint 3~47 archived)
   - 상세 이력: MEMORY.md 또는 `git log --oneline` 참조
 
@@ -182,7 +182,7 @@ cd packages/web && npx @cloudflare/next-on-pages && wrangler pages deploy .verce
 
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
 - **Pages**: `fx.minu.best` (Next.js, CNAME → Cloudflare Pages)
-- **D1**: 0001~0043 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
+- **D1**: 0001~0045 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
 - **CORS 주의**: Pages→Workers 크로스오리진 — `packages/api/src/app.ts`에 CORS 미들웨어 필수
 - **API URL**: `NEXT_PUBLIC_API_URL` 환경변수 — Workers URL + `/api` 경로 포함 필수
 - **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
