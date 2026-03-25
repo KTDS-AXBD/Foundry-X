@@ -242,3 +242,60 @@ export interface Prototype {
   tokensUsed: number;
   generatedAt: string;
 }
+
+// ─── Sprint 60: Methodology Plugin Types (F193+F194) ───
+
+export interface PmSkillsClassification {
+  entryPoint: "discovery" | "validation" | "expansion";
+  recommendedSkills: string[];
+  skillScores: Record<string, number>;
+}
+
+export interface PmSkillsCriterion {
+  id: string;
+  bizItemId: string;
+  criterionId: number;
+  name: string;
+  skill: string;
+  condition: string;
+  status: "pending" | "in_progress" | "completed" | "needs_revision";
+  evidence: string | null;
+  outputType: string;
+  score: number | null;
+  completedAt: string | null;
+  updatedAt: string;
+}
+
+export interface PmSkillsCriteriaProgress {
+  total: number;
+  completed: number;
+  inProgress: number;
+  needsRevision: number;
+  pending: number;
+  criteria: PmSkillsCriterion[];
+  gateStatus: "blocked" | "warning" | "ready";
+}
+
+export interface MethodologyInfo {
+  id: string;
+  name: string;
+  description: string;
+  version: string;
+  isDefault: boolean;
+}
+
+export interface MethodologyRecommendation {
+  id: string;
+  name: string;
+  score: number;
+}
+
+export interface MethodologyProgressSummary {
+  methodologyId: string;
+  methodologyName: string;
+  totalItems: number;
+  gateReady: number;
+  gateWarning: number;
+  gateBlocked: number;
+  avgProgress: number;
+}

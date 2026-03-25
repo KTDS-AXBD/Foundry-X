@@ -1156,3 +1156,132 @@ export async function submitSrFeedback(
 ): Promise<SrFeedbackItem> {
   return postApi<SrFeedbackItem>(`/sr/${srId}/feedback`, body);
 }
+
+// ─── Methodology API (F195) ───
+
+export interface MethodologyInfo {
+  id: string;
+  name: string;
+  description: string;
+  version: string;
+  isDefault: boolean;
+}
+
+export interface MethodologyDetail {
+  id: string;
+  name: string;
+  description: string;
+  version: string;
+  criteria: Array<{
+    id: number;
+    name: string;
+    condition: string;
+    skills: string[];
+    outputType: string;
+    isRequired: boolean;
+  }>;
+  reviewMethods: Array<{
+    id: string;
+    name: string;
+    description: string;
+    type: string;
+  }>;
+}
+
+export interface MethodologyRecommendation {
+  id: string;
+  name: string;
+  score: number;
+}
+
+export interface PmSkillsCriteriaProgress {
+  total: number;
+  completed: number;
+  inProgress: number;
+  needsRevision: number;
+  pending: number;
+  criteria: Array<{
+    id: string;
+    bizItemId: string;
+    criterionId: number;
+    name: string;
+    skill: string;
+    condition: string;
+    status: "pending" | "in_progress" | "completed" | "needs_revision";
+    evidence: string | null;
+    outputType: string;
+    score: number | null;
+    completedAt: string | null;
+    updatedAt: string;
+  }>;
+  gateStatus: "blocked" | "warning" | "ready";
+}
+
+export interface PmSkillAnalysisStep {
+  order: number;
+  skill: string;
+  name: string;
+  purpose: string;
+  dependencies: string[];
+  criteriaMapping: number[];
+  isCompleted: boolean;
+}
+
+export interface PmSkillsClassification {
+  methodologyId: string;
+  entryPoint: string;
+  confidence: number;
+  reasoning: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface GateResult {
+  gateStatus: "blocked" | "warning" | "ready";
+  completedCount: number;
+  totalCount: number;
+  requiredMissing: number;
+  details: Array<{
+    criterionId: number;
+    name: string;
+    status: string;
+    isRequired: boolean;
+  }>;
+}
+
+export async function getMethodologies(): Promise<{ methodologies: MethodologyInfo[] }> {
+  return fetchApi("/methodologies");
+}
+
+export async function getMethodologyDetail(id: string): Promise<MethodologyDetail> {
+  return fetchApi(`/methodologies/${id}`);
+}
+
+export async function getMethodologyRecommendation(
+  bizItemId: string,
+): Promise<{ recommendations: MethodologyRecommendation[] }> {
+  return fetchApi(`/methodologies/recommend/${bizItemId}`);
+}
+
+export async function getPmSkillsCriteria(
+  bizItemId: string,
+): Promise<PmSkillsCriteriaProgress> {
+  return fetchApi(`/methodologies/pm-skills/criteria/${bizItemId}`);
+}
+
+export async function getPmSkillsAnalysisSteps(
+  bizItemId: string,
+): Promise<{ entryPoint: string; steps: PmSkillAnalysisStep[]; nextExecutableSkills: string[] }> {
+  return fetchApi(`/methodologies/pm-skills/analysis-steps/${bizItemId}`);
+}
+
+export async function classifyWithPmSkills(
+  bizItemId: string,
+): Promise<{ classification: PmSkillsClassification }> {
+  return postApi(`/methodologies/pm-skills/classify/${bizItemId}`);
+}
+
+export async function getPmSkillsGate(
+  bizItemId: string,
+): Promise<GateResult> {
+  return fetchApi(`/methodologies/pm-skills/gate/${bizItemId}`);
+}
