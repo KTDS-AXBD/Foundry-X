@@ -1,10 +1,14 @@
 import { app, handleScheduled } from "./app.js";
 import { harnessRoute } from "./routes/harness.js";
+import { methodologyRoute } from "./routes/methodology.js";
 import { z } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 
 // ─── F126: Harness rules route (auth + tenant middleware from app.ts /api/* applies) ───
 app.route("/api", harnessRoute);
+
+// ─── F193+F194: Methodology management routes ───
+app.route("/api", methodologyRoute);
 
 // ─── F128: Global error handler — structured error responses ───
 app.onError((err, c) => {

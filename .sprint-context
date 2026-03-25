@@ -1,5 +1,5 @@
-SPRINT_NUM=59
-F_ITEMS=F191,F192
-DESCRIPTION=방법론 레지스트리+라우터 + BDP 모듈화 (Phase 5c 기반)
-WORKER_PLAN=W1:F191(레지스트리+인터페이스+라우터) W2:F192(BDP 서비스 MethodologyModule 래핑)
-DEPENDS_ON=Sprint 56+58 완료
+SPRINT_NUM=60
+F_ITEMS=F193,F194,F195
+DESCRIPTION=pm-skills 방법론 모듈+검증기준 + 방법론 관리 UI
+WORKER_PLAN=W1:F193+F194(pm-skills 모듈+검증기준) W2:F195(방법론 관리 UI)
+DEPENDS_ON=Sprint 59 완료

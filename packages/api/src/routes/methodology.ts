@@ -1,5 +1,6 @@
 /**
- * Sprint 59 F191: Methodology Routes — 레지스트리 조회 + 추천 + 선택 관리
+ * Methodology Routes — 레지스트리 조회 + 추천 + 선택 관리 + pm-skills 분석/기준/게이트
+ * Sprint 59 F191 + Sprint 60 F193+F194+F195
  */
 import { Hono } from "hono";
 import type { Env } from "../env.js";
@@ -9,6 +10,14 @@ import { BdpMethodologyModule } from "../services/bdp-methodology-module.js";
 import { SelectMethodologySchema } from "../schemas/methodology.js";
 import type { BizItemContext } from "../services/methodology-module.js";
 import type { MethodologySelection } from "../services/methodology-module.js";
+import { PmSkillsCriteriaService } from "../services/pm-skills-criteria.js";
+import { PmSkillsModule } from "../services/pm-skills-module.js";
+import { buildAnalysisSteps, getNextExecutableSkills, detectEntryPoint } from "../services/pm-skills-pipeline.js";
+import { getSkillGuide } from "../services/pm-skills-guide.js";
+import { getAllMethodologies, recommendMethodology } from "../services/methodology-types.js";
+import { UpdatePmSkillsCriterionSchema } from "../schemas/pm-skills.js";
+import { BizItemService } from "../services/biz-item-service.js";
+import type { EntryPoint } from "../services/pm-skills-pipeline.js";
 
 // ─── Registry 초기화: BDP 모듈 자동 등록 ───
 const registry = MethodologyRegistry.getInstance();
@@ -185,4 +194,142 @@ methodologyRoute.get("/biz-items/:itemId/methodology/history", async (c) => {
     .all();
 
   return c.json({ history: (results ?? []).map((r) => toSelection(r as Record<string, unknown>)) });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// Sprint 60: pm-skills 방법론 라우트 (F193+F194+F195)
+// ═══════════════════════════════════════════════════════════════
+
+// ─── GET /methodologies/recommend/:bizItemId — 방법론 추천 (F195) ───
+
+methodologyRoute.get("/methodologies/recommend/:bizItemId", async (c) => {
+  const orgId = c.get("orgId");
+  const bizItemId = c.req.param("bizItemId");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, bizItemId);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const recommendations = recommendMethodology({
+    title: item.title,
+    description: item.description,
+    source: item.source,
+    classification: item.classification ?? undefined,
+  });
+
+  return c.json({ recommendations });
+});
+
+// ─── POST /methodologies/pm-skills/classify/:bizItemId — 분류 (F193) ───
+
+methodologyRoute.post("/methodologies/pm-skills/classify/:bizItemId", async (c) => {
+  const orgId = c.get("orgId");
+  const bizItemId = c.req.param("bizItemId");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, bizItemId);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const module = new PmSkillsModule();
+  const classification = await module.classifyItem({
+    title: item.title,
+    description: item.description,
+    source: item.source,
+  });
+
+  const criteriaService = new PmSkillsCriteriaService(c.env.DB);
+  await criteriaService.initialize(bizItemId);
+
+  return c.json({ classification });
+});
+
+// ─── GET /methodologies/pm-skills/analysis-steps/:bizItemId — 분석 단계 (F193) ───
+
+methodologyRoute.get("/methodologies/pm-skills/analysis-steps/:bizItemId", async (c) => {
+  const orgId = c.get("orgId");
+  const bizItemId = c.req.param("bizItemId");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, bizItemId);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const entryPoint = detectEntryPoint(item);
+  const criteriaService = new PmSkillsCriteriaService(c.env.DB);
+  const progress = await criteriaService.getAll(bizItemId);
+
+  const completedSkills = progress.criteria
+    .filter(c => c.status === "completed")
+    .map(c => c.skill);
+
+  const steps = buildAnalysisSteps(entryPoint, completedSkills);
+  const nextSkills = getNextExecutableSkills(entryPoint, completedSkills);
+
+  return c.json({ entryPoint, steps, nextExecutableSkills: nextSkills });
+});
+
+// ─── GET /methodologies/pm-skills/skill-guide/:skill — 스킬 가이드 (F193) ───
+
+methodologyRoute.get("/methodologies/pm-skills/skill-guide/:skill", async (c) => {
+  const skill = "/" + c.req.param("skill");
+  const guide = getSkillGuide(skill);
+  if (!guide) return c.json({ error: "SKILL_NOT_FOUND" }, 404);
+
+  return c.json({ guide });
+});
+
+// ─── GET /methodologies/pm-skills/criteria/:bizItemId — 기준 목록 (F194) ───
+
+methodologyRoute.get("/methodologies/pm-skills/criteria/:bizItemId", async (c) => {
+  const orgId = c.get("orgId");
+  const bizItemId = c.req.param("bizItemId");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, bizItemId);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const criteriaService = new PmSkillsCriteriaService(c.env.DB);
+  const progress = await criteriaService.getAll(bizItemId);
+
+  return c.json(progress);
+});
+
+// ─── POST /methodologies/pm-skills/criteria/:bizItemId/:criterionId — 기준 갱신 (F194) ───
+
+methodologyRoute.post("/methodologies/pm-skills/criteria/:bizItemId/:criterionId", async (c) => {
+  const orgId = c.get("orgId");
+  const bizItemId = c.req.param("bizItemId");
+  const criterionId = parseInt(c.req.param("criterionId"), 10);
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, bizItemId);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  if (isNaN(criterionId) || criterionId < 1 || criterionId > 12) {
+    return c.json({ error: "INVALID_CRITERION_ID" }, 400);
+  }
+
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = UpdatePmSkillsCriterionSchema.safeParse(body);
+  if (!parsed.success) return c.json({ error: "VALIDATION_ERROR", details: parsed.error.issues }, 400);
+
+  const criteriaService = new PmSkillsCriteriaService(c.env.DB);
+  const criterion = await criteriaService.update(bizItemId, criterionId, parsed.data);
+
+  return c.json({ criterion });
+});
+
+// ─── GET /methodologies/pm-skills/gate/:bizItemId — 게이트 판정 (F194) ───
+
+methodologyRoute.get("/methodologies/pm-skills/gate/:bizItemId", async (c) => {
+  const orgId = c.get("orgId");
+  const bizItemId = c.req.param("bizItemId");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, bizItemId);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const criteriaService = new PmSkillsCriteriaService(c.env.DB);
+  const gate = await criteriaService.checkGate(bizItemId);
+
+  return c.json(gate);
 });
