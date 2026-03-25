@@ -28,6 +28,11 @@ import { SixHatsDebateService, SixHatsDebateError } from "../services/sixhats-de
 import { TrendDataService, TrendAnalysisError } from "../services/trend-data-service.js";
 import { CompetitorScanner, CompetitorScanError } from "../services/competitor-scanner.js";
 import { TrendReportRequestSchema } from "../schemas/trend.js";
+// Sprint 58 imports (F180, F181)
+import { BusinessPlanGeneratorService } from "../services/business-plan-generator.js";
+import { GenerateBusinessPlanSchema } from "../schemas/business-plan.js";
+import { PrototypeGeneratorService } from "../services/prototype-generator.js";
+import { GeneratePrototypeSchema } from "../schemas/prototype.js";
 
 export const bizItemsRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
@@ -754,4 +759,170 @@ bizItemsRoute.get("/biz-items/:id/prd/:prdId/sixhats/:debateId", async (c) => {
   const debate = await service.getDebate(debateId);
   if (!debate) return c.json({ error: "DEBATE_NOT_FOUND" }, 404);
   return c.json(debate);
+});
+
+// ─── POST /biz-items/:id/generate-business-plan — 사업계획서 자동 생성 (F180) ───
+
+bizItemsRoute.post("/biz-items/:id/generate-business-plan", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+  if (!item.classification) {
+    return c.json({ error: "CLASSIFICATION_REQUIRED", message: "Item must be classified before generating business plan" }, 400);
+  }
+
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = GenerateBusinessPlanSchema.safeParse(body);
+  const skipLlm = parsed.success ? parsed.data.skipLlmRefine : false;
+
+  const sp = await bizService.getStartingPoint(id);
+  const evaluation = await bizService.getEvaluation(id);
+  const criteriaService = new DiscoveryCriteriaService(c.env.DB);
+  const criteriaProgress = await criteriaService.getAll(id);
+  const ctxService = new AnalysisContextService(c.env.DB);
+  const contexts = await ctxService.getAll(id);
+  const trendReport = await bizService.getTrendReport(id);
+  const prdService = new PrdGeneratorService(c.env.DB, null as never);
+  const prd = await prdService.getLatest(id);
+
+  const runner = createAgentRunner(c.env);
+  const bpService = new BusinessPlanGeneratorService(c.env.DB, runner);
+
+  const bp = await bpService.generate({
+    bizItemId: id,
+    bizItem: item,
+    criteria: criteriaProgress.criteria,
+    contexts,
+    evaluation,
+    startingPoint: sp?.startingPoint as StartingPointType ?? null,
+    trendReport: trendReport ? {
+      marketSummary: trendReport.marketSummary,
+      marketSizeEstimate: trendReport.marketSizeEstimate,
+      competitors: trendReport.competitors,
+      trends: trendReport.trends,
+    } : null,
+    prdContent: prd?.content ?? null,
+    skipLlmRefine: skipLlm,
+  });
+
+  return c.json(bp, 201);
+});
+
+// ─── GET /biz-items/:id/business-plan — 최신 사업계획서 조회 (F180) ───
+
+bizItemsRoute.get("/biz-items/:id/business-plan", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const bpService = new BusinessPlanGeneratorService(c.env.DB, null);
+  const bp = await bpService.getLatest(id);
+  if (!bp) return c.json({ error: "BUSINESS_PLAN_NOT_FOUND" }, 404);
+
+  return c.json(bp);
+});
+
+// ─── GET /biz-items/:id/business-plan/versions — 버전 목록 (F180) ───
+
+bizItemsRoute.get("/biz-items/:id/business-plan/versions", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const bpService = new BusinessPlanGeneratorService(c.env.DB, null);
+  const versions = await bpService.listVersions(id);
+
+  return c.json({ versions });
+});
+
+// ─── POST /biz-items/:id/generate-prototype — Prototype 생성 (F181) ───
+
+bizItemsRoute.post("/biz-items/:id/generate-prototype", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const sp = await bizService.getStartingPoint(id);
+  if (!sp) return c.json({ error: "STARTING_POINT_REQUIRED", message: "Starting point must be classified before generating prototype" }, 400);
+
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = GeneratePrototypeSchema.safeParse(body);
+  const templateOverride = parsed.success ? parsed.data.template : undefined;
+
+  const evaluation = await bizService.getEvaluation(id);
+  const criteriaService = new DiscoveryCriteriaService(c.env.DB);
+  const criteriaProgress = await criteriaService.getAll(id);
+  const trendReport = await bizService.getTrendReport(id);
+  const prdService = new PrdGeneratorService(c.env.DB, null as never);
+  const prd = await prdService.getLatest(id);
+  const bpService = new BusinessPlanGeneratorService(c.env.DB, null);
+  const bp = await bpService.getLatest(id);
+
+  const runner = createAgentRunner(c.env);
+  const protoService = new PrototypeGeneratorService(c.env.DB, runner);
+
+  const proto = await protoService.generate({
+    bizItemId: id,
+    bizItem: item,
+    evaluation,
+    criteria: criteriaProgress.criteria,
+    startingPoint: sp.startingPoint as StartingPointType,
+    trendReport: trendReport ? {
+      marketSummary: trendReport.marketSummary,
+      marketSizeEstimate: trendReport.marketSizeEstimate,
+      competitors: trendReport.competitors,
+      trends: trendReport.trends,
+    } : null,
+    prd,
+    businessPlan: bp ? { content: bp.content } : null,
+    template: templateOverride as StartingPointType | undefined,
+  });
+
+  return c.json(proto, 201);
+});
+
+// ─── GET /biz-items/:id/prototype — 최신 Prototype 조회 (F181) ───
+
+bizItemsRoute.get("/biz-items/:id/prototype", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const protoService = new PrototypeGeneratorService(c.env.DB, null);
+  const proto = await protoService.getLatest(id);
+  if (!proto) return c.json({ error: "PROTOTYPE_NOT_FOUND" }, 404);
+
+  return c.json(proto);
+});
+
+// ─── GET /biz-items/:id/prototype/preview — HTML 직접 렌더링 (F181) ───
+
+bizItemsRoute.get("/biz-items/:id/prototype/preview", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const protoService = new PrototypeGeneratorService(c.env.DB, null);
+  const content = await protoService.getLatestContent(id);
+  if (!content) return c.json({ error: "PROTOTYPE_NOT_FOUND" }, 404);
+
+  return c.html(content);
 });
