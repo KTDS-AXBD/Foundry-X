@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 52 완료 (184 endpoints, 87 services, 1132 API tests + Web 73 + ~55 E2E)
+**현재 상태:** Sprint 58 완료 (~208 endpoints, 109 services, ~1400 API tests + Web 87 + ~55 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -58,9 +58,9 @@ foundry-x/
 │   │       └── index.ts
 │   ├── api/                # Hono API Server (Phase 2)
 │   │   └── src/
-│   │       ├── routes/     # 33개 (agent, audit, auth, automation-quality, biz-items, entities, feedback, freshness, github, governance, harness, health, inbox, integrity, jira, kpi, mcp, onboarding, org, profile, project-overview, proxy, reconciliation, requirements, slack, spec, sr, sso, token, webhook, webhook-registry, wiki, workflow)
-│   │       ├── services/   # 87개 — 목록은 `ls packages/api/src/services/` 참조
-│   │       ├── schemas/    # 34개 Zod 스키마 — 목록은 `ls packages/api/src/schemas/` 참조
+│   │       ├── routes/     # 35개 — 목록은 `ls packages/api/src/routes/` 참조
+│   │       ├── services/   # 109개 — 목록은 `ls packages/api/src/services/` 참조
+│   │       ├── schemas/    # 45개 Zod 스키마 — 목록은 `ls packages/api/src/schemas/` 참조
 │   │       └── index.ts
 │   ├── web/                # Next.js 14 Dashboard + Landing (Phase 2)
 │   │   └── src/
@@ -120,14 +120,14 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 
 # API 패키지 단독
 cd packages/api
-pnpm test                         # vitest run (1104 tests)
+pnpm test                         # vitest run (1193 tests)
 pnpm test -- --grep "agent"       # 특정 테스트 필터
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # 로컬 서버 실행
 
 # Web 패키지 단독
 cd packages/web
-pnpm test                         # vitest run (73 tests)
+pnpm test                         # vitest run (87 tests)
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # Next.js dev server (localhost:3000)
 pnpm e2e                          # Playwright E2E (17 specs)
@@ -150,8 +150,9 @@ pnpm e2e                          # Playwright E2E (17 specs)
 - **Phase 3:** ✅ 완료 (Sprint 18~25, v2.0.0) — 멀티테넌시 + GitHub/Slack/Jira 연동
 - **Phase 4:** ✅ Conditional Go (Sprint 26~31) — SSO + BFF + 엔티티 레지스트리 + 온보딩
 - **Sprint 32~47:** ✅ Agent Evolution Track A 완결 + PRD v8 재정의 + Phase 5 준비
-- **Sprint 48~52:** ✅ 현재 — SR 분류기 + 대시보드 IA 재설계 + 온보딩 플로우 + 사업 아이템 분류 Agent + 5시작점 분류
-  - 현재: 87 services, 184 endpoints, 1132 API tests, D1 55 테이블
+- **Sprint 48~53:** ✅ — SR 분류기 + 대시보드 IA 재설계 + 온보딩 플로우 + BDP 자동화 (5시작점→9기준→PRD생성)
+- **Sprint 54~58:** ✅ 현재 — BDP 6단계 자동화 완성 (수집 채널, AI 검토, Six Hats 토론, 사업계획서, Prototype)
+  - 현재: 109 services, ~208 endpoints, ~1400 API tests, D1 ~65 테이블
   - PDCA 문서: `docs/archive/2026-03/` (Sprint 3~47 archived)
   - 상세 이력: MEMORY.md 또는 `git log --oneline` 참조
 
@@ -181,7 +182,7 @@ cd packages/web && npx @cloudflare/next-on-pages && wrangler pages deploy .verce
 
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
 - **Pages**: `fx.minu.best` (Next.js, CNAME → Cloudflare Pages)
-- **D1**: 0001~0035 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
+- **D1**: 0001~0043 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
 - **CORS 주의**: Pages→Workers 크로스오리진 — `packages/api/src/app.ts`에 CORS 미들웨어 필수
 - **API URL**: `NEXT_PUBLIC_API_URL` 환경변수 — Workers URL + `/api` 경로 포함 필수
 - **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
@@ -194,6 +195,7 @@ cd packages/web && npx @cloudflare/next-on-pages && wrangler pages deploy .verce
 
 ## Gotchas
 
+- **Zone.Identifier**: WSL 환경에서 Windows 파일 복사 시 생성 — `.gitignore`에 `*:Zone.Identifier` 추가 권장
 - **CORS**: Pages→Workers 크로스오리진 — `packages/api/src/app.ts` CORS 미들웨어 필수
 - **API URL**: `NEXT_PUBLIC_API_URL`에 `/api` 경로 포함 필수 (빠뜨리면 404)
 - **D1 migrations**: 로컬 적용 후 `--remote` 반드시 별도 실행 (누락하면 프로덕션 500)
