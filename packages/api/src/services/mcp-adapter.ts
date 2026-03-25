@@ -99,4 +99,5 @@ export const TASK_TYPE_TO_MCP_TOOL: Record<AgentTaskType, string> = {
   "security-review": "foundry_security_review",
   "qa-testing": "foundry_qa_testing",
   "infra-analysis": "foundry_infra_analysis",
+  "bmc-generation": "foundry_bmc_generation",
 };
