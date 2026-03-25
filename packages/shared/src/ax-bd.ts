@@ -42,3 +42,27 @@ export interface Idea {
   createdAt: number;
   updatedAt: number;
 }
+
+// Sprint 64: F203 아이디어-BMC 연결
+export interface IdeaBmcLink {
+  id: string;
+  ideaId: string;
+  bmcId: string;
+  createdAt: number;
+}
+
+// Sprint 64: F204 BMC 댓글
+export interface BmcComment {
+  id: string;
+  bmcId: string;
+  blockType?: string;
+  authorId: string;
+  authorName?: string;
+  content: string;
+  createdAt: number;
+}
+
+export interface CommentCounts {
+  [blockType: string]: number;
+  _total: number;
+}
