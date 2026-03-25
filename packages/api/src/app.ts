@@ -35,6 +35,7 @@ import { auditRoute } from "./routes/audit.js";
 import { governanceRoute } from "./routes/governance.js";
 import { bizItemsRoute } from "./routes/biz-items.js";
 import { collectionRoute, ideaPortalWebhookRoute } from "./routes/collection.js";
+import { discoveryRoute } from "./routes/discovery.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -192,6 +193,9 @@ app.route("/api", bizItemsRoute);
 
 // Sprint 57: Collection — 수집 채널 통합 (auth + tenant required)
 app.route("/api", collectionRoute);
+
+// Sprint 56: Discovery 진행률 대시보드 (auth + tenant required)
+app.route("/api", discoveryRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
