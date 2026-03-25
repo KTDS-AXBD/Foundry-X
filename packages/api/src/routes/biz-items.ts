@@ -22,6 +22,8 @@ import { PrdGeneratorService } from "../services/prd-generator.js";
 import { UpdateCriterionSchema } from "../schemas/discovery-criteria.js";
 import { SaveAnalysisContextSchema } from "../schemas/analysis-context.js";
 import { GeneratePrdSchema } from "../schemas/prd.js";
+// Sprint 56 imports (F188)
+import { SixHatsDebateService, SixHatsDebateError } from "../services/sixhats-debate.js";
 // Sprint 57 imports (F179, F190)
 import { TrendDataService, TrendAnalysisError } from "../services/trend-data-service.js";
 import { CompetitorScanner, CompetitorScanError } from "../services/competitor-scanner.js";
@@ -706,4 +708,50 @@ bizItemsRoute.get("/biz-items/:id/prd/:prdId/persona-evaluations", async (c) => 
   if (result.evaluations.length === 0) return c.json({ error: "PERSONA_EVALUATIONS_NOT_FOUND" }, 404);
 
   return c.json(result);
+});
+
+// ─── POST /biz-items/:id/prd/:prdId/sixhats — Six Hats 토론 시작 (F188) ───
+
+bizItemsRoute.post("/biz-items/:id/prd/:prdId/sixhats", async (c) => {
+  const { id, prdId } = c.req.param();
+  const orgId = c.get("orgId");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const prd = await c.env.DB.prepare(
+    "SELECT content FROM biz_generated_prds WHERE id = ? AND biz_item_id = ?"
+  ).bind(prdId, id).first<{ content: string }>();
+  if (!prd) return c.json({ error: "PRD_NOT_FOUND" }, 404);
+
+  const service = new SixHatsDebateService(c.env.DB, c.env);
+  try {
+    const result = await service.startDebate(prdId, id, prd.content, orgId);
+    return c.json(result, 201);
+  } catch (err) {
+    if (err instanceof SixHatsDebateError) {
+      return c.json({ error: err.code, message: err.message }, 500);
+    }
+    throw err;
+  }
+});
+
+// ─── GET /biz-items/:id/prd/:prdId/sixhats — 토론 목록 조회 (F188) ───
+
+bizItemsRoute.get("/biz-items/:id/prd/:prdId/sixhats", async (c) => {
+  const { prdId } = c.req.param();
+  const service = new SixHatsDebateService(c.env.DB, c.env);
+  const debates = await service.listDebates(prdId);
+  return c.json({ debates });
+});
+
+// ─── GET /biz-items/:id/prd/:prdId/sixhats/:debateId — 특정 토론 상세 (F188) ───
+
+bizItemsRoute.get("/biz-items/:id/prd/:prdId/sixhats/:debateId", async (c) => {
+  const { debateId } = c.req.param();
+  const service = new SixHatsDebateService(c.env.DB, c.env);
+  const debate = await service.getDebate(debateId);
+  if (!debate) return c.json({ error: "DEBATE_NOT_FOUND" }, 404);
+  return c.json(debate);
 });
