@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #132 (2026-03-26)
+**Phase 6 Ecosystem Integration — REQ 12건 등록**:
+- ✅ FX-PLAN-012(BMAD/OpenSpec 벤치마킹) 기반 F220~F231 SPEC.md 등록
+- ✅ Adopt 4건(P0~P2): Brownfield Init, Agent-as-Code, Changes Dir, Doc Sharding
+- ✅ Reference 5건(P3): 컨텍스트 전달, 커맨드 UX, Party Mode, Spec Library, Expansion Pack
+- ✅ Watch 3건(P4): Agent Spec 표준, Scale-Adaptive, Multi-repo
+- ✅ Sprint 75~78 재배정, CLAUDE.md Phase 6 섹션 추가
+
 ### 세션 #131 (2026-03-26)
 **팀 가이드 사이트 점검 + Suspense 버그 수정**:
 - ✅ Getting Started: useSearchParams() Suspense boundary 추가 — 프로덕션에서 탭(설치 가이드/스킬/프로세스/FAQ) 미표시 버그 수정
