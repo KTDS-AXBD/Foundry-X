@@ -30,8 +30,8 @@ import {
    ═══════════════════════════════════════════════ */
 
 const SITE_META = {
-  sprint: "Sprint 70",
-  phase: "Phase 5f",
+  sprint: "Sprint 71",
+  phase: "Phase 5f 완료",
   phaseTitle: "AX BD 사업개발 체계 수립",
   tagline: "AX 사업개발 AI 오케스트레이션 플랫폼",
 } as const;
@@ -41,7 +41,7 @@ const stats = [
   { value: "135", label: "Services" },
   { value: "2,032+", label: "Tests" },
   { value: "60", label: "D1 Migrations" },
-  { value: "70", label: "Sprints" },
+  { value: "71", label: "Sprints" },
 ];
 
 const pillars = [
@@ -104,8 +104,10 @@ const roadmap: {
     items: ["레지스트리 + 인터페이스", "BDP 모듈화", "pm-skills 모듈"] },
   { phase: "Phase 5d", title: "Ideation MVP", version: "Sprint 61~67", status: "done",
     items: ["BMC CRUD + AI", "아이디어-BMC 연결", "인사이트 + 평가", "Discovery-X 연동"] },
-  { phase: "Phase 5f", title: "사업개발 체계 수립", version: "Sprint 68~71", status: "current",
+  { phase: "Phase 5f", title: "사업개발 체계 수립", version: "Sprint 68~71", status: "done",
     items: ["ai-biz 11스킬 CC전환", "API v8.2 (5유형+체크포인트)", "Discovery 대시보드", "팀 가이드"] },
+  { phase: "Phase 5g", title: "Test Agent + TDD", version: "Sprint 72~74", status: "planned",
+    items: ["TestAgent Web UI 활성화", "Agent SDK PoC", "TDD 자동화 CC Skill"] },
 ];
 
 const ecosystem = [
@@ -278,7 +280,7 @@ function ArchitectureBlueprint() {
 
 function RoadmapTimeline() {
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
       {roadmap.map((phase, i) => {
         const isDone = phase.status === "done";
         const isCurrent = phase.status === "current";
@@ -626,7 +628,7 @@ export default function LandingPage() {
               <span className="text-axis-primary">로드맵</span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              CLI에서 시작해 BDP 자동화까지. 64 Sprint를 거치며 사업개발 플랫폼을 구축했어요.
+              CLI에서 시작해 BDP 자동화까지. 71 Sprint를 거치며 사업개발 플랫폼을 구축했어요.
             </p>
           </div>
           <RoadmapTimeline />

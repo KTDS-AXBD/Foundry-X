@@ -181,7 +181,7 @@ function WelcomeBanner({
             Foundry-X 시작하기
           </h1>
           <p className="mb-4 text-sm text-muted-foreground">
-            아래 3가지 업무 동선을 확인하고, 바로 시작해 보세요.
+            아래 4가지 업무 동선을 확인하고, 바로 시작해 보세요.
           </p>
         </div>
         <Button
@@ -218,9 +218,9 @@ function WorkflowQuickstart() {
         어디서부터 시작할까요?
       </h2>
       <p className="mb-4 text-sm text-muted-foreground">
-        아래 3가지 업무 흐름 중 하나를 선택해서 바로 시작하세요.
+        아래 4가지 업무 흐름 중 하나를 선택해서 바로 시작하세요.
       </p>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {workflowCards.map((card) => (
           <Link key={card.href} href={card.href} className="group">
             <Card

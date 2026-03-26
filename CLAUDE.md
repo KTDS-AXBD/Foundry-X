@@ -59,8 +59,8 @@ foundry-x/
 │   ├── api/                # Hono API Server (Phase 2)
 │   │   └── src/
 │   │       ├── routes/     # 47개 — 목록은 `ls packages/api/src/routes/` 참조
-│   │       ├── services/   # 135개 — 목록은 `ls packages/api/src/services/` 참조
-│   │       ├── schemas/    # 61개 Zod 스키마 — 목록은 `ls packages/api/src/schemas/` 참조
+│   │       ├── services/   # 136개 — 목록은 `ls packages/api/src/services/` 참조
+│   │       ├── schemas/    # 62개 Zod 스키마 — 목록은 `ls packages/api/src/schemas/` 참조
 │   │       └── index.ts
 │   ├── web/                # Next.js 14 Dashboard + Landing (Phase 2)
 │   │   └── src/
@@ -159,7 +159,7 @@ pnpm e2e                          # Playwright E2E (17 specs)
   - 📋 Sprint 72 (F217): TestAgent 활성화 — Web UI + Orchestrator 통합
   - 📋 Sprint 73 (F218): Agent SDK Test Agent PoC
   - 📋 Sprint 74 (F219): TDD 자동화 CC Skill
-- **현재 수치:** ~135 services, ~304 endpoints, 1786 API tests + CLI 125 + Web 121+, D1 0001~0060
+- **현재 수치:** ~136 services, ~304 endpoints, 1786 API tests + CLI 125 + Web 121+, D1 0001~0060
 - **PRD:** `docs/specs/prd-v8-final.md` (플랫폼) + `docs/specs/ax-bd-atoz/prd-final.md` (A-to-Z) + `docs/specs/axbd/` (프로세스 v8.2)
 - **PDCA 문서:** `docs/archive/2026-03/` (Sprint 3~47 archived)
 

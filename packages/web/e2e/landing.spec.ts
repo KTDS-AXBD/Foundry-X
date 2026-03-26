@@ -19,8 +19,8 @@ test.describe("Landing Page", () => {
     // Navbar brand
     await expect(page.getByText("Foundry-X").first()).toBeVisible();
 
-    // Navigation links
-    await expect(page.getByRole("link", { name: "Features" }).first()).toBeVisible();
+    // Navigation links — Sprint 70에서 한국어 전환
+    await expect(page.getByRole("link", { name: "핵심 기능" }).first()).toBeVisible();
     await expect(page.getByRole("link", { name: "Dashboard" }).first()).toBeVisible();
   });
 });
