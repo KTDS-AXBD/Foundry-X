@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #130 (2026-03-26)
+**Sprint Pipeline 72+73+74 — Phase 5g Test Agent 완료**:
+- ✅ **Sprint 72** (F217): TestAgent 활성화 — TestAgentPanel+CoverageGapView+TestGenerationResult 3컴포넌트, api-client 확장. PR #212
+- ✅ **Sprint 73** (F218): Agent SDK Test Agent PoC — tools/test-agent-poc/ 독립 PoC (3 agent prompts + SDK 래퍼). PR #211
+- ✅ **Sprint 74** (F219): TDD 자동화 CC Skill — .claude/skills/tdd/ (SKILL.md + Red/Green/Refactor refs) + post-edit-test-warn hook. PR #210
+- ✅ **Landing E2E fix**: `"Features"` → `"핵심 기능"` 셀렉터 수정 (2/2 passed)
+- ✅ SPEC.md F217-F219 📋→✅, GitHub Issues #205-207 closed
+
+**검증 결과**: E2E landing 2/2 ✅
+
 ### 세션 #129 (2026-03-26)
 **팀 가이드 사이트 점검 — Landing+GettingStarted 현행화**:
 - ✅ Landing: Sprint 70→71, Phase 5f done, Phase 5g 로드맵 추가, "71 Sprint" 텍스트
