@@ -7,12 +7,11 @@ import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const navLinks = [
-  { href: "#process", label: "Process" },
-  { href: "#features", label: "Features" },
-  { href: "#agents", label: "Agents" },
-  { href: "#architecture", label: "Architecture" },
-  { href: "#ecosystem", label: "Ecosystem" },
-  { href: "#roadmap", label: "Roadmap" },
+  { href: "#process", label: "BDP 프로세스" },
+  { href: "#features", label: "핵심 기능" },
+  { href: "#agents", label: "AI 에이전트" },
+  { href: "#architecture", label: "아키텍처" },
+  { href: "#roadmap", label: "로드맵" },
 ];
 
 export function Navbar() {
