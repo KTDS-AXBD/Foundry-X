@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #126 (2026-03-26)
+**Sprint 병렬 작업 최적화 원칙 수립**:
+- ✅ `development-workflow.md`: "Sprint 병렬 작업 원칙" 섹션 신규 — 배치 구성/충돌 감지/의존성 형식/Merge 순서/리소스 제약
+- ✅ `ax-sprint-pipeline.md`: Phase 2 충돌 영역 사전 점검 필수화 + Gotchas 8항목 확장
+- ✅ `agent-team-patterns.md`: "Sprint Pipeline 배치 운영" 섹션 신규 — 배치 크기/상태 추적/Merge 순서
+- ✅ CLAUDE.md: Phase 5f ✅ 완료 + Phase 5g 등록
+
 ### 세션 #125 (2026-03-26)
 **Sprint 71 (F215) + Landing 현행화 + CI 수정 — Phase 5f 전체 완료**:
 - ✅ **Sprint 71** (F215): AX BD 팀 가이드 — Getting Started 4섹션 확장 (Cowork 설치+CC 사용법+프로세스+FAQ), 5 컴포넌트 + 테스트, PR #209
