@@ -4,9 +4,15 @@ import {
   OnboardingStepCompleteRequestSchema,
   OnboardingStepCompleteResponseSchema,
 } from "../schemas/onboarding.js";
+import {
+  SkillGuideResponseSchema,
+  ProcessFlowResponseSchema,
+  TeamFaqResponseSchema,
+} from "../schemas/skill-guide.js";
 import type { Env } from "../env.js";
 import { OnboardingProgressService } from "../services/onboarding-progress.js";
 import { KpiLogger } from "../services/kpi-logger.js";
+import { getSkillGuideData, getProcessFlowData, getTeamFaqData } from "../services/skill-guide.js";
 import type { JwtPayload } from "../middleware/auth.js";
 
 export const onboardingRoute = new OpenAPIHono<{ Bindings: Env }>();
@@ -168,4 +174,64 @@ onboardingRoute.openapi(getTeamSummary, async (c) => {
     averageProgress,
     members: members.sort((a, b) => b.progressPercent - a.progressPercent),
   });
+});
+
+// ─── GET /api/onboarding/skill-guide ───
+
+const getSkillGuide = createRoute({
+  method: "get",
+  path: "/onboarding/skill-guide",
+  tags: ["Onboarding"],
+  summary: "스킬 가이드 데이터 조회 (오케스트레이터 + 11 ai-biz 스킬)",
+  responses: {
+    200: {
+      content: { "application/json": { schema: SkillGuideResponseSchema } },
+      description: "스킬 가이드 데이터",
+    },
+  },
+});
+
+onboardingRoute.openapi(getSkillGuide, async (c) => {
+  const data = getSkillGuideData();
+  return c.json(data);
+});
+
+// ─── GET /api/onboarding/process-flow ───
+
+const getProcessFlow = createRoute({
+  method: "get",
+  path: "/onboarding/process-flow",
+  tags: ["Onboarding"],
+  summary: "프로세스 플로우 데이터 조회 (6단계 라이프사이클 + Discovery 상세)",
+  responses: {
+    200: {
+      content: { "application/json": { schema: ProcessFlowResponseSchema } },
+      description: "프로세스 플로우 데이터",
+    },
+  },
+});
+
+onboardingRoute.openapi(getProcessFlow, async (c) => {
+  const data = getProcessFlowData();
+  return c.json(data);
+});
+
+// ─── GET /api/onboarding/team-faq ───
+
+const getTeamFaq = createRoute({
+  method: "get",
+  path: "/onboarding/team-faq",
+  tags: ["Onboarding"],
+  summary: "팀 FAQ 데이터 조회",
+  responses: {
+    200: {
+      content: { "application/json": { schema: TeamFaqResponseSchema } },
+      description: "FAQ 항목 목록",
+    },
+  },
+});
+
+onboardingRoute.openapi(getTeamFaq, async (c) => {
+  const data = getTeamFaqData();
+  return c.json(data);
 });

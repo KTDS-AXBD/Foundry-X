@@ -1361,3 +1361,48 @@ export async function getAnalysisPath(bizItemId: string): Promise<AnalysisPathRe
 export async function getBizItems(): Promise<{ items: BizItemSummary[] }> {
   return fetchApi("/biz-items");
 }
+
+// ─── Sprint 71: Skill Guide API (F215) ───
+
+export interface SkillGuideResponse {
+  orchestrator: {
+    name: string;
+    description: string;
+    commands: Array<{ command: string; description: string }>;
+    stages: Array<{ id: string; name: string; description: string }>;
+  };
+  skills: Array<{
+    name: string;
+    displayName: string;
+    description: string;
+    category: string;
+    triggers: string[];
+    frameworks: string[];
+  }>;
+}
+
+export interface ProcessFlowResponse {
+  lifecycle: Array<{ stage: number; name: string; description: string; tools: string[] }>;
+  discovery: {
+    types: Array<{ code: string; name: string; description: string; icon: string }>;
+    stages: Array<{ id: string; name: string; coreFor: string[]; normalFor: string[]; lightFor: string[] }>;
+    commitGate: { stage: string; questions: string[] };
+  };
+}
+
+export interface TeamFaqResponse {
+  categories: string[];
+  items: Array<{ id: string; category: string; question: string; answer: string }>;
+}
+
+export async function getSkillGuide(): Promise<SkillGuideResponse> {
+  return fetchApi<SkillGuideResponse>("/onboarding/skill-guide");
+}
+
+export async function getProcessFlow(): Promise<ProcessFlowResponse> {
+  return fetchApi<ProcessFlowResponse>("/onboarding/process-flow");
+}
+
+export async function getTeamFaq(): Promise<TeamFaqResponse> {
+  return fetchApi<TeamFaqResponse>("/onboarding/team-faq");
+}
