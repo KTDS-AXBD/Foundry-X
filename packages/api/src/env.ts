@@ -24,4 +24,6 @@ export type Env = {
   AIF_WORKER?: Fetcher;  // AI Foundry Worker
   DX_API_URL?: string;   // 폴백: Discovery-X API URL
   AIF_API_URL?: string;  // 폴백: AI Foundry API URL
+  // Sprint 67: 이메일 발송 (F210)
+  RESEND_API_KEY?: string;
 };

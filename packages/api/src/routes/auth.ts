@@ -1,4 +1,4 @@
-import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
+import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { verify } from "hono/jwt";
 import { eq } from "drizzle-orm";
 import { hashPassword, verifyPassword } from "../utils/crypto.js";
@@ -19,6 +19,15 @@ import {
   SetupPasswordResponseSchema,
 } from "../schemas/auth.js";
 import { ErrorSchema, validationHook } from "../schemas/common.js";
+import {
+  ForgotPasswordSchema,
+  ForgotPasswordResponseSchema,
+  ResetTokenValidationSchema,
+  ResetPasswordSchema,
+  ResetPasswordResponseSchema,
+} from "../schemas/password-reset.js";
+import { PasswordResetService } from "../services/password-reset-service.js";
+import { EmailService } from "../services/email-service.js";
 import { SwitchOrgSchema, InvitationTokenSchema } from "../schemas/org.js";
 import { OrgService, OrgError } from "../services/org.js";
 
@@ -618,4 +627,102 @@ authRoute.openapi(googleAuth, async (c) => {
     user: { id: userId, email: googleUser.email, name: userName, role: userRole },
     ...tokens,
   });
+});
+
+// ─── Sprint 67: F210 Password Reset ───
+
+// POST /auth/forgot-password
+const forgotPassword = createRoute({
+  method: "post",
+  path: "/auth/forgot-password",
+  tags: ["Auth"],
+  summary: "Request password reset email",
+  request: {
+    body: { content: { "application/json": { schema: ForgotPasswordSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: ForgotPasswordResponseSchema } }, description: "Reset email sent (always 200 to prevent user enumeration)" },
+  },
+});
+
+authRoute.openapi(forgotPassword, async (c) => {
+  const { email } = c.req.valid("json");
+  const db = getDb(c.env.DB);
+
+  // Always return 200 to prevent user enumeration
+  const [user] = await db.select().from(users).where(eq(users.email, email));
+  if (!user) {
+    return c.json({ message: "If this email is registered, a reset link has been sent." });
+  }
+
+  const resetService = new PasswordResetService(c.env.DB);
+  const token = await resetService.createToken(user.id);
+
+  const resetUrl = `https://fx.minu.best/auth/reset-password/${token}`;
+  const emailService = new EmailService(c.env.RESEND_API_KEY);
+  await emailService.send({
+    to: email,
+    subject: "[Foundry-X] 비밀번호 재설정",
+    html: `<p>안녕하세요, ${user.name}님.</p>
+      <p>비밀번호 재설정을 요청하셨습니다.</p>
+      <p><a href="${resetUrl}">비밀번호 재설정하기</a></p>
+      <p>이 링크는 1시간 후 만료됩니다.</p>
+      <p>요청하지 않으셨다면 이 이메일을 무시하세요.</p>`,
+  });
+
+  return c.json({ message: "If this email is registered, a reset link has been sent." });
+});
+
+// GET /auth/reset-password/:token
+const validateResetToken = createRoute({
+  method: "get",
+  path: "/auth/reset-password/{token}",
+  tags: ["Auth"],
+  summary: "Validate password reset token",
+  request: {
+    params: z.object({ token: z.string().uuid() }),
+  },
+  responses: {
+    200: { content: { "application/json": { schema: ResetTokenValidationSchema } }, description: "Token valid" },
+    410: { content: { "application/json": { schema: ResetTokenValidationSchema } }, description: "Token expired or used" },
+  },
+});
+
+authRoute.openapi(validateResetToken, async (c) => {
+  const { token } = c.req.valid("param");
+  const resetService = new PasswordResetService(c.env.DB);
+  const result = await resetService.validateToken(token);
+
+  if (!result.valid) {
+    return c.json({ valid: false, reason: result.reason }, 410);
+  }
+  return c.json({ valid: true });
+});
+
+// POST /auth/reset-password
+const resetPassword = createRoute({
+  method: "post",
+  path: "/auth/reset-password",
+  tags: ["Auth"],
+  summary: "Reset password with token",
+  request: {
+    body: { content: { "application/json": { schema: ResetPasswordSchema } } },
+  },
+  responses: {
+    200: { content: { "application/json": { schema: ResetPasswordResponseSchema } }, description: "Password reset successful" },
+    400: { content: { "application/json": { schema: ErrorSchema } }, description: "Invalid or expired token" },
+  },
+});
+
+authRoute.openapi(resetPassword, async (c) => {
+  const { token, newPassword } = c.req.valid("json");
+  const resetService = new PasswordResetService(c.env.DB);
+
+  try {
+    await resetService.resetPassword(token, newPassword);
+    return c.json({ message: "Password has been reset successfully. Please login with your new password." });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Unknown error";
+    return c.json({ error: `Invalid or expired token: ${msg}`, errorCode: "AUTH_007" }, 400);
+  }
 });
