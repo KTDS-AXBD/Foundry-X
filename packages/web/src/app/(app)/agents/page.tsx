@@ -13,12 +13,13 @@ import { ConflictDiagram } from "@/components/feature/ConflictDiagram";
 import { ParallelExecutionForm } from "@/components/feature/ParallelExecutionForm";
 import { AgentPlanCard } from "@/components/feature/AgentPlanCard";
 import { AgentInboxPanel } from "@/components/feature/AgentInboxPanel";
+import { TestAgentPanel } from "@/components/feature/TestAgentPanel";
 
 // F55: 에이전트별 task 상태 추적
 type AgentTaskStatus = "pending" | "running" | "completed" | "failed";
 
 // F68: 탭 타입
-type AgentsTab = "agents" | "plans" | "inbox" | "prs" | "queue" | "parallel";
+type AgentsTab = "agents" | "plans" | "inbox" | "prs" | "queue" | "parallel" | "test-agent";
 
 interface AgentTaskState {
   taskId: string;
@@ -190,6 +191,7 @@ export default function AgentsPage() {
     { key: "prs", label: `PRs${agentPrs.length ? ` (${agentPrs.length})` : ""}` },
     { key: "queue", label: "Merge Queue" },
     { key: "parallel", label: "Parallel" },
+    { key: "test-agent", label: "TestAgent" },
   ];
 
   return (
@@ -330,6 +332,11 @@ export default function AgentsPage() {
             setActiveTab("queue");
           }}
         />
+      )}
+
+      {/* F217: TestAgent 탭 */}
+      {activeTab === "test-agent" && (
+        <TestAgentPanel onClose={() => setActiveTab("agents")} />
       )}
 
       {executeAgent && (

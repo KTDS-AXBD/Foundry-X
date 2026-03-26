@@ -1406,3 +1406,67 @@ export async function getProcessFlow(): Promise<ProcessFlowResponse> {
 export async function getTeamFaq(): Promise<TeamFaqResponse> {
   return fetchApi<TeamFaqResponse>("/onboarding/team-faq");
 }
+
+// ─── F217: TestAgent API Functions ───
+
+export interface TestGenerationResponse {
+  testFiles: Array<{
+    path: string;
+    content: string;
+    testCount: number;
+    framework: string;
+  }>;
+  totalTestCount: number;
+  coverageEstimate: number;
+  edgeCases: Array<{
+    function: string;
+    case: string;
+    category: string;
+  }>;
+  tokensUsed: number;
+  model: string;
+  duration: number;
+}
+
+export interface CoverageGapResponse {
+  analyzedFiles: number;
+  uncoveredFunctions: Array<{
+    file: string;
+    function: string;
+    complexity: string;
+    priority: string;
+  }>;
+  missingEdgeCases: Array<{
+    file: string;
+    function: string;
+    suggestedCases: string[];
+  }>;
+  overallCoverage: number;
+  tokensUsed: number;
+  model: string;
+}
+
+export async function generateTests(
+  sourceCode: string,
+  options?: { instructions?: string },
+): Promise<TestGenerationResponse> {
+  return postApi<TestGenerationResponse>("/agents/test/generate", {
+    taskId: crypto.randomUUID(),
+    context: {
+      repoUrl: "https://github.com/KTDS-AXBD/Foundry-X",
+      branch: "master",
+      fileContents: { "source.ts": sourceCode },
+      instructions: options?.instructions,
+    },
+  });
+}
+
+export async function analyzeCoverageGaps(
+  sourceCode: string,
+  testCode?: string,
+): Promise<CoverageGapResponse> {
+  return postApi<CoverageGapResponse>("/agents/test/coverage-gaps", {
+    sourceFiles: { "source.ts": sourceCode },
+    ...(testCode ? { testFiles: { "source.test.ts": testCode } } : {}),
+  });
+}
