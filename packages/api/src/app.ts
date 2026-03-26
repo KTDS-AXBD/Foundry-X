@@ -44,6 +44,8 @@ import { axBdHistoryRoute } from "./routes/ax-bd-history.js";
 import { axBdLinksRoute } from "./routes/ax-bd-links.js";
 import { axBdCommentsRoute } from "./routes/ax-bd-comments.js";
 import { axBdDiscoveryRoute } from "./routes/ax-bd-discovery.js";
+import { axBdInsightsRoute } from "./routes/ax-bd-insights.js";
+import { axBdEvaluationsRoute } from "./routes/ax-bd-evaluations.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -219,6 +221,10 @@ app.route("/api", axBdHistoryRoute);
 // Sprint 64: AX BD — 아이디어-BMC 연결 + BMC 댓글 (auth + tenant required)
 app.route("/api", axBdLinksRoute);
 app.route("/api", axBdCommentsRoute);
+
+// Sprint 65: AX BD — 인사이트 + 평가관리 (auth + tenant required)
+app.route("/api", axBdInsightsRoute);
+app.route("/api", axBdEvaluationsRoute);
 
 // Sprint 66: Discovery-X API 인터페이스 계약 (auth + tenant required)
 app.route("/api", axBdDiscoveryRoute);
