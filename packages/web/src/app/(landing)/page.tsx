@@ -30,18 +30,18 @@ import {
    ═══════════════════════════════════════════════ */
 
 const SITE_META = {
-  sprint: "Sprint 64",
-  phase: "Phase 5d",
-  phaseTitle: "AX BD Ideation MVP",
+  sprint: "Sprint 70",
+  phase: "Phase 5f",
+  phaseTitle: "AX BD 사업개발 체계 수립",
   tagline: "AX 사업개발 AI 오케스트레이션 플랫폼",
 } as const;
 
 const stats = [
-  { value: "192", label: "API Endpoints" },
-  { value: "116", label: "Services" },
-  { value: "1,481+", label: "Tests" },
-  { value: "50", label: "D1 Migrations" },
-  { value: "64", label: "Sprints" },
+  { value: "304", label: "API Endpoints" },
+  { value: "135", label: "Services" },
+  { value: "2,032+", label: "Tests" },
+  { value: "60", label: "D1 Migrations" },
+  { value: "70", label: "Sprints" },
 ];
 
 const pillars = [
