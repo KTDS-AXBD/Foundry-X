@@ -74,6 +74,18 @@ const workflowCards = [
     bg: "bg-axis-green/10",
     border: "border-axis-green/20",
   },
+  {
+    href: "/ax-bd/discovery",
+    icon: Blocks,
+    title: "🔍 Discovery 프로세스",
+    subtitle: "5유형 분류 → 7단계 발굴 → 신호등",
+    description:
+      "AX BD 2단계 발굴 프로세스 v8.2를 확인하고, 사업 아이템의 사업성 체크포인트와 신호등 이력을 관리해요.",
+    cta: "Discovery로 이동",
+    color: "text-violet-600",
+    bg: "bg-violet-50",
+    border: "border-violet-200",
+  },
 ];
 
 // ─── Feature Cards Data (기존 — 하단 보조) ───

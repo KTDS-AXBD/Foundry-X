@@ -1285,3 +1285,79 @@ export async function getPmSkillsGate(
 ): Promise<GateResult> {
   return fetchApi(`/methodologies/pm-skills/gate/${bizItemId}`);
 }
+
+// ─── Sprint 70: Viability / Traffic Light / Commit Gate API (F214) ───
+
+export interface ViabilityCheckpoint {
+  id: string;
+  bizItemId: string;
+  orgId: string;
+  stage: string;
+  decision: "go" | "pivot" | "drop";
+  question: string;
+  reason: string | null;
+  decidedBy: string;
+  decidedAt: string;
+}
+
+export interface TrafficLightResponse {
+  bizItemId: string;
+  summary: { go: number; pivot: number; drop: number; pending: number };
+  commitGate: { decision: string; decidedAt: string } | null;
+  checkpoints: ViabilityCheckpoint[];
+  overallSignal: "green" | "yellow" | "red";
+}
+
+export interface CommitGateResponse {
+  id: string;
+  bizItemId: string;
+  question1Answer: string | null;
+  question2Answer: string | null;
+  question3Answer: string | null;
+  question4Answer: string | null;
+  finalDecision: "commit" | "explore_alternatives" | "drop";
+  reason: string | null;
+  decidedBy: string;
+  decidedAt: string;
+}
+
+export interface AnalysisPathResponse {
+  discoveryType: string;
+  typeName: string;
+  stages: Array<{
+    stage: string;
+    stageName: string;
+    intensity: "core" | "normal" | "light";
+    question: string;
+  }>;
+  commitGateQuestions: string[];
+}
+
+export interface BizItemSummary {
+  id: string;
+  title: string;
+  description: string | null;
+  status: string;
+  discoveryType: string | null;
+  createdAt: string;
+}
+
+export async function getTrafficLight(bizItemId: string): Promise<TrafficLightResponse> {
+  return fetchApi(`/ax-bd/viability/traffic-light/${bizItemId}`);
+}
+
+export async function getCommitGate(bizItemId: string): Promise<CommitGateResponse> {
+  return fetchApi(`/ax-bd/viability/commit-gate/${bizItemId}`);
+}
+
+export async function getViabilityCheckpoints(bizItemId: string): Promise<{ checkpoints: ViabilityCheckpoint[] }> {
+  return fetchApi(`/ax-bd/viability/checkpoints/${bizItemId}`);
+}
+
+export async function getAnalysisPath(bizItemId: string): Promise<AnalysisPathResponse> {
+  return fetchApi(`/biz-items/${bizItemId}/analysis-path`);
+}
+
+export async function getBizItems(): Promise<{ items: BizItemSummary[] }> {
+  return fetchApi("/biz-items");
+}
