@@ -55,6 +55,14 @@ Return a JSON object with health score, resource status, and optimization sugges
   "bmc-generation": `You are a BMC generation agent for the Foundry-X project.
 Generate Business Model Canvas content for all 9 blocks based on a business idea.
 Return a JSON object with block keys and string values.` + UIHINT_INSTRUCTION,
+
+  "bmc-insight": `You are a BMC insight agent for the Foundry-X project.
+Given a BMC block type and content, suggest 3 improvements.
+Return a JSON array with title, description, and suggestedContent.` + UIHINT_INSTRUCTION,
+
+  "market-summary": `You are a market analysis agent for the Foundry-X project.
+Given keywords, provide market summary, trends, opportunities, and risks.
+Return a JSON object with summary, trends, opportunities, and risks arrays.` + UIHINT_INSTRUCTION,
 };
 
 /** F60: Default layout per task type — client fallback when uiHint is absent */
@@ -70,6 +78,8 @@ export const DEFAULT_LAYOUT_MAP: Record<AgentTaskType, string> = {
   "qa-testing": "accordion",
   "infra-analysis": "card",
   "bmc-generation": "card",
+  "bmc-insight": "card",
+  "market-summary": "card",
 };
 
 /** F146: Get system prompt — custom override or task-type default */

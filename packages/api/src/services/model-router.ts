@@ -28,6 +28,8 @@ export const DEFAULT_MODEL_MAP: Record<AgentTaskType, string> = {
   "qa-testing": "anthropic/claude-haiku-4-5",
   "infra-analysis": "anthropic/claude-sonnet-4",
   "bmc-generation": "anthropic/claude-sonnet-4-6",
+  "bmc-insight": "anthropic/claude-sonnet-4-6",
+  "market-summary": "anthropic/claude-sonnet-4-6",
 };
 
 interface D1RoutingRow {
