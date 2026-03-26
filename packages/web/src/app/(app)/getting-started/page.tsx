@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Bot,
@@ -26,14 +27,25 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion } from "@/components/ui/accordion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   getOnboardingProgress,
   completeOnboardingStep,
   submitFeedback,
+  getSkillGuide,
+  getProcessFlow,
+  getTeamFaq,
   type OnboardingProgress,
   type OnboardingStep,
+  type SkillGuideResponse,
+  type ProcessFlowResponse,
+  type TeamFaqResponse,
 } from "@/lib/api-client";
 import { useRestartTour } from "@/components/feature/OnboardingTour";
+import CoworkSetupGuide from "@/components/feature/CoworkSetupGuide";
+import SkillReferenceTable from "@/components/feature/SkillReferenceTable";
+import ProcessLifecycleFlow from "@/components/feature/ProcessLifecycleFlow";
+import TeamFaqSection from "@/components/feature/TeamFaqSection";
 
 // ─── 3대 업무 동선 퀵스타트 ───
 
@@ -457,13 +469,39 @@ function NpsFeedbackForm() {
   );
 }
 
+// ─── Tab Keys ───
+
+const TAB_KEYS = ["start", "setup", "skills", "process", "faq"] as const;
+type TabKey = (typeof TAB_KEYS)[number];
+
+const TAB_LABELS: Record<TabKey, string> = {
+  start: "시작하기",
+  setup: "설치 가이드",
+  skills: "스킬 레퍼런스",
+  process: "프로세스 가이드",
+  faq: "FAQ",
+};
+
 // ─── Page ───
 
 export default function GettingStartedPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const initialTab = (searchParams.get("tab") as TabKey) || "start";
+  const [activeTab, setActiveTab] = useState<string>(
+    TAB_KEYS.includes(initialTab as TabKey) ? initialTab : "start",
+  );
+
   const [progress, setProgress] = useState<OnboardingProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const restartTour = useRestartTour();
+
+  // Sprint 71 data
+  const [skillGuide, setSkillGuide] = useState<SkillGuideResponse | null>(null);
+  const [processFlow, setProcessFlow] = useState<ProcessFlowResponse | null>(null);
+  const [teamFaq, setTeamFaq] = useState<TeamFaqResponse | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -484,6 +522,34 @@ export default function GettingStartedPage() {
       cancelled = true;
     };
   }, []);
+
+  // Lazy-load Sprint 71 data when tabs are activated
+  useEffect(() => {
+    if (activeTab === "skills" && !skillGuide) {
+      getSkillGuide().then(setSkillGuide).catch(() => {});
+    }
+    if (activeTab === "process" && !processFlow) {
+      getProcessFlow().then(setProcessFlow).catch(() => {});
+    }
+    if (activeTab === "faq" && !teamFaq) {
+      getTeamFaq().then(setTeamFaq).catch(() => {});
+    }
+  }, [activeTab, skillGuide, processFlow, teamFaq]);
+
+  const handleTabChange = useCallback(
+    (value: string) => {
+      setActiveTab(value);
+      const params = new URLSearchParams(searchParams.toString());
+      if (value === "start") {
+        params.delete("tab");
+      } else {
+        params.set("tab", value);
+      }
+      const qs = params.toString();
+      router.replace(`/getting-started${qs ? `?${qs}` : ""}`, { scroll: false });
+    },
+    [router, searchParams],
+  );
 
   const handleToggleStep = async (stepId: string) => {
     if (!progress) return;
@@ -526,29 +592,63 @@ export default function GettingStartedPage() {
 
   return (
     <div className="space-y-8">
-      <WelcomeBanner
-        progressPercent={progressPercent}
-        onRestartTour={restartTour}
-      />
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
+        <TabsList>
+          {TAB_KEYS.map((key) => (
+            <TabsTrigger key={key} value={key}>
+              {TAB_LABELS[key]}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-      <WorkflowQuickstart />
+        {/* Tab: 시작하기 (기존 콘텐츠 그대로) */}
+        <TabsContent value="start" className="space-y-8 mt-6">
+          <WelcomeBanner
+            progressPercent={progressPercent}
+            onRestartTour={restartTour}
+          />
 
-      <FeatureCardsSection />
+          <WorkflowQuickstart />
 
-      {error && !loading && (
-        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-          온보딩 데이터를 불러오지 못했습니다: {error}
-        </div>
-      )}
+          <FeatureCardsSection />
 
-      <OnboardingChecklist
-        steps={steps}
-        onToggle={handleToggleStep}
-        loading={loading}
-      />
+          {error && !loading && (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+              온보딩 데이터를 불러오지 못했습니다: {error}
+            </div>
+          )}
 
-      <FaqSection />
+          <OnboardingChecklist
+            steps={steps}
+            onToggle={handleToggleStep}
+            loading={loading}
+          />
 
+          <FaqSection />
+        </TabsContent>
+
+        {/* Tab: 설치 가이드 */}
+        <TabsContent value="setup" className="mt-6">
+          <CoworkSetupGuide />
+        </TabsContent>
+
+        {/* Tab: 스킬 레퍼런스 */}
+        <TabsContent value="skills" className="mt-6">
+          <SkillReferenceTable data={skillGuide} />
+        </TabsContent>
+
+        {/* Tab: 프로세스 가이드 */}
+        <TabsContent value="process" className="mt-6">
+          <ProcessLifecycleFlow data={processFlow} />
+        </TabsContent>
+
+        {/* Tab: FAQ */}
+        <TabsContent value="faq" className="mt-6">
+          <TeamFaqSection data={teamFaq} />
+        </TabsContent>
+      </Tabs>
+
+      {/* NPS Feedback — always visible below tabs */}
       <NpsFeedbackForm />
     </div>
   );
