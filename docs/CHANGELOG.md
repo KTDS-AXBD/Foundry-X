@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ### 세션 #124 (2026-03-26)
-**F216 Test Agent 리서치 + F217~F219 REQ 등록**:
+**F216 Test Agent 리서치 + PRD 작성 + Sprint Pipeline 설계**:
 - ✅ **F216** (FX-REQ-208): 6종 Agent 활용 현황 점검 — PlannerAgent만 활용, 5종 미사용 확인
 - ✅ **리서치**: Anthropic Agent SDK / Code Review Agent / 외부 벤치마크 (Cursor, Codex, SWE-bench)
+- ✅ **PRD**: FX-SPEC-PRD-TA-V1 작성 (F217~F219 통합 PRD — 기술 설계, Kill 조건, 로드맵)
+- ✅ **Sprint Pipeline 설계**: Batch1(F215+F217+F218 병렬) → Batch2(F219 순차)
+- ✅ **CI 점검**: test/deploy ✅, prod-e2e ❌(Landing nav 3건 — 기존 이슈)
 - 📋 **F217** (FX-REQ-209, Sprint 72): TestAgent 활성화 — Web UI + 워크플로우 통합
 - 📋 **F218** (FX-REQ-210, Sprint 73): Agent SDK Test Agent PoC
 - 📋 **F219** (FX-REQ-211, Sprint 74): TDD 자동화 CC Skill
