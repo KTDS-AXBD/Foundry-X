@@ -507,4 +507,26 @@ export class BizItemService {
       expiresAt: row.expires_at ?? "",
     };
   }
+
+  // Sprint 69: discovery_type 업데이트 (F213)
+  async updateDiscoveryType(orgId: string, id: string, discoveryType: string): Promise<boolean> {
+    const result = await this.db
+      .prepare(
+        `UPDATE biz_items SET discovery_type = ?, updated_at = datetime('now')
+         WHERE id = ? AND org_id = ?`,
+      )
+      .bind(discoveryType, id, orgId)
+      .run();
+
+    return (result.meta?.changes ?? 0) > 0;
+  }
+
+  async getDiscoveryType(orgId: string, id: string): Promise<string | null> {
+    const row = await this.db
+      .prepare("SELECT discovery_type FROM biz_items WHERE id = ? AND org_id = ?")
+      .bind(id, orgId)
+      .first<{ discovery_type: string | null }>();
+
+    return row?.discovery_type ?? null;
+  }
 }
