@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #133 (2026-03-26)
+**스킬 프레임워크 점검 + 관리 체계 수립**:
+- ✅ selfcheck 보정: PDCA 위치이탈 4건 → features/ 이동, Zone.Identifier 2건 삭제, CLAUDE.md 스킬 등재
+- ✅ sf-scan: 82개 active 스킬, 10 카테고리, uncategorized 0건
+- ✅ sf-lint: 0 errors, 22 WARN (20건 false positive — commands에 이미 Use when 존재)
+- ✅ FX-GUID-001: CC 스킬 관리 가이드 (비개발자용 — 찾기/사용/수정/만들기/공유/품질관리)
+- ✅ FX-GUID-002: 82개 스킬 카탈로그 (10 카테고리, sf-scan 기반)
+- ✅ Workers 재배포: Version 3dfc71b0, HTTP 401 정상
+
 ### 세션 #132 (2026-03-26)
 **Phase 6 Ecosystem Integration — REQ 12건 등록**:
 - ✅ FX-PLAN-012(BMAD/OpenSpec 벤치마킹) 기반 F220~F231 SPEC.md 등록
