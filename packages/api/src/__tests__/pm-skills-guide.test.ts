@@ -29,7 +29,7 @@ describe("PmSkillsGuide (F184)", () => {
   it("getGuidesForCriterion — 기준 5 관련 스킬", () => {
     const guides = getGuidesForCriterion(5);
     expect(guides.length).toBeGreaterThanOrEqual(1);
-    expect(guides[0].skill).toBe("/business-model");
+    expect(guides[0]!.skill).toBe("/business-model");
   });
 
   it("모든 스킬에 필수 필드 존재", () => {

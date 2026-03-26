@@ -132,8 +132,8 @@ describe("DiscoveryCriteriaService (F183)", () => {
 
     const suggestions = await service.suggestFromStep("item-1", [1, 4]);
     expect(suggestions).toHaveLength(1);
-    expect(suggestions[0].criterionId).toBe(4);
-    expect(suggestions[0].currentStatus).toBe("pending");
+    expect(suggestions[0]!.criterionId).toBe(4);
+    expect(suggestions[0]!.currentStatus).toBe("pending");
   });
 
   it("suggestFromStep — 빈 매핑은 빈 배열", async () => {
@@ -146,7 +146,7 @@ describe("DiscoveryCriteriaService (F183)", () => {
     await service.initialize("item-1");
     const progress = await service.getAll("item-1");
     const first = progress.criteria[0];
-    expect(first.name).toBe("문제/고객 정의");
-    expect(first.condition).toContain("JTBD");
+    expect(first!.name).toBe("문제/고객 정의");
+    expect(first!.condition).toContain("JTBD");
   });
 });

@@ -130,7 +130,7 @@ describe("BizItems Business Plan Routes (F180)", () => {
     seedDb("INSERT OR IGNORE INTO users (id, email, name, role, created_at, updated_at) VALUES ('test-user', 'test@example.com', 'Test', 'admin', datetime('now'), datetime('now'))");
     seedDb("INSERT OR IGNORE INTO organizations (id, name, slug) VALUES ('org_test', 'Test Org', 'test-org')");
     seedDb("INSERT OR IGNORE INTO org_members (org_id, user_id, role) VALUES ('org_test', 'test-user', 'owner')");
-    authHeader = await createAuthHeaders(env, "test-user");
+    authHeader = await createAuthHeaders({ sub: "test-user" });
   });
 
   it("POST /generate-business-plan — 성공", async () => {
@@ -141,7 +141,7 @@ describe("BizItems Business Plan Routes (F180)", () => {
       body: { skipLlmRefine: true },
     });
     expect(res.status).toBe(201);
-    const data = await res.json() as any;
+    const data = (await res.json()) as any as any;
     expect(data.bizItemId).toBe("item-1");
     expect(data.version).toBe(1);
     expect(data.content).toContain("사업계획서 초안");
@@ -162,7 +162,7 @@ describe("BizItems Business Plan Routes (F180)", () => {
       body: { skipLlmRefine: true },
     });
     expect(res.status).toBe(400);
-    const data = await res.json() as any;
+    const data = (await res.json()) as any as any;
     expect(data.error).toBe("CLASSIFICATION_REQUIRED");
   });
 
@@ -176,7 +176,7 @@ describe("BizItems Business Plan Routes (F180)", () => {
 
     const res = await req("GET", "/api/biz-items/item-1/business-plan", { headers: authHeader });
     expect(res.status).toBe(200);
-    const data = await res.json() as any;
+    const data = (await res.json()) as any as any;
     expect(data.version).toBe(1);
   });
 
@@ -194,7 +194,7 @@ describe("BizItems Business Plan Routes (F180)", () => {
 
     const res = await req("GET", "/api/biz-items/item-1/business-plan/versions", { headers: authHeader });
     expect(res.status).toBe(200);
-    const data = await res.json() as any;
+    const data = (await res.json()) as any as any;
     expect(data.versions).toHaveLength(2);
   });
 });
@@ -208,7 +208,7 @@ describe("BizItems Prototype Routes (F181)", () => {
     seedDb("INSERT OR IGNORE INTO users (id, email, name, role, created_at, updated_at) VALUES ('test-user', 'test@example.com', 'Test', 'admin', datetime('now'), datetime('now'))");
     seedDb("INSERT OR IGNORE INTO organizations (id, name, slug) VALUES ('org_test', 'Test Org', 'test-org')");
     seedDb("INSERT OR IGNORE INTO org_members (org_id, user_id, role) VALUES ('org_test', 'test-user', 'owner')");
-    authHeader = await createAuthHeaders(env, "test-user");
+    authHeader = await createAuthHeaders({ sub: "test-user" });
   });
 
   it("POST /generate-prototype — 성공", async () => {
@@ -220,7 +220,7 @@ describe("BizItems Prototype Routes (F181)", () => {
       body: {},
     });
     expect(res.status).toBe(201);
-    const data = await res.json() as any;
+    const data = (await res.json()) as any as any;
     expect(data.bizItemId).toBe("item-1");
     expect(data.format).toBe("html");
     expect(data.templateUsed).toBe("tech");
@@ -235,7 +235,7 @@ describe("BizItems Prototype Routes (F181)", () => {
       body: {},
     });
     expect(res.status).toBe(400);
-    const data = await res.json() as any;
+    const data = (await res.json()) as any as any;
     expect(data.error).toBe("STARTING_POINT_REQUIRED");
   });
 
@@ -248,7 +248,7 @@ describe("BizItems Prototype Routes (F181)", () => {
       body: { template: "market" },
     });
     expect(res.status).toBe(201);
-    const data = await res.json() as any;
+    const data = (await res.json()) as any as any;
     expect(data.templateUsed).toBe("market");
   });
 
@@ -260,7 +260,7 @@ describe("BizItems Prototype Routes (F181)", () => {
 
     const res = await req("GET", "/api/biz-items/item-1/prototype", { headers: authHeader });
     expect(res.status).toBe(200);
-    const data = await res.json() as any;
+    const data = (await res.json()) as any as any;
     expect(data.format).toBe("html");
   });
 

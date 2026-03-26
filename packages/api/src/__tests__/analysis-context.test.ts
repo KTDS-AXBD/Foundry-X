@@ -53,9 +53,9 @@ describe("AnalysisContextService (F184)", () => {
 
     const contexts = await service.getAll("item-1");
     expect(contexts).toHaveLength(3);
-    expect(contexts[0].stepOrder).toBe(1);
-    expect(contexts[1].stepOrder).toBe(2);
-    expect(contexts[2].stepOrder).toBe(3);
+    expect(contexts[0]!.stepOrder).toBe(1);
+    expect(contexts[1]!.stepOrder).toBe(2);
+    expect(contexts[2]!.stepOrder).toBe(3);
   });
 
   it("getUpToStep — 특정 단계까지만 조회", async () => {
@@ -65,7 +65,7 @@ describe("AnalysisContextService (F184)", () => {
 
     const contexts = await service.getUpToStep("item-1", 2);
     expect(contexts).toHaveLength(2);
-    expect(contexts[1].stepOrder).toBe(2);
+    expect(contexts[1]!.stepOrder).toBe(2);
   });
 
   it("getAll — 아이템 간 격리", async () => {

@@ -52,7 +52,7 @@ describe("Discovery Route (F189)", () => {
     const headers = await createAuthHeaders();
     const res = await req("GET", "/api/discovery/progress", { headers });
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body).toHaveProperty("totalItems", 0);
     expect(body).toHaveProperty("byGateStatus");
     expect(body).toHaveProperty("byCriterion");
@@ -63,7 +63,7 @@ describe("Discovery Route (F189)", () => {
     const headers = await createAuthHeaders();
     const res = await req("GET", "/api/discovery/progress/summary", { headers });
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body).toHaveProperty("totalItems", 0);
     expect(body).toHaveProperty("overallCompletionRate", 0);
     expect(body).toHaveProperty("bottleneckCriterion", null);
@@ -79,7 +79,7 @@ describe("Discovery Route (F189)", () => {
     const headers = await createAuthHeaders();
     const res = await req("GET", "/api/discovery/progress", { headers });
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.totalItems).toBe(1);
     expect(body.items[0].completedCount).toBe(1);
     expect(body.items[0].gateStatus).toBe("blocked");
@@ -91,7 +91,7 @@ describe("Discovery Route (F189)", () => {
     const headers = await createAuthHeaders();
     const res = await req("GET", "/api/discovery/progress", { headers });
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.totalItems).toBe(0);
   });
 
@@ -106,7 +106,7 @@ describe("Discovery Route (F189)", () => {
     const headers = await createAuthHeaders();
     const res = await req("GET", "/api/discovery/progress/summary", { headers });
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.totalItems).toBe(1);
     expect(body.readyCount).toBe(1);
     expect(body.overallCompletionRate).toBe(100);

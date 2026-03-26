@@ -97,7 +97,7 @@ describe("Collection Pipeline API (F179)", () => {
         body: { keywords: ["AI 보험", "손해사정"], maxItems: 5 },
       });
       expect(res.status).toBe(201);
-      const data = await res.json();
+      const data = (((await res.json()) as any)) as any;
       expect(data.itemsFound).toBe(2);
       expect(data.itemsNew).toBe(2);
       expect(data.itemsDuplicate).toBe(0);
@@ -118,7 +118,7 @@ describe("Collection Pipeline API (F179)", () => {
         body: { keywords: ["AI 보험"], maxItems: 5 },
       });
       expect(res.status).toBe(201);
-      const data = await res.json();
+      const data = (((await res.json()) as any)) as any;
       expect(data.itemsNew).toBe(0);
       expect(data.itemsDuplicate).toBe(2);
     });
@@ -145,7 +145,7 @@ describe("Collection Pipeline API (F179)", () => {
     it("should return empty jobs list initially", async () => {
       const res = await req("GET", "/api/collection/jobs", { headers });
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = (((await res.json()) as any)) as any;
       expect(data.jobs).toHaveLength(0);
     });
 
@@ -156,7 +156,7 @@ describe("Collection Pipeline API (F179)", () => {
       });
       const res = await req("GET", "/api/collection/jobs", { headers });
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = (((await res.json()) as any)) as any;
       expect(data.jobs.length).toBeGreaterThanOrEqual(1);
       expect(data.jobs[0].channel).toBe("agent");
       expect(data.jobs[0].status).toBe("completed");
@@ -168,7 +168,7 @@ describe("Collection Pipeline API (F179)", () => {
         body: { keywords: ["AI"] },
       });
       const res = await req("GET", "/api/collection/jobs?channel=idea_portal", { headers });
-      const data = await res.json();
+      const data = (((await res.json()) as any)) as any;
       expect(data.jobs).toHaveLength(0);
     });
   });
@@ -179,7 +179,7 @@ describe("Collection Pipeline API (F179)", () => {
     it("should return stats with zero initially", async () => {
       const res = await req("GET", "/api/collection/stats", { headers });
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = (((await res.json()) as any)) as any;
       expect(data.total).toBe(0);
       expect(data.approvalRate).toBe(0);
     });
@@ -190,7 +190,7 @@ describe("Collection Pipeline API (F179)", () => {
         body: { keywords: ["AI"] },
       });
       const res = await req("GET", "/api/collection/stats", { headers });
-      const data = await res.json();
+      const data = (((await res.json()) as any)) as any;
       expect(data.total).toBe(2);
       expect(data.byChannel.agent).toBe(2);
     });
@@ -206,7 +206,7 @@ describe("Collection Pipeline API (F179)", () => {
       });
       const res = await req("GET", "/api/collection/screening-queue", { headers });
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = (((await res.json()) as any)) as any;
       expect(data.items.length).toBe(2);
       expect(data.items[0].source).toBe("agent");
     });
@@ -216,16 +216,16 @@ describe("Collection Pipeline API (F179)", () => {
         headers,
         body: { keywords: ["AI"] },
       });
-      const queue = await (await req("GET", "/api/collection/screening-queue", { headers })).json();
+      const queue: any = await (await req("GET", "/api/collection/screening-queue", { headers })).json();
       const itemId = queue.items[0].id;
 
       const res = await req("POST", `/api/collection/screening-queue/${itemId}/approve`, { headers });
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = (((await res.json()) as any)) as any;
       expect(data.status).toBe("draft");
 
       // Should no longer be in queue
-      const queue2 = await (await req("GET", "/api/collection/screening-queue", { headers })).json();
+      const queue2: any = await (await req("GET", "/api/collection/screening-queue", { headers })).json();
       expect(queue2.items.length).toBe(1);
     });
 
@@ -234,7 +234,7 @@ describe("Collection Pipeline API (F179)", () => {
         headers,
         body: { keywords: ["AI"] },
       });
-      const queue = await (await req("GET", "/api/collection/screening-queue", { headers })).json();
+      const queue: any = await (await req("GET", "/api/collection/screening-queue", { headers })).json();
       const itemId = queue.items[0].id;
 
       const res = await req("POST", `/api/collection/screening-queue/${itemId}/reject`, {
@@ -242,7 +242,7 @@ describe("Collection Pipeline API (F179)", () => {
         body: { reason: "중복 아이템" },
       });
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = (((await res.json()) as any)) as any;
       expect(data.status).toBe("rejected");
     });
 
@@ -289,7 +289,7 @@ describe("Collection Pipeline API (F179)", () => {
       }, env);
 
       expect(res.status).toBe(201);
-      const data = await res.json();
+      const data = (((await res.json()) as any)) as any;
       expect(data.id).toBeTruthy();
       expect(data.status).toBe("pending_review");
     });
@@ -328,13 +328,13 @@ describe("Collection Pipeline API (F179)", () => {
         headers,
         body: { keywords: ["AI"] },
       });
-      const queue = await (await req("GET", "/api/collection/screening-queue", { headers })).json();
+      const queue: any = await (await req("GET", "/api/collection/screening-queue", { headers })).json();
 
       // Approve first, reject second
       await req("POST", `/api/collection/screening-queue/${queue.items[0].id}/approve`, { headers });
       await req("POST", `/api/collection/screening-queue/${queue.items[1].id}/reject`, { headers });
 
-      const stats = await (await req("GET", "/api/collection/stats", { headers })).json();
+      const stats: any = await (await req("GET", "/api/collection/stats", { headers })).json();
       expect(stats.approvalRate).toBe(0.5);
     });
   });

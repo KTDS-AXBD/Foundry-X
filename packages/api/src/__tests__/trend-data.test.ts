@@ -157,7 +157,7 @@ describe("Trend Data API (F190)", () => {
         body: {},
       });
       expect(res.status).toBe(201);
-      const data = await res.json();
+      const data = (await res.json()) as any;
       expect(data.marketSummary).toBeTruthy();
       expect(data.marketSizeEstimate).toBeTruthy();
       expect(data.marketSizeEstimate.tam).toBe("5조원");
@@ -222,7 +222,7 @@ describe("Trend Data API (F190)", () => {
       });
       const res = await req("GET", "/api/biz-items/item-1/trend-report", { headers });
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = (await res.json()) as any;
       expect(data.marketSummary).toBeTruthy();
       expect(data.competitors).toHaveLength(2);
     });
@@ -242,7 +242,7 @@ describe("Trend Data API (F190)", () => {
         body: {},
       });
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = (await res.json()) as any;
       expect(data.competitors).toHaveLength(1);
       expect(data.competitors[0].name).toBe("CompanyA");
       expect(data.competitors[0].strengths).toHaveLength(1);

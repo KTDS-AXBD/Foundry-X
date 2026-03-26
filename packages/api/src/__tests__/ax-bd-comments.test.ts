@@ -131,7 +131,7 @@ describe("BmcCommentService", () => {
       const result = await commentService.getComments(testBmcId, "channels");
 
       expect(result.comments).toHaveLength(1);
-      expect(result.comments[0].blockType).toBe("channels");
+      expect(result.comments[0]!.blockType).toBe("channels");
       expect(result.total).toBe(1);
     });
 
@@ -302,7 +302,7 @@ describe("ax-bd-comments route", () => {
     });
 
     expect(res.status).toBe(201);
-    const body = await res.json();
+    const body = (((await res.json()) as any)) as any;
     expect(body.content).toBe("좋은 분석이에요");
     expect(body.blockType).toBe("channels");
   });
@@ -362,7 +362,7 @@ describe("ax-bd-comments route", () => {
 
     const res = await app.request(`/ax-bd/bmcs/${testBmcId}/comments`);
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (((await res.json()) as any)) as any;
     expect(body.comments).toHaveLength(2);
     expect(body.total).toBe(2);
   });
@@ -381,7 +381,7 @@ describe("ax-bd-comments route", () => {
 
     const res = await app.request(`/ax-bd/bmcs/${testBmcId}/comments/count`);
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (((await res.json()) as any)) as any;
     expect(body.channels).toBe(2);
     expect(body._total).toBe(2);
   });
@@ -392,13 +392,13 @@ describe("ax-bd-comments route", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content: "삭제 대상" }),
     });
-    const { id: commentId } = await createRes.json();
+    const { id: commentId } = (await createRes.json()) as any;
 
     const res = await app.request(`/ax-bd/bmcs/${testBmcId}/comments/${commentId}`, {
       method: "DELETE",
     });
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (((await res.json()) as any)) as any;
     expect(body.success).toBe(true);
   });
 
@@ -418,7 +418,7 @@ describe("ax-bd-comments route", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content: "user_2의 댓글" }),
     });
-    const { id: commentId } = await createRes.json();
+    const { id: commentId } = (await createRes.json()) as any;
 
     // user_1이 삭제 시도
     const res = await app.request(`/ax-bd/bmcs/${testBmcId}/comments/${commentId}`, {

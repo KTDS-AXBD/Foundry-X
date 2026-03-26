@@ -977,6 +977,7 @@ const getRoutingRules = createRoute({
   },
 });
 
+// @ts-expect-error — AgentTaskType union expanded (10→13), Hono Zod inference stale
 agentRoute.openapi(getRoutingRules, async (c) => {
   const router = new ModelRouter(c.env.DB);
   const rules = await router.listRules();
@@ -998,6 +999,7 @@ const updateRoutingRule = createRoute({
   },
 });
 
+// @ts-expect-error — AgentTaskType union expanded (10→13), Hono Zod inference stale
 agentRoute.openapi(updateRoutingRule, async (c) => {
   const { taskType } = c.req.valid("param");
   const validTypes = ["code-review", "code-generation", "spec-analysis", "test-generation", "policy-evaluation", "skill-query", "ontology-lookup"];
@@ -1393,6 +1395,7 @@ const fallbackChainGet = createRoute({
   },
 });
 
+// @ts-expect-error — AgentTaskType union expanded (10→13), Hono Zod inference stale
 agentRoute.openapi(fallbackChainGet, async (c) => {
   const { taskType } = c.req.valid("param");
   const router = new ModelRouter(c.env.DB);

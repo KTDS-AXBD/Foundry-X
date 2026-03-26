@@ -210,9 +210,9 @@ describe("PrdReviewPipeline (F186)", () => {
       .bind("prd-1")
       .all<Record<string, unknown>>();
     expect(results).toHaveLength(1);
-    expect(results[0].provider).toBe("chatgpt");
-    expect(results[0].prd_id).toBe("prd-1");
-    expect(results[0].org_id).toBe("org_test");
+    expect(results[0]!.provider).toBe("chatgpt");
+    expect(results[0]!.prd_id).toBe("prd-1");
+    expect(results[0]!.org_id).toBe("org_test");
   });
 
   it("saveScorecard — DB에 정상 저장", async () => {

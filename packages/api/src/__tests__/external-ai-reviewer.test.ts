@@ -50,9 +50,9 @@ describe("parseReviewResponse", () => {
     expect(result.overallScore).toBe(72);
     expect(result.verdict).toBe("conditional");
     expect(result.sections).toHaveLength(8);
-    expect(result.sections[0].name).toBe("핵심 문제 정의");
-    expect(result.sections[0].score).toBe(8);
-    expect(result.sections[0].grade).toBe("충실");
+    expect(result.sections[0]!.name).toBe("핵심 문제 정의");
+    expect(result.sections[0]!.score).toBe(8);
+    expect(result.sections[0]!.grade).toBe("충실");
     expect(result.improvements).toHaveLength(2);
   });
 
@@ -166,7 +166,7 @@ describe("ChatGptProvider", () => {
     expect(globalThis.fetch).toHaveBeenCalledTimes(1);
 
     const callArgs = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
-    expect(callArgs[0]).toBe("https://api.openai.com/v1/chat/completions");
+    expect(callArgs![0]).toBe("https://api.openai.com/v1/chat/completions");
   });
 
   it("fetch 실패 → ExternalAiError", async () => {
@@ -196,7 +196,7 @@ describe("GeminiProvider", () => {
     expect(result.overallScore).toBe(72);
 
     const callArgs = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
-    expect(callArgs[0]).toContain("generativelanguage.googleapis.com");
+    expect(callArgs![0]).toContain("generativelanguage.googleapis.com");
   });
 
   it("fetch 실패 → ExternalAiError", async () => {
@@ -226,7 +226,7 @@ describe("DeepSeekProvider", () => {
     expect(result.overallScore).toBe(72);
 
     const callArgs = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
-    expect(callArgs[0]).toBe("https://api.deepseek.com/chat/completions");
+    expect(callArgs![0]).toBe("https://api.deepseek.com/chat/completions");
   });
 
   it("fetch 실패 → ExternalAiError", async () => {

@@ -165,8 +165,8 @@ describe("BizItems PRD Review Integration (F186)", () => {
     expect(result.reviews).toHaveLength(2);
     expect(result.scorecard).toBeTruthy();
     expect(result.scorecard!.totalScore).toBe(75);
-    expect(result.reviews[0].provider).toBe("chatgpt");
-    expect(result.reviews[1].provider).toBe("gemini");
+    expect(result.reviews[0]!.provider).toBe("chatgpt");
+    expect(result.reviews[1]!.provider).toBe("gemini");
   });
 
   it("리뷰 조회 — 결과 없음 → 빈 결과 (404 시뮬레이션)", async () => {
