@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #125 (2026-03-26)
+**Sprint 71 (F215) + Landing 현행화 + CI 수정 — Phase 5f 전체 완료**:
+- ✅ **Sprint 71** (F215): AX BD 팀 가이드 — Getting Started 4섹션 확장 (Cowork 설치+CC 사용법+프로세스+FAQ), 5 컴포넌트 + 테스트, PR #209
+- ✅ **Landing page 현행화**: SITE_META/stats/pillars/architecture/roadmap/processSteps/footer — Sprint 64→70, v0.8→v8.2
+- ✅ **CI 수정**: typecheck 0 errors (test type assertions + agent.ts Hono union) + [id] 동적 라우트 제거 (output:export 호환)
+- ✅ **인프라**: sprint-status-monitor.sh, ccw-auto bypass-permissions 버그 수정, merge-monitor local 버그 수정
+
+**수치**: 47 routes, 135 services, 61 schemas, D1 0060, API 1786 tests (총 2032+)
+
 ### 세션 #124 (2026-03-26)
 **F216 Test Agent 리서치 + PRD 작성 + Sprint Pipeline 설계**:
 - ✅ **F216** (FX-REQ-208): 6종 Agent 활용 현황 점검 — PlannerAgent만 활용, 5종 미사용 확인
