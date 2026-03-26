@@ -174,6 +174,47 @@ export interface AgentExecutionResult {
   duration: number;
 }
 
+// ─── F217: TestAgent Response Types ───
+
+/** F217: TestAgent 테스트 생성 응답 */
+export interface TestGenerationResponse {
+  testFiles: Array<{
+    path: string;
+    content: string;
+    testCount: number;
+    framework: string;
+  }>;
+  totalTestCount: number;
+  coverageEstimate: number;
+  edgeCases: Array<{
+    function: string;
+    case: string;
+    category: 'boundary' | 'null' | 'error' | 'concurrency' | 'type';
+  }>;
+  tokensUsed: number;
+  model: string;
+  duration: number;
+}
+
+/** F217: TestAgent 커버리지 갭 응답 */
+export interface CoverageGapResponse {
+  analyzedFiles: number;
+  uncoveredFunctions: Array<{
+    file: string;
+    function: string;
+    complexity: 'low' | 'medium' | 'high';
+    priority: 'low' | 'medium' | 'high' | 'critical';
+  }>;
+  missingEdgeCases: Array<{
+    file: string;
+    function: string;
+    suggestedCases: string[];
+  }>;
+  overallCoverage: number;
+  tokensUsed: number;
+  model: string;
+}
+
 /** F53: AgentRunner 타입 식별 */
 export type AgentRunnerType = 'claude-api' | 'mcp' | 'mock';
 
