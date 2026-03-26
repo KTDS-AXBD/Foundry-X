@@ -50,7 +50,7 @@ const pillars = [
     title: "BDP 라이프사이클",
     label: "7단계 자동화",
     desc: "수집→발굴→형상화→검증→제품화→GTM→평가. 사업개발 전체를 한 곳에서.",
-    detail: "AX BD 프로세스 v0.8 기반, Foundry-X가 모든 단계를 오케스트레이션",
+    detail: "AX BD 프로세스 v8.2 기반, 5유형(I/M/P/T/S) 강도 라우팅 + 사업성 체크포인트",
     color: "axis-primary",
   },
   {
@@ -66,7 +66,7 @@ const pillars = [
     title: "SDD Triangle",
     label: "Spec ↔ Code ↔ Test",
     desc: "명세, 코드, 테스트가 항상 동기화돼요. Git이 진실, Foundry-X는 렌즈.",
-    detail: "192 endpoints, 1,481+ tests, 50 D1 migrations — 자동 정합성 검증",
+    detail: "304 endpoints, 2,032+ tests, 60 D1 migrations — 자동 정합성 검증",
     color: "axis-green",
   },
 ];
@@ -82,9 +82,9 @@ const agents = [
 
 const architecture = [
   { layer: "CLI Layer", items: ["foundry-x init", "foundry-x sync", "foundry-x status"], tech: "TypeScript + Commander + Ink TUI" },
-  { layer: "API Layer", items: ["192 Endpoints", "116 Services", "36 Route Modules"], tech: "Hono on Cloudflare Workers" },
+  { layer: "API Layer", items: ["304 Endpoints", "135 Services", "47 Route Modules"], tech: "Hono on Cloudflare Workers" },
   { layer: "Agent Layer", items: ["BMCAgent", "InsightAgent", "ReviewAgent", "ArchitectAgent + 3종"], tech: "Orchestrator + MCP + Multi-Model" },
-  { layer: "Data Layer", items: ["D1 SQLite (50 Migrations)", "KV Cache", "Git (SSOT)"], tech: "Cloudflare D1 + simple-git" },
+  { layer: "Data Layer", items: ["D1 SQLite (60 Migrations)", "KV Cache", "Git (SSOT)"], tech: "Cloudflare D1 + simple-git" },
 ];
 
 const roadmap: {
@@ -95,15 +95,17 @@ const roadmap: {
   items: string[];
 }[] = [
   { phase: "Phase 1~4", title: "CLI + API + Web + 멀티테넌시", version: "v0.1 → v2.1", status: "done",
-    items: ["CLI 3커맨드 + Ink TUI", "192 API Endpoints", "Next.js Dashboard", "SSO + RBAC"] },
+    items: ["CLI 3커맨드 + Ink TUI", "304 API Endpoints", "Next.js Dashboard", "SSO + RBAC"] },
   { phase: "Phase 5a", title: "Agent Evolution", version: "Sprint 32~47", status: "done",
     items: ["6종 에이전트", "모델 라우팅", "PRD v8 확정"] },
   { phase: "Phase 5b", title: "BDP 자동화", version: "Sprint 48~58", status: "done",
     items: ["Discovery 9기준", "다중 AI 검토", "Six Hats 토론", "수집 채널 통합"] },
   { phase: "Phase 5c", title: "방법론 플러그인", version: "Sprint 59~60", status: "done",
     items: ["레지스트리 + 인터페이스", "BDP 모듈화", "pm-skills 모듈"] },
-  { phase: "Phase 5d", title: "Ideation MVP", version: "Sprint 61~67", status: "current",
+  { phase: "Phase 5d", title: "Ideation MVP", version: "Sprint 61~67", status: "done",
     items: ["BMC CRUD + AI", "아이디어-BMC 연결", "인사이트 + 평가", "Discovery-X 연동"] },
+  { phase: "Phase 5f", title: "사업개발 체계 수립", version: "Sprint 68~71", status: "current",
+    items: ["ai-biz 11스킬 CC전환", "API v8.2 (5유형+체크포인트)", "Discovery 대시보드", "팀 가이드"] },
 ];
 
 const ecosystem = [
@@ -114,7 +116,7 @@ const ecosystem = [
 
 const processSteps = [
   { step: "01", title: "수집", desc: "시장/트렌드/경쟁사 데이터 자동 수집 (Discovery-X 연동)", icon: Scan },
-  { step: "02", title: "발굴", desc: "아이디어 등록 + Type A/B/C 분류 + Pain Point 발견", icon: Lightbulb },
+  { step: "02", title: "발굴", desc: "아이디어 등록 + 5유형(I/M/P/T/S) 분류 + 사업성 체크포인트", icon: Lightbulb },
   { step: "03", title: "형상화", desc: "BMC 에디터 + AI 초안 (BMCAgent) + PRD 자동 작성", icon: PenTool },
   { step: "04", title: "검증", desc: "다중 AI 검토 + Six Hats 토론 + 팀 승인", icon: CheckCircle2 },
   { step: "05", title: "제품화", desc: "PoC/MVP 자동 구축 — AI 에이전트가 코드·테스트·배포 처리", icon: Rocket },
