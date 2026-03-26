@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #131 (2026-03-26)
+**팀 가이드 사이트 점검 + Suspense 버그 수정**:
+- ✅ Getting Started: useSearchParams() Suspense boundary 추가 — 프로덕션에서 탭(설치 가이드/스킬/프로세스/FAQ) 미표시 버그 수정
+- ✅ 라이브 사이트 Playwright 점검: 탭 5개 정상, Discovery v8.2 전체, Landing Sprint 71/Phase 5g 확인
+
 ### 세션 #130 (2026-03-26)
 **Sprint Pipeline 72+73+74 — Phase 5g Test Agent 완료**:
 - ✅ **Sprint 72** (F217): TestAgent 활성화 — TestAgentPanel+CoverageGapView+TestGenerationResult 3컴포넌트, api-client 확장. PR #212
