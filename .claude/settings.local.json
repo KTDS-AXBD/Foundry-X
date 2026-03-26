@@ -21,7 +21,15 @@
       "Bash(tmux kill-window:*)",
       "Bash(bash -n ~/.bashrc)",
       "Bash(bash -n ~/scripts/sprint-post-session.sh)",
-      "Bash(bash -n ~/scripts/sprint-merge-monitor.sh)"
+      "Bash(bash -n ~/scripts/sprint-merge-monitor.sh)",
+      "Bash(tmux list-sessions:*)",
+      "Bash(tmux capture-pane:*)",
+      "Bash(find ~/.claude/plugins/cache/claude-plugins-official/learning-output-style -delete)",
+      "Bash(find ~/.claude/plugins/cache/claude-plugins-official/explanatory-output-style -delete)",
+      "Bash(git pull:*)",
+      "Bash(git commit:*)",
+      "Bash(git stash:*)",
+      "Bash(git rebase:*)"
     ]
   }
 }

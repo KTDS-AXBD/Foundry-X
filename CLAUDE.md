@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 64 완료, Sprint 65 착수 대기 (192 endpoints, 116 services, 1481 API tests + CLI 125 + Web 121 + ~55 E2E)
+**현재 상태:** Sprint 67 완료 (Phase 5d+5e 완료, ~292 endpoints, 132 services, 1504+ API tests + CLI 125 + Web 121+ + ~55 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -58,9 +58,9 @@ foundry-x/
 │   │       └── index.ts
 │   ├── api/                # Hono API Server (Phase 2)
 │   │   └── src/
-│   │       ├── routes/     # 36개 — 목록은 `ls packages/api/src/routes/` 참조
-│   │       ├── services/   # 116개 — 목록은 `ls packages/api/src/services/` 참조
-│   │       ├── schemas/    # 47개 Zod 스키마 — 목록은 `ls packages/api/src/schemas/` 참조
+│   │       ├── routes/     # 46개 — 목록은 `ls packages/api/src/routes/` 참조
+│   │       ├── services/   # 132개 — 목록은 `ls packages/api/src/services/` 참조
+│   │       ├── schemas/    # 59개 Zod 스키마 — 목록은 `ls packages/api/src/schemas/` 참조
 │   │       └── index.ts
 │   ├── web/                # Next.js 14 Dashboard + Landing (Phase 2)
 │   │   └── src/
@@ -94,6 +94,7 @@ foundry-x/
 | `docs/specs/prd-v8-final.md` | 현행 PRD (권위 문서, v8: AI 에이전트 오케스트레이션 플랫폼 정체성 재정의) |
 | `docs/specs/ax-bd-atoz/prd-final.md` | AX BD A-to-Z PRD (7단계 라이프사이클 + 시스템 통합 방향) |
 | `docs/specs/bizdevprocess-3/prd-ax-bd-v1.4.md` | AX BD Ideation MVP PRD (BMC + AI 에이전트, Sprint 61~67) |
+| `docs/specs/axbd/` | AX BD 사업개발 프로세스 v8.2 참고자료 (HTML 3 + MD 3 + ai-biz 플러그인) |
 | `docs/specs/dev-transparency-spec.md` | 개발 투명성 스펙 |
 | `docs/specs/interview-log.md` | 요구사항 인터뷰 종합 (Part 1-5) |
 | `docs/02-design/features/tech-stack-review.design.md` | 기술 스택 결정 근거 |
@@ -151,16 +152,14 @@ pnpm e2e                          # Playwright E2E (17 specs)
 - **Phase 5a:** ✅ 완료 (Sprint 32~47) — Agent Evolution Track A + PRD v8
 - **Phase 5b:** ✅ 완료 (Sprint 48~58) — BDP 6단계 자동화
 - **Phase 5c:** ✅ 완료 (Sprint 59~60) — 방법론 플러그인 아키텍처
-- **Phase 5d:** 🔧 진행 중 — AX BD Ideation MVP (Sprint 61~67)
-  - ✅ Sprint 61 (F197+F198): BMC CRUD + 아이디어 등록
-  - ✅ Sprint 62 (F199+F200): BMCAgent 초안 + 버전 히스토리
-  - ✅ Sprint 64 (F203+F204): 아이디어-BMC 연결 + 댓글
-  - 📋 Sprint 65 (F201+F202+F207+F196): 인사이트 + InsightAgent + 평가관리 MVP + WT UX ← **다음 착수**
-  - 📋 Sprint 66 (F205+F208): Homepage 재구성 + Discovery-X API 스펙
-  - 📋 Sprint 67 (F209+F210): AI Foundry 흡수 + 비밀번호 재설정
-- **Phase 5e:** 📋 계획 — AX BD A-to-Z 하위 기능 (F206 prd-final 기반, F207~F210)
-- **현재 수치:** 116 services, 192 endpoints, 1481 API tests, D1 0001~0050
-- **PRD:** `docs/specs/prd-v8-final.md` (플랫폼) + `docs/specs/ax-bd-atoz/prd-final.md` (A-to-Z)
+- **Phase 5d:** ✅ 완료 (Sprint 61~67) — AX BD Ideation MVP (BMC+AI에이전트+평가관리)
+- **Phase 5e:** ✅ 완료 — AX BD A-to-Z 하위 기능 (F206~F210)
+- **Phase 5f:** 📋 계획 — AX BD 사업개발 체계 수립 (프로세스 v8.2 풀 통합)
+  - 📋 Sprint 68 (F212): AX BD Discovery 스킬 체계 통합 ← **다음 착수**
+  - 📋 Sprint 69 (F213): Foundry-X API v8.2 확장
+  - 📋 Sprint 70 (F214): Web Discovery 대시보드
+- **현재 수치:** ~132 services, ~292 endpoints, 1750+ API tests, D1 0001~0057
+- **PRD:** `docs/specs/prd-v8-final.md` (플랫폼) + `docs/specs/ax-bd-atoz/prd-final.md` (A-to-Z) + `docs/specs/axbd/` (프로세스 v8.2)
 - **PDCA 문서:** `docs/archive/2026-03/` (Sprint 3~47 archived)
 
 ## Git Workflow
