@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #129 (2026-03-26)
+**팀 가이드 사이트 점검 — Landing+GettingStarted 현행화**:
+- ✅ Landing: Sprint 70→71, Phase 5f done, Phase 5g 로드맵 추가, "71 Sprint" 텍스트
+- ✅ Getting Started: "3가지→4가지 업무 동선" 수정, 퀵스타트 그리드 4칸 레이아웃
+- ✅ E2E: landing.spec 한국어 전환 반영 (Features→핵심 기능)
+- ✅ CLAUDE.md: services 135→136, schemas 61→62 (Phase 0c 실측 동기화)
+
+**검증 결과**: typecheck ✅
+
 ### 세션 #126 (2026-03-26)
 **Sprint 병렬 작업 최적화 원칙 수립**:
 - ✅ `development-workflow.md`: "Sprint 병렬 작업 원칙" 섹션 신규 — 배치 구성/충돌 감지/의존성 형식/Merge 순서/리소스 제약
