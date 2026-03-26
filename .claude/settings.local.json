@@ -18,7 +18,10 @@
       "Skill(commit-commands:commit)",
       "Bash(git push:*)",
       "Bash(curl -s -o /dev/null -w '%{http_code}' https://foundry-x-api.ktds-axbd.workers.dev/api/health)",
-      "Bash(tmux kill-window:*)"
+      "Bash(tmux kill-window:*)",
+      "Bash(bash -n ~/.bashrc)",
+      "Bash(bash -n ~/scripts/sprint-post-session.sh)",
+      "Bash(bash -n ~/scripts/sprint-merge-monitor.sh)"
     ]
   }
 }

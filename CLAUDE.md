@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 60 완료 (192 endpoints, 116 services, 1481 API tests + CLI 125 + Web 121 + ~55 E2E)
+**현재 상태:** Sprint 64 완료, Sprint 65 착수 대기 (192 endpoints, 116 services, 1481 API tests + CLI 125 + Web 121 + ~55 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -92,6 +92,8 @@ foundry-x/
 | 문서 | 용도 |
 |------|------|
 | `docs/specs/prd-v8-final.md` | 현행 PRD (권위 문서, v8: AI 에이전트 오케스트레이션 플랫폼 정체성 재정의) |
+| `docs/specs/ax-bd-atoz/prd-final.md` | AX BD A-to-Z PRD (7단계 라이프사이클 + 시스템 통합 방향) |
+| `docs/specs/bizdevprocess-3/prd-ax-bd-v1.4.md` | AX BD Ideation MVP PRD (BMC + AI 에이전트, Sprint 61~67) |
 | `docs/specs/dev-transparency-spec.md` | 개발 투명성 스펙 |
 | `docs/specs/interview-log.md` | 요구사항 인터뷰 종합 (Part 1-5) |
 | `docs/02-design/features/tech-stack-review.design.md` | 기술 스택 결정 근거 |
@@ -145,16 +147,21 @@ pnpm e2e                          # Playwright E2E (17 specs)
 
 ## Current Phase
 
-- **Phase 1:** ✅ 완료 (Sprint 1~5, v0.5.0) — CLI + Plumb, Go 판정 2026-03-17
-- **Phase 2:** ✅ 완료 (Sprint 6~17, v1.5.0) — API Server + Web Dashboard
-- **Phase 3:** ✅ 완료 (Sprint 18~25, v2.0.0) — 멀티테넌시 + GitHub/Slack/Jira 연동
-- **Phase 4:** ✅ Conditional Go (Sprint 26~31) — SSO + BFF + 엔티티 레지스트리 + 온보딩
-- **Sprint 32~47:** ✅ Agent Evolution Track A 완결 + PRD v8 재정의 + Phase 5 준비
-- **Sprint 48~53:** ✅ — SR 분류기 + 대시보드 IA 재설계 + 온보딩 플로우 + BDP 자동화 (5시작점→9기준→PRD생성)
-- **Sprint 54~60:** ✅ — BDP 6단계 자동화 + 방법론 플러그인 아키텍처 (Phase 5b+5c 완성)
-  - 현재: 116 services, 192 endpoints, 1481 API tests, D1 0001~0045
-  - PDCA 문서: `docs/archive/2026-03/` (Sprint 3~47 archived)
-  - 상세 이력: MEMORY.md 또는 `git log --oneline` 참조
+- **Phase 1~4:** ✅ 완료 (Sprint 1~31) — CLI + API + Web + 멀티테넌시 + SSO
+- **Phase 5a:** ✅ 완료 (Sprint 32~47) — Agent Evolution Track A + PRD v8
+- **Phase 5b:** ✅ 완료 (Sprint 48~58) — BDP 6단계 자동화
+- **Phase 5c:** ✅ 완료 (Sprint 59~60) — 방법론 플러그인 아키텍처
+- **Phase 5d:** 🔧 진행 중 — AX BD Ideation MVP (Sprint 61~67)
+  - ✅ Sprint 61 (F197+F198): BMC CRUD + 아이디어 등록
+  - ✅ Sprint 62 (F199+F200): BMCAgent 초안 + 버전 히스토리
+  - ✅ Sprint 64 (F203+F204): 아이디어-BMC 연결 + 댓글
+  - 📋 Sprint 65 (F201+F202+F207+F196): 인사이트 + InsightAgent + 평가관리 MVP + WT UX ← **다음 착수**
+  - 📋 Sprint 66 (F205+F208): Homepage 재구성 + Discovery-X API 스펙
+  - 📋 Sprint 67 (F209+F210): AI Foundry 흡수 + 비밀번호 재설정
+- **Phase 5e:** 📋 계획 — AX BD A-to-Z 하위 기능 (F206 prd-final 기반, F207~F210)
+- **현재 수치:** 116 services, 192 endpoints, 1481 API tests, D1 0001~0050
+- **PRD:** `docs/specs/prd-v8-final.md` (플랫폼) + `docs/specs/ax-bd-atoz/prd-final.md` (A-to-Z)
+- **PDCA 문서:** `docs/archive/2026-03/` (Sprint 3~47 archived)
 
 ## Git Workflow
 
