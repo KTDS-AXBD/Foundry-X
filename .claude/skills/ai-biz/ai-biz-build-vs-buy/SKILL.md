@@ -1,0 +1,63 @@
+---
+name: build-vs-buy
+description: |
+  AI 솔루션 Build vs Buy vs Partner 의사결정 매트릭스
+  Use when: Build vs Buy, 자체개발 vs 구매, 파트너십, build or buy, make or buy, partner decision
+  Triggers: Build vs Buy, 자체개발 vs 구매, 파트너십, build or buy, make or buy, partner decision
+  Do NOT use for: 순수 기술 비교 (벤치마크는 ecosystem-map 사용)
+user-invocable: true
+category: business-automation
+argument-hint: "[사업 아이템 설명]"
+---
+
+
+# Build vs Buy vs Partner 의사결정 매트릭스
+
+사용자가 제시한 AI 솔루션/기능에 대해 **자체 개발(Build) / 솔루션 도입(Buy) / 파트너십(Partner)** 중 최적 전략을 분석하세요.
+
+## 평가 기준 매트릭스
+
+| 평가 항목 | Build (자체 개발) | Buy (솔루션 도입) | Partner (제휴) |
+|---|---|---|---|
+| **전략적 차별화** | 핵심 역량이 되는가? | 범용 기능인가? | 보완재인가? |
+| **기술 복잡도** | 내부 역량으로 가능한가? | 검증된 솔루션이 있는가? | 파트너가 보유한가? |
+| **시간 제약** | 개발 기간이 허용되는가? | 즉시 도입 가능한가? | 협업 리드타임은? |
+| **비용 구조** | TCO 3년 비교 | 라이선스/구독 비용 | 수익 배분 모델 |
+| **데이터 통제** | 데이터 소유권 확보 | 데이터 외부 유출 리스크 | 데이터 공유 범위 |
+| **커스터마이징** | 완전한 제어 | 제한적 커스터마이징 | 협의 가능 범위 |
+| **유지보수** | 내부 운영 부담 | 벤더 의존도 | 공동 책임 |
+| **스케일링** | 자체 확장 가능 | 벤더 SLA 기준 | 파트너 용량 |
+
+## 분석 절차
+
+### Step 1: 기능 분류
+- 사업의 핵심 기능들을 나열
+- 각 기능별 **핵심 경쟁력(Core)** vs **지원 기능(Support)** vs **범용 기능(Commodity)** 분류
+
+### Step 2: 옵션별 상세 분석
+각 기능에 대해 Build/Buy/Partner 옵션을 평가:
+- 비용 (초기 + 3년 TCO)
+- 시간 (출시까지 소요 기간)
+- 리스크 (기술/벤더/시장)
+- 전략 적합성
+
+### Step 3: 의사결정 매트릭스 출력
+- 기능별 권장 옵션 (Build/Buy/Partner)
+- 전체 아키텍처 구성도 (어떤 부분을 Build하고 어떤 부분을 Buy할지)
+- 하이브리드 전략 권고 (예: 코어는 Build, 인프라는 Buy, 채널은 Partner)
+
+## 출력 형식
+1. **기능별 분류표**
+2. **옵션별 비교 매트릭스** (점수 포함)
+3. **권장 전략** (하이브리드 포함)
+4. **실행 로드맵** (분기별)
+5. **리스크 및 완화 방안**
+
+$ARGUMENTS
+
+## Gotchas
+
+- **Build/Buy/Partner 비율이 산업별로 크게 다름 — AI 인프라(GPU)는 Buy 우세, 도메인 로직은 Build 우세가 일반적. 3가지 옵션만 제시하지만 실제로는 Hybrid가 가장 흔한 결론**
+- **KT DS 맥락 유지**: 모든 분석은 KT DS의 SI/SM 역량, KT 그룹 고객 기반을 고려해야 함. 일반적인 스타트업 관점과 다름
+- **HITL 필수**: AI 분석 초안 제공 후 반드시 담당자 검증 요청. 결과를 그대로 수용하지 않음
+- **산출물 언어**: 한국어 작성, 프레임워크 용어는 원어 병기
