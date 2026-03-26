@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Sprint 67 완료 (Phase 5d+5e 완료, ~292 endpoints, 132 services, 1504+ API tests + CLI 125 + Web 121+ + ~55 E2E)
+**현재 상태:** Sprint 69 완료, Sprint 70 진행 중 (Phase 5f, ~292 endpoints, 132 services, 1750+ API tests + CLI 125 + Web 121+ + ~55 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -154,10 +154,11 @@ pnpm e2e                          # Playwright E2E (17 specs)
 - **Phase 5c:** ✅ 완료 (Sprint 59~60) — 방법론 플러그인 아키텍처
 - **Phase 5d:** ✅ 완료 (Sprint 61~67) — AX BD Ideation MVP (BMC+AI에이전트+평가관리)
 - **Phase 5e:** ✅ 완료 — AX BD A-to-Z 하위 기능 (F206~F210)
-- **Phase 5f:** 📋 계획 — AX BD 사업개발 체계 수립 (프로세스 v8.2 풀 통합)
-  - 📋 Sprint 68 (F212): AX BD Discovery 스킬 체계 통합 ← **다음 착수**
-  - 📋 Sprint 69 (F213): Foundry-X API v8.2 확장
-  - 📋 Sprint 70 (F214): Web Discovery 대시보드
+- **Phase 5f:** 🔧 진행 중 — AX BD 사업개발 체계 수립 (프로세스 v8.2 풀 통합)
+  - ✅ Sprint 68 (F212): AX BD Discovery 스킬 체계 통합 — ai-biz 11 CC skills + 오케스트레이터 + sf-lint/scan/deploy
+  - ✅ Sprint 69 (F213): Foundry-X API v8.2 확장
+  - 🔧 Sprint 70 (F214): Web Discovery 대시보드 ← **WT 작업 중**
+  - 📋 Sprint 71 (F215): AX BD 스킬 팀 가이드 — Getting Started 확장
 - **현재 수치:** ~132 services, ~292 endpoints, 1750+ API tests, D1 0001~0057
 - **PRD:** `docs/specs/prd-v8-final.md` (플랫폼) + `docs/specs/ax-bd-atoz/prd-final.md` (A-to-Z) + `docs/specs/axbd/` (프로세스 v8.2)
 - **PDCA 문서:** `docs/archive/2026-03/` (Sprint 3~47 archived)
