@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
@@ -485,6 +485,14 @@ const TAB_LABELS: Record<TabKey, string> = {
 // ─── Page ───
 
 export default function GettingStartedPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center py-12 text-sm text-muted-foreground">로딩 중...</div>}>
+      <GettingStartedContent />
+    </Suspense>
+  );
+}
+
+function GettingStartedContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
