@@ -1,55 +1,49 @@
-# Foundry-X 개발 착수 패키지
+# Foundry-X
 
-**프로젝트:** Foundry-X 파운드리엑스
-**태그라인:** 동료와 에이전트가 함께 만드는 곳
-**상태:** 착수 준비 완료 (충분도 84/100)
-**날짜:** 2026-03-16
+> AX 사업개발 AI 오케스트레이션 플랫폼
 
----
+## 무엇을 하나요?
 
-## 패키지 구성
+AX BD팀의 사업개발 전체 라이프사이클을 AI 에이전트로 자동화해요.
+수집→발굴→형상화→검증→제품화→GTM→평가 7단계를 한 곳에서.
 
-### 핵심 문서 (이것부터 읽으세요)
+## 왜 만들었나요?
 
-| 파일 | 내용 |
+사업기회 발굴부터 PoC/MVP 구축까지 2~4주 걸리던 과정을 3일 이내로 단축.
+"Git이 진실, Foundry-X는 렌즈" — 모든 명세/코드/테스트/결정 이력이 Git에 존재하고,
+Foundry-X가 이를 읽고 분석하고 동기화를 강제해요.
+
+## 현재 상태
+
+| 항목 | 수치 |
 |------|------|
-| `Foundry-X_Integrated_Plan.docx` | **통합 개발계획서** — 이 문서 하나로 전체 파악 가능 |
-| `Foundry-X/prd-v3.md` | **PRD 최종본** (정본) — 전체 상세 스펙 |
+| Phase | 5d — AX BD Ideation MVP |
+| Sprints | 64 완료 |
+| API Endpoints | 192 |
+| Services | 116 |
+| Tests | 1,481+ (API) + 125 (CLI) + 121 (Web) |
+| D1 Migrations | 50 |
 
-### 보충 스펙
+## 기술 스택
 
-| 파일 | 내용 |
+| 영역 | 기술 |
 |------|------|
-| `Foundry-X/docs/02-design/features/tech-stack-review.design.md` | 기술 스택 검토서 (TS+Python, 모노리포, Git SSOT) |
-| `Foundry-X/dev-transparency-spec.md` | 투명성 스펙 (GitHub Projects + Wiki + Discussions + BluePrint + WBS) |
+| CLI | TypeScript, Commander, Ink TUI |
+| API | Hono on Cloudflare Workers |
+| Web | Next.js 14, React 18, Zustand |
+| DB | Cloudflare D1 (SQLite) |
+| AI | Anthropic + OpenAI + Gemini + DeepSeek |
 
-### 진화 이력
+## 시작하기
 
-| 파일 | 내용 |
-|------|------|
-| `Foundry-X/interview-log.md` | 5파트 인터뷰 원문 기록 |
-| `Foundry-X/prd-v1.md` | 인터뷰 기반 초안 |
-| `Foundry-X/prd-v2.md` | 기술 스택 확정본 |
+```bash
+pnpm install
+turbo build
+turbo test
+```
 
-### 다중 AI 검토 기록
+## 링크
 
-| 폴더 | 내용 |
-|------|------|
-| `Foundry-X/review/round-1/` | Round 1: 프롬프트 4개 + 피드백 4개 + 종합 분석 (63/100) |
-| `Foundry-X/review/round-2/` | Round 2: 프롬프트 4개 + 피드백 4개 + 종합 분석 (84/100 ✅) |
-
----
-
-## 다음 단계
-
-### 착수 전 (Day 1 전)
-1. ADR-000: 기존 AI Foundry 문서 대체 선언
-2. Git provider 확정 (GitHub 또는 GitLab)
-
-### Sprint 1 (Week 1~2)
-- .plumb 내부 계약 문서화
-- subprocess 오류 처리 계약
-- 메타데이터 저장 방식 결정
-- 핵심 모듈 패키지 분리
-- TS+Python 빌드 검증
-- Triangle Health Score 설계
+- [Dashboard](https://fx.minu.best/dashboard)
+- [API Docs](https://foundry-x-api.ktds-axbd.workers.dev)
+- [npm](https://www.npmjs.com/package/foundry-x)

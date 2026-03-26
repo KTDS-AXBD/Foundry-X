@@ -168,3 +168,12 @@ export type {
   MethodologyRecommendationResult,
   MethodologySelectionRecord,
 } from './methodology.js';
+
+// Sprint 66: Discovery-X API types (F208)
+export type {
+  DiscoveryIngestPayload,
+  CollectionSource,
+  DiscoveryDataItem,
+  DiscoveryStatus,
+  DiscoveryConfig,
+} from './discovery-x.js';

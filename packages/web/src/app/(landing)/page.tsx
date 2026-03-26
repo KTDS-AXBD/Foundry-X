@@ -5,13 +5,16 @@ import {
   Anvil,
   ArrowRight,
   ArrowUpRight,
+  BarChart3,
   Brain,
   CheckCircle2,
-  Cpu,
   Eye,
   GitBranch,
   Layers,
+  Lightbulb,
+  Megaphone,
   Network,
+  PenTool,
   Rocket,
   Scan,
   Shield,
@@ -20,7 +23,6 @@ import {
   Target,
   TestTube,
   Timer,
-  Zap,
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════
@@ -28,35 +30,35 @@ import {
    ═══════════════════════════════════════════════ */
 
 const SITE_META = {
-  sprint: "Sprint 46",
-  phase: "Phase 5",
-  phaseTitle: "고객 파일럿",
-  tagline: "AI 에이전트 오케스트레이션 플랫폼",
+  sprint: "Sprint 64",
+  phase: "Phase 5d",
+  phaseTitle: "AX BD Ideation MVP",
+  tagline: "AX 사업개발 AI 오케스트레이션 플랫폼",
 } as const;
 
 const stats = [
-  { value: "163", label: "API Endpoints" },
-  { value: "76", label: "Services" },
-  { value: "1,160+", label: "Tests" },
-  { value: "6", label: "AI Agents" },
-  { value: "46", label: "Sprints" },
+  { value: "192", label: "API Endpoints" },
+  { value: "116", label: "Services" },
+  { value: "1,481+", label: "Tests" },
+  { value: "50", label: "D1 Migrations" },
+  { value: "64", label: "Sprints" },
 ];
 
 const pillars = [
   {
     icon: Brain,
-    title: "에이전트 오케스트레이션",
-    label: "6종 전문 에이전트",
-    desc: "Architect, Test, Security, QA, Infra, Reviewer — 각 역할에 특화된 AI 에이전트가 병렬로 작업해요.",
-    detail: "계획 → 코드 생성 → 테스트 → 보안 검토 → 배포까지 자동화",
+    title: "BDP 라이프사이클",
+    label: "7단계 자동화",
+    desc: "수집→발굴→형상화→검증→제품화→GTM→평가. 사업개발 전체를 한 곳에서.",
+    detail: "AX BD 프로세스 v0.8 기반, Foundry-X가 모든 단계를 오케스트레이션",
     color: "axis-primary",
   },
   {
     icon: Target,
-    title: "PoC/MVP 속도",
-    label: "3일 이내 구축",
-    desc: "사업기회 발굴부터 데모 가능한 MVP까지. AI 에이전트가 병목을 제거해 수주 경쟁력을 높여요.",
-    detail: "기존 2~4주 → 3일 이내 (최대 85% 시간 절감)",
+    title: "AI 에이전트 하네스",
+    label: "BMCAgent + InsightAgent",
+    desc: "BMC 초안 자동 작성, 인사이트 도출, 다중 AI 검토까지. 에이전트가 사업기회를 형상화해요.",
+    detail: "Anthropic + OpenAI + Gemini + DeepSeek 멀티모델 파이프라인",
     color: "axis-blue",
   },
   {
@@ -64,79 +66,25 @@ const pillars = [
     title: "SDD Triangle",
     label: "Spec ↔ Code ↔ Test",
     desc: "명세, 코드, 테스트가 항상 동기화돼요. Git이 진실, Foundry-X는 렌즈.",
-    detail: "Plumb 엔진 기반 자동 정합성 검증 + 건강도 점수",
+    detail: "192 endpoints, 1,481+ tests, 50 D1 migrations — 자동 정합성 검증",
     color: "axis-green",
   },
 ];
 
 const agents = [
-  {
-    name: "ArchitectAgent",
-    role: "아키텍처 분석 · 설계 리뷰",
-    desc: "코드베이스 구조를 분석하고, 의존성 관계를 파악하며, 설계 품질을 평가해요.",
-    icon: Layers,
-  },
-  {
-    name: "TestAgent",
-    role: "테스트 생성 · 커버리지 분석",
-    desc: "테스트 케이스를 자동 생성하고, 커버리지 갭과 엣지 케이스를 탐지해요.",
-    icon: TestTube,
-  },
-  {
-    name: "SecurityAgent",
-    role: "OWASP 스캔 · PR 보안 분석",
-    desc: "보안 취약점을 사전에 탐지하고, PR diff를 분석해 위험 요소를 리포트해요.",
-    icon: ShieldCheck,
-  },
-  {
-    name: "QAAgent",
-    role: "브라우저 테스트 · 수용 기준 검증",
-    desc: "실제 브라우저 환경에서 테스트하고, 수용 기준을 자동 검증해요.",
-    icon: CheckCircle2,
-  },
-  {
-    name: "InfraAgent",
-    role: "인프라 분석 · 마이그레이션 검증",
-    desc: "인프라 상태를 시뮬레이션하고, 마이그레이션 안전성을 사전 검증해요.",
-    icon: Cpu,
-  },
-  {
-    name: "ReviewerAgent",
-    role: "코드 리뷰 · 자동 PR 파이프라인",
-    desc: "코드 품질을 분석하고, PR을 자동 생성/리뷰하며 머지 큐를 관리해요.",
-    icon: Eye,
-  },
+  { name: "BMCAgent", role: "BMC 초안 · AI 자동 생성", desc: "9블록 BMC를 아이디어 기반으로 자동 작성. 업계 트렌드와 경쟁사 데이터를 반영해요.", icon: PenTool },
+  { name: "InsightAgent", role: "인사이트 · 기회 발굴", desc: "수집 데이터에서 패턴을 발견하고, 사업기회 인사이트를 자동 도출해요.", icon: Lightbulb },
+  { name: "ReviewAgent", role: "다중 AI 검토 · Six Hats", desc: "ChatGPT, Gemini, DeepSeek로 BMC/PRD를 교차 검토. Six Hats 토론으로 다각도 분석.", icon: Eye },
+  { name: "ArchitectAgent", role: "아키텍처 분석 · 설계 리뷰", desc: "코드베이스 구조를 분석하고, 의존성 관계를 파악하며, 설계 품질을 평가해요.", icon: Layers },
+  { name: "TestAgent", role: "테스트 생성 · 커버리지 분석", desc: "테스트 케이스를 자동 생성하고, 커버리지 갭과 엣지 케이스를 탐지해요.", icon: TestTube },
+  { name: "SecurityAgent", role: "OWASP 스캔 · PR 보안 분석", desc: "보안 취약점을 사전에 탐지하고, PR diff를 분석해 위험 요소를 리포트해요.", icon: ShieldCheck },
 ];
 
 const architecture = [
-  {
-    layer: "CLI Layer",
-    items: ["foundry-x init", "foundry-x sync", "foundry-x status"],
-    tech: "TypeScript + Commander + Ink TUI",
-  },
-  {
-    layer: "API Layer",
-    items: [
-      "163 Endpoints",
-      "76 Services",
-      "30 Route Modules",
-    ],
-    tech: "Hono on Cloudflare Workers",
-  },
-  {
-    layer: "Agent Layer",
-    items: [
-      "6종 전문 에이전트",
-      "모델 라우팅 + Fallback",
-      "Evaluator-Optimizer 패턴",
-    ],
-    tech: "Orchestrator + MCP + Claude API",
-  },
-  {
-    layer: "Data Layer",
-    items: ["D1 SQLite (47 Tables)", "KV Cache", "Git (SSOT)"],
-    tech: "Cloudflare D1 + simple-git",
-  },
+  { layer: "CLI Layer", items: ["foundry-x init", "foundry-x sync", "foundry-x status"], tech: "TypeScript + Commander + Ink TUI" },
+  { layer: "API Layer", items: ["192 Endpoints", "116 Services", "36 Route Modules"], tech: "Hono on Cloudflare Workers" },
+  { layer: "Agent Layer", items: ["BMCAgent", "InsightAgent", "ReviewAgent", "ArchitectAgent + 3종"], tech: "Orchestrator + MCP + Multi-Model" },
+  { layer: "Data Layer", items: ["D1 SQLite (50 Migrations)", "KV Cache", "Git (SSOT)"], tech: "Cloudflare D1 + simple-git" },
 ];
 
 const roadmap: {
@@ -146,92 +94,32 @@ const roadmap: {
   status: "done" | "current" | "planned";
   items: string[];
 }[] = [
-  {
-    phase: "Phase 1",
-    title: "CLI + Plumb",
-    version: "v0.1 → v0.5",
-    status: "done",
-    items: ["CLI 3커맨드", "Ink TUI", "4 Builders", "106 테스트"],
-  },
-  {
-    phase: "Phase 2",
-    title: "API + Web + Agent",
-    version: "v0.6 → v1.5",
-    status: "done",
-    items: ["59 엔드포인트", "MCP 프로토콜", "PlannerAgent", "자동 PR"],
-  },
-  {
-    phase: "Phase 3",
-    title: "멀티테넌시 + 연동",
-    version: "v1.6 → v2.0",
-    status: "done",
-    items: ["멀티테넌시", "GitHub/Slack/Jira", "워크플로우 엔진"],
-  },
-  {
-    phase: "Phase 4",
-    title: "에이전트 생태계",
-    version: "v2.1+",
-    status: "done",
-    items: ["6종 에이전트", "모델 라우팅", "앙상블 투표", "마켓플레이스"],
-  },
-  {
-    phase: "Phase 5",
-    title: "고객 파일럿",
-    version: "현재",
-    status: "current",
-    items: ["Azure PoC", "SR 시나리오", "KPI 수집", "데모 환경"],
-  },
+  { phase: "Phase 1~4", title: "CLI + API + Web + 멀티테넌시", version: "v0.1 → v2.1", status: "done",
+    items: ["CLI 3커맨드 + Ink TUI", "192 API Endpoints", "Next.js Dashboard", "SSO + RBAC"] },
+  { phase: "Phase 5a", title: "Agent Evolution", version: "Sprint 32~47", status: "done",
+    items: ["6종 에이전트", "모델 라우팅", "PRD v8 확정"] },
+  { phase: "Phase 5b", title: "BDP 자동화", version: "Sprint 48~58", status: "done",
+    items: ["Discovery 9기준", "다중 AI 검토", "Six Hats 토론", "수집 채널 통합"] },
+  { phase: "Phase 5c", title: "방법론 플러그인", version: "Sprint 59~60", status: "done",
+    items: ["레지스트리 + 인터페이스", "BDP 모듈화", "pm-skills 모듈"] },
+  { phase: "Phase 5d", title: "Ideation MVP", version: "Sprint 61~67", status: "current",
+    items: ["BMC CRUD + AI", "아이디어-BMC 연결", "인사이트 + 평가", "Discovery-X 연동"] },
 ];
 
 const ecosystem = [
-  {
-    name: "Discovery-X",
-    role: "탐색 · 실험",
-    desc: "데이터 기반 신사업 발굴",
-    arrow: "실험 → 프로젝트",
-    color: "axis-green",
-  },
-  {
-    name: "AI Foundry",
-    role: "지식 · 구축",
-    desc: "SI 산출물 → AI Skill 자산",
-    arrow: "MCP Skill 제공",
-    color: "axis-violet",
-  },
-  {
-    name: "AXIS DS",
-    role: "UI · 일관성",
-    desc: "디자인 토큰 + React 컴포넌트",
-    arrow: "컴포넌트 시스템",
-    color: "axis-blue",
-  },
+  { name: "Discovery-X", role: "수집 엔진", desc: "시장/트렌드/경쟁사 데이터 수집 → API로 Foundry-X에 공급", arrow: "API 연동", color: "axis-green" },
+  { name: "Foundry-X", role: "베이스캠프", desc: "발굴→형상화→검증→제품화→GTM→평가 전 단계 오케스트레이션", arrow: "중심", color: "axis-primary" },
+  { name: "AXIS DS", role: "UI 일관성", desc: "디자인 토큰 + React 컴포넌트 시스템", arrow: "컴포넌트 공급", color: "axis-blue" },
 ];
 
 const processSteps = [
-  {
-    step: "01",
-    title: "사업기회 수집",
-    desc: "SR(Service Request) 자동 분류 및 우선순위 매핑",
-    icon: Scan,
-  },
-  {
-    step: "02",
-    title: "에이전트 계획 수립",
-    desc: "PlannerAgent가 코드베이스를 분석하고 실행 계획 생성",
-    icon: Brain,
-  },
-  {
-    step: "03",
-    title: "병렬 자동화 실행",
-    desc: "6종 에이전트가 코드·테스트·보안·인프라를 동시 처리",
-    icon: Zap,
-  },
-  {
-    step: "04",
-    title: "PoC/MVP 데모",
-    desc: "고객에게 즉시 데모 가능한 결과물 제공",
-    icon: Rocket,
-  },
+  { step: "01", title: "수집", desc: "시장/트렌드/경쟁사 데이터 자동 수집 (Discovery-X 연동)", icon: Scan },
+  { step: "02", title: "발굴", desc: "아이디어 등록 + Type A/B/C 분류 + Pain Point 발견", icon: Lightbulb },
+  { step: "03", title: "형상화", desc: "BMC 에디터 + AI 초안 (BMCAgent) + PRD 자동 작성", icon: PenTool },
+  { step: "04", title: "검증", desc: "다중 AI 검토 + Six Hats 토론 + 팀 승인", icon: CheckCircle2 },
+  { step: "05", title: "제품화", desc: "PoC/MVP 자동 구축 — AI 에이전트가 코드·테스트·배포 처리", icon: Rocket },
+  { step: "06", title: "GTM", desc: "제안서·발표자료·데모 환경 자동 생성", icon: Megaphone },
+  { step: "07", title: "평가", desc: "KPI 추적 + 포트폴리오 대시보드 + Go/Kill 판단", icon: BarChart3 },
 ];
 
 /* ═══════════════════════════════════════════════
@@ -268,7 +156,7 @@ function AgentGrid() {
 
 function ProcessFlow() {
   return (
-    <div className="grid gap-6 md:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
       {processSteps.map((step, i) => (
         <div key={step.step} className="relative">
           {/* Connector */}
@@ -506,10 +394,10 @@ export default function LandingPage() {
 
           {/* Subheading */}
           <p className="animate-fade-in-up stagger-2 mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            사업기회 수집부터 PoC/MVP 구축, 고객 데모까지 —
+            수집→발굴→형상화→검증→제품화→GTM→평가 —
             <br className="hidden sm:block" />
             <span className="text-foreground/80">
-              6종 전문 에이전트가 개발 라이프사이클을 자동화해요.
+              BDP 7단계를 AI 에이전트가 자동화해요.
             </span>
           </p>
 
@@ -519,12 +407,12 @@ export default function LandingPage() {
               {
                 icon: Timer,
                 text: "85% 단축",
-                desc: "PoC/MVP 제작 시간 — 2~4주에서 3일 이내로",
+                desc: "사업기회 발굴→PoC 구축 — 2~4주에서 3일 이내로",
               },
               {
                 icon: Network,
-                text: "6종 에이전트",
-                desc: "Architect · Test · Security · QA · Infra · Reviewer",
+                text: "BDP 7단계",
+                desc: "수집 · 발굴 · 형상화 · 검증 · 제품화 · GTM · 평가",
               },
               {
                 icon: GitBranch,
@@ -593,11 +481,11 @@ export default function LandingPage() {
               How It Works
             </span>
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              사업기회에서{" "}
-              <span className="text-axis-primary">데모까지</span>
+              BDP{" "}
+              <span className="text-axis-primary">7단계</span> 프로세스
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              AI 에이전트가 수주 파이프라인의 모든 단계를 가속해요.
+              수집에서 평가까지, AI 에이전트가 사업개발 전 과정을 자동화해요.
             </p>
           </div>
           <ProcessFlow />
@@ -616,7 +504,7 @@ export default function LandingPage() {
               <span className="text-axis-primary">차별점</span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              에이전트 오케스트레이션, 속도, 동기화.
+              BDP 라이프사이클, AI 에이전트, SDD Triangle.
             </p>
           </div>
 
@@ -676,11 +564,10 @@ export default function LandingPage() {
             </span>
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
               6종{" "}
-              <span className="text-axis-primary">전문 에이전트</span>
+              <span className="text-axis-primary">AI 에이전트</span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              각 역할에 특화된 AI 에이전트가 병렬로 작업해요.
-              모델 라우팅 + Fallback 체인 + 피드백 루프로 품질을 보장해요.
+              사업기회 형상화부터 코드 검증까지. 멀티모델 파이프라인으로 품질을 보장해요.
             </p>
           </div>
           <AgentGrid />
@@ -718,7 +605,7 @@ export default function LandingPage() {
               <span className="text-axis-primary">생태계</span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              탐색 · 구축 · 디자인을 Foundry-X가 오케스트레이션해요.
+              수집 · 오케스트레이션 · 디자인을 연결해요.
             </p>
           </div>
           <EcosystemDiagram />
@@ -733,12 +620,11 @@ export default function LandingPage() {
               Roadmap
             </span>
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              5 Phase{" "}
+              Phase 5{" "}
               <span className="text-axis-primary">로드맵</span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              CLI에서 시작해 고객 파일럿까지.
-              46 Sprint를 거치며 에이전트 생태계를 완성했어요.
+              CLI에서 시작해 BDP 자동화까지. 64 Sprint를 거치며 사업개발 플랫폼을 구축했어요.
             </p>
           </div>
           <RoadmapTimeline />
@@ -751,12 +637,12 @@ export default function LandingPage() {
           <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
             AI 에이전트와 함께
             <br />
-            <span className="text-axis-primary">수주 경쟁력을 높이세요</span>
+            <span className="text-axis-primary">사업개발을 자동화하세요</span>
           </h2>
           <p className="mt-6 text-lg text-muted-foreground">
             Foundry-X는 AX 사업개발의 전체 라이프사이클을 자동화해요.
             <br />
-            PoC/MVP를 3일 이내로 구축하고, 고객에게 즉시 데모하세요.
+            수집에서 평가까지, BDP 7단계를 한 곳에서.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link

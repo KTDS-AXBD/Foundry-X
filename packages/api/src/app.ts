@@ -43,6 +43,7 @@ import { axBdAgentRoute } from "./routes/ax-bd-agent.js";
 import { axBdHistoryRoute } from "./routes/ax-bd-history.js";
 import { axBdLinksRoute } from "./routes/ax-bd-links.js";
 import { axBdCommentsRoute } from "./routes/ax-bd-comments.js";
+import { axBdDiscoveryRoute } from "./routes/ax-bd-discovery.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -218,6 +219,9 @@ app.route("/api", axBdHistoryRoute);
 // Sprint 64: AX BD — 아이디어-BMC 연결 + BMC 댓글 (auth + tenant required)
 app.route("/api", axBdLinksRoute);
 app.route("/api", axBdCommentsRoute);
+
+// Sprint 66: Discovery-X API 인터페이스 계약 (auth + tenant required)
+app.route("/api", axBdDiscoveryRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

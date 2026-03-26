@@ -1,8 +1,6 @@
-SPRINT_NUM=61
+SPRINT_NUM=66
 PROJECT=Foundry-X
-F_ITEMS=F197,F198
-CREATED=2026-03-25T22:00:00+09:00
-MASTER_COMMIT=7550bd1
-PLAN=docs/01-plan/features/sprint-61.plan.md
-DESIGN=docs/02-design/features/sprint-61.design.md
-PRD=docs/specs/bizdevprocess-3/prd-ax-bd-v1.4.md
+F_ITEMS=F205,F208
+CREATED=2026-03-26T09:25:08+09:00
+MASTER_COMMIT=907011b2383edd2e16bda3247c3657e5609a9ac6
+CHECKPOINT=report
