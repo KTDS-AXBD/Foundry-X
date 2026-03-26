@@ -26,6 +26,9 @@ import {
   Code2,
   TrendingUp,
   Settings,
+  Map,
+  Lightbulb,
+  Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -94,6 +97,17 @@ const navGroups: NavGroup[] = [
     ],
   },
 ];
+
+const axBdGroup: NavGroup = {
+  key: "ax-bd",
+  label: "AX BD 사업개발",
+  icon: Layers,
+  items: [
+    { href: "/ax-bd/discovery", label: "Discovery 프로세스", icon: Map },
+    { href: "/ax-bd/ideas", label: "아이디어 관리", icon: Lightbulb },
+    { href: "/ax-bd/bmc", label: "BMC", icon: Blocks },
+  ],
+};
 
 const utilItems: NavItem[] = [
   { href: "/wiki", label: "지식베이스", icon: BookOpen },
@@ -234,7 +248,7 @@ function NavLinks({ onSelect }: { onSelect?: () => void }) {
 
   // 활성 경로가 포함된 그룹은 자동 펼침
   useEffect(() => {
-    for (const group of [...navGroups, serviceGroup]) {
+    for (const group of [...navGroups, axBdGroup, serviceGroup]) {
       if (group.items.some((item) => pathname === item.href)) {
         if (!openGroups.has(group.key)) {
           toggle(group.key);
@@ -271,6 +285,15 @@ function NavLinks({ onSelect }: { onSelect?: () => void }) {
           onSelect={onSelect}
         />
       ))}
+
+      {/* AX BD 사업개발 */}
+      <CollapsibleGroup
+        group={axBdGroup}
+        pathname={pathname}
+        isOpen={openGroups.has(axBdGroup.key)}
+        onToggle={() => toggle(axBdGroup.key)}
+        onSelect={onSelect}
+      />
 
       {/* 구분선 */}
       <div className="my-2 border-t border-border/40" />
