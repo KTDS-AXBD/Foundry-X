@@ -47,6 +47,7 @@ import { axBdDiscoveryRoute } from "./routes/ax-bd-discovery.js";
 import { axBdInsightsRoute } from "./routes/ax-bd-insights.js";
 import { axBdEvaluationsRoute } from "./routes/ax-bd-evaluations.js";
 import { axBdPrototypesRoute } from "./routes/ax-bd-prototypes.js";
+import { axBdViabilityRoute } from "./routes/ax-bd-viability.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -232,6 +233,9 @@ app.route("/api", axBdDiscoveryRoute);
 
 // Sprint 67: F209 AI Foundry 흡수 — Prototype + PoC + TechReview (auth + tenant required)
 app.route("/api", axBdPrototypesRoute);
+
+// Sprint 69: F213 사업성 체크포인트 + Commit Gate (auth + tenant required)
+app.route("/api", axBdViabilityRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

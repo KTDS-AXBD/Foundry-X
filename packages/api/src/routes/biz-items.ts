@@ -33,6 +33,9 @@ import { BusinessPlanGeneratorService } from "../services/business-plan-generato
 import { GenerateBusinessPlanSchema } from "../schemas/business-plan.js";
 import { PrototypeGeneratorService } from "../services/prototype-generator.js";
 import { GeneratePrototypeSchema } from "../schemas/prototype.js";
+// Sprint 69 imports (F213)
+import { SetDiscoveryTypeSchema } from "../schemas/viability-checkpoint.schema.js";
+import { getAnalysisPathV82, type DiscoveryType } from "../services/analysis-path-v82.js";
 
 export const bizItemsRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
@@ -925,4 +928,40 @@ bizItemsRoute.get("/biz-items/:id/prototype/preview", async (c) => {
   if (!content) return c.json({ error: "PROTOTYPE_NOT_FOUND" }, 404);
 
   return c.html(content);
+});
+
+// ─── PATCH /biz-items/:id/discovery-type — discovery_type 설정 (F213) ───
+
+bizItemsRoute.patch("/biz-items/:id/discovery-type", async (c) => {
+  const body = await c.req.json();
+  const parsed = SetDiscoveryTypeSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+  }
+
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const service = new BizItemService(c.env.DB);
+  const ok = await service.updateDiscoveryType(orgId, id, parsed.data.discoveryType);
+  if (!ok) {
+    return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+  }
+  return c.json({ success: true, discoveryType: parsed.data.discoveryType });
+});
+
+// ─── GET /biz-items/:id/analysis-path-v82 — v8.2 유형별 분석 경로 조회 (F213) ───
+
+bizItemsRoute.get("/biz-items/:id/analysis-path-v82", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const service = new BizItemService(c.env.DB);
+  const discoveryType = await service.getDiscoveryType(orgId, id);
+  if (!discoveryType) {
+    return c.json({ error: "Discovery type not set. Use PATCH /biz-items/:id/discovery-type first." }, 400);
+  }
+
+  const analysisPath = getAnalysisPathV82(discoveryType as DiscoveryType);
+  return c.json(analysisPath);
 });
