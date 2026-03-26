@@ -1,7 +1,15 @@
 ---
 name: regulation-check
-description: AI 규제/컴플라이언스 체크리스트 — AI기본법, GDPR, 산업별 규제
+description: |
+  AI 규제/컴플라이언스 체크리스트 — AI기본법, GDPR, 산업별 규제
+  Use when: 규제 체크, AI 기본법, GDPR, 컴플라이언스, regulation check, compliance, AI act, GDPR
+  Triggers: 규제 체크, AI 기본법, GDPR, 컴플라이언스, regulation check, compliance, AI act, GDPR
+  Do NOT use for: 법률 자문 대체 (최종 법적 판단은 반드시 법무팀)
+user-invocable: true
+category: business-automation
+argument-hint: "[사업 아이템 설명]"
 ---
+
 
 # AI 규제 / 컴플라이언스 체크 (Regulation Check)
 
@@ -51,3 +59,10 @@ description: AI 규제/컴플라이언스 체크리스트 — AI기본법, GDPR,
 5. **법무 검토 필요 사항** (외부 자문 권고 영역)
 
 $ARGUMENTS
+
+## Gotchas
+
+- **AI 규제는 급변 중 — 2026년 기준 EU AI Act 시행, 한국 AI기본법 제정 진행 중. 분석 시점의 규제를 명시하고 분기별 재검토 필요. 이 스킬은 법률 자문을 대체하지 않음**
+- **KT DS 맥락 유지**: 모든 분석은 KT DS의 SI/SM 역량, KT 그룹 고객 기반을 고려해야 함. 일반적인 스타트업 관점과 다름
+- **HITL 필수**: AI 분석 초안 제공 후 반드시 담당자 검증 요청. 결과를 그대로 수용하지 않음
+- **산출물 언어**: 한국어 작성, 프레임워크 용어는 원어 병기

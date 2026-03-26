@@ -1,7 +1,15 @@
 ---
 name: feasibility-study
-description: AI 사업 타당성 분석 — 기술/시장/재무/조직 4축 평가
+description: |
+  AI 사업 타당성 분석 — 기술/시장/재무/조직 4축 평가
+  Use when: 타당성 분석, 사업성 평가, 4축 평가, feasibility, viability assessment
+  Triggers: 타당성 분석, 사업성 평가, 4축 평가, feasibility, viability assessment
+  Do NOT use for: 이미 Go 판정된 아이템의 실행 계획 (pilot-design 사용)
+user-invocable: true
+category: business-automation
+argument-hint: "[사업 아이템 설명]"
 ---
+
 
 # AI 사업 타당성 분석 (AI Business Feasibility Study)
 
@@ -50,3 +58,10 @@ description: AI 사업 타당성 분석 — 기술/시장/재무/조직 4축 평
 - **다음 단계 액션 아이템** (3~5개)
 
 $ARGUMENTS
+
+## Gotchas
+
+- **4축(기술/시장/재무/조직) 중 하나라도 1점이면 전체 Drop 권고. 조직 축은 과소평가되기 쉬움 — 핵심 인력 1명 이탈 시 프로젝트 중단 리스크 반드시 고려**
+- **KT DS 맥락 유지**: 모든 분석은 KT DS의 SI/SM 역량, KT 그룹 고객 기반을 고려해야 함. 일반적인 스타트업 관점과 다름
+- **HITL 필수**: AI 분석 초안 제공 후 반드시 담당자 검증 요청. 결과를 그대로 수용하지 않음
+- **산출물 언어**: 한국어 작성, 프레임워크 용어는 원어 병기

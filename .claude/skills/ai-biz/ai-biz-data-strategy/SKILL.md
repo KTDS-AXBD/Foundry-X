@@ -1,7 +1,15 @@
 ---
 name: data-strategy
-description: 데이터 확보/품질/파이프라인 전략 수립
+description: |
+  데이터 확보/품질/파이프라인 전략 수립
+  Use when: 데이터 전략, 데이터 파이프라인, 데이터 확보, data strategy, data pipeline, data sourcing
+  Triggers: 데이터 전략, 데이터 파이프라인, 데이터 확보, data strategy, data pipeline, data sourcing
+  Do NOT use for: 데이터 거버넌스 정책 수립 (regulation-check 사용)
+user-invocable: true
+category: business-automation
+argument-hint: "[사업 아이템 설명]"
 ---
+
 
 # AI 데이터 전략 (Data Strategy)
 
@@ -47,3 +55,10 @@ description: 데이터 확보/품질/파이프라인 전략 수립
 5. **데이터 로드맵** (분기별)
 
 $ARGUMENTS
+
+## Gotchas
+
+- **공공 데이터와 상용 데이터의 라이선스 조건이 다름 — 학습용/서비스용 구분 필수. 개인정보 포함 데이터는 반드시 regulation-check와 병행**
+- **KT DS 맥락 유지**: 모든 분석은 KT DS의 SI/SM 역량, KT 그룹 고객 기반을 고려해야 함. 일반적인 스타트업 관점과 다름
+- **HITL 필수**: AI 분석 초안 제공 후 반드시 담당자 검증 요청. 결과를 그대로 수용하지 않음
+- **산출물 언어**: 한국어 작성, 프레임워크 용어는 원어 병기

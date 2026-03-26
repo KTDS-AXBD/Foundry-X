@@ -1,7 +1,15 @@
 ---
 name: partner-scorecard
-description: 기술 파트너 평가 및 제휴 전략 수립
+description: |
+  기술 파트너 평가 및 제휴 전략 수립
+  Use when: 파트너 평가, 제휴 전략, 기술 파트너, partner evaluation, alliance strategy
+  Triggers: 파트너 평가, 제휴 전략, 기술 파트너, partner evaluation, alliance strategy
+  Do NOT use for: 내부 조직 역량 평가 (feasibility-study 조직 축 사용)
+user-invocable: true
+category: business-automation
+argument-hint: "[사업 아이템 설명]"
 ---
+
 
 # 기술 파트너 스코어카드 (Partner Scorecard)
 
@@ -47,3 +55,10 @@ description: 기술 파트너 평가 및 제휴 전략 수립
 5. **협상 전략 및 주의사항**
 
 $ARGUMENTS
+
+## Gotchas
+
+- **파트너 스코어카드는 평가 시점 기준 — 파트너사의 전략 변경(M&A, 피봇)으로 점수가 급변할 수 있음. Top 3 후보 중 최소 1개는 대안 확보**
+- **KT DS 맥락 유지**: 모든 분석은 KT DS의 SI/SM 역량, KT 그룹 고객 기반을 고려해야 함. 일반적인 스타트업 관점과 다름
+- **HITL 필수**: AI 분석 초안 제공 후 반드시 담당자 검증 요청. 결과를 그대로 수용하지 않음
+- **산출물 언어**: 한국어 작성, 프레임워크 용어는 원어 병기

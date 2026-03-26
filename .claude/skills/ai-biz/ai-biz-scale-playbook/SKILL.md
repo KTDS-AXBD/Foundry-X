@@ -1,7 +1,15 @@
 ---
 name: scale-playbook
-description: 파일럿에서 상용화로의 전환 플레이북
+description: |
+  파일럿에서 상용화로의 전환 플레이북
+  Use when: 스케일업, 상용화, 파일럿→프로덕션, scale playbook, commercialization, go-to-production
+  Triggers: 스케일업, 상용화, 파일럿→프로덕션, scale playbook, commercialization, go-to-production
+  Do NOT use for: 파일럿 단계 설계 (pilot-design 사용)
+user-invocable: true
+category: business-automation
+argument-hint: "[사업 아이템 설명]"
 ---
+
 
 # 스케일업 플레이북 (Scale Playbook)
 
@@ -67,3 +75,10 @@ description: 파일럿에서 상용화로의 전환 플레이북
 5. **KPI 대시보드** (Phase별 핵심 지표)
 
 $ARGUMENTS
+
+## Gotchas
+
+- **파일럿→상용화 전환율은 산업 평균 20~30% — 전환 실패 원인 Top 3: 조직 저항, 데이터 품질, 비용 초과. Phase Gate를 명확히 설정하고 각 Gate에서 Kill 옵션 유지**
+- **KT DS 맥락 유지**: 모든 분석은 KT DS의 SI/SM 역량, KT 그룹 고객 기반을 고려해야 함. 일반적인 스타트업 관점과 다름
+- **HITL 필수**: AI 분석 초안 제공 후 반드시 담당자 검증 요청. 결과를 그대로 수용하지 않음
+- **산출물 언어**: 한국어 작성, 프레임워크 용어는 원어 병기

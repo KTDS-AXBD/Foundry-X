@@ -1,7 +1,15 @@
 ---
 name: ir-deck
-description: 투자심의/경영진 보고용 AI 사업계획서 생성
+description: |
+  투자심의/경영진 보고용 AI 사업계획서 생성
+  Use when: IR 덱, 투자 보고서, 경영진 보고, 사업계획서, IR deck, investor presentation, executive report
+  Triggers: IR 덱, 투자 보고서, 경영진 보고, 사업계획서, IR deck, investor presentation, executive report
+  Do NOT use for: 일반 PRD 작성 (pm-skills create-prd 사용)
+user-invocable: true
+category: business-automation
+argument-hint: "[사업 아이템 설명]"
 ---
+
 
 # 투자심의 / IR Deck 작성 (AI Business Plan)
 
@@ -74,3 +82,10 @@ description: 투자심의/경영진 보고용 AI 사업계획서 생성
 - 예상 질문 및 답변 (Q&A 준비)
 
 $ARGUMENTS
+
+## Gotchas
+
+- **12슬라이드 구조는 경영진 보고용 — 실무 검토용은 별도 상세 문서 필요. Pyramid Principle 적용 시 결론(So What)을 먼저 배치**
+- **KT DS 맥락 유지**: 모든 분석은 KT DS의 SI/SM 역량, KT 그룹 고객 기반을 고려해야 함. 일반적인 스타트업 관점과 다름
+- **HITL 필수**: AI 분석 초안 제공 후 반드시 담당자 검증 요청. 결과를 그대로 수용하지 않음
+- **산출물 언어**: 한국어 작성, 프레임워크 용어는 원어 병기

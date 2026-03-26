@@ -1,7 +1,15 @@
 ---
 name: build-vs-buy
-description: AI 솔루션 Build vs Buy vs Partner 의사결정 매트릭스
+description: |
+  AI 솔루션 Build vs Buy vs Partner 의사결정 매트릭스
+  Use when: Build vs Buy, 자체개발 vs 구매, 파트너십, build or buy, make or buy, partner decision
+  Triggers: Build vs Buy, 자체개발 vs 구매, 파트너십, build or buy, make or buy, partner decision
+  Do NOT use for: 순수 기술 비교 (벤치마크는 ecosystem-map 사용)
+user-invocable: true
+category: business-automation
+argument-hint: "[사업 아이템 설명]"
 ---
+
 
 # Build vs Buy vs Partner 의사결정 매트릭스
 
@@ -46,3 +54,10 @@ description: AI 솔루션 Build vs Buy vs Partner 의사결정 매트릭스
 5. **리스크 및 완화 방안**
 
 $ARGUMENTS
+
+## Gotchas
+
+- **Build/Buy/Partner 비율이 산업별로 크게 다름 — AI 인프라(GPU)는 Buy 우세, 도메인 로직은 Build 우세가 일반적. 3가지 옵션만 제시하지만 실제로는 Hybrid가 가장 흔한 결론**
+- **KT DS 맥락 유지**: 모든 분석은 KT DS의 SI/SM 역량, KT 그룹 고객 기반을 고려해야 함. 일반적인 스타트업 관점과 다름
+- **HITL 필수**: AI 분석 초안 제공 후 반드시 담당자 검증 요청. 결과를 그대로 수용하지 않음
+- **산출물 언어**: 한국어 작성, 프레임워크 용어는 원어 병기

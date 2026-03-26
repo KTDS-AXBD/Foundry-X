@@ -1,7 +1,15 @@
 ---
 name: pilot-design
-description: PoC/파일럿 설계 및 성공 기준 정의
+description: |
+  PoC/파일럿 설계 및 성공 기준 정의
+  Use when: 파일럿 설계, PoC 설계, 성공 기준, pilot design, PoC plan, success criteria
+  Triggers: 파일럿 설계, PoC 설계, 성공 기준, pilot design, PoC plan, success criteria
+  Do NOT use for: 본격 제품 개발 계획 (scale-playbook 사용)
+user-invocable: true
+category: business-automation
+argument-hint: "[사업 아이템 설명]"
 ---
+
 
 # PoC / 파일럿 설계 (Pilot Design)
 
@@ -50,3 +58,10 @@ description: PoC/파일럿 설계 및 성공 기준 정의
 5. **Go/No-Go 판정 체크리스트**
 
 $ARGUMENTS
+
+## Gotchas
+
+- **PoC 기간은 4~8주가 적정 — 12주 초과 시 학습 효과 감소. 성공 기준을 사전 합의하지 않으면 '성공적인 PoC'의 정의가 사후적으로 바뀜**
+- **KT DS 맥락 유지**: 모든 분석은 KT DS의 SI/SM 역량, KT 그룹 고객 기반을 고려해야 함. 일반적인 스타트업 관점과 다름
+- **HITL 필수**: AI 분석 초안 제공 후 반드시 담당자 검증 요청. 결과를 그대로 수용하지 않음
+- **산출물 언어**: 한국어 작성, 프레임워크 용어는 원어 병기
