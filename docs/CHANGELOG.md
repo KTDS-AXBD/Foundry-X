@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #134 (2026-03-30)
+**CLAUDE.md 감사 + better-sqlite3 리빌드**:
+- ✅ CLAUDE.md 수치 현행화: endpoints ~304→~315, D1 61파일(0040 중복) 명시
+- ✅ CLAUDE.md 중복 제거: Deployment↔Gotchas CORS/API URL 이중 기재 해소 (208→207줄)
+- ✅ CLAUDE.md 보강: ESLint 커스텀 룰 3종 + D1 0040 중복 Gotcha 추가
+- ✅ better-sqlite3 Node v24 리빌드: MODULE_VERSION 127→137 — API 1050 fail→1803/1803 pass
+- ✅ pnpm virtual store 정상화: worktree 잔재(`.claude/worktrees/a/`) → 로컬 `node_modules/.pnpm/`
+
 ### 세션 #133 (2026-03-26)
 **스킬 프레임워크 점검 + 관리 체계 수립**:
 - ✅ selfcheck 보정: PDCA 위치이탈 4건 → features/ 이동, Zone.Identifier 2건 삭제, CLAUDE.md 스킬 등재
