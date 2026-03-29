@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Phase 6 계획 중 (Sprint 74 완료, ~304 endpoints, 136 services, 2100 tests + ~59 E2E)
+**현재 상태:** Phase 6 계획 중 (Sprint 74 완료, ~315 endpoints, 136 services, 2100 tests + ~59 E2E)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -143,12 +143,13 @@ pnpm e2e                          # Playwright E2E (17 specs, ~59 tests)
 - **Mock 전략:** Ink 컴포넌트는 실제 렌더링, 외부 서비스만 mock
 - **API 테스트:** Hono `app.request()` 직접 호출 방식, D1 mock은 in-memory SQLite
 - **E2E 테스트:** Playwright (`packages/web/e2e/`), 17 specs, `pnpm e2e`로 실행
+- **ESLint 커스텀 룰 3종** (packages/api): `no-direct-db-in-route`, `require-zod-schema`, `no-orphan-plumb-import`
 
 ## Current Phase
 
 - **Phase 1~5:** ✅ 완료 (Sprint 1~74) — CLI + API + Web + 멀티테넌시 + SSO + Agent Evolution + AX BD 통합 + TDD 자동화
 - **Phase 6:** 📋 계획 (Sprint 75~78) — Ecosystem Integration (BMAD/OpenSpec 벤치마킹)
-- **현재 수치:** ~136 services, ~304 endpoints, 1803 API tests + CLI 125 + Web 172, D1 0001~0060
+- **현재 수치:** ~136 services, ~315 endpoints, 1803 API tests + CLI 125 + Web 172, D1 0001~0060 (61파일, 0040 중복)
 - **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 
 ## Git Workflow
@@ -177,9 +178,7 @@ cd packages/web && npx @cloudflare/next-on-pages && wrangler pages deploy .verce
 
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
 - **Pages**: `fx.minu.best` (Next.js, CNAME → Cloudflare Pages)
-- **D1**: 0001~0060 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
-- **CORS 주의**: Pages→Workers 크로스오리진 — `packages/api/src/app.ts`에 CORS 미들웨어 필수
-- **API URL**: `NEXT_PUBLIC_API_URL` 환경변수 — Workers URL + `/api` 경로 포함 필수
+- **D1**: 0001~0060 마이그레이션 61파일 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
 - **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 
 ## Dev Tools (Track B — Agent Evolution)
@@ -196,6 +195,7 @@ cd packages/web && npx @cloudflare/next-on-pages && wrangler pages deploy .verce
 - **D1 migrations**: 로컬 적용 후 `--remote` 반드시 별도 실행 (누락하면 프로덕션 500)
 - **PostToolUse hook**: .ts/.tsx 편집 시 자동 eslint --fix + typecheck 실행 (15s/60s timeout)
 - **git add**: 절대 `git add .` 금지 — 멀티 pane 환경에서 다른 세션 변경 포함 위험
+- **D1 migration 0040 중복**: `0040_prd_reviews.sql`과 `0040_sixhats_debates.sql` 공존 — 새 마이그레이션은 0061부터
 
 ## 성공 지표 (구현 시 참고)
 
