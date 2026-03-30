@@ -46,7 +46,23 @@ export const useOrgStore = create<OrgState>((set, get) => ({
       if (!res.ok) { set({ isLoading: false }); return; }
       const orgs = await res.json() as OrgInfo[];
       set({ orgs, isLoading: false });
-      if (!get().activeOrgId && orgs.length > 0) {
+
+      // JWT에서 현재 orgId 파싱
+      const token = getToken();
+      let jwtOrgId: string | null = null;
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          jwtOrgId = payload.orgId ?? null;
+        } catch { /* invalid token */ }
+      }
+
+      const current = get().activeOrgId;
+      if (jwtOrgId && orgs.some((o) => o.id === jwtOrgId)) {
+        // JWT의 orgId가 유효하면 그것을 사용
+        set({ activeOrgId: jwtOrgId });
+      } else if (!current && orgs.length > 0) {
+        // API 응답이 멤버 수 DESC로 정렬되어 있으므로 첫 번째가 팀 Org
         set({ activeOrgId: orgs[0].id });
       }
     } catch {

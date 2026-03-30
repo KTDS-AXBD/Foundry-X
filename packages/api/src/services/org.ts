@@ -68,8 +68,9 @@ export class OrgService {
       `SELECT o.id, o.name, o.slug, o.plan, o.settings, o.created_at, o.updated_at
        FROM organizations o
        JOIN org_members m ON o.id = m.org_id
+       LEFT JOIN (SELECT org_id, COUNT(*) as cnt FROM org_members GROUP BY org_id) oc ON o.id = oc.org_id
        WHERE m.user_id = ?
-       ORDER BY m.joined_at ASC`
+       ORDER BY oc.cnt DESC, m.joined_at ASC`
     ).bind(userId).all();
 
     return (result.results ?? []).map((r: Record<string, unknown>) => ({
