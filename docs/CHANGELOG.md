@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #144 (2026-03-30)
+**ccw Master fallback 버그 수정**:
+- ✅ .sprint-context를 .gitignore에 추가 + git 트래킹 제거
+- ✅ Master에 잔류하던 Sprint 85 .sprint-context 삭제 → ccw가 Master에서 정상 동작
+- ✅ CLAUDE.md Phase 8 + Web 207 tests 반영
+
 ### 세션 #143 (2026-03-30)
 **로그인 캐시 문제 5건 수정 — 인증 안정성 강화**:
 - ✅ hydrate() JWT 만료 검증: 만료된 토큰으로 로그인됨 표시되던 문제 수정
