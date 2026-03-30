@@ -4,7 +4,7 @@ import type { ChangeEntry, SpecDelta } from '@foundry-x/shared';
 
 const CHANGES_DIR = '.foundry-x/changes';
 
-const EXPECTED_FILES = ['proposal.md', 'design.md', 'tasks.md', 'spec-delta.md'] as const;
+const _EXPECTED_FILES = ['proposal.md', 'design.md', 'tasks.md', 'spec-delta.md'] as const;
 
 async function dirExists(path: string): Promise<boolean> {
   try {
