@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 마일스톤 회고: Phase 6 — Ecosystem Integration (Sprint 75~78)
+
+> 기간: 2026-03-30 (단일 세션 #134b) | 4 Sprint 병렬 Pipeline
+
+### 지표 변화
+
+| 지표 | Phase 5 완료 | Phase 6 완료 | 변화 |
+|------|:----------:|:----------:|:----:|
+| 전체 tests | 2,083 | 2,286 | **+203** |
+| API tests | 1,786 | 1,965 | +179 |
+| CLI tests | 125 | 149 | +24 |
+| Routes | 47 | 54 | +7 |
+| Services | 136 | 143 | +7 |
+| Schemas | 62 | 69 | +7 |
+| D1 migrations | 0060 | 0065 | +5 |
+| F-items | F219 | F231 | +12 |
+
+### 잘된 점
+- **Sprint Pipeline 병렬화 성공**: 4개 Sprint를 2배치(75+76, 77+78)로 나누어 ccw-auto 병렬 실행. 총 ~110분에 12개 F-item 완료. 순차 실행 대비 약 50% 시간 단축
+- **Plan/Design 사전 작성 효과**: Sprint 75+76은 Master에서 Plan/Design을 먼저 작성한 후 Pipeline 실행. autopilot이 문서 읽기→구현으로 바로 진입하여 효율적
+- **충돌 최소화**: shared/types.ts 교차 수정에도 .sprint-context만 충돌 — rebase 1회로 해결. 배치 분석(CLI vs API 영역 분리)이 효과적
+- **BMAD/OpenSpec 벤치마킹 체계적 반영**: PRD(FX-PLAN-012) 기반으로 Adopt 4건, Reference 5건, Watch 3건을 구조적으로 분류하여 적용
+
+### 개선점
+- **[Ref] 항목의 과도한 구현**: Sprint 77의 F224~F228은 "설계 참고/문서화" 범위였으나, autopilot이 5개 서비스+라우트+D1 3건까지 구현. 문서 Sprint에는 구현 범위 제한 프롬프트 필요
+- **Monitor 조기 종료**: sprint-merge-monitor.sh의 1800초 timeout이 부족하여 수동 모니터링으로 전환. timeout을 3600초로 조정하거나 ccw-auto 완료 후 자동 재시작 필요
+- **Master Plan/Design 중복 생성**: Master에서 작성한 Plan/Design이 WT에서 다시 생성됨 — WT의 autopilot이 기존 문서를 감지하지 못하고 새로 작성. 문서 복사 또는 감지 로직 개선 필요
+- **Signal 파일 미갱신**: Sprint 75의 signal이 CREATED 상태에서 변경되지 않음. ccw-auto의 post-session 스크립트와 signal 연동 점검 필요
+
+### 결정 검증
+- **배치 2개 분리 (75+76 → 77+78) — 적절**: 코드 vs 문서 분리가 명확하여 충돌 없이 병렬 완료
+- **Plan/Design 사전 작성 — 부분 효과**: autopilot 시간 단축에 기여했으나 중복 생성 문제. 향후 WT에 기존 문서 복사 또는 "Plan 존재 시 건너뛰기" 로직 필요
+- **Plumb Stay Track A — 유지**: Phase 6에서 Plumb 관련 이슈 없음, 재판정 시점(2026-09) 유지 적절
+
+### 다음 마일스톤 방향
+- Phase 6 완료로 BMAD/OpenSpec 핵심 패턴 흡수 완료
+- Phase 7 후보: BD Pipeline End-to-End 통합, 내부 온보딩(F114), MCP 프로토콜 구현
+- Sprint 77 [Ref] 구현물의 품질 검증 필요 (코드 리뷰/테스트 보강)
+- Monitor/Signal 자동화 개선 (timeout 조정, signal 상태 연동)
+
+---
+
 ### 세션 #134b (2026-03-30)
 **Phase 6 Ecosystem Integration — Sprint 75~78 Pipeline 완료**:
 - ✅ Sprint 75 (F220+F222): Brownfield Init 강화 + Changes Directory — PR #213
