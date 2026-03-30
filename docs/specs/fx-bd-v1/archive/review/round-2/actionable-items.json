@@ -1,0 +1,341 @@
+{
+  "generated": "2026-03-30T01:36:29.367Z",
+  "totalItems": 55,
+  "byType": {
+    "flaw": 10,
+    "gap": 6,
+    "risk": 36
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**문제↔해결책 1:1 Mapping의 구체성 부족**: 표는 있으나, 주요 기능별로 실제 워크플로가 어떻게 이어지는지, 산출물이 어떻게 생성·전파·승인되는지 상세 시나리오(예: Step-by-Step flow)가 없습니다. 실무 적용 시 ‘누가, 언제, 어떻게’ 단계가 애매할 수 있음.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**성공기준과 기능의 직접 연결성 부족**: KPI와 기능 간의 인과관계가 명확히 드러나지 않습니다(예: ‘파이프라인 완주율 30%’가 어떤 기능과 직결되는지 설명 부족).",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**MVP/Success Criteria의 테스트 가능성**: “단계별 의사결정 워크플로 구현” 등은 구현된 기능의 구체적 모습(예: 버튼, 알림, UI/UX 플로우 등)이 부족해, 실제 UAT 시 검증 기준이 불명확할 수 있습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**개발 리소스 과소평가**: 1인 개발자+AI로 기획된 기능(P0~P2, Notification, 자동화, 편집/버전관리, 대시보드, 문서 패키징 등) 전체를 온보딩과 병행해 1~2 스프린트(Phase6~7)에서 구현하는 것은 실질적으로 무리입니다. 실제로는 3~4배 일정이 소요될 수 있음.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**AI 에이전트 역할 한계**: “문서 자동화, 리뷰, Notification, QA”를 AI가 “자동화”한다고 했으나, 이 부분의 구현 현실성(완전 자동화 수준, 실질적 QA/운영 자동화 가능 범위 등)이 불확실합니다. 반복적 QA나 간단한 리뷰 외에는 사람이 반드시 개입해야 할 여지가 큼.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**QA/UAT/운영에 대한 구체 실행 방안 부족**: QA, UAT, 운영지원의 책임자/일정/테스트 케이스 수준/버그 관리 프로세스가 추상적입니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**중대한 외부 연동(예: ORB/PRB, Discovery-X)의 불확실성**: 문서 생성까지만 명시하였으나, 실제 현업 연계는 수동 프로세스라면 업무 단절 가능성 존재",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**세부 워크플로/프로세스 플로우 차트**: 각 단계별 액션 플로우(등록→작성→공유→의사결정→게이트→패키징)가 흐름도/시나리오로 시각화되어야 실무 적용이 가능함",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**권한/역할 기반 접근 통제 상세 설계**: “팀원/팀장/심사위원/경영진”의 실제 시스템상 권한(편집, 승인, 다운로드, 공유 등) 구체 명시 필요",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영/장애 대응 체계**: 장애 발생 시 구체적인 대응 책임자, 프로세스(예: 긴급 공지, 임시 조치 등) 필요",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트/배포/롤백 계획**: 점진 배포 시 실패/이슈 발생 시 롤백 플랜이 없음",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**현업 시나리오로 검증된 Use Case**: PRD상 “팀원 6명”의 구체적 일상 업무(예: 아이템 발굴→시스템 내 의사결정→문서 자동생성→GTM 준비 등)가 실제 시스템 내에서 전부 가능한지, 테스트 시나리오가 필요함",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**데이터 백업/복구 정책**: Cloudflare D1 한계로 인한 데이터 손실 리스크에 대한 구체적 백업, 복구 시나리오 부재",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**문제↔해결책 1:1 Mapping의 구체성 부족**: 표는 있으나, 주요 기능별로 실제 워크플로가 어떻게 이어지는지, 산출물이 어떻게 생성·전파·승인되는지 상세 시나리오(예: Step-by-Step flow)가 없습니다. 실무 적용 시 ‘누가, 언제, 어떻게’ 단계가 애매할 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**성공기준과 기능의 직접 연결성 부족**: KPI와 기능 간의 인과관계가 명확히 드러나지 않습니다(예: ‘파이프라인 완주율 30%’가 어떤 기능과 직결되는지 설명 부족).",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**MVP/Success Criteria의 테스트 가능성**: “단계별 의사결정 워크플로 구현” 등은 구현된 기능의 구체적 모습(예: 버튼, 알림, UI/UX 플로우 등)이 부족해, 실제 UAT 시 검증 기준이 불명확할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**세부 워크플로/프로세스 플로우 차트**: 각 단계별 액션 플로우(등록→작성→공유→의사결정→게이트→패키징)가 흐름도/시나리오로 시각화되어야 실무 적용이 가능함",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**권한/역할 기반 접근 통제 상세 설계**: “팀원/팀장/심사위원/경영진”의 실제 시스템상 권한(편집, 승인, 다운로드, 공유 등) 구체 명시 필요",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/장애 대응 체계**: 장애 발생 시 구체적인 대응 책임자, 프로세스(예: 긴급 공지, 임시 조치 등) 필요",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트/배포/롤백 계획**: 점진 배포 시 실패/이슈 발생 시 롤백 플랜이 없음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**현업 시나리오로 검증된 Use Case**: PRD상 “팀원 6명”의 구체적 일상 업무(예: 아이템 발굴→시스템 내 의사결정→문서 자동생성→GTM 준비 등)가 실제 시스템 내에서 전부 가능한지, 테스트 시나리오가 필요함",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**데이터 백업/복구 정책**: Cloudflare D1 한계로 인한 데이터 손실 리스크에 대한 구체적 백업, 복구 시나리오 부재",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**리소스 부족/기능 과다**: 1인 개발+AI로 커버하기에는 실기능 규모와 복잡도가 과대, 스프린트 내 완성 불가 가능성 높음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**워크플로 세부 설계 미흡**: 실사용자가 실제로 ‘하나의 플랫폼’에서 End-to-End로 업무가 가능한지 상세 설계/테스트 미흡시, 온보딩 이후 실질 사용률 급락 가능",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**AI 자동화에 대한 과대한 기대**: AI가 반복업무 자동화, 리뷰, QA까지 실질적으로 커버할 수 있는지 불확실. 사람이 개입해야 할 업무가 과소평가됨",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**권한/보안 관리 미흡**: 내부/외부 공유 시 권한설정, 만료, 회수 등 실제 운영 리스크 관리 미흡",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**데이터 손실/오류**: D1의 내구성, 대용량/동시성 문제 발생 시 회복력 취약",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Change Management 실패**: 현업 적응 저조, 교육 부실, 반복 요청으로 인한 프로젝트 피로도 상승",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**P0 기능만으로 실제 온보딩 업무가 가능한지** Step-by-Step 시나리오와 Owner/Action/시스템 Flow를 구체화할 것",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**AI 자동화의 범위와 한계**(반복 QA, 리뷰, Notification 등)를 명확히 정의(사람 개입이 필요한 영역 분기)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**QA/UAT/운영 책임자·일정·테스트 케이스 등 실행계획 구체화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**권한/보안 설계**(공유/다운로드/링크 만료 등) 상세화",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**데이터 백업/복구 절차** 수립",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**현업 Use Case 기반 End-to-End 플로우 차트/시나리오** 작성 및 PRD에 첨부",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "사실 확인: PRD에 포함된 가정이나 수치 중 검증이 필요한 것들은?\n\nPRD는 많은 가정과 수치에 대해 스스로 현실성을 검토하고 보완책을 제시하여 매우 긍정적입니다. 하지만 몇 가지 추가적인 검증이 필요합니다.\n\n*   **\"팀원 주간 사용률 100% (6/6명)\" 목표:** PRD가 3개월 후 80% 이상 유지로 재조정 가능하다고 명시했지만, 초기 10",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**핵심 오픈 이슈 해결:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**개발 리소스 및 일정 구체화:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**Cloudflare D1 리스크 완화 계획 구체화:**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Ready",
+      "severity": "info"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**데이터 계층 설계 부재**: \"사업 아이템\" 하나에 메타데이터, 단계 상태, 문서 버전, 리뷰 코멘트, 액션 로그가 모두 D1 단일 테이블에 혼재될 가능성 높음. **도메인 주도 설계(DDD) 접근이 필요**: `Item`, `WorkflowState`, `DocumentVersion`, `ActivityLog` 등 Aggregates 분리.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**워크플로우 엔진 없음**: \"단계 전환 자동화\"가 상태 머신 수준으로 기술됨. 조건부 전환(예: 모든 리뷰어 승인 후 Go), 롤백, 타임아웃 처리 등 복잡한 비즈니스 룰을 하드코딩하면 유지보수 불가능. **유한 상태 머신(FSM) 라이브러리(XState)나 워크플로우 엔진 도입 검토 필요**.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**모놀리식 서비스 경향**: 310개 엔드포인트를 가진 기존 Foundry-X에 모든 기능을 추가하면 결합도가 급증. **BD 파이프라인 전용 마이크로서비스(또는 별도 Worker) 분리를 고려해야 함**. 특히 문서 생성/압축 같은 고부하 작업은 분리 필수.",
+      "severity": "high"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**긍정적 요소**: 기존 Foundry-X(Next.js/Hono/Cloudflare) 스택을 확장하는 접근은 합리적. 단계별 워크플로우, 문서 생성, 기본 알림은 구현 가능.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**주요 제약 및 병목**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Cloudflare D1의 프로덕션 부적합성**: 문서 버전 히스토리, 워크플로우 상태 추적, 액션 로그 등 **상태 기반 데이터가 많은 본 프로젝트에 D1은 위험**. 트랜잭션 보장, 백업/복구, 성능 측면에서 한계가 명확. 장기적으로 PlanetScale, Neon(PostgreSQL) 등으로의 마이그레이션 계획이 PRD에 포함되었으나, **초기 설",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**이벤트 기반 아키텍처 미비**: 단계 전환 알림, 리뷰 요청, 문서 자동 생성 등 비동기 작업 처리를 위한 큐/워커 시스템이 명시되지 않음. Cloudflare Queues나 별도 메시지 브로커(RabbitMQ, Redis) 도입이 필수적이나, 현재 스택에는 포함 안 됨.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**문서 패키징 성능**: Offering Pack/ORB 문서 생성 시 여러 산출물(BMC, PRD, 프로토타입)을 실시간으로 병합·압축할 경우, Cloudflare Workers의 CPU 시간/메모리 제한(10ms~50ms CPU)을 초과할 위험. **비동기 배치 작업으로 전환해야 함**.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**D1 데이터 손실/성능 저하로 인한 신뢰성 붕괴**: 프로덕션에서 워크플로우 상태가 소실되거나, 문서 버전이 꼬이면 팀의 업무 자체가 마비. **초기부터 D1과 외부 PostgreSQL을 이중화하는 하이브리드 아키텍처가 안전**.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**워크플로우 엔진 부재로 인한 스파게티 코드**: 단계 전환 로직이 여러 서비스에 흩어지고, 조건이 변경될 때마다 수동 디버깅 필요. **유지보수 비용이 폭발하며, 6개월 내 기술 부채로 프로젝트 실패 가능성**.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**1인 개발자 병목 및 아키텍처 결정권 한계**: Sinclair 개발자 한 명이 아키텍처, 프론트, 백엔드, 인프라, 보안을 모두 결정·구현해야 함. **중요한 아키텍처 결정(FSM 도입, 데이터 계층 분리)에 대한 검토 체계가 없음**.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**아키텍처 결정 문서(ADD) 작성**: 현재 PRD는 기능 요구사항만 기술. D1 대체 방안, 워크플로우 엔진 선택, 이벤트 큐 도입, 데이터 모델 설계를 명시한 ADD가 선행되어야 함.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**핵심 오픈 이슈 해결**: \"ORB/PRB 문서 양식\", \"가격 정보 형식\" 등 **데이터 스키마에 직접 영향을 주는 이슈는 개발 착수 전에 반드시 확정**.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**1인 개발자 지원 체계 수립**: 아키텍처 리뷰를 담당할 시니어 엔지니어(내부/외부) 연결, 또는 파트타임 백엔드 개발자 투입 계획 수립.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}

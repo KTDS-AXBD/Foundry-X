@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Phase 6 완료 (Sprint 78 완료, ~330 endpoints, 143 services, 2235 tests + ~59 E2E)
+**현재 상태:** Phase 7 진입 (Sprint 78 완료, ~330 endpoints, 143 services, 2286 tests + ~59 E2E) — BD Pipeline E2E 통합
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -95,6 +95,7 @@ foundry-x/
 |------|------|
 | `docs/specs/prd-v8-final.md` | 현행 PRD (권위 문서, v8: AI 에이전트 오케스트레이션 플랫폼) |
 | `docs/specs/ax-bd-atoz/prd-final.md` | AX BD A-to-Z PRD (7단계 라이프사이클 + 시스템 통합) |
+| `docs/specs/fx-bd-v1/prd-final.md` | BD Pipeline E2E 통합 PRD (Phase 7, 9 F-items) |
 | `docs/specs/bizdevprocess-3/prd-ax-bd-v1.4.md` | AX BD Ideation MVP PRD (BMC + AI 에이전트) |
 | `docs/specs/axbd/` | AX BD 프로세스 v8.2 참고자료 (ai-biz 플러그인 포함) |
 | `docs/specs/FX-PLAN-012/` | Phase 6 Ecosystem Integration PRD |
@@ -148,7 +149,8 @@ pnpm e2e                          # Playwright E2E (17 specs, ~59 tests)
 ## Current Phase
 
 - **Phase 1~5:** ✅ 완료 (Sprint 1~74) — CLI + API + Web + 멀티테넌시 + SSO + Agent Evolution + AX BD 통합 + TDD 자동화
-- **Phase 6:** 📋 계획 (Sprint 75~78) — Ecosystem Integration (BMAD/OpenSpec 벤치마킹)
+- **Phase 6:** ✅ 완료 (Sprint 75~78) — Ecosystem Integration (BMAD/OpenSpec 벤치마킹)
+- **Phase 7:** 📋 계획 (Sprint 79~81) — BD Pipeline End-to-End 통합 (FX-BD-V1)
 - **현재 수치:** ~143 services, ~330 endpoints, 1965 API tests + CLI 149 + Web 172, D1 0001~0065
 - **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 
