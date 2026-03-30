@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Phase 8 진행 중 (Sprint 85 완료, ~345 endpoints, 153 services, 2119 API + 149 CLI + 207 Web tests + ~58 E2E) — IA 구조 개선 + 신규 사업 Prototyping
+**현재 상태:** Phase 8 진행 중 (Sprint 85 완료, ~345 endpoints, 153 services, 2119 API + 149 CLI + 207 Web tests + ~59 E2E) — IA 구조 개선 + 신규 사업 Prototyping
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -82,7 +82,7 @@ foundry-x/
 ```
 
 ### .claude/ 프로젝트 설정
-- `.claude/hooks/` — PostToolUse 외부 스크립트 (post-edit-format.sh, post-edit-typecheck.sh, post-edit-test-warn.sh)
+- `.claude/hooks/` — PreToolUse (보호 파일 차단) + PostToolUse 외부 스크립트 (post-edit-format.sh, post-edit-typecheck.sh, post-edit-test-warn.sh)
 - `.claude/agents/` — 커스텀 에이전트 (deploy-verifier, spec-checker, build-validator)
 - `.claude/skills/ax-bd-discovery/` — AX BD 2단계 발굴 프로세스 오케스트레이터 (v8.2)
 - `.claude/skills/ai-biz/` — ai-biz 11종 서브스킬 (cost-model, feasibility-study 등)
@@ -114,7 +114,7 @@ turbo typecheck                   # 전체 타입체크
 
 # CLI 패키지 단독
 cd packages/cli
-pnpm test                         # vitest run (125 tests)
+pnpm test                         # vitest run (149 tests)
 pnpm test -- --grep "Header"      # 특정 테스트 필터
 pnpm lint                         # eslint src/ (flat config)
 pnpm typecheck                    # tsc --noEmit
@@ -129,9 +129,9 @@ pnpm dev                          # 로컬 서버 실행
 
 # Web 패키지 단독
 cd packages/web
-pnpm test                         # vitest run (172 tests)
+pnpm test                         # vitest run (207 tests)
 pnpm typecheck                    # tsc --noEmit
-pnpm dev                          # Next.js dev server (localhost:3000)
+pnpm dev                          # Vite dev server (localhost:3000)
 pnpm e2e                          # Playwright E2E (17 specs, ~59 tests)
 ```
 
@@ -180,8 +180,8 @@ cd packages/web && pnpm build && wrangler pages deploy dist --project-name=found
 ```
 
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
-- **Pages**: `fx.minu.best` (Next.js, CNAME → Cloudflare Pages)
-- **D1**: 0001~0065 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
+- **Pages**: `fx.minu.best` (Vite + React Router 7, CNAME → Cloudflare Pages)
+- **D1**: 0001~0074 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
 - **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 
 ## Dev Tools (Track B — Agent Evolution)
@@ -194,11 +194,11 @@ cd packages/web && pnpm build && wrangler pages deploy dist --project-name=found
 
 - **Zone.Identifier**: WSL 환경에서 Windows 파일 복사 시 생성 — `.gitignore`에 `*:Zone.Identifier` 추가 권장
 - **CORS**: Pages→Workers 크로스오리진 — `packages/api/src/app.ts` CORS 미들웨어 필수
-- **API URL**: `NEXT_PUBLIC_API_URL`에 `/api` 경로 포함 필수 (빠뜨리면 404)
+- **API URL**: `VITE_API_URL`에 `/api` 경로 포함 필수 (빠뜨리면 404)
 - **D1 migrations**: 로컬 적용 후 `--remote` 반드시 별도 실행 (누락하면 프로덕션 500)
 - **PostToolUse hook**: .ts/.tsx 편집 시 자동 eslint --fix + typecheck 실행 (15s/60s timeout)
 - **git add**: 절대 `git add .` 금지 — 멀티 pane 환경에서 다른 세션 변경 포함 위험
-- **D1 migration 0040 중복**: `0040_prd_reviews.sql`과 `0040_sixhats_debates.sql` 공존 — 새 마이그레이션은 0061부터
+- **D1 migration 0040 중복**: `0040_prd_reviews.sql`과 `0040_sixhats_debates.sql` 공존 — 새 마이그레이션은 0075부터
 
 ## 성공 지표 (구현 시 참고)
 
