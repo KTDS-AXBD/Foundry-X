@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #145 (2026-03-30)
+**CLAUDE.md drift 8건 수정 + 플러그인 인프라 점검**:
+- ✅ ax-infra-selfcheck 8/8 PASS — commands, standards, hooks, skills 전체 정합성 확인
+- ✅ CLAUDE.md Next.js→Vite 표기 2곳 수정 (dev server, Pages 배포)
+- ✅ CLAUDE.md 수치 갱신: Web tests 172→207, CLI tests 125→149, E2E ~58→~59
+- ✅ CLAUDE.md 환경변수: NEXT_PUBLIC_API_URL → VITE_API_URL (실제 코드 반영)
+- ✅ CLAUDE.md D1: 0065→0074 범위, 새 마이그레이션 0075부터
+- ✅ CLAUDE.md PreToolUse hook 설명 추가
+
 ### 세션 #144 (2026-03-30)
 **ccw Master fallback 버그 수정**:
 - ✅ .sprint-context를 .gitignore에 추가 + git 트래킹 제거
