@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { fetchApi } from "@/lib/api-client";
 import type {
   HealthScore,
@@ -10,7 +11,20 @@ import type {
 } from "@foundry-x/shared";
 import DashboardCard from "@/components/feature/DashboardCard";
 import HarnessHealth from "@/components/feature/HarnessHealth";
+import { STAGES } from "@/components/feature/ProcessStageGuide";
 import { cn } from "@/lib/utils";
+import {
+  ArrowRight,
+  ClipboardList,
+  Lightbulb,
+  FileText,
+  GitBranch,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+/* ------------------------------------------------------------------ */
+/*  Hooks                                                              */
+/* ------------------------------------------------------------------ */
 
 interface AsyncState<T> {
   data: T | null;
@@ -50,11 +64,112 @@ const gradeClass = (grade: string) => {
   return "text-destructive";
 };
 
+/* ------------------------------------------------------------------ */
+/*  프로세스 파이프라인 진행률                                          */
+/* ------------------------------------------------------------------ */
+
+interface PipelineStats {
+  totalItems: number;
+  byStage: Record<string, number>;
+  avgDaysInStage: Record<string, number>;
+}
+
+const stageColors = [
+  "bg-blue-500",
+  "bg-violet-500",
+  "bg-amber-500",
+  "bg-green-500",
+  "bg-indigo-500",
+  "bg-rose-500",
+];
+
+function ProcessPipeline({ stats }: { stats: PipelineStats | null }) {
+  return (
+    <div className="rounded-lg border bg-card p-5">
+      <h2 className="mb-4 text-sm font-semibold text-muted-foreground">
+        프로세스 파이프라인
+      </h2>
+      <div className="flex items-center gap-1">
+        {STAGES.map((stage, i) => {
+          const count = stats?.byStage?.[stage.label] ?? 0;
+          return (
+            <div key={stage.stage} className="flex items-center">
+              <Link
+                href={stage.paths[0]}
+                className="group flex flex-col items-center rounded-lg p-2 transition-colors hover:bg-muted"
+              >
+                <div
+                  className={cn(
+                    "flex size-10 items-center justify-center rounded-full text-white text-sm font-bold",
+                    stageColors[i],
+                  )}
+                >
+                  {count}
+                </div>
+                <span className="mt-1.5 text-[11px] font-medium text-muted-foreground group-hover:text-foreground">
+                  {stage.stage}. {stage.label}
+                </span>
+              </Link>
+              {i < STAGES.length - 1 && (
+                <ArrowRight className="mx-0.5 size-3.5 shrink-0 text-muted-foreground/40" />
+              )}
+            </div>
+          );
+        })}
+      </div>
+      {stats && (
+        <div className="mt-3 text-xs text-muted-foreground">
+          전체 {stats.totalItems}건 진행 중
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  퀵 액션                                                            */
+/* ------------------------------------------------------------------ */
+
+const quickActions = [
+  { label: "SR 등록", href: "/sr", icon: ClipboardList },
+  { label: "아이디어 추가", href: "/ax-bd/ideas", icon: Lightbulb },
+  { label: "Spec 생성", href: "/spec-generator", icon: FileText },
+  { label: "파이프라인", href: "/pipeline", icon: GitBranch },
+];
+
+function QuickActions() {
+  return (
+    <div className="rounded-lg border bg-card p-5">
+      <h2 className="mb-3 text-sm font-semibold text-muted-foreground">
+        퀵 액션
+      </h2>
+      <div className="grid grid-cols-2 gap-2">
+        {quickActions.map((action) => (
+          <Link key={action.href} href={action.href}>
+            <Button
+              variant="outline"
+              className="h-auto w-full justify-start gap-2 px-3 py-2.5"
+            >
+              <action.icon className="size-4 shrink-0" />
+              <span className="text-sm">{action.label}</span>
+            </Button>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Dashboard Page                                                     */
+/* ------------------------------------------------------------------ */
+
 export default function DashboardPage() {
   const health = useApi<HealthScore>("/health");
   const reqs = useApi<RequirementItem[]>("/requirements");
   const integrity = useApi<HarnessIntegrity>("/integrity");
   const freshness = useApi<FreshnessReport>("/freshness");
+  const pipelineStats = useApi<PipelineStats>("/pipeline/stats");
 
   const reqCounts = reqs.data
     ? {
@@ -66,10 +181,47 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold">Foundry-X Dashboard</h1>
+      <h1 className="mb-6 text-2xl font-bold">홈</h1>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* SDD Triangle */}
+      {/* 프로세스 파이프라인 (상단 메인) */}
+      <ProcessPipeline stats={pipelineStats.data} />
+
+      {/* 퀵 액션 + Sprint Status */}
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <QuickActions />
+
+        <DashboardCard
+          title="Sprint Status"
+          loading={reqs.loading}
+          error={reqs.error}
+        >
+          {reqCounts && (
+            <div className="flex gap-6">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-green-500">
+                  {reqCounts.done}
+                </div>
+                <div className="text-sm text-muted-foreground">Done</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-yellow-500">
+                  {reqCounts.inProgress}
+                </div>
+                <div className="text-sm text-muted-foreground">In Progress</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-muted-foreground">
+                  {reqCounts.planned}
+                </div>
+                <div className="text-sm text-muted-foreground">Planned</div>
+              </div>
+            </div>
+          )}
+        </DashboardCard>
+      </div>
+
+      {/* 기존 위젯 (하단 보조) */}
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
         <DashboardCard
           title="SDD Triangle"
           loading={health.loading}
@@ -107,37 +259,6 @@ export default function DashboardPage() {
           )}
         </DashboardCard>
 
-        {/* Sprint Status */}
-        <DashboardCard
-          title="Sprint Status"
-          loading={reqs.loading}
-          error={reqs.error}
-        >
-          {reqCounts && (
-            <div className="flex gap-6">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-green-500">
-                  {reqCounts.done}
-                </div>
-                <div className="text-sm text-muted-foreground">Done</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-yellow-500">
-                  {reqCounts.inProgress}
-                </div>
-                <div className="text-sm text-muted-foreground">In Progress</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-muted-foreground">
-                  {reqCounts.planned}
-                </div>
-                <div className="text-sm text-muted-foreground">Planned</div>
-              </div>
-            </div>
-          )}
-        </DashboardCard>
-
-        {/* Harness Health */}
         <DashboardCard
           title="Harness Health"
           loading={integrity.loading}
@@ -146,7 +267,6 @@ export default function DashboardPage() {
           {integrity.data && <HarnessHealth data={integrity.data} />}
         </DashboardCard>
 
-        {/* Harness Freshness */}
         <DashboardCard
           title="Harness Freshness"
           loading={freshness.loading}

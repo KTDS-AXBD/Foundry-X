@@ -22,35 +22,42 @@ const TOUR_STEPS: TourStep[] = [
     target: "getting-started",
     title: "🚀 시작하기",
     description:
-      "궁금할 때 언제든 여기로 오세요. 업무별 퀵스타트와 가이드를 볼 수 있어요.",
+      "궁금할 때 언제든 여기로 오세요. AX BD 프로세스 가이드와 단계별 안내를 볼 수 있어요.",
     position: "right",
   },
   {
     target: "dashboard",
-    title: "📊 홈 대시보드",
+    title: "🏠 홈",
     description:
-      "프로젝트 전체 건강도를 한눈에 확인하세요. SDD Triangle 점수와 스프린트 현황이 표시돼요.",
+      "프로세스 전체 진행률과 최근 활동을 한눈에 확인하세요.",
     position: "right",
   },
   {
-    target: "group-sr",
-    title: "📥 SR 관리",
+    target: "group-collect",
+    title: "📥 1. 수집",
     description:
-      "고객 서비스 요청(SR)을 접수하고 AI가 자동 분류해요. SR 접수 → 분석 → 제안서의 첫 단계예요.",
+      "SR, IR, 외부 채널에서 사업 아이디어를 수집하는 첫 번째 단계예요.",
     position: "right",
   },
   {
-    target: "group-dev",
-    title: "📝 개발",
+    target: "group-discover",
+    title: "🔍 2. 발굴",
     description:
-      "아이디어를 Spec으로 변환하고, AI 에이전트가 작업을 수행해요. Spec 생성 → 에이전트 실행 동선이에요.",
+      "수집된 아이디어를 분석하고 사업성을 평가해요. Discovery 프로세스, BMC, 진행률을 확인하세요.",
     position: "right",
   },
   {
-    target: "group-status",
-    title: "📈 현황",
+    target: "group-shape",
+    title: "📐 3. 형상화",
     description:
-      "프로젝트 상태, KPI 지표, 토큰 비용을 모니터링하세요. 진행 중인 모든 것을 여기서 추적할 수 있어요.",
+      "검증된 아이디어를 Spec, 사업제안서, Offering Pack으로 구체화해요.",
+    position: "right",
+  },
+  {
+    target: "group-validate",
+    title: "✅ 4~6. 검증→제품화→GTM",
+    description:
+      "게이트 통과(ORB/PRB), MVP 제작, 시장 진출까지 나머지 단계를 진행하세요.",
     position: "right",
   },
   {

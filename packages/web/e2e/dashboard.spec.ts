@@ -4,7 +4,7 @@ test.describe("Dashboard", () => {
   test("sidebar navigation is visible", async ({ authenticatedPage: page }) => {
     await page.goto("/dashboard");
 
-    // Sidebar nav items (desktop viewport) — IA 재설계 후 한국어 레이블
+    // 프로세스 6단계 기반 IA — 상단 + 관리 그룹 항목
     await expect(page.getByRole("link", { name: "홈" }).first()).toBeVisible();
     await expect(page.getByRole("link", { name: "에이전트" })).toBeVisible();
     await expect(page.getByRole("link", { name: "지식베이스" })).toBeVisible();
@@ -12,28 +12,29 @@ test.describe("Dashboard", () => {
     await expect(page.getByRole("link", { name: "아키텍처" })).toBeVisible();
   });
 
-  test("sidebar AX BD 그룹 + 현황 그룹 항목 확인", async ({ authenticatedPage: page }) => {
+  test("sidebar 프로세스 6단계 그룹 항목 확인", async ({ authenticatedPage: page }) => {
     await page.goto("/dashboard");
 
-    // AX BD 사업개발 그룹 펼치기 (기본 접힘)
-    const axBdGroup = page.getByText("AX BD 사업개발");
-    if (await axBdGroup.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await axBdGroup.click();
-      await expect(page.getByRole("link", { name: "아이디어 관리" })).toBeVisible();
-      await expect(page.getByRole("link", { name: "BMC" })).toBeVisible();
-    }
+    // 수집 그룹 (기본 펼침)
+    await expect(page.getByRole("link", { name: "SR 목록" })).toBeVisible();
 
-    // 현황 그룹 (기본 펼침)
-    await expect(page.getByRole("link", { name: "Discovery 진행률" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "방법론 관리" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Analytics" })).toBeVisible();
+    // 발굴 그룹 (기본 펼침)
+    await expect(page.getByRole("link", { name: "아이디어 관리" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "BMC" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "진행률" })).toBeVisible();
+
+    // 형상화 그룹 (기본 펼침)
+    await expect(page.getByRole("link", { name: "Spec 생성" })).toBeVisible();
+
+    // 검증/공유 그룹 (기본 펼침)
+    await expect(page.getByRole("link", { name: "파이프라인" })).toBeVisible();
   });
 
   test("dashboard heading is visible", async ({ authenticatedPage: page }) => {
     await page.goto("/dashboard");
 
     await expect(
-      page.getByRole("heading", { name: /Foundry-X Dashboard/i }),
+      page.getByRole("heading", { name: /홈/i }),
     ).toBeVisible();
   });
 });
