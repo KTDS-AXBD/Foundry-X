@@ -31,3 +31,6 @@ out/
 
 # Claude Code local settings (user-specific)
 .claude/settings.local.json
+
+# Sprint worktree context (should only exist in worktrees, not master)
+.sprint-context
