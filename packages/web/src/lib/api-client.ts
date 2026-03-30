@@ -13,6 +13,16 @@ export class ApiError extends Error {
   }
 }
 
+/** JWT exp claim으로 만료 여부 확인 */
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]!));
+    return typeof payload.exp === "number" && payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+}
+
 function getAuthHeaders(): Record<string, string> {
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -22,10 +32,10 @@ function jsonAuthHeaders(): Record<string, string> {
   return { "Content-Type": "application/json", ...getAuthHeaders() };
 }
 
-// 동시 다발 401 시 refresh를 한 번만 실행하기 위한 공유 Promise
+// 동시 다발 refresh 시 한 번만 실행하기 위한 공유 Promise
 let pendingRefresh: Promise<boolean> | null = null;
 
-async function handleUnauthorized(): Promise<boolean> {
+async function ensureFreshToken(): Promise<boolean> {
   if (pendingRefresh) return pendingRefresh;
   pendingRefresh = refreshAccessToken().finally(() => { pendingRefresh = null; });
   const ok = await pendingRefresh;
@@ -33,17 +43,27 @@ async function handleUnauthorized(): Promise<boolean> {
   return ok;
 }
 
+/** 요청 전 토큰 만료 체크 + 401 후 자동 retry */
 async function requestWithRetry(
   url: string,
   init: RequestInit,
   parseJson: boolean,
 ): Promise<Response> {
+  // Pre-flight: 만료된 토큰이면 요청 전에 미리 refresh
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  if (token && isTokenExpired(token)) {
+    const refreshed = await ensureFreshToken();
+    if (refreshed) {
+      init = { ...init, headers: { ...init.headers as Record<string, string>, ...getAuthHeaders() } };
+    }
+  }
+
   let res = await fetch(url, init);
 
+  // 401 fallback (서버 측 만료 판정이 다를 수 있으므로 유지)
   if (res.status === 401) {
-    const refreshed = await handleUnauthorized();
+    const refreshed = await ensureFreshToken();
     if (refreshed) {
-      // 새 토큰으로 헤더 교체 후 재시도
       const newHeaders = { ...init.headers as Record<string, string>, ...getAuthHeaders() };
       res = await fetch(url, { ...init, headers: newHeaders });
     }
