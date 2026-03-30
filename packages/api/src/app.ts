@@ -60,6 +60,9 @@ import { pipelineRoute } from "./routes/pipeline.js";
 import { shareLinksRoute } from "./routes/share-links.js";
 import { notificationsRoute } from "./routes/notifications.js";
 import { decisionsRoute } from "./routes/decisions.js";
+// Sprint 80: BDP + Gate Package (F234, F235, F237)
+import { bdpRoute } from "./routes/bdp.js";
+import { gatePackageRoute } from "./routes/gate-package.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -265,6 +268,10 @@ app.route("/api", pipelineRoute);
 app.route("/api", shareLinksRoute);
 app.route("/api", notificationsRoute);
 app.route("/api", decisionsRoute);
+
+// Sprint 80: BDP + Gate Package (F234, F235, F237)
+app.route("/api", bdpRoute);
+app.route("/api", gatePackageRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
