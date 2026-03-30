@@ -726,3 +726,46 @@ authRoute.openapi(resetPassword, async (c) => {
     return c.json({ error: `Invalid or expired token: ${msg}`, errorCode: "AUTH_007" }, 400);
   }
 });
+
+// ─── POST /auth/cleanup-tokens ───
+
+const cleanupTokens = createRoute({
+  method: "post",
+  path: "/auth/cleanup-tokens",
+  tags: ["Auth"],
+  summary: "Cleanup expired and revoked refresh tokens (admin only)",
+  responses: {
+    200: {
+      content: { "application/json": { schema: z.object({ deleted: z.number() }) } },
+      description: "Number of deleted tokens",
+    },
+    403: {
+      content: { "application/json": { schema: ErrorSchema } },
+      description: "Admin only",
+    },
+  },
+});
+
+authRoute.openapi(cleanupTokens, async (c) => {
+  // Verify JWT — admin only
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return c.json({ error: "Authorization required" }, 401);
+  }
+  const secret = c.env.JWT_SECRET ?? "dev-secret";
+  let payload: JwtPayload;
+  try {
+    payload = (await verify(authHeader.slice(7), secret, "HS256")) as unknown as JwtPayload;
+  } catch {
+    return c.json({ error: "Invalid token" }, 401);
+  }
+  if (payload.role !== "admin") {
+    return c.json({ error: "Admin only", errorCode: "AUTH_002" }, 403);
+  }
+
+  const result = await c.env.DB.prepare(
+    "DELETE FROM refresh_tokens WHERE expires_at < datetime('now') OR revoked_at IS NOT NULL"
+  ).run();
+
+  return c.json({ deleted: result.meta?.changes ?? 0 });
+});

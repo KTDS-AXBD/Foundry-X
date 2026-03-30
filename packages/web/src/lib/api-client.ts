@@ -1,4 +1,5 @@
 import type { ModelQualityResponse, AgentModelMatrixResponse } from "@foundry-x/shared";
+import { refreshAccessToken, scheduleTokenRefresh } from "./stores/auth-store";
 
 export const BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
@@ -21,71 +22,85 @@ function jsonAuthHeaders(): Record<string, string> {
   return { "Content-Type": "application/json", ...getAuthHeaders() };
 }
 
-export async function fetchApi<T>(path: string): Promise<T> {
-  const url = `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
-  const res = await fetch(url, { headers: getAuthHeaders() });
+// 동시 다발 401 시 refresh를 한 번만 실행하기 위한 공유 Promise
+let pendingRefresh: Promise<boolean> | null = null;
 
-  if (!res.ok) {
-    const message = res.status === 401
-      ? "로그인이 필요해요"
-      : `API ${res.status}: ${res.statusText}`;
-    throw new ApiError(res.status, message);
+async function handleUnauthorized(): Promise<boolean> {
+  if (pendingRefresh) return pendingRefresh;
+  pendingRefresh = refreshAccessToken().finally(() => { pendingRefresh = null; });
+  const ok = await pendingRefresh;
+  if (ok) scheduleTokenRefresh();
+  return ok;
+}
+
+async function requestWithRetry(
+  url: string,
+  init: RequestInit,
+  parseJson: boolean,
+): Promise<Response> {
+  let res = await fetch(url, init);
+
+  if (res.status === 401) {
+    const refreshed = await handleUnauthorized();
+    if (refreshed) {
+      // 새 토큰으로 헤더 교체 후 재시도
+      const newHeaders = { ...init.headers as Record<string, string>, ...getAuthHeaders() };
+      res = await fetch(url, { ...init, headers: newHeaders });
+    }
   }
 
+  if (!res.ok) {
+    if (res.status === 401) {
+      // refresh도 실패 → 로그아웃 처리
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+      throw new ApiError(401, "로그인이 필요해요");
+    }
+    throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  }
+  return res;
+}
+
+export async function fetchApi<T>(path: string): Promise<T> {
+  const url = `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  const res = await requestWithRetry(url, { headers: getAuthHeaders() }, true);
   return res.json() as Promise<T>;
 }
 
 export async function postApi<T>(path: string, body?: unknown): Promise<T> {
   const url = `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
-  const res = await fetch(url, {
+  const res = await requestWithRetry(url, {
     method: "POST",
     headers: body !== undefined ? jsonAuthHeaders() : { ...getAuthHeaders() },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
-  });
-  if (!res.ok) {
-    const message = res.status === 401
-      ? "로그인이 필요해요"
-      : `API ${res.status}: ${res.statusText}`;
-    throw new ApiError(res.status, message);
-  }
+  }, true);
   return res.json() as Promise<T>;
 }
 
 export async function deleteApi(path: string): Promise<void> {
   const url = `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
-  const res = await fetch(url, { method: "DELETE", headers: getAuthHeaders() });
-  if (!res.ok) {
-    const message = res.status === 401
-      ? "로그인이 필요해요"
-      : `API ${res.status}: ${res.statusText}`;
-    throw new ApiError(res.status, message);
-  }
+  await requestWithRetry(url, { method: "DELETE", headers: getAuthHeaders() }, false);
 }
 
 export async function patchApi<T>(path: string, body: unknown): Promise<T> {
   const url = `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
-  const res = await fetch(url, {
+  const res = await requestWithRetry(url, {
     method: "PATCH",
     headers: jsonAuthHeaders(),
     body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const message = res.status === 401
-      ? "로그인이 필요해요"
-      : `API ${res.status}: ${res.statusText}`;
-    throw new ApiError(res.status, message);
-  }
+  }, true);
   return res.json() as Promise<T>;
 }
 
 export async function putApi<T>(path: string, body: unknown): Promise<T> {
   const url = `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
-  const res = await fetch(url, {
+  const res = await requestWithRetry(url, {
     method: "PUT",
     headers: jsonAuthHeaders(),
     body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+  }, true);
   return res.json() as Promise<T>;
 }
 

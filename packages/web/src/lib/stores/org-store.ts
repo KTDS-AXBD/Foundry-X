@@ -61,6 +61,9 @@ export const useOrgStore = create<OrgState>((set, get) => ({
       if (jwtOrgId && orgs.some((o) => o.id === jwtOrgId)) {
         // JWT의 orgId가 유효하면 그것을 사용
         set({ activeOrgId: jwtOrgId });
+      } else if (jwtOrgId && !orgs.some((o) => o.id === jwtOrgId) && orgs.length > 0) {
+        // JWT orgId가 멤버십에 없음 (제거됨) → 첫 번째 org로 전환
+        void get().switchOrg(orgs[0].id);
       } else if (!current && orgs.length > 0) {
         // API 응답이 멤버 수 DESC로 정렬되어 있으므로 첫 번째가 팀 Org
         set({ activeOrgId: orgs[0].id });
