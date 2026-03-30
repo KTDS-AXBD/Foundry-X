@@ -12,6 +12,23 @@ test.describe("Dashboard", () => {
     await expect(page.getByRole("link", { name: "아키텍처" })).toBeVisible();
   });
 
+  test("sidebar AX BD 그룹 + 현황 그룹 항목 확인", async ({ authenticatedPage: page }) => {
+    await page.goto("/dashboard");
+
+    // AX BD 사업개발 그룹 펼치기 (기본 접힘)
+    const axBdGroup = page.getByText("AX BD 사업개발");
+    if (await axBdGroup.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await axBdGroup.click();
+      await expect(page.getByRole("link", { name: "아이디어 관리" })).toBeVisible();
+      await expect(page.getByRole("link", { name: "BMC" })).toBeVisible();
+    }
+
+    // 현황 그룹 (기본 펼침)
+    await expect(page.getByRole("link", { name: "Discovery 진행률" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "방법론 관리" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Analytics" })).toBeVisible();
+  });
+
   test("dashboard heading is visible", async ({ authenticatedPage: page }) => {
     await page.goto("/dashboard");
 

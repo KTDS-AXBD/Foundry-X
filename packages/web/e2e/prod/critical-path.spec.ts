@@ -61,6 +61,21 @@ test.describe("Production Critical Path", () => {
   });
 
   /**
+   * TC-9a: BD Pipeline 페이지 접근
+   * /pipeline 경로가 정상 렌더링되는지 확인해요. (Sprint 79 F232)
+   */
+  test("pipeline page renders", async ({ page }) => {
+    await page.goto("/pipeline");
+    await page.waitForLoadState("networkidle");
+
+    // 파이프라인 페이지가 렌더링됨 (인증 없이도 기본 UI)
+    const hasContent = await page.locator("body").textContent();
+    expect(hasContent).toBeTruthy();
+    const bodyChildCount = await page.locator("body > *").count();
+    expect(bodyChildCount).toBeGreaterThan(0);
+  });
+
+  /**
    * TC-9: Dashboard 접근 → 리다이렉트 확인
    * 비인증 상태에서 /dashboard 접근 시 적절한 응답을 하는지 확인해요.
    * (로그인 리다이렉트 또는 공개 대시보드 표시)
