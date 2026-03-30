@@ -8,12 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ### 세션 #136 (2026-03-30)
-**Phase 7 완료 — Sprint 79~81 BD Pipeline E2E 구현**:
+**Phase 7 완료 — Sprint 81 구현 + 인프라 정비 + 마일스톤 회고**:
 - ✅ Sprint 81: F236 Offering Pack + F238 MVP 추적 + F240 IR Bottom-up 채널
 - ✅ D1 마이그레이션 0072~0074, 서비스 3, 라우트 3, 스키마 3, 테스트 +49건
 - ✅ Sprint 80 SPEC ✅ 완료 처리 (F234/F235/F237)
 - ✅ Phase 7 전체 완료: F232~F240 9건 전부 ✅
-- ✅ API 2119 tests, 153 services, 63 routes, 78 schemas
+- ✅ Workers 재배포: Version bb0e8197, D1 0074 remote 전체 적용
+- ✅ Sprint 79/80/81 remote 브랜치 삭제
+- ✅ Phase 7 마일스톤 회고 (FX-RPRT-007): +154 tests, +9 routes, +10 services, +8199 LoC
 
 ### 세션 #135 (2026-03-30)
 **Phase 7 FX-BD-V1 — BD 파이프라인 E2E 통합 기획**:
