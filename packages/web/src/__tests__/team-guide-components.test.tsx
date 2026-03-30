@@ -97,7 +97,7 @@ describe("CoworkSetupGuide", () => {
   it("renders step cards", () => {
     render(<CoworkSetupGuide />);
     expect(screen.getByText("환경 확인")).toBeInTheDocument();
-    expect(screen.getByText("플러그인 설치")).toBeInTheDocument();
+    expect(screen.getByText("팀 스킬 설치")).toBeInTheDocument();
     expect(screen.getByText("설정 확인")).toBeInTheDocument();
     expect(screen.getByText("첫 실행")).toBeInTheDocument();
   });
@@ -110,7 +110,7 @@ describe("CoworkSetupGuide", () => {
   it("toggles to Claude Code environment", () => {
     render(<CoworkSetupGuide />);
     fireEvent.click(screen.getByText("Claude Code"));
-    expect(screen.getByText(/\.claude\/skills\/ 디렉토리에 스킬 복사/)).toBeInTheDocument();
+    expect(screen.getAllByText(/cp -r \/tmp\/ax-config\/skills\/ax-\*/).length).toBeGreaterThanOrEqual(1);
   });
 });
 
