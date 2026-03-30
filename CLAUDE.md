@@ -57,9 +57,9 @@ foundry-x/
 │   │       └── index.ts
 │   ├── api/                # Hono API Server (Phase 2)
 │   │   └── src/
-│   │       ├── routes/     # 47개 — 목록은 `ls packages/api/src/routes/` 참조
-│   │       ├── services/   # 136개 — 목록은 `ls packages/api/src/services/` 참조
-│   │       ├── schemas/    # 62개 Zod 스키마 — 목록은 `ls packages/api/src/schemas/` 참조
+│   │       ├── routes/     # 54개 — 목록은 `ls packages/api/src/routes/` 참조
+│   │       ├── services/   # 143개 — 목록은 `ls packages/api/src/services/` 참조
+│   │       ├── schemas/    # 69개 Zod 스키마 — 목록은 `ls packages/api/src/schemas/` 참조
 │   │       └── index.ts
 │   ├── web/                # Next.js 14 Dashboard + Landing (Phase 2)
 │   │   └── src/
@@ -121,7 +121,7 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 
 # API 패키지 단독
 cd packages/api
-pnpm test                         # vitest run (1861 tests)
+pnpm test                         # vitest run (1965 tests)
 pnpm test -- --grep "agent"       # 특정 테스트 필터
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # 로컬 서버 실행
