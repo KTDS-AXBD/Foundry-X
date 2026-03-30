@@ -49,3 +49,33 @@ export function parseStatusEmoji(
   if (emoji.includes("\u274C")) return "rejected";
   return "planned";
 }
+
+// ─── F222: Spec Delta Parsing ───
+
+export interface SpecDeltaParsed {
+  added: string[];
+  modified: string[];
+  removed: string[];
+}
+
+/** changes/ 구조의 spec-delta.md 파싱 */
+export function parseSpecDeltas(content: string): SpecDeltaParsed {
+  const delta: SpecDeltaParsed = { added: [], modified: [], removed: [] };
+  let currentSection: keyof SpecDeltaParsed | null = null;
+
+  for (const line of content.split("\n")) {
+    const trimmed = line.trim();
+
+    if (/^##\s+added/i.test(trimmed)) {
+      currentSection = "added";
+    } else if (/^##\s+modified/i.test(trimmed)) {
+      currentSection = "modified";
+    } else if (/^##\s+removed/i.test(trimmed)) {
+      currentSection = "removed";
+    } else if (currentSection && trimmed.startsWith("- ")) {
+      delta[currentSection].push(trimmed.slice(2).trim());
+    }
+  }
+
+  return delta;
+}

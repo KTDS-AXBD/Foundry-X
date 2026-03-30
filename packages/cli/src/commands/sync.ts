@@ -5,7 +5,8 @@ import { Logger } from '../services/logger.js';
 import { HealthScoreCalculator } from '../services/health-score.js';
 import { FoundryXError, NotInitializedError } from '../plumb/errors.js';
 import { renderOutput } from '../ui/render.js';
-import type { SyncResult, HealthScore } from '@foundry-x/shared';
+import type { ChangeEntry, SyncResult, HealthScore } from '@foundry-x/shared';
+import { scanChanges } from '../harness/changes-scanner.js';
 
 interface SyncOptions {
   json: boolean;
@@ -17,6 +18,8 @@ export interface SyncRunResult {
   decisions: SyncResult['decisions'];
   healthScore: HealthScore;
   syncResult: SyncResult;
+  /** F222: 변경 디렉토리 스캔 결과 */
+  changes?: ChangeEntry[];
 }
 
 /** 비즈니스 로직: Plumb review 실행 후 결과 반환. Plumb 미설치 시 null 반환. */
@@ -43,15 +46,19 @@ export async function runSync(cwd: string): Promise<SyncRunResult | null> {
   // 4. Run review
   const syncResult = await bridge.review();
 
-  // 5. Compute health score
+  // 5. Scan changes directory (F222)
+  const changes = await scanChanges(cwd);
+
+  // 6. Compute health score (with changes awareness)
   const calculator = new HealthScoreCalculator();
-  const healthScore = calculator.compute(syncResult);
+  const healthScore = calculator.compute(syncResult, changes);
 
   return {
     triangle: syncResult.triangle,
     decisions: syncResult.decisions,
     healthScore,
     syncResult,
+    changes,
   };
 }
 

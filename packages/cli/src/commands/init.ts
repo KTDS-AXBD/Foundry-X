@@ -57,13 +57,15 @@ export async function runInit(
   const mode = await detectRepoMode(cwd, options.mode as RepoMode | undefined);
   steps.push({ step: 'detect-mode', label: 'Detect mode', status: 'ok', detail: mode });
 
-  // 4. Discover stack
+  // 4. Discover stack (F220: enhanced with docs + directory structure + context)
   const profile = await discoverStack(cwd, mode);
+  const docCount = profile.existingDocs?.length ?? 0;
+  const dirCount = profile.directoryStructure?.length ?? 0;
   steps.push({
     step: 'discover-stack',
     label: 'Discover stack',
     status: 'ok',
-    detail: `${profile.languages.join(', ')} / ${profile.frameworks.join(', ') || '(none)'}`,
+    detail: `${profile.languages.join(', ')} / ${profile.frameworks.join(', ') || '(none)'} / ${docCount} docs, ${dirCount} dirs`,
   });
 
   // 5. Analyze architecture

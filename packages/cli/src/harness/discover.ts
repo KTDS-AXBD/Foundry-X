@@ -1,6 +1,6 @@
-import { access, readFile } from 'node:fs/promises';
+import { access, readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { MarkerFile, RepoMode, RepoProfile } from '@foundry-x/shared';
+import type { DirNode, DocFile, MarkerFile, ProjectContext, RepoMode, RepoProfile } from '@foundry-x/shared';
 
 const MARKER_MAP: Record<string, MarkerFile['type']> = {
   'package.json': 'node',
@@ -159,6 +159,11 @@ export async function discoverStack(
     if (Object.keys(found).length > 0) scripts = found;
   }
 
+  // F220: Brownfield context discovery
+  const existingDocs = await discoverDocs(cwd);
+  const directoryStructure = await discoverDirectoryStructure(cwd);
+  const projectContext = await buildProjectContext(cwd, existingDocs, directoryStructure);
+
   return {
     mode,
     languages,
@@ -172,5 +177,151 @@ export async function discoverStack(
     modules: [],
     architecturePattern: 'single-package',
     scripts,
+    existingDocs,
+    directoryStructure,
+    projectContext,
+  };
+}
+
+// ─── F220: Brownfield Context Discovery ───
+
+const DOC_PATTERNS: { pattern: string; type: DocFile['type']; isDir?: boolean }[] = [
+  { pattern: 'README.md', type: 'readme' },
+  { pattern: 'README', type: 'readme' },
+  { pattern: 'CHANGELOG.md', type: 'changelog' },
+  { pattern: 'CHANGES.md', type: 'changelog' },
+  { pattern: 'CONTRIBUTING.md', type: 'contributing' },
+  { pattern: 'SPEC.md', type: 'spec' },
+  { pattern: 'docs', type: 'docs', isDir: true },
+  { pattern: 'documentation', type: 'docs', isDir: true },
+  { pattern: 'adr', type: 'adr', isDir: true },
+  { pattern: 'docs/adr', type: 'adr', isDir: true },
+];
+
+export async function discoverDocs(cwd: string): Promise<DocFile[]> {
+  const found: DocFile[] = [];
+  for (const { pattern, type, isDir } of DOC_PATTERNS) {
+    const fullPath = join(cwd, pattern);
+    if (await fileExists(fullPath)) {
+      if (isDir) {
+        // For directories, only add if it's actually a directory
+        try {
+          const entries = await readdir(fullPath);
+          if (entries.length > 0) {
+            found.push({ path: pattern, type });
+          }
+        } catch {
+          // not a directory or not readable
+        }
+      } else {
+        found.push({ path: pattern, type });
+      }
+    }
+  }
+  return found;
+}
+
+const DIR_ROLE_MAP: Record<string, DirNode['role']> = {
+  routes: 'routes',
+  api: 'routes',
+  services: 'services',
+  lib: 'services',
+  components: 'components',
+  ui: 'components',
+  test: 'tests',
+  tests: 'tests',
+  __tests__: 'tests',
+  '.github': 'config',
+  '.gitlab': 'config',
+  '.circleci': 'config',
+  docs: 'docs',
+  documentation: 'docs',
+};
+
+function inferDirRole(name: string): DirNode['role'] {
+  return DIR_ROLE_MAP[name] ?? 'unknown';
+}
+
+export async function discoverDirectoryStructure(cwd: string): Promise<DirNode[]> {
+  const nodes: DirNode[] = [];
+
+  // Scan src/ if it exists, otherwise scan top-level
+  const srcPath = join(cwd, 'src');
+  const hasSrc = await fileExists(srcPath);
+  const scanRoot = hasSrc ? srcPath : cwd;
+  const prefix = hasSrc ? 'src/' : '';
+
+  try {
+    const entries = await readdir(scanRoot, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      if (entry.name.startsWith('.') && !DIR_ROLE_MAP[entry.name]) continue;
+      if (entry.name === 'node_modules' || entry.name === '.git') continue;
+
+      const role = inferDirRole(entry.name);
+      const node: DirNode = { name: `${prefix}${entry.name}`, role };
+
+      // One level deeper for known roles
+      if (role !== 'unknown') {
+        try {
+          const subEntries = await readdir(join(scanRoot, entry.name), { withFileTypes: true });
+          const children: DirNode[] = subEntries
+            .filter((e) => e.isDirectory() && !e.name.startsWith('.'))
+            .slice(0, 10) // limit to 10 subdirs
+            .map((e) => ({ name: e.name, role: inferDirRole(e.name) }));
+          if (children.length > 0) node.children = children;
+        } catch {
+          // not readable
+        }
+      }
+
+      nodes.push(node);
+    }
+  } catch {
+    // scanRoot not readable
+  }
+
+  return nodes;
+}
+
+export async function buildProjectContext(
+  cwd: string,
+  docs: DocFile[],
+  dirs: DirNode[],
+): Promise<ProjectContext> {
+  // Extract summary from README
+  let summary = 'No README found';
+  const readme = docs.find((d) => d.type === 'readme');
+  if (readme) {
+    try {
+      const content = await readFile(join(cwd, readme.path), 'utf-8');
+      // Take first non-empty, non-heading paragraph
+      const lines = content.split('\n');
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed && !trimmed.startsWith('#') && !trimmed.startsWith('!') && !trimmed.startsWith('[')) {
+          summary = trimmed.length > 200 ? trimmed.slice(0, 200) + '...' : trimmed;
+          break;
+        }
+      }
+    } catch {
+      // not readable
+    }
+  }
+
+  // Detect monorepo
+  const hasMonorepo =
+    (await fileExists(join(cwd, 'pnpm-workspace.yaml'))) ||
+    (await fileExists(join(cwd, 'lerna.json'))) ||
+    (await fileExists(join(cwd, 'nx.json')));
+
+  // Top-level dirs
+  const topLevelDirs = dirs.map((d) => d.name);
+
+  return {
+    summary,
+    hasMonorepo,
+    docCount: docs.length,
+    topLevelDirs,
   };
 }
