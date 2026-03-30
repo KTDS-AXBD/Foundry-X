@@ -1470,3 +1470,80 @@ export async function analyzeCoverageGaps(
     ...(testCode ? { testFiles: { "source.test.ts": testCode } } : {}),
   });
 }
+
+// ─── Detail Page API Functions ───
+
+export interface BizItemDetail extends BizItemSummary {
+  source: string;
+  classification: Record<string, unknown> | null;
+  createdBy: string;
+  updatedAt: string;
+}
+
+export interface IdeaDetail {
+  id: string;
+  title: string;
+  description: string | null;
+  tags: string[];
+  gitRef: string;
+  authorId: string;
+  syncStatus: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface BmcDetail {
+  id: string;
+  ideaId: string | null;
+  title: string;
+  blocks: Array<{ blockType: string; content: string | null; updatedAt: number }>;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface OfferingPackDetail {
+  id: string;
+  bizItemId: string;
+  title: string;
+  description: string | null;
+  status: string;
+  items: Array<{ id: string; itemType: string; title: string; content: string | null; url: string | null; sortOrder: number }>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BdpVersion {
+  id: string;
+  bizItemId: string;
+  versionNum: number;
+  content: string;
+  isFinal: boolean;
+  createdBy: string;
+  createdAt: string;
+}
+
+export async function fetchBizItemDetail(id: string): Promise<BizItemDetail> {
+  return fetchApi(`/biz-items/${id}`);
+}
+
+export async function fetchIdeaDetail(id: string): Promise<IdeaDetail> {
+  const res = await fetchApi<{ items: IdeaDetail[] }>("/ax-bd/ideas");
+  const found = res.items.find((i) => i.id === id);
+  if (!found) throw new Error("Idea not found");
+  return found;
+}
+
+export async function fetchBmcDetail(id: string): Promise<BmcDetail> {
+  const res = await fetchApi<{ items: BmcDetail[] }>("/ax-bd/bmc");
+  const found = res.items.find((b) => b.id === id);
+  if (!found) throw new Error("BMC not found");
+  return found;
+}
+
+export async function fetchOfferingPackDetail(id: string): Promise<OfferingPackDetail> {
+  return fetchApi(`/offering-packs/${id}`);
+}
+
+export async function fetchBdpLatest(bizItemId: string): Promise<BdpVersion> {
+  return fetchApi(`/bdp/${bizItemId}`);
+}
