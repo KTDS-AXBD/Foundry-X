@@ -25,33 +25,57 @@ const steps: Array<{
     description: "필수 도구가 설치되어 있는지 확인해요.",
     commands: {
       cowork: ["node --version  # v20 이상 필요", "cowork --version"],
-      "claude-code": ["node --version  # v20 이상 필요", "claude --version  # 최신 버전 권장"],
+      "claude-code": [
+        "node --version  # v20 이상 필요",
+        "claude --version  # 최신 버전 권장",
+        "gh auth status  # GitHub CLI 인증 확인",
+      ],
     },
   },
   {
     number: 2,
-    title: "플러그인 설치",
-    description: "AX BD 스킬 플러그인을 설치해요.",
+    title: "팀 스킬 설치",
+    description:
+      "KTDS-AXBD/ax-config 팀 리포에서 최신 스킬을 받아요.",
     commands: {
       cowork: ["cowork plugin install pm-skills ai-biz"],
       "claude-code": [
-        "# .claude/skills/ 디렉토리에 스킬 복사",
-        "cp -r /path/to/pm-skills .claude/skills/",
-        "cp -r /path/to/ai-biz .claude/skills/",
+        "# 팀 리포에서 스킬 받기",
+        "git clone git@github.com:KTDS-AXBD/ax-config.git /tmp/ax-config",
+        "cp -r /tmp/ax-config/skills/ax-* ~/.claude/skills/",
+        "rm -rf /tmp/ax-config",
       ],
     },
   },
   {
     number: 3,
     title: "설정 확인",
-    description: "설치된 플러그인이 정상 동작하는지 확인해요.",
+    description: "설치된 스킬이 정상 동작하는지 확인해요.",
     commands: {
       cowork: ["cowork plugin list", "cowork plugin verify pm-skills ai-biz"],
-      "claude-code": ["ls .claude/skills/", "claude /ax-help"],
+      "claude-code": [
+        "ls ~/.claude/skills/  # 20개 ax-* 스킬 확인",
+        "claude /ax-help  # 스킬 목록 + 사용법",
+      ],
     },
   },
   {
     number: 4,
+    title: "팀 스킬 업데이트",
+    description:
+      "새 스킬이 추가되거나 변경되면 팀 리포에서 다시 받아요.",
+    commands: {
+      cowork: ["cowork plugin update pm-skills ai-biz"],
+      "claude-code": [
+        "# 최신 스킬로 업데이트",
+        "git clone git@github.com:KTDS-AXBD/ax-config.git /tmp/ax-config",
+        "cp -r /tmp/ax-config/skills/ax-* ~/.claude/skills/",
+        "rm -rf /tmp/ax-config",
+      ],
+    },
+  },
+  {
+    number: 5,
     title: "첫 실행",
     description: "Discovery 프로세스를 시작해 보세요.",
     commands: {
