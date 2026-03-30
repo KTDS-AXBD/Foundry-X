@@ -15,6 +15,10 @@ const CUSTOM_ROLES_DDL = `
     org_id TEXT NOT NULL DEFAULT '',
     is_builtin INTEGER NOT NULL DEFAULT 0,
     enabled INTEGER NOT NULL DEFAULT 1,
+    persona TEXT NOT NULL DEFAULT '',
+    dependencies TEXT NOT NULL DEFAULT '[]',
+    customization_schema TEXT NOT NULL DEFAULT '{}',
+    menu_config TEXT NOT NULL DEFAULT '[]',
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
   );

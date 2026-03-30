@@ -1,7 +1,11 @@
 /**
  * F146: 에이전트 역할 커스터마이징 — CustomRoleManager
  * 빌트인 7종 + D1 커스텀 역할 통합 관리
+ * F221: Agent-as-Code 확장 — persona, dependencies, customization, menu
  */
+
+import { parseAgentDefinition, exportToYaml } from "./agent-definition-loader.js";
+import type { MenuItem } from "./agent-definition-loader.js";
 
 export interface CustomRole {
   id: string;
@@ -15,6 +19,11 @@ export interface CustomRole {
   orgId: string;
   isBuiltin: boolean;
   enabled: boolean;
+  // F221: Agent-as-Code 확장 필드
+  persona: string;
+  dependencies: string[];
+  customizationSchema: Record<string, unknown>;
+  menuConfig: MenuItem[];
   createdAt: string;
   updatedAt: string;
 }
@@ -28,6 +37,11 @@ export interface CreateRoleInput {
   preferredRunnerType?: string;
   taskType?: string;
   orgId?: string;
+  // F221 확장
+  persona?: string;
+  dependencies?: string[];
+  customizationSchema?: Record<string, unknown>;
+  menuConfig?: MenuItem[];
 }
 
 export interface UpdateRoleInput {
@@ -39,6 +53,11 @@ export interface UpdateRoleInput {
   preferredRunnerType?: string;
   taskType?: string;
   enabled?: boolean;
+  // F221 확장
+  persona?: string;
+  dependencies?: string[];
+  customizationSchema?: Record<string, unknown>;
+  menuConfig?: MenuItem[];
 }
 
 export interface CustomRoleRow {
@@ -53,6 +72,11 @@ export interface CustomRoleRow {
   org_id: string;
   is_builtin: number;
   enabled: number;
+  // F221 확장
+  persona: string;
+  dependencies: string;
+  customization_schema: string;
+  menu_config: string;
   created_at: string;
   updated_at: string;
 }
@@ -70,6 +94,10 @@ export function toCustomRole(row: CustomRoleRow): CustomRole {
     orgId: row.org_id,
     isBuiltin: row.is_builtin === 1,
     enabled: row.enabled === 1,
+    persona: row.persona ?? "",
+    dependencies: JSON.parse(row.dependencies || "[]"),
+    customizationSchema: JSON.parse(row.customization_schema || "{}"),
+    menuConfig: JSON.parse(row.menu_config || "[]"),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -89,6 +117,10 @@ export const BUILTIN_ROLES: CustomRole[] = [
     orgId: "",
     isBuiltin: true,
     enabled: true,
+    persona: "",
+    dependencies: [],
+    customizationSchema: {},
+    menuConfig: [],
     createdAt: "2026-01-01T00:00:00Z",
     updatedAt: "2026-01-01T00:00:00Z",
   },
@@ -104,6 +136,10 @@ export const BUILTIN_ROLES: CustomRole[] = [
     orgId: "",
     isBuiltin: true,
     enabled: true,
+    persona: "",
+    dependencies: [],
+    customizationSchema: {},
+    menuConfig: [],
     createdAt: "2026-01-01T00:00:00Z",
     updatedAt: "2026-01-01T00:00:00Z",
   },
@@ -119,6 +155,10 @@ export const BUILTIN_ROLES: CustomRole[] = [
     orgId: "",
     isBuiltin: true,
     enabled: true,
+    persona: "",
+    dependencies: [],
+    customizationSchema: {},
+    menuConfig: [],
     createdAt: "2026-01-01T00:00:00Z",
     updatedAt: "2026-01-01T00:00:00Z",
   },
@@ -134,6 +174,10 @@ export const BUILTIN_ROLES: CustomRole[] = [
     orgId: "",
     isBuiltin: true,
     enabled: true,
+    persona: "",
+    dependencies: [],
+    customizationSchema: {},
+    menuConfig: [],
     createdAt: "2026-01-01T00:00:00Z",
     updatedAt: "2026-01-01T00:00:00Z",
   },
@@ -149,6 +193,10 @@ export const BUILTIN_ROLES: CustomRole[] = [
     orgId: "",
     isBuiltin: true,
     enabled: true,
+    persona: "",
+    dependencies: [],
+    customizationSchema: {},
+    menuConfig: [],
     createdAt: "2026-01-01T00:00:00Z",
     updatedAt: "2026-01-01T00:00:00Z",
   },
@@ -164,6 +212,10 @@ export const BUILTIN_ROLES: CustomRole[] = [
     orgId: "",
     isBuiltin: true,
     enabled: true,
+    persona: "",
+    dependencies: [],
+    customizationSchema: {},
+    menuConfig: [],
     createdAt: "2026-01-01T00:00:00Z",
     updatedAt: "2026-01-01T00:00:00Z",
   },
@@ -179,6 +231,10 @@ export const BUILTIN_ROLES: CustomRole[] = [
     orgId: "",
     isBuiltin: true,
     enabled: true,
+    persona: "",
+    dependencies: [],
+    customizationSchema: {},
+    menuConfig: [],
     createdAt: "2026-01-01T00:00:00Z",
     updatedAt: "2026-01-01T00:00:00Z",
   },
@@ -194,8 +250,8 @@ export class CustomRoleManager {
     await this.db
       .prepare(
         `INSERT INTO custom_agent_roles
-         (id, name, description, system_prompt, allowed_tools, preferred_model, preferred_runner_type, task_type, org_id, is_builtin, enabled, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1, ?, ?)`,
+         (id, name, description, system_prompt, allowed_tools, preferred_model, preferred_runner_type, task_type, org_id, is_builtin, enabled, persona, dependencies, customization_schema, menu_config, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(
         id,
@@ -207,6 +263,10 @@ export class CustomRoleManager {
         input.preferredRunnerType ?? "openrouter",
         input.taskType ?? "code-review",
         input.orgId ?? "",
+        input.persona ?? "",
+        JSON.stringify(input.dependencies ?? []),
+        JSON.stringify(input.customizationSchema ?? {}),
+        JSON.stringify(input.menuConfig ?? []),
         now,
         now,
       )
@@ -224,6 +284,10 @@ export class CustomRoleManager {
       orgId: input.orgId ?? "",
       isBuiltin: false,
       enabled: true,
+      persona: input.persona ?? "",
+      dependencies: input.dependencies ?? [],
+      customizationSchema: input.customizationSchema ?? {},
+      menuConfig: input.menuConfig ?? [],
       createdAt: now,
       updatedAt: now,
     };
@@ -332,6 +396,22 @@ export class CustomRoleManager {
       updates.push("enabled = ?");
       values.push(input.enabled ? 1 : 0);
     }
+    if (input.persona !== undefined) {
+      updates.push("persona = ?");
+      values.push(input.persona);
+    }
+    if (input.dependencies !== undefined) {
+      updates.push("dependencies = ?");
+      values.push(JSON.stringify(input.dependencies));
+    }
+    if (input.customizationSchema !== undefined) {
+      updates.push("customization_schema = ?");
+      values.push(JSON.stringify(input.customizationSchema));
+    }
+    if (input.menuConfig !== undefined) {
+      updates.push("menu_config = ?");
+      values.push(JSON.stringify(input.menuConfig));
+    }
 
     updates.push("updated_at = ?");
     values.push(now);
@@ -374,5 +454,64 @@ export class CustomRoleManager {
       .prepare("DELETE FROM custom_agent_roles WHERE id = ?")
       .bind(roleId)
       .run();
+  }
+
+  /** F221: YAML/JSON → D1 import */
+  async importFromDefinition(content: string, format: "yaml" | "json", orgId?: string): Promise<CustomRole> {
+    const def = parseAgentDefinition(content, format);
+    return this.createRole({
+      name: def.name,
+      description: def.description,
+      systemPrompt: def.systemPrompt,
+      allowedTools: def.allowedTools,
+      preferredModel: def.preferredModel ?? undefined,
+      preferredRunnerType: def.preferredRunnerType,
+      taskType: def.taskType,
+      orgId,
+      persona: def.persona,
+      dependencies: def.dependencies,
+      customizationSchema: def.customization as Record<string, unknown>,
+      menuConfig: def.menu,
+    });
+  }
+
+  /** F221: D1 → YAML export */
+  async exportAsYaml(roleId: string): Promise<string> {
+    const role = await this.getRole(roleId);
+    if (!role) throw new Error("Role not found");
+    return exportToYaml({
+      name: role.name,
+      description: role.description || undefined,
+      persona: role.persona || undefined,
+      systemPrompt: role.systemPrompt,
+      allowedTools: role.allowedTools.length > 0 ? role.allowedTools : undefined,
+      preferredModel: role.preferredModel,
+      preferredRunnerType: role.preferredRunnerType as "openrouter" | "claude-api" | "mcp" | "mock",
+      taskType: role.taskType || undefined,
+      dependencies: role.dependencies.length > 0 ? role.dependencies : undefined,
+      customization: Object.keys(role.customizationSchema).length > 0
+        ? (role.customizationSchema as Record<string, { type: "string" | "number" | "boolean" | "array"; default: unknown }>)
+        : undefined,
+      menu: role.menuConfig.length > 0 ? role.menuConfig : undefined,
+    });
+  }
+
+  /** F221: D1 → JSON export */
+  async exportAsJson(roleId: string): Promise<string> {
+    const role = await this.getRole(roleId);
+    if (!role) throw new Error("Role not found");
+    return JSON.stringify({
+      name: role.name,
+      description: role.description,
+      persona: role.persona,
+      systemPrompt: role.systemPrompt,
+      allowedTools: role.allowedTools,
+      preferredModel: role.preferredModel,
+      preferredRunnerType: role.preferredRunnerType,
+      taskType: role.taskType,
+      dependencies: role.dependencies,
+      customization: role.customizationSchema,
+      menu: role.menuConfig,
+    }, null, 2);
   }
 }
