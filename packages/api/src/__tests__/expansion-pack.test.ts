@@ -94,7 +94,7 @@ describe("ExpansionPackService", () => {
 
     const filtered = await svc.list({ domain: "security" });
     expect(filtered).toHaveLength(1);
-    expect(filtered[0].name).toBe("Sec");
+    expect(filtered[0]!.name).toBe("Sec");
   });
 
   it("update: updates partial fields", async () => {
@@ -147,7 +147,7 @@ describe("ExpansionPackService", () => {
 
     const installations = await svc.listInstallations("org_test");
     expect(installations).toHaveLength(1);
-    expect(installations[0].packId).toBe(pack.id);
+    expect(installations[0]!.packId).toBe(pack.id);
 
     const otherInstallations = await svc.listInstallations("org_other");
     expect(otherInstallations).toHaveLength(0);

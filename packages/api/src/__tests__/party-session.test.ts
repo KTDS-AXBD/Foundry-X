@@ -120,8 +120,8 @@ describe("PartySessionService", () => {
 
     const messages = await svc.listMessages(session.id);
     expect(messages).toHaveLength(2);
-    expect(messages[0].content).toBe("First");
-    expect(messages[1].content).toBe("Second");
+    expect(messages[0]!.content).toBe("First");
+    expect(messages[1]!.content).toBe("Second");
   });
 
   it("concludeSession: updates status and summary", async () => {
@@ -145,11 +145,11 @@ describe("PartySessionService", () => {
 
     const active = await svc.listSessions("org_test", "active");
     expect(active).toHaveLength(1);
-    expect(active[0].topic).toBe("Active session");
+    expect(active[0]!.topic).toBe("Active session");
 
     const concluded = await svc.listSessions("org_test", "concluded");
     expect(concluded).toHaveLength(1);
-    expect(concluded[0].topic).toBe("To conclude");
+    expect(concluded[0]!.topic).toBe("To conclude");
 
     const all = await svc.listSessions("org_test");
     expect(all).toHaveLength(2);

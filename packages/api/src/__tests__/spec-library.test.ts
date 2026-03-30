@@ -84,7 +84,7 @@ describe("SpecLibraryService", () => {
 
     const filtered = await svc.list("org_test", { category: "feature" });
     expect(filtered).toHaveLength(1);
-    expect(filtered[0].title).toBe("Feature");
+    expect(filtered[0]!.title).toBe("Feature");
   });
 
   it("list: filters by tag using LIKE", async () => {
@@ -93,7 +93,7 @@ describe("SpecLibraryService", () => {
 
     const filtered = await svc.list("org_test", { tag: "auth" });
     expect(filtered).toHaveLength(1);
-    expect(filtered[0].title).toBe("Tagged");
+    expect(filtered[0]!.title).toBe("Tagged");
   });
 
   it("list: filters by status", async () => {
@@ -102,7 +102,7 @@ describe("SpecLibraryService", () => {
 
     const filtered = await svc.list("org_test", { status: "active" });
     expect(filtered).toHaveLength(1);
-    expect(filtered[0].title).toBe("Active");
+    expect(filtered[0]!.title).toBe("Active");
   });
 
   it("update: updates partial fields", async () => {
