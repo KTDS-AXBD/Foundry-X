@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --port 3000",
     "build": "next build",
+    "build:clean": "rm -rf .next && next build",
     "start": "next start",
     "lint": "echo 'Web lint: next lint config pending (Sprint 7)'",
     "test": "vitest run",
