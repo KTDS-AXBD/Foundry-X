@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GIVC Ontology 기반 산업 공급망 인과 예측 엔진 | KT DS</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #111;
+    --gray-900: #222;
+    --gray-700: #444;
+    --gray-600: #666;
+    --gray-400: #999;
+    --gray-300: #ccc;
+    --gray-200: #e5e5e5;
+    --gray-100: #f0f0f0;
+    --gray-50: #f8f9fa;
+    --white: #fff;
+    --accent: #2563eb;
+    --red: #dc2626;
+    --orange: #ea580c;
+    --green: #16a34a;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    color: var(--black);
+    background: var(--white);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 40px;
+    height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  nav .brand { font-weight: 700; font-size: 15px; letter-spacing: -0.02em; color: var(--black); }
+  nav .brand span { color: var(--gray-400); font-weight: 400; margin-left: 8px; font-size: 13px; }
+  nav ul { list-style: none; display: flex; gap: 28px; }
+  nav ul li a {
+    text-decoration: none; color: var(--gray-600); font-size: 13px; font-weight: 500;
+    transition: color 0.2s;
+  }
+  nav ul li a:hover { color: var(--black); }
+
+  /* SECTIONS */
+  section { padding: 120px 40px 80px; max-width: 1200px; margin: 0 auto; }
+  section.full-width { max-width: 100%; padding-left: 0; padding-right: 0; }
+
+  .section-label {
+    font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--gray-400); margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: 36px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.3;
+    margin-bottom: 20px; color: var(--black);
+  }
+  .section-sub {
+    font-size: 17px; color: var(--gray-600); line-height: 1.7; max-width: 680px;
+  }
+
+  /* FADE-IN */
+  .fade-in {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ===== HERO ===== */
+  #hero {
+    min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+    padding-top: 56px;
+  }
+  #hero h1 {
+    font-size: 52px; font-weight: 900; letter-spacing: -0.04em; line-height: 1.35;
+    white-space: pre-line; margin-bottom: 28px;
+  }
+  #hero .hero-sub {
+    font-size: 18px; color: var(--gray-600); margin-bottom: 48px; font-weight: 400;
+  }
+  #hero .hero-tag {
+    display: inline-block; font-size: 13px; font-weight: 600;
+    border: 1px solid var(--gray-200); border-radius: 100px; padding: 6px 16px;
+    color: var(--gray-600);
+  }
+
+  /* ===== SECTION 2: CURRENT ===== */
+  #current { background: var(--gray-50); padding-left: 40px; padding-right: 40px; }
+  #current .inner { max-width: 1200px; margin: 0 auto; }
+  .compare-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 48px;
+  }
+  .compare-col { background: var(--white); border-radius: 16px; padding: 36px; border: 1px solid var(--gray-200); }
+  .compare-col.highlight { border-color: var(--black); border-width: 2px; }
+  .compare-col h3 { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
+  .compare-col h3.good { color: var(--gray-600); }
+  .compare-col h3.gap { color: var(--black); }
+  .compare-item {
+    display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px;
+    font-size: 15px; line-height: 1.6;
+  }
+  .compare-item .icon { flex-shrink: 0; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; border-radius: 50%; }
+  .compare-item .icon.check { background: var(--gray-100); color: var(--gray-600); }
+  .compare-item .icon.cross { background: var(--black); color: var(--white); }
+  .bottom-note {
+    margin-top: 48px; padding: 24px 32px; background: var(--white); border-radius: 12px;
+    border-left: 3px solid var(--black); font-size: 15px; color: var(--gray-700); line-height: 1.7;
+  }
+
+  /* ===== SECTION 3: SOLUTION ===== */
+  .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 48px; }
+  .ba-card {
+    border: 1px solid var(--gray-200); border-radius: 16px; padding: 36px; background: var(--white);
+  }
+  .ba-card .ba-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 24px; color: var(--gray-400);
+  }
+  .ba-card.after { border-color: var(--black); border-width: 2px; }
+  .ba-card.after .ba-label { color: var(--black); }
+
+  .silo-boxes { display: flex; flex-wrap: wrap; gap: 10px; }
+  .silo-box {
+    padding: 10px 16px; background: var(--gray-100); border-radius: 8px; font-size: 13px;
+    font-weight: 600; color: var(--gray-600); border: 1px solid var(--gray-200);
+  }
+
+  .ontology-network { position: relative; min-height: 280px; display: flex; align-items: center; justify-content: center; }
+  .onto-center {
+    width: 80px; height: 80px; border-radius: 50%; background: var(--black); color: var(--white);
+    display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;
+    position: relative; z-index: 2;
+  }
+  .onto-nodes { position: absolute; width: 100%; height: 100%; }
+  .onto-node {
+    position: absolute; padding: 8px 14px; background: var(--white); border: 1.5px solid var(--gray-300);
+    border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--gray-700); white-space: nowrap;
+  }
+  .onto-node:nth-child(1) { top: 5%; left: 50%; transform: translateX(-50%); }
+  .onto-node:nth-child(2) { top: 20%; right: 5%; }
+  .onto-node:nth-child(3) { top: 55%; right: 2%; }
+  .onto-node:nth-child(4) { bottom: 5%; right: 20%; }
+  .onto-node:nth-child(5) { bottom: 5%; left: 20%; }
+  .onto-node:nth-child(6) { top: 55%; left: 2%; }
+
+  .onto-entity {
+    margin-top: 48px; padding: 36px; background: var(--gray-50); border-radius: 16px; border: 1px solid var(--gray-200);
+  }
+  .onto-entity h4 { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
+  .entity-tree { font-family: 'Pretendard', monospace; font-size: 14px; line-height: 2.2; color: var(--gray-700); }
+  .entity-tree .root { font-weight: 700; color: var(--black); font-size: 16px; }
+  .entity-tree .branch { padding-left: 28px; border-left: 2px solid var(--gray-200); margin-left: 12px; }
+  .entity-tree .leaf { position: relative; padding-left: 20px; }
+  .entity-tree .leaf::before { content: ''; position: absolute; left: -2px; top: 50%; width: 16px; height: 0; border-top: 2px solid var(--gray-200); }
+
+  .palantir-note {
+    margin-top: 32px; font-size: 15px; color: var(--gray-600); line-height: 1.8; max-width: 720px;
+  }
+
+  /* ===== SECTION 4: SCENARIOS ===== */
+  #scenarios { background: var(--gray-50); padding-left: 40px; padding-right: 40px; }
+  #scenarios .inner { max-width: 1200px; margin: 0 auto; }
+
+  .scenario-card {
+    background: var(--white); border: 1px solid var(--gray-200); border-radius: 20px;
+    padding: 48px; margin-bottom: 32px; transition: box-shadow 0.3s;
+  }
+  .scenario-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.06); }
+  .scenario-num { font-size: 12px; font-weight: 700; color: var(--gray-400); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .scenario-title { font-size: 22px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.02em; }
+  .scenario-q {
+    font-size: 17px; color: var(--gray-700); margin-bottom: 32px; padding: 20px 24px;
+    background: var(--gray-50); border-radius: 12px; border-left: 3px solid var(--black);
+    line-height: 1.7;
+  }
+
+  /* Flow diagram */
+  .flow-diagram { margin: 32px 0; overflow-x: auto; }
+  .flow-row { display: flex; align-items: center; gap: 0; margin-bottom: 12px; flex-wrap: nowrap; }
+  .flow-node {
+    padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .flow-node.source { background: var(--black); color: var(--white); }
+  .flow-node.mid { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200); }
+  .flow-node.end { background: var(--white); color: var(--black); border: 2px solid var(--black); }
+  .flow-arrow { width: 32px; text-align: center; color: var(--gray-400); font-size: 14px; flex-shrink: 0; }
+
+  .scenario-result {
+    margin-top: 24px; padding: 20px 24px; background: var(--gray-50); border-radius: 12px;
+    font-size: 14px; color: var(--gray-600); line-height: 1.7;
+  }
+  .scenario-result strong { color: var(--black); }
+  .scenario-data {
+    margin-top: 12px; font-size: 12px; color: var(--gray-400); font-weight: 500;
+  }
+
+  /* Mock table for S2 */
+  .mock-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+  .mock-table th {
+    text-align: left; padding: 12px 16px; background: var(--gray-50); font-weight: 600;
+    border-bottom: 2px solid var(--gray-200); font-size: 13px; color: var(--gray-600);
+  }
+  .mock-table td { padding: 14px 16px; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); }
+  .dep-bar { height: 6px; border-radius: 3px; background: var(--gray-200); width: 100%; max-width: 120px; position: relative; }
+  .dep-bar-fill { height: 100%; border-radius: 3px; background: var(--black); }
+  .dep-label { font-size: 12px; font-weight: 600; margin-top: 4px; }
+
+  /* Cascade for S3 */
+  .cascade-list { margin: 24px 0; }
+  .cascade-item {
+    display: flex; align-items: center; gap: 16px; padding: 14px 20px;
+    border-radius: 12px; margin-bottom: 8px; background: var(--white); border: 1px solid var(--gray-200);
+  }
+  .cascade-alert { font-size: 18px; flex-shrink: 0; }
+  .cascade-path { flex: 1; font-size: 14px; font-weight: 500; color: var(--gray-700); }
+  .cascade-path span { color: var(--gray-400); margin: 0 8px; }
+  .severity {
+    padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+  .severity.high { background: #fef2f2; color: var(--red); }
+  .severity.medium { background: #fffbeb; color: var(--orange); }
+  .severity.low { background: #f0fdf4; color: var(--green); }
+
+  /* Risk dashboard S4 */
+  .risk-cards { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 24px 0; }
+  .risk-card {
+    display: grid; grid-template-columns: 160px 1fr 140px 140px; gap: 16px;
+    align-items: center; padding: 20px 24px; border: 1px solid var(--gray-200);
+    border-radius: 12px; background: var(--white);
+  }
+  .risk-name { font-size: 14px; font-weight: 700; }
+  .risk-bar-wrap { }
+  .risk-bar { height: 8px; background: var(--gray-100); border-radius: 4px; overflow: hidden; }
+  .risk-bar-inner { height: 100%; border-radius: 4px; }
+  .risk-bar-inner.danger { background: var(--red); }
+  .risk-bar-inner.critical { background: var(--black); }
+  .risk-bar-inner.warn { background: var(--orange); }
+  .risk-dep { font-size: 12px; margin-top: 4px; color: var(--gray-600); }
+  .risk-badge {
+    font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; text-align: center;
+  }
+  .risk-badge.danger { background: #fef2f2; color: var(--red); }
+  .risk-badge.critical { background: var(--black); color: var(--white); }
+  .risk-badge.warn { background: #fffbeb; color: var(--orange); }
+  .risk-stat { font-size: 13px; color: var(--gray-600); text-align: center; }
+  .risk-stat strong { display: block; font-size: 20px; color: var(--black); }
+
+  /* ===== SECTION 5: TRENDS ===== */
+  .trend-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin: 48px 0 32px; }
+  .trend-card {
+    padding: 28px 24px; border: 1px solid var(--gray-200); border-radius: 16px;
+    background: var(--white); text-align: center;
+  }
+  .trend-logo { font-size: 18px; font-weight: 800; margin-bottom: 12px; color: var(--black); letter-spacing: -0.02em; }
+  .trend-desc { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+  .trend-badge {
+    display: inline-block; margin-top: 12px; font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 100px; background: var(--gray-100); color: var(--gray-600);
+  }
+  .key-stat {
+    text-align: center; padding: 32px; background: var(--gray-50); border-radius: 16px;
+    margin: 32px 0; border: 1px solid var(--gray-200);
+  }
+  .key-stat p { font-size: 18px; font-weight: 700; color: var(--black); line-height: 1.6; }
+  .key-stat .emphasis { font-size: 14px; font-weight: 500; color: var(--gray-600); margin-top: 8px; }
+
+  .compare-table { width: 100%; border-collapse: collapse; margin: 32px 0; font-size: 14px; }
+  .compare-table th {
+    padding: 14px 20px; text-align: left; font-weight: 600; font-size: 13px;
+    background: var(--gray-50); border-bottom: 2px solid var(--gray-200); color: var(--gray-600);
+  }
+  .compare-table td { padding: 16px 20px; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); }
+  .compare-table td:first-child { font-weight: 600; color: var(--black); }
+  .compare-table .ours { background: var(--gray-50); }
+
+  /* ===== SECTION 6: PROPOSAL ===== */
+  #proposal { background: var(--gray-50); padding-left: 40px; padding-right: 40px; }
+  #proposal .inner { max-width: 1200px; margin: 0 auto; }
+
+  .proposal-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 40px 0; }
+  .proposal-box {
+    padding: 28px; border-radius: 16px; background: var(--white); border: 1px solid var(--gray-200); text-align: center;
+  }
+  .proposal-box .val { font-size: 32px; font-weight: 900; color: var(--black); letter-spacing: -0.03em; }
+  .proposal-box .label { font-size: 13px; color: var(--gray-600); margin-top: 4px; }
+
+  .timeline { margin: 48px 0; position: relative; }
+  .timeline::before {
+    content: ''; position: absolute; top: 24px; left: 0; right: 0; height: 3px;
+    background: var(--gray-200);
+  }
+  .tl-items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
+  .tl-item { text-align: center; padding-top: 48px; position: relative; }
+  .tl-item::before {
+    content: ''; position: absolute; top: 18px; left: 50%; transform: translateX(-50%);
+    width: 14px; height: 14px; border-radius: 50%; background: var(--black); border: 3px solid var(--white);
+    box-shadow: 0 0 0 2px var(--black);
+  }
+  .tl-week { font-size: 12px; font-weight: 700; color: var(--gray-400); margin-bottom: 8px; }
+  .tl-label { font-size: 14px; font-weight: 600; color: var(--black); line-height: 1.5; }
+  .tl-desc { font-size: 12px; color: var(--gray-600); margin-top: 4px; line-height: 1.5; }
+
+  .infra-note {
+    margin-top: 40px; padding: 24px 32px; background: var(--white); border-radius: 12px;
+    border: 1px solid var(--gray-200); font-size: 15px; color: var(--gray-700); line-height: 1.7;
+  }
+
+  /* ===== SECTION 7: ROADMAP ===== */
+  .roadmap-visual { margin: 48px 0; overflow-x: auto; }
+  .roadmap-track {
+    display: flex; align-items: stretch; min-width: 900px; position: relative;
+    padding: 40px 0 20px;
+  }
+  .roadmap-track::before {
+    content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 3px;
+    background: var(--gray-200); transform: translateY(-50%);
+  }
+  .rm-phase {
+    flex: 1; position: relative; text-align: center; padding: 0 12px;
+  }
+  .rm-dot {
+    width: 16px; height: 16px; border-radius: 50%; background: var(--black);
+    margin: 0 auto 16px; position: relative; z-index: 2;
+    border: 3px solid var(--white); box-shadow: 0 0 0 2px var(--black);
+  }
+  .rm-date { font-size: 13px; font-weight: 700; color: var(--black); margin-bottom: 6px; }
+  .rm-label { font-size: 14px; font-weight: 600; color: var(--gray-700); line-height: 1.5; }
+  .rm-desc { font-size: 12px; color: var(--gray-400); margin-top: 4px; line-height: 1.5; }
+
+  .milestone-list { margin-top: 32px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+  .milestone {
+    padding: 20px; border: 1px solid var(--gray-200); border-radius: 12px; background: var(--white);
+  }
+  .milestone .ms-date { font-size: 12px; font-weight: 700; color: var(--gray-400); margin-bottom: 4px; }
+  .milestone .ms-text { font-size: 14px; font-weight: 600; color: var(--black); line-height: 1.5; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    padding: 60px 40px; text-align: center; border-top: 1px solid var(--gray-200);
+    background: var(--gray-50);
+  }
+  footer .ft-brand { font-size: 15px; font-weight: 700; color: var(--black); margin-bottom: 8px; }
+  footer .ft-sub { font-size: 13px; color: var(--gray-400); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    section { padding: 80px 20px 60px; }
+    #hero h1 { font-size: 32px; }
+    .section-title { font-size: 28px; }
+    .compare-grid, .ba-grid { grid-template-columns: 1fr; }
+    .trend-grid { grid-template-columns: 1fr 1fr; }
+    .proposal-meta { grid-template-columns: 1fr; }
+    .tl-items { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .tl-item::before { display: none; }
+    .timeline::before { display: none; }
+    .risk-card { grid-template-columns: 1fr; gap: 8px; }
+    nav ul { display: none; }
+    .flow-row { flex-wrap: wrap; }
+    .roadmap-track { min-width: 0; flex-wrap: wrap; gap: 24px; }
+    .roadmap-track::before { display: none; }
+    .rm-phase { flex: none; width: 45%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <div class="brand">KT DS<span>|  Ontology 기반 의사결정 지원</span></div>
+  <ul>
+    <li><a href="#hero">소개</a></li>
+    <li><a href="#current">현재 상황</a></li>
+    <li><a href="#solution">해결 방향</a></li>
+    <li><a href="#scenarios">시나리오</a></li>
+    <li><a href="#trends">글로벌 트렌드</a></li>
+    <li><a href="#proposal">제안</a></li>
+    <li><a href="#roadmap">로드맵</a></li>
+  </ul>
+</nav>
+
+<!-- SECTION 1: HERO -->
+<section id="hero">
+  <div class="fade-in">
+    <div class="hero-tag">한국기계산업진흥회 &middot; GIVC 고도화 제안</div>
+    <h1>GIVC 데이터를 연결하면,
+'만약 ~하면?'에
+답할 수 있습니다</h1>
+    <p class="hero-sub">Ontology 기반 산업 공급망 인과 예측 엔진</p>
+  </div>
+</section>
+
+<!-- SECTION 2: CURRENT -->
+<section id="current" class="full-width" style="background:var(--gray-50);">
+  <div class="inner fade-in">
+    <p class="section-label">Current State</p>
+    <h2 class="section-title">chatGIVC가 잘 하는 것,<br>아직 안 되는 것</h2>
+
+    <div class="compare-grid">
+      <div class="compare-col">
+        <h3 class="good">잘 하는 것</h3>
+        <div class="compare-item"><div class="icon check">&#10003;</div><div>SQL 자동생성으로 과거 데이터 조회 &middot; 분석</div></div>
+        <div class="compare-item"><div class="icon check">&#10003;</div><div>품목 자동분류 (TA + sLLM)</div></div>
+        <div class="compare-item"><div class="icon check">&#10003;</div><div>보고서 &middot; 문서 RAG 질의응답</div></div>
+        <div class="compare-item"><div class="icon check">&#10003;</div><div>시각화 (표 &middot; 차트)</div></div>
+        <div class="compare-item"><div class="icon check">&#10003;</div><div>품목코드 검색 &middot; 추천</div></div>
+      </div>
+
+      <div class="compare-col highlight">
+        <h3 class="gap">아직 안 되는 것</h3>
+        <div class="compare-item"><div class="icon cross">&times;</div><div>품목 간 인과관계 / 공급망 연결</div></div>
+        <div class="compare-item"><div class="icon cross">&times;</div><div>"만약 ~하면?" 시나리오 예측</div></div>
+        <div class="compare-item"><div class="icon cross">&times;</div><div>글로벌 이벤트 &rarr; 산업 파급효과 추적</div></div>
+        <div class="compare-item"><div class="icon cross">&times;</div><div>왜 이 품목이 영향받는지 "설명"</div></div>
+        <div class="compare-item"><div class="icon cross">&times;</div><div>선제적 경보 &rarr; 정책 대응 추천</div></div>
+      </div>
+    </div>
+
+    <div class="bottom-note">
+      이건 chatGIVC의 한계가 아닙니다.<br>
+      <strong>데이터가 아직 '연결'되지 않았기 때문입니다.</strong>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 3: SOLUTION -->
+<section id="solution">
+  <div class="fade-in">
+    <p class="section-label">Solution</p>
+    <h2 class="section-title">데이터는 이미 있습니다.<br>연결만 하면 됩니다</h2>
+
+    <div class="ba-grid">
+      <div class="ba-card">
+        <div class="ba-label">Before</div>
+        <p style="font-size:14px;color:var(--gray-600);margin-bottom:20px;">개별 데이터 사일로 — 연결 없음</p>
+        <div class="silo-boxes">
+          <div class="silo-box">무역</div>
+          <div class="silo-box">산업</div>
+          <div class="silo-box">R&amp;D</div>
+          <div class="silo-box">EWS</div>
+          <div class="silo-box">GIVC</div>
+          <div class="silo-box">보고서</div>
+        </div>
+      </div>
+
+      <div class="ba-card after">
+        <div class="ba-label">After</div>
+        <p style="font-size:14px;color:var(--gray-700);margin-bottom:20px;">Ontology로 모든 데이터가 연결됨</p>
+        <div class="ontology-network">
+          <div class="onto-nodes">
+            <div class="onto-node">무역</div>
+            <div class="onto-node">산업</div>
+            <div class="onto-node">R&amp;D</div>
+            <div class="onto-node">보고서</div>
+            <div class="onto-node">EWS</div>
+            <div class="onto-node">GIVC</div>
+          </div>
+          <div class="onto-center">Ontology</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="onto-entity">
+      <h4>Ontology 엔터티 구조</h4>
+      <div class="entity-tree">
+        <div class="root">품목 (중심)</div>
+        <div class="branch">
+          <div class="leaf">산업</div>
+          <div class="leaf">국가</div>
+          <div class="leaf">기업 (소부장넷)</div>
+          <div class="leaf">기술</div>
+          <div class="leaf">R&amp;D 과제</div>
+          <div class="leaf">이벤트</div>
+          <div class="leaf">경보 (EWS)</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="palantir-note">
+      AI에게 '이 문서 읽어봐'가 아니라 <strong>'이 품목의 관계를 봐'</strong>라고 주는 것입니다.<br>
+      Palantir가 전 세계에서 하는 것과 같은 구조를, 귀사 데이터에 맞춤화합니다.
+    </p>
+  </div>
+</section>
+
+<!-- SECTION 4: SCENARIOS -->
+<section id="scenarios" class="full-width" style="background:var(--gray-50);">
+  <div class="inner">
+    <div class="fade-in">
+      <p class="section-label">Scenarios</p>
+      <h2 class="section-title">귀사 데이터로<br>이런 분석이 가능합니다</h2>
+      <p class="section-sub" style="margin-bottom:48px;">4개 핵심 시나리오 — chatGIVC에 Ontology를 연결했을 때의 모습입니다.</p>
+    </div>
+
+    <!-- S1 -->
+    <div class="scenario-card fade-in">
+      <div class="scenario-num">Scenario 01</div>
+      <div class="scenario-title">글로벌 이벤트 &rarr; 산업 영향 연쇄 분석</div>
+      <div class="scenario-q">
+        "중동 분쟁으로 원유 공급이 30% 감소하면, 한국 산업에 어떤 영향이 어디까지 퍼질까?"
+      </div>
+
+      <div class="flow-diagram">
+        <!-- Row 1 -->
+        <div class="flow-row">
+          <div class="flow-node source">원유 (원재료)</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node mid">나프타</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node mid">에틸렌</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node mid">PE / PP</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node mid">합성수지</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node end">자동차 부품</div>
+        </div>
+        <!-- Row 2 -->
+        <div class="flow-row">
+          <div class="flow-node source" style="visibility:hidden;">원유 (원재료)</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node mid">프로필렌</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node mid">합성고무</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node end">타이어</div>
+        </div>
+        <!-- Row 3 -->
+        <div class="flow-row">
+          <div class="flow-node source" style="visibility:hidden;">원유 (원재료)</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node mid">BTX</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node mid">합성섬유</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node end">의류</div>
+        </div>
+        <!-- Row 4 -->
+        <div class="flow-row">
+          <div class="flow-node source" style="visibility:hidden;">원유 (원재료)</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node mid">휘발유 / 경유</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node mid">물류비 상승</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node end">전 산업 영향</div>
+        </div>
+      </div>
+
+      <div class="scenario-result">
+        <strong>분석 결과:</strong> 영향 산업 연쇄맵 + 각 단계 영향도 + '왜 영향받는지' 인과 경로 + 출처 데이터 링크
+      </div>
+      <div class="scenario-data">활용 데이터: GIVC 품목 2,443개 + 무역 데이터 + 산업 데이터</div>
+    </div>
+
+    <!-- S2 -->
+    <div class="scenario-card fade-in">
+      <div class="scenario-num">Scenario 02</div>
+      <div class="scenario-title">수입 의존 품목 대체 공급처 탐색</div>
+      <div class="scenario-q">
+        "중국 의존도 80% 이상인 품목, 대안은 어디에?"
+      </div>
+
+      <table class="mock-table">
+        <thead>
+          <tr>
+            <th>품목</th>
+            <th>중국 의존도</th>
+            <th>대체 공급처</th>
+            <th>국내 생산 기업</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;">희토류 영구자석</td>
+            <td>
+              <div class="dep-bar"><div class="dep-bar-fill" style="width:85%;"></div></div>
+              <div class="dep-label">85%</div>
+            </td>
+            <td>
+              <span style="font-size:13px;">베트남 (품질 ◐, 물량 ○)<br>인도 (품질 ○, 물량 ◐)</span>
+            </td>
+            <td>
+              <span style="font-size:13px;">A사 (생산규모 ○, 인증 ○)<br>B사 (규모 △)</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">리튬 전구체</td>
+            <td>
+              <div class="dep-bar"><div class="dep-bar-fill" style="width:92%;"></div></div>
+              <div class="dep-label">92%</div>
+            </td>
+            <td>
+              <span style="font-size:13px;">칠레 (품질 ○, 물량 ○)<br>호주 (품질 ○, 물량 ◐)</span>
+            </td>
+            <td>
+              <span style="font-size:13px;">C사 (생산규모 ◐, 인증 ○)</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">흑연 음극재</td>
+            <td>
+              <div class="dep-bar"><div class="dep-bar-fill" style="width:80%;"></div></div>
+              <div class="dep-label">80%</div>
+            </td>
+            <td>
+              <span style="font-size:13px;">모잠비크 (품질 ◐, 물량 ○)<br>캐나다 (품질 ○, 물량 △)</span>
+            </td>
+            <td>
+              <span style="font-size:13px;">D사 (생산규모 ○, 인증 △)<br>E사 (규모 △)</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="scenario-result">
+        <strong>분석 결과:</strong> 의존도 맵 + 대체 공급처 후보 + 품질/물량 평가 + 국내 기업 매칭
+      </div>
+      <div class="scenario-data">활용 데이터: 무역 데이터 + 소부장넷 기업 정보</div>
+    </div>
+
+    <!-- S3 -->
+    <div class="scenario-card fade-in">
+      <div class="scenario-num">Scenario 03</div>
+      <div class="scenario-title">EWS 경보 &rarr; 영향 산업군 자동 식별</div>
+      <div class="scenario-q">
+        "'철강 가격 급등' 경보가 뜨면, 어떤 산업이 연쇄적으로 영향받을까?"
+      </div>
+
+      <div class="cascade-list">
+        <div class="cascade-item" style="border-left:3px solid var(--black); background:var(--gray-50);">
+          <div class="cascade-alert">&#9888;</div>
+          <div class="cascade-path" style="font-weight:700;color:var(--black);">철강 가격 급등 경보 발령</div>
+          <div class="severity high" style="background:var(--black);color:var(--white);">ALERT</div>
+        </div>
+        <div class="cascade-item">
+          <div class="cascade-alert" style="opacity:0.3;">&#9492;</div>
+          <div class="cascade-path">자동차용 강판 <span>&rarr;</span> <strong>자동차 산업</strong></div>
+          <div class="severity high">HIGH</div>
+        </div>
+        <div class="cascade-item">
+          <div class="cascade-alert" style="opacity:0.3;">&#9492;</div>
+          <div class="cascade-path">건설용 형강 <span>&rarr;</span> <strong>건설 산업</strong></div>
+          <div class="severity high">HIGH</div>
+        </div>
+        <div class="cascade-item">
+          <div class="cascade-alert" style="opacity:0.3;">&#9492;</div>
+          <div class="cascade-path">조선용 후판 <span>&rarr;</span> <strong>조선 산업</strong></div>
+          <div class="severity medium">MEDIUM</div>
+        </div>
+        <div class="cascade-item">
+          <div class="cascade-alert" style="opacity:0.3;">&#9492;</div>
+          <div class="cascade-path">가전용 냉연 <span>&rarr;</span> <strong>가전 산업</strong></div>
+          <div class="severity low">LOW</div>
+        </div>
+      </div>
+
+      <div class="scenario-result">
+        <strong>분석 결과:</strong> 영향 산업 목록 + 강도(H/M/L) + 예상 시차 + 과거 유사 경보 비교
+      </div>
+      <div class="scenario-data">활용 데이터: EWS 경보 데이터 + GIVC 품목 관계 + 산업 데이터</div>
+    </div>
+
+    <!-- S4 -->
+    <div class="scenario-card fade-in">
+      <div class="scenario-num">Scenario 04</div>
+      <div class="scenario-title">글로벌 공급망 리스크맵</div>
+      <div class="scenario-q">
+        "반도체 소재의 국가별 &middot; 기술별 리스크 지도는?"
+      </div>
+
+      <div class="risk-cards">
+        <div class="risk-card">
+          <div class="risk-name">포토레지스트</div>
+          <div class="risk-bar-wrap">
+            <div class="risk-bar"><div class="risk-bar-inner danger" style="width:90%;"></div></div>
+            <div class="risk-dep">일본 90% 의존</div>
+          </div>
+          <div class="risk-badge danger">위험</div>
+          <div class="risk-stat">국내 R&amp;D <strong>3건</strong> 자립도 15%</div>
+        </div>
+        <div class="risk-card">
+          <div class="risk-name">EUV 펠리클</div>
+          <div class="risk-bar-wrap">
+            <div class="risk-bar"><div class="risk-bar-inner critical" style="width:95%;"></div></div>
+            <div class="risk-dep">일본 95% 의존</div>
+          </div>
+          <div class="risk-badge critical">심각</div>
+          <div class="risk-stat">국내 R&amp;D <strong>1건</strong> 자립도 5%</div>
+        </div>
+        <div class="risk-card">
+          <div class="risk-name">CMP 슬러리</div>
+          <div class="risk-bar-wrap">
+            <div class="risk-bar"><div class="risk-bar-inner warn" style="width:60%;"></div></div>
+            <div class="risk-dep">미국 60% 의존</div>
+          </div>
+          <div class="risk-badge warn">주의</div>
+          <div class="risk-stat">국내 R&amp;D <strong>5건</strong> 자립도 35%</div>
+        </div>
+      </div>
+
+      <div class="scenario-result">
+        <strong>분석 결과:</strong> 국가별 의존도 맵 + 리스크 등급 + R&amp;D 현황 + 자립도 지표 + 대응 우선순위
+      </div>
+      <div class="scenario-data">활용 데이터: 무역 데이터 + R&amp;D 과제 정보 + 소부장넷 기업 데이터</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 5: TRENDS -->
+<section id="trends">
+  <div class="fade-in">
+    <p class="section-label">Global Trends</p>
+    <h2 class="section-title">세계는 이미 이 방향입니다</h2>
+
+    <div class="trend-grid">
+      <div class="trend-card">
+        <div class="trend-logo">Palantir</div>
+        <div class="trend-desc">Ontology + AIP<br>정부 &middot; 국방 &middot; 산업 전반</div>
+        <div class="trend-badge">Global Leader</div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-logo">Blue Yonder</div>
+        <div class="trend-desc">Supply Chain KG<br>+ 5개 AI Agent</div>
+        <div class="trend-badge">2025 Gartner Leader</div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-logo">o9 Solutions</div>
+        <div class="trend-desc">Enterprise KG<br>+ Digital Brain</div>
+        <div class="trend-badge">2025 Gartner Leader</div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-logo">Resilinc</div>
+        <div class="trend-desc">15년+ 공급업체 KG<br>+ Agentic AI</div>
+        <div class="trend-badge">2025 Gartner Leader</div>
+      </div>
+    </div>
+
+    <div class="key-stat">
+      <p>2025년 Gartner 리더 3사가 모두<br>'Knowledge Graph + AI Agent' 구조를 채택했습니다</p>
+      <p class="emphasis">한국 정부기관 중 이 구조를 도입한 곳은 아직 없습니다.</p>
+    </div>
+
+    <p style="font-size:15px;color:var(--gray-600);margin-bottom:24px;font-weight:600;">같은 철학, 현실적 접근</p>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Palantir 방식</th>
+          <th class="ours" style="color:var(--black);">KT DS 제안</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>비용</td>
+          <td>100억 이상</td>
+          <td class="ours" style="font-weight:700;">~1억 (PoC)</td>
+        </tr>
+        <tr>
+          <td>기간</td>
+          <td>6~12개월</td>
+          <td class="ours" style="font-weight:700;">6~8주</td>
+        </tr>
+        <tr>
+          <td>데이터 주권</td>
+          <td>해외 클라우드</td>
+          <td class="ours" style="font-weight:700;">국내 On-premise</td>
+        </tr>
+        <tr>
+          <td>도메인 전문성</td>
+          <td>범용</td>
+          <td class="ours" style="font-weight:700;">한국어 도메인 전문가</td>
+        </tr>
+        <tr>
+          <td>인프라</td>
+          <td>신규 구축 필요</td>
+          <td class="ours" style="font-weight:700;">chatGIVC 인프라 활용<br><span style="font-size:12px;color:var(--gray-400);">(AI:ON-U, sLLM, 공통플랫폼)</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 6: PROPOSAL -->
+<section id="proposal" class="full-width" style="background:var(--gray-50);">
+  <div class="inner fade-in">
+    <p class="section-label">Proposal</p>
+    <h2 class="section-title">제안 구조</h2>
+
+    <div class="proposal-meta">
+      <div class="proposal-box">
+        <div class="val">4개 시나리오</div>
+        <div class="label">PoC 범위</div>
+      </div>
+      <div class="proposal-box">
+        <div class="val">~1억</div>
+        <div class="label">예상 비용</div>
+      </div>
+      <div class="proposal-box">
+        <div class="val">6~8주</div>
+        <div class="label">소요 기간</div>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-items">
+        <div class="tl-item">
+          <div class="tl-week">Week 1-2</div>
+          <div class="tl-label">Ontology 모델 설계</div>
+          <div class="tl-desc">GIVC 품목 관계 정의</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-week">Week 3-4</div>
+          <div class="tl-label">Knowledge Graph 구축</div>
+          <div class="tl-desc">데이터 연결</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-week">Week 5-6</div>
+          <div class="tl-label">Domain Agent 개발</div>
+          <div class="tl-desc">4개 시나리오 구현</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-week">Week 7-8</div>
+          <div class="tl-label">통합 데모 + 본사업 설계</div>
+          <div class="tl-desc">결과 보고 및 확장안</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="infra-note">
+      chatGIVC 인프라(AI:ON-U, sLLM, 공통플랫폼)를 활용하므로 <strong>빠른 착수가 가능합니다.</strong>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 7: ROADMAP -->
+<section id="roadmap">
+  <div class="fade-in">
+    <p class="section-label">Roadmap</p>
+    <h2 class="section-title">사업화 로드맵</h2>
+
+    <div class="roadmap-visual">
+      <div class="roadmap-track">
+        <div class="rm-phase">
+          <div class="rm-dot"></div>
+          <div class="rm-date">'26.05</div>
+          <div class="rm-label">유상 PoC 착수</div>
+          <div class="rm-desc">6~8주 집중 개발</div>
+        </div>
+        <div class="rm-phase">
+          <div class="rm-dot"></div>
+          <div class="rm-date">'26.06</div>
+          <div class="rm-label">내년도 예산 제출</div>
+          <div class="rm-desc">산업부 예산 반영</div>
+        </div>
+        <div class="rm-phase">
+          <div class="rm-dot"></div>
+          <div class="rm-date">'26.07~08</div>
+          <div class="rm-label">PoC 결과 보고</div>
+          <div class="rm-desc">4개 시나리오 데모</div>
+        </div>
+        <div class="rm-phase">
+          <div class="rm-dot"></div>
+          <div class="rm-date">'27</div>
+          <div class="rm-label">본사업</div>
+          <div class="rm-desc">GIVC KG 전체 구축<br>+ 운영 시스템</div>
+        </div>
+        <div class="rm-phase">
+          <div class="rm-dot"></div>
+          <div class="rm-date">'28~</div>
+          <div class="rm-label">확장 &middot; 고도화</div>
+          <div class="rm-desc">시나리오 확장<br>+ 고도화</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="milestone-list">
+      <div class="milestone">
+        <div class="ms-date">'26.05</div>
+        <div class="ms-text">PoC 착수</div>
+      </div>
+      <div class="milestone">
+        <div class="ms-date">'26.06</div>
+        <div class="ms-text">내년도 예산 제출 (산업부)</div>
+      </div>
+      <div class="milestone">
+        <div class="ms-date">'26.07~08</div>
+        <div class="ms-text">PoC 결과 보고</div>
+      </div>
+      <div class="milestone">
+        <div class="ms-date">'27</div>
+        <div class="ms-text">본사업 — GIVC KG 전체 구축 + 운영 시스템</div>
+      </div>
+      <div class="milestone">
+        <div class="ms-date">'28~</div>
+        <div class="ms-text">시나리오 확장 + 고도화</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-brand">KT DS &middot; Ontology 기반 의사결정 지원</div>
+  <div class="ft-sub">문의: [담당자 연락처]</div>
+</footer>
+
+<!-- SCROLL ANIMATION -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade-in').forEach(function(el) {
+    observer.observe(el);
+  });
+
+  // Smooth scroll for nav links
+  document.querySelectorAll('nav a[href^="#"]').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      var target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -105,7 +105,7 @@ export function Component() {
             <span className="font-medium text-sm">GIVC Ontology 기반 산업 공급망 인과 예측 엔진</span>
             <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium">피치덱</span>
           </div>
-          <p className="text-xs text-muted-foreground mt-0.5">한국기계산업진흥회 chatGIVC 고도화 제안 — v0.2</p>
+          <p className="text-xs text-muted-foreground mt-0.5">한국기계산업진흥회 chatGIVC 고도화 제안 — v0.9</p>
         </div>
         <ArrowRight className="size-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
       </Link>
