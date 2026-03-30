@@ -201,7 +201,7 @@ references: "[[FX-PLAN-013]], [[FX-DSGN-013]]"
 
 - [x] **배포 완료**: fx.minu.best (HTTP 200, 2026-03-30)
 - [x] **모니터링**: Cloudflare Analytics 활성화
-- [ ] **Changelog 업데이트**: `docs/04-report/changelog.md` (v0.1.0 기록)
+- [ ] **Changelog 업데이트**: `docs/changelog.md` (v0.1.0 기록)
 - [ ] **성능 리포트**: 벤치마크 결과를 팀에 공유 (빌드 시간 95% 단축)
 
 ### 8.2 다음 PDCA 사이클 (Phase 8 진행 중)
