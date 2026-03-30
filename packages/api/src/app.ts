@@ -55,6 +55,11 @@ import { commandRegistryRoute } from "./routes/command-registry.js";
 import { partySessionRoute } from "./routes/party-session.js";
 import { specLibraryRoute } from "./routes/spec-library.js";
 import { expansionPackRoute } from "./routes/expansion-pack.js";
+// Sprint 79: BD Pipeline E2E (F232, F233, F239)
+import { pipelineRoute } from "./routes/pipeline.js";
+import { shareLinksRoute } from "./routes/share-links.js";
+import { notificationsRoute } from "./routes/notifications.js";
+import { decisionsRoute } from "./routes/decisions.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -254,6 +259,12 @@ app.route("/api", commandRegistryRoute);
 app.route("/api", partySessionRoute);
 app.route("/api", specLibraryRoute);
 app.route("/api", expansionPackRoute);
+
+// Sprint 79: BD Pipeline E2E (F232, F233, F239)
+app.route("/api", pipelineRoute);
+app.route("/api", shareLinksRoute);
+app.route("/api", notificationsRoute);
+app.route("/api", decisionsRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
