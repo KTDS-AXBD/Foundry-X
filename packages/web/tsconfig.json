@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
+    "types": ["vite/client", "@testing-library/jest-dom"],
     "paths": {
       "@/*": ["./src/*"],
       "@foundry-x/shared": ["../shared/src/index.ts"]
