@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import type { FoundryToSubAppMessage, SubAppToFoundryMessage } from "@foundry-x/shared";
 import { ServiceLoadingSkeleton } from "./ServiceLoadingSkeleton";
 import { ServiceErrorBoundary } from "./ServiceErrorBoundary";
@@ -23,7 +23,7 @@ export function ServiceContainer({
   projectId,
   orgId,
 }: ServiceContainerProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +56,7 @@ export function ServiceContainer({
           break;
         case "FX_NAVIGATE":
           if (data.path && data.path.startsWith("/")) {
-            router.push(data.path);
+            navigate(data.path);
           }
           break;
         case "FX_ERROR":

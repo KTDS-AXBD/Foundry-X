@@ -1,8 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { setupPassword, googleLoginWithInvitation, ApiError } from "@/lib/api-client";
 
 const GOOGLE_CLIENT_ID =
-  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+  import.meta.env.VITE_GOOGLE_CLIENT_ID ||
   "1031483998824-at4tpreaq2b6b1meh3eli23ttt4cq3dn.apps.googleusercontent.com";
 
 interface InviteFormProps {
@@ -63,7 +62,7 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 export function InviteForm({ email, orgName, role, token }: InviteFormProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
@@ -79,7 +78,7 @@ export function InviteForm({ email, orgName, role, token }: InviteFormProps) {
         localStorage.setItem("token", data.accessToken);
         localStorage.setItem("refreshToken", data.refreshToken);
         localStorage.setItem("user", JSON.stringify(data.user));
-        router.push("/getting-started");
+        navigate("/getting-started");
       } catch (err) {
         if (err instanceof ApiError && err.status === 409) {
           setError("이미 계정이 있어요. 로그인 후 초대를 수락하세요.");
@@ -89,7 +88,7 @@ export function InviteForm({ email, orgName, role, token }: InviteFormProps) {
         setLoading(false);
       }
     },
-    [token, router],
+    [token, navigate],
   );
 
   const googleBtnRef = useGoogleIdentity(handleGoogleCredential);
@@ -223,7 +222,7 @@ export function InviteForm({ email, orgName, role, token }: InviteFormProps) {
 
         <p className="text-center text-xs text-muted-foreground">
           이미 계정이 있으신가요?{" "}
-          <Link href="/login" className="font-medium text-primary hover:underline">
+          <Link to="/login" className="font-medium text-primary hover:underline">
             로그인 →
           </Link>
         </p>

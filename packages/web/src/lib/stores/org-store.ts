@@ -20,7 +20,7 @@ interface OrgState {
   switchOrg: (orgId: string) => Promise<void>;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
+const BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 function getToken(): string | null {
   return typeof window !== "undefined" ? localStorage.getItem("token") : null;

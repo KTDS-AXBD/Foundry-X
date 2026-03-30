@@ -1,11 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-
-// Mock next/navigation
-vi.mock("next/navigation", () => ({
-  useParams: () => ({ id: "sr-1" }),
-  usePathname: () => "/sr",
-}));
+import { MemoryRouter } from "react-router-dom";
 
 // Mock api-client
 vi.mock("@/lib/api-client", () => ({
@@ -18,7 +13,7 @@ import SrStatsCards from "@/components/feature/SrStatsCards";
 import SrListTable from "@/components/feature/SrListTable";
 import SrWorkflowDag from "@/components/feature/SrWorkflowDag";
 import SrFeedbackDialog from "@/components/feature/SrFeedbackDialog";
-import SrPage from "@/app/(app)/sr/page";
+import { Component as SrPage } from "@/routes/sr";
 import { fetchSrList, fetchSrStats } from "@/lib/api-client";
 import type { SrStatsResponse, SrItem, SrWorkflowNodeClient } from "@/lib/api-client";
 
@@ -103,13 +98,13 @@ describe("SrListTable", () => {
   };
 
   it("renders SR titles", () => {
-    render(<SrListTable {...defaultProps} />);
+    render(<MemoryRouter><SrListTable {...defaultProps} /></MemoryRouter>);
     expect(screen.getByText("Fix login timeout")).toBeInTheDocument();
     expect(screen.getByText("Update docs")).toBeInTheDocument();
   });
 
   it("shows LLM fallback badge for low confidence", () => {
-    render(<SrListTable {...defaultProps} />);
+    render(<MemoryRouter><SrListTable {...defaultProps} /></MemoryRouter>);
     expect(screen.getByText("LLM 폴백")).toBeInTheDocument();
   });
 });
@@ -165,7 +160,7 @@ describe("SrPage", () => {
   });
 
   it("renders stats and list after loading", async () => {
-    render(<SrPage />);
+    render(<MemoryRouter><SrPage /></MemoryRouter>);
     await waitFor(() => {
       expect(screen.getByText("SR Management")).toBeInTheDocument();
     });

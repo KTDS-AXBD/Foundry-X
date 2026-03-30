@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
+import { useLocation, Link } from "react-router-dom";
 import {
   Inbox,
   Search,
@@ -132,7 +131,7 @@ function findStage(pathname: string): StageInfo | null {
 const STORAGE_PREFIX = "fx-stage-guide-";
 
 export function ProcessStageGuide() {
-  const pathname = usePathname();
+  const { pathname } = useLocation();
   const stage = findStage(pathname);
   const [dismissed, setDismissed] = useState(true); // 기본 숨김 → hydrate 후 표시
 
@@ -184,7 +183,7 @@ export function ProcessStageGuide() {
               </p>
             </div>
             <div className="mt-3 flex items-center gap-2">
-              <Link href={stage.nextAction.href}>
+              <Link to={stage.nextAction.href}>
                 <Button size="sm" variant="outline" className="h-7 text-xs">
                   {stage.nextAction.label}
                   <ArrowRight className="ml-1 size-3" />

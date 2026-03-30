@@ -12,7 +12,7 @@ vi.mock("@/lib/api-client", () => ({
 import QualityMetricCard from "@/components/feature/QualityMetricCard";
 import AgentModelHeatmap from "@/components/feature/AgentModelHeatmap";
 import ModelQualityTab from "@/components/feature/ModelQualityTab";
-import TokensPage from "@/app/(app)/tokens/page";
+import { Component as TokensPage } from "@/routes/tokens";
 import { getModelQuality, getAgentModelMatrix } from "@/lib/api-client";
 
 // ─── Mock Data ───

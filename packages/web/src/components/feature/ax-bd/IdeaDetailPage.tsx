@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import { fetchApi, deleteApi } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,7 +24,7 @@ interface IdeaDetailPageProps {
 }
 
 export default function IdeaDetailPage({ ideaId }: IdeaDetailPageProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [idea, setIdea] = useState<Idea | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +48,7 @@ export default function IdeaDetailPage({ ideaId }: IdeaDetailPageProps) {
     setDeleting(true);
     try {
       await deleteApi(`/ax-bd/ideas/${ideaId}`);
-      router.replace("/ax-bd/ideas");
+      navigate("/ax-bd/ideas", { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "삭제에 실패했어요.");
       setDeleting(false);

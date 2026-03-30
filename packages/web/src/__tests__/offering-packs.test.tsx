@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
 import { fireEvent } from "@testing-library/react";
-import OfferingPacksPage from "../app/(app)/offering-packs/page";
+import { Component as OfferingPacksPage } from "@/routes/offering-packs";
 
 // Mock fetchApi
 vi.mock("../lib/api-client", () => ({
