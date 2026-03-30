@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Menu, X, Anvil } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,7 @@ export function Navbar() {
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5">
+        <Link to="/" className="flex items-center gap-2.5">
           <div className="flex size-8 items-center justify-center rounded-lg bg-axis-primary/10">
             <Anvil className="size-4 text-axis-primary" />
           </div>
@@ -61,7 +61,7 @@ export function Navbar() {
         <div className="hidden items-center gap-3 md:flex">
           <ThemeToggle />
           <Link
-            href="/dashboard"
+            to="/dashboard"
             className="axis-glow inline-flex h-9 items-center rounded-lg bg-axis-primary px-4 text-sm font-semibold text-white transition-all hover:bg-axis-primary-hover"
           >
             Dashboard
@@ -99,7 +99,7 @@ export function Navbar() {
             <div className="mt-2 flex items-center gap-3 border-t border-border/50 pt-3">
               <ThemeToggle />
               <Link
-                href="/dashboard"
+                to="/dashboard"
                 onClick={() => setOpen(false)}
                 className="axis-glow inline-flex h-9 flex-1 items-center justify-center rounded-lg bg-axis-primary text-sm font-semibold text-white"
               >

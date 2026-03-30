@@ -2,7 +2,7 @@
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
 export function GoogleAuthProvider({ children }: { children: React.ReactNode }) {
   if (!GOOGLE_CLIENT_ID) return <>{children}</>;

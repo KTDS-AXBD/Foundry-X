@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, fireEvent } from "@testing-library/react";
-import IrProposalsPage from "../app/(app)/ir-proposals/page";
+import { Component as IrProposalsPage } from "@/routes/ir-proposals";
 import { IrProposalForm } from "../components/feature/ir-proposals/ir-proposal-form";
 
 vi.mock("../lib/api-client", () => ({

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -109,7 +109,7 @@ export default function SrListTable({
               items.map((sr) => (
                 <TableRow key={sr.id} className="cursor-pointer hover:bg-muted/50">
                   <TableCell>
-                    <Link href={`/sr/${sr.id}`} className="font-medium hover:underline">
+                    <Link to={`/sr/${sr.id}`} className="font-medium hover:underline">
                       {sr.title}
                     </Link>
                   </TableCell>

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import SpecGeneratorPage from "../app/(app)/spec-generator/page";
+import { Component as SpecGeneratorPage } from "@/routes/spec-generator";
 
 // Mock api-client (use @/ alias to match page import)
 vi.mock("@/lib/api-client", () => ({

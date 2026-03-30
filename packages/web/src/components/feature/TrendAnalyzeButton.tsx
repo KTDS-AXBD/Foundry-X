@@ -16,7 +16,7 @@ export default function TrendAnalyzeButton({ bizItemId, onComplete }: TrendAnaly
     setError(null);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+      const apiUrl = import.meta.env.VITE_API_URL ?? "";
       const res = await fetch(`${apiUrl}/biz-items/${bizItemId}/trend-report`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

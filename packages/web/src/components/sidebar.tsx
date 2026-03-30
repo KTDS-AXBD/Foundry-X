@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import {
   LayoutDashboard,
@@ -223,7 +223,7 @@ function NavLink({
   const active = pathname === item.href || pathname.startsWith(item.href + "/");
   return (
     <Link
-      href={item.href}
+      to={item.href}
       onClick={onSelect}
       data-tour={item.href.replace("/", "")}
       className={cn(
@@ -308,7 +308,7 @@ function CollapsibleGroup({
 }
 
 function NavLinks({ onSelect }: { onSelect?: () => void }) {
-  const pathname = usePathname();
+  const { pathname } = useLocation();
   const { openGroups, toggle } = useGroupState();
 
   const allGroups = [...processGroups, knowledgeGroup, adminGroup, externalGroup];
@@ -410,7 +410,7 @@ function AuthSection() {
   if (!isAuthenticated) {
     return (
       <Link
-        href="/login"
+        to="/login"
         className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
       >
         <LogIn className="size-4 shrink-0" />
@@ -471,7 +471,7 @@ export function Sidebar() {
             </div>
           </SheetContent>
         </Sheet>
-        <Link href="/dashboard" className="text-sm font-bold font-display">
+        <Link to="/dashboard" className="text-sm font-bold font-display">
           Foundry-X
         </Link>
         <div className="ml-auto">
@@ -485,7 +485,7 @@ export function Sidebar() {
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:w-60 lg:shrink-0 lg:flex-col lg:border-r lg:bg-card">
         <div className="flex h-14 items-center border-b px-4">
-          <Link href="/dashboard" className="text-base font-bold font-display">
+          <Link to="/dashboard" className="text-base font-bold font-display">
             Foundry-X
           </Link>
           <div className="ml-auto">

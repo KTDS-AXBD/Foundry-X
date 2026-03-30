@@ -4,6 +4,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* @fontsource font-family mapping (replaces next/font/google CSS variables) */
+:root {
+    --font-sans: "Plus Jakarta Sans Variable", system-ui, sans-serif;
+    --font-display: "Syne", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono Variable", monospace;
+}
+
 :root {
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);

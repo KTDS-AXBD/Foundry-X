@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
-import MvpTrackingPage from "../app/(app)/mvp-tracking/page";
+import { Component as MvpTrackingPage } from "@/routes/mvp-tracking";
 
 vi.mock("../lib/api-client", () => ({
   fetchApi: vi.fn().mockResolvedValue([]),

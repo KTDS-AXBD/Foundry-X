@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 
 export function OrgSwitcher() {
   const { activeOrgId, orgs, isLoading, fetchOrgs, switchOrg } = useOrgStore();
@@ -77,7 +77,7 @@ export function OrgSwitcher() {
         ))}
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <Link href="/workspace/org/settings" className="flex items-center gap-2">
+          <Link to="/workspace/org/settings" className="flex items-center gap-2">
             <Plus className="size-3.5" />
             <span>Create Organization</span>
           </Link>
