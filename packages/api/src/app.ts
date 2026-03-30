@@ -50,6 +50,11 @@ import { axBdPrototypesRoute } from "./routes/ax-bd-prototypes.js";
 import { axBdViabilityRoute } from "./routes/ax-bd-viability.js";
 import { agentDefinitionRoute } from "./routes/agent-definition.js";
 import { shardDocRoute } from "./routes/shard-doc.js";
+import { contextPassthroughRoute } from "./routes/context-passthrough.js";
+import { commandRegistryRoute } from "./routes/command-registry.js";
+import { partySessionRoute } from "./routes/party-session.js";
+import { specLibraryRoute } from "./routes/spec-library.js";
+import { expansionPackRoute } from "./routes/expansion-pack.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -242,6 +247,13 @@ app.route("/api", axBdViabilityRoute);
 // Sprint 76: F221 Agent-as-Code + F223 Doc Sharding (auth + tenant required)
 app.route("/api", agentDefinitionRoute);
 app.route("/api", shardDocRoute);
+
+// Sprint 77: F224~F228 Ecosystem Reference (auth + tenant required)
+app.route("/api", contextPassthroughRoute);
+app.route("/api", commandRegistryRoute);
+app.route("/api", partySessionRoute);
+app.route("/api", specLibraryRoute);
+app.route("/api", expansionPackRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
