@@ -22,6 +22,8 @@
     --axis-green: oklch(0.62 0.17 145);
     --axis-violet: oklch(0.58 0.2 290);
     --axis-warm: oklch(0.65 0.16 55);
+    --axis-indigo: oklch(0.55 0.22 270);
+    --axis-rose: oklch(0.60 0.19 15);
 }
 
 .dark {
@@ -42,6 +44,8 @@
     --axis-green: oklch(0.68 0.15 145);
     --axis-violet: oklch(0.65 0.18 290);
     --axis-warm: oklch(0.70 0.14 55);
+    --axis-indigo: oklch(0.62 0.20 270);
+    --axis-rose: oklch(0.67 0.17 15);
 }
 
 @theme inline {
@@ -95,6 +99,8 @@
     --color-axis-green: var(--axis-green);
     --color-axis-violet: var(--axis-violet);
     --color-axis-warm: var(--axis-warm);
+    --color-axis-indigo: var(--axis-indigo);
+    --color-axis-rose: var(--axis-rose);
 }
 
 @layer base {
