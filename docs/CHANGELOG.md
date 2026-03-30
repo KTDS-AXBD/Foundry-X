@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #146 (2026-03-31)
+**GIVC 피치덱 버전 셀렉터 + SPEC.md §2 수치 보정**:
+- ✅ GIVC 피치덱 v0.9 반영 — 고객선제안 최신 HTML 배치 (77KB)
+- ✅ 버전 셀렉터 UI — v0.1(초안)/v0.2(내부검토)/v0.9(고객선제안) 드롭다운 선택
+- ✅ Offering Packs Featured Showcase v0.2→v0.9 갱신
+- ✅ SPEC.md §2 수치 5건 보정: Web 172→207, 총 2440→2475, schemas 69→78, D1 0065→0074, E2E 27→25 specs
+
 ### 세션 #145 (2026-03-30)
 **CLAUDE.md drift 8건 수정 + 플러그인 인프라 점검**:
 - ✅ ax-infra-selfcheck 8/8 PASS — commands, standards, hooks, skills 전체 정합성 확인
