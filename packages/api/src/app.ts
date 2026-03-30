@@ -48,6 +48,8 @@ import { axBdInsightsRoute } from "./routes/ax-bd-insights.js";
 import { axBdEvaluationsRoute } from "./routes/ax-bd-evaluations.js";
 import { axBdPrototypesRoute } from "./routes/ax-bd-prototypes.js";
 import { axBdViabilityRoute } from "./routes/ax-bd-viability.js";
+import { agentDefinitionRoute } from "./routes/agent-definition.js";
+import { shardDocRoute } from "./routes/shard-doc.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -236,6 +238,10 @@ app.route("/api", axBdPrototypesRoute);
 
 // Sprint 69: F213 사업성 체크포인트 + Commit Gate (auth + tenant required)
 app.route("/api", axBdViabilityRoute);
+
+// Sprint 76: F221 Agent-as-Code + F223 Doc Sharding (auth + tenant required)
+app.route("/api", agentDefinitionRoute);
+app.route("/api", shardDocRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
