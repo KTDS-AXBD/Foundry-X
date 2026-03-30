@@ -7,6 +7,7 @@ import { buildArchitecture } from './builders/architecture-builder.js';
 import { buildConstitution } from './builders/constitution-builder.js';
 import { buildClaude } from './builders/claude-builder.js';
 import { buildAgents } from './builders/agents-builder.js';
+import { buildProjectContext } from './builders/project-context-builder.js';
 
 /** Builder 등록: 이 파일명에 대해 builder가 동적 콘텐츠를 생성 */
 const BUILDERS: Record<string, HarnessBuilder> = {
@@ -14,6 +15,7 @@ const BUILDERS: Record<string, HarnessBuilder> = {
   'CONSTITUTION.md': buildConstitution,
   'CLAUDE.md': buildClaude,
   'AGENTS.md': buildAgents,
+  'project-context.md': buildProjectContext,
 };
 
 async function fileExists(path: string): Promise<boolean> {

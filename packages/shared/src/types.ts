@@ -32,6 +32,63 @@ export interface RepoProfile {
   architecturePattern: string;
   /** package.json scripts 중 주요 커맨드 (build, test, lint 등) */
   scripts?: Record<string, string>;
+  /** F220: 발견된 문서 파일 */
+  existingDocs?: DocFile[];
+  /** F220: 주요 디렉토리 구조 */
+  directoryStructure?: DirNode[];
+  /** F220: 프로젝트 컨텍스트 */
+  projectContext?: ProjectContext;
+}
+
+// ─── F220: Brownfield Context Types ───
+
+/** 발견된 문서 파일 */
+export interface DocFile {
+  path: string;
+  type: 'readme' | 'changelog' | 'adr' | 'spec' | 'docs' | 'contributing' | 'other';
+}
+
+/** 디렉토리 노드 (트리 구조) */
+export interface DirNode {
+  name: string;
+  role: 'routes' | 'services' | 'components' | 'tests' | 'config' | 'docs' | 'unknown';
+  children?: DirNode[];
+}
+
+/** 프로젝트 컨텍스트 요약 */
+export interface ProjectContext {
+  summary: string;
+  hasMonorepo: boolean;
+  docCount: number;
+  topLevelDirs: string[];
+}
+
+// ─── F222: Changes Directory Types ───
+
+export type ChangeStatus = 'proposed' | 'approved' | 'implemented' | 'rejected';
+
+/** 단일 변경 항목 */
+export interface ChangeEntry {
+  id: string;
+  status: ChangeStatus;
+  hasProposal: boolean;
+  hasDesign: boolean;
+  hasTasks: boolean;
+  hasSpecDelta: boolean;
+  specDelta?: SpecDelta;
+}
+
+/** 스펙 변경분 */
+export interface SpecDelta {
+  added: string[];
+  modified: string[];
+  removed: string[];
+}
+
+/** changes/ 인덱스 */
+export interface ChangesIndex {
+  version: string;
+  changes: ChangeEntry[];
 }
 
 /** 산출물 생성 결과 */
