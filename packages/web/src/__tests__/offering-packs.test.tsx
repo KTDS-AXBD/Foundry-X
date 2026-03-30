@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
 import { fireEvent } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { Component as OfferingPacksPage } from "@/routes/offering-packs";
 
 // Mock fetchApi
@@ -32,19 +33,23 @@ const mockPacks = [
   },
 ];
 
+function renderWithRouter(ui: React.ReactElement) {
+  return render(<MemoryRouter>{ui}</MemoryRouter>);
+}
+
 describe("OfferingPacksPage", () => {
   beforeEach(() => {
     vi.mocked(fetchApi).mockResolvedValue([]);
   });
 
   it("renders offering pack list page", () => {
-    const { getByText } = render(<OfferingPacksPage />);
+    const { getByText } = renderWithRouter(<OfferingPacksPage />);
     expect(getByText("Offering Pack")).toBeDefined();
     expect(getByText("영업·제안용 번들 패키지 관리")).toBeDefined();
   });
 
   it("displays status filter tabs", () => {
-    const { getByText } = render(<OfferingPacksPage />);
+    const { getByText } = renderWithRouter(<OfferingPacksPage />);
     expect(getByText("전체")).toBeDefined();
     expect(getByText("초안")).toBeDefined();
     expect(getByText("검토중")).toBeDefined();
@@ -54,19 +59,19 @@ describe("OfferingPacksPage", () => {
 
   it("renders pack cards with title and status", async () => {
     vi.mocked(fetchApi).mockResolvedValueOnce(mockPacks);
-    const { findByText } = render(<OfferingPacksPage />);
+    const { findByText } = renderWithRouter(<OfferingPacksPage />);
     expect(await findByText("AX 플랫폼 제안 패키지")).toBeDefined();
     expect(await findByText("클라우드 전환 패키지")).toBeDefined();
   });
 
   it("shows create button", () => {
-    const { getByText } = render(<OfferingPacksPage />);
+    const { getByText } = renderWithRouter(<OfferingPacksPage />);
     expect(getByText("패키지 생성")).toBeDefined();
   });
 
   it("handles empty state", async () => {
     vi.mocked(fetchApi).mockResolvedValueOnce([]);
-    const { findByText } = render(<OfferingPacksPage />);
+    const { findByText } = renderWithRouter(<OfferingPacksPage />);
     expect(
       await findByText("Offering Pack이 없어요. 첫 패키지를 생성해보세요."),
     ).toBeDefined();
@@ -74,7 +79,7 @@ describe("OfferingPacksPage", () => {
 
   it("filters by status when tab is clicked", async () => {
     vi.mocked(fetchApi).mockResolvedValueOnce(mockPacks);
-    const { getAllByText, findByText } = render(<OfferingPacksPage />);
+    const { getAllByText, findByText } = renderWithRouter(<OfferingPacksPage />);
     // Wait for data to load
     await findByText("AX 플랫폼 제안 패키지");
     // Click "승인" filter tab (first occurrence = tab button)
