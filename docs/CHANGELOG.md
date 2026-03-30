@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #143 (2026-03-30)
+**로그인 캐시 문제 5건 수정 — 인증 안정성 강화**:
+- ✅ hydrate() JWT 만료 검증: 만료된 토큰으로 로그인됨 표시되던 문제 수정
+- ✅ 401 자동 refresh 인터셉터: API 호출 실패 시 refreshToken으로 갱신 후 재시도
+- ✅ 선제적 토큰 갱신 타이머: 만료 5분 전 자동 refresh 스케줄링
+- ✅ Org 컨텍스트 stale 방지: JWT orgId가 멤버십에 없으면 자동 전환
+- ✅ refreshToken DB 정리: POST /auth/cleanup-tokens 관리자 엔드포인트
+
+**검증 결과**:
+- ✅ typecheck (API + Web) / API 2119 tests / Web 207 tests
+
 ### 세션 #136 (2026-03-30)
 **Phase 7 완료 — Sprint 81 구현 + 인프라 정비 + 마일스톤 회고**:
 - ✅ Sprint 81: F236 Offering Pack + F238 MVP 추적 + F240 IR Bottom-up 채널
