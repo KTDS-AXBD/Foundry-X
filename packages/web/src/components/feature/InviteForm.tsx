@@ -111,7 +111,7 @@ export function InviteForm({ email, orgName, role, token }: InviteFormProps) {
       const data = await setupPassword({ token, name, password });
       localStorage.setItem("token", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
-      router.push("/getting-started");
+      navigate("/getting-started");
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
         setError("이미 계정이 있어요. 로그인 후 초대를 수락하세요.");
