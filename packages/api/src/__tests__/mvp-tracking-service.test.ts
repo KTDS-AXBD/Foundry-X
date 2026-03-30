@@ -160,12 +160,12 @@ describe("MvpTrackingService (F238)", () => {
       });
 
       await service.updateStatus(mvp.id, "org_test", { status: "testing", changedBy: "user-1" });
-      await service.updateStatus(mvp.id, "org_test", { status: "deployed", changedBy: "user-1" });
+      await service.updateStatus(mvp.id, "org_test", { status: "released", changedBy: "user-1" });
 
       const history = await service.getHistory(mvp.id, "org_test");
       expect(history).toHaveLength(3);
       const statuses = history.map((h) => h.toStatus);
-      expect(statuses).toContain("deployed");
+      expect(statuses).toContain("released");
       expect(statuses).toContain("testing");
       expect(statuses).toContain("in_dev");
     });
