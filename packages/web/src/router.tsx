@@ -27,6 +27,7 @@ export const router = createBrowserRouter([
       { path: "methodologies", lazy: () => import("@/routes/methodologies") },
       { path: "mvp-tracking", lazy: () => import("@/routes/mvp-tracking") },
       { path: "offering-packs", lazy: () => import("@/routes/offering-packs") },
+      { path: "offering-packs/givc-pitch", lazy: () => import("@/routes/offering-pack-givc-pitch") },
       { path: "offering-packs/:id", lazy: () => import("@/routes/offering-pack-detail") },
       { path: "pipeline", lazy: () => import("@/routes/pipeline") },
       { path: "projects", lazy: () => import("@/routes/projects") },

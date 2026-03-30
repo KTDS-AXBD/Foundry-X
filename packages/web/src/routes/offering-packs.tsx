@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchApi, postApi } from "@/lib/api-client";
-import { Package, Plus } from "lucide-react";
+import { Package, Plus, Presentation, ArrowRight } from "lucide-react";
 
 interface OfferingPack {
   id: string;
@@ -90,6 +91,24 @@ export function Component() {
           패키지 생성
         </Button>
       </div>
+
+      {/* Featured Showcase */}
+      <Link
+        to="/offering-packs/givc-pitch"
+        className="group flex items-center gap-4 rounded-lg border border-primary/20 bg-primary/5 p-4 hover:border-primary/40 hover:bg-primary/10 transition-colors"
+      >
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <Presentation className="size-5" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-sm">GIVC Ontology 기반 산업 공급망 인과 예측 엔진</span>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium">피치덱</span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">한국기계산업진흥회 chatGIVC 고도화 제안 — v0.2</p>
+        </div>
+        <ArrowRight className="size-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+      </Link>
 
       {/* Status Filter Tabs */}
       <div className="flex gap-1 border-b">
