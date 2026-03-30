@@ -356,3 +356,57 @@ export interface MethodologyProgressSummary {
   gateBlocked: number;
   avgProgress: number;
 }
+
+// ─── F229: Agent Spec 호환성 타입 (Watch — 향후 Export 어댑터 개발 시 사용) ───
+
+/** Oracle Agent Spec 호환 에이전트 정의 (최소 매핑) */
+export interface AgentSpecCompat {
+  name: string;
+  description?: string;
+  model?: string;
+  system_prompt: string;
+  tools?: AgentSpecTool[];
+  guardrails?: string[];
+}
+
+/** Agent Spec 도구 정의 (스키마 포함) */
+export interface AgentSpecTool {
+  name: string;
+  description?: string;
+  parameters?: Record<string, unknown>;
+}
+
+// ─── F230: Scale-Adaptive 복잡도 등급 (Watch — 향후 프로세스 조절 시 사용) ───
+
+/** 프로젝트 복잡도 등급 (BMAD 참고) */
+export type ProjectComplexity = 'quick-fix' | 'standard' | 'enterprise';
+
+/** 복잡도 감지 결과 */
+export interface ComplexityAssessment {
+  grade: ProjectComplexity;
+  factors: {
+    loc: number;
+    dependencies: number;
+    fileCount: number;
+    moduleCount: number;
+  };
+  recommendedAgentCount: number;
+  recommendedDocDepth: 'minimal' | 'standard' | 'full';
+}
+
+// ─── F231: Multi-repo 참조 타입 (Watch — 향후 멀티리포 지원 시 사용) ───
+
+/** 리포지토리 참조 */
+export interface RepoRef {
+  name: string;
+  url: string;
+  role: 'primary' | 'spec' | 'infrastructure' | 'shared';
+  branch?: string;
+}
+
+/** 멀티리포 워크스페이스 (향후 확장) */
+export interface WorkspaceConfig {
+  name: string;
+  repositories: RepoRef[];
+  specRepository?: string;
+}
