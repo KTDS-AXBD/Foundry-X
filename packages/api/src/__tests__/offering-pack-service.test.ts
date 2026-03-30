@@ -101,7 +101,7 @@ describe("OfferingPackService (F236)", () => {
     it("returns pack with items", async () => {
       await seedBizItem(db, "item-1");
       const pack = await service.create({ bizItemId: "item-1", orgId: "org_test", title: "Pack A", createdBy: "user-1" });
-      await service.addItem(pack.id, "org_test", { itemType: "document", title: "BDP Summary" });
+      await service.addItem(pack.id, "org_test", { itemType: "proposal", title: "BDP Summary" });
 
       const detail = await service.getById(pack.id, "org_test");
       expect(detail).not.toBeNull();
@@ -121,12 +121,12 @@ describe("OfferingPackService (F236)", () => {
       const pack = await service.create({ bizItemId: "item-1", orgId: "org_test", title: "Pack A", createdBy: "user-1" });
 
       const item = await service.addItem(pack.id, "org_test", {
-        itemType: "slide",
+        itemType: "custom",
         title: "Pitch Deck",
         url: "https://example.com/deck.pptx",
       });
 
-      expect(item.itemType).toBe("slide");
+      expect(item.itemType).toBe("custom");
       expect(item.url).toBe("https://example.com/deck.pptx");
     });
   });
