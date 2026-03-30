@@ -150,7 +150,7 @@ authRoute.openapi(login, async (c) => {
 
   // Resolve active organization — pick first membership
   const orgMembership = await c.env.DB.prepare(
-    "SELECT org_id, role FROM org_members WHERE user_id = ? ORDER BY joined_at ASC LIMIT 1"
+    "SELECT om.org_id, om.role FROM org_members om LEFT JOIN (SELECT org_id, COUNT(*) as cnt FROM org_members GROUP BY org_id) oc ON om.org_id = oc.org_id WHERE om.user_id = ? ORDER BY oc.cnt DESC, om.joined_at ASC LIMIT 1"
   ).bind(user.id).first<{ org_id: string; role: string }>();
 
   const orgId = orgMembership?.org_id ?? "";
@@ -232,7 +232,7 @@ authRoute.openapi(refresh, async (c) => {
 
   // Resolve org for refreshed token
   const orgMembership = await c.env.DB.prepare(
-    "SELECT org_id, role FROM org_members WHERE user_id = ? ORDER BY joined_at ASC LIMIT 1"
+    "SELECT om.org_id, om.role FROM org_members om LEFT JOIN (SELECT org_id, COUNT(*) as cnt FROM org_members GROUP BY org_id) oc ON om.org_id = oc.org_id WHERE om.user_id = ? ORDER BY oc.cnt DESC, om.joined_at ASC LIMIT 1"
   ).bind(user.id).first<{ org_id: string; role: string }>();
 
   const { _refreshJti, ...tokens } = await createTokenPair(
@@ -602,7 +602,7 @@ authRoute.openapi(googleAuth, async (c) => {
 
   if (!resolvedOrgId) {
     const orgMembership = await c.env.DB.prepare(
-      "SELECT org_id, role FROM org_members WHERE user_id = ? ORDER BY joined_at ASC LIMIT 1"
+      "SELECT om.org_id, om.role FROM org_members om LEFT JOIN (SELECT org_id, COUNT(*) as cnt FROM org_members GROUP BY org_id) oc ON om.org_id = oc.org_id WHERE om.user_id = ? ORDER BY oc.cnt DESC, om.joined_at ASC LIMIT 1"
     ).bind(userId).first<{ org_id: string; role: string }>();
     resolvedOrgId = orgMembership?.org_id ?? "";
     resolvedOrgRole = (orgMembership?.role ?? "member") as "owner" | "admin" | "member" | "viewer";
