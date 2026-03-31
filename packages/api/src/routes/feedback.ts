@@ -6,6 +6,7 @@ import {
 } from "../schemas/feedback.js";
 import type { Env } from "../env.js";
 import { FeedbackService } from "../services/feedback.js";
+import { NpsService } from "../services/nps-service.js";
 import type { JwtPayload } from "../middleware/auth.js";
 
 export const feedbackRoute = new OpenAPIHono<{ Bindings: Env }>();
@@ -35,7 +36,7 @@ const submitFeedback = createRoute({
 });
 
 feedbackRoute.openapi(submitFeedback, async (c) => {
-  const { npsScore, comment, pagePath, sessionSeconds, feedbackType } = c.req.valid("json");
+  const { npsScore, comment, pagePath, sessionSeconds, feedbackType, surveyId } = c.req.valid("json");
   const payload = getPayload(c);
   const service = new FeedbackService(c.env.DB);
 
@@ -45,6 +46,12 @@ feedbackRoute.openapi(submitFeedback, async (c) => {
     sessionSeconds,
     feedbackType,
   });
+
+  // F254: NPS 서베이 완료 연동
+  if (surveyId) {
+    const npsService = new NpsService(c.env.DB);
+    await npsService.completeSurvey(surveyId);
+  }
 
   return c.json({ success: true, id: result.id, npsScore: result.npsScore });
 });

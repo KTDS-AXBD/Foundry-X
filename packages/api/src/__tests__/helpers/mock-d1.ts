@@ -370,10 +370,24 @@ export class MockD1Database {
         user_id TEXT NOT NULL,
         nps_score INTEGER NOT NULL CHECK(nps_score >= 1 AND nps_score <= 10),
         comment TEXT,
+        page_path TEXT,
+        session_seconds INTEGER,
+        feedback_type TEXT DEFAULT 'nps',
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
         FOREIGN KEY (tenant_id) REFERENCES organizations(id)
       );
       CREATE INDEX IF NOT EXISTS idx_feedback_tenant ON onboarding_feedback(tenant_id, created_at DESC);
+
+      CREATE TABLE IF NOT EXISTS nps_surveys (
+        id TEXT PRIMARY KEY,
+        org_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        triggered_at TEXT NOT NULL DEFAULT (datetime('now')),
+        completed_at TEXT,
+        dismissed_at TEXT,
+        FOREIGN KEY (org_id) REFERENCES organizations(id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_nps_surveys_user ON nps_surveys(org_id, user_id, triggered_at DESC);
 
       CREATE TABLE IF NOT EXISTS onboarding_progress (
         id TEXT PRIMARY KEY,

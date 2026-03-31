@@ -69,6 +69,9 @@ import { mvpTrackingRoute } from "./routes/mvp-tracking.js";
 import { irProposalsRoute } from "./routes/ir-proposals.js";
 // Sprint 87: Admin bulk operations (F251)
 import { adminRoute } from "./routes/admin.js";
+// Sprint 88: Org shared data + NPS (F253, F254)
+import { orgSharedRoute } from "./routes/org-shared.js";
+import { npsRoute } from "./routes/nps.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -144,6 +147,7 @@ app.doc("/api/openapi.json", {
     { name: "Onboarding", description: "Onboarding progress tracking" },
     { name: "Audit", description: "AI generation audit logs" },
     { name: "Governance", description: "Data classification and governance rules" },
+    { name: "NPS", description: "NPS survey scheduling and team analytics" },
   ],
 });
 app.get("/api/docs", swaggerUI({ url: "/api/openapi.json" }));
@@ -284,6 +288,9 @@ app.route("/api", mvpTrackingRoute);
 app.route("/api", irProposalsRoute);
 // Sprint 87: Admin bulk operations (F251)
 app.route("/api", adminRoute);
+// Sprint 88: Org shared data + NPS (F253, F254)
+app.route("/api", orgSharedRoute);
+app.route("/api", npsRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

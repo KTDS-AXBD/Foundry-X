@@ -1075,6 +1075,7 @@ export async function submitContextFeedback(data: {
   pagePath?: string;
   sessionSeconds?: number;
   feedbackType?: "nps" | "feature" | "bug" | "general";
+  surveyId?: string;
 }): Promise<{ success: boolean; id: string; npsScore: number }> {
   return postApi("/feedback", data);
 }
@@ -1581,4 +1582,73 @@ export async function fetchOfferingPackDetail(id: string): Promise<OfferingPackD
 
 export async function fetchBdpLatest(bizItemId: string): Promise<BdpVersion> {
   return fetchApi(`/bdp/${bizItemId}`);
+}
+
+// ─── Sprint 88: Org Shared Data (F253) ───
+
+export interface OrgSharedBmcItem {
+  id: string;
+  title: string;
+  authorId: string;
+  authorName: string | null;
+  authorEmail: string | null;
+  syncStatus: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface OrgActivityItem {
+  type: string;
+  resourceId: string;
+  title: string;
+  actorId: string;
+  actorName: string | null;
+  timestamp: string;
+}
+
+export async function getOrgSharedBmcs(
+  orgId: string,
+  opts?: { page?: number; limit?: number },
+): Promise<{ items: OrgSharedBmcItem[]; total: number; page: number; limit: number }> {
+  const qs = new URLSearchParams();
+  if (opts?.page) qs.set("page", String(opts.page));
+  if (opts?.limit) qs.set("limit", String(opts.limit));
+  const query = qs.toString();
+  return fetchApi(`/orgs/${orgId}/shared/bmcs${query ? `?${query}` : ""}`);
+}
+
+export async function getOrgActivityFeed(
+  orgId: string,
+  limit?: number,
+): Promise<{ items: OrgActivityItem[] }> {
+  const qs = limit ? `?limit=${limit}` : "";
+  return fetchApi(`/orgs/${orgId}/shared/activity${qs}`);
+}
+
+// ─── Sprint 88: NPS Survey (F254) ───
+
+export async function checkNpsSurvey(): Promise<{ shouldShow: boolean; surveyId: string | null }> {
+  return fetchApi("/nps/check");
+}
+
+export async function dismissNpsSurvey(surveyId: string): Promise<{ success: boolean }> {
+  return postApi("/nps/dismiss", { surveyId });
+}
+
+export interface NpsOrgSummary {
+  averageNps: number;
+  totalResponses: number;
+  responseRate: number;
+  weeklyTrend: Array<{ week: string; avgNps: number; count: number }>;
+  recentFeedback: Array<{
+    id: string;
+    userId: string;
+    npsScore: number;
+    comment: string | null;
+    createdAt: string;
+  }>;
+}
+
+export async function getOrgNpsSummary(orgId: string): Promise<NpsOrgSummary> {
+  return fetchApi(`/orgs/${orgId}/nps/summary`);
 }
