@@ -80,6 +80,8 @@ import { axBdArtifactsRoute } from "./routes/ax-bd-artifacts.js";
 import { axBdProgressRoute } from "./routes/ax-bd-progress.js";
 // Sprint 92: KG Ontology (F255)
 import { axBdKgRoute } from "./routes/ax-bd-kg.js";
+// Sprint 95: Help Agent 챗봇 (F264)
+import { helpAgentRoute } from "./routes/help-agent.js";
 // Sprint 96: HITL 인터랙션 패널 (F266)
 import { hitlReviewRoute } from "./routes/hitl-review.js";
 import { handleScheduled } from "./scheduled.js";
@@ -310,6 +312,8 @@ app.route("/api", axBdArtifactsRoute);
 // Sprint 91: BD 프로세스 진행 추적 (F262)
 app.route("/api", axBdProgressRoute);
 app.route("/api", axBdKgRoute);
+// Sprint 95: Help Agent 챗봇 (F264)
+app.route("/api", helpAgentRoute);
 // Sprint 96: HITL 인터랙션 패널 (F266)
 app.route("/api", hitlReviewRoute);
 
