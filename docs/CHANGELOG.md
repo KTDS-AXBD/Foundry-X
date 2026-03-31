@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 마일스톤 회고: Phase 9a (v1.8.0) — Sprint 86~91
+
+### 지표 변화
+| 지표 | v1.7.0 | v1.8.0 | 변화 |
+|------|:------:|:------:|:----:|
+| 총 테스트 | 2475 | **2588** | **+113** |
+| API tests | 2119 | 2190 | +71 |
+| Web tests | 207 | 249 | +42 |
+| E2E tests | ~59 | ~93 | +34 |
+| API routes | 63 | 69 | +6 |
+| API services | 153 | 160 | +7 |
+| D1 migrations | 0074 | 0077 | +3 |
+| F-items | F247 | F262 | +15 |
+
+### 완료 Sprint (6개)
+- **Sprint 86** (F248~F250): ProtectedRoute 인증 가드 + E2E fixture 키 통일 + 로그인 E2E 7개
+- **Sprint 87** (F251+F252): 팀 계정 일괄 생성 + 온보딩 가이드 고도화 (PR #224)
+- **Sprint 88** (F253+F254): 팀 데이터 공유 + NPS 피드백 수집
+- **Sprint 89** (F258+F259): BD 프로세스 가이드 UI + 스킬 카탈로그 UI (PR #225)
+- **Sprint 90** (F260+F261): BD 스킬 실행 엔진 + 산출물 저장·버전 관리 (PR #227)
+- **Sprint 91** (F262): BD 프로세스 진행 추적 + 사업성 신호등 (PR #228)
+
+### 잘된 점
+- **BD 스킬 풀스택 통합**: CLAUDE_AXBD 76스킬+36커맨드를 웹 풀스택으로 5개 F-item(F258~F262)에 체계적 분해 → 3 Sprint 순차 완성. 프로세스 가이드 → 스킬 실행 → 진행 추적까지 E2E 파이프라인 구축
+
+### 개선점
+- **SPEC 미커밋 drift**: F-item 등록 후 커밋 없이 WT 생성 → WT가 미등록 SPEC을 가짐 (S149 교훈). `development-workflow.md`에 "SPEC 등록 후 즉시 커밋+push 필수" 룰 추가로 대응 완료
+
+### 결정 검증
+- **Sprint 병렬화 (87+89)**: 의존성 분석 후 안전하게 병렬 실행 → 충돌 없이 성공
+- **autopilot 워크플로우**: tmux send-keys 방식이 안정적. Sprint 89(1h45m), 90(20m), 91(2h12m)
+
+### 다음 마일스톤 방향
+- D1 0075~0077 remote 배포 + Workers 재배포
+- GIVC Ontology PoC (F255~F256)
+- 추가 BD 아이템 탐색 (F257)
+
+---
+
 ### 세션 #149 (2026-03-31)
 **Sprint 86: 인증 가드 + E2E 보강 + Workers 재배포**:
 - ✅ ProtectedRoute 래퍼: AppLayout 하위 36개 라우트 미인증 접근 차단 → /login 리다이렉트
