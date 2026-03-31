@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #152b (2026-03-31)
+**KG Ontology E2E + Sprint 94 merge + CLAUDE.md 수치 갱신**:
+- ✅ KG Ontology E2E 7개 추가 (28 specs, ~100 tests)
+- ✅ Sprint 94 (F263+F265): 발굴 UX 위저드 UI + 온보딩 투어 merge 완료
+- ✅ CLAUDE.md: routes 71, services 166, schemas 85, E2E 100 갱신
+
 ### 세션 #152 (2026-03-31)
 **Sprint 92~93 GIVC PoC 완료 + D1 0076 배포**:
 - ✅ Sprint 92 (F255): GIVC Ontology PoC 1차 — Property Graph 3-테이블 + 16 API + KG 탐색기 (PR #229)
