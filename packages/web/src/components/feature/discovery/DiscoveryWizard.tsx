@@ -9,6 +9,7 @@ import ProcessFlowV82 from "@/components/feature/ProcessFlowV82";
 import TypeRoutingMatrix from "@/components/feature/TypeRoutingMatrix";
 import WizardStepper from "./WizardStepper";
 import WizardStepDetail from "./WizardStepDetail";
+import HelpAgentChat from "./HelpAgentChat";
 import {
   fetchApi,
   getDiscoveryProgress,
@@ -244,6 +245,12 @@ export default function DiscoveryWizard() {
           ))}
         </div>
       </div>
+
+      {/* Help Agent FAB — 하단 우측 플로팅 챗 */}
+      <HelpAgentChat
+        bizItemId={selectedItemId ?? undefined}
+        stage={activeStage}
+      />
     </div>
   );
 }
