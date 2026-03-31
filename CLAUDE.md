@@ -203,7 +203,7 @@ pnpm build && npx wrangler pages deploy dist --project-name=foundry-x-web
 - **D1 migrations**: 로컬 적용 후 `--remote` 반드시 별도 실행 (누락하면 프로덕션 500)
 - **PostToolUse hook**: .ts/.tsx 편집 시 자동 eslint --fix + typecheck 실행 (15s/60s timeout)
 - **git add**: 절대 `git add .` 금지 — 멀티 pane 환경에서 다른 세션 변경 포함 위험
-- **D1 migration 중복**: `0040_prd_reviews.sql`/`0040_sixhats_debates.sql` + `0078_help_agent.sql`/`0078_hitl_reviews.sql` 공존 — 새 마이그레이션은 0079부터
+- **D1 migration 중복**: `0040` 2개 + `0075` 2개 공존 (remote 적용 완료) — 새 마이그레이션은 0080부터
 
 ## 성공 지표 (구현 시 참고)
 
