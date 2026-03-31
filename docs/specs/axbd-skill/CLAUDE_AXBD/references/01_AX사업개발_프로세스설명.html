@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2단계 발굴 프로세스 — AX BD팀</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f7f8fa; --w:#fff; --g9:#1a1d23; --g8:#2d3340; --g7:#454e60; --g5:#8892a4; --g4:#b0b8c8; --ln:#e4e7ec; --ln2:#d0d5de;
+  --ta:#1a6b4a; --ta-bg:#e6f4ef; --ta-lt:#b8ddd0;
+  --tb:#1a4a8a; --tb-bg:#e6eef9; --tb-lt:#b8ccee;
+  --tc:#7a3a0a; --tc-bg:#fef3e2; --tc-lt:#f0cc90;
+  --c1:#2a7a60; --c1-bg:#e6f4ef;
+  --c2:#2560b0; --c2-bg:#e6eef9;
+  --c3:#b86c10; --c3-bg:#fef3e2;
+  --c4:#b82828; --c4-bg:#fce8e8;
+  --c5:#5830b8; --c5-bg:#eee8fc;
+  --sh:0 1px 3px rgba(0,0,0,.07),0 0 0 1px rgba(0,0,0,.05);
+  --sh2:0 3px 12px rgba(0,0,0,.1),0 0 0 1px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:'Pretendard',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;color:var(--g9)}
+
+/* ══ TOP NAV ══ */
+.top-nav{background:var(--w);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:200;padding:0 48px}
+.top-nav-in{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:52px}
+.top-nav-title{font-size:13px;font-weight:700;color:var(--g9);letter-spacing:-.2px}
+.nav-tabs{display:flex;gap:2px}
+.nav-tab{padding:7px 18px;border-radius:8px;font-size:12px;font-weight:600;color:var(--g5);background:none;border:none;cursor:pointer;font-family:inherit;transition:all .15s}
+.nav-tab:hover{background:var(--bg);color:var(--g8)}
+.nav-tab.active{background:var(--g9);color:#fff}
+
+/* ══ SECTIONS ══ */
+.section{display:none;padding:36px 48px 64px}
+.section.active{display:block}
+.wrap{max-width:960px;margin:0 auto}
+.sec-hdr{margin-bottom:28px}
+.sec-eye{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--g5);margin-bottom:5px}
+.sec-title{font-size:18px;font-weight:800;color:var(--g9);letter-spacing:-.4px;margin-bottom:4px}
+.sec-sub{font-size:12px;color:var(--g5);line-height:1.6}
+.sec-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--g5);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--ln)}
+
+/* ══ SECTION A — 전체 흐름 ══ */
+.s0-block{background:var(--g9);border-radius:14px;padding:22px 26px;box-shadow:var(--sh2);margin-bottom:6px}
+.s0-num{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#606880;margin-bottom:3px}
+.s0-name{font-size:16px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.s0-en{font-size:11px;color:#606880;margin-top:2px;margin-bottom:14px}
+.s0-desc{font-size:12px;color:#9aa0b0;line-height:1.65;margin-bottom:16px}
+.turns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.turn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:13px 14px}
+.turn-num{font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#606880;margin-bottom:5px}
+.turn-q{font-size:11px;color:#c8cdd8;line-height:1.6}
+.turn-q strong{color:#fff}
+.branch-area{margin:4px 0;display:flex;flex-direction:column;align-items:center}
+.branch-line{width:1px;height:18px;background:var(--g4)}
+.branch-label{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--g5);margin:4px 0}
+.branch-spread{display:flex;align-items:flex-start;gap:16px;width:100%}
+.type-col{flex:1;display:flex;flex-direction:column;align-items:center}
+.type-card{width:100%;border-radius:12px;padding:16px 18px;box-shadow:var(--sh)}
+.type-tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700;margin-bottom:8px;border:1px solid}
+.type-name{font-size:13px;font-weight:700;margin-bottom:5px;letter-spacing:-.2px}
+.type-def{font-size:11px;line-height:1.6;color:var(--g7);margin-bottom:8px}
+.type-ex{font-size:10px;padding:5px 8px;border-radius:6px;color:var(--g5);border:1px dashed var(--ln);line-height:1.5}
+.ti .type-card{background:#f3e5f5} .ti .type-tag{color:#7b1fa2;border-color:#d1b8e8;background:#fff} .ti .type-name{color:#7b1fa2}
+.tm .type-card{background:var(--tb-bg)} .tm .type-tag{color:var(--tb);border-color:var(--tb-lt);background:#fff} .tm .type-name{color:var(--tb)}
+.tp .type-card{background:var(--tc-bg)} .tp .type-tag{color:var(--tc);border-color:var(--tc-lt);background:#fff} .tp .type-name{color:var(--tc)}
+.tt .type-card{background:var(--ta-bg)} .tt .type-tag{color:var(--ta);border-color:var(--ta-lt);background:#fff} .tt .type-name{color:var(--ta)}
+.ts .type-card{background:#fce8e8} .ts .type-tag{color:#8b1a1a;border-color:#e8b8b8;background:#fff} .ts .type-name{color:#8b1a1a}
+.col-arrow{width:1px;height:16px;margin:4px auto}
+.ti .col-arrow{background:#d1b8e8} .tm .col-arrow{background:var(--tb-lt)} .tp .col-arrow{background:var(--tc-lt)} .tt .col-arrow{background:var(--ta-lt)} .ts .col-arrow{background:#e8b8b8}
+.route-card{width:100%;background:var(--w);border-radius:10px;padding:10px 12px;box-shadow:var(--sh);border-top:3px solid}
+.ti .route-card{border-color:#7b1fa2} .tm .route-card{border-color:var(--tb)} .tp .route-card{border-color:var(--tc)} .tt .route-card{border-color:var(--ta)} .ts .route-card{border-color:#8b1a1a}
+.route-title{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--g5);margin-bottom:6px}
+.route-steps{display:flex;flex-direction:column;gap:4px}
+.rs{display:flex;align-items:flex-start;gap:5px;font-size:10px;line-height:1.45}
+.rs-num{font-size:8px;font-weight:700;padding:2px 5px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.rs-text{color:var(--g7)} .rs-text strong{font-weight:600}
+.rs.em .rs-text{color:var(--g9);font-weight:600} .rs.em .rs-num{font-weight:800}
+.ti .rs-num{background:#f3e5f5;color:#7b1fa2} .ti .rs.em .rs-num{background:#7b1fa2;color:#fff}
+.tm .rs-num{background:var(--tb-bg);color:var(--tb)} .tm .rs.em .rs-num{background:var(--tb);color:#fff}
+.tp .rs-num{background:var(--tc-bg);color:var(--tc)} .tp .rs.em .rs-num{background:var(--tc);color:#fff}
+.tt .rs-num{background:var(--ta-bg);color:var(--ta)} .tt .rs.em .rs-num{background:var(--ta);color:#fff}
+.ts .rs-num{background:#fce8e8;color:#8b1a1a} .ts .rs.em .rs-num{background:#8b1a1a;color:#fff}
+.branch-spread{gap:10px}
+.type-card{padding:12px 14px}
+.type-def{font-size:10px}
+.type-ex{font-size:9px}
+.hitl-banner{display:flex;align-items:center;gap:10px;background:#fffbea;border:1px solid #f0d060;border-radius:8px;padding:9px 14px;margin-bottom:14px}
+.hitl-icon{width:22px;height:22px;border-radius:5px;background:#f0d060;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#7a5500;flex-shrink:0}
+.hitl-text{font-size:11px;color:#7a5500;line-height:1.55} .hitl-text strong{font-weight:700;color:#5a3800}
+.hitl-badge{display:inline-flex;align-items:center;padding:1px 6px;border-radius:4px;background:#fff8e0;border:1px solid #f0d060;font-size:9px;font-weight:700;color:#7a5500;margin-left:5px;white-space:nowrap;vertical-align:middle}
+.merge-area{margin-top:16px}
+.merge-line-wrap{display:flex;justify-content:center;height:20px}
+.merge-line{width:1px;background:var(--g4)}
+.common-steps{display:flex;flex-direction:column;gap:6px}
+.cs{display:grid;grid-template-columns:200px 1fr;background:var(--w);border-radius:10px;box-shadow:var(--sh);overflow:hidden}
+.cs-l{padding:13px 16px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(0,0,0,.05)}
+.cs-num{font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:3px}
+.cs-name{font-size:13px;font-weight:700;letter-spacing:-.2px}
+.cs-en{font-size:10px;font-weight:500;margin-top:2px;opacity:.5}
+.cs-r{padding:13px 18px;display:flex;align-items:center}
+.cs-desc{font-size:11px;color:var(--g7);line-height:1.6} .cs-desc strong{color:var(--g9);font-weight:600}
+.cs.t9 .cs-l{background:var(--c5-bg)} .cs.t9 .cs-num,.cs.t9 .cs-en{color:var(--c5)} .cs.t9 .cs-name{color:#3a1878}
+.cs.t4 .cs-l{background:var(--c4-bg)} .cs.t4 .cs-num,.cs.t4 .cs-en{color:var(--c4)} .cs.t4 .cs-name{color:#701414}
+.cs.tf .cs-l{background:var(--g9)} .cs.tf .cs-num{color:#606880} .cs.tf .cs-name{color:#fff} .cs.tf .cs-en{color:#606880}
+.cs-arr{display:flex;justify-content:center;height:14px;position:relative}
+.cs-arr::before{content:'';display:block;width:1px;height:9px;background:var(--g4);position:absolute;top:0;left:50%}
+.cs-arr::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--g4)}
+
+/* ══ SECTION B — 아코디언 ══ */
+.acc-list{display:flex;flex-direction:column;gap:6px}
+.acc-item{background:var(--w);border-radius:12px;box-shadow:var(--sh);overflow:hidden}
+.acc-head{display:flex;align-items:center;padding:16px 20px;cursor:pointer;gap:14px;transition:background .12s;user-select:none}
+.acc-head:hover{background:#fafbfc}
+.acc-num{font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;min-width:28px;flex-shrink:0}
+.acc-main{flex:1}
+.acc-name{font-size:13px;font-weight:700;color:var(--g9);letter-spacing:-.2px}
+.acc-en{font-size:10px;font-weight:500;color:var(--g5);margin-top:1px}
+.acc-sub{font-size:11px;color:var(--g5);margin-top:3px}
+.acc-arrow{font-size:12px;color:var(--g4);transition:transform .2s;flex-shrink:0}
+.acc-item.open .acc-arrow{transform:rotate(180deg)}
+.acc-body{display:none;padding:0 20px 18px;border-top:1px solid var(--ln)}
+.acc-item.open .acc-body{display:block}
+.acc-section{margin-top:14px}
+.acc-section-title{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--g5);margin-bottom:8px}
+.tag-list{display:flex;flex-wrap:wrap;gap:5px}
+.m-tag{padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;background:var(--bg);border:1px solid var(--ln2);color:var(--g7)}
+.m-tag.hi{background:var(--c5-bg);border-color:#c8b8ee;color:var(--c5)}
+.skill-list{display:flex;flex-direction:column;gap:5px}
+.skill-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:var(--bg);border:1px solid var(--ln);font-size:12px}
+.skill-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0}
+.skill-name{flex:1;color:var(--g8);font-weight:600}
+.skill-desc{font-size:10px;color:var(--g5)}
+.skill-link{font-size:10px;font-weight:600;color:var(--c2);text-decoration:none;padding:3px 8px;border-radius:5px;background:var(--c2-bg);border:1px solid var(--tb-lt);white-space:nowrap;flex-shrink:0}
+.skill-link:hover{background:var(--tb-lt)}
+.bmc-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:4px;background:#fff0f0;border:1px solid #f0b0b0;font-size:9px;font-weight:700;color:var(--c4);margin-left:6px;vertical-align:middle}
+
+/* ══ SECTION C — 전체 스킬 목록 ══ */
+
+.skill-full-list{display:flex;flex-direction:column;gap:5px}
+.sf-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:9px;background:var(--w);border:1px solid var(--ln);box-shadow:var(--sh)}
+.sf-badge{padding:2px 7px;border-radius:5px;font-size:9px;font-weight:800;text-transform:uppercase;flex-shrink:0}
+.sf-badge.pm{background:#e8f0fa;color:#2560b0}
+.sf-badge.ab{background:#fff3e0;color:#e65100}
+.sf-badge.fw{background:#f3e5f5;color:#7b1fa2}
+.sf-badge.ac{background:#e6f4ef;color:#2a7a60}
+.sf-name{flex:1;font-size:12px;font-weight:600;color:var(--g8)}
+.sf-stage{font-size:10px;color:var(--g5);margin-right:6px}
+.sf-link{font-size:10px;font-weight:600;color:var(--c2);text-decoration:none;padding:3px 8px;border-radius:5px;background:var(--c2-bg);border:1px solid var(--tb-lt);white-space:nowrap}
+.sf-link:hover{background:var(--tb-lt)}
+.sf-group-label{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--g5);margin:16px 0 6px;display:flex;align-items:center;gap:8px}
+.sf-group-label::after{content:'';flex:1;height:1px;background:var(--ln)}
+
+/* ══ SECTION S — 환경세팅 ══ */
+.setup-steps{display:flex;flex-direction:column;gap:8px}
+.setup-phase{background:var(--w);border-radius:14px;box-shadow:var(--sh2);overflow:hidden}
+.setup-phase-hdr{display:flex;align-items:center;gap:14px;padding:18px 24px;cursor:pointer;user-select:none;transition:background .12s}
+.setup-phase-hdr:hover{background:#fafbfc}
+.setup-phase-num{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
+.setup-phase-info{flex:1}
+.setup-phase-name{font-size:15px;font-weight:800;color:var(--g9);letter-spacing:-.3px}
+.setup-phase-en{font-size:11px;color:var(--g5);margin-top:2px}
+.setup-phase-status{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.setup-phase-tag{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;border:1px solid}
+.setup-phase-arrow{font-size:12px;color:var(--g4);transition:transform .2s;flex-shrink:0}
+.setup-phase.open .setup-phase-arrow{transform:rotate(180deg)}
+.setup-phase-body{display:none;padding:0 24px 22px;border-top:1px solid var(--ln)}
+.setup-phase.open .setup-phase-body{display:block;padding-top:20px}
+.setup-ol{list-style:none;counter-reset:setup-step;display:flex;flex-direction:column;gap:14px}
+.setup-step{counter-increment:setup-step;display:flex;gap:12px;align-items:flex-start}
+.setup-step-num{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;margin-top:1px}
+.setup-step-content{flex:1}
+.setup-step-title{font-size:13px;font-weight:700;color:var(--g9);margin-bottom:3px;letter-spacing:-.2px}
+.setup-step-desc{font-size:11.5px;color:var(--g7);line-height:1.65}
+.setup-step-desc a{color:var(--c2);font-weight:600;text-decoration:none}
+.setup-step-desc a:hover{text-decoration:underline}
+.setup-code{display:inline-block;font-family:'Consolas','SF Mono',monospace;font-size:11px;padding:2px 7px;border-radius:5px;background:#f0f2f5;border:1px solid var(--ln);color:var(--g8);font-weight:500}
+.setup-code-block{display:block;font-family:'Consolas','SF Mono',monospace;font-size:11.5px;padding:10px 14px;border-radius:8px;background:var(--g9);color:#c8cdd8;line-height:1.7;margin-top:8px;overflow-x:auto;white-space:pre}
+.setup-code-block strong{color:#fff;font-weight:600}
+.setup-code-block .cm{color:#606880}
+.setup-tip{display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding:9px 12px;border-radius:8px;background:#fffbea;border:1px solid #f0d060;font-size:11px;color:#7a5500;line-height:1.55}
+.setup-tip strong{color:#5a3800;font-weight:700}
+.setup-tip-icon{flex-shrink:0;margin-top:1px}
+.setup-check{display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding:9px 12px;border-radius:8px;background:var(--ta-bg);border:1px solid var(--ta-lt);font-size:11px;color:var(--ta);line-height:1.55}
+.setup-check strong{font-weight:700}
+.setup-warn{display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding:9px 12px;border-radius:8px;background:var(--c4-bg);border:1px solid #e8b8b8;font-size:11px;color:var(--c4);line-height:1.55}
+.setup-warn strong{font-weight:700}
+.setup-divider{height:1px;background:var(--ln);margin:4px 0}
+.setup-summary{background:var(--g9);border-radius:14px;padding:22px 26px;box-shadow:var(--sh2)}
+.setup-summary-title{font-size:14px;font-weight:800;color:#fff;letter-spacing:-.3px;margin-bottom:14px}
+.setup-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.setup-summary-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 16px;text-align:center}
+.setup-summary-icon{font-size:20px;margin-bottom:6px}
+.setup-summary-label{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#606880;margin-bottom:3px}
+.setup-summary-value{font-size:13px;font-weight:700;color:#fff}
+.setup-method-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.setup-method-card{padding:12px 14px;border-radius:10px;border:1px solid var(--ln)}
+.setup-method-card.recommended{border-color:var(--ta-lt);background:var(--ta-bg)}
+.setup-method-card.alt{border-color:var(--ln2);background:var(--bg)}
+.setup-method-label{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.setup-method-name{font-size:12px;font-weight:700;color:var(--g9);margin-bottom:3px}
+.setup-method-desc{font-size:10.5px;color:var(--g7);line-height:1.55}
+.setup-connector{display:flex;justify-content:center;padding:4px 0}
+.setup-connector-line{width:1px;height:12px;background:var(--g4)}
+
+.foot{margin-top:32px;text-align:right;font-size:10px;color:var(--g4)}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="top-nav-in">
+    <div class="top-nav-title">2단계 발굴 프로세스 — AX BD팀</div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchTab('S',this)">환경세팅</button>
+      <button class="nav-tab" onclick="switchTab('A',this)">전체 흐름</button>
+      <button class="nav-tab" onclick="switchTab('B',this)">단계별 상세</button>
+      <button class="nav-tab" onclick="switchTab('C',this)">전체 스킬 목록</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════════════════════════
+     SECTION S — 환경세팅
+════════════════════════════ -->
+<div class="section active" id="sec-S">
+<div class="wrap">
+
+  <div class="sec-hdr">
+    <div class="sec-eye">AX Business Development · Environment Setup</div>
+    <div class="sec-title">환경세팅 가이드</div>
+    <div class="sec-sub">AI 기반 사업개발 프로세스를 시작하기 전, 아래 3단계를 순서대로 완료하세요 · 각 단계를 클릭해 상세 내용을 확인합니다</div>
+  </div>
+
+  <!-- ── 완료 요약 ── -->
+  <div class="setup-summary" style="margin-bottom:20px">
+    <div class="setup-summary-title">세팅 완료 시 환경 구성</div>
+    <div class="setup-summary-grid" style="grid-template-columns:repeat(5,1fr)">
+      <div class="setup-summary-card">
+        <div class="setup-summary-icon">💬</div>
+        <div class="setup-summary-label">Step 1</div>
+        <div class="setup-summary-value">Claude Desktop</div>
+      </div>
+      <div class="setup-summary-card">
+        <div class="setup-summary-icon">🔧</div>
+        <div class="setup-summary-label">Step 2</div>
+        <div class="setup-summary-value">Git</div>
+      </div>
+      <div class="setup-summary-card">
+        <div class="setup-summary-icon">⚡</div>
+        <div class="setup-summary-label">Step 3</div>
+        <div class="setup-summary-value">Claude Code</div>
+      </div>
+      <div class="setup-summary-card">
+        <div class="setup-summary-icon">📁</div>
+        <div class="setup-summary-label">Step 4</div>
+        <div class="setup-summary-value">폴더 압축 해제</div>
+      </div>
+      <div class="setup-summary-card">
+        <div class="setup-summary-icon">🚀</div>
+        <div class="setup-summary-label">Step 5</div>
+        <div class="setup-summary-value">사업 발굴 시작</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="setup-steps">
+
+    <!-- ══ STEP 1 — Claude Desktop ══ -->
+    <div class="setup-phase open" id="setup-0">
+      <div class="setup-phase-hdr" onclick="toggleSetup(0)">
+        <div class="setup-phase-num" style="background:var(--c2)">1</div>
+        <div class="setup-phase-info">
+          <div class="setup-phase-name">Claude Desktop 설치</div>
+          <div class="setup-phase-en">Install Claude Desktop App</div>
+        </div>
+        <div class="setup-phase-status">
+          <div class="setup-phase-tag" style="color:var(--c2);border-color:var(--tb-lt);background:var(--c2-bg)">4단계</div>
+        </div>
+        <div class="setup-phase-arrow">▼</div>
+      </div>
+      <div class="setup-phase-body">
+        <div class="setup-ol">
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--c2-bg);color:var(--c2)">1</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">다운로드</div>
+              <div class="setup-step-desc">
+                <a href="https://claude.ai/download" target="_blank">claude.ai/download</a> 에서 <strong>Windows용</strong> 설치 파일을 다운로드합니다.
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--c2-bg);color:var(--c2)">2</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">설치 실행</div>
+              <div class="setup-step-desc">
+                다운로드된 <span class="setup-code">Claude-Setup.exe</span> 파일을 실행하고, 안내에 따라 설치를 완료합니다.
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--c2-bg);color:var(--c2)">3</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">로그인</div>
+              <div class="setup-step-desc">
+                설치 완료 후 앱을 실행하여 회사 계정으로 로그인합니다.
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--c2-bg);color:var(--c2)">4</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">동작 확인</div>
+              <div class="setup-step-desc">
+                대화창에 간단한 질문을 입력하여 응답이 정상적으로 오는지 확인합니다.
+              </div>
+              <div class="setup-check">
+                <span class="setup-tip-icon">✓</span>
+                <span><strong>확인 포인트:</strong> 대화창에서 자유롭게 질문/답변이 가능하면 Step 1 완료</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 2 — Git 설치 ══ -->
+    <div class="setup-phase" id="setup-1">
+      <div class="setup-phase-hdr" onclick="toggleSetup(1)">
+        <div class="setup-phase-num" style="background:var(--c1)">2</div>
+        <div class="setup-phase-info">
+          <div class="setup-phase-name">Git 설치</div>
+          <div class="setup-phase-en">Install Git for Windows</div>
+        </div>
+        <div class="setup-phase-status">
+          <div class="setup-phase-tag" style="color:var(--c1);border-color:var(--ta-lt);background:var(--c1-bg)">4단계</div>
+        </div>
+        <div class="setup-phase-arrow">▼</div>
+      </div>
+      <div class="setup-phase-body">
+        <div class="setup-ol">
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--c1-bg);color:var(--c1)">1</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">다운로드</div>
+              <div class="setup-step-desc">
+                <a href="https://git-scm.com/downloads/win" target="_blank">git-scm.com/downloads/win</a> 에서 <strong>64-bit Git for Windows Setup</strong>을 다운로드합니다.
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--c1-bg);color:var(--c1)">2</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">설치 실행</div>
+              <div class="setup-step-desc">
+                설치 파일을 실행합니다. 설치 옵션은 <strong>모두 기본값(Next)</strong>으로 진행해도 무방합니다.
+              </div>
+              <div class="setup-tip">
+                <span class="setup-tip-icon">💡</span>
+                <span><strong>참고:</strong> 설치 중 "Adjusting your PATH environment" 단계에서 <strong>"Git from the command line and also from 3rd-party software"</strong> (기본값)가 선택되어 있는지 확인하세요.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--c1-bg);color:var(--c1)">3</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">설치 확인</div>
+              <div class="setup-step-desc">
+                <strong>명령 프롬프트(cmd)</strong> 또는 <strong>PowerShell</strong>을 열고 아래 명령어를 입력합니다.
+              </div>
+              <div class="setup-code-block">git --version
+<span class="cm"># 예시 출력: git version 2.47.1.windows.1</span></div>
+              <div class="setup-check">
+                <span class="setup-tip-icon">✓</span>
+                <span><strong>확인 포인트:</strong> 버전 번호가 출력되면 설치 성공</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--c1-bg);color:var(--c1)">4</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">사용자 정보 설정</div>
+              <div class="setup-step-desc">
+                Git에 본인의 이름과 이메일을 등록합니다. (최초 1회만 설정)
+              </div>
+              <div class="setup-code-block">git config --global user.name "<strong>홍길동</strong>"
+git config --global user.email "<strong>gildong.hong@ktds.co.kr</strong>"</div>
+              <div class="setup-check">
+                <span class="setup-tip-icon">✓</span>
+                <span><strong>확인 포인트:</strong> 오류 메시지 없이 명령이 실행되면 Step 2 완료</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 3 — Claude Code ══ -->
+    <div class="setup-phase" id="setup-2">
+      <div class="setup-phase-hdr" onclick="toggleSetup(2)">
+        <div class="setup-phase-num" style="background:var(--c3)">3</div>
+        <div class="setup-phase-info">
+          <div class="setup-phase-name">Claude Code 설치, 로그인 및 세팅</div>
+          <div class="setup-phase-en">Claude Code CLI — Install, Login &amp; Configuration</div>
+        </div>
+        <div class="setup-phase-status">
+          <div class="setup-phase-tag" style="color:var(--c3);border-color:var(--tc-lt);background:var(--c3-bg)">3단계</div>
+        </div>
+        <div class="setup-phase-arrow">▼</div>
+      </div>
+      <div class="setup-phase-body">
+
+        <!-- 3-1: 설치 방법 선택 -->
+        <div style="margin-bottom:18px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--g5);margin-bottom:10px">설치 방법 비교 — Windows 노트북 기준</div>
+          <div class="setup-method-grid">
+            <div class="setup-method-card recommended">
+              <div class="setup-method-label" style="color:var(--ta)">권장 — PowerShell 네이티브 설치</div>
+              <div class="setup-method-name">irm https://claude.ai/install.ps1 | iex</div>
+              <div class="setup-method-desc">Node.js 설치 불필요, 자동 업데이트 지원, 가장 간편한 방법. <strong>일반 사용자에게 권장합니다.</strong></div>
+            </div>
+            <div class="setup-method-card alt">
+              <div class="setup-method-label" style="color:var(--g5)">대안 — WinGet 패키지 설치</div>
+              <div class="setup-method-name">winget install Anthropic.ClaudeCode</div>
+              <div class="setup-method-desc">Windows 패키지 관리자 사용. winget이 이미 설치된 환경에 적합합니다.</div>
+            </div>
+          </div>
+          <div class="setup-tip" style="margin-top:8px">
+            <span class="setup-tip-icon">💡</span>
+            <span><strong>npm 방식은 더 이상 권장하지 않습니다.</strong> 과거에는 <span class="setup-code" style="font-size:10px">npm install -g @anthropic-ai/claude-code</span> 로 설치했으나, 현재는 네이티브 설치가 공식 권장 방법입니다. Node.js가 필요 없고 자동 업데이트가 지원됩니다. Docker 방식은 지원하지 않습니다.</span>
+          </div>
+        </div>
+
+        <div class="setup-ol">
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--c3-bg);color:var(--c3)">1</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">PowerShell을 관리자 권한으로 실행</div>
+              <div class="setup-step-desc">
+                Windows 검색창에서 <span class="setup-code">PowerShell</span> 을 검색한 뒤, <strong>"관리자 권한으로 실행"</strong>을 클릭합니다.
+              </div>
+              <div class="setup-tip">
+                <span class="setup-tip-icon">💡</span>
+                <span><strong>방법:</strong> 키보드에서 <span class="setup-code" style="font-size:10px">Win</span> 키를 누르고 → "PowerShell" 입력 → 오른쪽에 나타나는 <strong>"관리자 권한으로 실행"</strong> 클릭</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--c3-bg);color:var(--c3)">2</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">Claude Code 설치</div>
+              <div class="setup-step-desc">
+                아래 명령어를 PowerShell에 <strong>복사 → 붙여넣기(Ctrl+V)</strong> 한 뒤 Enter를 누릅니다.
+              </div>
+              <div class="setup-code-block"><strong>irm https://claude.ai/install.ps1 | iex</strong>
+<span class="cm"># 설치가 자동으로 진행됩니다 (1~2분 소요)</span></div>
+              <div class="setup-check">
+                <span class="setup-tip-icon">✓</span>
+                <span><strong>확인 포인트:</strong> 설치 완료 메시지가 나타나면 성공. <strong>PowerShell을 닫았다가 다시 열어주세요</strong> (환경변수 반영을 위해).</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--c3-bg);color:var(--c3)">3</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">설치 확인</div>
+              <div class="setup-step-desc">
+                새로 연 PowerShell에서 버전을 확인합니다.
+              </div>
+              <div class="setup-code-block">claude --version
+<span class="cm"># 예시 출력: claude v1.x.x</span></div>
+              <div class="setup-warn" style="display:none" id="installWarn">
+                <span class="setup-tip-icon">!</span>
+                <span><strong>오류 시:</strong> 'claude'은(는) 인식할 수 없는 명령 → PowerShell을 닫고 다시 열어보세요</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-check" style="margin-top:10px">
+            <span class="setup-tip-icon">✓</span>
+            <span><strong>확인 포인트:</strong> <span style="font-family:Consolas,monospace;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:3px">claude --version</span> 에서 버전 번호가 출력되면 Step 3 완료. 이어서 Step 4에서 작업 폴더를 연결합니다.</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 4 — 작업 폴더 배치 ══ -->
+    <div class="setup-phase" id="setup-3">
+      <div class="setup-phase-hdr" onclick="toggleSetup(3)">
+        <div class="setup-phase-num" style="background:var(--c5)">4</div>
+        <div class="setup-phase-info">
+          <div class="setup-phase-name">작업 폴더(CLAUDE_AXBD) 압축 해제</div>
+          <div class="setup-phase-en">Extract Project Folder</div>
+        </div>
+        <div class="setup-phase-status">
+          <div class="setup-phase-tag" style="color:var(--c5);border-color:#c8b8ee;background:var(--c5-bg)">2단계</div>
+        </div>
+        <div class="setup-phase-arrow">▼</div>
+      </div>
+      <div class="setup-phase-body">
+
+        <div style="background:var(--c5-bg);border:1px solid #c8b8ee;border-radius:10px;padding:14px 16px;margin-bottom:16px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--c5);margin-bottom:6px">CLAUDE_AXBD 폴더란?</div>
+          <div style="font-size:11.5px;color:var(--g7);line-height:1.7">
+            팀에서 제공하는 <strong>사전 구성된 작업 폴더</strong>입니다. 안에 AI 사업개발에 필요한 <strong>76개 분석 스킬</strong>, <strong>36개 워크플로우</strong>, <strong>프로세스 정의서</strong>, <strong>팀 컨텍스트</strong>가 모두 포함되어 있습니다. 별도 설치 없이 압축만 풀면 바로 사용할 수 있습니다.
+          </div>
+        </div>
+
+        <div class="setup-ol">
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--c5-bg);color:var(--c5)">1</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">CLAUDE_AXBD.zip 다운로드</div>
+              <div class="setup-step-desc">
+                팀 공유 폴더(또는 전달받은 경로)에서 <span class="setup-code">CLAUDE_AXBD.zip</span> 파일을 다운로드합니다.
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--c5-bg);color:var(--c5)">2</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">바탕화면에 압축 해제</div>
+              <div class="setup-step-desc">
+                다운로드한 zip 파일을 <strong>바탕화면</strong>에 압축 해제합니다.
+              </div>
+              <div style="background:var(--bg);border:1px solid var(--ln);border-radius:10px;padding:14px 16px;margin-top:10px">
+                <div style="font-size:11.5px;color:var(--g7);line-height:1.9">
+                  <strong style="color:var(--g9)">① </strong> <span class="setup-code">CLAUDE_AXBD.zip</span> 파일을 <strong>마우스 우클릭</strong><br>
+                  <strong style="color:var(--g9)">② </strong> <strong>"압축 풀기..."</strong> 또는 <strong>"여기에 풀기"</strong> 클릭<br>
+                  <strong style="color:var(--g9)">③ </strong> 압축 해제 위치를 <strong>바탕화면</strong>으로 지정
+                </div>
+              </div>
+              <div class="setup-check" style="margin-top:8px">
+                <span class="setup-tip-icon">✓</span>
+                <span><strong>결과:</strong> 바탕화면에 <span style="font-family:Consolas,monospace;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:3px">CLAUDE_AXBD</span> 폴더가 보이면 성공. 폴더 안에 <span style="font-family:Consolas,monospace;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:3px">CLAUDE.md</span>, <span style="font-family:Consolas,monospace;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:3px">README.md</span> 등이 있는지 확인하세요.</span>
+              </div>
+              <div class="setup-warn">
+                <span class="setup-tip-icon">!</span>
+                <span><strong>주의:</strong> 폴더가 <span style="font-family:Consolas,monospace;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:3px">CLAUDE_AXBD/CLAUDE_AXBD/</span> 처럼 이중으로 중첩되지 않았는지 확인하세요. 바탕화면 바로 아래에 <span style="font-family:Consolas,monospace;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:3px">CLAUDE_AXBD</span> 폴더가 하나만 있어야 합니다.</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 5 — Claude Desktop Code에서 시작 ══ -->
+    <div class="setup-phase" id="setup-4">
+      <div class="setup-phase-hdr" onclick="toggleSetup(4)">
+        <div class="setup-phase-num" style="background:var(--g9)">5</div>
+        <div class="setup-phase-info">
+          <div class="setup-phase-name">Claude Desktop에서 사업 발굴 시작</div>
+          <div class="setup-phase-en">Launch AI Business Discovery via Desktop App</div>
+        </div>
+        <div class="setup-phase-status">
+          <div class="setup-phase-tag" style="color:var(--g9);border-color:var(--g4);background:var(--bg)">5단계</div>
+        </div>
+        <div class="setup-phase-arrow">▼</div>
+      </div>
+      <div class="setup-phase-body">
+
+        <div class="setup-ol">
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--bg);color:var(--g9)">1</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">Claude Desktop 앱에서 Code 탭 진입</div>
+              <div class="setup-step-desc">
+                Claude Desktop 앱을 실행하고 <strong>Code 탭</strong>으로 이동합니다.
+              </div>
+              <div style="background:var(--bg);border:1px solid var(--ln);border-radius:10px;padding:14px 16px;margin-top:10px">
+                <div style="font-size:11.5px;color:var(--g7);line-height:1.9">
+                  <strong style="color:var(--g9)">① </strong> Claude Desktop 앱 실행<br>
+                  <strong style="color:var(--g9)">② </strong> 화면 좌측의 <strong>Code 탭</strong>을 클릭합니다
+                </div>
+              </div>
+              <div class="setup-tip" style="margin-top:8px">
+                <span class="setup-tip-icon">💡</span>
+                <span><strong>Code 탭이란?</strong> Claude Desktop 앱 안에 내장된 Claude Code 기능입니다. 터미널 없이 앱 안에서 바로 AI 사업개발을 수행할 수 있습니다.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--bg);color:var(--g9)">2</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">CLAUDE_AXBD 폴더 연결</div>
+              <div class="setup-step-desc">
+                Code 탭에서 작업 폴더를 지정합니다. 이 단계가 가장 중요합니다.
+              </div>
+              <div style="background:var(--bg);border:1px solid var(--ln);border-radius:10px;padding:14px 16px;margin-top:10px">
+                <div style="font-size:11.5px;color:var(--g7);line-height:1.9">
+                  <strong style="color:var(--g9)">① </strong> <strong>"Select folder"</strong> 버튼 클릭<br>
+                  <strong style="color:var(--g9)">② </strong> 바탕화면의 <span class="setup-code">CLAUDE_AXBD</span> 폴더를 선택<br>
+                  <strong style="color:var(--g9)">③ </strong> Claude가 폴더 안의 <span class="setup-code">CLAUDE.md</span> 를 자동으로 읽어 팀 컨텍스트를 인식합니다
+                </div>
+              </div>
+              <div class="setup-tip" style="margin-top:8px">
+                <span class="setup-tip-icon">💡</span>
+                <span><strong>왜 폴더를 연결하나요?</strong> 폴더를 연결하면 안에 사전 배치된 <strong>76개 분석 스킬</strong>, <strong>36개 워크플로우</strong>, <strong>프로세스 정의</strong>를 Claude가 자동으로 인식합니다. 또한 AI가 생성하는 모든 산출물이 이 폴더의 <span class="setup-code" style="font-size:10px">outputs/</span> 에 저장됩니다.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--bg);color:var(--g9)">3</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">스킬 인식 확인</div>
+              <div class="setup-step-desc">
+                대화창에서 <span class="setup-code">/</span> 를 입력하여 스킬이 정상 로딩되었는지 확인합니다.
+              </div>
+              <div style="background:var(--bg);border:1px solid var(--ln);border-radius:10px;padding:14px 16px;margin-top:10px">
+                <div style="font-size:11.5px;color:var(--g7);line-height:1.9">
+                  <strong style="color:var(--g9)">① </strong> 대화 입력창에 <span class="setup-code">/</span> 를 입력<br>
+                  <strong style="color:var(--g9)">② </strong> 자동완성 목록에 스킬이 표시되는지 확인<br>
+                  <strong style="color:var(--g9)">③ </strong> <span class="setup-code">/swot</span> 또는 <span class="setup-code">/ai-biz</span> 를 입력해 필터링 확인
+                </div>
+              </div>
+              <div class="setup-check" style="margin-top:8px">
+                <span class="setup-tip-icon">✓</span>
+                <span><strong>확인 포인트:</strong> <span style="font-family:Consolas,monospace;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:3px">/swot-analysis</span>, <span style="font-family:Consolas,monospace;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:3px">/ai-biz-moat-analysis</span> 등이 목록에 나타나면 스킬 인식 성공</span>
+              </div>
+              <div class="setup-warn">
+                <span class="setup-tip-icon">!</span>
+                <span><strong>목록이 비어있다면:</strong> 폴더가 정상 연결되지 않은 것입니다. Code 탭에서 폴더 경로가 <span style="font-family:Consolas,monospace;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:3px">CLAUDE_AXBD</span> 를 가리키고 있는지 다시 확인하세요.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--bg);color:var(--g9)">4</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">사업 발굴 시작하기</div>
+              <div class="setup-step-desc">
+                대화창에 아래와 같이 입력하면 AI가 자동으로 <strong>2-0 아이템 분류</strong> 프로세스를 시작합니다.
+              </div>
+              <div style="background:var(--g9);border-radius:10px;padding:16px 18px;margin-top:10px">
+                <div style="font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#606880;margin-bottom:8px">대화 입력 예시</div>
+                <div style="font-size:12px;color:#c8cdd8;line-height:1.8;font-family:'Pretendard',sans-serif">
+                  <span style="color:#fff;font-weight:600">나는 AX BD팀 홍길동입니다.</span><br>
+                  <span style="color:#fff;font-weight:600">"AI 기반 손해사정 자동화"에 대해 2단계 발굴을 시작합니다.</span><br><br>
+                  <span style="color:#9aa0b0">보험사 손해사정 업무의 80%를 AI로 자동화하는 서비스입니다.</span><br>
+                  <span style="color:#9aa0b0">참고: https://example.com/관련기사</span>
+                </div>
+              </div>
+              <div class="setup-check" style="margin-top:8px">
+                <span class="setup-tip-icon">✓</span>
+                <span><strong>성공:</strong> Claude가 <strong>"이 아이템은 어디서 시작됐나요?"</strong> (Turn 1 출발점 파악)를 묻기 시작하면 프로세스가 정상 작동하는 것입니다!</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-step">
+            <div class="setup-step-num" style="background:var(--bg);color:var(--g9)">5</div>
+            <div class="setup-step-content">
+              <div class="setup-step-title">이후 사용 시 (매일 반복)</div>
+              <div class="setup-step-desc">
+                최초 세팅 이후에는 아래 순서만 반복하면 됩니다.
+              </div>
+              <div style="background:var(--ta-bg);border:1px solid var(--ta-lt);border-radius:10px;padding:14px 16px;margin-top:10px">
+                <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--ta);margin-bottom:8px">매일 사용 흐름 (3단계)</div>
+                <div style="font-size:11.5px;color:var(--g7);line-height:1.9">
+                  <strong style="color:var(--g9)">① </strong> Claude Desktop 앱 실행 → <strong>Code 탭</strong><br>
+                  <strong style="color:var(--g9)">② </strong> <span class="setup-code">CLAUDE_AXBD</span> 폴더가 연결되어 있는지 확인 (이전에 연결했다면 유지됨)<br>
+                  <strong style="color:var(--g9)">③ </strong> 대화 시작 — 이전 세션 이어가기 또는 새 아이템 분석 시작
+                </div>
+              </div>
+              <div class="setup-tip" style="margin-top:8px">
+                <span class="setup-tip-icon">💡</span>
+                <span><strong>유용한 명령어:</strong> 대화 중 <span class="setup-code" style="font-size:10px">전체 진행 상황</span> 을 입력하면 2-0~2-10 전체 진행 현황을 확인할 수 있고, <span class="setup-code" style="font-size:10px">산출물 정리해줘</span> 를 입력하면 지금까지의 분석 결과를 구조화된 문서로 출력합니다.</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">AX BD팀 · 환경세팅 가이드 v8.2 · 2026-03</div>
+</div>
+</div>
+
+<!-- ════════════════════════════
+     SECTION A — 전체 흐름
+════════════════════════════ -->
+<div class="section" id="sec-A">
+<div class="wrap">
+
+  <div class="sec-hdr">
+    <div class="sec-eye">AX Business Development · Discovery Stage 2</div>
+    <div class="sec-title">2단계 발굴 — 전체 흐름</div>
+    <div class="sec-sub">사업 아이템 유형에 따라 분석 경로가 달라집니다 · 2-1~2-7 전 단계 HITL 적용 · 2-8~2-10 공통 단계</div>
+  </div>
+
+  <div class="sec-label">Step 2-0 · 사업 아이템 분류</div>
+  <div class="s0-block">
+    <div class="s0-num">2-0</div>
+    <div class="s0-name">사업 아이템 분류</div>
+    <div class="s0-en">Item Classification Agent</div>
+    <div class="s0-desc">1단계에서 들어온 사업 아이템을 AI Agent와 <strong style="color:#fff">자연어 대화 3턴</strong>으로 <strong style="color:#fff">5가지 유형(I/M/P/T/S)</strong>을 분류하고, 유형별 초기 분석 및 맞춤 분석 경로를 제안한다</div>
+    <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px 14px;margin-bottom:14px">
+      <div style="font-size:9px;font-weight:700;letter-spacing:.6px;color:#606880;margin-bottom:5px">AX BD팀 미션 컨텍스트 (AI 사전 인지)</div>
+      <div style="font-size:10px;color:#9aa0b0;line-height:1.6">MM→AI 신규사업 전환 · Agentic AI Identity · 반제품화(AI 자산) · FDE 모델(도메인+컨설팅+기술) · SI/ITO 시너지</div>
+    </div>
+    <div class="turns">
+      <div class="turn"><div class="turn-num">Turn 1 · 출발점 파악</div><div class="turn-q">"이 아이템은 어디서 시작됐나요?<br>① <strong>기존 서비스/URL</strong> ② <strong>시장·산업·고객군</strong> ③ <strong>고객 문제</strong> ④ <strong>AI 기술/트렌드</strong> ⑤ <strong>아이디어/방향성</strong>"</div></div>
+      <div class="turn"><div class="turn-num">Turn 2 · 유형별 초기 분석</div><div class="turn-q">AI가 유형에 맞게 자동 분석 수행:<br><strong>I</strong>→문제 가설 3개 | <strong>M</strong>→핵심 Jobs 5개 | <strong>P</strong>→심각도·빈도 추정 | <strong>T</strong>→산업별 문제 Top 5 | <strong>S</strong>→가치사슬+AI 기회</div></div>
+      <div class="turn"><div class="turn-num">Turn 3 · AX BD 전략 적합성</div><div class="turn-q">"① <strong>반제품/AI 자산</strong> 재사용? ② <strong>Agentic AI</strong> 요소? ③ <strong>SI/ITO</strong> 결합? ④ 추진 방향: 신시장 / AI 전환 / 내부 효율화?"</div></div>
+    </div>
+  </div>
+
+  <div class="branch-area">
+    <div class="branch-line"></div>
+    <div class="branch-label">5가지 유형 분류 결과 → 맞춤 분석 경로 선택</div>
+  </div>
+
+  <div class="sec-label">Step 2-1 ~ 2-7 · 유형별 분기 경로</div>
+  <div class="hitl-banner">
+    <div class="hitl-icon">H</div>
+    <div class="hitl-text"><strong>HITL (Human-In-The-Loop)</strong> — 2-1~2-7 전 단계는 AI가 분석 초안을 제공하지만, <strong>담당자가 직접 프롬프트를 조정하고 대화하며 내용을 습득·검증</strong>하는 것이 핵심입니다. AI 결과를 그대로 수용하지 않고, 각 단계마다 담당자의 도메인 이해와 판단이 개입되어야 사업화 깊이가 확보됩니다.</div>
+  </div>
+
+  <div class="branch-spread">
+    <div class="type-col ti">
+      <div class="type-card">
+        <div class="type-tag">Type I</div>
+        <div class="type-name">아이디어형</div>
+        <div class="type-def">팀원 발상·경영진 방향·워크샵 결과에서 출발</div>
+        <div class="type-ex">예) "AI 기반 ESG 컨설팅"</div>
+      </div>
+      <div class="col-arrow"></div>
+      <div class="route-card">
+        <div class="route-title">분석 경로 <span class="hitl-badge">HITL</span></div>
+        <div class="route-steps">
+          <div class="rs"><span class="rs-num">2-1</span><span class="rs-text">레퍼런스 — 간소</span></div>
+          <div class="rs em"><span class="rs-num">2-2</span><span class="rs-text"><strong>시장 검증 (핵심)</strong></span></div>
+          <div class="rs"><span class="rs-num">2-3</span><span class="rs-text">경쟁 분석 — 보통</span></div>
+          <div class="rs em"><span class="rs-num">2-4</span><span class="rs-text"><strong>아이템 도출 (핵심)</strong></span></div>
+          <div class="rs em"><span class="rs-num">2-5</span><span class="rs-text"><strong>아이템 선정 (핵심)</strong></span></div>
+          <div class="rs em"><span class="rs-num">2-6</span><span class="rs-text"><strong>고객 정의 (핵심)</strong></span></div>
+          <div class="rs"><span class="rs-num">2-7</span><span class="rs-text">BM 정의 — 보통</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="type-col tm">
+      <div class="type-card">
+        <div class="type-tag">Type M</div>
+        <div class="type-name">시장·타겟형</div>
+        <div class="type-def">특정 산업/고객군에서 기회를 포착</div>
+        <div class="type-ex">예) "물류 AI 전환 수요 급증"</div>
+      </div>
+      <div class="col-arrow"></div>
+      <div class="route-card">
+        <div class="route-title">분석 경로 <span class="hitl-badge">HITL</span></div>
+        <div class="route-steps">
+          <div class="rs"><span class="rs-num">2-1</span><span class="rs-text">레퍼런스 — 보통</span></div>
+          <div class="rs em"><span class="rs-num">2-2</span><span class="rs-text"><strong>시장 검증 (핵심)</strong></span></div>
+          <div class="rs em"><span class="rs-num">2-3</span><span class="rs-text"><strong>경쟁 분석 (핵심)</strong></span></div>
+          <div class="rs"><span class="rs-num">2-4</span><span class="rs-text">아이템 도출 — 보통</span></div>
+          <div class="rs em"><span class="rs-num">2-5</span><span class="rs-text"><strong>아이템 선정 (핵심)</strong></span></div>
+          <div class="rs em"><span class="rs-num">2-6</span><span class="rs-text"><strong>고객 정의 (핵심)</strong></span></div>
+          <div class="rs"><span class="rs-num">2-7</span><span class="rs-text">BM 정의 — 보통</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="type-col tp">
+      <div class="type-card">
+        <div class="type-tag">Type P</div>
+        <div class="type-name">고객문제형</div>
+        <div class="type-def">영업·현장에서 올라온 구체적 Pain</div>
+        <div class="type-ex">예) 손해사정 자동화, 지식관리 AI</div>
+      </div>
+      <div class="col-arrow"></div>
+      <div class="route-card">
+        <div class="route-title">분석 경로 <span class="hitl-badge">HITL</span></div>
+        <div class="route-steps">
+          <div class="rs"><span class="rs-num">2-1</span><span class="rs-text">레퍼런스 — 간소</span></div>
+          <div class="rs em"><span class="rs-num">2-2</span><span class="rs-text"><strong>시장 검증 (핵심)</strong></span></div>
+          <div class="rs em"><span class="rs-num">2-3</span><span class="rs-text"><strong>경쟁 분석 (핵심)</strong></span></div>
+          <div class="rs em"><span class="rs-num">2-4</span><span class="rs-text"><strong>아이템 도출 (핵심)</strong></span></div>
+          <div class="rs em"><span class="rs-num">2-5</span><span class="rs-text"><strong>아이템 선정 (핵심)</strong></span></div>
+          <div class="rs em"><span class="rs-num">2-6</span><span class="rs-text"><strong>고객 정의 (핵심)</strong> — WTP</span></div>
+          <div class="rs em"><span class="rs-num">2-7</span><span class="rs-text"><strong>BM 정의 (핵심)</strong></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="type-col tt">
+      <div class="type-card">
+        <div class="type-tag">Type T</div>
+        <div class="type-name">기술형</div>
+        <div class="type-def">AI 기술·트렌드에서 사업 기회 탐색</div>
+        <div class="type-ex">예) Agentic AI, 피지컬 AI</div>
+      </div>
+      <div class="col-arrow"></div>
+      <div class="route-card">
+        <div class="route-title">분석 경로 <span class="hitl-badge">HITL</span></div>
+        <div class="route-steps">
+          <div class="rs em"><span class="rs-num">2-1</span><span class="rs-text"><strong>레퍼런스 (핵심)</strong> — AI 기회</span></div>
+          <div class="rs em"><span class="rs-num">2-2</span><span class="rs-text"><strong>시장 검증 (핵심)</strong></span></div>
+          <div class="rs em"><span class="rs-num">2-3</span><span class="rs-text"><strong>경쟁 분석 (핵심)</strong> — 잠식 위험</span></div>
+          <div class="rs em"><span class="rs-num">2-4</span><span class="rs-text"><strong>아이템 도출 (핵심)</strong> — Use Case</span></div>
+          <div class="rs em"><span class="rs-num">2-5</span><span class="rs-text"><strong>아이템 선정 (핵심)</strong> — 테크핏</span></div>
+          <div class="rs"><span class="rs-num">2-6</span><span class="rs-text">고객 정의 — 보통</span></div>
+          <div class="rs"><span class="rs-num">2-7</span><span class="rs-text">BM 정의 — 보통</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="type-col ts">
+      <div class="type-card">
+        <div class="type-tag">Type S</div>
+        <div class="type-name">기존서비스형</div>
+        <div class="type-def">실존 서비스·플랫폼을 벤치마크</div>
+        <div class="type-ex">예) 이지클로 → KT DS Agent</div>
+      </div>
+      <div class="col-arrow"></div>
+      <div class="route-card">
+        <div class="route-title">분석 경로 <span class="hitl-badge">HITL</span></div>
+        <div class="route-steps">
+          <div class="rs em"><span class="rs-num">2-1</span><span class="rs-text"><strong>레퍼런스 (핵심)</strong> — 3레이어</span></div>
+          <div class="rs"><span class="rs-num">2-2</span><span class="rs-text">시장 검증 — 간소</span></div>
+          <div class="rs em"><span class="rs-num">2-3</span><span class="rs-text"><strong>경쟁 분석 (핵심)</strong> — 잠식 위험</span></div>
+          <div class="rs em"><span class="rs-num">2-4</span><span class="rs-text"><strong>아이템 도출 (핵심)</strong> — 전환 로직</span></div>
+          <div class="rs"><span class="rs-num">2-5</span><span class="rs-text">아이템 선정 — 보통</span></div>
+          <div class="rs"><span class="rs-num">2-6</span><span class="rs-text">고객 정의 — 보통</span></div>
+          <div class="rs em"><span class="rs-num">2-7</span><span class="rs-text"><strong>BM 정의 (핵심)</strong> — BM 변화</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="merge-area">
+    <div class="merge-line-wrap"><div class="merge-line"></div></div>
+    <div style="text-align:center;margin:4px 0 10px"><span style="display:inline-block;padding:4px 14px;border-radius:100px;background:var(--g8);color:#fff;font-size:10px;font-weight:700;letter-spacing:.5px">공통 합류 — 2-8부터 동일 경로</span></div>
+    <div class="sec-label">Step 2-8 ~ 2-10 · 공통 단계</div>
+    <div class="common-steps">
+      <div class="cs t4">
+        <div class="cs-l"><div class="cs-num" style="color:var(--c4)">2-8</div><div class="cs-name" style="color:#701414">발굴 결과 패키징</div><div class="cs-en">Discovery Output Report</div></div>
+        <div class="cs-r"><div class="cs-desc">2-1~2-7 결과를 통합해 <strong>3단계 형상화의 Input Deck</strong>으로 완성하고 GTM 초안과 Beachhead 시장을 확정한다</div></div>
+      </div>
+      <div class="cs-arr"></div>
+      <div class="cs t9">
+        <div class="cs-l"><div class="cs-num" style="color:var(--c5)">2-9</div><div class="cs-name" style="color:#3a1878">AI 멀티 페르소나 사전 평가</div><div class="cs-en">AI Agent Pre-Screening</div></div>
+        <div class="cs-r" style="display:block;padding:0">
+          <div style="padding:12px 18px 10px;border-bottom:1px solid var(--ln)"><div class="cs-desc"><strong>8개 KT DS 내부 페르소나를 AI Agent로 구현</strong>해 발굴 결과를 자동 평가하고 합의·분기·우려 영역을 사전 도출한다</div></div>
+          <div style="padding:9px 18px;display:flex;align-items:center;gap:8px">
+            <span style="display:inline-flex;align-items:center;padding:3px 8px;border-radius:5px;background:#fffbea;border:1px solid #f0d060;font-size:10px;font-weight:700;color:#7a5500;flex-shrink:0">HITL</span>
+            <span style="font-size:11px;color:var(--g5)">담당자가 AI 평가 결과를 직접 확인하고 각 페르소나 관점의 논점을 해석·조정한다 — AI 판정을 수용하되 담당자 판단이 최종</span>
+          </div>
+        </div>
+      </div>
+      <div class="cs-arr"></div>
+      <div class="cs tf">
+        <div class="cs-l"><div class="cs-num">2-10</div><div class="cs-name">AX BD팀 공유 및 검토</div><div class="cs-en">Team Review &amp; Handoff</div></div>
+        <div class="cs-r" style="display:block;padding:0">
+          <div style="padding:12px 18px 10px"><div class="cs-desc">2-1~2-9 전체를 <strong>팀 검토 Deck으로 통합</strong>해 팀원 전체가 함께 확인하고 열린 질문·토론 안건을 도출해 3단계 형상화로 Handoff한다</div></div>
+          <div style="padding:0 18px 12px;display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+            <span style="padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700;background:var(--c1-bg);color:var(--c1);border:1px solid var(--ta-lt)">Go →</span>
+            <span style="padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700;background:var(--c3-bg);color:var(--c3);border:1px solid var(--tc-lt)">Hold →</span>
+            <span style="padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700;background:var(--c4-bg);color:var(--c4);border:1px solid #e8b8b8">Drop →</span>
+            <span style="font-size:10px;color:var(--g5)">팀 의사결정 → 3단계 형상화 진입</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">AX BD팀 · 2단계 발굴 프로세스 v8.2 · 2026-03</div>
+</div>
+</div>
+
+<!-- ════════════════════════════
+     SECTION B — 단계별 상세
+════════════════════════════ -->
+<div class="section" id="sec-B">
+<div class="wrap">
+  <div class="sec-hdr">
+    <div class="sec-eye">Step-by-Step Detail</div>
+    <div class="sec-title">단계별 상세</div>
+    <div class="sec-sub">각 단계를 클릭해 적용 방법론과 실행 스킬을 확인하세요</div>
+  </div>
+  <div class="acc-list" id="accList"></div>
+  <div class="foot" style="margin-top:24px">AX BD팀 · 2단계 발굴 프로세스 v8.2 · 2026-03</div>
+</div>
+</div>
+
+<!-- ════════════════════════════
+     SECTION C — 전체 스킬 목록
+════════════════════════════ -->
+<div class="section" id="sec-C">
+<div class="wrap">
+  <div class="sec-hdr">
+    <div class="sec-eye">Full Skill Reference</div>
+    <div class="sec-title">전체 스킬 목록</div>
+    <div class="sec-sub">2단계 발굴에서 사용하는 전체 스킬, 방법론, 프레임워크를 한눈에 검색할 수 있습니다</div>
+  </div>
+
+  <div class="sec-label">전체 스킬 목록</div>
+  <div class="skill-full-list" id="skillFullList"></div>
+  <div class="foot" style="margin-top:24px">AX BD팀 · 2단계 발굴 프로세스 v8.2 · 2026-03</div>
+</div>
+</div>
+
+<script>
+/* ══════════════════════════════
+   DATA
+══════════════════════════════ */
+const STEPS = [
+  {num:'2-0', name:'사업 아이템 분류', en:'Item Classification Agent',
+   sub:'AI Agent 대화로 유형 분류 및 맞춤 분석 경로 제안', bmc:false,
+   methods:['자연어 대화 분류 (3턴) + 유형별 초기 분석','아이템 유형 정의 (I/M/P/T/S)','AX BD팀 미션 적합성 확인'],
+   skills:[
+     {badge:'ac', name:'Claude.ai 대화창', desc:'직접 프롬프트 입력', link:'https://claude.ai'}
+   ]},
+  {num:'2-1', name:'레퍼런스 분석', en:'Benchmark Deconstruction',
+   sub:'외부 레퍼런스·트렌드·사례의 BM·기술·UX 구조화', bmc:false,
+   methods:['Competitive Analysis','3-Layer Deconstruction (BM·기술·UX)','JTBD Framework','AI Ecosystem Mapping','Value Chain Analysis (Porter)','AI 기회 매핑 (자동화/개인화/예측/최적화/생성)','💡 사업성 체크: 우리가 다르게 할 수 있는 부분이 보이는가?'],
+   skills:[
+     {badge:'pm', name:'/competitor-analysis', desc:'직접·간접 경쟁사 식별, 강점·약점·차별화', link:'https://github.com/phuryn/pm-skills/tree/main/pm-market-research'},
+     {badge:'pm', name:'/market-segments', desc:'시장 세그먼트 식별 및 특성 분석', link:'https://github.com/phuryn/pm-skills/tree/main/pm-market-research'},
+     {badge:'ab', name:'/ai-biz-ecosystem-map', desc:'AI 생태계 맵핑 (밸류체인·경쟁구도·보완재)', link:'#'},
+     {badge:'fw', name:'Value Chain Analysis', desc:'Porter — 가치 활동 분해로 경쟁우위 식별', link:'#'},
+     {badge:'ac', name:'web_fetch / web_search', desc:'Anthropic 빌트인', link:'https://docs.anthropic.com/'}
+   ]},
+  {num:'2-2', name:'수요 시장 검증', en:'Market Signal Validation',
+   sub:'TAM/SAM/SOM 및 고객 Pain Point 분석', bmc:false,
+   methods:['TAM/SAM/SOM (Top-down + Bottom-up)','Market Sizing','Market Segments','Assumption Mapping','Task-Based TAM (a16z)','"Why Now" Timing Analysis','💡 사업성 체크: 지금 추진할 만한 이유가 있는가?'],
+   skills:[
+     {badge:'pm', name:'/market-sizing', desc:'TAM/SAM/SOM Top-down + Bottom-up 산출', link:'https://github.com/phuryn/pm-skills/tree/main/pm-market-research'},
+     {badge:'pm', name:'/market-segments', desc:'고객 세그먼트 3~5개 식별', link:'https://github.com/phuryn/pm-skills/tree/main/pm-market-research'},
+     {badge:'pm', name:'/identify-assumptions-new', desc:'핵심 가정 식별 (8개 리스크 카테고리)', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-discovery'},
+     {badge:'fw', name:'Task-Based TAM', desc:'a16z/Sequoia — 태스크수 × 비용 × AI대체율', link:'#'},
+     {badge:'ac', name:'web_search', desc:'시장 데이터·리포트·통계 검색', link:'https://docs.anthropic.com/'}
+   ]},
+  {num:'2-3', name:'경쟁·자사 분석', en:'Competitive Landscape',
+   sub:'국내외 경쟁 구도 파악 및 KT DS 비대칭 강점 도출', bmc:false,
+   methods:['SWOT Analysis','Porter\'s 5 Forces','PESTLE Analysis','Value Chain Analysis','Blue Ocean (ERRC)','Crossing the Chasm','Competitive Battlecard','Moat Analysis','AI Partner Scorecard','Disruption Risk Analysis','Imitation Difficulty Score','💡 사업성 체크: 우리만의 자리가 있는가?'],
+   skills:[
+     {badge:'pm', name:'/swot-analysis', desc:'SWOT 분석 + 실행 권고', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-strategy'},
+     {badge:'pm', name:'/porters-five-forces', desc:'Porter\'s 5 Forces 산업 경쟁 구조', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-strategy'},
+     {badge:'pm', name:'/pestle-analysis', desc:'PESTLE 거시환경 6축 분석', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-strategy'},
+     {badge:'pm', name:'/competitive-battlecard', desc:'경쟁사별 세일즈 배틀카드', link:'https://github.com/phuryn/pm-skills/tree/main/pm-go-to-market'},
+     {badge:'ab', name:'/ai-biz-moat-analysis', desc:'AI 경쟁 해자 분석 (데이터/기술/네트워크)', link:'#'},
+     {badge:'ab', name:'/ai-biz-partner-scorecard', desc:'기술 파트너 평가 및 제휴 전략', link:'#'},
+     {badge:'ab', name:'/ai-biz-ecosystem-map', desc:'AI 생태계 맵핑', link:'#'},
+     {badge:'fw', name:'Value Chain Analysis', desc:'Porter — 경쟁사·자사 가치활동 비교', link:'#'},
+     {badge:'ac', name:'web_search', desc:'경쟁사 최신 동향 검색', link:'https://docs.anthropic.com/'}
+   ]},
+  {num:'2-4', name:'사업 아이템 도출', en:'Opportunity Ideation',
+   sub:'KT DS형 사업 아이템 도출 및 BMC 초안 작성', bmc:true,
+   methods:['Opportunity Solution Tree','Business Model Canvas (BMC 초안)','Ansoff Matrix','Three Horizons of Growth (McKinsey)','HMW (How Might We)','a16z AI Value Chain','AI Feasibility (기술/시장/재무/조직)','Build vs Buy vs Partner','엘리베이터 피치 30초','💡 사업성 체크: 30초 설명에 고개를 끄덕일까?'],
+   skills:[
+     {badge:'pm', name:'/opportunity-solution-tree', desc:'목표→기회→솔루션→실험 트리', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-discovery'},
+     {badge:'pm', name:'/business-model', desc:'Business Model Canvas 9블록 (초안)', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-strategy'},
+     {badge:'pm', name:'/ansoff-matrix', desc:'Ansoff Matrix — 시장침투/개발/다각화', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-strategy'},
+     {badge:'pm', name:'/brainstorm-experiments-new', desc:'신규 제품 린 실험(프리토타입) 설계', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-discovery'},
+     {badge:'ab', name:'/ai-biz-feasibility-study', desc:'AI 사업 타당성 분석 (기술/시장/재무/조직)', link:'#'},
+     {badge:'ab', name:'/ai-biz-build-vs-buy', desc:'Build vs Buy vs Partner 의사결정 매트릭스', link:'#'},
+     {badge:'ab', name:'/ai-biz-data-strategy', desc:'데이터 확보/품질/파이프라인 전략', link:'#'},
+     {badge:'fw', name:'a16z AI Value Chain', desc:'AI 밸류체인 3레이어 포지셔닝', link:'#'},
+     {badge:'fw', name:'Three Horizons of Growth', desc:'McKinsey — H1/H2/H3 시간축 성장전략', link:'#'}
+   ]},
+  {num:'2-5', name:'핵심 아이템 선정', en:'Opportunity Scoring',
+   sub:'매력도×실행가능성 기준 집중 아이템 1~2개 선정', bmc:false,
+   methods:['Opportunity Scoring Matrix','ICE/RICE Scoring','BCG Growth-Share Matrix','McKinsey 9-Box','Prioritize Assumptions','NIST AI RMF','AI Regulation Check','Moat Analysis','Tech Fit Scoring','가정별 검증 실험 연결','5영역 가정 발굴 체크리스트','💡 Commit Gate: 4주 투자할 확신이 있는가? (심화 4Q)'],
+   skills:[
+     {badge:'pm', name:'/prioritization-frameworks', desc:'9개 우선순위 프레임워크 (RICE, ICE, Kano 등)', link:'https://github.com/phuryn/pm-skills/tree/main/pm-execution'},
+     {badge:'pm', name:'/prioritize-assumptions', desc:'Impact × Risk 매트릭스 + 실험 설계', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-discovery'},
+     {badge:'pm', name:'/prioritize-features', desc:'기능 후보 우선순위화', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-discovery'},
+     {badge:'ab', name:'/ai-biz-regulation-check', desc:'AI 규제/컴플라이언스 체크 (AI기본법·GDPR)', link:'#'},
+     {badge:'ab', name:'/ai-biz-moat-analysis', desc:'AI 경쟁 해자 강도 평가', link:'#'},
+     {badge:'fw', name:'NIST AI RMF', desc:'AI 리스크 관리 — Govern/Map/Measure/Manage', link:'#'},
+     {badge:'fw', name:'BCG Growth-Share Matrix', desc:'Star/?/CashCow/Dog 포트폴리오 자원배분', link:'#'}
+   ]},
+  {num:'2-6', name:'타겟 고객 정의', en:'Customer Persona & Journey',
+   sub:'B2B/B2G 구매자 페르소나·구매여정·가치제안 정의', bmc:false,
+   methods:['User Persona (경제적 구매자/실무자)','Customer Journey Map','Ideal Customer Profile (ICP)','Interview Script','JTBD (Jobs-To-Be-Done)','Value Proposition Canvas','Gartner AI Maturity Model','WTP(지불의향) 검증','인터뷰 최소 기준 5명+','💡 사업성 체크: 이 고객과 문제가 실재하는가?'],
+   skills:[
+     {badge:'pm', name:'/user-personas', desc:'JTBD 기반 사용자 페르소나 3개', link:'https://github.com/phuryn/pm-skills/tree/main/pm-market-research'},
+     {badge:'pm', name:'/customer-journey-map', desc:'구매여정 터치포인트·감정·기회 맵핑', link:'https://github.com/phuryn/pm-skills/tree/main/pm-market-research'},
+     {badge:'pm', name:'/value-proposition', desc:'JTBD 6파트 가치제안 설계', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-strategy'},
+     {badge:'pm', name:'/ideal-customer-profile', desc:'B2B ICP — 이상 고객 프로필 정의', link:'https://github.com/phuryn/pm-skills/tree/main/pm-go-to-market'},
+     {badge:'pm', name:'/interview-script', desc:'고객 인터뷰 스크립트 생성', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-discovery'},
+     {badge:'fw', name:'Gartner AI Maturity Model', desc:'고객 AI 성숙도 5단계 세그멘테이션', link:'#'}
+   ]},
+  {num:'2-7', name:'비즈니스 모델 정의', en:'Business Model Hypothesis',
+   sub:'BMC 완성 및 수익 시나리오 3안·Unit Economics 검증', bmc:true,
+   methods:['Business Model Canvas (BMC 완성본)','Lean Canvas','Startup Canvas','Pricing Strategy','Growth Loops','Unit Economics (LTV/CAC/BEP)','수익 시나리오 3안','MIT Sloan AI BM 4유형','AI Cost Structure','Data Flywheel','a16z AI Margin Analysis','BM 변화 시뮬레이션 (S형)','💡 사업성 체크: 이 BM으로 돈을 벌 수 있는가?'],
+   skills:[
+     {badge:'pm', name:'/business-model', desc:'BMC 9블록 완성', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-strategy'},
+     {badge:'pm', name:'/lean-canvas', desc:'Lean Canvas', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-strategy'},
+     {badge:'pm', name:'/monetization-strategy', desc:'수익화 전략 3~5개 브레인스토밍', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-strategy'},
+     {badge:'pm', name:'/pricing-strategy', desc:'가격 모델, WTP 추정, 가격 실험', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-strategy'},
+     {badge:'pm', name:'/startup-canvas', desc:'Product Strategy + Business Model 통합', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-strategy'},
+     {badge:'pm', name:'/growth-loops', desc:'성장 플라이휠 5유형 설계', link:'https://github.com/phuryn/pm-skills/tree/main/pm-go-to-market'},
+     {badge:'ab', name:'/ai-biz-cost-model', desc:'AI 원가 구조 (데이터·학습·추론·인프라)', link:'#'},
+     {badge:'fw', name:'MIT Sloan AI BM 4유형', desc:'Existing+/Customer Proxy/Modular/Orchestrator', link:'#'},
+     {badge:'fw', name:'Data Flywheel', desc:'Andrew Ng — 데이터 선순환 구조 설계', link:'#'},
+     {badge:'fw', name:'a16z AI Margin Analysis', desc:'SaaS(70-80%) vs AI(50-60%) 마진 구조', link:'#'}
+   ]},
+  {num:'2-8', name:'발굴 결과 패키징', en:'Discovery Output Report',
+   sub:'2-1~2-7 통합 및 3단계 형상화 Input Deck 완성', bmc:false,
+   methods:['GTM Strategy','Beachhead Market','GTM Motions','Metrics Dashboard','PRD','North Star Metric','Balanced Scorecard','PwC AI Studio & ROI','Agentic AI Process Redesign (Bain/Deloitte)','Executive Summary','Pyramid Principle','IR Deck / 투자심의 보고서','PoC/Pilot Design','Validation Experiment Plan','Discovery Summary 5문장','Discovery 완료 게이트','📊 누적 사업성 신호등 (Go/Pivot/Drop 이력 요약)'],
+   skills:[
+     {badge:'pm', name:'/gtm-strategy', desc:'GTM 전략 — 채널, 메시징, 성공 지표', link:'https://github.com/phuryn/pm-skills/tree/main/pm-go-to-market'},
+     {badge:'pm', name:'/beachhead-segment', desc:'Beachhead 시장 선정', link:'https://github.com/phuryn/pm-skills/tree/main/pm-go-to-market'},
+     {badge:'pm', name:'/gtm-motions', desc:'GTM 모션 7유형 분석', link:'https://github.com/phuryn/pm-skills/tree/main/pm-go-to-market'},
+     {badge:'pm', name:'/metrics-dashboard', desc:'KPI 대시보드 설계', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-discovery'},
+     {badge:'pm', name:'/create-prd', desc:'PRD 8섹션 작성', link:'https://github.com/phuryn/pm-skills/tree/main/pm-execution'},
+     {badge:'pm', name:'/north-star-metric', desc:'North Star Metric 정의', link:'https://github.com/phuryn/pm-skills/tree/main/pm-marketing-growth'},
+     {badge:'ab', name:'/ai-biz-ir-deck', desc:'투자심의/경영진 보고용 사업계획서', link:'#'},
+     {badge:'ab', name:'/ai-biz-pilot-design', desc:'PoC/파일럿 설계 및 성공 기준', link:'#'},
+     {badge:'ab', name:'/ai-biz-regulation-check', desc:'AI 규제/컴플라이언스 체크', link:'#'},
+     {badge:'fw', name:'Balanced Scorecard', desc:'Kaplan/Norton — 4관점 KPI 체계', link:'#'},
+     {badge:'fw', name:'PwC AI Studio & ROI', desc:'AI CoE + ROI 지속 측정 체계', link:'#'},
+     {badge:'fw', name:'Agentic AI Process Redesign', desc:'Bain/Deloitte — E2E 프로세스 재설계', link:'#'}
+   ]},
+  {num:'2-9', name:'AI 멀티 페르소나 사전 평가', en:'AI Agent Pre-Screening',
+   sub:'8개 내부 페르소나 AI 자동 평가 및 합의·우려 사전 도출', bmc:false,
+   methods:['Multi-Persona Simulation','Weighted Scoring Matrix (Layer 1)','Context Prompting (Layer 2)','Pre-Mortem Analysis','AI Ethics Impact Assessment (Alan Turing/IEEE)'],
+   skills:[
+     {badge:'ab', name:'AI 멀티 페르소나 사전 평가', desc:'AX BD팀 자체 제작', link:'AI_사전평가.html'},
+     {badge:'pm', name:'/prioritize-assumptions', desc:'핵심 가정 우선순위화', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-discovery'},
+     {badge:'pm', name:'/pre-mortem', desc:'Pre-mortem 리스크 분류', link:'https://github.com/phuryn/pm-skills/tree/main/pm-execution'},
+     {badge:'fw', name:'AI Ethics Impact Assessment', desc:'Alan Turing/IEEE — AI 윤리 영향 평가', link:'#'}
+   ]},
+  {num:'2-10', name:'AX BD팀 공유 및 검토', en:'Team Review & Handoff',
+   sub:'팀 전체 검토 및 Go / Hold / Drop 의사결정', bmc:false,
+   methods:['Executive Summary (1-Pager)','Product Strategy','Product Vision','Stakeholder Map','McKinsey 7-S Model','WEF AI Workforce 5축 변혁','Open Questions 구조화','Go/Hold/Drop 판정','Prototype 범위 정의','Scale Playbook'],
+   skills:[
+     {badge:'pm', name:'/product-strategy', desc:'9섹션 Product Strategy Canvas', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-strategy'},
+     {badge:'pm', name:'/gtm-strategy', desc:'GTM 전략 최종 검토', link:'https://github.com/phuryn/pm-skills/tree/main/pm-go-to-market'},
+     {badge:'pm', name:'/stakeholder-map', desc:'이해관계자 맵 + 커뮤니케이션 계획', link:'https://github.com/phuryn/pm-skills/tree/main/pm-execution'},
+     {badge:'pm', name:'/product-vision', desc:'팀 동기부여를 위한 제품 비전', link:'https://github.com/phuryn/pm-skills/tree/main/pm-product-strategy'},
+     {badge:'pm', name:'/create-prd', desc:'PRD 8섹션 — 프로토타입 범위 정의', link:'https://github.com/phuryn/pm-skills/tree/main/pm-execution'},
+     {badge:'ab', name:'/ai-biz-scale-playbook', desc:'파일럿→상용화 전환 플레이북', link:'#'},
+     {badge:'fw', name:'McKinsey 7-S Model', desc:'조직 정합성 7요소 점검', link:'#'},
+     {badge:'fw', name:'WEF AI Workforce 5축', desc:'비전/역량/기술/프로세스/문화 변혁', link:'#'}
+   ]}
+];
+
+const NUM_COLORS = {
+  '2-0':'#606880','2-1':'#2a7a60','2-2':'#2a7a60','2-3':'#2560b0','2-4':'#2560b0',
+  '2-5':'#b86c10','2-6':'#b86c10','2-7':'#b82828','2-8':'#b82828','2-9':'#5830b8','2-10':'#1a1d23'
+};
+const NUM_BG = {
+  '2-0':'#2d3340','2-1':'#e6f4ef','2-2':'#e6f4ef','2-3':'#e6eef9','2-4':'#e6eef9',
+  '2-5':'#fef3e2','2-6':'#fef3e2','2-7':'#fce8e8','2-8':'#fce8e8','2-9':'#eee8fc','2-10':'#f2f4f6'
+};
+const BADGE_STYLE = {
+  pm:'background:#e8f0fa;color:#2560b0',
+  ab:'background:#fff3e0;color:#e65100',
+  fw:'background:#f3e5f5;color:#7b1fa2',
+  ac:'background:#e6f4ef;color:#2a7a60'
+};
+const BADGE_LABEL = {pm:'pm-skills', ab:'ai-biz', fw:'Framework', ac:'Anthropic'};
+
+/* ── BUILD ACCORDION ── */
+function buildAccordion() {
+  const list = document.getElementById('accList');
+  list.innerHTML = STEPS.map((s,i) => `
+    <div class="acc-item" id="acc-${i}">
+      <div class="acc-head" onclick="toggleAcc(${i})">
+        <div class="acc-num" style="color:${NUM_COLORS[s.num]}">${s.num}</div>
+        <div class="acc-main">
+          <div class="acc-name">${s.name}</div>
+          <div class="acc-en">${s.en}</div>
+          <div class="acc-sub">${s.sub}</div>
+        </div>
+        <div class="acc-arrow">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="acc-section">
+          <div class="acc-section-title">방법론 · 프레임워크</div>
+          <div class="tag-list">
+            ${s.methods.map(m=>`<span class="m-tag">${m}</span>`).join('')}
+          </div>
+        </div>
+        <div class="acc-section">
+          <div class="acc-section-title">적용 스킬</div>
+          <div class="skill-list">
+            ${s.skills.map(sk=>`
+              <div class="skill-item">
+                <div class="skill-icon" style="${BADGE_STYLE[sk.badge]}">${BADGE_LABEL[sk.badge].slice(0,2)}</div>
+                <div class="skill-name">${sk.name}</div>
+                <div class="skill-desc">${sk.desc}</div>
+                <a href="${sk.link}" target="_blank" class="skill-link">↗ 바로가기</a>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleAcc(i) {
+  const item = document.getElementById(`acc-${i}`);
+  item.classList.toggle('open');
+}
+
+/* ── BUILD SKILL FULL LIST ── */
+function buildSkillList() {
+  const dedup = (arr) => arr.filter((v,i,a)=>a.findIndex(t=>t.name===v.name)===i);
+  const pmSkills = dedup(STEPS.flatMap(s=>s.skills.filter(sk=>sk.badge==='pm')));
+  const abSkills = dedup(STEPS.flatMap(s=>s.skills.filter(sk=>sk.badge==='ab')));
+  const fwSkills = dedup(STEPS.flatMap(s=>s.skills.filter(sk=>sk.badge==='fw')));
+  const acSkills = dedup(STEPS.flatMap(s=>s.skills.filter(sk=>sk.badge==='ac')));
+
+  const stages = (badge) => {
+    return STEPS.reduce((acc,s)=>{
+      s.skills.filter(sk=>sk.badge===badge).forEach(sk=>{ if(!acc[sk.name]) acc[sk.name]=[]; acc[sk.name].push(s.num); }); return acc;
+    },{});
+  };
+  const pmMap=stages('pm'), abMap=stages('ab'), fwMap=stages('fw'), acMap=stages('ac');
+
+  let html = '';
+
+  /* pm-skills */
+  html += `<div class="sf-group-label">phuryn/pm-skills <span style="font-size:10px;font-weight:400;color:var(--g5)">&nbsp;— <a href="https://github.com/phuryn/pm-skills" target="_blank" style="color:var(--c2)">github.com/phuryn/pm-skills ↗</a> (${pmSkills.length}개)</span></div>`;
+  html += pmSkills.map(sk=>`
+    <div class="sf-item">
+      <div class="sf-badge pm">pm-skills</div>
+      <div class="sf-name">${sk.name}</div>
+      <div class="sf-desc" style="font-size:11px;color:var(--g5)">${sk.desc}</div>
+      <div class="sf-stage">${(pmMap[sk.name]||[]).join(', ')}</div>
+      <a href="${sk.link}" target="_blank" class="sf-link">↗ GitHub</a>
+    </div>`).join('');
+
+  /* ai-biz 커스텀 스킬 */
+  html += `<div class="sf-group-label">ai-biz 커스텀 스킬 <span style="font-size:10px;font-weight:400;color:var(--g5)">&nbsp;— AX BD팀 자체 제작 AI 사업개발 스킬 (${abSkills.length}개)</span></div>`;
+  html += abSkills.map(sk=>`
+    <div class="sf-item">
+      <div class="sf-badge" style="${BADGE_STYLE.ab}">ai-biz</div>
+      <div class="sf-name">${sk.name}</div>
+      <div class="sf-desc" style="font-size:11px;color:var(--g5)">${sk.desc}</div>
+      <div class="sf-stage">${(abMap[sk.name]||[]).join(', ')}</div>
+    </div>`).join('');
+
+  /* 프레임워크 */
+  html += `<div class="sf-group-label">AI·경영 전략 프레임워크 <span style="font-size:10px;font-weight:400;color:var(--g5)">&nbsp;— 공신력 있는 기관 출처 방법론 (${fwSkills.length}개)</span></div>`;
+  html += fwSkills.map(sk=>`
+    <div class="sf-item">
+      <div class="sf-badge" style="${BADGE_STYLE.fw}">Framework</div>
+      <div class="sf-name">${sk.name}</div>
+      <div class="sf-desc" style="font-size:11px;color:var(--g5)">${sk.desc}</div>
+      <div class="sf-stage">${(fwMap[sk.name]||[]).join(', ')}</div>
+    </div>`).join('');
+
+  /* Anthropic 공식 */
+  html += `<div class="sf-group-label">Anthropic 공식 스킬 <span style="font-size:10px;font-weight:400;color:var(--g5)">&nbsp;— <a href="https://docs.anthropic.com" target="_blank" style="color:var(--c2)">docs.anthropic.com ↗</a> (${acSkills.length}개)</span></div>`;
+  html += acSkills.map(sk=>`
+    <div class="sf-item">
+      <div class="sf-badge ac">Anthropic</div>
+      <div class="sf-name">${sk.name}</div>
+      <div class="sf-stage">${(acMap[sk.name]||[]).join(', ')}</div>
+      <a href="${sk.link}" target="_blank" class="sf-link">↗ 문서</a>
+    </div>`).join('');
+
+  document.getElementById('skillFullList').innerHTML = html;
+}
+
+/* ── TAB SWITCH ── */
+function switchTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── SETUP TOGGLE ── */
+function toggleSetup(i) {
+  const el = document.getElementById(`setup-${i}`);
+  el.classList.toggle('open');
+}
+
+/* ── INIT ── */
+buildAccordion();
+buildSkillList();
+</script>
+</body>
+</html>

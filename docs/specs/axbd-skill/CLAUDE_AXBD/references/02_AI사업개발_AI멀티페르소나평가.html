@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2-9 AI 멀티 페르소나 사전 평가 — AX사업개발팀</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --w:#fff;--bg:#f8f9fa;--bg2:#f2f4f6;--bg3:#eaecef;
+  --ln:#e5e8eb;--ln2:#d1d6db;
+  --g9:#191f28;--g8:#333d4b;--g7:#4e5968;--g5:#8b95a1;--g4:#b0b8c1;
+  --bl:#3182f6;--bl-bg:#eff6ff;--bl-lt:#dbeafe;
+  --gr:#00b493;--gr-bg:#ecfdf5;--gr-lt:#a7f3d0;
+  --or:#f59e0b;--or-bg:#fffbeb;--or-lt:#fde68a;
+  --rd:#f03e3e;--rd-bg:#fff5f5;--rd-lt:#fecaca;
+  --pu:#6c63ff;--pu-bg:#f5f3ff;--pu-lt:#ddd6fe;
+  --kt:#e8321a;--kt-bg:#fff1f0;--kt-lt:#fecaca;
+  --r8:8px;--r12:12px;--r16:16px;--r20:20px;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--g9);font-family:'Pretendard',-apple-system,sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ── HEADER ── */
+.hdr{background:var(--w);border-bottom:1px solid var(--ln);padding:0 48px;position:sticky;top:0;z-index:100}
+.hdr-in{max-width:1200px;margin:0 auto;padding:18px 0}
+.hdr-bc{font-size:11px;color:var(--g5);margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.hdr-t{font-size:20px;font-weight:700;color:var(--g9);letter-spacing:-.4px}
+.hdr-s{font-size:12px;color:var(--g5);margin-top:2px}
+.chips{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.chip{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:600;border:1px solid}
+.con{max-width:1200px;margin:0 auto;padding:28px 48px 80px}
+.sec{margin-bottom:36px}
+.eye{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--bl);margin-bottom:4px}
+.sec-t{font-size:16px;font-weight:700;color:var(--g9);margin-bottom:2px;letter-spacing:-.3px}
+.sec-d{font-size:12px;color:var(--g5);margin-bottom:14px}
+.divider{border:none;border-top:1px solid var(--ln);margin:28px 0}
+
+/* ══════════════════════════════
+   A-1. PERSONA CARDS
+══════════════════════════════ */
+.pc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.pc{background:var(--w);border:1px solid var(--ln);border-radius:var(--r16);padding:18px;box-shadow:var(--sh);transition:box-shadow .2s,transform .15s}
+.pc:hover{box-shadow:var(--sh2);transform:translateY(-2px)}
+.pc.kt-card{border-top:2px solid var(--kt)}
+.pc.first-card{border-top:2px solid var(--bl)}
+.pc-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;margin-bottom:10px}
+.pc-first-tag{display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;background:var(--bl-bg);color:var(--bl)}
+.pc-kt-tag{display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;background:var(--or-bg);color:var(--or)}
+.pc-title{font-size:13px;font-weight:700;color:var(--g9);margin-bottom:10px;letter-spacing:-.2px}
+.pc-row{display:flex;gap:6px;margin-bottom:5px;font-size:11px}
+.pc-label{color:var(--g4);min-width:48px;flex-shrink:0;font-size:10px;font-weight:600;padding-top:1px}
+.pc-val{color:var(--g7);line-height:1.5}
+.pc-context{font-size:11px;color:var(--g5);margin:8px 0;padding:7px 9px;background:var(--bg2);border-radius:var(--r8);line-height:1.55;border-left:2px solid var(--ln2)}
+.pc-q{font-size:10px;color:var(--g5);font-style:italic;margin:7px 0 8px;line-height:1.5}
+.pc-rej{display:flex;flex-wrap:wrap;gap:4px}
+.pc-rej-tag{padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500;background:var(--rd-bg);border:0.5px solid var(--rd-lt);color:var(--rd)}
+
+/* ══════════════════════════════
+   A-2. WEIGHT SLIDER
+══════════════════════════════ */
+.ws-wrap{background:var(--w);border:1px solid var(--ln);border-radius:var(--r16);box-shadow:var(--sh);overflow:hidden}
+.ws-tabs{display:flex;border-bottom:1px solid var(--ln);overflow-x:auto}
+.ws-tab{padding:11px 16px;font-size:12px;font-weight:600;color:var(--g5);border:none;background:none;cursor:pointer;font-family:inherit;white-space:nowrap;display:flex;align-items:center;gap:6px;border-bottom:2px solid transparent;transition:all .15s;flex-shrink:0}
+.ws-tab:hover{color:var(--g8);background:var(--bg2)}
+.ws-tab.active{color:var(--g9);border-bottom-color:var(--bl)}
+.ws-tab .tab-dot{width:7px;height:7px;border-radius:50%}
+.ws-body{padding:22px 24px}
+.ws-persona-name{font-size:13px;font-weight:700;margin-bottom:4px}
+.ws-persona-sub{font-size:11px;color:var(--g5);margin-bottom:18px}
+.ws-total{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:8px 12px;border-radius:var(--r8);font-size:12px;font-weight:600}
+.ws-total.ok{background:var(--gr-bg);color:var(--gr)}
+.ws-total.err{background:var(--rd-bg);color:var(--rd)}
+.sl-row{display:grid;grid-template-columns:110px 1fr 44px;align-items:center;gap:12px;margin-bottom:12px}
+.sl-label{font-size:12px;color:var(--g7);font-weight:500}
+.sl-label small{display:block;font-size:10px;color:var(--g4);font-weight:400}
+input[type=range].sl{width:100%;-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;background:var(--bg3);outline:none;cursor:pointer}
+input[type=range].sl::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--bl);cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(49,130,246,.35)}
+input[type=range].sl::-webkit-slider-thumb:hover{background:#2066d0}
+.sl-val{font-size:13px;font-weight:700;text-align:right}
+.ws-reset{margin-top:4px;padding:7px 14px;background:var(--bg2);border:1px solid var(--ln2);border-radius:var(--r8);font-size:11px;font-weight:600;color:var(--g7);cursor:pointer;font-family:inherit}
+.ws-reset:hover{background:var(--bg3)}
+
+/* ══════════════════════════════
+   A-3. PERSONA CONTEXT EDITOR
+══════════════════════════════ */
+.pe-wrap{border:1px solid var(--ln);border-radius:var(--r16);overflow:hidden;box-shadow:var(--sh);display:grid;grid-template-columns:220px 1fr}
+.pe-list{background:var(--bg2);border-right:1px solid var(--ln)}
+.pe-item{padding:11px 15px;cursor:pointer;border-bottom:1px solid var(--ln);transition:background .12s;display:flex;align-items:center;gap:9px}
+.pe-item:last-child{border-bottom:none}
+.pe-item:hover{background:var(--bg3)}
+.pe-item.active{background:var(--w);border-right:2px solid var(--bl);margin-right:-1px}
+.pe-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.pe-item-name{font-size:11px;font-weight:600;color:var(--g8)}
+.pe-item-sub{font-size:10px;color:var(--g5);margin-top:1px}
+.pe-form{background:var(--w);padding:20px 24px;overflow-y:auto;max-height:480px}
+.pe-form-t{font-size:13px;font-weight:700;margin-bottom:2px}
+.pe-form-d{font-size:11px;color:var(--g5);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--ln)}
+.pf{margin-bottom:13px}
+.pf-label{font-size:11px;font-weight:700;color:var(--g7);margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.pf-badge{padding:1px 6px;border-radius:3px;font-size:9px;font-weight:600;background:var(--bl-bg);color:var(--bl)}
+.pf textarea{width:100%;padding:8px 11px;border:1px solid var(--ln2);border-radius:var(--r8);font-size:11px;font-family:inherit;color:var(--g9);line-height:1.6;resize:vertical;min-height:56px;transition:border-color .15s}
+.pf textarea:focus{outline:none;border-color:var(--bl);box-shadow:0 0 0 3px rgba(49,130,246,.1)}
+.tag-ed{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.rtag{display:flex;align-items:center;gap:3px;padding:2px 8px;border-radius:4px;background:var(--rd-bg);border:0.5px solid var(--rd-lt);font-size:11px;color:var(--rd)}
+.rtag button{background:none;border:none;cursor:pointer;color:var(--rd);font-size:13px;padding:0;line-height:1;opacity:.6}
+.rtag button:hover{opacity:1}
+.add-tag-row{display:flex;gap:6px;margin-top:6px}
+.add-tag-row input{flex:1;padding:5px 9px;border:1px solid var(--ln2);border-radius:var(--r8);font-size:11px;font-family:inherit;color:var(--g9)}
+.add-tag-row input:focus{outline:none;border-color:var(--bl)}
+.add-tag-btn{padding:5px 11px;border-radius:var(--r8);background:var(--rd-bg);border:0.5px solid var(--rd-lt);color:var(--rd);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
+.save-btn{margin-top:14px;padding:7px 18px;background:var(--bl);color:#fff;border:none;border-radius:var(--r8);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.save-btn:hover{opacity:.88}
+.save-ok{display:none;font-size:11px;color:var(--gr);margin-left:8px;font-weight:600}
+
+/* ══════════════════════════════
+   B. BRIEFING + RUN
+══════════════════════════════ */
+.brief-area{width:100%;min-height:190px;padding:13px 15px;border:1px solid var(--ln2);border-radius:var(--r16);font-size:12px;font-family:inherit;line-height:1.85;resize:vertical;color:var(--g9);background:var(--w);transition:border-color .15s}
+.brief-area:focus{outline:none;border-color:var(--bl);box-shadow:0 0 0 3px rgba(49,130,246,.1)}
+.run-wrap{background:var(--bl-bg);border:1px solid var(--bl-lt);border-radius:var(--r16);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:11px}
+.run-btn{padding:10px 28px;background:var(--bl);color:#fff;border:none;border-radius:var(--r8);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.run-btn:hover:not(:disabled){opacity:.88;transform:translateY(-1px)}
+.run-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+/* ══════════════════════════════
+   PROGRESS
+══════════════════════════════ */
+.prog-wrap{margin-top:13px;display:none}
+.prog-lbl{font-size:11px;font-weight:600;color:var(--g5);margin-bottom:7px;display:flex;align-items:center;gap:7px}
+.thinking-dots span{display:inline-block;animation:blink 1.2s infinite;font-size:14px;color:var(--bl)}
+.thinking-dots span:nth-child(2){animation-delay:.2s}
+.thinking-dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,100%{opacity:.2}50%{opacity:1}}
+.prog-list{display:flex;flex-direction:column;gap:5px}
+.pi{display:flex;align-items:center;gap:10px;padding:8px 13px;border-radius:var(--r8);background:var(--w);border:1px solid var(--ln);font-size:12px;transition:all .3s}
+.pi.running{border-color:var(--bl-lt);background:var(--bl-bg)}
+.pi.done{border-color:var(--gr-lt);background:var(--gr-bg)}
+.pi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--g4);transition:background .3s}
+.pi.running .pi-dot{background:var(--bl);animation:pulse .7s infinite}
+.pi.done .pi-dot{background:var(--gr);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.pi-name{font-weight:600;color:var(--g8);min-width:150px}
+.pi-st{color:var(--g5);flex:1;font-size:11px}
+.pi.running .pi-st{color:var(--bl)}
+.pi.done .pi-st{color:var(--gr);font-weight:600}
+.pi-sc{font-size:13px;font-weight:700;margin-left:auto;min-width:36px;text-align:right}
+.pi-vd{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;border:1px solid;margin-left:7px;white-space:nowrap}
+
+/* ══════════════════════════════
+   C. RESULTS
+══════════════════════════════ */
+.r-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:13px}
+.rcard{background:var(--w);border:1px solid var(--ln);border-radius:var(--r16);padding:17px 19px;text-align:center;box-shadow:var(--sh)}
+.rl{font-size:10px;color:var(--g5);margin-bottom:4px;font-weight:500}
+.rv{font-size:24px;font-weight:700;letter-spacing:-1px}
+.rs{font-size:11px;color:var(--g4);margin-top:3px}
+.verd{display:flex;align-items:center;gap:13px;padding:14px 18px;border-radius:var(--r16);border:1px solid;margin-bottom:11px}
+.v-icon{font-size:19px}
+.v-label{font-size:14px;font-weight:700}
+.v-sub{font-size:11px;color:var(--g5);margin-top:2px}
+.diverge{background:var(--or-bg);border:1px solid var(--or-lt);border-radius:var(--r16);padding:13px 17px}
+.div-t{font-size:12px;font-weight:700;color:var(--or);margin-bottom:7px}
+.di{font-size:12px;color:var(--g7);padding:4px 0;border-bottom:1px solid rgba(245,158,11,.15);display:flex;gap:7px;align-items:flex-start}
+.di:last-child{border-bottom:none}
+.dd{width:5px;height:5px;border-radius:50%;background:var(--or);flex-shrink:0;margin-top:6px}
+.s3{display:grid;grid-template-columns:320px 1fr;gap:15px;align-items:start}
+.radar-card{background:var(--w);border:1px solid var(--ln);border-radius:var(--r16);padding:16px;text-align:center;box-shadow:var(--sh)}
+.pt-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ptc{background:var(--w);border:1px solid var(--ln);border-radius:var(--r16);padding:12px 14px;box-shadow:var(--sh)}
+.ptc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}
+.ptc-name{font-size:11px;color:var(--g5);font-weight:500;line-height:1.4}
+.ptc-score{font-size:20px;font-weight:700;letter-spacing:-.5px}
+.ptbar{height:4px;border-radius:2px;background:var(--bg3);overflow:hidden}
+.ptfill{height:4px;border-radius:2px;transition:width .8s ease}
+.e-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ec{background:var(--w);border:1px solid var(--ln);border-radius:var(--r16);padding:16px;box-shadow:var(--sh)}
+.ec.kt{border-top:2px solid var(--kt)}
+.ec.first{border-top:2px solid var(--bl)}
+.ec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.ec-name{font-size:12px;font-weight:700;line-height:1.3}
+.ec-score{font-size:12px;font-weight:700;padding:2px 8px;border-radius:100px;border:1px solid}
+.ec-body{font-size:11px;color:var(--g7);line-height:1.7;margin-bottom:6px}
+.ec-concern{font-size:11px;padding:5px 8px;border-radius:var(--r8);background:var(--rd-bg);color:var(--rd);margin-bottom:5px}
+.ec-cond{font-size:11px;padding:5px 8px;border-radius:var(--r8);background:var(--bl-bg);color:var(--bl);margin-bottom:8px}
+.ec-vd{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:100px;font-size:10px;font-weight:700;border:1px solid}
+.ov-box{background:var(--w);border:1px solid var(--ln);border-radius:var(--r20);padding:24px 28px;box-shadow:var(--sh)}
+.ov-title{font-size:14px;font-weight:700;color:var(--g9);margin-bottom:16px;padding-bottom:13px;border-bottom:1px solid var(--ln);letter-spacing:-.2px}
+.go-counts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.gc{text-align:center;padding:13px;border-radius:var(--r16);border:1px solid}
+.gc-n{font-size:26px;font-weight:700}
+.gc-l{font-size:11px;font-weight:600;margin-top:2px}
+.ov-sec{margin-bottom:14px}
+.ov-sec-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.ov-sec p{font-size:12px;color:var(--g7);line-height:1.75}
+.tag-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px}
+.tag{padding:2px 9px;border-radius:100px;font-size:10px;font-weight:600;border:1px solid}
+.ov-charts{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:14px}
+.ov-cb{background:var(--bg2);border-radius:var(--r16);padding:15px}
+.ov-cb-t{font-size:11px;font-weight:700;color:var(--g7);margin-bottom:13px}
+.abr{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.abl{font-size:11px;color:var(--g7);min-width:68px;text-align:right;flex-shrink:0}
+.abt{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.abf{height:8px;border-radius:4px;transition:width .9s ease}
+.abv{font-size:11px;font-weight:700;min-width:26px;flex-shrink:0}
+.ag-item{font-size:12px;color:var(--g7);padding:5px 0;border-bottom:1px solid var(--ln);line-height:1.6}
+.ag-item:last-child{border-bottom:none}
+.ov-footer{margin-top:16px;padding-top:13px;border-top:1px solid var(--ln);font-size:11px;color:var(--g4);display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px}
+.fade{opacity:0;transform:translateY(10px);transition:opacity .5s ease,transform .5s ease}
+.fade.in{opacity:1;transform:none}
+
+@media(max-width:1024px){
+  .pc-grid,.e-grid{grid-template-columns:repeat(2,1fr)}
+  .r-grid{grid-template-columns:repeat(2,1fr)}
+  .s3,.ov-charts{grid-template-columns:1fr}
+  .pe-wrap{grid-template-columns:1fr}
+  .pe-list{display:flex;overflow-x:auto;border-right:none;border-bottom:1px solid var(--ln)}
+  .pe-item{border-bottom:none;border-right:1px solid var(--ln);white-space:nowrap}
+  .pe-item.active{border-right:none;border-bottom:2px solid var(--bl);margin-right:0;margin-bottom:-1px}
+  .con{padding:20px 16px 60px}
+  .hdr{padding:0 16px}
+  .ws-tabs{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-in">
+    <div class="hdr-bc">AX 사업개발 <span style="color:var(--g4)">/</span> 2단계 발굴 <span style="color:var(--g4)">/</span> 2-9 AI 멀티 페르소나 사전 평가</div>
+    <div class="hdr-t">AI 멀티 페르소나 사전 평가 <span style="font-size:12px;font-weight:400;color:var(--g5)">— AI Agent Pre-Screening</span></div>
+    <div class="hdr-s">8개 KT DS 내부 페르소나를 AI Agent로 구현 · 2-1~2-8 발굴 결과를 각 페르소나 관점으로 자동 평가 · 합의·분기·우려 사전 도출</div>
+    <div class="chips">
+      <span class="chip" style="color:var(--bl);border-color:#bfdbfe;background:var(--bl-bg)">Discovery 2-9</span>
+      <span class="chip" style="color:var(--gr);border-color:var(--gr-lt);background:var(--gr-bg)">8 AI Agent Personas</span>
+      <span class="chip" style="color:var(--or);border-color:var(--or-lt);background:var(--or-bg)">KT DS · KT Group</span>
+      <span class="chip" style="color:var(--kt);border-color:var(--kt-lt);background:var(--kt-bg)">AI Auto-Evaluation</span>
+    </div>
+  </div>
+</header>
+
+<main class="con">
+
+<!-- ══ A-1. PERSONA CARDS ══ -->
+<section class="sec">
+  <div class="eye">Personas</div>
+  <div class="sec-t">8개 평가 페르소나 정의</div>
+  <div class="sec-d">각 페르소나는 Layer 1(가중치) + Layer 2(현재 맥락)를 통합한 독립적 AI 평가 에이전트입니다</div>
+  <div class="pc-grid" id="pcGrid"></div>
+</section>
+
+<hr class="divider">
+
+<!-- ══ A-2. WEIGHT SLIDER ══ -->
+<section class="sec">
+  <div class="eye">Layer 1 — Weight Matrix</div>
+  <div class="sec-t">페르소나별 평가 가중치</div>
+  <div class="sec-d">페르소나를 선택하고 슬라이더로 각 평가 축의 비중을 조정합니다 · 합계 100% 자동 보정</div>
+  <div class="ws-wrap">
+    <div class="ws-tabs" id="wsTabs"></div>
+    <div class="ws-body" id="wsBody"></div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══ A-3. CONTEXT EDITOR ══ -->
+<section class="sec">
+  <div class="eye">Layer 2 — Context Editor</div>
+  <div class="sec-t">페르소나 맥락 정의 · 편집</div>
+  <div class="sec-d">각 페르소나의 현재 상황·맥락을 설정합니다 · 언제든 수정 가능하며 변경 즉시 평가에 반영됩니다</div>
+  <div class="pe-wrap">
+    <div class="pe-list" id="peList"></div>
+    <div class="pe-form" id="peForm"></div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══ B. EVALUATION ══ -->
+<section class="sec">
+  <div class="eye">AI Evaluation</div>
+  <div class="sec-t">AI 페르소나 평가 실행</div>
+  <div class="sec-d">2-1~2-8 발굴 결과를 요약 입력 후 평가를 실행합니다 · AI가 8개 페르소나로 순차 빙의해 자동 평가합니다</div>
+
+  <!-- API 키 입력 -->
+  <div style="background:var(--bl-bg);border:1px solid var(--bl-lt);border-radius:var(--r16);padding:16px 20px;margin-bottom:11px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--bl);flex-shrink:0" id="keyDot"></div>
+      <div style="font-size:12px;font-weight:700;color:var(--g8)">Anthropic API Key</div>
+      <div style="font-size:10px;color:var(--g5);margin-left:4px" id="keyStatus">미입력 — 데모 모드로 실행됩니다</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input type="password" id="apiKey" placeholder="sk-ant-api03-..." autocomplete="off"
+        style="flex:1;padding:8px 12px;border:1px solid var(--ln2);border-radius:var(--r8);font-size:12px;font-family:inherit;background:var(--w);color:var(--g9);transition:border-color .15s"
+        oninput="onKeyInput(this.value)">
+      <button onclick="saveKey()" style="padding:8px 16px;background:var(--bl);color:#fff;border:none;border-radius:var(--r8);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">저장</button>
+      <button onclick="clearKey()" style="padding:8px 12px;background:var(--bg2);border:1px solid var(--ln2);color:var(--g7);border-radius:var(--r8);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">초기화</button>
+    </div>
+    <div style="font-size:10px;color:var(--bl);margin-top:7px;line-height:1.6">
+      API 키는 이 브라우저 탭 메모리에만 저장되며 외부로 전송되지 않습니다 &nbsp;·&nbsp;
+      <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--bl);font-weight:600">키 발급 →</a>
+      &nbsp;·&nbsp; 키 미입력 시 데모 모드(하드코딩 결과)로 실행됩니다
+    </div>
+  </div>
+
+  <!-- 브리핑 -->
+  <div style="background:var(--w);border:1px solid var(--ln);border-radius:var(--r16);padding:18px 22px;margin-bottom:11px;box-shadow:var(--sh)">
+    <div style="font-size:12px;font-weight:700;color:var(--g8);margin-bottom:7px">사업 아이템 브리핑 <span style="font-weight:400;color:var(--g5)">(2-1~2-8 핵심 결과 요약)</span></div>
+    <textarea class="brief-area" id="briefing" placeholder="브리핑 내용을 입력하세요..."></textarea>
+  </div>
+
+  <div class="run-wrap">
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--g9)" id="runTitle">8개 AI 페르소나 순차 평가 시작</div>
+      <div style="font-size:11px;color:var(--g5);margin-top:2px" id="runDesc">각 페르소나의 Layer 1(가중치) + Layer 2(맥락) 기준으로 자동 평가 · 합의·분기·우려 영역 자동 도출</div>
+    </div>
+    <button class="run-btn" id="runBtn" onclick="startEval()">평가 실행</button>
+  </div>
+  <div class="prog-wrap" id="progWrap">
+    <div class="prog-lbl">
+      <span id="progTxt">AI 페르소나 순차 평가 중</span>
+      <span class="thinking-dots"><span>.</span><span>.</span><span>.</span></span>
+    </div>
+    <div class="prog-list" id="progList"></div>
+  </div>
+</section>
+
+<!-- ══ C. RESULTS ══ -->
+<hr class="divider fade" id="d1" style="display:none">
+<section class="sec fade" id="s2" style="display:none">
+  <div class="eye">Step 2 — Results</div>
+  <div class="sec-t">종합 결과</div>
+  <div class="sec-d">8개 AI 페르소나 가중 평균 · Go/Conditional/No Go 판정 · 핵심 논점 자동 추출</div>
+  <div class="r-grid" id="rGrid"></div>
+  <div id="verdBox"></div>
+  <div id="divBox"></div>
+</section>
+<hr class="divider fade" id="d2" style="display:none">
+<section class="sec fade" id="s3" style="display:none">
+  <div class="eye">Step 3 — Radar Chart</div>
+  <div class="sec-t">페르소나별 환산 점수</div>
+  <div class="sec-d">8개 AI 페르소나 가중 합산 점수 분포</div>
+  <div class="s3">
+    <div class="radar-card"><canvas id="radar" width="290" height="270"></canvas></div>
+    <div class="pt-grid" id="ptGrid"></div>
+  </div>
+</section>
+<hr class="divider fade" id="d3" style="display:none">
+<section class="sec fade" id="s4" style="display:none">
+  <div class="eye">Step 4 — Persona Review</div>
+  <div class="sec-t">페르소나별 평가 요약</div>
+  <div class="sec-d">각 AI 페르소나의 판단 근거 · 핵심 우려 · 통과 조건</div>
+  <div class="e-grid" id="eGrid"></div>
+</section>
+<hr class="divider fade" id="d4" style="display:none">
+<section class="sec fade" id="s5" style="display:none">
+  <div class="eye">Step 5 — Overall Summary</div>
+  <div class="sec-t">전체 평가 요약</div>
+  <div class="sec-d">사업화 판단 기준별 종합 분석 · 합의·보완·팀 검토 안건</div>
+  <div class="ov-box" id="ovBox"></div>
+</section>
+
+</main>
+<script>
+/* ══════════════════════════════════════════
+   1. CORE DATA  (AX Expert 첫 번째)
+══════════════════════════════════════════ */
+const PS = [
+  {name:'AX사업개발 Expert', color:'#2563eb', short:'AX Expert', badgeBg:'#E6F1FB', badgeColor:'#0C447C', isFirst:true, isKT:false,
+   title:'시장·GTM 현실성',
+   keyValue:'실제 고객 획득 경로 · 시장 타이밍',
+   lens:'첫 계약 경로 · 차별화 · 경쟁 회피',
+   q:'"첫 고객 어디서 어떻게 따? 왜 우리가 이겨?"',
+   redlines:['첫 고객 경로 불명확','차별화 없음','KT 파이프라인 미활용']},
+  {name:'고객사 의사결정자', color:'#7c3aed', short:'고객사', badgeBg:'#EEEDFE', badgeColor:'#3C3489', isFirst:false, isKT:false,
+   title:'도입 효과 확신',
+   keyValue:'우리 조직에 실제 효과가 있는가',
+   lens:'ROI 수치 · 레퍼런스 · 도입 리스크',
+   q:'"비슷한 곳에서 써봤어? 효과 얼마나 돼?"',
+   redlines:['도입 사례 없음','ROI 불명확','보안·컴플라이언스 미흡']},
+  {name:'KT DS 대표', color:'#059669', short:'KT DS대표', badgeBg:'#E1F5EE', badgeColor:'#085041', isFirst:false, isKT:false,
+   title:'그룹 전략 정렬',
+   keyValue:'KT그룹 AX 방향 일치 · 규모화 가능',
+   lens:'3년 매출 포텐셜 · 그룹사 시너지',
+   q:'"3년 뒤 매출 얼마? 그룹 방향이랑 맞아?"',
+   redlines:['그룹사 사업 충돌','단발 SI 반복','MM 구조 유지']},
+  {name:'경영기획총괄', color:'#d97706', short:'경영기획', badgeBg:'#FAECE7', badgeColor:'#712B13', isFirst:false, isKT:false,
+   title:'재무 건전성',
+   keyValue:'투자 대비 수익 · BEP 일정',
+   lens:'CapEx · OpEx · BEP 기간 · 현금흐름',
+   q:'"초기 투자 얼마? 언제 흑자? 고정비는?"',
+   redlines:['BEP 3년 초과','무상 사업 구조','원가 구조 불투명']},
+  {name:'AX사업개발본부장', color:'#ea580c', short:'AX본부장', badgeBg:'#FAEEDA', badgeColor:'#633806', isFirst:false, isKT:false,
+   title:'포트폴리오 균형',
+   keyValue:'기존 사업과 시너지 · 자원 충돌 없음',
+   lens:'내부 자원 배분 · 타 사업 충돌 여부',
+   q:'"기존 사업이랑 겹쳐? 인력 어떻게 빼?"',
+   redlines:['내부 인력 과부하','기존 사업 충돌','협력사 의존도 과다']},
+  {name:'영업조직', color:'#16a34a', short:'영업', badgeBg:'#EAF3DE', badgeColor:'#27500A', isFirst:false, isKT:false,
+   title:'판매 가능성',
+   keyValue:'고객에게 설명 가능 · 팔 수 있는가',
+   lens:'메시지 단순성 · 가격 납득 · 배틀카드',
+   q:'"고객한테 뭐라고 설명해? 가격 납득돼?"',
+   redlines:['설명 복잡','가격 근거 없음','기존 파이프라인 활용 불가']},
+  {name:'수행조직', color:'#64748b', short:'수행', badgeBg:'#F1EFE8', badgeColor:'#444441', isFirst:false, isKT:false,
+   title:'실행 가능성',
+   keyValue:'지금 역량으로 실제 구현 가능한가',
+   lens:'기술 난이도 · 인력 확보 · 일정 현실성',
+   q:'"지금 인력으로 가능해? 외부 의존도는?"',
+   redlines:['기술 내재화 불가','일정 비현실적','요구사항 불명확']},
+  {name:'KT 그룹 전략', color:'#e8321a', short:'KT그룹', badgeBg:'#E6F1FB', badgeColor:'#185FA5', isFirst:false, isKT:true,
+   title:'그룹 생태계 기여',
+   keyValue:'KT·그룹사와 시너지 · MM탈피 구조',
+   lens:'그룹사 파이프라인 · 반제품화 · MM탈피',
+   q:'"KT 그룹사랑 같이 팔 수 있어? SI 탈피했어?"',
+   redlines:['KT 전략 방향 역행','그룹사 사업 중복','MM 기반 단발 사업']},
+];
+
+/* 평가 축 */
+const AXES = [
+  {key:'roi', label:'고객 ROI',       sub:'절감 비용·생산성 수치화'},
+  {key:'str', label:'전략 정렬도',    sub:"KT그룹 AX 방향·'26년 경영계획"},
+  {key:'fin', label:'재무 타당성',    sub:'BEP 기간·CapEx·MM탈피 수익구조'},
+  {key:'gtm', label:'GTM 현실성',    sub:'Beachhead·첫 계약·그룹사 채널'},
+  {key:'tec', label:'기술 실현가능성',sub:'TRL·내재화 수준·구현 기간'},
+  {key:'rsk', label:'리스크 구조',    sub:'규제·경쟁 심화·기술 실패'},
+  {key:'syn', label:'그룹 시너지',    sub:'반제품화·MM탈피·그룹사 파이프라인'},
+];
+
+/* 가중치 (AX Expert 첫 번째 순서) */
+const WEIGHTS_DEFAULT = [
+  [.30,.05,.15,.10,.20,.20,.00], // AX Expert
+  [.30,.05,.15,.10,.20,.20,.00], // 고객사
+  [.08,.28,.20,.14,.10,.15,.05], // KT DS대표
+  [.10,.15,.40,.10,.10,.15,.00], // 경영기획
+  [.10,.22,.18,.20,.10,.15,.05], // AX본부장
+  [.25,.05,.05,.35,.10,.20,.00], // 영업
+  [.05,.05,.15,.05,.50,.20,.00], // 수행
+  [.10,.30,.15,.10,.15,.15,.05], // KT그룹
+];
+let weights = WEIGHTS_DEFAULT.map(r=>[...r]);
+
+/* 페르소나 맥락 */
+const PC = [
+  {situation:'AI 기반 의사결정 지원 사업화에 깊은 관심. KT그룹사 인접 영역 확장 우선. KT DS 기존 파이프라인 적극 활용해 초기 시장 진입 속도 확보. 열린 자세로 신규 사업 기회 탐색.',
+   priority:'KT DS만의 차별화 논리, 첫 고객 획득 경로, 시장 타이밍, KT 그룹사 파이프라인 활용',
+   style:'"왜 우리가 이길 수 있는가"의 논리를 가장 중요하게 봄. 시장 타이밍과 경쟁 회피 전략 함께 검토.',
+   redlines:['첫 고객 경로 불명확','차별화 없음','KT 파이프라인 미활용']},
+  {situation:'사업 아이템의 목표 도메인(공공·금융·제조·유통 등) 시장 현황을 반영해 설정. 해당 산업의 AI 도입 성숙도, 규제 환경, 주요 Pain Point를 감안해 평가 맥락 구성.',
+   priority:'정량적 ROI 수치, 유사 업종 레퍼런스, 도입 리스크 최소화',
+   style:'유사 업종 레퍼런스·정량적 효과 수치 우선 요구. "비슷한 곳에서 써봤어? 효과 얼마나 돼?"',
+   redlines:['도입 사례 없음','ROI 불명확','보안·컴플라이언스 미흡']},
+  {situation:"'26년 Agentic AI 전문회사 Identity 구축이 최우선 과제. MM(Man-Month) 기반 탈피 → Agent+커스터마이징 매출 구조 전환이 핵심 KPI. KT그룹 내 AI 사업 경쟁 심화로 KT DS만의 차별화 포지셔닝 필요.",
+   priority:'KT 그룹 AX 전략 방향 Align, 3년 매출 포텐셜, 반제품화·모듈형 Offering 가능성',
+   style:'KT 그룹 방향과의 Align이 전제 조건. 3년 매출 숫자와 그룹사 충돌 여부를 먼저 확인.',
+   redlines:['그룹사 사업 충돌','단발 SI 반복','MM 구조 유지']},
+  {situation:'투자 여력 매우 타이트. 신규 사업 투자는 확실한 매출 근거와 사업성 선행 필수. 불확실한 PoC성 투자에 매우 보수적. 유상 사업 구조 원칙.',
+   priority:'BEP 달성 시점, 초기 투자 규모, 명확한 수익 구조, 유상 매출 가시성',
+   style:'"초기 투자 얼마, 언제 흑자, 고정비는" 순서로 확인. 숫자로 설명 안 되면 논의 거부.',
+   redlines:['BEP 3년 초과','무상 사업 구조','원가 구조 불투명']},
+  {situation:'본부 인력 여유 없음. 신규 사업 수행 시 기존 사업과 자원 충돌 불가피. 내부 기술 연계가 바람직하나 현실적으로 쉽지 않음. 협력사(파트너) 적극 활용 필요.',
+   priority:'인력 조달 계획, 협력사 활용 구조, 기존 사업과의 충돌 최소화',
+   style:'"누가 실제로 하는가"를 먼저 확인. 인력 계획과 협력사 활용 방안이 구체적이어야 논의 진행.',
+   redlines:['내부 인력 과부하','기존 사업 충돌','협력사 의존도 과다']},
+  {situation:'KT DS 기존 고객·파이프라인 연계가 가장 현실적인 초기 영업 경로. 현재 영업 도메인은 제한적이나 확장 니즈 있음. 신규 고객 개척보다 기존 관계 기반 확장 선호.',
+   priority:'기존 파이프라인 연계 가능성, 메시지 단순성, 가격 납득 근거, 배틀카드 완성도',
+   style:'"지금 내 고객한테 팔 수 있어?"가 핵심. 설명이 단순하고 가격 근거 명확해야 현장 영업 가능.',
+   redlines:['설명 복잡','가격 근거 없음','기존 파이프라인 활용 불가']},
+  {situation:'실제 구축을 담당하므로 기술적 실현 가능성 판단이 매우 보수적. 검증되지 않은 기술 스택·짧은 구현 일정에 강한 우려. 신기술 내재화 수준 성장 중이나 아직 제한적.',
+   priority:'기술 내재화 가능성, 구현 일정 현실성, 외부 의존도 수준, 유지보수 리스크',
+   style:'"지금 우리 인력으로 실제로 만들 수 있어?" 핵심. 외부 의존도·기술 난이도·구현 기간 보수적으로 평가.',
+   redlines:['기술 내재화 불가','일정 비현실적','요구사항 불명확']},
+  {situation:'KT의 AX 전략을 항상 탐색해 반영. KT DS는 그룹 AX 전략 실행 주체로서 그룹 전체 AI 사업화 생태계에 기여. Agentic AI 전문 실행 조직으로서 KT·그룹사가 하기 어려운 버티컬 특화·도메인 깊이·SI 역량 담당.',
+   priority:'KT 그룹 AX 전략 Align, 반제품화·모듈형 Offering, MM탈피 수익구조, 그룹사 파이프라인 연계',
+   style:'KT 그룹 전략 Align이 전제. 반제품화·모듈형으로 그룹사 확장 가능한지, MM탈피 구조인지 핵심 기준.',
+   redlines:['KT 전략 방향 역행','그룹사 사업 중복','MM 기반 단발 사업']},
+];
+
+/* 하드코딩 평가 결과 (AX Expert 첫 번째) — Enterprise Agent Catalog 프레임 반영 */
+const EVAL = [
+  {scores:{roi:4,str:5,fin:4,gtm:4,tec:4,rsk:3,syn:4}, verdict:'Go',
+   summary:'이지클로의 마켓 구조를 엔터프라이즈로 전환하는 "Agent 카탈로그" 프레임은 빌더 접근 대비 차별화가 명확합니다. 기업 고객이 직접 구축할 필요 없이 검증된 Agent를 선택·배포하는 모델은 챗봇 피로감(P7)과 구축 역량 부족(P8)이라는 시장 Pain에 정확히 부합합니다. KT 그룹사 파이프라인을 Beachhead로 활용하는 GTM은 현실적이며, 마켓플레이스 수수료 25% 수익 구조는 확장성이 높습니다.',
+   concern:'카탈로그 초기 콘텐츠(Pre-built Agent) 확보 속도 — 고객이 선택할 Agent가 충분하지 않으면 마켓 모델 자체가 작동 불가',
+   condition:'런칭 시 최소 10개 이상의 산업별 Pre-built Agent 큐레이션 완료 및 파트너 Agent 3개사 이상 확보'},
+  {scores:{roi:4,str:3,fin:3,gtm:4,tec:4,rsk:3,syn:0}, verdict:'Conditional',
+   summary:'"카탈로그에서 골라 바로 배포"라는 가치 제안은 매우 매력적입니다. 솔직히 이전에 AI 챗봇을 도입했다가 Hallucination 문제로 실망한 경험이 있는데, 업무 특화 Pre-built Agent라면 범용 챗봇과 다를 수 있겠다는 기대가 있습니다. 다만 검증된 Agent의 품질 수준과 우리 업무에 얼마나 맞는지는 실제 PoC를 통해 확인해야 합니다.',
+   concern:'Pre-built Agent가 우리 업무 프로세스에 실제로 맞을지 — "카탈로그에 있다"와 "우리한테 맞다"는 다른 문제',
+   condition:'손해사정 PoC 완료 후 정량적 효과 지표(처리시간 단축 %, 비용 절감액) 제시 + 커스터마이징 범위 명확화'},
+  {scores:{roi:4,str:5,fin:4,gtm:4,tec:3,rsk:3,syn:5}, verdict:'Go',
+   summary:"'빌더가 아닌 카탈로그'라는 프레임 전환은 전략적으로 매우 적절합니다. 기존 AI 서빙 플랫폼(AI:ON-U 등)이 시장에서 충분한 견인력을 확보하지 못한 교훈을 반영하여, 범용 도구 제공이 아닌 검증된 완제품 Agent 유통 모델로 방향을 잡은 것은 '26년 Agentic AI 전문회사 Identity 구축과 정확히 부합합니다. Agent 이용 구독(40%) + 마켓 수수료(25%)의 수익 구조는 MM 탈피 목표에도 직결됩니다.",
+   concern:'그룹사 내 AI 사업 주도권 경쟁 — KT, kt cloud의 AI 마켓플레이스 구상과 역할 중복 가능성',
+   condition:'KT 그룹 AX 전략과의 공식 Align 확인 및 Agent 카탈로그 영역에서의 KT DS 독점적 역할 명문화'},
+  {scores:{roi:4,str:4,fin:4,gtm:3,tec:3,rsk:3,syn:3}, verdict:'Conditional',
+   summary:'초기 투자 ₩20억은 이전 가설(₩15억) 대비 증가했으나, LTV/CAC 5.2x와 CAC Payback 8.7개월이라는 Unit Economics는 B2B SaaS 우수 수준입니다. BEP Y3 Q2 가설은 Base 시나리오 기준 8사→25사→55사 누적 고객 확보를 전제하므로 현실적입니다. 다만 마켓플레이스 수수료 25% 비중이 안정적 수익으로 자리잡기까지의 과도기 현금흐름이 구체화되어야 합니다.',
+   concern:'마켓플레이스 수수료(25%) 수익이 안정화되기까지의 과도기 — 초기 1~2년은 구독+SI로 버텨야',
+   condition:'Phase별 수익 믹스 변화 시나리오(Y1: SI 중심 → Y3: 카탈로그 중심)와 월별 현금흐름 계획 제시'},
+  {scores:{roi:4,str:4,fin:3,gtm:4,tec:3,rsk:3,syn:4}, verdict:'Conditional',
+   summary:'카탈로그 모델은 빌더 플랫폼 대비 개발 부담이 오히려 줄어들 수 있어 긍정적입니다. Agent 오케스트레이션 엔진을 처음부터 만드는 것이 아니라, Pre-built Agent를 큐레이션·검증·배포하는 카탈로그 인프라에 집중하면 인력 부담이 완화됩니다. 다만 산업별 Agent 콘텐츠 개발은 도메인 전문성이 필요하므로 파트너 생태계 구축이 관건입니다.',
+   concern:'카탈로그 콘텐츠(Pre-built Agent) 개발 인력 — 내부 11명으로 산업별 Agent를 다수 개발하기 어려움',
+   condition:'ISV/파트너사 Agent 개발 생태계 구축 계획과 내부 전담 PM(최소 2인) + QA(1인) 배정 확정'},
+  {scores:{roi:4,str:4,fin:3,gtm:5,tec:3,rsk:3,syn:3}, verdict:'Go',
+   summary:'"카탈로그에서 검증된 Agent를 골라 바로 배포"라는 메시지는 현장 영업에서 설명하기 매우 쉽습니다. 기존 고객들이 "또 챗봇이야?" 반응을 보이는 상황에서, "이건 챗봇이 아니라 업무 Agent입니다, 카탈로그에서 고르세요"라는 차별화 포인트가 명확합니다. 가격도 Agent 이용료 기반이라 고객 입장에서 납득 가능한 구조입니다.',
+   concern:'배틀카드 부재 — MS Copilot Studio·Salesforce Agentforce 대비 "왜 KT DS 카탈로그?"에 대한 설명 자료',
+   condition:'경쟁사 대비 차별화 배틀카드(보안+한국 규제 맞춤+카탈로그 큐레이션) 및 고객용 ROI 시뮬레이터 개발'},
+  {scores:{roi:3,str:3,fin:3,gtm:3,tec:4,rsk:3,syn:0}, verdict:'Conditional',
+   summary:'카탈로그 모델은 빌더 플랫폼 대비 기술 구현 복잡도가 낮아 실행 가능성이 높습니다. Agent 배포·관리 인프라, 카탈로그 UI, 보안 격리 환경이 핵심 개발 범위이며 이는 기존 역량으로 충분히 대응 가능합니다. 다만 Pre-built Agent 자체의 품질 검증 프레임워크(테스트·인증·모니터링)는 새로운 역량이므로 별도 투자가 필요합니다.',
+   concern:'Agent 품질 인증 프레임워크 — 카탈로그에 올라가는 Agent의 Hallucination·정확도 검증 체계 구축 필요',
+   condition:'MVP 범위를 카탈로그 인프라 + 손해사정 Agent 1종으로 한정하고, 품질 인증 체계는 Phase 2에서 고도화'},
+  {scores:{roi:4,str:5,fin:4,gtm:4,tec:3,rsk:3,syn:5}, verdict:'Go',
+   summary:'Agent 카탈로그 모델은 KT 그룹 AX 전략과 완벽히 부합합니다. KT DS가 엔터프라이즈 Agent 마켓의 운영·큐레이션 주체가 되고, 그룹사가 각자 도메인의 Agent를 카탈로그에 공급하는 생태계 구조는 그룹 전체 AI 사업화에 기여하면서도 KT DS의 독자적 역할을 확보합니다. Agent 이용 구독 + 마켓 수수료 구조는 MM 탈피와 반제품화를 동시에 달성합니다.',
+   concern:'KT 그룹 내 AI 마켓플레이스 주도권 경쟁 심화 시 KT DS 카탈로그의 포지셔닝 — KT·kt cloud와의 역할 명확화',
+   condition:'KT 그룹 AX 전략 협의체에서 "엔터프라이즈 Agent 카탈로그는 KT DS 전담" 명문화 및 그룹사 Agent 공급 파이프라인 공식 연계'},
+];
+
+/* 사업화 판단 기준 */
+const BIZ = [
+  {label:'매출 실현성',  axes:['roi','fin'], color:'#00b493'},
+  {label:'전략 정합성',  axes:['str','syn'], color:'#3182f6'},
+  {label:'실행 가능성',  axes:['tec','rsk'], color:'#f59e0b'},
+  {label:'시장 진입성',  axes:['gtm','roi'], color:'#6c63ff'},
+  {label:'사업 확장성',  axes:['str','gtm','syn'], color:'#e8321a'},
+];
+
+const PRESET_BRIEF = `■ 사업 아이템명
+KT DS형 엔터프라이즈 Agent 마켓 — "Enterprise Agent Catalog"
+핵심 프레임: 빌더 플랫폼이 아닌, 검증된 Pre-built Agent를 카탈로그에서 선택·즉시 배포하는 엔터프라이즈 Agent 마켓플레이스
+
+■ 벤치마크 출처 (2-1 레퍼런스 분석)
+이지클로(easyclaw.compounding.co.kr)
+- "빌더 + 마켓" 양면 플랫폼 — 빌더(공급 측)는 Agent를 만드는 도구, 마켓(수요 측)은 완성된 Agent를 바로 골라 쓰는 소비 채널
+- 핵심 발견: 이지클로의 진짜 혁신은 빌더가 아니라, 빌더로 만든 Agent가 즉시 유통되는 마켓 구조
+- 월 1만원 구독 + 마켓플레이스(49K~249K원) 이중 수익구조 → 마켓이 진짜 수익 엔진
+- 마켓플레이스 Top: 배민 리뷰관리 3,421회 / 카카오CS 2,891회
+- 한계: 보안·컴플라이언스 없음, 엔터프라이즈 미진입(HR에이전트 156회)
+- 시장 트렌드: 범용 AI 플랫폼/챗봇 → 업무 특화 Pre-built Agent 전환 가속 (Gartner, McKinsey, Forrester)
+
+■ 수요 시장 검증 (2-2)
+- TAM ₩2.4조 / SAM ₩4,800억 / SOM ₩180억(3년) — 국내 엔터프라이즈 AI Agent 시장, CAGR 40.5%
+- 핵심 Pain: P1~P3(보안·통합·거버넌스) + P7(챗봇형 AI 피로감 — RAG 기반 챗봇 도입했지만 효용성 부족 실망) + P8(Agent 직접 구축 역량 부족 — 빌더 줘도 만들 인력·시간 없음)
+- 기존 AI 플랫폼의 시장 교훈: 도구를 줘서 만들라는 접근은 한계, 검증된 완제품 Agent 카탈로그 수요 급증
+- 공공·금융 조달 가능 AI Agent 카탈로그: 국내 공급자 사실상 전무
+
+■ 경쟁 구도 및 자사 현황 (2-3)
+경쟁사: 이지클로(SMB 특화, 보안 無), MS Copilot(한국 규제 맞춤 부족), Salesforce Agentforce(CRM 외 한계)
+KT DS 비대칭 강점:
+- KT Cloud 기반 보안 격리 환경 (VPC 격리, 망분리, ISMS-P)
+- 공공·금융 SI 레퍼런스 300+ 보유 → 조달 등록 가능
+- KT 그룹사 영업 채널 직접 활용
+- SWOT 약점 보완: 기존 AI 서빙 플랫폼(AI:ON-U 등) 견인력 부족 → 새로운 가치 제안(Agent 카탈로그)으로 전환
+- Blue Ocean ERRC: 범용 챗봇 빌더 접근 제거 → 엔터프라이즈 Agent 카탈로그(검증·인증된 Pre-built Agent) 창출
+
+■ 핵심 사업 아이템 (2-4~2-5)
+A1. Enterprise Agent Catalog (핵심 — 빌더가 아닌 카탈로그가 핵심 가치)
+- 검증된 업무 Agent를 카탈로그에서 선택·즉시 배포
+- 산업별 Pre-built Agent 개발·검증·큐레이션
+- 파트너 Agent 생태계 관리
+A3. Agent 컨설팅/SI (초기 매출 브릿지)
+- 고객 맞춤 Agent 설계·구축·통합 + Managed Service
+수익모델: Agent 이용 구독(40%) + 카탈로그/마켓플레이스 수수료 25%(파트너 Agent 거래) + 인프라 종량제(15%) + SI(15%) + 교육(5%)
+
+■ 재무 가설 (2-7)
+- 초기 투자: ₩20억 (플랫폼 개발 ₩8억 + 인프라 ₩3억 + 초기 인건비 ₩6억 + 영업마케팅 ₩3억), 11명 인력
+- LTV/CAC: 5.2x (건전, 기준 >3x) / CAC Payback: 8.7개월 (기준 <12개월)
+- BEP: Y3 Q2 / NRR 120%+ Land & Expand 모델
+- 5개년 ARR(Base): Y1 ₩18억 → Y3 ₩144억 → Y5 ₩420억
+- 수익 구조: Agent 이용 구독(40%) + 마켓 수수료(25%) = 반복수익 65% → MM탈피 구조
+
+■ GTM 전략 (2-8)
+Beachhead: KT 계열 보험사 손해사정 자동화 파일럿 → '26.06 PoC 완료 → 외부 확산
+Phase 1(Y1): A3+A1 MVP → Phase 2(Y2): A1 GA + Agent 카탈로그 확장 → Phase 3(Y3): 파트너 Agent 오픈 마켓
+채널: KT DS 기존 영업 파이프라인 + KT 그룹사 파이프라인 + 나라장터 공공 조달
+
+■ 핵심 리스크
+- 고객 지불 의향 검증(LoI) + 기술 실현 가능성 확인(PoC) — 둘 다 '26.Q2에 답 나옴
+- 선점 window 12~18개월 — 지금 시작해야 함
+- 기존 AI 플랫폼 교훈: 범용 도구 제공만으로는 기업 효용 창출 한계 → 카탈로그/마켓 모델로 전환 필수`;
+
+/* ══════════════════════════════════════════
+   2. HELPERS
+══════════════════════════════════════════ */
+function pTotal(pi) {
+  return AXES.reduce((s,a,ai) => s + (EVAL[pi].scores[a.key]||0) * weights[pi][ai], 0);
+}
+function overall() { return EVAL.reduce((_,__,i)=>_+pTotal(i),0)/8; }
+function scColor(v){ return v>=4?'#00b493':v>=3?'#f59e0b':'#f03e3e'; }
+function vd(v){
+  const s = typeof v==='string'?v:(v>=4?'Go':v>=3?'Conditional':'NoGo');
+  if(s==='Go')          return{t:'Go',          icon:'✓',bc:'var(--gr-lt)',bg:'var(--gr-bg)',c:'var(--gr)'};
+  if(s==='Conditional') return{t:'Conditional', icon:'◎',bc:'var(--or-lt)',bg:'var(--or-bg)',c:'var(--or)'};
+  return                       {t:'No Go',       icon:'✗',bc:'var(--rd-lt)',bg:'var(--rd-bg)',c:'var(--rd)'};
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function showEl(id,delay=0){
+  return new Promise(r=>setTimeout(()=>{
+    const el=document.getElementById(id);
+    el.style.display='';
+    requestAnimationFrame(()=>{el.classList.add('in');r();});
+  },delay));
+}
+
+/* ══════════════════════════════════════════
+   3. A-1. PERSONA CARDS
+══════════════════════════════════════════ */
+function buildCards(){
+  document.getElementById('pcGrid').innerHTML = PS.map((p,i)=>{
+    const ctx = PC[i];
+    const tags = p.redlines.map(t=>`<span class="pc-rej-tag">${t}</span>`).join('');
+    return `<div class="pc${p.isKT?' kt-card':''}${p.isFirst?' first-card':''}">
+      <div class="pc-badge" style="background:${p.badgeBg};color:${p.badgeColor}">
+        ${p.short}
+        ${p.isFirst?'<span class="pc-first-tag">1st</span>':''}
+        ${p.isKT?'<span class="pc-kt-tag">KT DS 특수</span>':''}
+      </div>
+      <div class="pc-title">${p.title}</div>
+      <div class="pc-row"><span class="pc-label">핵심 가치</span><span class="pc-val">${p.keyValue}</span></div>
+      <div class="pc-row"><span class="pc-label">평가 렌즈</span><span class="pc-val">${p.lens}</span></div>
+      <div class="pc-context">${ctx.situation.length>80?ctx.situation.slice(0,80)+'…':ctx.situation}</div>
+      <div class="pc-q">${p.q}</div>
+      <div class="pc-rej">${tags}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   4. A-2. WEIGHT SLIDER
+══════════════════════════════════════════ */
+let wsActive = 0;
+function buildWsTabs(){
+  document.getElementById('wsTabs').innerHTML = PS.map((p,i)=>
+    `<button class="ws-tab${i===0?' active':''}" id="wst${i}" onclick="selWsTab(${i})">
+      <span class="tab-dot" style="background:${p.color}"></span>${p.short}
+    </button>`
+  ).join('');
+  renderWsBody(0);
+}
+function selWsTab(i){
+  document.querySelectorAll('.ws-tab').forEach((el,j)=>el.classList.toggle('active',j===i));
+  wsActive=i; renderWsBody(i);
+}
+function renderWsBody(pi){
+  const p=PS[pi];
+  const total = Math.round(weights[pi].reduce((s,v)=>s+v,0)*100);
+  const okClass = Math.abs(total-100)<2?'ok':'err';
+  document.getElementById('wsBody').innerHTML=`
+    <div class="ws-persona-name" style="color:${p.color}">${p.name}</div>
+    <div class="ws-persona-sub">${p.title} · 슬라이더를 조정하면 합계 100%로 자동 보정됩니다</div>
+    <div class="ws-total ${okClass}" id="wsTotal">합계: ${total}% ${okClass==='ok'?'✓ 정상':'⚠ 확인 필요'}</div>
+    ${AXES.map((ax,ai)=>{
+      const pct=Math.round(weights[pi][ai]*100);
+      const isDisabled = ax.key==='syn' && (pi!==1&&pi!==3&&pi!==7); // 그룹 시너지: 대표/본부장/KT그룹만
+      return `<div class="sl-row">
+        <div class="sl-label">${ax.label}<small>${ax.sub}</small></div>
+        <input type="range" class="sl" min="0" max="60" step="1" value="${pct}"
+          ${isDisabled?'disabled style="opacity:.3"':''}
+          oninput="onSlider(${pi},${ai},this.value)" id="sl${pi}_${ai}">
+        <div class="sl-val" id="sv${pi}_${ai}" style="color:${pct>=20?'var(--bl)':pct>=10?'var(--g7)':'var(--g4)'}">${pct}%</div>
+      </div>`;
+    }).join('')}
+    <button class="ws-reset" onclick="resetWeights(${pi})">기본값으로 초기화</button>
+  `;
+}
+function onSlider(pi,ai,val){
+  weights[pi][ai] = parseInt(val)/100;
+  const svEl=document.getElementById(`sv${pi}_${ai}`);
+  if(svEl){ const pct=parseInt(val); svEl.textContent=pct+'%'; svEl.style.color=pct>=20?'var(--bl)':pct>=10?'var(--g7)':'var(--g4)'; }
+  const total=Math.round(weights[pi].reduce((s,v)=>s+v,0)*100);
+  const tot=document.getElementById('wsTotal');
+  if(tot){ const ok=Math.abs(total-100)<2; tot.className='ws-total '+(ok?'ok':'err'); tot.textContent='합계: '+total+'% '+(ok?'✓ 정상':'⚠ 확인 필요'); }
+  buildCards(); // 카드 맥락 동기화는 유지
+}
+function resetWeights(pi){
+  weights[pi]=[...WEIGHTS_DEFAULT[pi]];
+  renderWsBody(pi);
+}
+
+/* ══════════════════════════════════════════
+   5. A-3. CONTEXT EDITOR
+══════════════════════════════════════════ */
+let selP=0;
+function buildEditor(){
+  document.getElementById('peList').innerHTML = PS.map((p,i)=>
+    `<div class="pe-item${i===0?' active':''}" id="pli${i}" onclick="selPersona(${i})">
+      <div class="pe-dot" style="background:${p.color}"></div>
+      <div><div class="pe-item-name">${p.name}</div><div class="pe-item-sub">${p.title}</div></div>
+    </div>`
+  ).join('');
+  renderForm(0);
+}
+function selPersona(i){
+  document.querySelectorAll('.pe-item').forEach((el,j)=>el.classList.toggle('active',j===i));
+  selP=i; renderForm(i);
+}
+function renderForm(i){
+  const p=PS[i],c=PC[i];
+  const tags=c.redlines.map((t,ti)=>
+    `<div class="rtag">${t}<button onclick="rmTag(${i},${ti})">×</button></div>`).join('');
+  document.getElementById('peForm').innerHTML=`
+    <div class="pe-form-t" style="color:${p.color}">${p.name}</div>
+    <div class="pe-form-d">${p.title} · 현재 상황과 맥락을 수정하면 AI 평가에 즉시 반영됩니다</div>
+    <div class="pf">
+      <div class="pf-label">현재 상황·맥락 <span class="pf-badge">Layer 2</span></div>
+      <textarea id="pf-sit-${i}" rows="3" onchange="PC[${i}].situation=this.value;buildCards()">${c.situation}</textarea>
+      <div style="font-size:10px;color:var(--g4);margin-top:3px">이 내용을 기반으로 AI가 해당 페르소나 관점에서 사업안을 평가합니다</div>
+    </div>
+    <div class="pf">
+      <div class="pf-label">중점 평가 기준</div>
+      <textarea id="pf-pri-${i}" rows="2" onchange="PC[${i}].priority=this.value">${c.priority}</textarea>
+    </div>
+    <div class="pf">
+      <div class="pf-label">의사결정 스타일</div>
+      <textarea id="pf-sty-${i}" rows="2" onchange="PC[${i}].style=this.value">${c.style}</textarea>
+    </div>
+    <div class="pf">
+      <div class="pf-label">Red Line (거부 조건)</div>
+      <div class="tag-ed" id="ted-${i}">${tags}</div>
+      <div class="add-tag-row">
+        <input type="text" id="nt-${i}" placeholder="새 거부 조건 입력" onkeydown="if(event.key==='Enter')addTag(${i})">
+        <button class="add-tag-btn" onclick="addTag(${i})">+ 추가</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center">
+      <button class="save-btn" onclick="saveForm(${i})">저장</button>
+      <span class="save-ok" id="sok-${i}">✓ 저장됨</span>
+    </div>`;
+}
+function rmTag(i,ti){PC[i].redlines.splice(ti,1);renderForm(i);buildCards();}
+function addTag(i){const inp=document.getElementById(`nt-${i}`),v=inp.value.trim();if(!v)return;PC[i].redlines.push(v);inp.value='';renderForm(i);buildCards();}
+function saveForm(i){
+  ['sit','pri','sty'].forEach(k=>{
+    const el=document.getElementById(`pf-${k}-${i}`);
+    if(el){const map={sit:'situation',pri:'priority',sty:'style'};PC[i][map[k]]=el.value;}
+  });
+  buildCards();
+  const ok=document.getElementById(`sok-${i}`);
+  ok.style.display='inline'; setTimeout(()=>ok.style.display='none',2000);
+}
+
+/* ══════════════════════════════════════════
+   6. EVALUATION SIMULATION
+══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   6. API KEY MANAGEMENT
+══════════════════════════════════════════ */
+let _apiKey = '';
+
+function onKeyInput(v){
+  const dot = document.getElementById('keyDot');
+  const st  = document.getElementById('keyStatus');
+  if(v.startsWith('sk-ant')){
+    dot.style.background='var(--or)';
+    st.textContent='입력됨 — 저장 버튼을 눌러 확정하세요';
+    st.style.color='var(--or)';
+  } else if(v.length>0){
+    dot.style.background='var(--rd)';
+    st.textContent='올바른 형식이 아닙니다 (sk-ant-... 형식)';
+    st.style.color='var(--rd)';
+  } else {
+    dot.style.background='var(--bl)';
+    st.textContent='미입력 — 데모 모드로 실행됩니다';
+    st.style.color='var(--g5)';
+  }
+}
+function saveKey(){
+  const v = document.getElementById('apiKey').value.trim();
+  if(!v){ alert('API 키를 입력해주세요.'); return; }
+  if(!v.startsWith('sk-ant')){ alert('올바른 Anthropic API 키를 입력해주세요.\n형식: sk-ant-api03-...'); return; }
+  _apiKey = v;
+  const dot=document.getElementById('keyDot'), st=document.getElementById('keyStatus');
+  dot.style.background='var(--gr)';
+  st.textContent='✓ 저장됨 — 실제 AI 평가 모드로 실행됩니다';
+  st.style.color='var(--gr)';
+  document.getElementById('runTitle').textContent='8개 AI 페르소나 순차 평가 시작 (실제 Claude API)';
+  document.getElementById('runDesc').textContent='Layer 1(가중치) + Layer 2(맥락)가 Claude에게 전달되어 실제 분석이 수행됩니다';
+}
+function clearKey(){
+  _apiKey='';
+  document.getElementById('apiKey').value='';
+  const dot=document.getElementById('keyDot'), st=document.getElementById('keyStatus');
+  dot.style.background='var(--bl)';
+  st.textContent='초기화됨 — 데모 모드로 실행됩니다';
+  st.style.color='var(--g5)';
+  document.getElementById('runTitle').textContent='8개 AI 페르소나 순차 평가 시작';
+  document.getElementById('runDesc').textContent='각 페르소나의 Layer 1(가중치) + Layer 2(맥락) 기준으로 자동 평가 · 합의·분기·우려 영역 자동 도출';
+}
+
+/* ══════════════════════════════════════════
+   7. PROMPT BUILDER
+══════════════════════════════════════════ */
+function buildPrompt(pi, briefing){
+  const p  = PS[pi];
+  const ctx= PC[pi];
+  const wList = AXES.map((ax,ai)=>`  - ${ax.label}(${ax.sub}): ${Math.round(weights[pi][ai]*100)}%`).join('\n');
+  const rlList = ctx.redlines.map(r=>`  - ${r}`).join('\n');
+  return {
+    system: `당신은 KT DS의 "${p.name}" 역할을 맡은 AI 사업성 평가자입니다.
+당신은 이 역할에 완전히 몰입하여, 아래 정의된 맥락과 평가 기준으로만 판단합니다.
+
+## 당신의 역할 정의
+- 직책: ${p.name}
+- 핵심 가치: ${p.keyValue}
+- 평가 렌즈: ${p.lens}
+- 대표 질문: ${p.q}
+
+## 현재 상황과 맥락 (Layer 2)
+${ctx.situation}
+
+## 중점 평가 기준
+${ctx.priority}
+
+## 의사결정 스타일
+${ctx.style}
+
+## 절대 통과시키지 않는 조건 (Red Line)
+${rlList}
+
+## 평가 축별 가중치 (Layer 1 — 당신이 중요하게 보는 비중)
+${wList}
+
+## 응답 규칙
+- 반드시 아래 JSON 형식으로만 응답하세요. JSON 외 다른 텍스트는 절대 포함하지 마세요.
+- scores의 각 항목은 1~5 정수로 평가하세요 (syn 축은 가중치가 0%인 경우 0으로 설정).
+- verdict는 반드시 "Go", "Conditional", "NoGo" 중 하나만 사용하세요.
+- summary는 이 페르소나 관점에서의 핵심 판단을 2~3문장으로 서술하세요.
+- top_concern은 가장 우려되는 점 1가지를 한 문장으로 서술하세요.
+- condition은 통과 조건 또는 보완 요청 사항 1가지를 한 문장으로 서술하세요.
+
+{
+  "scores": {"roi":<1-5>,"str":<1-5>,"fin":<1-5>,"gtm":<1-5>,"tec":<1-5>,"rsk":<1-5>,"syn":<0 또는 1-5>},
+  "verdict": "<Go|Conditional|NoGo>",
+  "summary": "<핵심 판단 2~3문장>",
+  "top_concern": "<최대 우려 1가지>",
+  "condition": "<통과 조건 또는 보완 요청 1가지>"
+}`,
+    user: `다음 사업 브리핑을 "${p.name}" 관점에서 평가하세요:\n\n${briefing}`
+  };
+}
+
+/* ══════════════════════════════════════════
+   8. API CALL (실제) + DEMO FALLBACK
+══════════════════════════════════════════ */
+async function callClaude(pi, briefing){
+  const {system, user} = buildPrompt(pi, briefing);
+  const resp = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key': _apiKey,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true',
+    },
+    body: JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:800,
+      system,
+      messages:[{role:'user',content:user}]
+    })
+  });
+  if(!resp.ok){
+    const err=await resp.json().catch(()=>({}));
+    throw new Error(err?.error?.message||`HTTP ${resp.status}`);
+  }
+  const data=await resp.json();
+  const text=data.content?.[0]?.text||'';
+  const m=text.match(/\{[\s\S]*?\}/);
+  if(!m) throw new Error('JSON 파싱 실패');
+  return JSON.parse(m[0]);
+}
+
+/* ══════════════════════════════════════════
+   9. EVALUATION RUNNER
+══════════════════════════════════════════ */
+let liveResults = [];  // 실제 API 결과 저장
+let radarChart=null, bizChart=null;
+
+function getResult(i){ return liveResults[i] || EVAL[i]; }
+
+async function startEval(){
+  const briefing=document.getElementById('briefing').value.trim();
+  if(!briefing){alert('브리핑을 입력해주세요.');return;}
+  const useAPI = _apiKey.length>0;
+  const btn=document.getElementById('runBtn');
+  btn.disabled=true; btn.textContent='평가 중...';
+
+  ['d1','s2','d2','s3','d3','s4','d4','s5'].forEach(id=>{
+    const el=document.getElementById(id); el.style.display='none'; el.classList.remove('in');
+  });
+  if(radarChart){radarChart.destroy();radarChart=null;}
+  if(bizChart){bizChart.destroy();bizChart=null;}
+
+  liveResults = [];
+
+  const pw=document.getElementById('progWrap'); pw.style.display='block';
+  document.querySelector('.thinking-dots').style.display='inline';
+  document.getElementById('progList').innerHTML = PS.map((p,i)=>
+    `<div class="pi" id="pi${i}">
+      <div class="pi-dot" id="pd${i}" style="background:${p.color};opacity:.35"></div>
+      <div class="pi-name">${p.name}</div>
+      <div class="pi-st" id="ps${i}">대기 중</div>
+      <div class="pi-sc" id="psc${i}" style="color:var(--g4)">—</div>
+    </div>`
+  ).join('');
+
+  const demoTimes=[2600,2900,3100,2700,2800,2300,2500,3000];
+
+  for(let i=0;i<8;i++){
+    document.getElementById(`pd${i}`).style.opacity='1';
+    document.getElementById(`pi${i}`).classList.add('running');
+    document.getElementById(`ps${i}`).textContent= useAPI ? 'Claude 분석 중...' : '분석 중...';
+    document.getElementById('progTxt').textContent=`${PS[i].name} 관점으로 평가 중`;
+
+    let result;
+    if(useAPI){
+      try{
+        result = await callClaude(i, briefing);
+        liveResults.push(result);
+      } catch(e){
+        // API 오류 시 해당 페르소나는 데모 데이터 사용
+        liveResults.push(null);
+        document.getElementById(`pi${i}`).classList.remove('running');
+        document.getElementById(`pi${i}`).style.borderColor='var(--rd-lt)';
+        document.getElementById(`pi${i}`).style.background='var(--rd-bg)';
+        document.getElementById(`pd${i}`).style.background='var(--rd)';
+        document.getElementById(`ps${i}`).textContent=`API 오류 — 데모 결과 사용 (${e.message.slice(0,30)}...)`;
+        document.getElementById(`ps${i}`).style.color='var(--rd)';
+        await sleep(300);
+        continue;
+      }
+    } else {
+      await sleep(demoTimes[i]);
+      liveResults.push(null); // null → getResult()에서 EVAL[i] 사용
+    }
+
+    document.getElementById(`pi${i}`).classList.remove('running');
+    document.getElementById(`pi${i}`).classList.add('done');
+
+    const r = getResult(i);
+    const t = pTotalFromScores(i, r.scores);
+    const v = vd(r.verdict);
+    document.getElementById(`ps${i}`).innerHTML=
+      `완료 <span class="pi-vd" style="color:${v.c};border-color:${v.bc};background:${v.bg}">${v.icon} ${v.t}</span>
+       ${useAPI?'<span style="font-size:9px;color:var(--gr);margin-left:5px">● AI 실제 분석</span>':''}`;
+    document.getElementById(`psc${i}`).textContent=t.toFixed(2);
+    document.getElementById(`psc${i}`).style.color=scColor(t);
+    await sleep(150);
+  }
+
+  document.getElementById('progTxt').textContent='평가 완료 — 결과 생성 중';
+  document.querySelector('.thinking-dots').style.display='none';
+  await sleep(400);
+
+  renderS2(); await showEl('d1'); await showEl('s2',80); await sleep(350);
+  renderS3(); await showEl('d2'); await showEl('s3',80); await sleep(350);
+  renderS4(); await showEl('d3'); await showEl('s4',80); await sleep(350);
+  renderS5(); await showEl('d4'); await showEl('s5',80);
+  btn.disabled=false; btn.textContent='재평가';
+  await sleep(250); document.getElementById('s2').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* 점수 → 가중 합산 (liveResults 기반) */
+function pTotalFromScores(pi, scores){
+  return AXES.reduce((s,a,ai)=>s+(scores[a.key]||0)*weights[pi][ai],0);
+}
+function pTotal(pi){ return pTotalFromScores(pi, getResult(pi).scores); }
+function overall(){ return PS.reduce((_,__,i)=>_+pTotal(i),0)/8; }
+
+/* ── STEP 2 ── */
+function renderS2(){
+  const ov=overall(), v=vd(ov);
+  const pts=PS.map((_,i)=>pTotal(i));
+  const mx=pts.indexOf(Math.max(...pts)), mn=pts.indexOf(Math.min(...pts));
+  const goC=PS.map((_,i)=>getResult(i).verdict).filter(v=>v==='Go').length;
+  const coC=PS.map((_,i)=>getResult(i).verdict).filter(v=>v==='Conditional').length;
+  const ngC=PS.map((_,i)=>getResult(i).verdict).filter(v=>v==='NoGo').length;
+  document.getElementById('rGrid').innerHTML=`
+    <div class="rcard"><div class="rl">8인 평균 점수</div><div class="rv" style="color:${scColor(ov)}">${ov.toFixed(2)}</div><div class="rs">/ 5.00</div></div>
+    <div class="rcard" style="border-color:${v.bc};background:${v.bg}"><div class="rl">최종 판정</div><div class="rv" style="font-size:15px;color:${v.c};margin-top:3px">${v.icon} ${v.t}</div><div class="rs">${v.t==='Go'?'형상화 단계 진행':v.t==='Conditional'?'조건부 보완 후 진행':'재검토 필요'}</div></div>
+    <div class="rcard"><div class="rl">최고 평가</div><div class="rv" style="font-size:15px;color:${PS[mx].color}">${PS[mx].short}</div><div class="rs">${pts[mx].toFixed(2)}점</div></div>
+    <div class="rcard"><div class="rl">최저 평가 → 보완</div><div class="rv" style="font-size:15px;color:var(--rd)">${PS[mn].short}</div><div class="rs">${pts[mn].toFixed(2)}점</div></div>`;
+  document.getElementById('verdBox').innerHTML=`
+    <div class="verd" style="border-color:${v.bc};background:${v.bg};margin-bottom:11px">
+      <div class="v-icon">${v.icon}</div>
+      <div><div class="v-label" style="color:${v.c}">${v.t==='Go'?'Go — 형상화 단계 진행 권고':v.t==='Conditional'?'Conditional — 조건부 보완 후 진행':'No Go — 재검토 필요'}</div>
+      <div class="v-sub">8개 AI 페르소나 가중 평균: <strong style="color:${scColor(ov)}">${ov.toFixed(2)}/5.00</strong> · Go ${goC}개 / Conditional ${coC}개 / No Go ${ngC}개</div></div>
+    </div>`;
+  const divItems=AXES.map(ax=>{
+    const vals=PS.map((_,pi)=>getResult(pi).scores[ax.key]||0);
+    const lo=Math.min(...vals),hi=Math.max(...vals);
+    if(hi-lo<1.5)return'';
+    return`<div class="di"><div class="dd"></div><div><strong>${ax.label}</strong> — 최저 ${lo}점 ↔ 최고 ${hi}점 <span style="color:var(--or);font-weight:600">→ 2-10 팀 토론 안건</span></div></div>`;
+  }).filter(Boolean);
+  document.getElementById('divBox').innerHTML=divItems.length
+    ?`<div class="diverge"><div class="div-t">⚡ 핵심 논점 자동 추출 — 편차 1.5↑ (${divItems.length}건)</div>${divItems.join('')}</div>`
+    :`<div style="background:var(--gr-bg);border:1px solid var(--gr-lt);border-radius:var(--r16);padding:13px 17px;font-size:12px;color:var(--gr);font-weight:600">✓ 주요 분기 없음</div>`;
+}
+
+/* ── STEP 3 ── */
+function renderS3(){
+  const pts=PS.map((_,i)=>pTotal(i));
+  const ctx=document.getElementById('radar').getContext('2d');
+  radarChart=new Chart(ctx,{type:'radar',
+    data:{labels:PS.map(p=>p.short),datasets:[{data:pts,borderColor:'#3182f6',backgroundColor:'rgba(49,130,246,.07)',
+      pointBackgroundColor:PS.map(p=>p.color),pointBorderColor:'#fff',pointBorderWidth:2,pointRadius:4,borderWidth:2}]},
+    options:{responsive:false,scales:{r:{min:0,max:5,ticks:{stepSize:1,font:{size:9},color:'#b0b8c1',backdropColor:'transparent'},
+      grid:{color:'rgba(0,0,0,.05)'},angleLines:{color:'rgba(0,0,0,.05)'},pointLabels:{font:{size:10,weight:'600'},color:'#4e5968'}}},
+    plugins:{legend:{display:false}}}});
+  document.getElementById('ptGrid').innerHTML=PS.map((p,i)=>{
+    const t=pts[i],pct=(t/5)*100;
+    return`<div class="ptc"><div class="ptc-top"><div class="ptc-name">${p.name}</div><div class="ptc-score" style="color:${scColor(t)}">${t.toFixed(2)}</div></div>
+    <div class="ptbar"><div class="ptfill" style="width:${pct}%;background:${p.color}"></div></div></div>`;
+  }).join('');
+}
+
+/* ── STEP 4 ── */
+function renderS4(){
+  const pts=PS.map((_,i)=>pTotal(i));
+  const useAPI=_apiKey.length>0;
+  document.getElementById('eGrid').innerHTML=PS.map((p,i)=>{
+    const r=getResult(i),t=pts[i],v2=vd(r.verdict);
+    return`<div class="ec${p.isKT?' kt':''}${p.isFirst?' first':''}">
+      <div class="ec-head">
+        <div class="ec-name" style="color:${p.color}">${p.name}${useAPI&&liveResults[i]?'<span style="font-size:9px;color:var(--gr);margin-left:5px">● AI</span>':''}</div>
+        <div class="ec-score" style="color:${scColor(t)};border-color:${v2.bc};background:${v2.bg}">${t.toFixed(2)}</div>
+      </div>
+      <div class="ec-body">${r.summary}</div>
+      <div class="ec-concern">⚠ ${r.top_concern||r.concern||''}</div>
+      <div class="ec-cond">✦ ${r.condition||''}</div>
+      <div class="ec-vd" style="color:${v2.c};border-color:${v2.bc};background:${v2.bg}">${v2.icon} ${v2.t}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── STEP 5 ── */
+function renderS5(){
+  const ov=overall(), v=vd(ov);
+  const goC=PS.map((_,i)=>getResult(i).verdict).filter(v=>v==='Go').length;
+  const coC=PS.map((_,i)=>getResult(i).verdict).filter(v=>v==='Conditional').length;
+  const ngC=PS.map((_,i)=>getResult(i).verdict).filter(v=>v==='NoGo').length;
+  const axAvgs=AXES.map(ax=>PS.reduce((s,_,i)=>s+(getResult(i).scores[ax.key]||0),0)/8);
+  const top3=axAvgs.map((v,i)=>({v,i})).sort((a,b)=>b.v-a.v).slice(0,3);
+  const bot2=axAvgs.map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v).slice(0,2);
+  const bizScores=BIZ.map(bc=>{
+    const axList=AXES.filter(a=>bc.axes.includes(a.key));
+    const avg=axList.reduce((s,ax)=>s+PS.reduce((ss,_,i)=>ss+(getResult(i).scores[ax.key]||0),0)/8,0)/axList.length;
+    return{...bc,val:avg};
+  });
+  const useAPI=_apiKey.length>0;
+  const modeTag=useAPI?'<span style="color:var(--gr);font-weight:600;font-size:11px">● 실제 Claude AI 분석 결과</span>':'<span style="color:var(--g5);font-size:11px">데모 모드 (하드코딩 결과)</span>';
+  document.getElementById('ovBox').innerHTML=`
+    <div class="ov-title">전체 평가 요약 — KT DS형 Enterprise Agent Catalog &nbsp;${modeTag}</div>
+    <div class="go-counts">
+      <div class="gc" style="background:var(--gr-bg);border-color:var(--gr-lt)"><div class="gc-n" style="color:var(--gr)">${goC}</div><div class="gc-l" style="color:var(--gr)">Go</div></div>
+      <div class="gc" style="background:var(--or-bg);border-color:var(--or-lt)"><div class="gc-n" style="color:var(--or)">${coC}</div><div class="gc-l" style="color:var(--or)">Conditional</div></div>
+      <div class="gc" style="background:var(--rd-bg);border-color:var(--rd-lt)"><div class="gc-n" style="color:var(--rd)">${ngC}</div><div class="gc-l" style="color:var(--rd)">No Go</div></div>
+    </div>
+    <div class="ov-sec">
+      <div class="ov-sec-lbl" style="color:${v.c}">최종 판정: ${v.icon} ${v.t==='Conditional'?'Conditional — 조건부 보완 후 형상화 진행':v.t}</div>
+      <p>8개 AI 페르소나 가중 평균 <strong style="color:${scColor(ov)}">${ov.toFixed(2)}/5.00</strong>. "빌더가 아닌 카탈로그" 프레임 전환에 대해 KT DS 대표·AX Expert·영업·KT 그룹 전략 4개 페르소나가 Go를 부여. 기존 AI 플랫폼 교훈을 반영한 Agent 카탈로그 모델의 전략적 타당성에 강한 합의가 형성되었으며, 카탈로그 콘텐츠 확보와 품질 인증 체계가 임계 경로입니다.</p>
+    </div>
+    <div class="ov-sec">
+      <div class="ov-sec-lbl" style="color:var(--gr)">합의 영역 — 상위 평가 축</div>
+      <div class="tag-row">${top3.map(({v:val,i})=>`<span class="tag" style="color:var(--gr);border-color:var(--gr-lt);background:var(--gr-bg)">${AXES[i].label} ${val.toFixed(1)}점</span>`).join('')}</div>
+      <p>"검증된 Agent를 카탈로그에서 선택·배포"하는 모델이 챗봇 피로감(P7)·구축 역량 부족(P8)을 직접 해결한다는 점, 그리고 KT 그룹 AX 전략 방향과의 강한 정합성에 대해 모든 페르소나가 긍정적입니다.</p>
+    </div>
+    <div class="ov-sec">
+      <div class="ov-sec-lbl" style="color:var(--or)">보완 필요 — 하위 평가 축</div>
+      <div class="tag-row">${bot2.map(({v:val,i})=>`<span class="tag" style="color:var(--or);border-color:var(--or-lt);background:var(--or-bg)">${AXES[i].label} ${val.toFixed(1)}점</span>`).join('')}</div>
+      <p>카탈로그 초기 콘텐츠(Pre-built Agent) 확보 속도와 Agent 품질 인증 프레임워크 구축이 Conditional 판정을 Go로 전환시킬 핵심 과제입니다. 손해사정 PoC('26.06)와 파트너 Agent 생태계 구축이 형상화 단계 전 선결 과제입니다.</p>
+    </div>
+    <div class="ov-sec">
+      <div class="ov-sec-lbl" style="color:var(--bl)">사업화 판단 기준별 종합</div>
+      <div class="ov-charts">
+        <div class="ov-cb">
+          <div class="ov-cb-t">판단 기준별 점수 (5점 만점)</div>
+          ${bizScores.map(b=>{const pct=(b.val/5)*100;return`<div class="abr"><div class="abl">${b.label}</div><div class="abt"><div class="abf" style="width:${pct}%;background:${b.color}"></div></div><div class="abv" style="color:${b.color}">${b.val.toFixed(1)}</div></div>`;}).join('')}
+        </div>
+        <div class="ov-cb" style="text-align:center">
+          <div class="ov-cb-t">사업화 기준 레이더</div>
+          <canvas id="bizRadar" width="230" height="210"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="ov-sec">
+      <div class="ov-sec-lbl" style="color:var(--pu)">2-10 팀 검토 안건</div>
+      <div class="ag-item">① <strong>카탈로그 초기 콘텐츠 전략</strong> — 런칭 시 최소 Pre-built Agent 10종 확보 방안: 자체 개발 vs 파트너 Agent vs 오픈소스 래핑</div>
+      <div class="ag-item">② <strong>Agent 품질 인증 체계</strong> — 카탈로그에 올라가는 Agent의 Hallucination·정확도 검증 프레임워크 구축 범위 및 일정 (수행조직 강력 권고)</div>
+      <div class="ag-item">③ <strong>파트너 Agent 생태계</strong> — ISV/파트너사 Agent 개발·등록·수익공유 구조 확정 및 초기 3개사 파트너 확보 타임라인</div>
+      <div class="ag-item">④ <strong>KT 그룹 Agent 카탈로그 역할 명문화</strong> — KT 그룹 AX 전략 협의체에서 "엔터프라이즈 Agent 카탈로그 = KT DS 전담" 공식화 및 그룹사 Agent 공급 채널 확보</div>
+      <div class="ag-item">⑤ <strong>기존 AI 플랫폼 교훈 반영</strong> — AI:ON-U 등 기존 플랫폼의 시장 견인력 부족 원인 분석 결과를 카탈로그 모델 설계에 공식 반영</div>
+    </div>
+    <div class="ov-footer">
+      <span>평가일: ${new Date().toLocaleDateString('ko-KR')} · 평가 방식: AI 멀티 페르소나 사전 평가 (Prototype Demo)</span>
+      <span>다음 단계: 2-10 AXBD팀 공유 검토 → 3단계 형상화(Prototype)</span>
+    </div>`;
+  setTimeout(()=>{
+    const bctx=document.getElementById('bizRadar')?.getContext('2d');
+    if(!bctx)return;
+    bizChart=new Chart(bctx,{type:'radar',
+      data:{labels:bizScores.map(b=>b.label),
+        datasets:[{data:bizScores.map(b=>b.val),borderColor:'#6c63ff',backgroundColor:'rgba(108,99,255,.09)',
+          pointBackgroundColor:bizScores.map(b=>b.color),pointBorderColor:'#fff',pointBorderWidth:2,pointRadius:4,borderWidth:2}]},
+      options:{responsive:false,scales:{r:{min:0,max:5,ticks:{stepSize:1,font:{size:8},color:'#b0b8c1',backdropColor:'transparent'},
+        grid:{color:'rgba(0,0,0,.05)'},angleLines:{color:'rgba(0,0,0,.05)'},pointLabels:{font:{size:10,weight:'600'},color:'#4e5968'}}},
+      plugins:{legend:{display:false}}}});
+  },150);
+}
+
+/* ══════════════════════════════════════════
+   7. INIT
+══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded',()=>{
+  buildCards();
+  buildWsTabs();
+  buildEditor();
+  document.getElementById('briefing').value=PRESET_BRIEF;
+});
+</script>
+</body>
+</html>

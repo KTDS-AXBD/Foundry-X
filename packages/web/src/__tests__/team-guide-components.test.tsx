@@ -94,23 +94,23 @@ const teamFaqData: TeamFaqResponse = {
 // ─── CoworkSetupGuide ───
 
 describe("CoworkSetupGuide", () => {
-  it("renders step cards", () => {
+  it("renders step cards for default Claude Code environment", () => {
     render(<CoworkSetupGuide />);
-    expect(screen.getByText("환경 확인")).toBeInTheDocument();
-    expect(screen.getByText("팀 스킬 설치")).toBeInTheDocument();
-    expect(screen.getByText("설정 확인")).toBeInTheDocument();
-    expect(screen.getByText("첫 실행")).toBeInTheDocument();
+    expect(screen.getByText("CLAUDE_AXBD 폴더 다운로드")).toBeInTheDocument();
+    expect(screen.getByText("Claude Code 실행")).toBeInTheDocument();
+    expect(screen.getByText("스킬 동작 확인")).toBeInTheDocument();
+    expect(screen.getByText("발굴 프로세스 시작")).toBeInTheDocument();
   });
 
-  it("defaults to Cowork environment", () => {
+  it("defaults to Claude Code environment (recommended)", () => {
     render(<CoworkSetupGuide />);
-    expect(screen.getByText("cowork plugin install pm-skills ai-biz")).toBeInTheDocument();
+    expect(screen.getByText("git clone https://github.com/KTDS-AXBD/CLAUDE_AXBD.git")).toBeInTheDocument();
   });
 
-  it("toggles to Claude Code environment", () => {
+  it("toggles to Claude Desktop environment", () => {
     render(<CoworkSetupGuide />);
-    fireEvent.click(screen.getByText("Claude Code"));
-    expect(screen.getAllByText(/cp -r \/tmp\/ax-config\/skills\/ax-\*/).length).toBeGreaterThanOrEqual(1);
+    fireEvent.click(screen.getByText("Claude Desktop App"));
+    expect(screen.getByText(/Select folder/)).toBeInTheDocument();
   });
 });
 

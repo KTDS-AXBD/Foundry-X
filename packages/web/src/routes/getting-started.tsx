@@ -478,7 +478,7 @@ type TabKey = (typeof TAB_KEYS)[number];
 
 const TAB_LABELS: Record<TabKey, string> = {
   start: "시작하기",
-  setup: "설치 가이드",
+  setup: "환경 설정",
   skills: "스킬 레퍼런스",
   process: "프로세스 가이드",
   faq: "FAQ",

@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AX BD팀 2단계 발굴 리포트 — Fooding AI 식자재 구매 의사결정 엔진</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f7f8fa;--card:#fff;--border:#e5e8eb;--text:#191f28;--sub:#4e5968;--muted:#8b95a1;
+  --mint:#00c4b4;--mint-bg:#e6faf8;--mint-dark:#009e90;
+  --blue:#3182f6;--blue-bg:#e8f3ff;--blue-dark:#1b64da;
+  --amber:#ff9f43;--amber-bg:#fff5e6;--amber-dark:#e08600;
+  --red:#f04452;--red-bg:#ffe8ea;--red-dark:#d92638;
+  --purple:#8b5cf6;--purple-bg:#f0e8ff;--purple-dark:#6d28d9;
+  --radius:16px;--shadow:0 2px 8px rgba(0,0,0,.06);
+  --font:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,Roboto,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding:24px 20px 80px}
+header{text-align:center;padding:48px 0 32px}
+header h1{font-size:28px;font-weight:800;letter-spacing:-.5px}
+header .subtitle{color:var(--sub);font-size:15px;margin-top:8px}
+header .badge{display:inline-block;margin-top:12px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;background:var(--blue-bg);color:var(--blue)}
+.tab-bar{display:flex;gap:4px;overflow-x:auto;padding:4px;background:var(--card);border-radius:14px;border:1px solid var(--border);margin-bottom:32px;scrollbar-width:none}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:10px 18px;border:none;background:transparent;border-radius:10px;font-family:var(--font);font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;white-space:nowrap}
+.tab-btn:hover{color:var(--text);background:var(--bg)}
+.tab-btn.active{color:#fff;background:var(--blue)}
+.tab-btn[data-color="mint"].active{background:var(--mint)}
+.tab-btn[data-color="blue"].active{background:var(--blue)}
+.tab-btn[data-color="amber"].active{background:var(--amber)}
+.tab-btn[data-color="red"].active{background:var(--red)}
+.tab-btn[data-color="purple"].active{background:var(--purple)}
+.tab-panel{display:none;animation:fadeIn .3s ease}
+.tab-panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:32px;margin-bottom:24px;box-shadow:var(--shadow)}
+.card-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.card-header .icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.card-header h3{font-size:18px;font-weight:700}
+.card-header p{font-size:13px;color:var(--muted);margin-top:2px}
+.section-title{font-size:22px;font-weight:800;margin-bottom:8px;letter-spacing:-.3px}
+.section-sub{font-size:14px;color:var(--sub);margin-bottom:24px}
+.hitl-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;background:#e8f9ee;color:#0d7a3e;margin-bottom:24px}
+.hitl-badge::before{content:'';width:8px;height:8px;border-radius:50%;background:#22c55e}
+.tbl-wrap{overflow-x:auto;margin:16px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:var(--bg);font-weight:700;text-align:left;padding:12px 16px;border-bottom:2px solid var(--border);white-space:nowrap}
+td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--sub)}
+tr:hover td{background:var(--bg)}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:768px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+.metric{background:var(--bg);border-radius:12px;padding:20px;text-align:center}
+.metric .val{font-size:28px;font-weight:800;color:var(--blue)}
+.metric .label{font-size:12px;color:var(--muted);margin-top:4px}
+.metric.mint .val{color:var(--mint)}
+.metric.amber .val{color:var(--amber)}
+.metric.red .val{color:var(--red)}
+.insight-box{background:linear-gradient(135deg,var(--blue-bg),#f0e8ff);border-radius:14px;padding:24px 28px;margin:24px 0;border-left:4px solid var(--blue)}
+.insight-box h4{font-size:15px;font-weight:700;margin-bottom:10px;color:var(--blue-dark)}
+.insight-box ul{list-style:none;padding:0}
+.insight-box li{position:relative;padding-left:20px;margin-bottom:6px;font-size:14px;color:var(--sub)}
+.insight-box li::before{content:'\2192';position:absolute;left:0;color:var(--blue)}
+.next-step{background:var(--bg);border-radius:14px;padding:20px 24px;margin-top:24px;border:1px dashed var(--border)}
+.next-step h4{font-size:14px;font-weight:700;margin-bottom:8px;color:var(--muted)}
+.next-step p{font-size:14px;color:var(--sub)}
+.tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;margin:2px}
+.tag-mint{background:var(--mint-bg);color:var(--mint-dark)}
+.tag-blue{background:var(--blue-bg);color:var(--blue-dark)}
+.tag-amber{background:var(--amber-bg);color:var(--amber-dark)}
+.tag-red{background:var(--red-bg);color:var(--red-dark)}
+.tag-purple{background:var(--purple-bg);color:var(--purple-dark)}
+.chart-box{position:relative;max-width:480px;margin:20px auto}
+.compare-header{font-weight:700;color:var(--text) !important;background:var(--blue-bg) !important}
+.bmc-grid{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:auto auto;gap:2px;background:var(--border);border-radius:14px;overflow:hidden;margin:20px 0}
+.bmc-cell{background:var(--card);padding:16px;min-height:140px}
+.bmc-cell h5{font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:8px;letter-spacing:.5px}
+.bmc-cell ul{list-style:none;padding:0;font-size:13px;color:var(--sub)}
+.bmc-cell li{margin-bottom:4px;padding-left:14px;position:relative}
+.bmc-cell li::before{content:'\2022';position:absolute;left:0;color:var(--blue)}
+.bmc-kp{grid-column:1;grid-row:1/3}
+.bmc-ka{grid-column:2;grid-row:1}
+.bmc-kr{grid-column:2;grid-row:2}
+.bmc-vp{grid-column:3;grid-row:1/3}
+.bmc-cr{grid-column:4;grid-row:1}
+.bmc-ch{grid-column:4;grid-row:2}
+.bmc-cs{grid-column:5;grid-row:1/3}
+.bmc-cost{grid-column:1/3;grid-row:3}
+.bmc-rev{grid-column:3/6;grid-row:3}
+@media(max-width:768px){.bmc-grid{grid-template-columns:1fr;grid-template-rows:auto}.bmc-kp,.bmc-vp,.bmc-cs,.bmc-cost,.bmc-rev{grid-column:1;grid-row:auto}.bmc-ka,.bmc-kr,.bmc-cr,.bmc-ch{grid-column:1;grid-row:auto}}
+.swot-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border);border-radius:14px;overflow:hidden;margin:20px 0}
+.swot-cell{padding:24px;min-height:180px}
+.swot-cell h5{font-size:14px;font-weight:800;margin-bottom:12px}
+.swot-cell ul{list-style:none;padding:0;font-size:13px}
+.swot-cell li{margin-bottom:6px;padding-left:16px;position:relative}
+.swot-s{background:#e8f9ee}.swot-s h5{color:#0d7a3e}.swot-s li::before{content:'\2713';position:absolute;left:0;color:#22c55e}
+.swot-w{background:#fff5e6}.swot-w h5{color:#b45309}.swot-w li::before{content:'\25b3';position:absolute;left:0;color:var(--amber)}
+.swot-o{background:var(--blue-bg)}.swot-o h5{color:var(--blue-dark)}.swot-o li::before{content:'\2605';position:absolute;left:0;color:var(--blue)}
+.swot-t{background:var(--red-bg)}.swot-t h5{color:var(--red-dark)}.swot-t li::before{content:'\26a0';position:absolute;left:0;color:var(--red)}
+.persona-card{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:28px;position:relative;overflow:hidden}
+.persona-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+.persona-card.type-a::before{background:var(--blue)}
+.persona-card.type-b::before{background:var(--mint)}
+.persona-name{font-size:20px;font-weight:800;margin-bottom:4px}
+.persona-role{font-size:13px;color:var(--muted);margin-bottom:16px}
+.persona-section{margin-bottom:14px}
+.persona-section h5{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.persona-section p,.persona-section li{font-size:13px;color:var(--sub)}
+.persona-section ul{list-style:none;padding:0}
+.persona-section li{padding-left:14px;position:relative;margin-bottom:3px}
+.persona-section li::before{content:'\2022';position:absolute;left:0;color:var(--blue)}
+.journey-track{display:flex;gap:2px;margin:20px 0;overflow-x:auto}
+.journey-stage{flex:1;min-width:160px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative}
+.journey-stage h5{font-size:13px;font-weight:700;margin-bottom:8px}
+.journey-stage p{font-size:12px;color:var(--sub)}
+.journey-stage .emotion{font-size:20px;text-align:center;margin:8px 0}
+.score-bar{height:8px;border-radius:4px;background:var(--bg);overflow:hidden;margin:4px 0}
+.score-fill{height:100%;border-radius:4px;transition:width .5s ease}
+.ue-flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;margin:20px 0}
+.ue-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;text-align:center;min-width:120px}
+.ue-item .val{font-size:22px;font-weight:800}
+.ue-item .label{font-size:11px;color:var(--muted);margin-top:2px}
+.ue-arrow{font-size:20px;color:var(--muted)}
+.exec-hero{background:linear-gradient(135deg,#1b1b2f,#162447);color:#fff;border-radius:20px;padding:48px 40px;margin-bottom:32px;position:relative;overflow:hidden}
+.exec-hero::after{content:'';position:absolute;top:-50%;right:-20%;width:400px;height:400px;border-radius:50%;background:rgba(49,130,246,.15)}
+.exec-hero h2{font-size:26px;font-weight:800;margin-bottom:12px;position:relative}
+.exec-hero p{font-size:15px;color:rgba(255,255,255,.75);position:relative;max-width:640px;line-height:1.8}
+.exec-verdict{display:inline-block;margin-top:16px;padding:8px 20px;border-radius:10px;font-weight:800;font-size:14px;position:relative}
+.verdict-go{background:rgba(34,197,94,.2);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.step-header{margin-bottom:28px}
+.step-number{font-size:13px;font-weight:800;color:var(--blue);margin-bottom:4px}
+.step-eng{font-size:13px;color:var(--muted);margin-top:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>AX BD팀 2단계 발굴 리포트</h1>
+  <p class="subtitle">벤치마크 서비스: 식봄·푸드팡·CJ프레시웨이 → KTDS Fooding (AI 식자재 구매 의사결정 엔진)</p>
+  <span class="badge">Type A · 서비스 벤치마크형 · 2026.03</span>
+</header>
+
+<nav class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-tab="tab1" data-color="mint">2-1 레퍼런스 분석</button>
+  <button class="tab-btn" data-tab="tab2" data-color="mint">2-2 수요 시장</button>
+  <button class="tab-btn" data-tab="tab3" data-color="blue">2-3 경쟁·자사</button>
+  <button class="tab-btn" data-tab="tab4" data-color="blue">2-4 아이템 도출</button>
+  <button class="tab-btn" data-tab="tab5" data-color="amber">2-5 아이템 선정</button>
+  <button class="tab-btn" data-tab="tab6" data-color="amber">2-6 타겟 고객</button>
+  <button class="tab-btn" data-tab="tab7" data-color="amber">2-7 비즈니스 모델</button>
+  <button class="tab-btn" data-tab="tab8" data-color="red">2-8 패키징</button>
+  <button class="tab-btn" data-tab="tab9" data-color="purple">2-9 멀티 페르소나 평가</button>
+</nav>
+
+<!-- ==================== TAB 2-1 ==================== -->
+<div class="tab-panel active" id="tab1">
+<div class="step-header">
+  <div class="step-number">STEP 2-1</div>
+  <div class="section-title">레퍼런스 분석</div>
+  <div class="step-eng">Benchmark Deconstruction — 식봄·푸드팡·CJ프레시웨이 해부</div>
+  <div class="section-sub">"식자재 플랫폼의 AI가 '주문 편의성'에 한정된 현실을 밝히고, '구매 의사결정 AI' 공백을 확인하여 KTDS Fooding의 포지셔닝을 도출한다"</div>
+  <span class="hitl-badge">HITL 검증 완료</span>
+</div>
+
+<div style="margin-bottom:24px">
+  <span class="tag tag-blue">Competitive Analysis</span>
+  <span class="tag tag-mint">3-Layer Deconstruction</span>
+  <span class="tag tag-purple">JTBD Framework</span>
+  <span class="tag tag-amber">pm-skills/competitor-analysis</span>
+</div>
+
+<!-- 서비스 개요 카드 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--mint-bg);color:var(--mint)">&#x1F50D;</div>
+    <div><h3>식봄(마켓보로) 서비스 프로파일</h3><p>마켓보로(주) · 2015년 설립 · sikbom.com</p></div>
+  </div>
+  <div class="grid-4">
+    <div class="metric mint"><div class="val">2,341억</div><div class="label">거래액 (2025), 전년비 52%↑</div></div>
+    <div class="metric"><div class="val">23만명</div><div class="label">회원 (전국 외식업소 25%)</div></div>
+    <div class="metric amber"><div class="val">13조원</div><div class="label">누적 거래액 돌파</div></div>
+    <div class="metric red"><div class="val">27.5%</div><div class="label">CJ프레시웨이 지분 인수</div></div>
+  </div>
+  <p style="margin-top:16px;font-size:14px;color:var(--sub)">
+    식봄은 <strong>외식 식자재 오픈마켓</strong>으로 여러 판매자의 상품을 합배송(싱싱배송)·새벽배송으로 제공한다. CJ프레시웨이가 403억에 27.5%를 인수하며 최대주주가 됨으로써 <strong>시장 재편</strong>이 진행 중이다. AI는 구매패턴 추천, CRM 알리미 수준으로 <strong>얕은 수준</strong>에 머물러 있다. 20만개 이상 상품, 전국 외식업소의 25%가 회원으로 등록되어 있으나, "뭘 얼마나 사야 하는지"는 여전히 사장님의 감에 의존하는 구조이다.
+  </p>
+</div>
+
+<!-- 3-Layer Deconstruction -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--blue-bg);color:var(--blue)">&#x1F4CA;</div>
+    <div><h3>3-Layer Deconstruction 분석</h3><p>BM · 기술 · UX 레이어별 해부</p></div>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead>
+      <tr><th style="width:80px">레이어</th><th style="width:160px">구성 요소</th><th>식봄 현황</th><th>KTDS Fooding 전환</th></tr>
+    </thead>
+    <tbody>
+      <tr><td rowspan="4" style="font-weight:700;color:var(--blue)">BM</td><td>수익 모델</td><td>오픈마켓 수수료 + 합배송 물류비</td><td>AI 의사결정 모듈 구독(월10만~30만) + KT 라이선스 + 정부사업 + API</td></tr>
+      <tr><td>고객 세그먼트</td><td>외식사업자(음식점, 카페)</td><td>동일 + KT 사장이지 사용자 + 식자재 유통사</td></tr>
+      <tr><td>핵심 가치</td><td>"여러 판매자 합배송으로 편리한 구매"</td><td>"뭘, 얼마에, 언제, 얼마나 사야 하는지 — 이유와 함께 알려주는 AI"</td></tr>
+      <tr><td>마켓 구조</td><td>CJ프레시웨이, 현대그린푸드, SPC, 농협 등 입점</td><td>식봄/푸드팡 등 기존 플랫폼과 연동하는 AI 레이어</td></tr>
+      <tr><td rowspan="4" style="font-weight:700;color:var(--mint)">기술</td><td>기반</td><td>자체 커머스 플랫폼 + 마켓봄 SaaS</td><td>Ontology/Knowledge Graph 기반 AI 의사결정 엔진</td></tr>
+      <tr><td>인프라</td><td>자체 물류(싱싱배송)</td><td>KT Cloud + 공공API(aT KAMIS 시세)</td></tr>
+      <tr><td>AI 수준</td><td>구매패턴 추천 / CRM 알리미 (얕음)</td><td>Ontology 기반 설명 가능한 AI (수요예측+가격비교+자동발주)</td></tr>
+      <tr><td>데이터</td><td>거래 데이터 / 공급사 데이터</td><td>공공시세(aT) + 하이오더 매출 + 날씨 + 식자재 Ontology</td></tr>
+      <tr><td rowspan="3" style="font-weight:700;color:var(--amber)">UX</td><td>배포 방식</td><td>모바일앱 + 웹</td><td>PWA(설치 없이 사용) + 사장이지 모듈</td></tr>
+      <tr><td>관리 기능</td><td>주문 / 배송 추적 / 결제</td><td>AI 추천 확인 → 원클릭 발주 + 원가 대시보드 + 절감 리포트</td></tr>
+      <tr><td>사용자</td><td>외식 사업자 직접</td><td>소상공인 사장님 + KT 사장이지 사용자</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- 경쟁사 비교 테이블 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--red-bg);color:var(--red)">&#x2694;&#xFE0F;</div>
+    <div><h3>경쟁사 비교 — 식봄 vs 푸드팡 vs CJ프레시엔 vs Fooding</h3><p>핵심 차별화 포인트 비교</p></div>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>비교 항목</th><th>식봄</th><th>푸드팡</th><th>CJ프레시엔</th><th class="compare-header">Fooding(KTDS)</th></tr></thead>
+    <tbody>
+      <tr><td style="font-weight:700">타겟</td><td>외식사업자</td><td>음식점</td><td>B2B 급식/외식</td><td style="background:var(--blue-bg)">소상공인(개인음식점)</td></tr>
+      <tr><td style="font-weight:700">핵심 가치</td><td>합배송/새벽배송</td><td>도매시장 직거래/시세투명성</td><td>자연어 AI 주문</td><td style="background:var(--blue-bg)">AI 구매 의사결정(설명가능)</td></tr>
+      <tr><td style="font-weight:700">거래규모</td><td>2,341억(2025)</td><td>~450억</td><td>3.5조(전체매출)</td><td style="background:var(--blue-bg)">신규</td></tr>
+      <tr><td style="font-weight:700">AI 수준</td><td>추천/CRM알림</td><td>데이터리포트</td><td>LLM자연어주문(베타)</td><td style="background:var(--blue-bg)">Ontology기반 의사결정</td></tr>
+      <tr><td style="font-weight:700">가격</td><td>수수료</td><td>무료배송</td><td>B2B계약</td><td style="background:var(--blue-bg)">월10만~30만 구독</td></tr>
+      <tr><td style="font-weight:700">투자</td><td>CJ 403억 인수</td><td>누적218억+</td><td>-</td><td style="background:var(--blue-bg)">Phase1: 12억</td></tr>
+      <tr><td style="font-weight:700">설명가능성</td><td>&#x2717;</td><td>&#x2717;</td><td>&#x2717;</td><td style="background:var(--blue-bg);font-weight:700;color:var(--blue)">&#x2705; (Ontology)</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- JTBD -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--purple-bg);color:var(--purple)">&#x1F3AF;</div>
+    <div><h3>JTBD(Jobs-To-Be-Done) Framework</h3><p>기존 플랫폼 사용자 vs Fooding 타겟 고객의 핵심 Job 비교</p></div>
+  </div>
+  <div class="grid-2">
+    <div style="background:var(--mint-bg);border-radius:14px;padding:24px">
+      <h4 style="font-size:15px;font-weight:700;color:var(--mint-dark);margin-bottom:12px">기존 플랫폼 사용자의 Job</h4>
+      <p style="font-size:14px;color:var(--sub);margin-bottom:12px"><strong>When</strong> 식자재가 떨어져서 주문해야 할 때</p>
+      <p style="font-size:14px;color:var(--sub);margin-bottom:12px"><strong>I want to</strong> 여러 공급사 가격을 비교하고 편하게 주문하고 싶다</p>
+      <p style="font-size:14px;color:var(--sub);margin-bottom:12px"><strong>So that</strong> 시장에 직접 안 가도 되고 배송비를 아낄 수 있다</p>
+      <p style="font-size:13px;color:var(--muted);margin-top:12px;padding-top:12px;border-top:1px solid rgba(0,0,0,.1)"><strong>Pain:</strong> 여전히 "뭘 얼마나 사야 하는지"는 내 감에 의존</p>
+    </div>
+    <div style="background:var(--blue-bg);border-radius:14px;padding:24px">
+      <h4 style="font-size:15px;font-weight:700;color:var(--blue-dark);margin-bottom:12px">Fooding 타겟 고객의 Job</h4>
+      <p style="font-size:14px;color:var(--sub);margin-bottom:12px"><strong>When</strong> 매일 저녁 마감 후 내일 식자재를 고민할 때</p>
+      <p style="font-size:14px;color:var(--sub);margin-bottom:12px"><strong>I want to</strong> AI가 최적 수량·가격·공급처를 근거와 함께 추천해주길</p>
+      <p style="font-size:14px;color:var(--sub);margin-bottom:12px"><strong>So that</strong> 새벽 시장을 안 가도 되고, 월 50만원+ 절감이 눈에 보인다</p>
+      <p style="font-size:13px;color:var(--muted);margin-top:12px;padding-top:12px;border-top:1px solid rgba(0,0,0,.1)"><strong>Pain:</strong> 가격비교 불가, 수요예측 불가, 원가관리 부재, AI 불신</p>
+    </div>
+  </div>
+</div>
+
+<!-- 해외 벤치마크 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--purple-bg);color:var(--purple)">&#x1F4E2;</div>
+    <div><h3>해외 벤치마크 — 글로벌 AI 식자재 플랫폼</h3><p>글로벌 트렌드 시사점</p></div>
+  </div>
+  <div class="grid-2">
+    <div style="background:var(--purple-bg);border-radius:14px;padding:20px">
+      <h4 style="font-size:14px;font-weight:700;color:var(--purple-dark);margin-bottom:12px">글로벌 AI 식자재 플랫폼</h4>
+      <ul style="list-style:none;padding:0;font-size:13px;color:var(--sub)">
+        <li style="margin-bottom:8px">&#x2022; <strong>Choco(독일, 2018):</strong> 1,500 셰프 + 10,000 공급사, AI 주문 자동화</li>
+        <li style="margin-bottom:8px">&#x2022; <strong>Pepper(미국):</strong> 식자재 유통사 디지털 OS, 10만+ 아이템 카탈로그</li>
+        <li style="margin-bottom:8px">&#x2022; <strong>BlueCart(미국):</strong> AI 인보이스 OCR, 자동 발주</li>
+        <li>&#x2022; <strong>ELKASO(UAE):</strong> 1,400+ 레스토랑, 300+ 공급사 비교</li>
+      </ul>
+    </div>
+    <div style="background:var(--blue-bg);border-radius:14px;padding:20px">
+      <h4 style="font-size:14px;font-weight:700;color:var(--blue-dark);margin-bottom:12px">KTDS 전환 시사점</h4>
+      <ul style="list-style:none;padding:0;font-size:13px;color:var(--sub)">
+        <li style="margin-bottom:8px">&#x2022; <strong>"구매 의사결정 AI"는 글로벌에서도 아직 초기</strong> — 선점 기회</li>
+        <li style="margin-bottom:8px">&#x2022; Choco 모델(레스토랑&#x2194;공급사 연결) + AI 의사결정 = Fooding</li>
+        <li>&#x2022; 해외는 채널/주문 자동화 중심, <strong>"왜 이걸 사야 하는지" 설명하는 AI는 없음</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="insight-box">
+  <h4>핵심 인사이트 — 레퍼런스 분석 결론</h4>
+  <ul>
+    <li><strong>CJ+식봄 통합으로 시장 재편 중</strong> — 독자 플랫폼 정면 승부 어려운 구도</li>
+    <li><strong>모든 플랫폼의 AI가 "주문 편의성"에 한정</strong> — "구매 의사결정"을 돕는 AI = 없음</li>
+    <li><strong>사장이지에 식자재 기능 완전 부재</strong> — "Missing Piece"로 포지셔닝</li>
+    <li><strong>정부 정책 타이밍 최적</strong> — AI 도우미 50억 + 소상공인 5.4조</li>
+    <li><strong>소상공인 위기가 수요를 만듦</strong> — 폐업률 > 개업률 역전</li>
+  </ul>
+</div>
+
+<div class="next-step">
+  <h4>&#x25B6; 다음 단계 연결</h4>
+  <p>2-1에서 도출된 "AI 의사결정 레이어" 포지셔닝 기반으로, <strong>2-2 수요 시장 검증</strong>에서 TAM/SAM/SOM과 정책 연계를 검증한다.</p>
+</div>
+</div>
+
+<!-- ==================== TAB 2-2 ==================== -->
+<div class="tab-panel" id="tab2">
+<div class="step-header">
+  <div class="step-number">STEP 2-2</div>
+  <div class="section-title">수요 시장 검증</div>
+  <div class="step-eng">Market Signal Validation — TAM/SAM/SOM 산출 및 정책 연계</div>
+  <div class="section-sub">"소상공인 AI 식자재 의사결정 시장은 실재하는가? 그 규모와 정책 연계는?"</div>
+  <span class="hitl-badge">HITL 검증 완료</span>
+</div>
+
+<div style="margin-bottom:24px">
+  <span class="tag tag-blue">TAM/SAM/SOM (Top-down + Bottom-up)</span>
+  <span class="tag tag-mint">Assumption Mapping</span>
+  <span class="tag tag-amber">pm-skills/market-sizing</span>
+</div>
+
+<!-- TAM/SAM/SOM -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--mint-bg);color:var(--mint)">&#x1F30D;</div>
+    <div><h3>TAM / SAM / SOM 시장 규모 산출</h3><p>Top-down + Bottom-up 교차 검증 · 2025~2026년 기준</p></div>
+  </div>
+  <div class="grid-3" style="margin-bottom:24px">
+    <div class="metric" style="background:linear-gradient(135deg,var(--blue-bg),#f0e8ff);border-radius:14px;padding:28px">
+      <div class="label" style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px">TAM (Total Addressable Market)</div>
+      <div class="val" style="font-size:36px;color:var(--blue)">&#x20A9;64&#xC870;</div>
+      <div class="label" style="margin-top:8px;font-size:12px">B2B 식자재 유통 시장 (2025)</div>
+    </div>
+    <div class="metric" style="background:linear-gradient(135deg,var(--mint-bg),#e8f9ee);border-radius:14px;padding:28px">
+      <div class="label" style="font-size:13px;font-weight:700;color:var(--mint);margin-bottom:8px">SAM (Serviceable Available Market)</div>
+      <div class="val" style="font-size:36px;color:var(--mint)">&#x20A9;7,000억</div>
+      <div class="label" style="margin-top:8px;font-size:12px">AI 의사결정 모듈 시장 (소상공인)</div>
+    </div>
+    <div class="metric" style="background:linear-gradient(135deg,var(--amber-bg),#fff5e6);border-radius:14px;padding:28px">
+      <div class="label" style="font-size:13px;font-weight:700;color:var(--amber);margin-bottom:8px">SOM (Serviceable Obtainable Market)</div>
+      <div class="val" style="font-size:36px;color:var(--amber)">&#x20A9;121억</div>
+      <div class="label" style="margin-top:8px;font-size:12px">3년 누적, 하이브리드 트랙</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div style="background:var(--bg);border-radius:12px;padding:20px">
+      <h4 style="font-size:14px;font-weight:700;margin-bottom:12px">&#x1F4D0; Top-down 산출</h4>
+      <table style="font-size:13px">
+        <tr><td style="padding:6px 12px">B2B 식자재 시장 (2025)</td><td style="padding:6px 12px;font-weight:700;text-align:right">64조</td></tr>
+        <tr><td style="padding:6px 12px">&#xD7; 소상공인 비중 (90%)</td><td style="padding:6px 12px;font-weight:700;text-align:right">57.6조</td></tr>
+        <tr><td style="padding:6px 12px">&#xD7; AI/디지털 전환 적용 가능 (10%)</td><td style="padding:6px 12px;font-weight:700;text-align:right">5.8조</td></tr>
+        <tr style="background:var(--blue-bg)"><td style="padding:6px 12px;font-weight:700">KTDS 접근 가능 영역 = SAM</td><td style="padding:6px 12px;font-weight:700;text-align:right;color:var(--blue)">7,000억</td></tr>
+      </table>
+    </div>
+    <div style="background:var(--bg);border-radius:12px;padding:20px">
+      <h4 style="font-size:14px;font-weight:700;margin-bottom:12px">&#x1F4CA; Bottom-up 산출</h4>
+      <table style="font-size:13px">
+        <tr><td style="padding:6px 12px">개인 음식점 40만개 &#xD7; 15% &#xD7; 월10만</td><td style="padding:6px 12px;font-weight:700;text-align:right">7,200억</td></tr>
+        <tr><td style="padding:6px 12px">카페/베이커리 10만 &#xD7; 10% &#xD7; 월8만</td><td style="padding:6px 12px;font-weight:700;text-align:right">960억</td></tr>
+        <tr><td style="padding:6px 12px">소규모 급식 5만 &#xD7; 8% &#xD7; 월20만</td><td style="padding:6px 12px;font-weight:700;text-align:right">960억</td></tr>
+        <tr style="background:var(--mint-bg)"><td style="padding:6px 12px;font-weight:700">Bottom-up SAM: ~9,120억</td><td style="padding:6px 12px;font-weight:700;text-align:right;color:var(--mint)">보수적 7,000억 채택</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="chart-box" style="max-width:600px">
+    <canvas id="tamChart"></canvas>
+  </div>
+</div>
+
+<!-- 시장 성장 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--blue-bg);color:var(--blue)">&#x1F4C8;</div>
+    <div><h3>시장 성장 전망 및 주요 지표</h3><p>공공 데이터 · 업계 보고서 종합</p></div>
+  </div>
+  <div class="grid-4">
+    <div class="metric"><div class="val">10%&#x2192;30%</div><div class="label">B2B 식자재 온라인 전환율 (2028)</div></div>
+    <div class="metric mint"><div class="val">52%+</div><div class="label">식봄 연간 거래액 성장률</div></div>
+    <div class="metric amber"><div class="val">50억</div><div class="label">소상공인 AI 도우미 예산 (2026 신규)</div></div>
+    <div class="metric red"><div class="val">5.4조</div><div class="label">소상공인 지원 총예산 (사상 최대)</div></div>
+  </div>
+</div>
+
+<!-- 정책 연계 분석 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--amber-bg);color:var(--amber)">&#x1F3DB;&#xFE0F;</div>
+    <div><h3>정책 연계 분석</h3><p>KTDS 참여 가능 경로 — "공급기업"이 핵심</p></div>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>정책사업</th><th>예산</th><th>KTDS 참여</th><th>참여 경로</th></tr></thead>
+    <tbody>
+      <tr><td style="font-weight:600">AI 바우처 (과기정통부)</td><td>기업당 최대2억</td><td><span class="tag tag-blue">&#x2705; 공급기업</span></td><td>AI솔루션 공급기업Pool 등록</td></tr>
+      <tr><td style="font-weight:600">스마트상점 기술보급 (소진공)</td><td>업체당 500~700만</td><td><span class="tag tag-blue">&#x2705; 기술공급</span></td><td>130개사 선정 모집</td></tr>
+      <tr><td style="font-weight:600">소상공인 AI 도우미</td><td>50억 (신규)</td><td><span class="tag tag-amber">&#x26A0;&#xFE0F; 확인필요</span></td><td>솔루션 공급사</td></tr>
+      <tr><td style="font-weight:600">정책자금</td><td>3.36조</td><td><span class="tag tag-red">&#x274C; 직접불가</span></td><td>간접: 정책자금으로 솔루션 구매</td></tr>
+      <tr><td style="font-weight:600">데이터바우처</td><td>-</td><td><span class="tag tag-blue">&#x2705; 공급기업</span></td><td>식자재 데이터 가공·분석</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="font-size:13px;color:var(--muted);margin-top:12px;text-align:center"><strong>핵심:</strong> KTDS는 대기업이므로 수요기업 불가, <strong>공급기업</strong>으로 참여 가능</p>
+</div>
+
+<!-- Pain Point -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--red-bg);color:var(--red)">&#x1F525;</div>
+    <div><h3>소상공인 Pain Point 맵</h3><p>식자재 구매 관련 핵심 고통 — Assumption Mapping 기반</p></div>
+  </div>
+  <div class="grid-2">
+    <div style="background:var(--red-bg);border-radius:14px;padding:24px">
+      <h4 style="font-size:14px;font-weight:700;color:var(--red-dark);margin-bottom:16px">&#x1F6AB; Showstopper Pain</h4>
+      <div style="margin-bottom:12px;padding:12px;background:rgba(255,255,255,.7);border-radius:10px">
+        <strong style="font-size:13px">P1. 가격비교 불가</strong>
+        <p style="font-size:12px;color:var(--sub);margin-top:4px">전화/감 의존, 여러 업체 비교 물리적 불가</p>
+      </div>
+      <div style="padding:12px;background:rgba(255,255,255,.7);border-radius:10px">
+        <strong style="font-size:13px">P2. 수요예측 불가</strong>
+        <p style="font-size:12px;color:var(--sub);margin-top:4px">경험 의존 → 폐기 or 품절 반복</p>
+      </div>
+    </div>
+    <div style="background:var(--amber-bg);border-radius:14px;padding:24px">
+      <h4 style="font-size:14px;font-weight:700;color:var(--amber-dark);margin-bottom:16px">&#x26A1; High-Impact Pain</h4>
+      <div style="margin-bottom:12px;padding:12px;background:rgba(255,255,255,.7);border-radius:10px">
+        <strong style="font-size:13px">P3. 원가관리 부재</strong>
+        <p style="font-size:12px;color:var(--sub);margin-top:4px">매출의 35~40%가 식자재인데 추적 못 함</p>
+      </div>
+      <div style="padding:12px;background:rgba(255,255,255,.7);border-radius:10px">
+        <strong style="font-size:13px">P4. 주문 시간 소모</strong>
+        <p style="font-size:12px;color:var(--sub);margin-top:4px">매일 1~2시간 새벽 시장/전화 주문</p>
+      </div>
+    </div>
+  </div>
+  <div class="grid-2" style="margin-top:16px">
+    <div style="background:var(--purple-bg);border-radius:14px;padding:24px">
+      <h4 style="font-size:14px;font-weight:700;color:var(--purple-dark);margin-bottom:16px">&#x1F4A1; Emerging Pain</h4>
+      <div style="margin-bottom:12px;padding:12px;background:rgba(255,255,255,.7);border-radius:10px">
+        <strong style="font-size:13px">P5. AI 불신</strong>
+        <p style="font-size:12px;color:var(--sub);margin-top:4px">"AI가 추천하면 믿을 수 있나?" → 설명 가능한 AI 필요</p>
+      </div>
+      <div style="padding:12px;background:rgba(255,255,255,.7);border-radius:10px">
+        <strong style="font-size:13px">P6. 품질 불확실성</strong>
+        <p style="font-size:12px;color:var(--sub);margin-top:4px">공급처별 품질 편차, 냉장 관리 우려</p>
+      </div>
+    </div>
+    <div style="background:var(--bg);border-radius:14px;padding:24px">
+      <h4 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:16px">&#x1F4A1; Pain → Opportunity 전환</h4>
+      <div style="margin-bottom:12px;padding:12px;background:rgba(255,255,255,.7);border-radius:10px">
+        <strong style="font-size:13px">P1→O1: 실시간 멀티 채널 가격비교 + Ontology 근거</strong>
+      </div>
+      <div style="margin-bottom:12px;padding:12px;background:rgba(255,255,255,.7);border-radius:10px">
+        <strong style="font-size:13px">P2→O2: 매출+날씨+계절 기반 AI 수요예측</strong>
+      </div>
+      <div style="padding:12px;background:rgba(255,255,255,.7);border-radius:10px">
+        <strong style="font-size:13px">P5→O5: Ontology "왜?" 설명 → 투명한 AI</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 예상 절감 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:#e8f9ee;color:#0d7a3e">&#x1F4B0;</div>
+    <div><h3>월 식자재비 500만원 음식점 기준 예상 절감</h3><p>AI 모듈 월 10만원 대비 ROI 분석</p></div>
+  </div>
+  <div class="grid-4">
+    <div class="metric" style="border:2px solid var(--blue);border-radius:14px"><div class="val" style="color:var(--blue)">50~75만</div><div class="label">가격 최적화 (월)</div></div>
+    <div class="metric" style="border:2px solid var(--mint);border-radius:14px"><div class="val" style="color:var(--mint)">15~25만</div><div class="label">폐기 감소 (월)</div></div>
+    <div class="metric" style="border:2px solid var(--amber);border-radius:14px"><div class="val" style="color:var(--amber)">~45만</div><div class="label">시간절감 인건비 환산</div></div>
+    <div class="metric" style="border:2px solid var(--purple);border-radius:14px"><div class="val" style="color:var(--purple)">11~14x</div><div class="label">ROI (월 10만 대비)</div></div>
+  </div>
+  <p style="font-size:14px;color:var(--sub);margin-top:16px;text-align:center"><strong>총 월 110~145만원 절감, 연 1,300~1,740만원</strong> — AI 모듈 월 10만원 대비 ROI 11~14배</p>
+</div>
+
+<div class="insight-box">
+  <h4>핵심 인사이트 — 수요 시장 검증 결론</h4>
+  <ul>
+    <li><strong>SOM은 솔직히 작다</strong> — 하지만 KT 채널 활용 시 달라짐</li>
+    <li><strong>정책 연계는 "공급기업" 경로가 핵심</strong></li>
+    <li><strong>ROI 11~14배는 영업의 무기</strong></li>
+    <li><strong>100억 달성에는 4중 수익 구조 필요</strong> (구독+KT+정부+데이터)</li>
+  </ul>
+</div>
+
+<div class="next-step">
+  <h4>&#x25B6; 다음 단계 연결</h4>
+  <p>시장 규모와 Pain Point가 검증되었으므로, <strong>2-3 경쟁·자사 분석</strong>에서 KTDS가 이 시장에서 어떤 포지션을 잡을 수 있는지 분석한다.</p>
+</div>
+</div>
+
+<!-- ==================== TAB 2-3 ==================== -->
+<div class="tab-panel" id="tab3">
+<div class="step-header">
+  <div class="step-number">STEP 2-3</div>
+  <div class="section-title">경쟁·자사 분석</div>
+  <div class="step-eng">Competitive Landscape — 경쟁 구도 파악 및 KTDS 비대칭 강점 도출</div>
+  <div class="section-sub">"KTDS만이 점유할 수 있는 포지션은 어디인가? 임팩티브AI와의 차별화는?"</div>
+  <span class="hitl-badge">HITL 검증 완료</span>
+</div>
+
+<div style="margin-bottom:24px">
+  <span class="tag tag-blue">SWOT Analysis</span>
+  <span class="tag tag-mint">Porter's Five Forces</span>
+  <span class="tag tag-purple">Blue Ocean ERRC</span>
+  <span class="tag tag-amber">pm-skills/swot-analysis · porters-five-forces</span>
+</div>
+
+<!-- SWOT -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--blue-bg);color:var(--blue)">&#x1F9ED;</div>
+    <div><h3>SWOT Analysis — KTDS Fooding</h3><p>pm-skills/swot-analysis 프레임워크 적용</p></div>
+  </div>
+  <div class="swot-grid">
+    <div class="swot-cell swot-s">
+      <h5>Strengths (강점)</h5>
+      <ul>
+        <li>Ontology/KG 기반 의사결정 기술 PoC 진행 중 (손해사정 → 식자재 응용)</li>
+        <li>KT 사장이지 채널 접근 — 모듈 탑재 가능한 유일한 포지션</li>
+        <li>KT Cloud 보안 인프라 — 소상공인 데이터 보안</li>
+        <li>SI 역량 — 기존 시스템 연동, 커스터마이징</li>
+        <li>정부사업 수주 경험 — AI 바우처/스마트상점 참여 가능</li>
+        <li>E8 등 Ontology 협력사 네트워크</li>
+      </ul>
+    </div>
+    <div class="swot-cell swot-w">
+      <h5>Weaknesses (약점)</h5>
+      <ul>
+        <li>식자재 도메인 경험 없음 — 시장 리서치 출발, 현장 검증 미완</li>
+        <li>소상공인 B2C 경험 부족 — UX/마케팅/CS 역량 약함</li>
+        <li>식자재 데이터 미보유 — 시세, 공급사, 품질 데이터 확보 필요</li>
+        <li>MM 기반 수익 구조 관성 — 구독형 전환 조직 내 저항</li>
+        <li>사장이지 MAU 불확실 — KT 채널 의존 시 효과 제한</li>
+      </ul>
+    </div>
+    <div class="swot-cell swot-o">
+      <h5>Opportunities (기회)</h5>
+      <ul>
+        <li>소상공인 AI 의사결정 시장 = 완전 공백</li>
+        <li>2026 정부 정책 사상 최대 (5.4조 + AI 50억 신규)</li>
+        <li>음식점 폐업률 사상 최고 → "생존" 위한 절박한 수요</li>
+        <li>CJ+식봄 통합으로 "AI 연동 파트너" 수요 발생</li>
+        <li>Ontology = "설명 가능한 AI" 차별화</li>
+      </ul>
+    </div>
+    <div class="swot-cell swot-t">
+      <h5>Threats (위협)</h5>
+      <ul>
+        <li>CJ프레시웨이 자체 AI 고도화 (프레시엔 → 의사결정 확장 시 직접 경쟁)</li>
+        <li>임팩티브AI 소상공인 시장 진출 (82억 시리즈A, 식품 유통 확장 중)</li>
+        <li>소상공인 디지털 수용도 낮음</li>
+        <li>LLM 비용/성능 변동 → 마진 압박</li>
+        <li>KT 내부 의사결정 지연</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- 경쟁 포지셔닝 맵 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--purple-bg);color:var(--purple)">&#x1F4CD;</div>
+    <div><h3>경쟁 포지셔닝 맵</h3><p>AI 의사결정 수준 &#xD7; 소상공인 접근성 기준</p></div>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>경쟁사</th><th>유형</th><th>핵심 역량</th><th>AI 수준</th><th>KTDS와의 관계</th></tr></thead>
+    <tbody>
+      <tr><td style="font-weight:700">식봄(마켓보로)</td><td><span class="tag tag-mint">직접</span></td><td>오픈마켓 23만 회원</td><td>AI추천(얕음)</td><td><span class="tag tag-blue">보완재 가능</span></td></tr>
+      <tr><td style="font-weight:700">CJ프레시웨이</td><td><span class="tag tag-red">직접</span></td><td>매출3.5조, 식봄최대주주</td><td>LLM자연어주문</td><td><span class="tag tag-red">위협</span></td></tr>
+      <tr><td style="font-weight:700">푸드팡</td><td><span class="tag tag-mint">직접</span></td><td>도매시장 직거래, 시세</td><td>데이터리포트</td><td><span class="tag tag-blue">보완재 가능</span></td></tr>
+      <tr><td style="font-weight:700">임팩티브AI</td><td><span class="tag tag-red">핵심 경쟁</span></td><td>Deepflow 수요예측SaaS</td><td>AI수요예측특화(98.6%)</td><td><span class="tag tag-red">가장 유사한 경쟁자</span></td></tr>
+      <tr><td style="font-weight:700">삼성웰스토리</td><td><span class="tag tag-amber">간접</span></td><td>단체급식1위</td><td>급식특화</td><td><span class="tag tag-amber">타겟 다름</span></td></tr>
+      <tr><td style="font-weight:700">MS Copilot</td><td><span class="tag tag-amber">대체재</span></td><td>범용AI</td><td>식자재특화&#x274C;</td><td><span class="tag tag-amber">부분 대체</span></td></tr>
+      <tr style="background:var(--blue-bg)"><td style="font-weight:700;color:var(--blue)">KTDS Fooding</td><td><span class="tag tag-blue">목표</span></td><td>Ontology + KT채널</td><td>설명가능 의사결정</td><td style="font-weight:700;color:var(--blue)">—</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- Porter's 5 Forces -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--mint-bg);color:var(--mint)">&#x26A1;</div>
+    <div><h3>Porter's Five Forces 분석</h3><p>pm-skills/porters-five-forces 프레임워크 적용</p></div>
+  </div>
+  <div class="chart-box" style="max-width:600px">
+    <canvas id="porterChart"></canvas>
+  </div>
+  <div class="tbl-wrap" style="margin-top:16px">
+  <table>
+    <thead><tr><th style="width:160px">Force</th><th style="width:80px">수준</th><th>분석</th></tr></thead>
+    <tbody>
+      <tr><td style="font-weight:700">경쟁 강도</td><td><span class="level level-mid">중간 (3/5)</span></td><td>플랫폼은 치열하나 AI 의사결정은 부재</td></tr>
+      <tr><td style="font-weight:700">신규 진입 위협</td><td><span class="level level-high">높음 (4/5)</span></td><td>LLM 접근성 → 선점 속도 핵심</td></tr>
+      <tr><td style="font-weight:700">대체재 위협</td><td><span class="level level-mid">중간 (3/5)</span></td><td>ChatGPT DIY</td></tr>
+      <tr><td style="font-weight:700">공급자 교섭력</td><td><span class="level level-high">높음 (4/5)</span></td><td>LLM API 의존</td></tr>
+      <tr><td style="font-weight:700">구매자 교섭력</td><td><span class="level level-high">높음 (4/5)</span></td><td>소상공인 가격 민감</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- 임팩티브AI 벤치마크 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--red-bg);color:var(--red)">&#x1F50D;</div>
+    <div><h3>임팩티브AI 심층 벤치마크</h3><p>가장 유사한 경쟁자 비교 분석</p></div>
+  </div>
+  <div class="grid-2">
+    <div style="background:var(--bg);border-radius:14px;padding:20px">
+      <h4 style="font-size:14px;font-weight:700;margin-bottom:12px">임팩티브AI 프로파일</h4>
+      <table style="font-size:13px">
+        <tr><td style="padding:4px 12px">설립</td><td style="padding:4px 12px;font-weight:700">2021 (한동대 정두희 교수)</td></tr>
+        <tr><td style="padding:4px 12px">투자</td><td style="padding:4px 12px;font-weight:700">누적 108억 (시리즈A 82억)</td></tr>
+        <tr><td style="padding:4px 12px">고객</td><td style="padding:4px 12px;font-weight:700">삼성생명, CJ제일제당, 한미약품</td></tr>
+        <tr><td style="padding:4px 12px">예측 정확도</td><td style="padding:4px 12px;font-weight:700;color:var(--blue)">98.6% (MAPE 1.20%)</td></tr>
+        <tr><td style="padding:4px 12px">특허</td><td style="padding:4px 12px;font-weight:700">46건 (미국 6건)</td></tr>
+      </table>
+    </div>
+    <div style="background:var(--blue-bg);border-radius:14px;padding:20px">
+      <h4 style="font-size:14px;font-weight:700;color:var(--blue-dark);margin-bottom:12px">KTDS vs 임팩티브AI</h4>
+      <ul style="list-style:none;padding:0;font-size:13px;color:var(--sub)">
+        <li style="margin-bottom:8px">&#x2022; 임팩티브AI = <strong>"정밀한 예측"</strong> (블랙박스 ML)</li>
+        <li style="margin-bottom:8px">&#x2022; KTDS = <strong>"설명 가능한 추천"</strong> (Ontology)</li>
+        <li style="margin-bottom:8px">&#x2022; 대기업 → 임팩티브AI</li>
+        <li>&#x2022; <strong>소상공인 → KTDS</strong> (타겟 분리)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ERRC -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--amber-bg);color:var(--amber)">&#x1F30A;</div>
+    <div><h3>Blue Ocean ERRC 프레임워크</h3><p>KTDS가 경쟁을 무의미하게 만들 전략 액션</p></div>
+  </div>
+  <div class="grid-4">
+    <div style="background:var(--red-bg);border-radius:14px;padding:20px">
+      <h4 style="font-size:14px;font-weight:700;color:var(--red-dark);margin-bottom:12px">Eliminate (제거)</h4>
+      <ul style="list-style:none;padding:0;font-size:13px;color:var(--sub)">
+        <li style="margin-bottom:6px">&#x2022; 물류/배송 직접 운영</li>
+        <li>&#x2022; 범용 AI 챗봇 접근</li>
+      </ul>
+    </div>
+    <div style="background:var(--amber-bg);border-radius:14px;padding:20px">
+      <h4 style="font-size:14px;font-weight:700;color:var(--amber-dark);margin-bottom:12px">Reduce (축소)</h4>
+      <ul style="list-style:none;padding:0;font-size:13px;color:var(--sub)">
+        <li style="margin-bottom:6px">&#x2022; 초기 투자 규모 (하이브리드)</li>
+        <li>&#x2022; 자체 개발 범위</li>
+      </ul>
+    </div>
+    <div style="background:var(--blue-bg);border-radius:14px;padding:20px">
+      <h4 style="font-size:14px;font-weight:700;color:var(--blue-dark);margin-bottom:12px">Raise (증가)</h4>
+      <ul style="list-style:none;padding:0;font-size:13px;color:var(--sub)">
+        <li style="margin-bottom:6px">&#x2022; AI 설명가능성</li>
+        <li style="margin-bottom:6px">&#x2022; 정부사업 연계</li>
+        <li>&#x2022; KT 채널 활용</li>
+      </ul>
+    </div>
+    <div style="background:#e8f9ee;border-radius:14px;padding:20px">
+      <h4 style="font-size:14px;font-weight:700;color:#0d7a3e;margin-bottom:12px">Create (창출)</h4>
+      <ul style="list-style:none;padding:0;font-size:13px;color:var(--sub)">
+        <li style="margin-bottom:6px">&#x2022; <strong>Ontology 기반 식자재 구매 의사결정 AI</strong></li>
+        <li style="margin-bottom:6px">&#x2022; 원가관리 대시보드</li>
+        <li>&#x2022; 멀티 플랫폼 연동 AI 레이어</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="insight-box">
+  <h4>핵심 인사이트 — 경쟁·자사 분석 결론</h4>
+  <ul>
+    <li><strong>"AI 의사결정 레이어" 포지션이 경쟁 회피의 핵심</strong></li>
+    <li><strong>Ontology = "설명 가능한 AI"가 차별화</strong></li>
+    <li><strong>가장 큰 위협은 CJ프레시웨이의 AI 고도화</strong> → 선점 Window 12~18개월</li>
+    <li><strong>100억 달성 경로:</strong> 사장이지 모듈 + AI 바우처 + 독자 구독 + 데이터</li>
+  </ul>
+</div>
+
+<div class="next-step">
+  <h4>&#x25B6; 다음 단계 연결</h4>
+  <p>경쟁 포지셔닝이 확인되었으므로, <strong>2-4 사업 아이템 도출</strong>에서 Fooding의 구체적 아이템과 BMC를 설계한다.</p>
+</div>
+</div>
+
+<!-- ==================== TAB 2-4 ==================== -->
+<div class="tab-panel" id="tab4">
+<div class="step-header">
+  <div class="step-number">STEP 2-4</div>
+  <div class="section-title">사업 아이템 도출</div>
+  <div class="step-eng">Opportunity Ideation — Fooding 정의 및 BMC</div>
+  <div class="section-sub">"경쟁·자사 분석 기반, Fooding의 핵심 기능·트랙·비즈니스 모델을 구조화한다"</div>
+  <span class="hitl-badge">HITL 검증 완료</span>
+</div>
+
+<div style="margin-bottom:24px">
+  <span class="tag tag-blue">Opportunity Solution Tree</span>
+  <span class="tag tag-mint">Business Model Canvas</span>
+  <span class="tag tag-purple">HMW (How Might We)</span>
+  <span class="tag tag-amber">pm-skills/business-model</span>
+</div>
+
+<!-- HMW -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--purple-bg);color:var(--purple)">&#x1F4A1;</div>
+    <div><h3>HMW(How Might We) 질문 도출</h3><p>Pain Point → 기회 전환</p></div>
+  </div>
+  <div class="grid-2">
+    <div style="background:var(--purple-bg);border-radius:14px;padding:20px">
+      <p style="font-size:14px;font-weight:700;color:var(--purple-dark);margin-bottom:8px">HMW #1</p>
+      <p style="font-size:14px;color:var(--sub)">어떻게 하면 <strong>소상공인이 AI 전문가 없이도</strong> 식자재 구매를 최적화할 수 있을까?</p>
+    </div>
+    <div style="background:var(--blue-bg);border-radius:14px;padding:20px">
+      <p style="font-size:14px;font-weight:700;color:var(--blue-dark);margin-bottom:8px">HMW #2</p>
+      <p style="font-size:14px;color:var(--sub)">어떻게 하면 <strong>"왜 이렇게 사야 하는지" 설명 가능한 AI</strong>를 만들 수 있을까?</p>
+    </div>
+    <div style="background:var(--mint-bg);border-radius:14px;padding:20px">
+      <p style="font-size:14px;font-weight:700;color:var(--mint-dark);margin-bottom:8px">HMW #3</p>
+      <p style="font-size:14px;color:var(--sub)">어떻게 하면 <strong>기존 플랫폼과 경쟁하지 않으면서</strong> 가치를 만들 수 있을까?</p>
+    </div>
+    <div style="background:var(--amber-bg);border-radius:14px;padding:20px">
+      <p style="font-size:14px;font-weight:700;color:var(--amber-dark);margin-bottom:8px">HMW #4</p>
+      <p style="font-size:14px;color:var(--sub)">어떻게 하면 <strong>KT 사장이지의 Missing Piece</strong>로 자연스럽게 들어갈 수 있을까?</p>
+    </div>
+  </div>
+</div>
+
+<!-- 아이템 정의 + 5대 핵심 기능 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--blue-bg);color:var(--blue)">&#x1F4CB;</div>
+    <div><h3>Fooding — 5대 핵심 기능</h3><p>"뭘, 얼마에, 언제, 얼마나 사야 하는지를 Ontology 기반으로 근거와 함께 추천하는 AI"</p></div>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>#</th><th>기능명</th><th>설명</th><th>Ontology 역할</th></tr></thead>
+    <tbody>
+      <tr style="background:var(--blue-bg)"><td style="font-weight:800;color:var(--blue)">F1</td><td style="font-weight:700">AI 수요예측</td><td>매출+계절+날씨 → 필요량</td><td>메뉴→식자재 매핑</td></tr>
+      <tr><td style="font-weight:800;color:var(--mint)">F2</td><td style="font-weight:700">실시간 가격비교</td><td>공공시세+플랫폼가격 → 최적 공급처</td><td>"왜 이 공급처" 근거</td></tr>
+      <tr><td style="font-weight:800;color:var(--amber)">F3</td><td style="font-weight:700">자동 발주 (Phase 2)</td><td>예측 기반 자동 주문</td><td>발주 규칙 KG 관리</td></tr>
+      <tr><td style="font-weight:800;color:var(--purple)">F4</td><td style="font-weight:700">원가 관리 대시보드</td><td>매출 대비 식자재 비율 실시간</td><td>대체 식자재 영향 설명</td></tr>
+      <tr><td style="font-weight:800;color:var(--red)">F5</td><td style="font-weight:700">구매 리포트</td><td>주간/월간 분석 + 절감</td><td>근거 기반 개선안</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- 3 트랙 비교 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--amber-bg);color:var(--amber)">&#x1F4CA;</div>
+    <div><h3>3가지 트랙 비교</h3><p>독자 플랫폼 vs B2B 엔진 vs 하이브리드</p></div>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>항목</th><th>Track 1 (독자 플랫폼)</th><th>Track 2 (B2B 엔진)</th><th class="compare-header">Track 3 (하이브리드)</th></tr></thead>
+    <tbody>
+      <tr><td style="font-weight:700">투자</td><td>25~35억</td><td>10~15억</td><td style="background:var(--blue-bg)">10→35억 (단계적)</td></tr>
+      <tr><td style="font-weight:700">MVP 기간</td><td>12~15개월</td><td>6~9개월</td><td style="background:var(--blue-bg)">6~9개월</td></tr>
+      <tr><td style="font-weight:700">3년 매출</td><td>50~80억</td><td>30~50억</td><td style="background:var(--blue-bg);font-weight:700;color:var(--blue)">70~120억</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- 하이브리드 Phase 설계 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:#e8f9ee;color:#0d7a3e">&#x1F680;</div>
+    <div><h3>하이브리드 트랙 Phase 설계</h3><p>Track 2로 시작 → Track 1으로 확장</p></div>
+  </div>
+  <div class="grid-3">
+    <div style="background:var(--blue-bg);border-radius:14px;padding:20px;border:2px solid var(--blue)">
+      <h4 style="font-size:14px;font-weight:700;color:var(--blue-dark);margin-bottom:12px">Phase 1 "Prove It" (M1~9)</h4>
+      <p style="font-size:13px;color:var(--sub)">Engine MVP + PoC 10곳 + AI바우처 + KT미팅</p>
+      <p style="font-size:14px;font-weight:700;color:var(--blue);margin-top:8px">투자 12억</p>
+    </div>
+    <div style="background:var(--mint-bg);border-radius:14px;padding:20px;border:2px solid var(--mint)">
+      <h4 style="font-size:14px;font-weight:700;color:var(--mint-dark);margin-bottom:12px">Phase 2 "Scale It" (M10~24)</h4>
+      <p style="font-size:13px;color:var(--sub)">독자 앱 + 사장이지 모듈 + 정부사업</p>
+      <p style="font-size:14px;font-weight:700;color:var(--mint);margin-top:8px">추가 15억</p>
+    </div>
+    <div style="background:var(--amber-bg);border-radius:14px;padding:20px;border:2px solid var(--amber)">
+      <h4 style="font-size:14px;font-weight:700;color:var(--amber-dark);margin-bottom:12px">Phase 3 "Own It" (M25~36)</h4>
+      <p style="font-size:13px;color:var(--sub)">3중 채널 + 100억</p>
+      <p style="font-size:14px;font-weight:700;color:var(--amber);margin-top:8px">자체 현금흐름</p>
+    </div>
+  </div>
+</div>
+
+<!-- BMC -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--amber-bg);color:var(--amber)">&#x1F3D7;&#xFE0F;</div>
+    <div><h3>Business Model Canvas — Fooding</h3><p>pm-skills/business-model 프레임워크 적용 · 9 Building Blocks</p></div>
+  </div>
+  <div class="bmc-grid">
+    <div class="bmc-cell bmc-kp" style="border-left:3px solid var(--blue)">
+      <h5>Key Partners</h5>
+      <ul><li>E8 Ontology협력사</li><li>KT (사장이지+하이오더+Cloud)</li><li>aT (시세데이터)</li><li>식봄/푸드팡 (API파트너)</li><li>소진공 (정부사업)</li></ul>
+    </div>
+    <div class="bmc-cell bmc-ka">
+      <h5>Key Activities</h5>
+      <ul><li>식자재 Ontology/KG 구축</li><li>AI 엔진 개발</li><li>소상공인 PoC/인터뷰</li><li>KT 모듈 제안</li><li>정부사업 수주</li></ul>
+    </div>
+    <div class="bmc-cell bmc-kr">
+      <h5>Key Resources</h5>
+      <ul><li>Ontology PoC 역량</li><li>AI/ML 엔지니어링</li><li>KT 그룹 관계</li><li>정부사업 수주 역량</li></ul>
+    </div>
+    <div class="bmc-cell bmc-vp" style="border-left:3px solid var(--mint)">
+      <h5>Value Propositions</h5>
+      <ul><li><strong>"뭘, 얼마에, 언제, 얼마나 사야 하는지 — 이유와 함께 알려주는 AI"</strong></li></ul>
+    </div>
+    <div class="bmc-cell bmc-cr">
+      <h5>Customer Relationships</h5>
+      <ul><li>Free→Basic 전환</li><li>주간 절감 리포트</li><li>사장님 커뮤니티</li></ul>
+    </div>
+    <div class="bmc-cell bmc-ch">
+      <h5>Channels</h5>
+      <ul><li>AI 바우처/스마트상점 (정부)</li><li>KT 사장이지 (모듈)</li><li>독자 앱 (Phase2)</li><li>상인회/커뮤니티</li></ul>
+    </div>
+    <div class="bmc-cell bmc-cs" style="border-left:3px solid var(--amber)">
+      <h5>Customer Segments</h5>
+      <ul><li><strong>1순위:</strong> 개인 음식점</li><li><strong>2순위:</strong> 카페·베이커리</li><li><strong>3순위:</strong> 소규모 급식</li><li>B2B 식자재 유통사</li></ul>
+    </div>
+    <div class="bmc-cell bmc-cost">
+      <h5>Cost Structure</h5>
+      <ul><li><strong>인건비 60%</strong> + LLM/Cloud 20% + 마케팅 12% + 기타 8%</li></ul>
+    </div>
+    <div class="bmc-cell bmc-rev">
+      <h5>Revenue Streams</h5>
+      <ul><li><strong>구독 52%</strong> + 정부사업 20% + KT 라이선스 10% + API 10% + 데이터 8%</li></ul>
+    </div>
+  </div>
+</div>
+
+<div class="next-step">
+  <h4>&#x25B6; 다음 단계 연결</h4>
+  <p>3개 트랙에서 <strong>2-5 핵심 아이템 선정</strong>을 통해 ICE Scoring으로 최적 트랙을 확정한다.</p>
+</div>
+</div>
+
+<!-- ==================== TAB 2-5 ==================== -->
+<div class="tab-panel" id="tab5">
+<div class="step-header">
+  <div class="step-number">STEP 2-5</div>
+  <div class="section-title">핵심 아이템 선정</div>
+  <div class="step-eng">Opportunity Scoring — ICE Scoring 및 Go/No-Go 기준</div>
+  <div class="section-sub">"3개 트랙 중 KTDS가 지금 선택해야 할 최적 트랙을 데이터 기반으로 선정한다"</div>
+  <span class="hitl-badge">HITL 검증 완료</span>
+</div>
+
+<div style="margin-bottom:24px">
+  <span class="tag tag-blue">ICE Scoring</span>
+  <span class="tag tag-mint">McKinsey 9-Box</span>
+  <span class="tag tag-purple">Prioritize Assumptions</span>
+  <span class="tag tag-amber">pm-skills/prioritization-frameworks</span>
+</div>
+
+<!-- ICE Scoring -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--blue-bg);color:var(--blue)">&#x1F4CA;</div>
+    <div><h3>ICE Scoring Matrix</h3><p>Impact × Confidence × Ease · 각 10점 만점</p></div>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>트랙</th><th style="text-align:center">Impact</th><th style="text-align:center">Confidence</th><th style="text-align:center">Ease</th><th style="text-align:center">ICE Score</th><th>순위</th></tr></thead>
+    <tbody>
+      <tr style="background:var(--blue-bg)">
+        <td style="font-weight:700">Track 3 (하이브리드)</td>
+        <td style="text-align:center"><strong>8.7</strong><div class="score-bar"><div class="score-fill" style="width:87%;background:var(--blue)"></div></div></td>
+        <td style="text-align:center"><strong>7.7</strong><div class="score-bar"><div class="score-fill" style="width:77%;background:var(--blue)"></div></div></td>
+        <td style="text-align:center"><strong>7.8</strong><div class="score-bar"><div class="score-fill" style="width:78%;background:var(--blue)"></div></div></td>
+        <td style="text-align:center;font-size:20px;font-weight:800;color:var(--blue)">522.5</td>
+        <td style="text-align:center"><span class="tag tag-blue">1위</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:700">Track 2 (B2B 엔진)</td>
+        <td style="text-align:center"><strong>5.0</strong></td>
+        <td style="text-align:center"><strong>7.0</strong></td>
+        <td style="text-align:center"><strong>7.8</strong></td>
+        <td style="text-align:center;font-size:20px;font-weight:800;color:var(--sub)">273.0</td>
+        <td style="text-align:center"><span class="tag tag-amber">2위</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:700">Track 1 (독자 플랫폼)</td>
+        <td style="text-align:center"><strong>7.7</strong></td>
+        <td style="text-align:center"><strong>6.0</strong></td>
+        <td style="text-align:center"><strong>4.3</strong></td>
+        <td style="text-align:center;font-size:20px;font-weight:800;color:var(--sub)">198.7</td>
+        <td style="text-align:center"><span class="tag tag-amber">3위</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- 선정 결과 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:#e8f9ee;color:#0d7a3e">&#x2705;</div>
+    <div><h3>선정 결과 — Fooding (하이브리드 트랙)</h3><p>ICE + 전략적 판단 종합</p></div>
+  </div>
+  <div class="grid-2">
+    <div style="background:linear-gradient(135deg,var(--blue-bg),#f0e8ff);border-radius:16px;padding:28px;border:2px solid var(--blue)">
+      <span class="tag tag-blue" style="font-size:13px;padding:5px 14px">Fooding 하이브리드 트랙</span>
+      <div style="background:rgba(255,255,255,.7);border-radius:10px;padding:16px;margin-top:12px">
+        <p style="font-size:13px;color:var(--sub);margin-bottom:4px"><strong>Phase 1 투자:</strong> 12억 (KTDS 자체)</p>
+        <p style="font-size:13px;color:var(--sub);margin-bottom:4px"><strong>Phase 1 기간:</strong> 9개월</p>
+        <p style="font-size:13px;color:var(--sub);margin-bottom:4px"><strong>3년 매출 목표:</strong> 100억 (3중 채널)</p>
+        <p style="font-size:13px;color:var(--sub)"><strong>핵심 차별화:</strong> Ontology 기반 "설명 가능한 AI"</p>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,var(--mint-bg),#e8f9ee);border-radius:16px;padding:28px;border:2px solid var(--mint)">
+      <span class="tag tag-mint" style="font-size:13px;padding:5px 14px">실행 전략</span>
+      <div style="background:rgba(255,255,255,.7);border-radius:10px;padding:16px;margin-top:12px">
+        <p style="font-size:13px;color:var(--sub);margin-bottom:4px"><strong>Phase 1:</strong> Track 2(B2B엔진) 시작</p>
+        <p style="font-size:13px;color:var(--sub);margin-bottom:4px"><strong>Phase 2:</strong> Track 1(독자플랫폼) 확장</p>
+        <p style="font-size:13px;color:var(--sub);margin-bottom:4px"><strong>Phase 3:</strong> 스케일</p>
+        <p style="font-size:13px;color:var(--sub)"><strong>Go/No-Go:</strong> M9에서 PoC 성과 기반 판정</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Assumption Mapping -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--red-bg);color:var(--red)">&#x26A0;&#xFE0F;</div>
+    <div><h3>핵심 가정(Assumption) 검증 우선순위</h3><p>Riskiest Assumption Test</p></div>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>#</th><th>핵심 가정</th><th>리스크</th><th>검증 시점</th></tr></thead>
+    <tbody>
+      <tr><td style="font-weight:700">H1</td><td>소상공인이 AI 추천을 신뢰하고 행동을 바꿀 것이다</td><td><span class="level level-high">최고</span></td><td>Phase 1 검증</td></tr>
+      <tr><td style="font-weight:700">H2</td><td>Ontology "설명"이 블랙박스보다 수용률 높을 것이다</td><td><span class="level level-high">높음</span></td><td>Phase 1 A/B</td></tr>
+      <tr><td style="font-weight:700">H3</td><td>공공 시세+플랫폼 가격으로 의미 있는 절감 가능</td><td><span class="level level-high">높음</span></td><td>Phase 1 시뮬레이션</td></tr>
+      <tr><td style="font-weight:700">H4</td><td>KT가 사장이지에 모듈 탑재 승인할 것이다</td><td><span class="level level-high">높음</span></td><td>Phase 1 KT 미팅</td></tr>
+      <tr><td style="font-weight:700">H5</td><td>월 10만원 구독료를 지불할 것이다</td><td><span class="level level-mid">중간</span></td><td>Phase 2 전환율</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- Go/No-Go 기준 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:#e8f9ee;color:#0d7a3e">&#x2696;&#xFE0F;</div>
+    <div><h3>Go / No-Go 기준</h3><p>M9 시점 판정 기준</p></div>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>조건</th><th style="color:#0d7a3e">Go</th><th style="color:var(--amber)">Hold</th><th style="color:var(--red)">Drop</th></tr></thead>
+    <tbody>
+      <tr><td style="font-weight:700">PoC 수용률</td><td>60%+</td><td>30~60%</td><td>&lt;30%</td></tr>
+      <tr><td style="font-weight:700">절감 효과</td><td>월 50만+</td><td>20~50만</td><td>&lt;20만</td></tr>
+      <tr><td style="font-weight:700">KT 모듈</td><td>승인/LOI</td><td>검토중</td><td>거절</td></tr>
+      <tr><td style="font-weight:700">유료 전환</td><td>5곳+</td><td>2~4곳</td><td>1곳 이하</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="next-step">
+  <h4>&#x25B6; 다음 단계 연결</h4>
+  <p>핵심 아이템이 선정되었으므로, <strong>2-6 타겟 고객 정의</strong>에서 Fooding의 타겟 페르소나와 여정을 정의한다.</p>
+</div>
+</div>
+
+<!-- ==================== TAB 2-6 ==================== -->
+<div class="tab-panel" id="tab6">
+<div class="step-header">
+  <div class="step-number">STEP 2-6</div>
+  <div class="section-title">타겟 고객 정의</div>
+  <div class="step-eng">Customer Persona & Journey — 소상공인 사장님 페르소나</div>
+  <div class="section-sub">"누가 쓰는가? 왜 쓰는가? 어떤 과정을 거쳐 습관이 되는가?"</div>
+  <span class="hitl-badge">HITL 검증 완료</span>
+</div>
+
+<div style="margin-bottom:24px">
+  <span class="tag tag-blue">User Persona</span>
+  <span class="tag tag-mint">Customer Journey Map</span>
+  <span class="tag tag-purple">JTBD</span>
+  <span class="tag tag-amber">Value Proposition Canvas</span>
+</div>
+
+<!-- Persona Cards -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--blue-bg);color:var(--blue)">&#x1F464;</div>
+    <div><h3>타겟 페르소나</h3><p>경험자(김사장) + 신규창업자(이대표)</p></div>
+  </div>
+  <div class="grid-2">
+    <div class="persona-card type-a">
+      <div class="persona-name">김사장</div>
+      <div class="persona-role">52세 남성 · 한식당(백반·찌개) · 서울 마포구 · 15년차</div>
+      <div class="persona-section"><h5>프로필</h5><p>월 매출 2,500만, 식자재비 850만(34%). 새벽4시 가락시장 주3회 + 단골 전화주문 주2회. 카톡 능숙, 배민 사장님 사용, 식봄 "들어봤는데 안 써봄"</p></div>
+      <div class="persona-section"><h5>JTBD</h5><ul><li><strong>Functional:</strong> 최적가격 + 적정량 → 비용 줄이고 시간 확보</li><li><strong>Emotional:</strong> "바가지 안 쓴다" 안심 + "장사에 집중" 여유</li></ul></div>
+      <div class="persona-section"><h5>Pain Points</h5><ul><li>"새벽 시장 다녀오면 지쳐서 실수"</li><li>"양파 올랐는데 미리 알았으면"</li></ul></div>
+    </div>
+    <div class="persona-card type-b">
+      <div class="persona-name">이대표</div>
+      <div class="persona-role">34세 여성 · 파스타·브런치 카페 · 성수동 · 8개월차</div>
+      <div class="persona-section"><h5>프로필</h5><p>월 매출 1,800만, 식자재비 720만(40%). 식봄50%+마트30%+배달20% — 체계 없음. 디지털 매우 높음 (앱 적극, AI 관심)</p></div>
+      <div class="persona-section"><h5>JTBD</h5><ul><li>경험 없이도 AI가 최적 구매 → 원가율 35% 이하 관리</li></ul></div>
+      <div class="persona-section"><h5>Pain Points</h5><ul><li>"원가 계산이 안 돼서 남는 게 없어"</li><li>"폐업률 기사 불안"</li></ul></div>
+    </div>
+  </div>
+</div>
+
+<!-- Customer Journey Map -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--mint-bg);color:var(--mint)">&#x1F5FA;&#xFE0F;</div>
+    <div><h3>고객 여정 지도 (Customer Journey Map)</h3><p>6단계 — 인식부터 추천까지</p></div>
+  </div>
+  <div class="journey-track">
+    <div class="journey-stage" style="border-top:3px solid var(--muted)"><h5>1. 인식</h5><div class="emotion">&#x1F61F;</div><p><strong>Trigger:</strong> "식자재 비용 너무 많이 나가는데"</p><p style="font-size:11px;color:var(--muted);margin-top:4px">검색, 단톡방</p></div>
+    <div class="journey-stage" style="border-top:3px solid var(--amber)"><h5>2. 관심</h5><div class="emotion">&#x1F914;</div><p><strong>Trigger:</strong> "AI가 추천해준다고?"</p><p style="font-size:11px;color:var(--muted);margin-top:4px">랜딩페이지, 시뮬레이터</p></div>
+    <div class="journey-stage" style="border-top:3px solid var(--blue)"><h5>3. 시도</h5><div class="emotion">&#x1F62E;</div><p><strong>Trigger:</strong> "무료니까 한번"</p><p style="font-size:11px;color:var(--muted);margin-top:4px">가입, AI바우처 → "진짜 더 싸네"</p></div>
+    <div class="journey-stage" style="border-top:3px solid var(--mint)"><h5>4. 습관화</h5><div class="emotion">&#x1F60A;</div><p><strong>Trigger:</strong> "매일 Fooding 확인"</p><p style="font-size:11px;color:var(--muted);margin-top:4px">일일 추천, 원가 대시보드</p></div>
+    <div class="journey-stage" style="border-top:3px solid #22c55e"><h5>5. 신뢰</h5><div class="emotion">&#x1F604;</div><p><strong>Trigger:</strong> "없이는 못 해"</p><p style="font-size:11px;color:var(--muted);margin-top:4px">유료 전환, 전체 구매 경유</p></div>
+    <div class="journey-stage" style="border-top:3px solid var(--purple)"><h5>6. 추천</h5><div class="emotion">&#x1F929;</div><p><strong>Trigger:</strong> "옆 가게도 알려줘야지"</p><p style="font-size:11px;color:var(--muted);margin-top:4px">지인 추천, 커뮤니티</p></div>
+  </div>
+</div>
+
+<!-- Value Proposition Canvas -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--purple-bg);color:var(--purple)">&#x1F48E;</div>
+    <div><h3>Value Proposition Canvas</h3><p>고객 프로필 vs 가치 맵</p></div>
+  </div>
+  <div class="grid-2">
+    <div style="background:var(--bg);border-radius:14px;padding:24px">
+      <h4 style="font-size:15px;font-weight:700;color:var(--purple-dark);margin-bottom:16px">Customer Profile</h4>
+      <div style="margin-bottom:12px"><p style="font-size:12px;font-weight:700;color:var(--muted)">JOBS</p><p style="font-size:13px;color:var(--sub)">최적가격 확보, 적정량 구매, 시간 줄이기, 원가관리</p></div>
+      <div style="margin-bottom:12px"><p style="font-size:12px;font-weight:700;color:var(--muted)">PAINS</p><p style="font-size:13px;color:var(--sub)">비교불가, 예측불가, AI불신</p></div>
+      <div><p style="font-size:12px;font-weight:700;color:var(--muted)">GAINS</p><p style="font-size:13px;color:var(--sub)">월50만+절감, 시간확보, 프로관리</p></div>
+    </div>
+    <div style="background:var(--blue-bg);border-radius:14px;padding:24px">
+      <h4 style="font-size:15px;font-weight:700;color:var(--blue-dark);margin-bottom:16px">Value Map (Fooding)</h4>
+      <div style="margin-bottom:12px"><p style="font-size:12px;font-weight:700;color:var(--muted)">PRODUCTS</p><p style="font-size:13px;color:var(--sub)">AI 가격비교 + 수요예측 + 자동발주 + 원가관리</p></div>
+      <div style="margin-bottom:12px"><p style="font-size:12px;font-weight:700;color:var(--muted)">PAIN RELIEVERS</p><p style="font-size:13px;color:var(--sub)">실시간비교 + AI예측 + Ontology "이유"</p></div>
+      <div><p style="font-size:12px;font-weight:700;color:var(--muted)">GAIN CREATORS</p><p style="font-size:13px;color:var(--sub)">자동발주 + 절감리포트 + 동종비교</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="next-step">
+  <h4>&#x25B6; 다음 단계 연결</h4>
+  <p>타겟 고객이 정의되었으므로, <strong>2-7 비즈니스 모델 정의</strong>에서 수익 시나리오와 Unit Economics를 설계한다.</p>
+</div>
+</div>
+
+<!-- ==================== TAB 2-7 ==================== -->
+<div class="tab-panel" id="tab7">
+<div class="step-header">
+  <div class="step-number">STEP 2-7</div>
+  <div class="section-title">비즈니스 모델 정의</div>
+  <div class="step-eng">Business Model Hypothesis — Lean Canvas, 수익 시나리오, Unit Economics</div>
+  <div class="section-sub">"이 사업은 돈이 되는가? 얼마나 빨리 BEP에 도달하는가?"</div>
+  <span class="hitl-badge">HITL 검증 완료</span>
+</div>
+
+<div style="margin-bottom:24px">
+  <span class="tag tag-blue">BMC 완성본</span>
+  <span class="tag tag-mint">Lean Canvas</span>
+  <span class="tag tag-purple">Unit Economics (LTV/CAC/BEP)</span>
+  <span class="tag tag-amber">pm-skills/monetization-strategy · lean-canvas</span>
+</div>
+
+<!-- Lean Canvas -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--mint-bg);color:var(--mint)">&#x1F4CB;</div>
+    <div><h3>Lean Canvas — Fooding</h3><p>pm-skills/lean-canvas 프레임워크 적용</p></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:auto auto auto;gap:2px;background:var(--border);border-radius:14px;overflow:hidden;margin:16px 0">
+    <div style="background:var(--card);padding:14px;grid-column:1;grid-row:1/3">
+      <h5 style="font-size:11px;font-weight:800;color:var(--red);margin-bottom:8px;text-transform:uppercase">1. Problem</h5>
+      <ul style="list-style:none;padding:0;font-size:12px;color:var(--sub)"><li style="margin-bottom:6px">&#x2460; 가격비교불가</li><li style="margin-bottom:6px">&#x2461; 수요예측불가</li><li>&#x2462; 원가관리부재</li></ul>
+      <p style="font-size:11px;color:var(--muted);margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><strong>기존 대안:</strong> 식봄/푸드팡(채널만), CJ프레시엔(주문편의), 엑셀/감</p>
+    </div>
+    <div style="background:var(--card);padding:14px;grid-column:2;grid-row:1">
+      <h5 style="font-size:11px;font-weight:800;color:var(--blue);margin-bottom:8px;text-transform:uppercase">4. Solution</h5>
+      <ul style="list-style:none;padding:0;font-size:12px;color:var(--sub)"><li style="margin-bottom:4px">&#x2022; Ontology/KG AI 엔진</li><li style="margin-bottom:4px">&#x2022; 수요예측+가격비교+자동발주</li><li>&#x2022; 원가관리+리포트</li></ul>
+    </div>
+    <div style="background:var(--card);padding:14px;grid-column:2;grid-row:2">
+      <h5 style="font-size:11px;font-weight:800;color:var(--blue);margin-bottom:8px;text-transform:uppercase">8. Key Metrics</h5>
+      <ul style="list-style:none;padding:0;font-size:12px;color:var(--sub)"><li style="margin-bottom:4px">&#x2022; MAU, 추천수용률</li><li style="margin-bottom:4px">&#x2022; 월절감액, 유료전환율</li><li>&#x2022; NRR, CAC Payback</li></ul>
+    </div>
+    <div style="background:var(--card);padding:14px;grid-column:3;grid-row:1/3">
+      <h5 style="font-size:11px;font-weight:800;color:var(--mint);margin-bottom:8px;text-transform:uppercase">3. UVP</h5>
+      <p style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px">"뭘, 얼마에, 언제, 얼마나 사야 하는지 — 이유와 함께 알려주는 AI"</p>
+      <p style="font-size:11px;color:var(--muted);margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><strong>High-level:</strong> 식자재계의 "토스"</p>
+    </div>
+    <div style="background:var(--card);padding:14px;grid-column:4;grid-row:1">
+      <h5 style="font-size:11px;font-weight:800;color:var(--purple);margin-bottom:8px;text-transform:uppercase">9. Unfair Advantage</h5>
+      <ul style="list-style:none;padding:0;font-size:12px;color:var(--sub)"><li style="margin-bottom:4px">&#x2022; Ontology 설명가능AI</li><li style="margin-bottom:4px">&#x2022; KT 사장이지 독점</li><li style="margin-bottom:4px">&#x2022; 하이오더 매출데이터</li><li>&#x2022; 정부사업 역량</li></ul>
+    </div>
+    <div style="background:var(--card);padding:14px;grid-column:4;grid-row:2">
+      <h5 style="font-size:11px;font-weight:800;color:var(--purple);margin-bottom:8px;text-transform:uppercase">5. Channels</h5>
+      <ul style="list-style:none;padding:0;font-size:12px;color:var(--sub)"><li style="margin-bottom:4px">&#x2022; Phase1: AI바우처+스마트상점+KT사장이지</li><li>&#x2022; Phase2: 독자앱+커뮤니티</li></ul>
+    </div>
+    <div style="background:var(--card);padding:14px;grid-column:5;grid-row:1/3">
+      <h5 style="font-size:11px;font-weight:800;color:var(--amber);margin-bottom:8px;text-transform:uppercase">2. Customer Segments</h5>
+      <ul style="list-style:none;padding:0;font-size:12px;color:var(--sub)"><li style="margin-bottom:6px"><strong>Beachhead:</strong> 개인 음식점</li><li style="margin-bottom:6px"><strong>Early Adopter:</strong> 신규창업자</li><li><strong>확장:</strong> 카페, 급식</li></ul>
+    </div>
+    <div style="background:var(--card);padding:14px;grid-column:1/3;grid-row:3">
+      <h5 style="font-size:11px;font-weight:800;color:var(--red);margin-bottom:8px;text-transform:uppercase">7. Cost Structure</h5>
+      <p style="font-size:12px;color:var(--sub)"><strong>인건비 60%</strong> + LLM/Cloud 20% + 마케팅 12% + 기타 8% | <strong>Phase1 투자:</strong> 12억</p>
+    </div>
+    <div style="background:var(--card);padding:14px;grid-column:3/6;grid-row:3">
+      <h5 style="font-size:11px;font-weight:800;color:#0d7a3e;margin-bottom:8px;text-transform:uppercase">6. Revenue Streams</h5>
+      <p style="font-size:12px;color:var(--sub)"><strong>구독 52%</strong>(월10~30만) + 정부사업 20% + KT라이선스 10% + API 10% + 데이터 8%</p>
+    </div>
+  </div>
+</div>
+
+<!-- 수익 시나리오 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--blue-bg);color:var(--blue)">&#x1F4B0;</div>
+    <div><h3>수익 시나리오 3안 비교 (3개년)</h3><p>보수적 / 기본(Base) / 공격적</p></div>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>구분</th><th style="text-align:center">Y1</th><th style="text-align:center">Y2</th><th style="text-align:center">Y3</th><th style="text-align:center">3년 누적</th></tr></thead>
+    <tbody>
+      <tr><td colspan="5" style="font-weight:700;background:var(--bg);color:var(--muted)">보수적</td></tr>
+      <tr><td>매출 (억원)</td><td style="text-align:center">6</td><td style="text-align:center">20</td><td style="text-align:center">45</td><td style="text-align:center;font-weight:700">71</td></tr>
+      <tr><td colspan="5" style="font-weight:700;background:var(--blue-bg);color:var(--blue-dark)">기본 (Base) ← 주력</td></tr>
+      <tr style="color:var(--blue)"><td>매출 (억원)</td><td style="text-align:center;font-weight:700">10</td><td style="text-align:center;font-weight:700">35</td><td style="text-align:center;font-weight:700">76</td><td style="text-align:center;font-weight:800;font-size:18px">121</td></tr>
+      <tr><td colspan="5" style="font-weight:700;background:var(--mint-bg);color:var(--mint-dark)">공격적</td></tr>
+      <tr><td>매출 (억원)</td><td style="text-align:center">15</td><td style="text-align:center">50</td><td style="text-align:center">110</td><td style="text-align:center;font-weight:700">175</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div style="background:var(--bg);border-radius:14px;padding:20px;margin-top:16px">
+    <h4 style="font-size:14px;font-weight:700;margin-bottom:12px">Base Y3 수익원별 구성</h4>
+    <div class="grid-4" style="font-size:13px">
+      <div class="metric" style="border-radius:10px"><div class="val" style="font-size:20px">40억</div><div class="label">소상공인 구독 (52%)</div></div>
+      <div class="metric" style="border-radius:10px"><div class="val" style="font-size:20px">15억</div><div class="label">정부사업 (20%)</div></div>
+      <div class="metric" style="border-radius:10px"><div class="val" style="font-size:20px">8억</div><div class="label">KT 라이선스 (10%)</div></div>
+      <div class="metric" style="border-radius:10px"><div class="val" style="font-size:20px">13억</div><div class="label">API+데이터 (18%)</div></div>
+    </div>
+  </div>
+
+  <div class="chart-box" style="max-width:700px">
+    <canvas id="revenueChart"></canvas>
+  </div>
+</div>
+
+<!-- 가격 티어 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--amber-bg);color:var(--amber)">&#x1F4B3;</div>
+    <div><h3>가격 티어</h3><p>Free → Basic → Pro → Enterprise</p></div>
+  </div>
+  <div class="grid-4">
+    <div class="metric" style="border:1px solid var(--border);border-radius:14px"><div class="val" style="font-size:20px;color:var(--muted)">&#x20A9;0</div><div class="label">Free</div></div>
+    <div class="metric" style="border:2px solid var(--blue);border-radius:14px"><div class="val" style="font-size:20px;color:var(--blue)">&#x20A9;99,000</div><div class="label">Basic / 월</div></div>
+    <div class="metric" style="border:2px solid var(--mint);border-radius:14px"><div class="val" style="font-size:20px;color:var(--mint)">&#x20A9;290,000</div><div class="label">Pro / 월</div></div>
+    <div class="metric" style="border:2px solid var(--purple);border-radius:14px"><div class="val" style="font-size:20px;color:var(--purple)">별도</div><div class="label">Enterprise</div></div>
+  </div>
+</div>
+
+<!-- Unit Economics -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--amber-bg);color:var(--amber)">&#x1F4D0;</div>
+    <div><h3>Unit Economics — Base 시나리오 기준</h3><p>LTV / CAC / BEP</p></div>
+  </div>
+  <div class="ue-flow">
+    <div class="ue-item"><div class="val" style="color:var(--blue)">&#x20A9;324만</div><div class="label">LTV (월9만GP &#xD7; 36개월)</div></div>
+    <div class="ue-arrow">&#xF7;</div>
+    <div class="ue-item"><div class="val" style="color:var(--red)">&#x20A9;60만</div><div class="label">CAC (가중평균)</div></div>
+    <div class="ue-arrow">=</div>
+    <div class="ue-item" style="border:2px solid var(--blue)"><div class="val" style="color:var(--blue)">5.4x</div><div class="label">LTV/CAC Ratio</div></div>
+  </div>
+
+  <div class="grid-4" style="margin-top:24px">
+    <div class="metric" style="border:2px solid var(--blue);border-radius:14px">
+      <div class="val" style="color:var(--blue)">5.4x</div><div class="label">LTV/CAC</div>
+      <p style="font-size:11px;color:#0d7a3e;margin-top:4px">&#x2713; 건전 (&gt;3x)</p>
+    </div>
+    <div class="metric" style="border:2px solid var(--mint);border-radius:14px">
+      <div class="val" style="color:var(--mint)">6.7개월</div><div class="label">CAC Payback</div>
+      <p style="font-size:11px;color:#0d7a3e;margin-top:4px">&#x2713; 건전 (&lt;12개월)</p>
+    </div>
+    <div class="metric" style="border:2px solid var(--amber);border-radius:14px">
+      <div class="val" style="color:var(--amber)">Y2 Q2</div><div class="label">BEP 도달</div>
+      <p style="font-size:11px;color:var(--amber);margin-top:4px">누적 투자 27억 회수</p>
+    </div>
+    <div class="metric" style="border:2px solid var(--purple);border-radius:14px">
+      <div class="val" style="color:var(--purple)">27억</div><div class="label">총 투자</div>
+      <p style="font-size:11px;color:var(--muted);margin-top:4px">Phase1: 12억 + Phase2: 15억</p>
+    </div>
+  </div>
+</div>
+
+<div class="insight-box">
+  <h4>핵심 인사이트 — 비즈니스 모델 결론</h4>
+  <ul>
+    <li><strong>Unit Economics가 건전:</strong> LTV/CAC 5.4x, CAC Payback 6.7개월</li>
+    <li><strong>BEP는 Y2 Q2 달성 가능:</strong> 18개월 — Phase 1+2 투자 27억 회수</li>
+    <li><strong>구독 52% + 정부사업 20% = 반복수익 72%:</strong> MM 기반 탈피 구조</li>
+    <li><strong>100억 달성에는 3중 채널(독자+사장이지+정부) 동시 작동 필수</strong></li>
+  </ul>
+</div>
+
+<div class="next-step">
+  <h4>&#x25B6; 다음 단계 연결</h4>
+  <p>비즈니스 모델이 검증되었으므로, <strong>2-8 발굴 결과 패키징</strong>에서 전체 분석을 통합한다.</p>
+</div>
+</div>
+
+<!-- ==================== TAB 2-8 ==================== -->
+<div class="tab-panel" id="tab8">
+<div class="step-header">
+  <div class="step-number">STEP 2-8</div>
+  <div class="section-title">발굴 결과 패키징</div>
+  <div class="step-eng">Discovery Output Report — 3단계 형상화 Input Deck</div>
+  <div class="section-sub">"2-1~2-7 전 단계 분석을 통합하여, 3단계 형상화에 필요한 핵심 의사결정 자료를 완성한다"</div>
+  <span class="hitl-badge">HITL 검증 완료</span>
+</div>
+
+<div class="exec-hero">
+  <h2>Executive Summary</h2>
+  <p>
+    소상공인 음식점의 식자재 구매 비효율(64조 시장의 90%가 전화/수기/감 의존)을 Ontology 기반 <strong>'설명 가능한 AI'</strong>로 해결하는 의사결정 엔진 <strong>'Fooding'</strong> — KT 사장이지 모듈 + 독자 앱 + 정부사업의 <strong>3중 채널</strong>로 3년 누적 121억 달성.
+  </p>
+  <div class="exec-verdict verdict-go">&#x2713; Go — 3단계 형상화 진행 권고</div>
+</div>
+
+<!-- 핵심 수치 대시보드 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--blue-bg);color:var(--blue)">&#x1F4CA;</div>
+    <div><h3>핵심 수치 대시보드</h3><p>의사결정에 필요한 Key Numbers</p></div>
+  </div>
+  <div class="grid-4">
+    <div class="metric" style="border-radius:14px;border:1px solid var(--border)"><div class="val" style="color:var(--blue)">&#x20A9;7,000억</div><div class="label">SAM</div></div>
+    <div class="metric" style="border-radius:14px;border:1px solid var(--border)"><div class="val" style="color:var(--mint)">&#x20A9;121억</div><div class="label">SOM (3년)</div></div>
+    <div class="metric" style="border-radius:14px;border:1px solid var(--border)"><div class="val" style="color:var(--amber)">5.4x</div><div class="label">LTV/CAC</div></div>
+    <div class="metric" style="border-radius:14px;border:1px solid var(--border)"><div class="val" style="color:var(--purple)">&#x20A9;27억</div><div class="label">총 투자</div></div>
+  </div>
+  <div class="grid-4" style="margin-top:16px">
+    <div class="metric" style="border-radius:14px;border:1px solid var(--border)"><div class="val" style="color:var(--blue)">Y2 Q2</div><div class="label">BEP 도달</div></div>
+    <div class="metric" style="border-radius:14px;border:1px solid var(--border)"><div class="val" style="color:var(--mint)">&#x20A9;420억</div><div class="label">Y5 ARR (추정)</div></div>
+    <div class="metric" style="border-radius:14px;border:1px solid var(--border)"><div class="val" style="color:var(--amber)">40%+</div><div class="label">CAGR</div></div>
+    <div class="metric" style="border-radius:14px;border:1px solid var(--border)"><div class="val" style="color:var(--red)">12~18개월</div><div class="label">선점 Window</div></div>
+  </div>
+</div>
+
+<!-- 단계별 핵심 인사이트 통합 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--purple-bg);color:var(--purple)">&#x1F511;</div>
+    <div><h3>단계별 핵심 인사이트 통합</h3><p>2-0 ~ 2-7 각 단계의 핵심 발견</p></div>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th style="width:120px">단계</th><th>핵심 발견</th><th style="width:200px">전략적 함의</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag tag-blue">2-0</span></td><td>Type A 분류 → 사장이지 Gap에서 기회</td><td>Missing Piece 전략</td></tr>
+      <tr><td><span class="tag tag-mint">2-1</span></td><td>CJ+식봄 재편, AI=주문편의 한정</td><td>"AI 의사결정 레이어" 차별화</td></tr>
+      <tr><td><span class="tag tag-mint">2-2</span></td><td>SAM 7,000억, 정책 최대</td><td>공급기업 경로</td></tr>
+      <tr><td><span class="tag tag-blue">2-3</span></td><td>임팩티브AI=유사 경쟁, 소상공인 공백</td><td>Ontology "설명가능성"</td></tr>
+      <tr><td><span class="tag tag-blue">2-4</span></td><td>Fooding 정의, 3트랙</td><td>동일 엔진, 다중 채널</td></tr>
+      <tr><td><span class="tag tag-amber">2-5</span></td><td>하이브리드 ICE 1위</td><td>Phase별 리스크 분산</td></tr>
+      <tr><td><span class="tag tag-amber">2-6</span></td><td>김사장/이대표 페르소나</td><td>Beachhead 개인음식점</td></tr>
+      <tr><td><span class="tag tag-amber">2-7</span></td><td>LTV/CAC 5.4x, BEP Y2 Q2</td><td>100억 사업 가능</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- Phase별 로드맵 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--red-bg);color:var(--red)">&#x1F680;</div>
+    <div><h3>Phase별 로드맵</h3><p>36개월 실행 계획</p></div>
+  </div>
+  <div class="grid-3">
+    <div style="background:linear-gradient(135deg,var(--blue-bg),#f0e8ff);border-radius:16px;padding:28px;border:2px solid var(--blue)">
+      <h4 style="font-size:16px;font-weight:800;color:var(--blue-dark);margin-bottom:16px">Phase 1 "Prove It"</h4>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:8px">M1~9 · 12억</p>
+      <div style="font-size:13px;color:var(--sub)">
+        <div style="padding:4px 0">엔진 MVP</div>
+        <div style="padding:4px 0">PoC 10곳</div>
+        <div style="padding:4px 0">KT 미팅</div>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,var(--mint-bg),#e8f9ee);border-radius:16px;padding:28px;border:2px solid var(--mint)">
+      <h4 style="font-size:16px;font-weight:800;color:var(--mint-dark);margin-bottom:16px">Phase 2 "Scale It"</h4>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:8px">M10~24 · 15억</p>
+      <div style="font-size:13px;color:var(--sub)">
+        <div style="padding:4px 0">앱 런칭</div>
+        <div style="padding:4px 0">사장이지 모듈</div>
+        <div style="padding:4px 0">정부사업</div>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,var(--amber-bg),#fff5e6);border-radius:16px;padding:28px;border:2px solid var(--amber)">
+      <h4 style="font-size:16px;font-weight:800;color:var(--amber-dark);margin-bottom:16px">Phase 3 "Own It"</h4>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:8px">M25~36 · 자체</p>
+      <div style="font-size:13px;color:var(--sub)">
+        <div style="padding:4px 0">3중 채널</div>
+        <div style="padding:4px 0">100억</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Go/Hold/Drop -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:#e8f9ee;color:#0d7a3e">&#x2696;&#xFE0F;</div>
+    <div><h3>Go / Hold / Drop 판정 기준</h3><p>M9 시점 최종 의사결정</p></div>
+  </div>
+  <div class="grid-3">
+    <div style="background:#e8f9ee;border-radius:14px;padding:24px;border:2px solid #22c55e">
+      <h4 style="font-size:16px;font-weight:800;color:#0d7a3e;margin-bottom:16px;text-align:center">&#x2705; Go</h4>
+      <ul style="list-style:none;padding:0;font-size:13px;color:var(--sub)">
+        <li style="margin-bottom:8px;padding-left:16px;position:relative"><span style="position:absolute;left:0">&#x25A1;</span> PoC 수용률 60%+</li>
+        <li style="margin-bottom:8px;padding-left:16px;position:relative"><span style="position:absolute;left:0">&#x25A1;</span> 절감 월 50만+</li>
+        <li style="margin-bottom:8px;padding-left:16px;position:relative"><span style="position:absolute;left:0">&#x25A1;</span> KT LOI</li>
+        <li style="padding-left:16px;position:relative"><span style="position:absolute;left:0">&#x25A1;</span> 유료 5곳+</li>
+      </ul>
+    </div>
+    <div style="background:var(--amber-bg);border-radius:14px;padding:24px;border:2px solid var(--amber)">
+      <h4 style="font-size:16px;font-weight:800;color:var(--amber-dark);margin-bottom:16px;text-align:center">&#x23F8; Hold</h4>
+      <p style="font-size:13px;color:var(--sub)">Track 2 단독 전환</p>
+    </div>
+    <div style="background:var(--red-bg);border-radius:14px;padding:24px;border:2px solid var(--red)">
+      <h4 style="font-size:16px;font-weight:800;color:var(--red-dark);margin-bottom:16px;text-align:center">&#x274C; Drop</h4>
+      <p style="font-size:13px;color:var(--sub)">피벗 검토 (급식/프랜차이즈 B2B)</p>
+    </div>
+  </div>
+</div>
+
+<!-- 마일스톤 타임라인 -->
+<div class="card">
+  <div class="card-header">
+    <div class="icon" style="background:var(--blue-bg);color:var(--blue)">&#x1F4C5;</div>
+    <div><h3>주요 마일스톤 타임라인</h3><p>Phase 1 (M1~M9)</p></div>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>시점</th><th>마일스톤</th></tr></thead>
+    <tbody>
+      <tr style="background:var(--mint-bg)"><td style="font-weight:700">M1</td><td>킥오프, E8 협력</td></tr>
+      <tr><td style="font-weight:700">M2</td><td>Ontology v1 설계</td></tr>
+      <tr><td style="font-weight:700">M3</td><td>aT API 연동 + 사장님 인터뷰</td></tr>
+      <tr><td style="font-weight:700">M4</td><td>AI 엔진 알파</td></tr>
+      <tr><td style="font-weight:700">M5</td><td>PWA 프론트 개발</td></tr>
+      <tr style="background:var(--blue-bg)"><td style="font-weight:700">M6</td><td>PoC 착수 + AI바우처 등록</td></tr>
+      <tr><td style="font-weight:700">M7</td><td>PoC 중간 + KT미팅</td></tr>
+      <tr><td style="font-weight:700">M8</td><td>PoC 성과 측정</td></tr>
+      <tr style="background:var(--amber-bg)"><td style="font-weight:700">M9</td><td><strong>Go/No-Go 판정</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="insight-box" style="background:linear-gradient(135deg,#1b1b2f,#162447);border:none;border-radius:20px;padding:32px">
+  <h4 style="color:#4ade80;font-size:16px">최종 결론 — 발굴 완료</h4>
+  <ul style="color:rgba(255,255,255,.8)">
+    <li style="color:rgba(255,255,255,.85)"><strong style="color:#fff">Fooding은 KTDS의 AX 신사업 전환을 위한 최적 아이템</strong></li>
+    <li style="color:rgba(255,255,255,.85)">시장 공백(소상공인 AI 의사결정) + 기술 역량(Ontology) + 채널(KT) = 삼박자</li>
+    <li style="color:rgba(255,255,255,.85)">선점 Window 12~18개월, <strong style="color:#4ade80">지금 시작해야 한다.</strong></li>
+    <li style="color:rgba(255,255,255,.85)">다음 단계: 사업계획서 초안 디벨롭 → PRD → 3단계 형상화</li>
+  </ul>
+</div>
+
+<div style="text-align:center;margin-top:40px;padding:20px;color:var(--muted);font-size:12px">
+  <p>AX BD팀 2단계 발굴 리포트 · Fooding — AI 식자재 구매 의사결정 엔진</p>
+  <p>생성일: 2026.03.24 · HITL 검증 완료 · 3단계 형상화 Input Deck</p>
+  <p style="margin-top:8px">적용 PM Skills: competitor-analysis · market-sizing · swot-analysis · porters-five-forces · business-model · lean-canvas · user-personas · customer-journey-map · value-proposition · monetization-strategy · prioritization-frameworks</p>
+</div>
+</div>
+
+<!-- ==================== TAB 2-9 ==================== -->
+<div class="tab-panel" id="tab9">
+<div class="step-header">
+  <div class="step-number">STEP 2-9</div>
+  <h2 class="section-title">AI 멀티 페르소나 사전 평가</h2>
+  <p class="section-sub">8명의 AI 페르소나가 Fooding 아이템을 다각도로 사전 평가합니다</p>
+</div>
+<iframe id="tab9frame" style="width:100%;border:none;min-height:100vh;border-radius:var(--radius);background:var(--card)"></iframe>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    initCharts();
+    if(btn.dataset.tab==='tab9'){
+      const fr=document.getElementById('tab9frame');
+      if(!fr.src || fr.src==='about:blank'){
+        const bin=atob(window.__tab9b64);
+        const bytes=new Uint8Array(bin.length);
+        for(let k=0;k<bin.length;k++) bytes[k]=bin.charCodeAt(k);
+        const blob=new Blob([bytes],{type:'text/html;charset=utf-8'});
+        fr.src=URL.createObjectURL(blob);
+        fr.onload=function(){
+          try{
+            const h=fr.contentDocument.documentElement.scrollHeight;
+            fr.style.height=(h+40)+'px';
+          }catch(e){}
+        };
+      }
+    }
+  });
+});
+
+function initCharts(){
+  // TAM/SAM/SOM chart
+  const tamEl=document.getElementById('tamChart');
+  if(tamEl && !tamEl.__init){
+    tamEl.__init=true;
+    new Chart(tamEl,{
+      type:'doughnut',
+      data:{
+        labels:['TAM \u20A964\uC870','SAM \u20A97,000\uC5B5','SOM \u20A9121\uC5B5'],
+        datasets:[{
+          data:[640000,7000,121],
+          backgroundColor:['rgba(49,130,246,.2)','rgba(0,196,180,.3)','rgba(255,159,67,.5)'],
+          borderColor:['#3182f6','#00c4b4','#ff9f43'],
+          borderWidth:2
+        }]
+      },
+      options:{
+        responsive:true,
+        plugins:{
+          legend:{position:'bottom',labels:{font:{family:'Pretendard Variable',size:13},padding:16}},
+          title:{display:true,text:'\uC18C\uC0C1\uACF5\uC778 AI \uC2DD\uC790\uC7AC \uC758\uC0AC\uACB0\uC815 \uC2DC\uC7A5 \uADDC\uBAA8',font:{family:'Pretendard Variable',size:15,weight:'bold'},padding:{bottom:16}}
+        }
+      }
+    });
+  }
+  // Porter chart
+  const porterEl=document.getElementById('porterChart');
+  if(porterEl && !porterEl.__init){
+    porterEl.__init=true;
+    new Chart(porterEl,{
+      type:'radar',
+      data:{
+        labels:['\uACBD\uC7C1 \uAC15\uB3C4','\uC2E0\uADDC \uC9C4\uC785 \uC704\uD611','\uB300\uCCB4\uC7AC \uC704\uD611','\uACF5\uAE09\uC790 \uAD50\uC12D\uB825','\uAD6C\uB9E4\uC790 \uAD50\uC12D\uB825'],
+        datasets:[{
+          label:'\uC704\uD611 \uC218\uC900 (1-5)',
+          data:[3,4,3,4,4],
+          backgroundColor:'rgba(49,130,246,.15)',
+          borderColor:'#3182f6',
+          pointBackgroundColor:'#3182f6',
+          borderWidth:2
+        }]
+      },
+      options:{
+        responsive:true,
+        scales:{r:{beginAtZero:true,max:5,ticks:{stepSize:1,font:{size:11}},pointLabels:{font:{family:'Pretendard Variable',size:12,weight:'600'}}}},
+        plugins:{legend:{display:false},title:{display:true,text:"Porter's Five Forces \u2014 \uC2DD\uC790\uC7AC AI \uC758\uC0AC\uACB0\uC815 \uC2DC\uC7A5",font:{family:'Pretendard Variable',size:15,weight:'bold'}}}
+      }
+    });
+  }
+  // Revenue chart
+  const revEl=document.getElementById('revenueChart');
+  if(revEl && !revEl.__init){
+    revEl.__init=true;
+    new Chart(revEl,{
+      type:'line',
+      data:{
+        labels:['Y1','Y2','Y3'],
+        datasets:[
+          {label:'\uBCF4\uC218\uC801',data:[6,20,45],borderColor:'#8b95a1',backgroundColor:'rgba(139,149,161,.1)',fill:true,tension:.3},
+          {label:'\uAE30\uBCF8 (Base)',data:[10,35,76],borderColor:'#3182f6',backgroundColor:'rgba(49,130,246,.1)',fill:true,tension:.3,borderWidth:3},
+          {label:'\uACF5\uACA9\uC801',data:[15,50,110],borderColor:'#00c4b4',backgroundColor:'rgba(0,196,180,.1)',fill:true,tension:.3}
+        ]
+      },
+      options:{
+        responsive:true,
+        scales:{
+          y:{title:{display:true,text:'\uB9E4\uCD9C (\uC5B5\uC6D0)',font:{family:'Pretendard Variable',size:13,weight:'600'}},beginAtZero:true}
+        },
+        plugins:{
+          legend:{position:'bottom',labels:{font:{family:'Pretendard Variable',size:12}}},
+          title:{display:true,text:'3\uAC1C\uB144 \uB9E4\uCD9C \uC2DC\uB098\uB9AC\uC624 \uBE44\uAD50',font:{family:'Pretendard Variable',size:15,weight:'bold'}}
+        }
+      }
+    });
+  }
+}
+window.addEventListener('load',initCharts);
+</script>
+<script>
+window.__tab9b64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImtvIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9IlVURi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xLjAiPgo8dGl0bGU+Mi05IEFJIOupgO2LsCDtjpjrpbTshozrgpgg7IKs7KCEIO2PieqwgCDigJQgRm9vZGluZzwvdGl0bGU+CjxsaW5rIGhyZWY9Imh0dHBzOi8vZm9udHMuZ29vZ2xlYXBpcy5jb20vY3NzMj9mYW1pbHk9UHJldGVuZGFyZDp3Z2h0QDMwMDs0MDA7NTAwOzYwMDs3MDAmZGlzcGxheT1zd2FwIiByZWw9InN0eWxlc2hlZXQiPgo8c2NyaXB0IHNyYz0iaHR0cHM6Ly9jZG5qcy5jbG91ZGZsYXJlLmNvbS9hamF4L2xpYnMvQ2hhcnQuanMvNC40LjEvY2hhcnQudW1kLm1pbi5qcyI+PC9zY3JpcHQ+CjxzdHlsZT4KOnJvb3R7CiAgLS13OiNmZmY7LS1iZzojZjhmOWZhOy0tYmcyOiNmMmY0ZjY7LS1iZzM6I2VhZWNlZjsKICAtLWxuOiNlNWU4ZWI7LS1sbjI6I2QxZDZkYjsKICAtLWc5OiMxOTFmMjg7LS1nODojMzMzZDRiOy0tZzc6IzRlNTk2ODstLWc1OiM4Yjk1YTE7LS1nNDojYjBiOGMxOwogIC0tYmw6IzMxODJmNjstLWJsLWJnOiNlZmY2ZmY7LS1ibC1sdDojZGJlYWZlOwogIC0tZ3I6IzAwYjQ5MzstLWdyLWJnOiNlY2ZkZjU7LS1nci1sdDojYTdmM2QwOwogIC0tb3I6I2Y1OWUwYjstLW9yLWJnOiNmZmZiZWI7LS1vci1sdDojZmRlNjhhOwogIC0tcmQ6I2YwM2UzZTstLXJkLWJnOiNmZmY1ZjU7LS1yZC1sdDojZmVjYWNhOwogIC0tcHU6IzZjNjNmZjstLXB1LWJnOiNmNWYzZmY7LS1wdS1sdDojZGRkNmZlOwogIC0ta3Q6I2U4MzIxYTstLWt0LWJnOiNmZmYxZjA7LS1rdC1sdDojZmVjYWNhOwogIC0tcjg6OHB4Oy0tcjEyOjEycHg7LS1yMTY6MTZweDstLXIyMDoyMHB4OwogIC0tc2g6MCAxcHggM3B4IHJnYmEoMCwwLDAsLjA2KSwwIDFweCAycHggcmdiYSgwLDAsMCwuMDQpOwogIC0tc2gyOjAgNHB4IDE2cHggcmdiYSgwLDAsMCwuMDgpLDAgMnB4IDRweCByZ2JhKDAsMCwwLC4wNCk7Cn0KKntib3gtc2l6aW5nOmJvcmRlci1ib3g7bWFyZ2luOjA7cGFkZGluZzowfQpib2R5e2JhY2tncm91bmQ6dmFyKC0tYmcpO2NvbG9yOnZhcigtLWc5KTtmb250LWZhbWlseTonUHJldGVuZGFyZCcsLWFwcGxlLXN5c3RlbSxzYW5zLXNlcmlmO2ZvbnQtc2l6ZToxNHB4O2xpbmUtaGVpZ2h0OjEuNjstd2Via2l0LWZvbnQtc21vb3RoaW5nOmFudGlhbGlhc2VkfQoKLyog4pSA4pSAIEhFQURFUiDilIDilIAgKi8KLmhkcntiYWNrZ3JvdW5kOnZhcigtLXcpO2JvcmRlci1ib3R0b206MXB4IHNvbGlkIHZhcigtLWxuKTtwYWRkaW5nOjAgNDhweDtwb3NpdGlvbjpzdGlja3k7dG9wOjA7ei1pbmRleDoxMDB9Ci5oZHItaW57bWF4LXdpZHRoOjEyMDBweDttYXJnaW46MCBhdXRvO3BhZGRpbmc6MThweCAwfQouaGRyLWJje2ZvbnQtc2l6ZToxMXB4O2NvbG9yOnZhcigtLWc1KTttYXJnaW4tYm90dG9tOjRweDtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2dhcDo1cHh9Ci5oZHItdHtmb250LXNpemU6MjBweDtmb250LXdlaWdodDo3MDA7Y29sb3I6dmFyKC0tZzkpO2xldHRlci1zcGFjaW5nOi0uNHB4fQouaGRyLXN7Zm9udC1zaXplOjEycHg7Y29sb3I6dmFyKC0tZzUpO21hcmdpbi10b3A6MnB4fQouY2hpcHN7ZGlzcGxheTpmbGV4O2dhcDo2cHg7bWFyZ2luLXRvcDo5cHg7ZmxleC13cmFwOndyYXB9Ci5jaGlwe3BhZGRpbmc6M3B4IDEwcHg7Ym9yZGVyLXJhZGl1czoxMDBweDtmb250LXNpemU6MTBweDtmb250LXdlaWdodDo2MDA7Ym9yZGVyOjFweCBzb2xpZH0KLmNvbnttYXgtd2lkdGg6MTIwMHB4O21hcmdpbjowIGF1dG87cGFkZGluZzoyOHB4IDQ4cHggODBweH0KLnNlY3ttYXJnaW4tYm90dG9tOjM2cHh9Ci5leWV7Zm9udC1zaXplOjEwcHg7Zm9udC13ZWlnaHQ6NzAwO2xldHRlci1zcGFjaW5nOjFweDt0ZXh0LXRyYW5zZm9ybTp1cHBlcmNhc2U7Y29sb3I6dmFyKC0tYmwpO21hcmdpbi1ib3R0b206NHB4fQouc2VjLXR7Zm9udC1zaXplOjE2cHg7Zm9udC13ZWlnaHQ6NzAwO2NvbG9yOnZhcigtLWc5KTttYXJnaW4tYm90dG9tOjJweDtsZXR0ZXItc3BhY2luZzotLjNweH0KLnNlYy1ke2ZvbnQtc2l6ZToxMnB4O2NvbG9yOnZhcigtLWc1KTttYXJnaW4tYm90dG9tOjE0cHh9Ci5kaXZpZGVye2JvcmRlcjpub25lO2JvcmRlci10b3A6MXB4IHNvbGlkIHZhcigtLWxuKTttYXJnaW46MjhweCAwfQoKLyog4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCiAgIEEtMS4gUEVSU09OQSBDQVJEUwrilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAgKi8KLnBjLWdyaWR7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczpyZXBlYXQoNCwxZnIpO2dhcDoxMnB4fQoucGN7YmFja2dyb3VuZDp2YXIoLS13KTtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxuKTtib3JkZXItcmFkaXVzOnZhcigtLXIxNik7cGFkZGluZzoxOHB4O2JveC1zaGFkb3c6dmFyKC0tc2gpO3RyYW5zaXRpb246Ym94LXNoYWRvdyAuMnMsdHJhbnNmb3JtIC4xNXN9Ci5wYzpob3Zlcntib3gtc2hhZG93OnZhcigtLXNoMik7dHJhbnNmb3JtOnRyYW5zbGF0ZVkoLTJweCl9Ci5wYy5rdC1jYXJke2JvcmRlci10b3A6MnB4IHNvbGlkIHZhcigtLWt0KX0KLnBjLmZpcnN0LWNhcmR7Ym9yZGVyLXRvcDoycHggc29saWQgdmFyKC0tYmwpfQoucGMtYmFkZ2V7ZGlzcGxheTppbmxpbmUtZmxleDthbGlnbi1pdGVtczpjZW50ZXI7Z2FwOjVweDtwYWRkaW5nOjNweCAxMHB4O2JvcmRlci1yYWRpdXM6MTAwcHg7Zm9udC1zaXplOjEwcHg7Zm9udC13ZWlnaHQ6NzAwO21hcmdpbi1ib3R0b206MTBweH0KLnBjLWZpcnN0LXRhZ3tkaXNwbGF5OmlubGluZS1ibG9jaztwYWRkaW5nOjFweCA1cHg7Ym9yZGVyLXJhZGl1czozcHg7Zm9udC1zaXplOjhweDtmb250LXdlaWdodDo3MDA7YmFja2dyb3VuZDp2YXIoLS1ibC1iZyk7Y29sb3I6dmFyKC0tYmwpfQoucGMta3QtdGFne2Rpc3BsYXk6aW5saW5lLWJsb2NrO3BhZGRpbmc6MXB4IDVweDtib3JkZXItcmFkaXVzOjNweDtmb250LXNpemU6OHB4O2ZvbnQtd2VpZ2h0OjcwMDtiYWNrZ3JvdW5kOnZhcigtLW9yLWJnKTtjb2xvcjp2YXIoLS1vcil9Ci5wYy10aXRsZXtmb250LXNpemU6MTNweDtmb250LXdlaWdodDo3MDA7Y29sb3I6dmFyKC0tZzkpO21hcmdpbi1ib3R0b206MTBweDtsZXR0ZXItc3BhY2luZzotLjJweH0KLnBjLXJvd3tkaXNwbGF5OmZsZXg7Z2FwOjZweDttYXJnaW4tYm90dG9tOjVweDtmb250LXNpemU6MTFweH0KLnBjLWxhYmVse2NvbG9yOnZhcigtLWc0KTttaW4td2lkdGg6NDhweDtmbGV4LXNocmluazowO2ZvbnQtc2l6ZToxMHB4O2ZvbnQtd2VpZ2h0OjYwMDtwYWRkaW5nLXRvcDoxcHh9Ci5wYy12YWx7Y29sb3I6dmFyKC0tZzcpO2xpbmUtaGVpZ2h0OjEuNX0KLnBjLWNvbnRleHR7Zm9udC1zaXplOjExcHg7Y29sb3I6dmFyKC0tZzUpO21hcmdpbjo4cHggMDtwYWRkaW5nOjdweCA5cHg7YmFja2dyb3VuZDp2YXIoLS1iZzIpO2JvcmRlci1yYWRpdXM6dmFyKC0tcjgpO2xpbmUtaGVpZ2h0OjEuNTU7Ym9yZGVyLWxlZnQ6MnB4IHNvbGlkIHZhcigtLWxuMil9Ci5wYy1xe2ZvbnQtc2l6ZToxMHB4O2NvbG9yOnZhcigtLWc1KTtmb250LXN0eWxlOml0YWxpYzttYXJnaW46N3B4IDAgOHB4O2xpbmUtaGVpZ2h0OjEuNX0KLnBjLXJlantkaXNwbGF5OmZsZXg7ZmxleC13cmFwOndyYXA7Z2FwOjRweH0KLnBjLXJlai10YWd7cGFkZGluZzoycHggN3B4O2JvcmRlci1yYWRpdXM6NHB4O2ZvbnQtc2l6ZToxMHB4O2ZvbnQtd2VpZ2h0OjUwMDtiYWNrZ3JvdW5kOnZhcigtLXJkLWJnKTtib3JkZXI6MC41cHggc29saWQgdmFyKC0tcmQtbHQpO2NvbG9yOnZhcigtLXJkKX0KCi8qIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAogICBBLTIuIFdFSUdIVCBTTElERVIK4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQICovCi53cy13cmFwe2JhY2tncm91bmQ6dmFyKC0tdyk7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1sbik7Ym9yZGVyLXJhZGl1czp2YXIoLS1yMTYpO2JveC1zaGFkb3c6dmFyKC0tc2gpO292ZXJmbG93OmhpZGRlbn0KLndzLXRhYnN7ZGlzcGxheTpmbGV4O2JvcmRlci1ib3R0b206MXB4IHNvbGlkIHZhcigtLWxuKTtvdmVyZmxvdy14OmF1dG99Ci53cy10YWJ7cGFkZGluZzoxMXB4IDE2cHg7Zm9udC1zaXplOjEycHg7Zm9udC13ZWlnaHQ6NjAwO2NvbG9yOnZhcigtLWc1KTtib3JkZXI6bm9uZTtiYWNrZ3JvdW5kOm5vbmU7Y3Vyc29yOnBvaW50ZXI7Zm9udC1mYW1pbHk6aW5oZXJpdDt3aGl0ZS1zcGFjZTpub3dyYXA7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtnYXA6NnB4O2JvcmRlci1ib3R0b206MnB4IHNvbGlkIHRyYW5zcGFyZW50O3RyYW5zaXRpb246YWxsIC4xNXM7ZmxleC1zaHJpbms6MH0KLndzLXRhYjpob3Zlcntjb2xvcjp2YXIoLS1nOCk7YmFja2dyb3VuZDp2YXIoLS1iZzIpfQoud3MtdGFiLmFjdGl2ZXtjb2xvcjp2YXIoLS1nOSk7Ym9yZGVyLWJvdHRvbS1jb2xvcjp2YXIoLS1ibCl9Ci53cy10YWIgLnRhYi1kb3R7d2lkdGg6N3B4O2hlaWdodDo3cHg7Ym9yZGVyLXJhZGl1czo1MCV9Ci53cy1ib2R5e3BhZGRpbmc6MjJweCAyNHB4fQoud3MtcGVyc29uYS1uYW1le2ZvbnQtc2l6ZToxM3B4O2ZvbnQtd2VpZ2h0OjcwMDttYXJnaW4tYm90dG9tOjRweH0KLndzLXBlcnNvbmEtc3Vie2ZvbnQtc2l6ZToxMXB4O2NvbG9yOnZhcigtLWc1KTttYXJnaW4tYm90dG9tOjE4cHh9Ci53cy10b3RhbHtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2dhcDoxMHB4O21hcmdpbi1ib3R0b206MTZweDtwYWRkaW5nOjhweCAxMnB4O2JvcmRlci1yYWRpdXM6dmFyKC0tcjgpO2ZvbnQtc2l6ZToxMnB4O2ZvbnQtd2VpZ2h0OjYwMH0KLndzLXRvdGFsLm9re2JhY2tncm91bmQ6dmFyKC0tZ3ItYmcpO2NvbG9yOnZhcigtLWdyKX0KLndzLXRvdGFsLmVycntiYWNrZ3JvdW5kOnZhcigtLXJkLWJnKTtjb2xvcjp2YXIoLS1yZCl9Ci5zbC1yb3d7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczoxMTBweCAxZnIgNDRweDthbGlnbi1pdGVtczpjZW50ZXI7Z2FwOjEycHg7bWFyZ2luLWJvdHRvbToxMnB4fQouc2wtbGFiZWx7Zm9udC1zaXplOjEycHg7Y29sb3I6dmFyKC0tZzcpO2ZvbnQtd2VpZ2h0OjUwMH0KLnNsLWxhYmVsIHNtYWxse2Rpc3BsYXk6YmxvY2s7Zm9udC1zaXplOjEwcHg7Y29sb3I6dmFyKC0tZzQpO2ZvbnQtd2VpZ2h0OjQwMH0KaW5wdXRbdHlwZT1yYW5nZV0uc2x7d2lkdGg6MTAwJTstd2Via2l0LWFwcGVhcmFuY2U6bm9uZTthcHBlYXJhbmNlOm5vbmU7aGVpZ2h0OjVweDtib3JkZXItcmFkaXVzOjNweDtiYWNrZ3JvdW5kOnZhcigtLWJnMyk7b3V0bGluZTpub25lO2N1cnNvcjpwb2ludGVyfQppbnB1dFt0eXBlPXJhbmdlXS5zbDo6LXdlYmtpdC1zbGlkZXItdGh1bWJ7LXdlYmtpdC1hcHBlYXJhbmNlOm5vbmU7d2lkdGg6MTZweDtoZWlnaHQ6MTZweDtib3JkZXItcmFkaXVzOjUwJTtiYWNrZ3JvdW5kOnZhcigtLWJsKTtjdXJzb3I6cG9pbnRlcjtib3JkZXI6MnB4IHNvbGlkICNmZmY7Ym94LXNoYWRvdzowIDFweCA0cHggcmdiYSg0OSwxMzAsMjQ2LC4zNSl9CmlucHV0W3R5cGU9cmFuZ2VdLnNsOjotd2Via2l0LXNsaWRlci10aHVtYjpob3ZlcntiYWNrZ3JvdW5kOiMyMDY2ZDB9Ci5zbC12YWx7Zm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6NzAwO3RleHQtYWxpZ246cmlnaHR9Ci53cy1yZXNldHttYXJnaW4tdG9wOjRweDtwYWRkaW5nOjdweCAxNHB4O2JhY2tncm91bmQ6dmFyKC0tYmcyKTtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxuMik7Ym9yZGVyLXJhZGl1czp2YXIoLS1yOCk7Zm9udC1zaXplOjExcHg7Zm9udC13ZWlnaHQ6NjAwO2NvbG9yOnZhcigtLWc3KTtjdXJzb3I6cG9pbnRlcjtmb250LWZhbWlseTppbmhlcml0fQoud3MtcmVzZXQ6aG92ZXJ7YmFja2dyb3VuZDp2YXIoLS1iZzMpfQoKLyog4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCiAgIEEtMy4gUEVSU09OQSBDT05URVhUIEVESVRPUgrilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAgKi8KLnBlLXdyYXB7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1sbik7Ym9yZGVyLXJhZGl1czp2YXIoLS1yMTYpO292ZXJmbG93OmhpZGRlbjtib3gtc2hhZG93OnZhcigtLXNoKTtkaXNwbGF5OmdyaWQ7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOjIyMHB4IDFmcn0KLnBlLWxpc3R7YmFja2dyb3VuZDp2YXIoLS1iZzIpO2JvcmRlci1yaWdodDoxcHggc29saWQgdmFyKC0tbG4pfQoucGUtaXRlbXtwYWRkaW5nOjExcHggMTVweDtjdXJzb3I6cG9pbnRlcjtib3JkZXItYm90dG9tOjFweCBzb2xpZCB2YXIoLS1sbik7dHJhbnNpdGlvbjpiYWNrZ3JvdW5kIC4xMnM7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtnYXA6OXB4fQoucGUtaXRlbTpsYXN0LWNoaWxke2JvcmRlci1ib3R0b206bm9uZX0KLnBlLWl0ZW06aG92ZXJ7YmFja2dyb3VuZDp2YXIoLS1iZzMpfQoucGUtaXRlbS5hY3RpdmV7YmFja2dyb3VuZDp2YXIoLS13KTtib3JkZXItcmlnaHQ6MnB4IHNvbGlkIHZhcigtLWJsKTttYXJnaW4tcmlnaHQ6LTFweH0KLnBlLWRvdHt3aWR0aDo3cHg7aGVpZ2h0OjdweDtib3JkZXItcmFkaXVzOjUwJTtmbGV4LXNocmluazowfQoucGUtaXRlbS1uYW1le2ZvbnQtc2l6ZToxMXB4O2ZvbnQtd2VpZ2h0OjYwMDtjb2xvcjp2YXIoLS1nOCl9Ci5wZS1pdGVtLXN1Yntmb250LXNpemU6MTBweDtjb2xvcjp2YXIoLS1nNSk7bWFyZ2luLXRvcDoxcHh9Ci5wZS1mb3Jte2JhY2tncm91bmQ6dmFyKC0tdyk7cGFkZGluZzoyMHB4IDI0cHg7b3ZlcmZsb3cteTphdXRvO21heC1oZWlnaHQ6NDgwcHh9Ci5wZS1mb3JtLXR7Zm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6NzAwO21hcmdpbi1ib3R0b206MnB4fQoucGUtZm9ybS1ke2ZvbnQtc2l6ZToxMXB4O2NvbG9yOnZhcigtLWc1KTttYXJnaW4tYm90dG9tOjE2cHg7cGFkZGluZy1ib3R0b206MTJweDtib3JkZXItYm90dG9tOjFweCBzb2xpZCB2YXIoLS1sbil9Ci5wZnttYXJnaW4tYm90dG9tOjEzcHh9Ci5wZi1sYWJlbHtmb250LXNpemU6MTFweDtmb250LXdlaWdodDo3MDA7Y29sb3I6dmFyKC0tZzcpO21hcmdpbi1ib3R0b206NHB4O2Rpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7Z2FwOjVweH0KLnBmLWJhZGdle3BhZGRpbmc6MXB4IDZweDtib3JkZXItcmFkaXVzOjNweDtmb250LXNpemU6OXB4O2ZvbnQtd2VpZ2h0OjYwMDtiYWNrZ3JvdW5kOnZhcigtLWJsLWJnKTtjb2xvcjp2YXIoLS1ibCl9Ci5wZiB0ZXh0YXJlYXt3aWR0aDoxMDAlO3BhZGRpbmc6OHB4IDExcHg7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1sbjIpO2JvcmRlci1yYWRpdXM6dmFyKC0tcjgpO2ZvbnQtc2l6ZToxMXB4O2ZvbnQtZmFtaWx5OmluaGVyaXQ7Y29sb3I6dmFyKC0tZzkpO2xpbmUtaGVpZ2h0OjEuNjtyZXNpemU6dmVydGljYWw7bWluLWhlaWdodDo1NnB4O3RyYW5zaXRpb246Ym9yZGVyLWNvbG9yIC4xNXN9Ci5wZiB0ZXh0YXJlYTpmb2N1c3tvdXRsaW5lOm5vbmU7Ym9yZGVyLWNvbG9yOnZhcigtLWJsKTtib3gtc2hhZG93OjAgMCAwIDNweCByZ2JhKDQ5LDEzMCwyNDYsLjEpfQoudGFnLWVke2Rpc3BsYXk6ZmxleDtmbGV4LXdyYXA6d3JhcDtnYXA6NHB4O21hcmdpbi10b3A6NHB4fQoucnRhZ3tkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2dhcDozcHg7cGFkZGluZzoycHggOHB4O2JvcmRlci1yYWRpdXM6NHB4O2JhY2tncm91bmQ6dmFyKC0tcmQtYmcpO2JvcmRlcjowLjVweCBzb2xpZCB2YXIoLS1yZC1sdCk7Zm9udC1zaXplOjExcHg7Y29sb3I6dmFyKC0tcmQpfQoucnRhZyBidXR0b257YmFja2dyb3VuZDpub25lO2JvcmRlcjpub25lO2N1cnNvcjpwb2ludGVyO2NvbG9yOnZhcigtLXJkKTtmb250LXNpemU6MTNweDtwYWRkaW5nOjA7bGluZS1oZWlnaHQ6MTtvcGFjaXR5Oi42fQoucnRhZyBidXR0b246aG92ZXJ7b3BhY2l0eToxfQouYWRkLXRhZy1yb3d7ZGlzcGxheTpmbGV4O2dhcDo2cHg7bWFyZ2luLXRvcDo2cHh9Ci5hZGQtdGFnLXJvdyBpbnB1dHtmbGV4OjE7cGFkZGluZzo1cHggOXB4O2JvcmRlcjoxcHggc29saWQgdmFyKC0tbG4yKTtib3JkZXItcmFkaXVzOnZhcigtLXI4KTtmb250LXNpemU6MTFweDtmb250LWZhbWlseTppbmhlcml0O2NvbG9yOnZhcigtLWc5KX0KLmFkZC10YWctcm93IGlucHV0OmZvY3Vze291dGxpbmU6bm9uZTtib3JkZXItY29sb3I6dmFyKC0tYmwpfQouYWRkLXRhZy1idG57cGFkZGluZzo1cHggMTFweDtib3JkZXItcmFkaXVzOnZhcigtLXI4KTtiYWNrZ3JvdW5kOnZhcigtLXJkLWJnKTtib3JkZXI6MC41cHggc29saWQgdmFyKC0tcmQtbHQpO2NvbG9yOnZhcigtLXJkKTtmb250LXNpemU6MTFweDtmb250LXdlaWdodDo2MDA7Y3Vyc29yOnBvaW50ZXI7Zm9udC1mYW1pbHk6aW5oZXJpdH0KLnNhdmUtYnRue21hcmdpbi10b3A6MTRweDtwYWRkaW5nOjdweCAxOHB4O2JhY2tncm91bmQ6dmFyKC0tYmwpO2NvbG9yOiNmZmY7Ym9yZGVyOm5vbmU7Ym9yZGVyLXJhZGl1czp2YXIoLS1yOCk7Zm9udC1zaXplOjEycHg7Zm9udC13ZWlnaHQ6NjAwO2N1cnNvcjpwb2ludGVyO2ZvbnQtZmFtaWx5OmluaGVyaXR9Ci5zYXZlLWJ0bjpob3ZlcntvcGFjaXR5Oi44OH0KLnNhdmUtb2t7ZGlzcGxheTpub25lO2ZvbnQtc2l6ZToxMXB4O2NvbG9yOnZhcigtLWdyKTttYXJnaW4tbGVmdDo4cHg7Zm9udC13ZWlnaHQ6NjAwfQoKLyog4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCiAgIEIuIEJSSUVGSU5HICsgUlVOCuKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkCAqLwouYnJpZWYtYXJlYXt3aWR0aDoxMDAlO21pbi1oZWlnaHQ6MTkwcHg7cGFkZGluZzoxM3B4IDE1cHg7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1sbjIpO2JvcmRlci1yYWRpdXM6dmFyKC0tcjE2KTtmb250LXNpemU6MTJweDtmb250LWZhbWlseTppbmhlcml0O2xpbmUtaGVpZ2h0OjEuODU7cmVzaXplOnZlcnRpY2FsO2NvbG9yOnZhcigtLWc5KTtiYWNrZ3JvdW5kOnZhcigtLXcpO3RyYW5zaXRpb246Ym9yZGVyLWNvbG9yIC4xNXN9Ci5icmllZi1hcmVhOmZvY3Vze291dGxpbmU6bm9uZTtib3JkZXItY29sb3I6dmFyKC0tYmwpO2JveC1zaGFkb3c6MCAwIDAgM3B4IHJnYmEoNDksMTMwLDI0NiwuMSl9Ci5ydW4td3JhcHtiYWNrZ3JvdW5kOnZhcigtLWJsLWJnKTtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWJsLWx0KTtib3JkZXItcmFkaXVzOnZhcigtLXIxNik7cGFkZGluZzoxNnB4IDIwcHg7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6c3BhY2UtYmV0d2VlbjtnYXA6MTZweDttYXJnaW4tdG9wOjExcHh9Ci5ydW4tYnRue3BhZGRpbmc6MTBweCAyOHB4O2JhY2tncm91bmQ6dmFyKC0tYmwpO2NvbG9yOiNmZmY7Ym9yZGVyOm5vbmU7Ym9yZGVyLXJhZGl1czp2YXIoLS1yOCk7Zm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6NzAwO2N1cnNvcjpwb2ludGVyO2ZvbnQtZmFtaWx5OmluaGVyaXQ7d2hpdGUtc3BhY2U6bm93cmFwO3RyYW5zaXRpb246YWxsIC4xNXM7ZmxleC1zaHJpbms6MH0KLnJ1bi1idG46aG92ZXI6bm90KDpkaXNhYmxlZCl7b3BhY2l0eTouODg7dHJhbnNmb3JtOnRyYW5zbGF0ZVkoLTFweCl9Ci5ydW4tYnRuOmRpc2FibGVke29wYWNpdHk6LjQ1O2N1cnNvcjpub3QtYWxsb3dlZDt0cmFuc2Zvcm06bm9uZX0KCi8qIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAogICBQUk9HUkVTUwrilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAgKi8KLnByb2ctd3JhcHttYXJnaW4tdG9wOjEzcHg7ZGlzcGxheTpub25lfQoucHJvZy1sYmx7Zm9udC1zaXplOjExcHg7Zm9udC13ZWlnaHQ6NjAwO2NvbG9yOnZhcigtLWc1KTttYXJnaW4tYm90dG9tOjdweDtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2dhcDo3cHh9Ci50aGlua2luZy1kb3RzIHNwYW57ZGlzcGxheTppbmxpbmUtYmxvY2s7YW5pbWF0aW9uOmJsaW5rIDEuMnMgaW5maW5pdGU7Zm9udC1zaXplOjE0cHg7Y29sb3I6dmFyKC0tYmwpfQoudGhpbmtpbmctZG90cyBzcGFuOm50aC1jaGlsZCgyKXthbmltYXRpb24tZGVsYXk6LjJzfQoudGhpbmtpbmctZG90cyBzcGFuOm50aC1jaGlsZCgzKXthbmltYXRpb24tZGVsYXk6LjRzfQpAa2V5ZnJhbWVzIGJsaW5rezAlLDEwMCV7b3BhY2l0eTouMn01MCV7b3BhY2l0eToxfX0KLnByb2ctbGlzdHtkaXNwbGF5OmZsZXg7ZmxleC1kaXJlY3Rpb246Y29sdW1uO2dhcDo1cHh9Ci5waXtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2dhcDoxMHB4O3BhZGRpbmc6OHB4IDEzcHg7Ym9yZGVyLXJhZGl1czp2YXIoLS1yOCk7YmFja2dyb3VuZDp2YXIoLS13KTtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxuKTtmb250LXNpemU6MTJweDt0cmFuc2l0aW9uOmFsbCAuM3N9Ci5waS5ydW5uaW5ne2JvcmRlci1jb2xvcjp2YXIoLS1ibC1sdCk7YmFja2dyb3VuZDp2YXIoLS1ibC1iZyl9Ci5waS5kb25le2JvcmRlci1jb2xvcjp2YXIoLS1nci1sdCk7YmFja2dyb3VuZDp2YXIoLS1nci1iZyl9Ci5waS1kb3R7d2lkdGg6OHB4O2hlaWdodDo4cHg7Ym9yZGVyLXJhZGl1czo1MCU7ZmxleC1zaHJpbms6MDtiYWNrZ3JvdW5kOnZhcigtLWc0KTt0cmFuc2l0aW9uOmJhY2tncm91bmQgLjNzfQoucGkucnVubmluZyAucGktZG90e2JhY2tncm91bmQ6dmFyKC0tYmwpO2FuaW1hdGlvbjpwdWxzZSAuN3MgaW5maW5pdGV9Ci5waS5kb25lIC5waS1kb3R7YmFja2dyb3VuZDp2YXIoLS1ncik7YW5pbWF0aW9uOm5vbmV9CkBrZXlmcmFtZXMgcHVsc2V7MCUsMTAwJXtvcGFjaXR5OjF9NTAle29wYWNpdHk6LjI1fX0KLnBpLW5hbWV7Zm9udC13ZWlnaHQ6NjAwO2NvbG9yOnZhcigtLWc4KTttaW4td2lkdGg6MTUwcHh9Ci5waS1zdHtjb2xvcjp2YXIoLS1nNSk7ZmxleDoxO2ZvbnQtc2l6ZToxMXB4fQoucGkucnVubmluZyAucGktc3R7Y29sb3I6dmFyKC0tYmwpfQoucGkuZG9uZSAucGktc3R7Y29sb3I6dmFyKC0tZ3IpO2ZvbnQtd2VpZ2h0OjYwMH0KLnBpLXNje2ZvbnQtc2l6ZToxM3B4O2ZvbnQtd2VpZ2h0OjcwMDttYXJnaW4tbGVmdDphdXRvO21pbi13aWR0aDozNnB4O3RleHQtYWxpZ246cmlnaHR9Ci5waS12ZHtmb250LXNpemU6MTBweDtmb250LXdlaWdodDo3MDA7cGFkZGluZzoycHggOHB4O2JvcmRlci1yYWRpdXM6MTAwcHg7Ym9yZGVyOjFweCBzb2xpZDttYXJnaW4tbGVmdDo3cHg7d2hpdGUtc3BhY2U6bm93cmFwfQoKLyog4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCiAgIEMuIFJFU1VMVFMK4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQICovCi5yLWdyaWR7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczpyZXBlYXQoNCwxZnIpO2dhcDoxMnB4O21hcmdpbi1ib3R0b206MTNweH0KLnJjYXJke2JhY2tncm91bmQ6dmFyKC0tdyk7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1sbik7Ym9yZGVyLXJhZGl1czp2YXIoLS1yMTYpO3BhZGRpbmc6MTdweCAxOXB4O3RleHQtYWxpZ246Y2VudGVyO2JveC1zaGFkb3c6dmFyKC0tc2gpfQoucmx7Zm9udC1zaXplOjEwcHg7Y29sb3I6dmFyKC0tZzUpO21hcmdpbi1ib3R0b206NHB4O2ZvbnQtd2VpZ2h0OjUwMH0KLnJ2e2ZvbnQtc2l6ZToyNHB4O2ZvbnQtd2VpZ2h0OjcwMDtsZXR0ZXItc3BhY2luZzotMXB4fQoucnN7Zm9udC1zaXplOjExcHg7Y29sb3I6dmFyKC0tZzQpO21hcmdpbi10b3A6M3B4fQoudmVyZHtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2dhcDoxM3B4O3BhZGRpbmc6MTRweCAxOHB4O2JvcmRlci1yYWRpdXM6dmFyKC0tcjE2KTtib3JkZXI6MXB4IHNvbGlkO21hcmdpbi1ib3R0b206MTFweH0KLnYtaWNvbntmb250LXNpemU6MTlweH0KLnYtbGFiZWx7Zm9udC1zaXplOjE0cHg7Zm9udC13ZWlnaHQ6NzAwfQoudi1zdWJ7Zm9udC1zaXplOjExcHg7Y29sb3I6dmFyKC0tZzUpO21hcmdpbi10b3A6MnB4fQouZGl2ZXJnZXtiYWNrZ3JvdW5kOnZhcigtLW9yLWJnKTtib3JkZXI6MXB4IHNvbGlkIHZhcigtLW9yLWx0KTtib3JkZXItcmFkaXVzOnZhcigtLXIxNik7cGFkZGluZzoxM3B4IDE3cHh9Ci5kaXYtdHtmb250LXNpemU6MTJweDtmb250LXdlaWdodDo3MDA7Y29sb3I6dmFyKC0tb3IpO21hcmdpbi1ib3R0b206N3B4fQouZGl7Zm9udC1zaXplOjEycHg7Y29sb3I6dmFyKC0tZzcpO3BhZGRpbmc6NHB4IDA7Ym9yZGVyLWJvdHRvbToxcHggc29saWQgcmdiYSgyNDUsMTU4LDExLC4xNSk7ZGlzcGxheTpmbGV4O2dhcDo3cHg7YWxpZ24taXRlbXM6ZmxleC1zdGFydH0KLmRpOmxhc3QtY2hpbGR7Ym9yZGVyLWJvdHRvbTpub25lfQouZGR7d2lkdGg6NXB4O2hlaWdodDo1cHg7Ym9yZGVyLXJhZGl1czo1MCU7YmFja2dyb3VuZDp2YXIoLS1vcik7ZmxleC1zaHJpbms6MDttYXJnaW4tdG9wOjZweH0KLnMze2Rpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MzIwcHggMWZyO2dhcDoxNXB4O2FsaWduLWl0ZW1zOnN0YXJ0fQoucmFkYXItY2FyZHtiYWNrZ3JvdW5kOnZhcigtLXcpO2JvcmRlcjoxcHggc29saWQgdmFyKC0tbG4pO2JvcmRlci1yYWRpdXM6dmFyKC0tcjE2KTtwYWRkaW5nOjE2cHg7dGV4dC1hbGlnbjpjZW50ZXI7Ym94LXNoYWRvdzp2YXIoLS1zaCl9Ci5wdC1ncmlke2Rpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyIDFmcjtnYXA6OXB4fQoucHRje2JhY2tncm91bmQ6dmFyKC0tdyk7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1sbik7Ym9yZGVyLXJhZGl1czp2YXIoLS1yMTYpO3BhZGRpbmc6MTJweCAxNHB4O2JveC1zaGFkb3c6dmFyKC0tc2gpfQoucHRjLXRvcHtkaXNwbGF5OmZsZXg7anVzdGlmeS1jb250ZW50OnNwYWNlLWJldHdlZW47YWxpZ24taXRlbXM6ZmxleC1zdGFydDttYXJnaW4tYm90dG9tOjVweH0KLnB0Yy1uYW1le2ZvbnQtc2l6ZToxMXB4O2NvbG9yOnZhcigtLWc1KTtmb250LXdlaWdodDo1MDA7bGluZS1oZWlnaHQ6MS40fQoucHRjLXNjb3Jle2ZvbnQtc2l6ZToyMHB4O2ZvbnQtd2VpZ2h0OjcwMDtsZXR0ZXItc3BhY2luZzotLjVweH0KLnB0YmFye2hlaWdodDo0cHg7Ym9yZGVyLXJhZGl1czoycHg7YmFja2dyb3VuZDp2YXIoLS1iZzMpO292ZXJmbG93OmhpZGRlbn0KLnB0ZmlsbHtoZWlnaHQ6NHB4O2JvcmRlci1yYWRpdXM6MnB4O3RyYW5zaXRpb246d2lkdGggLjhzIGVhc2V9Ci5lLWdyaWR7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczpyZXBlYXQoNCwxZnIpO2dhcDoxMnB4fQouZWN7YmFja2dyb3VuZDp2YXIoLS13KTtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxuKTtib3JkZXItcmFkaXVzOnZhcigtLXIxNik7cGFkZGluZzoxNnB4O2JveC1zaGFkb3c6dmFyKC0tc2gpfQouZWMua3R7Ym9yZGVyLXRvcDoycHggc29saWQgdmFyKC0ta3QpfQouZWMuZmlyc3R7Ym9yZGVyLXRvcDoycHggc29saWQgdmFyKC0tYmwpfQouZWMtaGVhZHtkaXNwbGF5OmZsZXg7anVzdGlmeS1jb250ZW50OnNwYWNlLWJldHdlZW47YWxpZ24taXRlbXM6Y2VudGVyO21hcmdpbi1ib3R0b206OHB4fQouZWMtbmFtZXtmb250LXNpemU6MTJweDtmb250LXdlaWdodDo3MDA7bGluZS1oZWlnaHQ6MS4zfQouZWMtc2NvcmV7Zm9udC1zaXplOjEycHg7Zm9udC13ZWlnaHQ6NzAwO3BhZGRpbmc6MnB4IDhweDtib3JkZXItcmFkaXVzOjEwMHB4O2JvcmRlcjoxcHggc29saWR9Ci5lYy1ib2R5e2ZvbnQtc2l6ZToxMXB4O2NvbG9yOnZhcigtLWc3KTtsaW5lLWhlaWdodDoxLjc7bWFyZ2luLWJvdHRvbTo2cHh9Ci5lYy1jb25jZXJue2ZvbnQtc2l6ZToxMXB4O3BhZGRpbmc6NXB4IDhweDtib3JkZXItcmFkaXVzOnZhcigtLXI4KTtiYWNrZ3JvdW5kOnZhcigtLXJkLWJnKTtjb2xvcjp2YXIoLS1yZCk7bWFyZ2luLWJvdHRvbTo1cHh9Ci5lYy1jb25ke2ZvbnQtc2l6ZToxMXB4O3BhZGRpbmc6NXB4IDhweDtib3JkZXItcmFkaXVzOnZhcigtLXI4KTtiYWNrZ3JvdW5kOnZhcigtLWJsLWJnKTtjb2xvcjp2YXIoLS1ibCk7bWFyZ2luLWJvdHRvbTo4cHh9Ci5lYy12ZHtkaXNwbGF5OmlubGluZS1mbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtnYXA6M3B4O3BhZGRpbmc6M3B4IDhweDtib3JkZXItcmFkaXVzOjEwMHB4O2ZvbnQtc2l6ZToxMHB4O2ZvbnQtd2VpZ2h0OjcwMDtib3JkZXI6MXB4IHNvbGlkfQoub3YtYm94e2JhY2tncm91bmQ6dmFyKC0tdyk7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1sbik7Ym9yZGVyLXJhZGl1czp2YXIoLS1yMjApO3BhZGRpbmc6MjRweCAyOHB4O2JveC1zaGFkb3c6dmFyKC0tc2gpfQoub3YtdGl0bGV7Zm9udC1zaXplOjE0cHg7Zm9udC13ZWlnaHQ6NzAwO2NvbG9yOnZhcigtLWc5KTttYXJnaW4tYm90dG9tOjE2cHg7cGFkZGluZy1ib3R0b206MTNweDtib3JkZXItYm90dG9tOjFweCBzb2xpZCB2YXIoLS1sbik7bGV0dGVyLXNwYWNpbmc6LS4ycHh9Ci5nby1jb3VudHN7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczpyZXBlYXQoMywxZnIpO2dhcDoxMHB4O21hcmdpbi1ib3R0b206MTZweH0KLmdje3RleHQtYWxpZ246Y2VudGVyO3BhZGRpbmc6MTNweDtib3JkZXItcmFkaXVzOnZhcigtLXIxNik7Ym9yZGVyOjFweCBzb2xpZH0KLmdjLW57Zm9udC1zaXplOjI2cHg7Zm9udC13ZWlnaHQ6NzAwfQouZ2MtbHtmb250LXNpemU6MTFweDtmb250LXdlaWdodDo2MDA7bWFyZ2luLXRvcDoycHh9Ci5vdi1zZWN7bWFyZ2luLWJvdHRvbToxNHB4fQoub3Ytc2VjLWxibHtmb250LXNpemU6MTBweDtmb250LXdlaWdodDo3MDA7dGV4dC10cmFuc2Zvcm06dXBwZXJjYXNlO2xldHRlci1zcGFjaW5nOi42cHg7bWFyZ2luLWJvdHRvbTo1cHh9Ci5vdi1zZWMgcHtmb250LXNpemU6MTJweDtjb2xvcjp2YXIoLS1nNyk7bGluZS1oZWlnaHQ6MS43NX0KLnRhZy1yb3d7ZGlzcGxheTpmbGV4O2ZsZXgtd3JhcDp3cmFwO2dhcDo0cHg7bWFyZ2luLWJvdHRvbTo1cHh9Ci50YWd7cGFkZGluZzoycHggOXB4O2JvcmRlci1yYWRpdXM6MTAwcHg7Zm9udC1zaXplOjEwcHg7Zm9udC13ZWlnaHQ6NjAwO2JvcmRlcjoxcHggc29saWR9Ci5vdi1jaGFydHN7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczoxZnIgMWZyO2dhcDoxNXB4O21hcmdpbi10b3A6MTRweH0KLm92LWNie2JhY2tncm91bmQ6dmFyKC0tYmcyKTtib3JkZXItcmFkaXVzOnZhcigtLXIxNik7cGFkZGluZzoxNXB4fQoub3YtY2ItdHtmb250LXNpemU6MTFweDtmb250LXdlaWdodDo3MDA7Y29sb3I6dmFyKC0tZzcpO21hcmdpbi1ib3R0b206MTNweH0KLmFicntkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2dhcDo5cHg7bWFyZ2luLWJvdHRvbTo4cHh9Ci5hYmx7Zm9udC1zaXplOjExcHg7Y29sb3I6dmFyKC0tZzcpO21pbi13aWR0aDo2OHB4O3RleHQtYWxpZ246cmlnaHQ7ZmxleC1zaHJpbms6MH0KLmFidHtmbGV4OjE7aGVpZ2h0OjhweDtiYWNrZ3JvdW5kOnZhcigtLWJnMyk7Ym9yZGVyLXJhZGl1czo0cHg7b3ZlcmZsb3c6aGlkZGVufQouYWJme2hlaWdodDo4cHg7Ym9yZGVyLXJhZGl1czo0cHg7dHJhbnNpdGlvbjp3aWR0aCAuOXMgZWFzZX0KLmFidntmb250LXNpemU6MTFweDtmb250LXdlaWdodDo3MDA7bWluLXdpZHRoOjI2cHg7ZmxleC1zaHJpbms6MH0KLmFnLWl0ZW17Zm9udC1zaXplOjEycHg7Y29sb3I6dmFyKC0tZzcpO3BhZGRpbmc6NXB4IDA7Ym9yZGVyLWJvdHRvbToxcHggc29saWQgdmFyKC0tbG4pO2xpbmUtaGVpZ2h0OjEuNn0KLmFnLWl0ZW06bGFzdC1jaGlsZHtib3JkZXItYm90dG9tOm5vbmV9Ci5vdi1mb290ZXJ7bWFyZ2luLXRvcDoxNnB4O3BhZGRpbmctdG9wOjEzcHg7Ym9yZGVyLXRvcDoxcHggc29saWQgdmFyKC0tbG4pO2ZvbnQtc2l6ZToxMXB4O2NvbG9yOnZhcigtLWc0KTtkaXNwbGF5OmZsZXg7anVzdGlmeS1jb250ZW50OnNwYWNlLWJldHdlZW47ZmxleC13cmFwOndyYXA7Z2FwOjVweH0KLmZhZGV7b3BhY2l0eTowO3RyYW5zZm9ybTp0cmFuc2xhdGVZKDEwcHgpO3RyYW5zaXRpb246b3BhY2l0eSAuNXMgZWFzZSx0cmFuc2Zvcm0gLjVzIGVhc2V9Ci5mYWRlLmlue29wYWNpdHk6MTt0cmFuc2Zvcm06bm9uZX0KCkBtZWRpYShtYXgtd2lkdGg6MTAyNHB4KXsKICAucGMtZ3JpZCwuZS1ncmlke2dyaWQtdGVtcGxhdGUtY29sdW1uczpyZXBlYXQoMiwxZnIpfQogIC5yLWdyaWR7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOnJlcGVhdCgyLDFmcil9CiAgLnMzLC5vdi1jaGFydHN7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOjFmcn0KICAucGUtd3JhcHtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyfQogIC5wZS1saXN0e2Rpc3BsYXk6ZmxleDtvdmVyZmxvdy14OmF1dG87Ym9yZGVyLXJpZ2h0Om5vbmU7Ym9yZGVyLWJvdHRvbToxcHggc29saWQgdmFyKC0tbG4pfQogIC5wZS1pdGVte2JvcmRlci1ib3R0b206bm9uZTtib3JkZXItcmlnaHQ6MXB4IHNvbGlkIHZhcigtLWxuKTt3aGl0ZS1zcGFjZTpub3dyYXB9CiAgLnBlLWl0ZW0uYWN0aXZle2JvcmRlci1yaWdodDpub25lO2JvcmRlci1ib3R0b206MnB4IHNvbGlkIHZhcigtLWJsKTttYXJnaW4tcmlnaHQ6MDttYXJnaW4tYm90dG9tOi0xcHh9CiAgLmNvbntwYWRkaW5nOjIwcHggMTZweCA2MHB4fQogIC5oZHJ7cGFkZGluZzowIDE2cHh9CiAgLndzLXRhYnN7ZmxleC13cmFwOndyYXB9Cn0KPC9zdHlsZT4KPC9oZWFkPgo8Ym9keT4KCjwhLS0gSEVBREVSIC0tPgo8aGVhZGVyIGNsYXNzPSJoZHIiPgogIDxkaXYgY2xhc3M9Imhkci1pbiI+CiAgICA8ZGl2IGNsYXNzPSJoZHItYmMiPkFYIOyCrOyXheqwnOuwnCA8c3BhbiBzdHlsZT0iY29sb3I6dmFyKC0tZzQpIj4vPC9zcGFuPiAy64uo6rOEIOuwnOq1tCA8c3BhbiBzdHlsZT0iY29sb3I6dmFyKC0tZzQpIj4vPC9zcGFuPiAyLTkgQUkg66mA7YuwIO2OmOultOyGjOuCmCDsgqzsoIQg7Y+J6rCAPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJoZHItdCI+QUkg66mA7YuwIO2OmOultOyGjOuCmCDsgqzsoIQg7Y+J6rCAIDxzcGFuIHN0eWxlPSJmb250LXNpemU6MTJweDtmb250LXdlaWdodDo0MDA7Y29sb3I6dmFyKC0tZzUpIj7igJQgQUkgQWdlbnQgUHJlLVNjcmVlbmluZzwvc3Bhbj48L2Rpdj4KICAgIDxkaXYgY2xhc3M9Imhkci1zIj446rCcIEtUIERTIOuCtOu2gCDtjpjrpbTshozrgpjrpbwgQUkgQWdlbnTroZwg6rWs7ZiEIMK3IDItMX4yLTggRm9vZGluZyDrsJzqtbQg6rKw6rO866W8IOqwgSDtjpjrpbTshozrgpgg6rSA7KCQ7Jy866GcIOyekOuPmSDtj4nqsIAgwrcg7ZWp7J2YwrfrtoTquLDCt+yasOugpCDsgqzsoIQg64+E7LacPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJjaGlwcyI+CiAgICAgIDxzcGFuIGNsYXNzPSJjaGlwIiBzdHlsZT0iY29sb3I6dmFyKC0tYmwpO2JvcmRlci1jb2xvcjojYmZkYmZlO2JhY2tncm91bmQ6dmFyKC0tYmwtYmcpIj5EaXNjb3ZlcnkgMi05PC9zcGFuPgogICAgICA8c3BhbiBjbGFzcz0iY2hpcCIgc3R5bGU9ImNvbG9yOnZhcigtLWdyKTtib3JkZXItY29sb3I6dmFyKC0tZ3ItbHQpO2JhY2tncm91bmQ6dmFyKC0tZ3ItYmcpIj44IEFJIEFnZW50IFBlcnNvbmFzPC9zcGFuPgogICAgICA8c3BhbiBjbGFzcz0iY2hpcCIgc3R5bGU9ImNvbG9yOnZhcigtLW9yKTtib3JkZXItY29sb3I6dmFyKC0tb3ItbHQpO2JhY2tncm91bmQ6dmFyKC0tb3ItYmcpIj5LVCBEUyDCtyBLVCBHcm91cDwvc3Bhbj4KICAgICAgPHNwYW4gY2xhc3M9ImNoaXAiIHN0eWxlPSJjb2xvcjp2YXIoLS1rdCk7Ym9yZGVyLWNvbG9yOnZhcigtLWt0LWx0KTtiYWNrZ3JvdW5kOnZhcigtLWt0LWJnKSI+QUkgQXV0by1FdmFsdWF0aW9uPC9zcGFuPgogICAgPC9kaXY+CiAgPC9kaXY+CjwvaGVhZGVyPgoKPG1haW4gY2xhc3M9ImNvbiI+Cgo8IS0tIOKVkOKVkCBBLTEuIFBFUlNPTkEgQ0FSRFMg4pWQ4pWQIC0tPgo8c2VjdGlvbiBjbGFzcz0ic2VjIj4KICA8ZGl2IGNsYXNzPSJleWUiPlBlcnNvbmFzPC9kaXY+CiAgPGRpdiBjbGFzcz0ic2VjLXQiPjjqsJwg7Y+J6rCAIO2OmOultOyGjOuCmCDsoJXsnZg8L2Rpdj4KICA8ZGl2IGNsYXNzPSJzZWMtZCI+6rCBIO2OmOultOyGjOuCmOuKlCBMYXllciAxKOqwgOykkey5mCkgKyBMYXllciAyKO2YhOyerCDrp6Xrnb0p66W8IO2Gte2Vqe2VnCDrj4Xrpr3soIEgQUkg7Y+J6rCAIOyXkOydtOyghO2KuOyeheuLiOuLpDwvZGl2PgogIDxkaXYgY2xhc3M9InBjLWdyaWQiIGlkPSJwY0dyaWQiPjwvZGl2Pgo8L3NlY3Rpb24+Cgo8aHIgY2xhc3M9ImRpdmlkZXIiPgoKPCEtLSDilZDilZAgQS0yLiBXRUlHSFQgU0xJREVSIOKVkOKVkCAtLT4KPHNlY3Rpb24gY2xhc3M9InNlYyI+CiAgPGRpdiBjbGFzcz0iZXllIj5MYXllciAxIOKAlCBXZWlnaHQgTWF0cml4PC9kaXY+CiAgPGRpdiBjbGFzcz0ic2VjLXQiPu2OmOultOyGjOuCmOuzhCDtj4nqsIAg6rCA7KSR7LmYPC9kaXY+CiAgPGRpdiBjbGFzcz0ic2VjLWQiPu2OmOultOyGjOuCmOulvCDshKDtg53tlZjqs6Ag7Iqs65287J20642U66GcIOqwgSDtj4nqsIAg7LaV7J2YIOu5hOykkeydhCDsobDsoJXtlanri4jri6Qgwrcg7ZWp6rOEIDEwMCUg7J6Q64+ZIOuztOyglTwvZGl2PgogIDxkaXYgY2xhc3M9IndzLXdyYXAiPgogICAgPGRpdiBjbGFzcz0id3MtdGFicyIgaWQ9IndzVGFicyI+PC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJ3cy1ib2R5IiBpZD0id3NCb2R5Ij48L2Rpdj4KICA8L2Rpdj4KPC9zZWN0aW9uPgoKPGhyIGNsYXNzPSJkaXZpZGVyIj4KCjwhLS0g4pWQ4pWQIEEtMy4gQ09OVEVYVCBFRElUT1Ig4pWQ4pWQIC0tPgo8c2VjdGlvbiBjbGFzcz0ic2VjIj4KICA8ZGl2IGNsYXNzPSJleWUiPkxheWVyIDIg4oCUIENvbnRleHQgRWRpdG9yPC9kaXY+CiAgPGRpdiBjbGFzcz0ic2VjLXQiPu2OmOultOyGjOuCmCDrp6Xrnb0g7KCV7J2YIMK3IO2OuOynkTwvZGl2PgogIDxkaXYgY2xhc3M9InNlYy1kIj7qsIEg7Y6Y66W07IaM64KY7J2YIO2YhOyerCDsg4HtmanCt+unpeudveydhCDshKTsoJXtlanri4jri6Qgwrcg7Ja47KCc65OgIOyImOyglSDqsIDriqXtlZjrqbAg67OA6rK9IOymieyLnCDtj4nqsIDsl5Ag67CY7JiB65Cp64uI64ukPC9kaXY+CiAgPGRpdiBjbGFzcz0icGUtd3JhcCI+CiAgICA8ZGl2IGNsYXNzPSJwZS1saXN0IiBpZD0icGVMaXN0Ij48L2Rpdj4KICAgIDxkaXYgY2xhc3M9InBlLWZvcm0iIGlkPSJwZUZvcm0iPjwvZGl2PgogIDwvZGl2Pgo8L3NlY3Rpb24+Cgo8aHIgY2xhc3M9ImRpdmlkZXIiPgoKPCEtLSDilZDilZAgQi4gRVZBTFVBVElPTiDilZDilZAgLS0+CjxzZWN0aW9uIGNsYXNzPSJzZWMiPgogIDxkaXYgY2xhc3M9ImV5ZSI+QUkgRXZhbHVhdGlvbjwvZGl2PgogIDxkaXYgY2xhc3M9InNlYy10Ij5BSSDtjpjrpbTshozrgpgg7Y+J6rCAIOyLpO2WiTwvZGl2PgogIDxkaXYgY2xhc3M9InNlYy1kIj4yLTF+Mi04IOuwnOq1tCDqsrDqs7zrpbwg7JqU7JW9IOyeheugpSDtm4Qg7Y+J6rCA66W8IOyLpO2Wie2VqeuLiOuLpCDCtyBBSeqwgCA46rCcIO2OmOultOyGjOuCmOuhnCDsiJzssKgg67mZ7J2Y7ZW0IOyekOuPmSDtj4nqsIDtlanri4jri6Q8L2Rpdj4KCiAgPCEtLSBBUEkg7YKkIOyeheugpSAtLT4KICA8ZGl2IHN0eWxlPSJiYWNrZ3JvdW5kOnZhcigtLWJsLWJnKTtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWJsLWx0KTtib3JkZXItcmFkaXVzOnZhcigtLXIxNik7cGFkZGluZzoxNnB4IDIwcHg7bWFyZ2luLWJvdHRvbToxMXB4Ij4KICAgIDxkaXYgc3R5bGU9ImRpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7Z2FwOjhweDttYXJnaW4tYm90dG9tOjhweCI+CiAgICAgIDxkaXYgc3R5bGU9IndpZHRoOjhweDtoZWlnaHQ6OHB4O2JvcmRlci1yYWRpdXM6NTAlO2JhY2tncm91bmQ6dmFyKC0tYmwpO2ZsZXgtc2hyaW5rOjAiIGlkPSJrZXlEb3QiPjwvZGl2PgogICAgICA8ZGl2IHN0eWxlPSJmb250LXNpemU6MTJweDtmb250LXdlaWdodDo3MDA7Y29sb3I6dmFyKC0tZzgpIj5BbnRocm9waWMgQVBJIEtleTwvZGl2PgogICAgICA8ZGl2IHN0eWxlPSJmb250LXNpemU6MTBweDtjb2xvcjp2YXIoLS1nNSk7bWFyZ2luLWxlZnQ6NHB4IiBpZD0ia2V5U3RhdHVzIj7rr7jsnoXroKUg4oCUIOuNsOuqqCDrqqjrk5zroZwg7Iuk7ZaJ65Cp64uI64ukPC9kaXY+CiAgICA8L2Rpdj4KICAgIDxkaXYgc3R5bGU9ImRpc3BsYXk6ZmxleDtnYXA6OHB4O2FsaWduLWl0ZW1zOmNlbnRlciI+CiAgICAgIDxpbnB1dCB0eXBlPSJwYXNzd29yZCIgaWQ9ImFwaUtleSIgcGxhY2Vob2xkZXI9InNrLWFudC1hcGkwMy0uLi4iIGF1dG9jb21wbGV0ZT0ib2ZmIgogICAgICAgIHN0eWxlPSJmbGV4OjE7cGFkZGluZzo4cHggMTJweDtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxuMik7Ym9yZGVyLXJhZGl1czp2YXIoLS1yOCk7Zm9udC1zaXplOjEycHg7Zm9udC1mYW1pbHk6aW5oZXJpdDtiYWNrZ3JvdW5kOnZhcigtLXcpO2NvbG9yOnZhcigtLWc5KTt0cmFuc2l0aW9uOmJvcmRlci1jb2xvciAuMTVzIgogICAgICAgIG9uaW5wdXQ9Im9uS2V5SW5wdXQodGhpcy52YWx1ZSkiPgogICAgICA8YnV0dG9uIG9uY2xpY2s9InNhdmVLZXkoKSIgc3R5bGU9InBhZGRpbmc6OHB4IDE2cHg7YmFja2dyb3VuZDp2YXIoLS1ibCk7Y29sb3I6I2ZmZjtib3JkZXI6bm9uZTtib3JkZXItcmFkaXVzOnZhcigtLXI4KTtmb250LXNpemU6MTJweDtmb250LXdlaWdodDo2MDA7Y3Vyc29yOnBvaW50ZXI7Zm9udC1mYW1pbHk6aW5oZXJpdDt3aGl0ZS1zcGFjZTpub3dyYXAiPuyggOyepTwvYnV0dG9uPgogICAgICA8YnV0dG9uIG9uY2xpY2s9ImNsZWFyS2V5KCkiIHN0eWxlPSJwYWRkaW5nOjhweCAxMnB4O2JhY2tncm91bmQ6dmFyKC0tYmcyKTtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxuMik7Y29sb3I6dmFyKC0tZzcpO2JvcmRlci1yYWRpdXM6dmFyKC0tcjgpO2ZvbnQtc2l6ZToxMXB4O2ZvbnQtd2VpZ2h0OjYwMDtjdXJzb3I6cG9pbnRlcjtmb250LWZhbWlseTppbmhlcml0Ij7stIjquLDtmZQ8L2J1dHRvbj4KICAgIDwvZGl2PgogICAgPGRpdiBzdHlsZT0iZm9udC1zaXplOjEwcHg7Y29sb3I6dmFyKC0tYmwpO21hcmdpbi10b3A6N3B4O2xpbmUtaGVpZ2h0OjEuNiI+CiAgICAgIEFQSSDtgqTripQg7J20IOu4jOudvOyasOyggCDtg60g66mU66qo66as7JeQ66eMIOyggOyepeuQmOupsCDsmbjrtoDroZwg7KCE7Iah65CY7KeAIOyViuyKteuLiOuLpCAmbmJzcDvCtyZuYnNwOwogICAgICA8YSBocmVmPSJodHRwczovL2NvbnNvbGUuYW50aHJvcGljLmNvbS9zZXR0aW5ncy9rZXlzIiB0YXJnZXQ9Il9ibGFuayIgc3R5bGU9ImNvbG9yOnZhcigtLWJsKTtmb250LXdlaWdodDo2MDAiPu2CpCDrsJzquIkg4oaSPC9hPgogICAgICAmbmJzcDvCtyZuYnNwOyDtgqQg66+47J6F66ClIOyLnCDrjbDrqqgg66qo65OcKO2VmOuTnOy9lOuUqSDqsrDqs7wp66GcIOyLpO2WieuQqeuLiOuLpAogICAgPC9kaXY+CiAgPC9kaXY+CgogIDwhLS0g67iM66as7ZWRIC0tPgogIDxkaXYgc3R5bGU9ImJhY2tncm91bmQ6dmFyKC0tdyk7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1sbik7Ym9yZGVyLXJhZGl1czp2YXIoLS1yMTYpO3BhZGRpbmc6MThweCAyMnB4O21hcmdpbi1ib3R0b206MTFweDtib3gtc2hhZG93OnZhcigtLXNoKSI+CiAgICA8ZGl2IHN0eWxlPSJmb250LXNpemU6MTJweDtmb250LXdlaWdodDo3MDA7Y29sb3I6dmFyKC0tZzgpO21hcmdpbi1ib3R0b206N3B4Ij7sgqzsl4Ug7JWE7J207YWcIOu4jOumrO2VkSA8c3BhbiBzdHlsZT0iZm9udC13ZWlnaHQ6NDAwO2NvbG9yOnZhcigtLWc1KSI+KDItMX4yLTgg7ZW17IusIOqysOqzvCDsmpTslb0pPC9zcGFuPjwvZGl2PgogICAgPHRleHRhcmVhIGNsYXNzPSJicmllZi1hcmVhIiBpZD0iYnJpZWZpbmciIHBsYWNlaG9sZGVyPSLruIzrpqztlZEg64K07Jqp7J2EIOyeheugpe2VmOyEuOyalC4uLiI+PC90ZXh0YXJlYT4KICA8L2Rpdj4KCiAgPGRpdiBjbGFzcz0icnVuLXdyYXAiPgogICAgPGRpdj4KICAgICAgPGRpdiBzdHlsZT0iZm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6NzAwO2NvbG9yOnZhcigtLWc5KSIgaWQ9InJ1blRpdGxlIj446rCcIEFJIO2OmOultOyGjOuCmCDsiJzssKgg7Y+J6rCAIOyLnOyekTwvZGl2PgogICAgICA8ZGl2IHN0eWxlPSJmb250LXNpemU6MTFweDtjb2xvcjp2YXIoLS1nNSk7bWFyZ2luLXRvcDoycHgiIGlkPSJydW5EZXNjIj7qsIEg7Y6Y66W07IaM64KY7J2YIExheWVyIDEo6rCA7KSR7LmYKSArIExheWVyIDIo66el6529KSDquLDspIDsnLzroZwg7J6Q64+ZIO2PieqwgCDCtyDtlansnZjCt+u2hOq4sMK37Jqw66CkIOyYgeyXrSDsnpDrj5kg64+E7LacPC9kaXY+CiAgICA8L2Rpdj4KICAgIDxidXR0b24gY2xhc3M9InJ1bi1idG4iIGlkPSJydW5CdG4iIG9uY2xpY2s9InN0YXJ0RXZhbCgpIj7tj4nqsIAg7Iuk7ZaJPC9idXR0b24+CiAgPC9kaXY+CiAgPGRpdiBjbGFzcz0icHJvZy13cmFwIiBpZD0icHJvZ1dyYXAiPgogICAgPGRpdiBjbGFzcz0icHJvZy1sYmwiPgogICAgICA8c3BhbiBpZD0icHJvZ1R4dCI+QUkg7Y6Y66W07IaM64KYIOyInOywqCDtj4nqsIAg7KSRPC9zcGFuPgogICAgICA8c3BhbiBjbGFzcz0idGhpbmtpbmctZG90cyI+PHNwYW4+Ljwvc3Bhbj48c3Bhbj4uPC9zcGFuPjxzcGFuPi48L3NwYW4+PC9zcGFuPgogICAgPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJwcm9nLWxpc3QiIGlkPSJwcm9nTGlzdCI+PC9kaXY+CiAgPC9kaXY+Cjwvc2VjdGlvbj4KCjwhLS0g4pWQ4pWQIEMuIFJFU1VMVFMg4pWQ4pWQIC0tPgo8aHIgY2xhc3M9ImRpdmlkZXIgZmFkZSIgaWQ9ImQxIiBzdHlsZT0iZGlzcGxheTpub25lIj4KPHNlY3Rpb24gY2xhc3M9InNlYyBmYWRlIiBpZD0iczIiIHN0eWxlPSJkaXNwbGF5Om5vbmUiPgogIDxkaXYgY2xhc3M9ImV5ZSI+U3RlcCAyIOKAlCBSZXN1bHRzPC9kaXY+CiAgPGRpdiBjbGFzcz0ic2VjLXQiPuyihe2VqSDqsrDqs7w8L2Rpdj4KICA8ZGl2IGNsYXNzPSJzZWMtZCI+OOqwnCBBSSDtjpjrpbTshozrgpgg6rCA7KSRIO2Pieq3oCDCtyBHby9Db25kaXRpb25hbC9ObyBHbyDtjJDsoJUgwrcg7ZW17IusIOuFvOygkCDsnpDrj5kg7LaU7LacPC9kaXY+CiAgPGRpdiBjbGFzcz0ici1ncmlkIiBpZD0ickdyaWQiPjwvZGl2PgogIDxkaXYgaWQ9InZlcmRCb3giPjwvZGl2PgogIDxkaXYgaWQ9ImRpdkJveCI+PC9kaXY+Cjwvc2VjdGlvbj4KPGhyIGNsYXNzPSJkaXZpZGVyIGZhZGUiIGlkPSJkMiIgc3R5bGU9ImRpc3BsYXk6bm9uZSI+CjxzZWN0aW9uIGNsYXNzPSJzZWMgZmFkZSIgaWQ9InMzIiBzdHlsZT0iZGlzcGxheTpub25lIj4KICA8ZGl2IGNsYXNzPSJleWUiPlN0ZXAgMyDigJQgUmFkYXIgQ2hhcnQ8L2Rpdj4KICA8ZGl2IGNsYXNzPSJzZWMtdCI+7Y6Y66W07IaM64KY67OEIO2ZmOyCsCDsoJDsiJg8L2Rpdj4KICA8ZGl2IGNsYXNzPSJzZWMtZCI+OOqwnCBBSSDtjpjrpbTshozrgpgg6rCA7KSRIO2VqeyCsCDsoJDsiJgg67aE7Y+sPC9kaXY+CiAgPGRpdiBjbGFzcz0iczMiPgogICAgPGRpdiBjbGFzcz0icmFkYXItY2FyZCI+PGNhbnZhcyBpZD0icmFkYXIiIHdpZHRoPSIyOTAiIGhlaWdodD0iMjcwIj48L2NhbnZhcz48L2Rpdj4KICAgIDxkaXYgY2xhc3M9InB0LWdyaWQiIGlkPSJwdEdyaWQiPjwvZGl2PgogIDwvZGl2Pgo8L3NlY3Rpb24+CjxociBjbGFzcz0iZGl2aWRlciBmYWRlIiBpZD0iZDMiIHN0eWxlPSJkaXNwbGF5Om5vbmUiPgo8c2VjdGlvbiBjbGFzcz0ic2VjIGZhZGUiIGlkPSJzNCIgc3R5bGU9ImRpc3BsYXk6bm9uZSI+CiAgPGRpdiBjbGFzcz0iZXllIj5TdGVwIDQg4oCUIFBlcnNvbmEgUmV2aWV3PC9kaXY+CiAgPGRpdiBjbGFzcz0ic2VjLXQiPu2OmOultOyGjOuCmOuzhCDtj4nqsIAg7JqU7JW9PC9kaXY+CiAgPGRpdiBjbGFzcz0ic2VjLWQiPuqwgSBBSSDtjpjrpbTshozrgpjsnZgg7YyQ64uoIOq3vOqxsCDCtyDtlbXsi6wg7Jqw66CkIMK3IO2GteqzvCDsobDqsbQ8L2Rpdj4KICA8ZGl2IGNsYXNzPSJlLWdyaWQiIGlkPSJlR3JpZCI+PC9kaXY+Cjwvc2VjdGlvbj4KPGhyIGNsYXNzPSJkaXZpZGVyIGZhZGUiIGlkPSJkNCIgc3R5bGU9ImRpc3BsYXk6bm9uZSI+CjxzZWN0aW9uIGNsYXNzPSJzZWMgZmFkZSIgaWQ9InM1IiBzdHlsZT0iZGlzcGxheTpub25lIj4KICA8ZGl2IGNsYXNzPSJleWUiPlN0ZXAgNSDigJQgT3ZlcmFsbCBTdW1tYXJ5PC9kaXY+CiAgPGRpdiBjbGFzcz0ic2VjLXQiPuyghOyytCDtj4nqsIAg7JqU7JW9PC9kaXY+CiAgPGRpdiBjbGFzcz0ic2VjLWQiPuyCrOyXhe2ZlCDtjJDri6gg6riw7KSA67OEIOyihe2VqSDrtoTshJ0gwrcg7ZWp7J2Ywrfrs7TsmYTCt+2MgCDqsoDthqAg7JWI6rG0PC9kaXY+CiAgPGRpdiBjbGFzcz0ib3YtYm94IiBpZD0ib3ZCb3giPjwvZGl2Pgo8L3NlY3Rpb24+Cgo8L21haW4+CjxzY3JpcHQ+Ci8qIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAogICAxLiBDT1JFIERBVEEgIChBWCBFeHBlcnQg7LKrIOuyiOynuCkK4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQICovCmNvbnN0IFBTID0gWwogIHtuYW1lOidBWOyCrOyXheqwnOuwnCBFeHBlcnQnLCBjb2xvcjonIzI1NjNlYicsIHNob3J0OidBWCBFeHBlcnQnLCBiYWRnZUJnOicjRTZGMUZCJywgYmFkZ2VDb2xvcjonIzBDNDQ3QycsIGlzRmlyc3Q6dHJ1ZSwgaXNLVDpmYWxzZSwKICAgdGl0bGU6J+yLnOyepcK3R1RNIO2YhOyLpOyEsScsCiAgIGtleVZhbHVlOifsi6TsoJwg6rOg6rCdIO2ajeuTnSDqsr3roZwgwrcg7Iuc7J6lIO2DgOydtOuwjScsCiAgIGxlbnM6J+yyqyDqs4Tslb0g6rK966GcIMK3IOywqOuzhO2ZlCDCtyDqsr3sn4Eg7ZqM7ZS8JywKICAgcTonIuyyqyDqs6DqsJ0g7Ja065SU7IScIOyWtOuWu+qyjCDrlLA/IOyZnCDsmrDrpqzqsIAg7J206rKoPyInLAogICByZWRsaW5lczpbJ+yyqyDqs6DqsJ0g6rK966GcIOu2iOuqhe2ZlScsJ+ywqOuzhO2ZlCDsl4bsnYwnLCdLVCDtjIzsnbTtlITrnbzsnbgg66+47Zmc7JqpJ119LAogIHtuYW1lOifqs6DqsJ3sgqwg7J2Y7IKs6rKw7KCV7J6QJywgY29sb3I6JyM3YzNhZWQnLCBzaG9ydDon6rOg6rCd7IKsJywgYmFkZ2VCZzonI0VFRURGRScsIGJhZGdlQ29sb3I6JyMzQzM0ODknLCBpc0ZpcnN0OmZhbHNlLCBpc0tUOmZhbHNlLAogICB0aXRsZTon64+E7J6FIO2aqOqzvCDtmZXsi6AnLAogICBrZXlWYWx1ZTon7Jqw66asIOyhsOyngeyXkCDsi6TsoJwg7Zqo6rO86rCAIOyeiOuKlOqwgCcsCiAgIGxlbnM6J1JPSSDsiJjsuZggwrcg66CI7Y2865+w7IqkIMK3IOuPhOyehSDrpqzsiqTtgawnLAogICBxOici67mE7Iq37ZWcIOqzs+yXkOyEnCDsjajrtKTslrQ/IO2aqOqzvCDslrzrp4jrgpgg64+8PyInLAogICByZWRsaW5lczpbJ+uPhOyehSDsgqzroYAg7JeG7J2MJywnUk9JIOu2iOuqhe2ZlScsJ+uztOyViMK37Lu07ZSM65287J207Ja47IqkIOuvuO2doSddfSwKICB7bmFtZTonS1QgRFMg64yA7ZGcJywgY29sb3I6JyMwNTk2NjknLCBzaG9ydDonS1QgRFPrjIDtkZwnLCBiYWRnZUJnOicjRTFGNUVFJywgYmFkZ2VDb2xvcjonIzA4NTA0MScsIGlzRmlyc3Q6ZmFsc2UsIGlzS1Q6ZmFsc2UsCiAgIHRpdGxlOifqt7jro7kg7KCE6561IOygleugrCcsCiAgIGtleVZhbHVlOidLVOq3uOujuSBBWCDrsKntlqUg7J287LmYIMK3IOq3nOuqqO2ZlCDqsIDriqUnLAogICBsZW5zOicz64WEIOunpOy2nCDtj6zthZDshZwgwrcg6re466O57IKsIOyLnOuEiOyngCcsCiAgIHE6JyIz64WEIOuSpCDrp6Tstpwg7Ja866eIPyDqt7jro7kg67Cp7Zal7J20656RIOunnuyVhD8iJywKICAgcmVkbGluZXM6Wyfqt7jro7nsgqwg7IKs7JeFIOy2qeuPjCcsJ+uLqOuwnCBTSSDrsJjrs7UnLCdNTSDqtazsobAg7Jyg7KeAJ119LAogIHtuYW1lOifqsr3smIHquLDtmo3stJ3qtIQnLCBjb2xvcjonI2Q5NzcwNicsIHNob3J0Oifqsr3smIHquLDtmo0nLCBiYWRnZUJnOicjRkFFQ0U3JywgYmFkZ2VDb2xvcjonIzcxMkIxMycsIGlzRmlyc3Q6ZmFsc2UsIGlzS1Q6ZmFsc2UsCiAgIHRpdGxlOifsnqzrrLQg6rG07KCE7ISxJywKICAga2V5VmFsdWU6J+2IrOyekCDrjIDruYQg7IiY7J21IMK3IEJFUCDsnbzsoJUnLAogICBsZW5zOidDYXBFeCDCtyBPcEV4IMK3IEJFUCDquLDqsIQgwrcg7ZiE6riI7Z2Q66aEJywKICAgcTonIuy0iOq4sCDtiKzsnpAg7Ja866eIPyDslrjsoJwg7Z2R7J6QPyDqs6DsoJXruYTripQ/IicsCiAgIHJlZGxpbmVzOlsnQkVQIDPrhYQg7LSI6rO8Jywn66y07IOBIOyCrOyXhSDqtazsobAnLCfsm5DqsIAg6rWs7KGwIOu2iO2IrOuqhSddfSwKICB7bmFtZTonQVjsgqzsl4XqsJzrsJzrs7jrtoDsnqUnLCBjb2xvcjonI2VhNTgwYycsIHNob3J0OidBWOuzuOu2gOyepScsIGJhZGdlQmc6JyNGQUVFREEnLCBiYWRnZUNvbG9yOicjNjMzODA2JywgaXNGaXJzdDpmYWxzZSwgaXNLVDpmYWxzZSwKICAgdGl0bGU6J+2PrO2KuO2PtOumrOyYpCDqt6DtmJUnLAogICBrZXlWYWx1ZTon6riw7KG0IOyCrOyXheqzvCDsi5zrhIjsp4Agwrcg7J6Q7JuQIOy2qeuPjCDsl4bsnYwnLAogICBsZW5zOifrgrTrtoAg7J6Q7JuQIOuwsOu2hCDCtyDtg4Ag7IKs7JeFIOy2qeuPjCDsl6zrtoAnLAogICBxOici6riw7KG0IOyCrOyXheydtOuekSDqsrnss5A/IOyduOugpSDslrTrlrvqsowg67m8PyInLAogICByZWRsaW5lczpbJ+uCtOu2gCDsnbjroKUg6rO867aA7ZWYJywn6riw7KG0IOyCrOyXhSDstqnrj4wnLCftmJHroKXsgqwg7J2Y7KG064+EIOqzvOuLpCddfSwKICB7bmFtZTon7JiB7JeF7KGw7KeBJywgY29sb3I6JyMxNmEzNGEnLCBzaG9ydDon7JiB7JeFJywgYmFkZ2VCZzonI0VBRjNERScsIGJhZGdlQ29sb3I6JyMyNzUwMEEnLCBpc0ZpcnN0OmZhbHNlLCBpc0tUOmZhbHNlLAogICB0aXRsZTon7YyQ66ekIOqwgOuKpeyEsScsCiAgIGtleVZhbHVlOifqs6DqsJ3sl5Dqsowg7ISk66qFIOqwgOuKpSDCtyDtjJQg7IiYIOyeiOuKlOqwgCcsCiAgIGxlbnM6J+uplOyLnOyngCDri6jsiJzshLEgwrcg6rCA6rKpIOuCqeuTnSDCtyDrsLDti4DsubTrk5wnLAogICBxOici6rOg6rCd7ZWc7YWMIOutkOudvOqzoCDshKTrqoXtlbQ/IOqwgOqyqSDrgqnrk53rj7w/IicsCiAgIHJlZGxpbmVzOlsn7ISk66qFIOuzteyeoScsJ+qwgOqyqSDqt7zqsbAg7JeG7J2MJywn6riw7KG0IO2MjOydtO2UhOudvOyduCDtmZzsmqkg67aI6rCAJ119LAogIHtuYW1lOifsiJjtlonsobDsp4EnLCBjb2xvcjonIzY0NzQ4YicsIHNob3J0OifsiJjtloknLCBiYWRnZUJnOicjRjFFRkU4JywgYmFkZ2VDb2xvcjonIzQ0NDQ0MScsIGlzRmlyc3Q6ZmFsc2UsIGlzS1Q6ZmFsc2UsCiAgIHRpdGxlOifsi6Ttlokg6rCA64ql7ISxJywKICAga2V5VmFsdWU6J+yngOq4iCDsl63rn4nsnLzroZwg7Iuk7KCcIOq1rO2YhCDqsIDriqXtlZzqsIAnLAogICBsZW5zOifquLDsiKAg64Kc7J2064+EIMK3IOyduOugpSDtmZXrs7Qgwrcg7J287KCVIO2YhOyLpOyEsScsCiAgIHE6JyLsp4DquIgg7J2466Cl7Jy866GcIOqwgOuKpe2VtD8g7Jm467aAIOydmOyhtOuPhOuKlD8iJywKICAgcmVkbGluZXM6WyfquLDsiKAg64K07J6s7ZmUIOu2iOqwgCcsJ+ydvOyglSDruYTtmITsi6TsoIEnLCfsmpTqtazsgqztla0g67aI66qF7ZmVJ119LAogIHtuYW1lOidLVCDqt7jro7kg7KCE6561JywgY29sb3I6JyNlODMyMWEnLCBzaG9ydDonS1Tqt7jro7knLCBiYWRnZUJnOicjRTZGMUZCJywgYmFkZ2VDb2xvcjonIzE4NUZBNScsIGlzRmlyc3Q6ZmFsc2UsIGlzS1Q6dHJ1ZSwKICAgdGl0bGU6J+q3uOujuSDsg53tg5zqs4Qg6riw7JesJywKICAga2V5VmFsdWU6J0tUwrfqt7jro7nsgqzsmYAg7Iuc64SI7KeAIMK3IE1N7YOI7ZS8IOq1rOyhsCcsCiAgIGxlbnM6J+q3uOujueyCrCDtjIzsnbTtlITrnbzsnbggwrcg67CY7KCc7ZKI7ZmUIMK3IE1N7YOI7ZS8JywKICAgcTonIktUIOq3uOujueyCrOuekSDqsJnsnbQg7YyUIOyImCDsnojslrQ/IFNJIO2DiO2UvO2WiOyWtD8iJywKICAgcmVkbGluZXM6WydLVCDsoITrnrUg67Cp7ZalIOyXre2WiScsJ+q3uOujueyCrCDsgqzsl4Ug7KSR67O1JywnTU0g6riw67CYIOuLqOuwnCDsgqzsl4UnXX0sCl07CgovKiDtj4nqsIAg7LaVICovCmNvbnN0IEFYRVMgPSBbCiAge2tleToncm9pJywgbGFiZWw6J+qzoOqwnSBST0knLCAgICAgICBzdWI6J+ygiOqwkCDruYTsmqnCt+yDneyCsOyEsSDsiJjsuZjtmZQnfSwKICB7a2V5OidzdHInLCBsYWJlbDon7KCE6561IOygleugrOuPhCcsICAgIHN1YjoiS1Tqt7jro7kgQVgg67Cp7ZalwrcnMjbrhYQg6rK97JiB6rOE7ZqNIn0sCiAge2tleTonZmluJywgbGFiZWw6J+yerOustCDtg4Dri7nshLEnLCAgICBzdWI6J0JFUCDquLDqsITCt0NhcEV4wrdNTe2DiO2UvCDsiJjsnbXqtazsobAnfSwKICB7a2V5OidndG0nLCBsYWJlbDonR1RNIO2YhOyLpOyEsScsICAgIHN1YjonQmVhY2hoZWFkwrfssqsg6rOE7JW9wrfqt7jro7nsgqwg7LGE64SQJ30sCiAge2tleTondGVjJywgbGFiZWw6J+q4sOyIoCDsi6TtmITqsIDriqXshLEnLHN1YjonVFJMwrfrgrTsnqztmZQg7IiY7KSAwrfqtaztmIQg6riw6rCEJ30sCiAge2tleToncnNrJywgbGFiZWw6J+umrOyKpO2BrCDqtazsobAnLCAgICBzdWI6J+q3nOygnMK36rK97J+BIOyLrO2ZlMK36riw7IigIOyLpO2MqCd9LAogIHtrZXk6J3N5bicsIGxhYmVsOifqt7jro7kg7Iuc64SI7KeAJywgICAgc3ViOifrsJjsoJztkojtmZTCt01N7YOI7ZS8wrfqt7jro7nsgqwg7YyM7J207ZSE65287J24J30sCl07CgovKiDqsIDspJHsuZggKEFYIEV4cGVydCDssqsg67KI7Ke4IOyInOyEnCkgKi8KY29uc3QgV0VJR0hUU19ERUZBVUxUID0gWwogIFsuMzAsLjA1LC4xNSwuMTAsLjIwLC4yMCwuMDBdLCAvLyBBWCBFeHBlcnQKICBbLjMwLC4wNSwuMTUsLjEwLC4yMCwuMjAsLjAwXSwgLy8g6rOg6rCd7IKsCiAgWy4wOCwuMjgsLjIwLC4xNCwuMTAsLjE1LC4wNV0sIC8vIEtUIERT64yA7ZGcCiAgWy4xMCwuMTUsLjQwLC4xMCwuMTAsLjE1LC4wMF0sIC8vIOqyveyYgeq4sO2ajQogIFsuMTAsLjIyLC4xOCwuMjAsLjEwLC4xNSwuMDVdLCAvLyBBWOuzuOu2gOyepQogIFsuMjUsLjA1LC4wNSwuMzUsLjEwLC4yMCwuMDBdLCAvLyDsmIHsl4UKICBbLjA1LC4wNSwuMTUsLjA1LC41MCwuMjAsLjAwXSwgLy8g7IiY7ZaJCiAgWy4xMCwuMzAsLjE1LC4xMCwuMTUsLjE1LC4wNV0sIC8vIEtU6re466O5Cl07CmxldCB3ZWlnaHRzID0gV0VJR0hUU19ERUZBVUxULm1hcChyPT5bLi4ucl0pOwoKLyog7Y6Y66W07IaM64KYIOunpeudvSAqLwpjb25zdCBQQyA9IFsKICB7c2l0dWF0aW9uOidBSSDquLDrsJgg7J2Y7IKs6rKw7KCVIOyngOybkCDsgqzsl4XtmZTsl5Ag6rmK7J2AIOq0gOyLrC4gS1Tqt7jro7nsgqwg7J247KCRIOyYgeyXrSDtmZXsnqUg7Jqw7ISgLiBLVCBEUyDquLDsobQg7YyM7J207ZSE65287J24IOyggeq3uSDtmZzsmqntlbQg7LSI6riwIOyLnOyepSDsp4TsnoUg7IaN64+EIO2ZleuztC4g7Je066awIOyekOyEuOuhnCDsi6Dqt5wg7IKs7JeFIOq4sO2ajCDtg5Dsg4kuJywKICAgcHJpb3JpdHk6J0tUIERT66eM7J2YIOywqOuzhO2ZlCDrhbzrpqwsIOyyqyDqs6DqsJ0g7ZqN65OdIOqyveuhnCwg7Iuc7J6lIO2DgOydtOuwjSwgS1Qg6re466O57IKsIO2MjOydtO2UhOudvOyduCDtmZzsmqknLAogICBzdHlsZTonIuyZnCDsmrDrpqzqsIAg7J206ri4IOyImCDsnojripTqsIAi7J2YIOuFvOumrOulvCDqsIDsnqUg7KSR7JqU7ZWY6rKMIOu0hC4g7Iuc7J6lIO2DgOydtOuwjeqzvCDqsr3sn4Eg7ZqM7ZS8IOyghOuetSDtlajqu5gg6rKA7YagLicsCiAgIHJlZGxpbmVzOlsn7LKrIOqzoOqwnSDqsr3roZwg67aI66qF7ZmVJywn7LCo67OE7ZmUIOyXhuydjCcsJ0tUIO2MjOydtO2UhOudvOyduCDrr7jtmZzsmqknXX0sCiAge3NpdHVhdGlvbjon7IKs7JeFIOyVhOydtO2FnOydmCDrqqntkZwg64+E66mU7J24KOqzteqztcK36riI7Jy1wrfsoJzsobDCt+ycoO2GtSDrk7EpIOyLnOyepSDtmITtmansnYQg67CY7JiB7ZW0IOyEpOyglS4g7ZW064u5IOyCsOyXheydmCBBSSDrj4TsnoUg7ISx7IiZ64+ELCDqt5zsoJwg7ZmY6rK9LCDso7zsmpQgUGFpbiBQb2ludOulvCDqsJDslYjtlbQg7Y+J6rCAIOunpeudvSDqtazshLEuJywKICAgcHJpb3JpdHk6J+ygleufieyggSBST0kg7IiY7LmYLCDsnKDsgqwg7JeF7KKFIOugiO2NvOufsOyKpCwg64+E7J6FIOumrOyKpO2BrCDstZzshoztmZQnLAogICBzdHlsZTon7Jyg7IKsIOyXheyihSDroIjtjbzrn7DsiqTCt+ygleufieyggSDtmqjqs7wg7IiY7LmYIOyasOyEoCDsmpTqtawuICLruYTsirftlZwg6rOz7JeQ7IScIOyNqOu0pOyWtD8g7Zqo6rO8IOyWvOuniOuCmCDrj7w/IicsCiAgIHJlZGxpbmVzOlsn64+E7J6FIOyCrOuhgCDsl4bsnYwnLCdST0kg67aI66qF7ZmVJywn67O07JWIwrfsu7TtlIzrnbzsnbTslrjsiqQg66+47Z2hJ119LAogIHtzaXR1YXRpb246IicyNuuFhCBBZ2VudGljIEFJIOyghOusuO2ajOyCrCBJZGVudGl0eSDqtazstpXsnbQg7LWc7Jqw7ISgIOqzvOygnC4gTU0oTWFuLU1vbnRoKSDquLDrsJgg7YOI7ZS8IOKGkiBBZ2VudCvsu6TsiqTthLDrp4jsnbTsp5Ug66ek7LacIOq1rOyhsCDsoITtmZjsnbQg7ZW17IusIEtQSS4gS1Tqt7jro7kg64K0IEFJIOyCrOyXhSDqsr3sn4Eg7Ius7ZmU66GcIEtUIERT66eM7J2YIOywqOuzhO2ZlCDtj6zsp4DshZTri50g7ZWE7JqULiIsCiAgIHByaW9yaXR5OidLVCDqt7jro7kgQVgg7KCE6561IOuwqe2WpSBBbGlnbiwgM+uFhCDrp6Tstpwg7Y+s7YWQ7IWcLCDrsJjsoJztkojtmZTCt+uqqOuTiO2YlSBPZmZlcmluZyDqsIDriqXshLEnLAogICBzdHlsZTonS1Qg6re466O5IOuwqe2WpeqzvOydmCBBbGlnbuydtCDsoITsoJwg7KGw6rG0LiAz64WEIOunpOy2nCDsiKvsnpDsmYAg6re466O57IKsIOy2qeuPjCDsl6zrtoDrpbwg66i87KCAIO2ZleyduC4nLAogICByZWRsaW5lczpbJ+q3uOujueyCrCDsgqzsl4Ug7Lap64+MJywn64uo67CcIFNJIOuwmOuztScsJ01NIOq1rOyhsCDsnKDsp4AnXX0sCiAge3NpdHVhdGlvbjon7Yis7J6QIOyXrOugpSDrp6TsmrAg7YOA7J207Yq4LiDsi6Dqt5wg7IKs7JeFIO2IrOyekOuKlCDtmZXsi6TtlZwg66ek7LacIOq3vOqxsOyZgCDsgqzsl4XshLEg7ISg7ZaJIO2VhOyImC4g67aI7ZmV7Iuk7ZWcIFBvQ+yEsSDtiKzsnpDsl5Ag66ek7JqwIOuztOyImOyggS4g7Jyg7IOBIOyCrOyXhSDqtazsobAg7JuQ7LmZLicsCiAgIHByaW9yaXR5OidCRVAg64us7ISxIOyLnOygkCwg7LSI6riwIO2IrOyekCDqt5zrqqgsIOuqhe2Zle2VnCDsiJjsnbUg6rWs7KGwLCDsnKDsg4Eg66ek7LacIOqwgOyLnOyEsScsCiAgIHN0eWxlOici7LSI6riwIO2IrOyekCDslrzrp4gsIOyWuOygnCDtnZHsnpAsIOqzoOygleu5hOuKlCIg7Iic7ISc66GcIO2ZleyduC4g7Iir7J6Q66GcIOyEpOuqhSDslYgg65CY66m0IOuFvOydmCDqsbDrtoAuJywKICAgcmVkbGluZXM6WydCRVAgM+uFhCDstIjqs7wnLCfrrLTsg4Eg7IKs7JeFIOq1rOyhsCcsJ+ybkOqwgCDqtazsobAg67aI7Yis66qFJ119LAogIHtzaXR1YXRpb246J+uzuOu2gCDsnbjroKUg7Jes7JygIOyXhuydjC4g7Iug6recIOyCrOyXhSDsiJjtlokg7IucIOq4sOyhtCDsgqzsl4Xqs7wg7J6Q7JuQIOy2qeuPjCDrtojqsIDtlLwuIOuCtOu2gCDquLDsiKAg7Jew6rOE6rCAIOuwlOuejOynge2VmOuCmCDtmITsi6TsoIHsnLzroZwg7Im97KeAIOyViuydjC4g7ZiR66Cl7IKsKO2MjO2KuOuEiCkg7KCB6re5IO2ZnOyaqSDtlYTsmpQuJywKICAgcHJpb3JpdHk6J+yduOugpSDsobDri6wg6rOE7ZqNLCDtmJHroKXsgqwg7Zmc7JqpIOq1rOyhsCwg6riw7KG0IOyCrOyXheqzvOydmCDstqnrj4wg7LWc7IaM7ZmUJywKICAgc3R5bGU6JyLriITqsIAg7Iuk7KCc66GcIO2VmOuKlOqwgCLrpbwg66i87KCAIO2ZleyduC4g7J2466ClIOqzhO2ajeqzvCDtmJHroKXsgqwg7Zmc7JqpIOuwqeyViOydtCDqtazssrTsoIHsnbTslrTslbwg64W87J2YIOynhO2WiS4nLAogICByZWRsaW5lczpbJ+uCtOu2gCDsnbjroKUg6rO867aA7ZWYJywn6riw7KG0IOyCrOyXhSDstqnrj4wnLCftmJHroKXsgqwg7J2Y7KG064+EIOqzvOuLpCddfSwKICB7c2l0dWF0aW9uOidLVCBEUyDquLDsobQg6rOg6rCdwrftjIzsnbTtlITrnbzsnbgg7Jew6rOE6rCAIOqwgOyepSDtmITsi6TsoIHsnbgg7LSI6riwIOyYgeyXhSDqsr3roZwuIO2YhOyerCDsmIHsl4Ug64+E66mU7J247J2AIOygnO2VnOyggeydtOuCmCDtmZXsnqUg64uI7KaIIOyeiOydjC4g7Iug6recIOqzoOqwnSDqsJzsspnrs7Tri6Qg6riw7KG0IOq0gOqzhCDquLDrsJgg7ZmV7J6lIOyEoO2YuC4nLAogICBwcmlvcml0eTon6riw7KG0IO2MjOydtO2UhOudvOyduCDsl7Dqs4Qg6rCA64ql7ISxLCDrqZTsi5zsp4Ag64uo7Iic7ISxLCDqsIDqsqkg64Kp65OdIOq3vOqxsCwg67Cw7YuA7Lm065OcIOyZhOyEseuPhCcsCiAgIHN0eWxlOici7KeA6riIIOuCtCDqs6DqsJ3tlZzthYwg7YyUIOyImCDsnojslrQ/IuqwgCDtlbXsi6wuIOyEpOuqheydtCDri6jsiJztlZjqs6Ag6rCA6rKpIOq3vOqxsCDrqoXtmZXtlbTslbwg7ZiE7J6lIOyYgeyXhSDqsIDriqUuJywKICAgcmVkbGluZXM6WyfshKTrqoUg67O17J6hJywn6rCA6rKpIOq3vOqxsCDsl4bsnYwnLCfquLDsobQg7YyM7J207ZSE65287J24IO2ZnOyaqSDrtojqsIAnXX0sCiAge3NpdHVhdGlvbjon7Iuk7KCcIOq1rOy2leydhCDri7Tri7ntlZjrr4DroZwg6riw7Iig7KCBIOyLpO2YhCDqsIDriqXshLEg7YyQ64uo7J20IOunpOyasCDrs7TsiJjsoIEuIOqygOymneuQmOyngCDslYrsnYAg6riw7IigIOyKpO2DncK37Ken7J2AIOq1rO2YhCDsnbzsoJXsl5Ag6rCV7ZWcIOyasOugpC4g7Iug6riw7IigIOuCtOyerO2ZlCDsiJjspIAg7ISx7J6lIOykkeydtOuCmCDslYTsp4Eg7KCc7ZWc7KCBLicsCiAgIHByaW9yaXR5OifquLDsiKAg64K07J6s7ZmUIOqwgOuKpeyEsSwg6rWs7ZiEIOydvOyglSDtmITsi6TshLEsIOyZuOu2gCDsnZjsobTrj4Qg7IiY7KSALCDsnKDsp4Drs7TsiJgg66as7Iqk7YGsJywKICAgc3R5bGU6JyLsp4DquIgg7Jqw66asIOyduOugpeycvOuhnCDsi6TsoJzroZwg66eM65OkIOyImCDsnojslrQ/IiDtlbXsi6wuIOyZuOu2gCDsnZjsobTrj4TCt+q4sOyIoCDrgpzsnbTrj4TCt+q1rO2YhCDquLDqsIQg67O07IiY7KCB7Jy866GcIO2PieqwgC4nLAogICByZWRsaW5lczpbJ+q4sOyIoCDrgrTsnqztmZQg67aI6rCAJywn7J287KCVIOu5hO2YhOyLpOyggScsJ+yalOq1rOyCrO2VrSDrtojrqoXtmZUnXX0sCiAge3NpdHVhdGlvbjonS1TsnZggQVgg7KCE65617J2EIO2VreyDgSDtg5Dsg4ntlbQg67CY7JiBLiBLVCBEU+uKlCDqt7jro7kgQVgg7KCE6561IOyLpO2WiSDso7zssrTroZzshJwg6re466O5IOyghOyytCBBSSDsgqzsl4XtmZQg7IOd7YOc6rOE7JeQIOq4sOyXrC4gQWdlbnRpYyBBSSDsoITrrLgg7Iuk7ZaJIOyhsOyngeycvOuhnOyEnCBLVMK36re466O57IKs6rCAIO2VmOq4sCDslrTroKTsmrQg67KE7Yuw7LusIO2Kue2ZlMK364+E66mU7J24IOq5iuydtMK3U0kg7Jet65+JIOuLtOuLuS4nLAogICBwcmlvcml0eTonS1Qg6re466O5IEFYIOyghOuetSBBbGlnbiwg67CY7KCc7ZKI7ZmUwrfrqqjrk4jtmJUgT2ZmZXJpbmcsIE1N7YOI7ZS8IOyImOydteq1rOyhsCwg6re466O57IKsIO2MjOydtO2UhOudvOyduCDsl7Dqs4QnLAogICBzdHlsZTonS1Qg6re466O5IOyghOuetSBBbGlnbuydtCDsoITsoJwuIOuwmOygnO2SiO2ZlMK366qo65OI7ZiV7Jy866GcIOq3uOujueyCrCDtmZXsnqUg6rCA64ql7ZWc7KeALCBNTe2DiO2UvCDqtazsobDsnbjsp4Ag7ZW17IusIOq4sOykgC4nLAogICByZWRsaW5lczpbJ0tUIOyghOuetSDrsKntlqUg7Jet7ZaJJywn6re466O57IKsIOyCrOyXhSDspJHrs7UnLCdNTSDquLDrsJgg64uo67CcIOyCrOyXhSddfSwKXTsKCi8qIO2VmOuTnOy9lOuUqSDtj4nqsIAg6rKw6rO8IChBWCBFeHBlcnQg7LKrIOuyiOynuCkg4oCUIEZvb2Rpbmcg4oCUIEFJIOyLneyekOyerCDqtazrp6Qg7J2Y7IKs6rKw7KCVIOyXlOynhCDtlITroIjsnoQg67CY7JiBICovCmNvbnN0IEVWQUwgPSBbCiAge3Njb3Jlczp7cm9pOjQsc3RyOjQsZmluOjMsZ3RtOjQsdGVjOjMscnNrOjMsc3luOjN9LCB2ZXJkaWN0OidHbycsCiAgIHN1bW1hcnk6J09udG9sb2d5IOq4sOuwmCDshKTrqoUg6rCA64ql7ZWcIEFJ64qUIOyGjOyDgeqzteyduCDsi5zsnqXsl5DshJwg66qF7ZmV7ZWcIOywqOuzhO2ZlC4g6riw7KG0IO2UjOueq+2PvCjsi53rtIQv7ZG465Oc7YyhKeqzvCDqsr3sn4HsnbQg7JWE64uMIOuztOyZhOyerCDtj6zsp4DshZjsnbQg7ZiE7Iuk7KCBLiBLVCDsgqzsnqXsnbTsp4Ag66qo65OIIOyghOueteydgCDssYTrhJAg7ZmV67O07JeQIO2aqOqzvOyggS4nLAogICBjb25jZXJuOifshozsg4Hqs7XsnbjsnZggQUkg7IiY7Jqp64+E6rCAIOyYiOyDgeuztOuLpCDrgq7snYQg7IiYIOyeiOydjCBcdTIwMTQgUG9D7JeQ7IScIOyImOyaqeuloCA2MCUg64us7ISx7J20IOq0gOqxtCcsCiAgIGNvbmRpdGlvbjonUG9DIDEw6rOz7JeQ7IScIOy2lOyynCDsiJjsmqnrpaAgNjAlKyDrsI8g7JuUIOygiOqwkCA1MOunjOybkCsg7Iuk7KadIO2VhOyalCd9LAogIHtzY29yZXM6e3JvaTozLHN0cjozLGZpbjozLGd0bTozLHRlYzozLHJzazozLHN5bjowfSwgdmVyZGljdDonQ29uZGl0aW9uYWwnLAogICBzdW1tYXJ5Oici7ISk66qFIOqwgOuKpe2VnCBBSSLripQg7IaM7IOB6rO17J247JeQ6rKMIOunpOugpeyggeydtOuCmCwg7Iuk7KCc66GcIO2WieuPmSDrs4DtmZQo6rWs66ekIOyKteq0gCDsoITtmZgp6rmM7KeAIOydtOuBjCDsiJgg7J6I64qU7KeAIOqygOymnSDtlYTsmpQuIFJPSSAxMeuwsOudvOuKlCDsiJjsuZjqsIAg7Iuk7KCcIFBvQ+yXkOyEnCDsnqztmITrkJjslrTslbwg7ISk65Od66ClIO2ZleuztC4nLAogICBjb25jZXJuOifshozsg4Hqs7XsnbjsnbQg6riw7KG0IOqxsOuemOyymCjri6jqs6gp66W8IEFJIOy2lOyynOycvOuhnCDrsJTqv4Ag7J2Y7Zal7J20IOyeiOuKlOyngCBcdTIwMTQg6rSA6rOEIOq4sOuwmCDqsbDrnpgg6rSA7ISx7J20IOqwle2VqCcsCiAgIGNvbmRpdGlvbjon7IKs7J6l64uYIOyduO2EsOu3sCAxMOuqhSDsnbTsg4Hsl5DshJwgIkFJIOy2lOyynOuMgOuhnCDqs7XquInsspgg67OA6rK9IOydmO2WpSIgNTAlKyDtmZXsnbgnfSwKICB7c2NvcmVzOntyb2k6MyxzdHI6NCxmaW46MyxndG06NCx0ZWM6Myxyc2s6MyxzeW46NH0sIHZlcmRpY3Q6J0dvJywKICAgc3VtbWFyeToiJzI264WEIEFYIOyLoOyCrOyXhSDrsKntlqXqs7wg67aA7ZWpLiBNTSDtg4jtlLxcdTIxOTLqtazrj4XtmJUg7KCE7ZmY7JeQIOygge2Vqe2VnCDrqqjrjbguIOuLpOunjCDsi53snpDsnqzrnbzripQg7IOI66Gc7Jq0IOuPhOuplOyduCDsp4Tstpzsl5Ag64yA7ZWcIOumrOyKpO2BrCDqtIDrpqwg7ZWE7JqULiBLVCDsgqzsnqXsnbTsp4Ag7Jew6rOE64qUIOq3uOujuSDsi5zrhIjsp4DroZwg7KKL7J2AIOygkeq3vC4iLAogICBjb25jZXJuOifsi53snpDsnqwg64+E66mU7J24IOqyve2XmCDrtoDsnqwgXHUyMDE0IEtURFPqsIAg7J20IOyLnOyepeydhCDsnbTtlbTtlZjqs6Ag7J6I64uk64qUIOymneqxsOqwgCDrtoDsobEnLAogICBjb25kaXRpb246J+yGjOyDgeqzteyduCDsgqzsnqXri5gg7ZiE7J6lIOyduO2EsOu3sCAxMOqxtCsg7JmE66OMIOuwjyDrj4TrqZTsnbgg7KCE66y46rCAKOyLneyekOyerCDsnKDthrUpIOyekOusuOychOybkCDtmZXrs7QnfSwKICB7c2NvcmVzOntyb2k6MyxzdHI6MyxmaW46MyxndG06Myx0ZWM6Myxyc2s6MyxzeW46MH0sIHZlcmRpY3Q6J0NvbmRpdGlvbmFsJywKICAgc3VtbWFyeTonUGhhc2UgMSDtiKzsnpAgMTLslrXsnYAg7IiY7JqpIOqwgOuKpe2VmOuCmCwgMTAw7Ja1IOunpOy2nCDri6zshLHsl5AgNOykkSDsiJjsnbUg6rWs7KGwKOq1rOuPhStLVCvsoJXrtoAr642w7J207YSwKeqwgCDrqqjrkZAg7J6R64+Z7ZW07JW8IO2VnOuLpOuKlCDsoJDsnbQg7Jqw66CkLiDsoJXrtoDsgqzsl4Ug7J2Y7KG064+EKFkxIDUwJSnqsIAg64aS7JWEIOyViOygleyEsSDqsoDthqAg7ZWE7JqULicsCiAgIGNvbmNlcm46J1kxIOunpOy2nCAxMOyWtSDspJEg7KCV67aA7IKs7JeFIDXslrUoNTAlKSBcdTIwMTQg7KCV67aA7IKs7JeFIOyImOyjvCDsi6TtjKgg7IucIOyggeyekO2PrSDtmZXrjIAnLAogICBjb25kaXRpb246J1BoYXNlIDEg6rCc7IucIOyghCBBSSDrsJTsmrDsspgg6rO16riJ6riw7JeFIOyCrOyghCDrk7HroZ0g7JmE66OMIOuwjyDsiqTrp4jtirjsg4HsoJAg6riw7Iig6rO16riJ6riw7JeFIOyEoOyglSDtmZXrs7QnfSwKICB7c2NvcmVzOntyb2k6MyxzdHI6NCxmaW46MyxndG06Myx0ZWM6Myxyc2s6MyxzeW46M30sIHZlcmRpY3Q6J0NvbmRpdGlvbmFsJywKICAgc3VtbWFyeTon7ZWY7J2067iM66as65OcIO2KuOuemeydgCDrpqzsiqTtgawg67aE7IKwIOuptOyXkOyEnCDtlanrpqzsoIEuIOuzuOu2gCDsnbjroKUg7Jes7Jyg6rCAIOyXhuycvOuvgOuhnCAxMOuqhSDrsLDsoJXsnbQg7ZiE7Iuk7KCB7J247KeALCDtirntnoggQUkg7JeU7KeA64uI7Ja0IDTrqoUg7ZmV67O0IOuwqeyViCDqtazssrTtmZQg7ZWE7JqULicsCiAgIGNvbmNlcm46J0FJIOyXlOyngOuLiOyWtCA066qFICsgTExNIDHrqoUg7ZmV67O0IFx1MjAxNCDrgrTrtoAg7KCE7ZmYIG9yIOyZuOu2gCDssYTsmqkg6rOE7ZqN7J20IOu2iOu2hOuqhScsCiAgIGNvbmRpdGlvbjonRTgg7ZiR66Cl7IKs7JmAIE9udG9sb2d5IOqzteuPmeqwnOuwnCBNT1Ug7LK06rKwIOuwjyBBSSDsl5Tsp4Dri4jslrQg7LGE7JqpL+yghO2ZmCDqs4Ttmo0g7IiY66a9J30sCiAge3Njb3Jlczp7cm9pOjQsc3RyOjMsZmluOjMsZ3RtOjQsdGVjOjMscnNrOjMsc3luOjN9LCB2ZXJkaWN0OidHbycsCiAgIHN1bW1hcnk6JyLsgqzsnqXri5jtlZzthYwg7JuUIDEw66eM7JuQ7Jy866GcIOyblCA1MOunjOybkCDslYTrgoDri6Qi64qUIOuplOyLnOyngOuKlCDsmIHsl4XtlZjquLAg66ek7JqwIOyii+ydjC4g7KCV67aAIOuwlOyasOyymOuhnCDstIjquLAg67mE7JqpIDDsm5DsnbTrqbQg64+E7J6FIOyepeuyveuPhCDrgq7snYwuIOuLpOunjCDquLDsobQgS1Qg7JiB7JeFIO2MjOydtO2UhOudvOyduOyXkCDsi53snpDsnqwgQUnrpbwg7Ja065a76rKMIOuBvOyauOyngCDqtazssrQg67Cp7JWIIO2VhOyalC4nLAogICBjb25jZXJuOifquLDsobQgS1Qg7JiB7JeFIO2MjOydtO2UhOudvOyduCjthrXsi6Av7YG065287Jqw65OcKeqzvCDsi53snpDsnqwgQUnsnZgg7KCR7KCQIFx1MjAxNCAi7IKs7J6l7J207KeAIOyYgeyXhe2MgCLqs7wg67OE64+EIO2YkeydmCDtlYTsmpQnLAogICBjb25kaXRpb246J0tUIOyCrOyepeydtOyngCDsmIHsl4XtjIDqs7wg6rO164+ZIOyYgeyXhSDtlITroZzshLjsiqQg7ISk6rOEIOuwjyDsmIHsl4Ug7J6Q66OMKFJPSSDsi5zrrqzroIjsnbTthLApIOqwnOuwnCd9LAogIHtzY29yZXM6e3JvaTozLHN0cjozLGZpbjozLGd0bTozLHRlYzozLHJzazozLHN5bjowfSwgdmVyZGljdDonQ29uZGl0aW9uYWwnLAogICBzdW1tYXJ5OidPbnRvbG9neS9LR+ulvCDshpDtlbTsgqzsoJXsl5DshJwg7Iud7J6Q7J6s66GcIOyghO2ZmO2VmOuKlCDquLDsiKDsoIEg64Kc7J2064+EIOyeiOycvOuCmCBFOCDtmJHroKXsnLzroZwg7ZW06rKwIOqwgOuKpS4g64uk66eMIOyLneyekOyerCDrjbDsnbTthLAg7YyM7J207ZSE65287J24KGFUIEFQSSArIO2UjOueq+2PvCDtgazroaTrp4Ep6rO8IOyGjOyDgeqzteyduOyaqSBVWCDqsJzrsJzsnYAg7IOI66Gc7Jq0IOuPhOyghC4nLAogICBjb25jZXJuOifshozsg4Hqs7Xsnbgg64yA7IOBIOuqqOuwlOydvCBVWCDqsr3tl5gg67aA7KGxIFx1MjAxNCBCMkMg7IiY7KSA7J2YIOyngeq0gOyggSBVSeqwgCDtlYTsmpTtlZjrgpggU0kg7Lac7IugIOyhsOyngeydmCBVWCDsl63rn4kg7ZWc6rOEJywKICAgY29uZGl0aW9uOidVWCDsoITrrLgg7Jm467aAIO2MjO2KuOuEiCjrlJTsnpDsnbgg7JeQ7J207KCE7IucKSDqs4Tslb0g65iQ64qUIEIyQyBVWCDqsr3tl5jsnpAgMeuqhSDssYTsmqknfSwKICB7c2NvcmVzOntyb2k6MyxzdHI6NCxmaW46MyxndG06NCx0ZWM6Myxyc2s6MyxzeW46NH0sIHZlcmRpY3Q6J0dvJywKICAgc3VtbWFyeTon7IKs7J6l7J207KeA7J2YIE1BVSDrrLjsoJzrpbwg7ZW06rKw7ZWgIOyImCDsnojripQgIuunpOydvCDsl7TslrTslbwg7ZWY64qUIOq4sOuKpSLsnLzroZzshJwgRm9vZGluZyDrqqjrk4jsnZgg6rCA7LmYIOyduOyglS4gS1Qg6re466O5IOyGjOyDgeqzteyduCDsoITrnrUo7IKs7J6l7J207KeAKeqzvCDsi5zrhIjsp4AuIOuLpOunjCBLVOqwgCDsp4HsoJEg6rCc67Cc7ZWY7KeAIOyViuqzoCBLVERTIOuqqOuTiOydhCDsiJjsmqntlaDsp4DripQg64K067aAIOyXre2VmSDqtIDqs4Tsl5Ag64us66a8LicsCiAgIGNvbmNlcm46J0tUIOyCrOyepeydtOyngCDtjIDsnbQg7Iud7J6Q7J6sIOq4sOuKpeydhCDsnpDssrQg6rCc67Cc7ZWY66CkIO2VoCDqsIDriqXshLEgXHUyMDE0IEtURFMg66qo65OI7J20IOyVhOuLjCDsnpDssrQg6rCc67Cc66GcIOuwqe2WpSDsoITtmZgg7IucIOyxhOuEkCDsg4Hsi6QnLAogICBjb25kaXRpb246J0tUIOyCrOyepeydtOyngCDtjIDqs7wgIuyLneyekOyerCBBSSDrqqjrk4ggPSBLVERTIOyghOuLtCIg7ZWp7J2YIOuwjyDqs7Xsi50gTE9JIOuYkOuKlCBNT1UnfSwKXTsKCi8qIOyCrOyXhe2ZlCDtjJDri6gg6riw7KSAICovCmNvbnN0IEJJWiA9IFsKICB7bGFiZWw6J+unpOy2nCDsi6TtmITshLEnLCAgYXhlczpbJ3JvaScsJ2ZpbiddLCBjb2xvcjonIzAwYjQ5Myd9LAogIHtsYWJlbDon7KCE6561IOygle2VqeyEsScsICBheGVzOlsnc3RyJywnc3luJ10sIGNvbG9yOicjMzE4MmY2J30sCiAge2xhYmVsOifsi6Ttlokg6rCA64ql7ISxJywgIGF4ZXM6Wyd0ZWMnLCdyc2snXSwgY29sb3I6JyNmNTllMGInfSwKICB7bGFiZWw6J+yLnOyepSDsp4TsnoXshLEnLCAgYXhlczpbJ2d0bScsJ3JvaSddLCBjb2xvcjonIzZjNjNmZid9LAogIHtsYWJlbDon7IKs7JeFIO2ZleyepeyEsScsICBheGVzOlsnc3RyJywnZ3RtJywnc3luJ10sIGNvbG9yOicjZTgzMjFhJ30sCl07Cgpjb25zdCBQUkVTRVRfQlJJRUYgPSBg4pGgIOyCrOyXhSDslYTsnbTthZzrqoUKS1REUyBGb29kaW5nIOKAlCBBSSDsi53snpDsnqwg6rWs66ekIOydmOyCrOqysOyglSDsl5Tsp4QK7ZW17IusIO2UhOugiOyehDog7Iud7J6Q7J6sIO2UjOueq+2PvOydtCDslYTri4wsIE9udG9sb2d5L0tHIOq4sOuwmCAi7ISk66qFIOqwgOuKpe2VnCBBSSLroZwg7IaM7IOB6rO17J247J2YIOyLneyekOyerCDqtazrp6Qg7J2Y7IKs6rKw7KCV7J2EIOyngOybkO2VmOuKlCDrqqjrk4jtmJUg7JeU7KeECgrikaEg67Kk7LmY66eI7YGsIOy2nOyymCAoMi0xIOugiO2NvOufsOyKpCDrtoTshJ0pCuyLneu0hCjrp4jsvJPrs7TroZwpLCDtkbjrk5ztjKEsIENK7ZSE66CI7Iuc7Juo7J20IO2UhOugiOyLnOyXlAotIOyLneu0hDog6rGw656Y7JWhIDIsMzQx7Ja1KDIwMjUpLCDtmozsm5AgMjPrp4zrqoUsIENK7ZSE66CI7Iuc7Juo7J206rCAIDI3LjUlIOyduOyImCDihpIg7Iuc7J6lIOyerO2OuAotIO2RuOuTnO2MoTog64+E66ek7Iuc7J6lIOyngeqxsOuemCwg66ek7LacIH40NTDslrUsIOyLnOumrOymiEMgMSwwMDDslrUg7LaU7KeECi0gQ0rtlITroIjsi5zsl5Q6IEFJIOyjvOusuCDsl5DsnbTsoITtirggMjAyNi4wMSDrsqDtg4AsIOunpOy2nCAzLjXsobAKLSDtlbXsi6wg67Cc6rKsOiDrqqjrk6Ag7ZSM656r7Y+87J2YIEFJ6rCAICLso7zrrLgg7Y647J2Y7ISxIuyXkCDtlZzsoJUsICLqtazrp6Qg7J2Y7IKs6rKw7KCVIiBBSSA9IOqzteuwsQotIOyehO2Mqe2LsOu4jEFJKERlZXBmbG93KTog7Jyg7J287ZWcIOycoOyCrCDqsr3sn4HsnpAsIOyImOyalOyYiOy4oSA5OC42JSDsoJXtmZXrj4QsIOuLqCBCMkIg64yA6riw7JeFIO2DgOqynyAo7IaM7IOB6rO17J24IOKdjCkKLSBLVCDsgqzsnqXsnbTsp4A6IDEy6rCcIOq4sOuKpSDspJEg7Iud7J6Q7J6sIDDqsJwgPSDtlbXsi6wgR2FwCi0g7LCo67OE7ZmUOiBPbnRvbG9neSAi7ISk66qFIOqwgOuKpe2VnCBBSSIgdnMg7J6E7Yyp7Yuw67iMQUkgIuu4lOuemeuwleyKpCBNTCIKCuKRoiDsiJjsmpQg7Iuc7J6lIOqygOymnSAoMi0yKQotIFRBTSDigqk2NOyhsCAvIFNBTSDigqk3LDAwMOyWtSAvIFNPTSDigqkxMjHslrUoM+uFhCDriITsoIEpIOKAlCDshozsg4Hqs7XsnbggQUkg7Iud7J6Q7J6sIOydmOyCrOqysOyglSDrqqjrk4gg7Iuc7J6lCi0g7ZW17IusIFBhaW46IFAxIOqwgOqyqeu5hOq1kOu2iOqwgCArIFAyIOyImOyalOyYiOy4oeu2iOqwgCArIFAzIOybkOqwgOq0gOumrOu2gOyerCArIFA1IEFJ67aI7IugIOKGkiBPbnRvbG9neSAi7ISk66qFIuycvOuhnCDtlbTqsrAKLSAyMDI2IOygleu2gCDsoJXssYUg7IKs7IOBIOy1nOuMgDog7IaM7IOB6rO17J24IDUuNOyhsCArIEFJIOuPhOyasOuvuCA1MOyWtSDsi6Dqt5wKLSBLVERT64qUIOqzteq4ieq4sOyXheycvOuhnCDssLjsl6wg6rCA64qlIChBSSDrsJTsmrDsspgsIOyKpOuniO2KuOyDgeygkCDquLDsiKDrs7TquIkpCi0g7IaM7IOB6rO17J24IOychOq4sDogMjAyNSAxUSDsnYzsi53soJAg7Y+Q7JeF66WgPuqwnOyXheuloCDsgqzsg4Eg7LKrIOyXreyghCwgNDAl6rCAIDPrhYQg64K0IO2PkOyXhQotIFJPSSAxMX4xNOuwsDog7JuUMTDrp4wg66qo65OIIOKGkiDsm5QxMTB+MTQ166eMIOygiOqwkAoK4pGjIOqyveyfgSDqtazrj4Qg67CPIOyekOyCrCDtmITtmakgKDItMykK6rK97J+B7IKsOiDsi53rtIQo67O07JmE7J6sKSwgQ0rtlITroIjsi5zsm6jsnbQo7JyE7ZiRKSwg7ZG465Oc7YyhKOuztOyZhOyerCksIOyehO2Mqe2LsOu4jEFJKO2VteyLrOqyveyfgSwgQjJCKQpLVERTIOu5hOuMgOy5rSDqsJXsoJA6Ci0gT250b2xvZ3kvS0cg7J2Y7IKs6rKw7KCVIFBvQyDsp4Ttlokg7KSRICjshpDtlbTsgqzsoJUg64+E66mU7J24IOKGkiDsi53snpDsnqwg7J2R7JqpKQotIEtUIOyCrOyepeydtOyngCDrqqjrk4gg7KCc7JWIIOqwgOuKpe2VnCDsnKDsnbztlZwg7Y+s7KeA7IWYCi0gS1QgQ2xvdWQg67O07JWIIOyduO2UhOudvAotIFNJL+ygleu2gOyCrOyXhSDsiJjso7wg7Jet65+JCi0gU1dPVCDtlbXsi6w6IOyGjOyDgeqzteyduCBBSSDsnZjsgqzqsrDsoJUgPSDsmYTsoIQg6rO167CxLCDshKDsoJAgd2luZG93IDEyfjE46rCc7JuUCgrikaQg7ZW17IusIOyCrOyXhSDslYTsnbTthZwgKDItNH4yLTUpCkZvb2Rpbmcg4oCUIEFJIOyLneyekOyerCDqtazrp6Qg7J2Y7IKs6rKw7KCVIOyXlOynhAotIDXrjIAg7ZW17IusIOq4sOuKpTogQUkg7IiY7JqU7JiI7LihIC8g7Iuk7Iuc6rCEIOqwgOqyqeu5hOq1kCAvIOyekOuPmeuwnOyjvChQaGFzZTIpIC8g7JuQ6rCA6rSA66asIC8g6rWs66ek66as7Y+s7Yq4Ci0g7Yq4656ZOiDtlZjsnbTruIzrpqzrk5wgKElDRSBTY29yZSA1MjIuNSwgMeychCkg4oCUIFRyYWNrIDIoQjJC7JeU7KeEKSDsi5zsnpEg4oaSIFRyYWNrIDEo64+F7J6Q7ZSM656r7Y+8KSDtmZXsnqUKLSDtlbXsi6w6ICLrrZgsIOyWvOuniOyXkCwg7Ja47KCcLCDslrzrp4jrgpgg7IKs7JW8IO2VmOuKlOyngCDigJQg7J207Jyg7JmAIO2VqOq7mCDslYzroKTso7zripQgQUkiCi0gT250b2xvZ3nqsIAgIuyZnCDsnbQg6rO16riJ7LKY7JeQ7IScIOydtCDqsIDqsqnsl5Ag7IKs7JW8IO2VmOuKlOyngCIg6re86rGwIOygnOyLnCA9IOqyveyfgeyCrCDrtojqsIAKCuyImOydteuqqOuNuDog6rWs64+FKDUyJSkgKyDsoJXrtoDsgqzsl4UoMjAlKSArIEtU65287J207ISg7IqkKDEwJSkgKyBBUEkoMTAlKSArIOuNsOydtO2EsCg4JSkKLSDqsIDqsqk6IEZyZWUg4oaSIEJhc2ljKOKCqTk5LDAwMC/sm5QpIOKGkiBQcm8o4oKpMjkwLDAwMC/sm5QpIOKGkiBFbnRlcnByaXNlCgrikaUg7J6s66y0IOqwgOyEpCAoMi03KQotIOy0iOq4sCDtiKzsnpA6IOKCqTI37Ja1IChQaGFzZTEgMTLslrUgKyBQaGFzZTIgMTXslrUpLCAxMOKGkjIw66qFIOyduOugpQotIExUVi9DQUM6IDUuNHggKOqxtOyghCkgLyBDQUMgUGF5YmFjazogNi436rCc7JuUIC8gQkVQOiBZMiBRMiAoMTjqsJzsm5QpCi0gNeqwnOuFhCBBUlIoQmFzZSk6IFkxIOKCqTEw7Ja1IOKGkiBZMiDigqkzNeyWtSDihpIgWTMg4oKpNzbslrUgKDPrhYQg64iE7KCBIOKCqTEyMeyWtSkKLSDsiJjsnbUg6rWs7KGwOiDqtazrj4UoNTIlKSArIOygleu2gOyCrOyXhSgyMCUpID0g67CY67O17IiY7J21IDYyJSDihpIgTU0g7YOI7ZS8CgrikaYgR1RNIOyghOuetSAoMi04KQpCZWFjaGhlYWQ6IOqwnOyduCDsnYzsi53soJAgKOyblCDsi53snpDsnqwgMzAw66eM7JuQKywg67mE7ZSE656c7LCo7J207KaIIDQw66eM6rCcKQpQaGFzZSAxKE0xfjkpOiDsl5Tsp4QgTVZQICsgUG9DIDEw6rOzICsgQUnrsJTsmrDsspgg65Ox66GdICsgS1Trr7jtjIUKUGhhc2UgMihNMTB+MjQpOiDrj4XsnpDslbEg65+w7LmtICsg7IKs7J6l7J207KeAIOuqqOuTiCArIOygleu2gOyCrOyXhSDrs7jqsqntmZQKUGhhc2UgMyhNMjV+MzYpOiAz7KSRIOyxhOuEkCDstZzsoIHtmZQgKyAxMDDslrUgQVJSCuyxhOuEkDogQUkg67CU7Jqw7LKYKOygleu2gCkgKyBLVCDsgqzsnqXsnbTsp4Ao66qo65OIKSArIOuPheyekCDslbEgKyDsg4Hsnbjtmowv7Luk666k64uI7YuwCgrikacg7ZW17IusIOumrOyKpO2BrAotIOyGjOyDgeqzteyduCBBSSDsiJjsmqnrj4Qg6rKA7KadIO2VhOyalCArIE9udG9sb2d5IOyEpOuqheydtCDsiJjsmqnrpaDsnYQg64aS7J2064qU7KeAIEEvQiDthYzsiqTtirgKLSBDSu2UhOugiOyLnOybqOydtCBBSSDqs6Drj4TtmZQg7IucIOqyveyfgSDihpIg7ISg7KCQIHdpbmRvdyAxMn4xOOqwnOyblAotIEtUIOuqqOuTiCDsirnsnbgg67aI7ZmV7IukIOKGkiDrj4XsnpAgKyDsoJXrtoDsgqzsl4XsnLzroZwg64yA7LK0IOqwgOuKpQotIEdvL05vLUdvIOq4sOykgDogUG9DIOyImOyaqeuloCA2MCUrLCDsoIjqsJAg7JuUNTDrp4wrLCBLVCBMT0ksIOycoOujjCA16rOzK2A7CgovKiDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAKICAgMi4gSEVMUEVSUwrilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAgKi8KZnVuY3Rpb24gcFRvdGFsKHBpKSB7CiAgcmV0dXJuIEFYRVMucmVkdWNlKChzLGEsYWkpID0+IHMgKyAoRVZBTFtwaV0uc2NvcmVzW2Eua2V5XXx8MCkgKiB3ZWlnaHRzW3BpXVthaV0sIDApOwp9CmZ1bmN0aW9uIG92ZXJhbGwoKSB7IHJldHVybiBFVkFMLnJlZHVjZSgoXyxfXyxpKT0+XytwVG90YWwoaSksMCkvODsgfQpmdW5jdGlvbiBzY0NvbG9yKHYpeyByZXR1cm4gdj49ND8nIzAwYjQ5Myc6dj49Mz8nI2Y1OWUwYic6JyNmMDNlM2UnOyB9CmZ1bmN0aW9uIHZkKHYpewogIGNvbnN0IHMgPSB0eXBlb2Ygdj09PSdzdHJpbmcnP3Y6KHY+PTQ/J0dvJzp2Pj0zPydDb25kaXRpb25hbCc6J05vR28nKTsKICBpZihzPT09J0dvJykgICAgICAgICAgcmV0dXJue3Q6J0dvJywgICAgICAgICAgaWNvbjon4pyTJyxiYzondmFyKC0tZ3ItbHQpJyxiZzondmFyKC0tZ3ItYmcpJyxjOid2YXIoLS1nciknfTsKICBpZihzPT09J0NvbmRpdGlvbmFsJykgcmV0dXJue3Q6J0NvbmRpdGlvbmFsJywgaWNvbjon4peOJyxiYzondmFyKC0tb3ItbHQpJyxiZzondmFyKC0tb3ItYmcpJyxjOid2YXIoLS1vciknfTsKICByZXR1cm4gICAgICAgICAgICAgICAgICAgICAgIHt0OidObyBHbycsICAgICAgIGljb246J+KclycsYmM6J3ZhcigtLXJkLWx0KScsYmc6J3ZhcigtLXJkLWJnKScsYzondmFyKC0tcmQpJ307Cn0KZnVuY3Rpb24gc2xlZXAobXMpe3JldHVybiBuZXcgUHJvbWlzZShyPT5zZXRUaW1lb3V0KHIsbXMpKTt9CmZ1bmN0aW9uIHNob3dFbChpZCxkZWxheT0wKXsKICByZXR1cm4gbmV3IFByb21pc2Uocj0+c2V0VGltZW91dCgoKT0+ewogICAgY29uc3QgZWw9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoaWQpOwogICAgZWwuc3R5bGUuZGlzcGxheT0nJzsKICAgIHJlcXVlc3RBbmltYXRpb25GcmFtZSgoKT0+e2VsLmNsYXNzTGlzdC5hZGQoJ2luJyk7cigpO30pOwogIH0sZGVsYXkpKTsKfQoKLyog4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCiAgIDMuIEEtMS4gUEVSU09OQSBDQVJEUwrilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAgKi8KZnVuY3Rpb24gYnVpbGRDYXJkcygpewogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdwY0dyaWQnKS5pbm5lckhUTUwgPSBQUy5tYXAoKHAsaSk9PnsKICAgIGNvbnN0IGN0eCA9IFBDW2ldOwogICAgY29uc3QgdGFncyA9IHAucmVkbGluZXMubWFwKHQ9PmA8c3BhbiBjbGFzcz0icGMtcmVqLXRhZyI+JHt0fTwvc3Bhbj5gKS5qb2luKCcnKTsKICAgIHJldHVybiBgPGRpdiBjbGFzcz0icGMke3AuaXNLVD8nIGt0LWNhcmQnOicnfSR7cC5pc0ZpcnN0PycgZmlyc3QtY2FyZCc6Jyd9Ij4KICAgICAgPGRpdiBjbGFzcz0icGMtYmFkZ2UiIHN0eWxlPSJiYWNrZ3JvdW5kOiR7cC5iYWRnZUJnfTtjb2xvcjoke3AuYmFkZ2VDb2xvcn0iPgogICAgICAgICR7cC5zaG9ydH0KICAgICAgICAke3AuaXNGaXJzdD8nPHNwYW4gY2xhc3M9InBjLWZpcnN0LXRhZyI+MXN0PC9zcGFuPic6Jyd9CiAgICAgICAgJHtwLmlzS1Q/JzxzcGFuIGNsYXNzPSJwYy1rdC10YWciPktUIERTIO2KueyImDwvc3Bhbj4nOicnfQogICAgICA8L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0icGMtdGl0bGUiPiR7cC50aXRsZX08L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0icGMtcm93Ij48c3BhbiBjbGFzcz0icGMtbGFiZWwiPu2VteyLrCDqsIDsuZg8L3NwYW4+PHNwYW4gY2xhc3M9InBjLXZhbCI+JHtwLmtleVZhbHVlfTwvc3Bhbj48L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0icGMtcm93Ij48c3BhbiBjbGFzcz0icGMtbGFiZWwiPu2PieqwgCDroIzspog8L3NwYW4+PHNwYW4gY2xhc3M9InBjLXZhbCI+JHtwLmxlbnN9PC9zcGFuPjwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJwYy1jb250ZXh0Ij4ke2N0eC5zaXR1YXRpb24ubGVuZ3RoPjgwP2N0eC5zaXR1YXRpb24uc2xpY2UoMCw4MCkrJ+KApic6Y3R4LnNpdHVhdGlvbn08L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0icGMtcSI+JHtwLnF9PC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9InBjLXJlaiI+JHt0YWdzfTwvZGl2PgogICAgPC9kaXY+YDsKICB9KS5qb2luKCcnKTsKfQoKLyog4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCiAgIDQuIEEtMi4gV0VJR0hUIFNMSURFUgrilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAgKi8KbGV0IHdzQWN0aXZlID0gMDsKZnVuY3Rpb24gYnVpbGRXc1RhYnMoKXsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnd3NUYWJzJykuaW5uZXJIVE1MID0gUFMubWFwKChwLGkpPT4KICAgIGA8YnV0dG9uIGNsYXNzPSJ3cy10YWIke2k9PT0wPycgYWN0aXZlJzonJ30iIGlkPSJ3c3Qke2l9IiBvbmNsaWNrPSJzZWxXc1RhYigke2l9KSI+CiAgICAgIDxzcGFuIGNsYXNzPSJ0YWItZG90IiBzdHlsZT0iYmFja2dyb3VuZDoke3AuY29sb3J9Ij48L3NwYW4+JHtwLnNob3J0fQogICAgPC9idXR0b24+YAogICkuam9pbignJyk7CiAgcmVuZGVyV3NCb2R5KDApOwp9CmZ1bmN0aW9uIHNlbFdzVGFiKGkpewogIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3JBbGwoJy53cy10YWInKS5mb3JFYWNoKChlbCxqKT0+ZWwuY2xhc3NMaXN0LnRvZ2dsZSgnYWN0aXZlJyxqPT09aSkpOwogIHdzQWN0aXZlPWk7IHJlbmRlcldzQm9keShpKTsKfQpmdW5jdGlvbiByZW5kZXJXc0JvZHkocGkpewogIGNvbnN0IHA9UFNbcGldOwogIGNvbnN0IHRvdGFsID0gTWF0aC5yb3VuZCh3ZWlnaHRzW3BpXS5yZWR1Y2UoKHMsdik9PnMrdiwwKSoxMDApOwogIGNvbnN0IG9rQ2xhc3MgPSBNYXRoLmFicyh0b3RhbC0xMDApPDI/J29rJzonZXJyJzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnd3NCb2R5JykuaW5uZXJIVE1MPWAKICAgIDxkaXYgY2xhc3M9IndzLXBlcnNvbmEtbmFtZSIgc3R5bGU9ImNvbG9yOiR7cC5jb2xvcn0iPiR7cC5uYW1lfTwvZGl2PgogICAgPGRpdiBjbGFzcz0id3MtcGVyc29uYS1zdWIiPiR7cC50aXRsZX0gwrcg7Iqs65287J20642U66W8IOyhsOygle2VmOuptCDtlanqs4QgMTAwJeuhnCDsnpDrj5kg67O07KCV65Cp64uI64ukPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJ3cy10b3RhbCAke29rQ2xhc3N9IiBpZD0id3NUb3RhbCI+7ZWp6rOEOiAke3RvdGFsfSUgJHtva0NsYXNzPT09J29rJz8n4pyTIOygleyDgSc6J+KaoCDtmZXsnbgg7ZWE7JqUJ308L2Rpdj4KICAgICR7QVhFUy5tYXAoKGF4LGFpKT0+ewogICAgICBjb25zdCBwY3Q9TWF0aC5yb3VuZCh3ZWlnaHRzW3BpXVthaV0qMTAwKTsKICAgICAgY29uc3QgaXNEaXNhYmxlZCA9IGF4LmtleT09PSdzeW4nICYmIChwaSE9PTEmJnBpIT09MyYmcGkhPT03KTsgLy8g6re466O5IOyLnOuEiOyngDog64yA7ZGcL+uzuOu2gOyepS9LVOq3uOujueunjAogICAgICByZXR1cm4gYDxkaXYgY2xhc3M9InNsLXJvdyI+CiAgICAgICAgPGRpdiBjbGFzcz0ic2wtbGFiZWwiPiR7YXgubGFiZWx9PHNtYWxsPiR7YXguc3VifTwvc21hbGw+PC9kaXY+CiAgICAgICAgPGlucHV0IHR5cGU9InJhbmdlIiBjbGFzcz0ic2wiIG1pbj0iMCIgbWF4PSI2MCIgc3RlcD0iMSIgdmFsdWU9IiR7cGN0fSIKICAgICAgICAgICR7aXNEaXNhYmxlZD8nZGlzYWJsZWQgc3R5bGU9Im9wYWNpdHk6LjMiJzonJ30KICAgICAgICAgIG9uaW5wdXQ9Im9uU2xpZGVyKCR7cGl9LCR7YWl9LHRoaXMudmFsdWUpIiBpZD0ic2wke3BpfV8ke2FpfSI+CiAgICAgICAgPGRpdiBjbGFzcz0ic2wtdmFsIiBpZD0ic3Yke3BpfV8ke2FpfSIgc3R5bGU9ImNvbG9yOiR7cGN0Pj0yMD8ndmFyKC0tYmwpJzpwY3Q+PTEwPyd2YXIoLS1nNyknOid2YXIoLS1nNCknfSI+JHtwY3R9JTwvZGl2PgogICAgICA8L2Rpdj5gOwogICAgfSkuam9pbignJyl9CiAgICA8YnV0dG9uIGNsYXNzPSJ3cy1yZXNldCIgb25jbGljaz0icmVzZXRXZWlnaHRzKCR7cGl9KSI+6riw67O46rCS7Jy866GcIOy0iOq4sO2ZlDwvYnV0dG9uPgogIGA7Cn0KZnVuY3Rpb24gb25TbGlkZXIocGksYWksdmFsKXsKICB3ZWlnaHRzW3BpXVthaV0gPSBwYXJzZUludCh2YWwpLzEwMDsKICBjb25zdCBzdkVsPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKGBzdiR7cGl9XyR7YWl9YCk7CiAgaWYoc3ZFbCl7IGNvbnN0IHBjdD1wYXJzZUludCh2YWwpOyBzdkVsLnRleHRDb250ZW50PXBjdCsnJSc7IHN2RWwuc3R5bGUuY29sb3I9cGN0Pj0yMD8ndmFyKC0tYmwpJzpwY3Q+PTEwPyd2YXIoLS1nNyknOid2YXIoLS1nNCknOyB9CiAgY29uc3QgdG90YWw9TWF0aC5yb3VuZCh3ZWlnaHRzW3BpXS5yZWR1Y2UoKHMsdik9PnMrdiwwKSoxMDApOwogIGNvbnN0IHRvdD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnd3NUb3RhbCcpOwogIGlmKHRvdCl7IGNvbnN0IG9rPU1hdGguYWJzKHRvdGFsLTEwMCk8MjsgdG90LmNsYXNzTmFtZT0nd3MtdG90YWwgJysob2s/J29rJzonZXJyJyk7IHRvdC50ZXh0Q29udGVudD0n7ZWp6rOEOiAnK3RvdGFsKyclICcrKG9rPyfinJMg7KCV7IOBJzon4pqgIO2ZleyduCDtlYTsmpQnKTsgfQogIGJ1aWxkQ2FyZHMoKTsgLy8g7Lm065OcIOunpeudvSDrj5nquLDtmZTripQg7Jyg7KeACn0KZnVuY3Rpb24gcmVzZXRXZWlnaHRzKHBpKXsKICB3ZWlnaHRzW3BpXT1bLi4uV0VJR0hUU19ERUZBVUxUW3BpXV07CiAgcmVuZGVyV3NCb2R5KHBpKTsKfQoKLyog4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCiAgIDUuIEEtMy4gQ09OVEVYVCBFRElUT1IK4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQICovCmxldCBzZWxQPTA7CmZ1bmN0aW9uIGJ1aWxkRWRpdG9yKCl7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3BlTGlzdCcpLmlubmVySFRNTCA9IFBTLm1hcCgocCxpKT0+CiAgICBgPGRpdiBjbGFzcz0icGUtaXRlbSR7aT09PTA/JyBhY3RpdmUnOicnfSIgaWQ9InBsaSR7aX0iIG9uY2xpY2s9InNlbFBlcnNvbmEoJHtpfSkiPgogICAgICA8ZGl2IGNsYXNzPSJwZS1kb3QiIHN0eWxlPSJiYWNrZ3JvdW5kOiR7cC5jb2xvcn0iPjwvZGl2PgogICAgICA8ZGl2PjxkaXYgY2xhc3M9InBlLWl0ZW0tbmFtZSI+JHtwLm5hbWV9PC9kaXY+PGRpdiBjbGFzcz0icGUtaXRlbS1zdWIiPiR7cC50aXRsZX08L2Rpdj48L2Rpdj4KICAgIDwvZGl2PmAKICApLmpvaW4oJycpOwogIHJlbmRlckZvcm0oMCk7Cn0KZnVuY3Rpb24gc2VsUGVyc29uYShpKXsKICBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCcucGUtaXRlbScpLmZvckVhY2goKGVsLGopPT5lbC5jbGFzc0xpc3QudG9nZ2xlKCdhY3RpdmUnLGo9PT1pKSk7CiAgc2VsUD1pOyByZW5kZXJGb3JtKGkpOwp9CmZ1bmN0aW9uIHJlbmRlckZvcm0oaSl7CiAgY29uc3QgcD1QU1tpXSxjPVBDW2ldOwogIGNvbnN0IHRhZ3M9Yy5yZWRsaW5lcy5tYXAoKHQsdGkpPT4KICAgIGA8ZGl2IGNsYXNzPSJydGFnIj4ke3R9PGJ1dHRvbiBvbmNsaWNrPSJybVRhZygke2l9LCR7dGl9KSI+w5c8L2J1dHRvbj48L2Rpdj5gKS5qb2luKCcnKTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncGVGb3JtJykuaW5uZXJIVE1MPWAKICAgIDxkaXYgY2xhc3M9InBlLWZvcm0tdCIgc3R5bGU9ImNvbG9yOiR7cC5jb2xvcn0iPiR7cC5uYW1lfTwvZGl2PgogICAgPGRpdiBjbGFzcz0icGUtZm9ybS1kIj4ke3AudGl0bGV9IMK3IO2YhOyerCDsg4Htmanqs7wg66el65297J2EIOyImOygle2VmOuptCBBSSDtj4nqsIDsl5Ag7KaJ7IucIOuwmOyYgeuQqeuLiOuLpDwvZGl2PgogICAgPGRpdiBjbGFzcz0icGYiPgogICAgICA8ZGl2IGNsYXNzPSJwZi1sYWJlbCI+7ZiE7J6sIOyDge2ZqcK366el6529IDxzcGFuIGNsYXNzPSJwZi1iYWRnZSI+TGF5ZXIgMjwvc3Bhbj48L2Rpdj4KICAgICAgPHRleHRhcmVhIGlkPSJwZi1zaXQtJHtpfSIgcm93cz0iMyIgb25jaGFuZ2U9IlBDWyR7aX1dLnNpdHVhdGlvbj10aGlzLnZhbHVlO2J1aWxkQ2FyZHMoKSI+JHtjLnNpdHVhdGlvbn08L3RleHRhcmVhPgogICAgICA8ZGl2IHN0eWxlPSJmb250LXNpemU6MTBweDtjb2xvcjp2YXIoLS1nNCk7bWFyZ2luLXRvcDozcHgiPuydtCDrgrTsmqnsnYQg6riw67CY7Jy866GcIEFJ6rCAIO2VtOuLuSDtjpjrpbTshozrgpgg6rSA7KCQ7JeQ7IScIOyCrOyXheyViOydhCDtj4nqsIDtlanri4jri6Q8L2Rpdj4KICAgIDwvZGl2PgogICAgPGRpdiBjbGFzcz0icGYiPgogICAgICA8ZGl2IGNsYXNzPSJwZi1sYWJlbCI+7KSR7KCQIO2PieqwgCDquLDspIA8L2Rpdj4KICAgICAgPHRleHRhcmVhIGlkPSJwZi1wcmktJHtpfSIgcm93cz0iMiIgb25jaGFuZ2U9IlBDWyR7aX1dLnByaW9yaXR5PXRoaXMudmFsdWUiPiR7Yy5wcmlvcml0eX08L3RleHRhcmVhPgogICAgPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJwZiI+CiAgICAgIDxkaXYgY2xhc3M9InBmLWxhYmVsIj7snZjsgqzqsrDsoJUg7Iqk7YOA7J28PC9kaXY+CiAgICAgIDx0ZXh0YXJlYSBpZD0icGYtc3R5LSR7aX0iIHJvd3M9IjIiIG9uY2hhbmdlPSJQQ1ske2l9XS5zdHlsZT10aGlzLnZhbHVlIj4ke2Muc3R5bGV9PC90ZXh0YXJlYT4KICAgIDwvZGl2PgogICAgPGRpdiBjbGFzcz0icGYiPgogICAgICA8ZGl2IGNsYXNzPSJwZi1sYWJlbCI+UmVkIExpbmUgKOqxsOu2gCDsobDqsbQpPC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9InRhZy1lZCIgaWQ9InRlZC0ke2l9Ij4ke3RhZ3N9PC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9ImFkZC10YWctcm93Ij4KICAgICAgICA8aW5wdXQgdHlwZT0idGV4dCIgaWQ9Im50LSR7aX0iIHBsYWNlaG9sZGVyPSLsg4gg6rGw67aAIOyhsOqxtCDsnoXroKUiIG9ua2V5ZG93bj0iaWYoZXZlbnQua2V5PT09J0VudGVyJylhZGRUYWcoJHtpfSkiPgogICAgICAgIDxidXR0b24gY2xhc3M9ImFkZC10YWctYnRuIiBvbmNsaWNrPSJhZGRUYWcoJHtpfSkiPisg7LaU6rCAPC9idXR0b24+CiAgICAgIDwvZGl2PgogICAgPC9kaXY+CiAgICA8ZGl2IHN0eWxlPSJkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyIj4KICAgICAgPGJ1dHRvbiBjbGFzcz0ic2F2ZS1idG4iIG9uY2xpY2s9InNhdmVGb3JtKCR7aX0pIj7soIDsnqU8L2J1dHRvbj4KICAgICAgPHNwYW4gY2xhc3M9InNhdmUtb2siIGlkPSJzb2stJHtpfSI+4pyTIOyggOyepeuQqDwvc3Bhbj4KICAgIDwvZGl2PmA7Cn0KZnVuY3Rpb24gcm1UYWcoaSx0aSl7UENbaV0ucmVkbGluZXMuc3BsaWNlKHRpLDEpO3JlbmRlckZvcm0oaSk7YnVpbGRDYXJkcygpO30KZnVuY3Rpb24gYWRkVGFnKGkpe2NvbnN0IGlucD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZChgbnQtJHtpfWApLHY9aW5wLnZhbHVlLnRyaW0oKTtpZighdilyZXR1cm47UENbaV0ucmVkbGluZXMucHVzaCh2KTtpbnAudmFsdWU9Jyc7cmVuZGVyRm9ybShpKTtidWlsZENhcmRzKCk7fQpmdW5jdGlvbiBzYXZlRm9ybShpKXsKICBbJ3NpdCcsJ3ByaScsJ3N0eSddLmZvckVhY2goaz0+ewogICAgY29uc3QgZWw9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoYHBmLSR7a30tJHtpfWApOwogICAgaWYoZWwpe2NvbnN0IG1hcD17c2l0OidzaXR1YXRpb24nLHByaToncHJpb3JpdHknLHN0eTonc3R5bGUnfTtQQ1tpXVttYXBba11dPWVsLnZhbHVlO30KICB9KTsKICBidWlsZENhcmRzKCk7CiAgY29uc3Qgb2s9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoYHNvay0ke2l9YCk7CiAgb2suc3R5bGUuZGlzcGxheT0naW5saW5lJzsgc2V0VGltZW91dCgoKT0+b2suc3R5bGUuZGlzcGxheT0nbm9uZScsMjAwMCk7Cn0KCi8qIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAogICA2LiBFVkFMVUFUSU9OIFNJTVVMQVRJT04K4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQICovCi8qIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAogICA2LiBBUEkgS0VZIE1BTkFHRU1FTlQK4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQICovCmxldCBfYXBpS2V5ID0gJyc7CgpmdW5jdGlvbiBvbktleUlucHV0KHYpewogIGNvbnN0IGRvdCA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdrZXlEb3QnKTsKICBjb25zdCBzdCAgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgna2V5U3RhdHVzJyk7CiAgaWYodi5zdGFydHNXaXRoKCdzay1hbnQnKSl7CiAgICBkb3Quc3R5bGUuYmFja2dyb3VuZD0ndmFyKC0tb3IpJzsKICAgIHN0LnRleHRDb250ZW50PSfsnoXroKXrkKgg4oCUIOyggOyepSDrsoTtirzsnYQg64iM65+sIO2Zleygle2VmOyEuOyalCc7CiAgICBzdC5zdHlsZS5jb2xvcj0ndmFyKC0tb3IpJzsKICB9IGVsc2UgaWYodi5sZW5ndGg+MCl7CiAgICBkb3Quc3R5bGUuYmFja2dyb3VuZD0ndmFyKC0tcmQpJzsKICAgIHN0LnRleHRDb250ZW50PSfsmKzrsJTrpbgg7ZiV7Iud7J20IOyVhOuLmeuLiOuLpCAoc2stYW50LS4uLiDtmJXsi50pJzsKICAgIHN0LnN0eWxlLmNvbG9yPSd2YXIoLS1yZCknOwogIH0gZWxzZSB7CiAgICBkb3Quc3R5bGUuYmFja2dyb3VuZD0ndmFyKC0tYmwpJzsKICAgIHN0LnRleHRDb250ZW50PSfrr7jsnoXroKUg4oCUIOuNsOuqqCDrqqjrk5zroZwg7Iuk7ZaJ65Cp64uI64ukJzsKICAgIHN0LnN0eWxlLmNvbG9yPSd2YXIoLS1nNSknOwogIH0KfQpmdW5jdGlvbiBzYXZlS2V5KCl7CiAgY29uc3QgdiA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdhcGlLZXknKS52YWx1ZS50cmltKCk7CiAgaWYoIXYpeyBhbGVydCgnQVBJIO2CpOulvCDsnoXroKXtlbTso7zshLjsmpQuJyk7IHJldHVybjsgfQogIGlmKCF2LnN0YXJ0c1dpdGgoJ3NrLWFudCcpKXsgYWxlcnQoJ+yYrOuwlOuluCBBbnRocm9waWMgQVBJIO2CpOulvCDsnoXroKXtlbTso7zshLjsmpQuXG7tmJXsi506IHNrLWFudC1hcGkwMy0uLi4nKTsgcmV0dXJuOyB9CiAgX2FwaUtleSA9IHY7CiAgY29uc3QgZG90PWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdrZXlEb3QnKSwgc3Q9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2tleVN0YXR1cycpOwogIGRvdC5zdHlsZS5iYWNrZ3JvdW5kPSd2YXIoLS1nciknOwogIHN0LnRleHRDb250ZW50PSfinJMg7KCA7J6l65CoIOKAlCDsi6TsoJwgQUkg7Y+J6rCAIOuqqOuTnOuhnCDsi6TtlonrkKnri4jri6QnOwogIHN0LnN0eWxlLmNvbG9yPSd2YXIoLS1nciknOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdydW5UaXRsZScpLnRleHRDb250ZW50PSc46rCcIEFJIO2OmOultOyGjOuCmCDsiJzssKgg7Y+J6rCAIOyLnOyekSAo7Iuk7KCcIENsYXVkZSBBUEkpJzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncnVuRGVzYycpLnRleHRDb250ZW50PSdMYXllciAxKOqwgOykkey5mCkgKyBMYXllciAyKOunpeudvSnqsIAgQ2xhdWRl7JeQ6rKMIOyghOuLrOuQmOyWtCDsi6TsoJwg67aE7ISd7J20IOyImO2WieuQqeuLiOuLpCc7Cn0KZnVuY3Rpb24gY2xlYXJLZXkoKXsKICBfYXBpS2V5PScnOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdhcGlLZXknKS52YWx1ZT0nJzsKICBjb25zdCBkb3Q9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2tleURvdCcpLCBzdD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgna2V5U3RhdHVzJyk7CiAgZG90LnN0eWxlLmJhY2tncm91bmQ9J3ZhcigtLWJsKSc7CiAgc3QudGV4dENvbnRlbnQ9J+y0iOq4sO2ZlOuQqCDigJQg642w66qoIOuqqOuTnOuhnCDsi6TtlonrkKnri4jri6QnOwogIHN0LnN0eWxlLmNvbG9yPSd2YXIoLS1nNSknOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdydW5UaXRsZScpLnRleHRDb250ZW50PSc46rCcIEFJIO2OmOultOyGjOuCmCDsiJzssKgg7Y+J6rCAIOyLnOyekSc7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3J1bkRlc2MnKS50ZXh0Q29udGVudD0n6rCBIO2OmOultOyGjOuCmOydmCBMYXllciAxKOqwgOykkey5mCkgKyBMYXllciAyKOunpeudvSkg6riw7KSA7Jy866GcIOyekOuPmSDtj4nqsIAgwrcg7ZWp7J2YwrfrtoTquLDCt+yasOugpCDsmIHsl60g7J6Q64+ZIOuPhOy2nCc7Cn0KCi8qIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAogICA3LiBQUk9NUFQgQlVJTERFUgrilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAgKi8KZnVuY3Rpb24gYnVpbGRQcm9tcHQocGksIGJyaWVmaW5nKXsKICBjb25zdCBwICA9IFBTW3BpXTsKICBjb25zdCBjdHg9IFBDW3BpXTsKICBjb25zdCB3TGlzdCA9IEFYRVMubWFwKChheCxhaSk9PmAgIC0gJHtheC5sYWJlbH0oJHtheC5zdWJ9KTogJHtNYXRoLnJvdW5kKHdlaWdodHNbcGldW2FpXSoxMDApfSVgKS5qb2luKCdcbicpOwogIGNvbnN0IHJsTGlzdCA9IGN0eC5yZWRsaW5lcy5tYXAocj0+YCAgLSAke3J9YCkuam9pbignXG4nKTsKICByZXR1cm4gewogICAgc3lzdGVtOiBg64u57Iug7J2AIEtUIERT7J2YICIke3AubmFtZX0iIOyXre2VoOydhCDrp6HsnYAgQUkg7IKs7JeF7ISxIO2PieqwgOyekOyeheuLiOuLpC4K64u57Iug7J2AIOydtCDsl63tlaDsl5Ag7JmE7KCE7Z6IIOuqsOyehe2VmOyXrCwg7JWE656YIOygleydmOuQnCDrp6Xrnb3qs7wg7Y+J6rCAIOq4sOykgOycvOuhnOunjCDtjJDri6jtlanri4jri6QuCgojIyDri7nsi6DsnZgg7Jet7ZWgIOygleydmAotIOyngeyxhTogJHtwLm5hbWV9Ci0g7ZW17IusIOqwgOy5mDogJHtwLmtleVZhbHVlfQotIO2PieqwgCDroIzspog6ICR7cC5sZW5zfQotIOuMgO2RnCDsp4jrrLg6ICR7cC5xfQoKIyMg7ZiE7J6sIOyDge2ZqeqzvCDrp6Xrnb0gKExheWVyIDIpCiR7Y3R4LnNpdHVhdGlvbn0KCiMjIOykkeygkCDtj4nqsIAg6riw7KSACiR7Y3R4LnByaW9yaXR5fQoKIyMg7J2Y7IKs6rKw7KCVIOyKpO2DgOydvAoke2N0eC5zdHlsZX0KCiMjIOygiOuMgCDthrXqs7zsi5ztgqTsp4Ag7JWK64qUIOyhsOqxtCAoUmVkIExpbmUpCiR7cmxMaXN0fQoKIyMg7Y+J6rCAIOy2leuzhCDqsIDspJHsuZggKExheWVyIDEg4oCUIOuLueyLoOydtCDspJHsmpTtlZjqsowg67O064qUIOu5hOykkSkKJHt3TGlzdH0KCiMjIOydkeuLtSDqt5zsuZkKLSDrsJjrk5zsi5wg7JWE656YIEpTT04g7ZiV7Iud7Jy866Gc66eMIOydkeuLte2VmOyEuOyalC4gSlNPTiDsmbgg64uk66W4IO2FjeyKpO2KuOuKlCDsoIjrjIAg7Y+s7ZWo7ZWY7KeAIOuniOyEuOyalC4KLSBzY29yZXPsnZgg6rCBIO2VreuqqeydgCAxfjUg7KCV7IiY66GcIO2PieqwgO2VmOyEuOyalCAoc3luIOy2leydgCDqsIDspJHsuZjqsIAgMCXsnbgg6rK97JqwIDDsnLzroZwg7ISk7KCVKS4KLSB2ZXJkaWN064qUIOuwmOuTnOyLnCAiR28iLCAiQ29uZGl0aW9uYWwiLCAiTm9HbyIg7KSRIO2VmOuCmOunjCDsgqzsmqntlZjshLjsmpQuCi0gc3VtbWFyeeuKlCDsnbQg7Y6Y66W07IaM64KYIOq0gOygkOyXkOyEnOydmCDtlbXsi6wg7YyQ64uo7J2EIDJ+M+usuOyepeycvOuhnCDshJzsiKDtlZjshLjsmpQuCi0gdG9wX2NvbmNlcm7snYAg6rCA7J6lIOyasOugpOuQmOuKlCDsoJAgMeqwgOyngOulvCDtlZwg66y47J6l7Jy866GcIOyEnOyIoO2VmOyEuOyalC4KLSBjb25kaXRpb27snYAg7Ya16rO8IOyhsOqxtCDrmJDripQg67O07JmEIOyalOyyrSDsgqztla0gMeqwgOyngOulvCDtlZwg66y47J6l7Jy866GcIOyEnOyIoO2VmOyEuOyalC4KCnsKICAic2NvcmVzIjogeyJyb2kiOjwxLTU+LCJzdHIiOjwxLTU+LCJmaW4iOjwxLTU+LCJndG0iOjwxLTU+LCJ0ZWMiOjwxLTU+LCJyc2siOjwxLTU+LCJzeW4iOjwwIOuYkOuKlCAxLTU+fSwKICAidmVyZGljdCI6ICI8R298Q29uZGl0aW9uYWx8Tm9Hbz4iLAogICJzdW1tYXJ5IjogIjztlbXsi6wg7YyQ64uoIDJ+M+usuOyepT4iLAogICJ0b3BfY29uY2VybiI6ICI87LWc64yAIOyasOugpCAx6rCA7KeAPiIsCiAgImNvbmRpdGlvbiI6ICI87Ya16rO8IOyhsOqxtCDrmJDripQg67O07JmEIOyalOyyrSAx6rCA7KeAPiIKfWAsCiAgICB1c2VyOiBg64uk7J2MIOyCrOyXhSDruIzrpqztlZHsnYQgIiR7cC5uYW1lfSIg6rSA7KCQ7JeQ7IScIO2PieqwgO2VmOyEuOyalDpcblxuJHticmllZmluZ31gCiAgfTsKfQoKLyog4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCiAgIDguIEFQSSBDQUxMICjsi6TsoJwpICsgREVNTyBGQUxMQkFDSwrilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAgKi8KYXN5bmMgZnVuY3Rpb24gY2FsbENsYXVkZShwaSwgYnJpZWZpbmcpewogIGNvbnN0IHtzeXN0ZW0sIHVzZXJ9ID0gYnVpbGRQcm9tcHQocGksIGJyaWVmaW5nKTsKICBjb25zdCByZXNwID0gYXdhaXQgZmV0Y2goJ2h0dHBzOi8vYXBpLmFudGhyb3BpYy5jb20vdjEvbWVzc2FnZXMnLHsKICAgIG1ldGhvZDonUE9TVCcsCiAgICBoZWFkZXJzOnsKICAgICAgJ0NvbnRlbnQtVHlwZSc6J2FwcGxpY2F0aW9uL2pzb24nLAogICAgICAneC1hcGkta2V5JzogX2FwaUtleSwKICAgICAgJ2FudGhyb3BpYy12ZXJzaW9uJzonMjAyMy0wNi0wMScsCiAgICAgICdhbnRocm9waWMtZGFuZ2Vyb3VzLWRpcmVjdC1icm93c2VyLWFjY2Vzcyc6J3RydWUnLAogICAgfSwKICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsKICAgICAgbW9kZWw6J2NsYXVkZS1zb25uZXQtNC0yMDI1MDUxNCcsCiAgICAgIG1heF90b2tlbnM6ODAwLAogICAgICBzeXN0ZW0sCiAgICAgIG1lc3NhZ2VzOlt7cm9sZTondXNlcicsY29udGVudDp1c2VyfV0KICAgIH0pCiAgfSk7CiAgaWYoIXJlc3Aub2spewogICAgY29uc3QgZXJyPWF3YWl0IHJlc3AuanNvbigpLmNhdGNoKCgpPT4oe30pKTsKICAgIHRocm93IG5ldyBFcnJvcihlcnI/LmVycm9yPy5tZXNzYWdlfHxgSFRUUCAke3Jlc3Auc3RhdHVzfWApOwogIH0KICBjb25zdCBkYXRhPWF3YWl0IHJlc3AuanNvbigpOwogIGNvbnN0IHRleHQ9ZGF0YS5jb250ZW50Py5bMF0/LnRleHR8fCcnOwogIGNvbnN0IG09dGV4dC5tYXRjaCgvXHtbXHNcU10qP1x9Lyk7CiAgaWYoIW0pIHRocm93IG5ldyBFcnJvcignSlNPTiDtjIzsi7Eg7Iuk7YyoJyk7CiAgcmV0dXJuIEpTT04ucGFyc2UobVswXSk7Cn0KCi8qIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAogICA5LiBFVkFMVUFUSU9OIFJVTk5FUgrilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAgKi8KbGV0IGxpdmVSZXN1bHRzID0gW107ICAvLyDsi6TsoJwgQVBJIOqysOqzvCDsoIDsnqUKbGV0IHJhZGFyQ2hhcnQ9bnVsbCwgYml6Q2hhcnQ9bnVsbDsKCmZ1bmN0aW9uIGdldFJlc3VsdChpKXsgcmV0dXJuIGxpdmVSZXN1bHRzW2ldIHx8IEVWQUxbaV07IH0KCmFzeW5jIGZ1bmN0aW9uIHN0YXJ0RXZhbCgpewogIGNvbnN0IGJyaWVmaW5nPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdicmllZmluZycpLnZhbHVlLnRyaW0oKTsKICBpZighYnJpZWZpbmcpe2FsZXJ0KCfruIzrpqztlZHsnYQg7J6F66Cl7ZW07KO87IS47JqULicpO3JldHVybjt9CiAgY29uc3QgdXNlQVBJID0gX2FwaUtleS5sZW5ndGg+MDsKICBjb25zdCBidG49ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3J1bkJ0bicpOwogIGJ0bi5kaXNhYmxlZD10cnVlOyBidG4udGV4dENvbnRlbnQ9J+2PieqwgCDspJEuLi4nOwoKICBbJ2QxJywnczInLCdkMicsJ3MzJywnZDMnLCdzNCcsJ2Q0JywnczUnXS5mb3JFYWNoKGlkPT57CiAgICBjb25zdCBlbD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZChpZCk7IGVsLnN0eWxlLmRpc3BsYXk9J25vbmUnOyBlbC5jbGFzc0xpc3QucmVtb3ZlKCdpbicpOwogIH0pOwogIGlmKHJhZGFyQ2hhcnQpe3JhZGFyQ2hhcnQuZGVzdHJveSgpO3JhZGFyQ2hhcnQ9bnVsbDt9CiAgaWYoYml6Q2hhcnQpe2JpekNoYXJ0LmRlc3Ryb3koKTtiaXpDaGFydD1udWxsO30KCiAgbGl2ZVJlc3VsdHMgPSBbXTsKCiAgY29uc3QgcHc9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3Byb2dXcmFwJyk7IHB3LnN0eWxlLmRpc3BsYXk9J2Jsb2NrJzsKICBkb2N1bWVudC5xdWVyeVNlbGVjdG9yKCcudGhpbmtpbmctZG90cycpLnN0eWxlLmRpc3BsYXk9J2lubGluZSc7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3Byb2dMaXN0JykuaW5uZXJIVE1MID0gUFMubWFwKChwLGkpPT4KICAgIGA8ZGl2IGNsYXNzPSJwaSIgaWQ9InBpJHtpfSI+CiAgICAgIDxkaXYgY2xhc3M9InBpLWRvdCIgaWQ9InBkJHtpfSIgc3R5bGU9ImJhY2tncm91bmQ6JHtwLmNvbG9yfTtvcGFjaXR5Oi4zNSI+PC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9InBpLW5hbWUiPiR7cC5uYW1lfTwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJwaS1zdCIgaWQ9InBzJHtpfSI+64yA6riwIOykkTwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJwaS1zYyIgaWQ9InBzYyR7aX0iIHN0eWxlPSJjb2xvcjp2YXIoLS1nNCkiPuKAlDwvZGl2PgogICAgPC9kaXY+YAogICkuam9pbignJyk7CgogIGNvbnN0IGRlbW9UaW1lcz1bMjYwMCwyOTAwLDMxMDAsMjcwMCwyODAwLDIzMDAsMjUwMCwzMDAwXTsKCiAgZm9yKGxldCBpPTA7aTw4O2krKyl7CiAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZChgcGQke2l9YCkuc3R5bGUub3BhY2l0eT0nMSc7CiAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZChgcGkke2l9YCkuY2xhc3NMaXN0LmFkZCgncnVubmluZycpOwogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoYHBzJHtpfWApLnRleHRDb250ZW50PSB1c2VBUEkgPyAnQ2xhdWRlIOu2hOyEnSDspJEuLi4nIDogJ+u2hOyEnSDspJEuLi4nOwogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3Byb2dUeHQnKS50ZXh0Q29udGVudD1gJHtQU1tpXS5uYW1lfSDqtIDsoJDsnLzroZwg7Y+J6rCAIOykkWA7CgogICAgbGV0IHJlc3VsdDsKICAgIGlmKHVzZUFQSSl7CiAgICAgIHRyeXsKICAgICAgICByZXN1bHQgPSBhd2FpdCBjYWxsQ2xhdWRlKGksIGJyaWVmaW5nKTsKICAgICAgICBsaXZlUmVzdWx0cy5wdXNoKHJlc3VsdCk7CiAgICAgIH0gY2F0Y2goZSl7CiAgICAgICAgLy8gQVBJIOyYpOulmCDsi5wg7ZW064u5IO2OmOultOyGjOuCmOuKlCDrjbDrqqgg642w7J207YSwIOyCrOyaqQogICAgICAgIGxpdmVSZXN1bHRzLnB1c2gobnVsbCk7CiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoYHBpJHtpfWApLmNsYXNzTGlzdC5yZW1vdmUoJ3J1bm5pbmcnKTsKICAgICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZChgcGkke2l9YCkuc3R5bGUuYm9yZGVyQ29sb3I9J3ZhcigtLXJkLWx0KSc7CiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoYHBpJHtpfWApLnN0eWxlLmJhY2tncm91bmQ9J3ZhcigtLXJkLWJnKSc7CiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoYHBkJHtpfWApLnN0eWxlLmJhY2tncm91bmQ9J3ZhcigtLXJkKSc7CiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoYHBzJHtpfWApLnRleHRDb250ZW50PWBBUEkg7Jik66WYIOKAlCDrjbDrqqgg6rKw6rO8IOyCrOyaqSAoJHtlLm1lc3NhZ2Uuc2xpY2UoMCwzMCl9Li4uKWA7CiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoYHBzJHtpfWApLnN0eWxlLmNvbG9yPSd2YXIoLS1yZCknOwogICAgICAgIGF3YWl0IHNsZWVwKDMwMCk7CiAgICAgICAgY29udGludWU7CiAgICAgIH0KICAgIH0gZWxzZSB7CiAgICAgIGF3YWl0IHNsZWVwKGRlbW9UaW1lc1tpXSk7CiAgICAgIGxpdmVSZXN1bHRzLnB1c2gobnVsbCk7IC8vIG51bGwg4oaSIGdldFJlc3VsdCgp7JeQ7IScIEVWQUxbaV0g7IKs7JqpCiAgICB9CgogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoYHBpJHtpfWApLmNsYXNzTGlzdC5yZW1vdmUoJ3J1bm5pbmcnKTsKICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKGBwaSR7aX1gKS5jbGFzc0xpc3QuYWRkKCdkb25lJyk7CgogICAgY29uc3QgciA9IGdldFJlc3VsdChpKTsKICAgIGNvbnN0IHQgPSBwVG90YWxGcm9tU2NvcmVzKGksIHIuc2NvcmVzKTsKICAgIGNvbnN0IHYgPSB2ZChyLnZlcmRpY3QpOwogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoYHBzJHtpfWApLmlubmVySFRNTD0KICAgICAgYOyZhOujjCA8c3BhbiBjbGFzcz0icGktdmQiIHN0eWxlPSJjb2xvcjoke3YuY307Ym9yZGVyLWNvbG9yOiR7di5iY307YmFja2dyb3VuZDoke3YuYmd9Ij4ke3YuaWNvbn0gJHt2LnR9PC9zcGFuPgogICAgICAgJHt1c2VBUEk/JzxzcGFuIHN0eWxlPSJmb250LXNpemU6OXB4O2NvbG9yOnZhcigtLWdyKTttYXJnaW4tbGVmdDo1cHgiPuKXjyBBSSDsi6TsoJwg67aE7ISdPC9zcGFuPic6Jyd9YDsKICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKGBwc2Mke2l9YCkudGV4dENvbnRlbnQ9dC50b0ZpeGVkKDIpOwogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoYHBzYyR7aX1gKS5zdHlsZS5jb2xvcj1zY0NvbG9yKHQpOwogICAgYXdhaXQgc2xlZXAoMTUwKTsKICB9CgogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdwcm9nVHh0JykudGV4dENvbnRlbnQ9J+2PieqwgCDsmYTro4wg4oCUIOqysOqzvCDsg53shLEg7KSRJzsKICBkb2N1bWVudC5xdWVyeVNlbGVjdG9yKCcudGhpbmtpbmctZG90cycpLnN0eWxlLmRpc3BsYXk9J25vbmUnOwogIGF3YWl0IHNsZWVwKDQwMCk7CgogIHJlbmRlclMyKCk7IGF3YWl0IHNob3dFbCgnZDEnKTsgYXdhaXQgc2hvd0VsKCdzMicsODApOyBhd2FpdCBzbGVlcCgzNTApOwogIHJlbmRlclMzKCk7IGF3YWl0IHNob3dFbCgnZDInKTsgYXdhaXQgc2hvd0VsKCdzMycsODApOyBhd2FpdCBzbGVlcCgzNTApOwogIHJlbmRlclM0KCk7IGF3YWl0IHNob3dFbCgnZDMnKTsgYXdhaXQgc2hvd0VsKCdzNCcsODApOyBhd2FpdCBzbGVlcCgzNTApOwogIHJlbmRlclM1KCk7IGF3YWl0IHNob3dFbCgnZDQnKTsgYXdhaXQgc2hvd0VsKCdzNScsODApOwogIGJ0bi5kaXNhYmxlZD1mYWxzZTsgYnRuLnRleHRDb250ZW50PSfsnqztj4nqsIAnOwogIGF3YWl0IHNsZWVwKDI1MCk7IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdzMicpLnNjcm9sbEludG9WaWV3KHtiZWhhdmlvcjonc21vb3RoJyxibG9jazonc3RhcnQnfSk7Cn0KCi8qIOygkOyImCDihpIg6rCA7KSRIO2VqeyCsCAobGl2ZVJlc3VsdHMg6riw67CYKSAqLwpmdW5jdGlvbiBwVG90YWxGcm9tU2NvcmVzKHBpLCBzY29yZXMpewogIHJldHVybiBBWEVTLnJlZHVjZSgocyxhLGFpKT0+cysoc2NvcmVzW2Eua2V5XXx8MCkqd2VpZ2h0c1twaV1bYWldLDApOwp9CmZ1bmN0aW9uIHBUb3RhbChwaSl7IHJldHVybiBwVG90YWxGcm9tU2NvcmVzKHBpLCBnZXRSZXN1bHQocGkpLnNjb3Jlcyk7IH0KZnVuY3Rpb24gb3ZlcmFsbCgpeyByZXR1cm4gUFMucmVkdWNlKChfLF9fLGkpPT5fK3BUb3RhbChpKSwwKS84OyB9CgovKiDilIDilIAgU1RFUCAyIOKUgOKUgCAqLwpmdW5jdGlvbiByZW5kZXJTMigpewogIGNvbnN0IG92PW92ZXJhbGwoKSwgdj12ZChvdik7CiAgY29uc3QgcHRzPVBTLm1hcCgoXyxpKT0+cFRvdGFsKGkpKTsKICBjb25zdCBteD1wdHMuaW5kZXhPZihNYXRoLm1heCguLi5wdHMpKSwgbW49cHRzLmluZGV4T2YoTWF0aC5taW4oLi4ucHRzKSk7CiAgY29uc3QgZ29DPVBTLm1hcCgoXyxpKT0+Z2V0UmVzdWx0KGkpLnZlcmRpY3QpLmZpbHRlcih2PT52PT09J0dvJykubGVuZ3RoOwogIGNvbnN0IGNvQz1QUy5tYXAoKF8saSk9PmdldFJlc3VsdChpKS52ZXJkaWN0KS5maWx0ZXIodj0+dj09PSdDb25kaXRpb25hbCcpLmxlbmd0aDsKICBjb25zdCBuZ0M9UFMubWFwKChfLGkpPT5nZXRSZXN1bHQoaSkudmVyZGljdCkuZmlsdGVyKHY9PnY9PT0nTm9HbycpLmxlbmd0aDsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnckdyaWQnKS5pbm5lckhUTUw9YAogICAgPGRpdiBjbGFzcz0icmNhcmQiPjxkaXYgY2xhc3M9InJsIj447J24IO2Pieq3oCDsoJDsiJg8L2Rpdj48ZGl2IGNsYXNzPSJydiIgc3R5bGU9ImNvbG9yOiR7c2NDb2xvcihvdil9Ij4ke292LnRvRml4ZWQoMil9PC9kaXY+PGRpdiBjbGFzcz0icnMiPi8gNS4wMDwvZGl2PjwvZGl2PgogICAgPGRpdiBjbGFzcz0icmNhcmQiIHN0eWxlPSJib3JkZXItY29sb3I6JHt2LmJjfTtiYWNrZ3JvdW5kOiR7di5iZ30iPjxkaXYgY2xhc3M9InJsIj7stZzsooUg7YyQ7KCVPC9kaXY+PGRpdiBjbGFzcz0icnYiIHN0eWxlPSJmb250LXNpemU6MTVweDtjb2xvcjoke3YuY307bWFyZ2luLXRvcDozcHgiPiR7di5pY29ufSAke3YudH08L2Rpdj48ZGl2IGNsYXNzPSJycyI+JHt2LnQ9PT0nR28nPyftmJXsg4HtmZQg64uo6rOEIOynhO2WiSc6di50PT09J0NvbmRpdGlvbmFsJz8n7KGw6rG067aAIOuztOyZhCDtm4Qg7KeE7ZaJJzon7J6s6rKA7YagIO2VhOyalCd9PC9kaXY+PC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJyY2FyZCI+PGRpdiBjbGFzcz0icmwiPuy1nOqzoCDtj4nqsIA8L2Rpdj48ZGl2IGNsYXNzPSJydiIgc3R5bGU9ImZvbnQtc2l6ZToxNXB4O2NvbG9yOiR7UFNbbXhdLmNvbG9yfSI+JHtQU1tteF0uc2hvcnR9PC9kaXY+PGRpdiBjbGFzcz0icnMiPiR7cHRzW214XS50b0ZpeGVkKDIpfeygkDwvZGl2PjwvZGl2PgogICAgPGRpdiBjbGFzcz0icmNhcmQiPjxkaXYgY2xhc3M9InJsIj7stZzsoIAg7Y+J6rCAIOKGkiDrs7TsmYQ8L2Rpdj48ZGl2IGNsYXNzPSJydiIgc3R5bGU9ImZvbnQtc2l6ZToxNXB4O2NvbG9yOnZhcigtLXJkKSI+JHtQU1ttbl0uc2hvcnR9PC9kaXY+PGRpdiBjbGFzcz0icnMiPiR7cHRzW21uXS50b0ZpeGVkKDIpfeygkDwvZGl2PjwvZGl2PmA7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3ZlcmRCb3gnKS5pbm5lckhUTUw9YAogICAgPGRpdiBjbGFzcz0idmVyZCIgc3R5bGU9ImJvcmRlci1jb2xvcjoke3YuYmN9O2JhY2tncm91bmQ6JHt2LmJnfTttYXJnaW4tYm90dG9tOjExcHgiPgogICAgICA8ZGl2IGNsYXNzPSJ2LWljb24iPiR7di5pY29ufTwvZGl2PgogICAgICA8ZGl2PjxkaXYgY2xhc3M9InYtbGFiZWwiIHN0eWxlPSJjb2xvcjoke3YuY30iPiR7di50PT09J0dvJz8nR28g4oCUIO2YleyDge2ZlCDri6jqs4Qg7KeE7ZaJIOq2jOqzoCc6di50PT09J0NvbmRpdGlvbmFsJz8nQ29uZGl0aW9uYWwg4oCUIOyhsOqxtOu2gCDrs7TsmYQg7ZuEIOynhO2WiSc6J05vIEdvIOKAlCDsnqzqsoDthqAg7ZWE7JqUJ308L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0idi1zdWIiPjjqsJwgQUkg7Y6Y66W07IaM64KYIOqwgOykkSDtj4nqt6A6IDxzdHJvbmcgc3R5bGU9ImNvbG9yOiR7c2NDb2xvcihvdil9Ij4ke292LnRvRml4ZWQoMil9LzUuMDA8L3N0cm9uZz4gwrcgR28gJHtnb0N96rCcIC8gQ29uZGl0aW9uYWwgJHtjb0N96rCcIC8gTm8gR28gJHtuZ0N96rCcPC9kaXY+PC9kaXY+CiAgICA8L2Rpdj5gOwogIGNvbnN0IGRpdkl0ZW1zPUFYRVMubWFwKGF4PT57CiAgICBjb25zdCB2YWxzPVBTLm1hcCgoXyxwaSk9PmdldFJlc3VsdChwaSkuc2NvcmVzW2F4LmtleV18fDApOwogICAgY29uc3QgbG89TWF0aC5taW4oLi4udmFscyksaGk9TWF0aC5tYXgoLi4udmFscyk7CiAgICBpZihoaS1sbzwxLjUpcmV0dXJuJyc7CiAgICByZXR1cm5gPGRpdiBjbGFzcz0iZGkiPjxkaXYgY2xhc3M9ImRkIj48L2Rpdj48ZGl2PjxzdHJvbmc+JHtheC5sYWJlbH08L3N0cm9uZz4g4oCUIOy1nOyggCAke2xvfeygkCDihpQg7LWc6rOgICR7aGl97KCQIDxzcGFuIHN0eWxlPSJjb2xvcjp2YXIoLS1vcik7Zm9udC13ZWlnaHQ6NjAwIj7ihpIgMi0xMCDtjIAg7Yag66GgIOyViOqxtDwvc3Bhbj48L2Rpdj48L2Rpdj5gOwogIH0pLmZpbHRlcihCb29sZWFuKTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZGl2Qm94JykuaW5uZXJIVE1MPWRpdkl0ZW1zLmxlbmd0aAogICAgP2A8ZGl2IGNsYXNzPSJkaXZlcmdlIj48ZGl2IGNsYXNzPSJkaXYtdCI+4pqhIO2VteyLrCDrhbzsoJAg7J6Q64+ZIOy2lOy2nCDigJQg7Y647LCoIDEuNeKGkSAoJHtkaXZJdGVtcy5sZW5ndGh96rG0KTwvZGl2PiR7ZGl2SXRlbXMuam9pbignJyl9PC9kaXY+YAogICAgOmA8ZGl2IHN0eWxlPSJiYWNrZ3JvdW5kOnZhcigtLWdyLWJnKTtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWdyLWx0KTtib3JkZXItcmFkaXVzOnZhcigtLXIxNik7cGFkZGluZzoxM3B4IDE3cHg7Zm9udC1zaXplOjEycHg7Y29sb3I6dmFyKC0tZ3IpO2ZvbnQtd2VpZ2h0OjYwMCI+4pyTIOyjvOyalCDrtoTquLAg7JeG7J2MPC9kaXY+YDsKfQoKLyog4pSA4pSAIFNURVAgMyDilIDilIAgKi8KZnVuY3Rpb24gcmVuZGVyUzMoKXsKICBjb25zdCBwdHM9UFMubWFwKChfLGkpPT5wVG90YWwoaSkpOwogIGNvbnN0IGN0eD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncmFkYXInKS5nZXRDb250ZXh0KCcyZCcpOwogIHJhZGFyQ2hhcnQ9bmV3IENoYXJ0KGN0eCx7dHlwZToncmFkYXInLAogICAgZGF0YTp7bGFiZWxzOlBTLm1hcChwPT5wLnNob3J0KSxkYXRhc2V0czpbe2RhdGE6cHRzLGJvcmRlckNvbG9yOicjMzE4MmY2JyxiYWNrZ3JvdW5kQ29sb3I6J3JnYmEoNDksMTMwLDI0NiwuMDcpJywKICAgICAgcG9pbnRCYWNrZ3JvdW5kQ29sb3I6UFMubWFwKHA9PnAuY29sb3IpLHBvaW50Qm9yZGVyQ29sb3I6JyNmZmYnLHBvaW50Qm9yZGVyV2lkdGg6Mixwb2ludFJhZGl1czo0LGJvcmRlcldpZHRoOjJ9XX0sCiAgICBvcHRpb25zOntyZXNwb25zaXZlOmZhbHNlLHNjYWxlczp7cjp7bWluOjAsbWF4OjUsdGlja3M6e3N0ZXBTaXplOjEsZm9udDp7c2l6ZTo5fSxjb2xvcjonI2IwYjhjMScsYmFja2Ryb3BDb2xvcjondHJhbnNwYXJlbnQnfSwKICAgICAgZ3JpZDp7Y29sb3I6J3JnYmEoMCwwLDAsLjA1KSd9LGFuZ2xlTGluZXM6e2NvbG9yOidyZ2JhKDAsMCwwLC4wNSknfSxwb2ludExhYmVsczp7Zm9udDp7c2l6ZToxMCx3ZWlnaHQ6JzYwMCd9LGNvbG9yOicjNGU1OTY4J319fSwKICAgIHBsdWdpbnM6e2xlZ2VuZDp7ZGlzcGxheTpmYWxzZX19fX0pOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdwdEdyaWQnKS5pbm5lckhUTUw9UFMubWFwKChwLGkpPT57CiAgICBjb25zdCB0PXB0c1tpXSxwY3Q9KHQvNSkqMTAwOwogICAgcmV0dXJuYDxkaXYgY2xhc3M9InB0YyI+PGRpdiBjbGFzcz0icHRjLXRvcCI+PGRpdiBjbGFzcz0icHRjLW5hbWUiPiR7cC5uYW1lfTwvZGl2PjxkaXYgY2xhc3M9InB0Yy1zY29yZSIgc3R5bGU9ImNvbG9yOiR7c2NDb2xvcih0KX0iPiR7dC50b0ZpeGVkKDIpfTwvZGl2PjwvZGl2PgogICAgPGRpdiBjbGFzcz0icHRiYXIiPjxkaXYgY2xhc3M9InB0ZmlsbCIgc3R5bGU9IndpZHRoOiR7cGN0fSU7YmFja2dyb3VuZDoke3AuY29sb3J9Ij48L2Rpdj48L2Rpdj48L2Rpdj5gOwogIH0pLmpvaW4oJycpOwp9CgovKiDilIDilIAgU1RFUCA0IOKUgOKUgCAqLwpmdW5jdGlvbiByZW5kZXJTNCgpewogIGNvbnN0IHB0cz1QUy5tYXAoKF8saSk9PnBUb3RhbChpKSk7CiAgY29uc3QgdXNlQVBJPV9hcGlLZXkubGVuZ3RoPjA7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2VHcmlkJykuaW5uZXJIVE1MPVBTLm1hcCgocCxpKT0+ewogICAgY29uc3Qgcj1nZXRSZXN1bHQoaSksdD1wdHNbaV0sdjI9dmQoci52ZXJkaWN0KTsKICAgIHJldHVybmA8ZGl2IGNsYXNzPSJlYyR7cC5pc0tUPycga3QnOicnfSR7cC5pc0ZpcnN0PycgZmlyc3QnOicnfSI+CiAgICAgIDxkaXYgY2xhc3M9ImVjLWhlYWQiPgogICAgICAgIDxkaXYgY2xhc3M9ImVjLW5hbWUiIHN0eWxlPSJjb2xvcjoke3AuY29sb3J9Ij4ke3AubmFtZX0ke3VzZUFQSSYmbGl2ZVJlc3VsdHNbaV0/JzxzcGFuIHN0eWxlPSJmb250LXNpemU6OXB4O2NvbG9yOnZhcigtLWdyKTttYXJnaW4tbGVmdDo1cHgiPuKXjyBBSTwvc3Bhbj4nOicnfTwvZGl2PgogICAgICAgIDxkaXYgY2xhc3M9ImVjLXNjb3JlIiBzdHlsZT0iY29sb3I6JHtzY0NvbG9yKHQpfTtib3JkZXItY29sb3I6JHt2Mi5iY307YmFja2dyb3VuZDoke3YyLmJnfSI+JHt0LnRvRml4ZWQoMil9PC9kaXY+CiAgICAgIDwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJlYy1ib2R5Ij4ke3Iuc3VtbWFyeX08L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iZWMtY29uY2VybiI+4pqgICR7ci50b3BfY29uY2Vybnx8ci5jb25jZXJufHwnJ308L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iZWMtY29uZCI+4pymICR7ci5jb25kaXRpb258fCcnfTwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJlYy12ZCIgc3R5bGU9ImNvbG9yOiR7djIuY307Ym9yZGVyLWNvbG9yOiR7djIuYmN9O2JhY2tncm91bmQ6JHt2Mi5iZ30iPiR7djIuaWNvbn0gJHt2Mi50fTwvZGl2PgogICAgPC9kaXY+YDsKICB9KS5qb2luKCcnKTsKfQoKLyog4pSA4pSAIFNURVAgNSDilIDilIAgKi8KZnVuY3Rpb24gcmVuZGVyUzUoKXsKICBjb25zdCBvdj1vdmVyYWxsKCksIHY9dmQob3YpOwogIGNvbnN0IGdvQz1QUy5tYXAoKF8saSk9PmdldFJlc3VsdChpKS52ZXJkaWN0KS5maWx0ZXIodj0+dj09PSdHbycpLmxlbmd0aDsKICBjb25zdCBjb0M9UFMubWFwKChfLGkpPT5nZXRSZXN1bHQoaSkudmVyZGljdCkuZmlsdGVyKHY9PnY9PT0nQ29uZGl0aW9uYWwnKS5sZW5ndGg7CiAgY29uc3QgbmdDPVBTLm1hcCgoXyxpKT0+Z2V0UmVzdWx0KGkpLnZlcmRpY3QpLmZpbHRlcih2PT52PT09J05vR28nKS5sZW5ndGg7CiAgY29uc3QgYXhBdmdzPUFYRVMubWFwKGF4PT5QUy5yZWR1Y2UoKHMsXyxpKT0+cysoZ2V0UmVzdWx0KGkpLnNjb3Jlc1theC5rZXldfHwwKSwwKS84KTsKICBjb25zdCB0b3AzPWF4QXZncy5tYXAoKHYsaSk9Pih7dixpfSkpLnNvcnQoKGEsYik9PmIudi1hLnYpLnNsaWNlKDAsMyk7CiAgY29uc3QgYm90Mj1heEF2Z3MubWFwKCh2LGkpPT4oe3YsaX0pKS5zb3J0KChhLGIpPT5hLnYtYi52KS5zbGljZSgwLDIpOwogIGNvbnN0IGJpelNjb3Jlcz1CSVoubWFwKGJjPT57CiAgICBjb25zdCBheExpc3Q9QVhFUy5maWx0ZXIoYT0+YmMuYXhlcy5pbmNsdWRlcyhhLmtleSkpOwogICAgY29uc3QgYXZnPWF4TGlzdC5yZWR1Y2UoKHMsYXgpPT5zK1BTLnJlZHVjZSgoc3MsXyxpKT0+c3MrKGdldFJlc3VsdChpKS5zY29yZXNbYXgua2V5XXx8MCksMCkvOCwwKS9heExpc3QubGVuZ3RoOwogICAgcmV0dXJuey4uLmJjLHZhbDphdmd9OwogIH0pOwogIGNvbnN0IHVzZUFQST1fYXBpS2V5Lmxlbmd0aD4wOwogIGNvbnN0IG1vZGVUYWc9dXNlQVBJPyc8c3BhbiBzdHlsZT0iY29sb3I6dmFyKC0tZ3IpO2ZvbnQtd2VpZ2h0OjYwMDtmb250LXNpemU6MTFweCI+4pePIOyLpOygnCBDbGF1ZGUgQUkg67aE7ISdIOqysOqzvDwvc3Bhbj4nOic8c3BhbiBzdHlsZT0iY29sb3I6dmFyKC0tZzUpO2ZvbnQtc2l6ZToxMXB4Ij7rjbDrqqgg66qo65OcICjtlZjrk5zsvZTrlKkg6rKw6rO8KTwvc3Bhbj4nOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdvdkJveCcpLmlubmVySFRNTD1gCiAgICA8ZGl2IGNsYXNzPSJvdi10aXRsZSI+7KCE7LK0IO2PieqwgCDsmpTslb0g4oCUIEtUIERT7ZiVIEZvb2Rpbmcg4oCUIEFJIOyLneyekOyerCDqtazrp6Qg7J2Y7IKs6rKw7KCVIOyXlOynhCAmbmJzcDske21vZGVUYWd9PC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJnby1jb3VudHMiPgogICAgICA8ZGl2IGNsYXNzPSJnYyIgc3R5bGU9ImJhY2tncm91bmQ6dmFyKC0tZ3ItYmcpO2JvcmRlci1jb2xvcjp2YXIoLS1nci1sdCkiPjxkaXYgY2xhc3M9ImdjLW4iIHN0eWxlPSJjb2xvcjp2YXIoLS1ncikiPiR7Z29DfTwvZGl2PjxkaXYgY2xhc3M9ImdjLWwiIHN0eWxlPSJjb2xvcjp2YXIoLS1ncikiPkdvPC9kaXY+PC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9ImdjIiBzdHlsZT0iYmFja2dyb3VuZDp2YXIoLS1vci1iZyk7Ym9yZGVyLWNvbG9yOnZhcigtLW9yLWx0KSI+PGRpdiBjbGFzcz0iZ2MtbiIgc3R5bGU9ImNvbG9yOnZhcigtLW9yKSI+JHtjb0N9PC9kaXY+PGRpdiBjbGFzcz0iZ2MtbCIgc3R5bGU9ImNvbG9yOnZhcigtLW9yKSI+Q29uZGl0aW9uYWw8L2Rpdj48L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iZ2MiIHN0eWxlPSJiYWNrZ3JvdW5kOnZhcigtLXJkLWJnKTtib3JkZXItY29sb3I6dmFyKC0tcmQtbHQpIj48ZGl2IGNsYXNzPSJnYy1uIiBzdHlsZT0iY29sb3I6dmFyKC0tcmQpIj4ke25nQ308L2Rpdj48ZGl2IGNsYXNzPSJnYy1sIiBzdHlsZT0iY29sb3I6dmFyKC0tcmQpIj5ObyBHbzwvZGl2PjwvZGl2PgogICAgPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJvdi1zZWMiPgogICAgICA8ZGl2IGNsYXNzPSJvdi1zZWMtbGJsIiBzdHlsZT0iY29sb3I6JHt2LmN9Ij7stZzsooUg7YyQ7KCVOiAke3YuaWNvbn0gJHt2LnQ9PT0nQ29uZGl0aW9uYWwnPydDb25kaXRpb25hbCDigJQg7KGw6rG067aAIOuztOyZhCDtm4Qg7ZiV7IOB7ZmUIOynhO2WiSc6di50fTwvZGl2PgogICAgICA8cD446rCcIEFJIO2OmOultOyGjOuCmCDqsIDspJEg7Y+J6regIDxzdHJvbmcgc3R5bGU9ImNvbG9yOiR7c2NDb2xvcihvdil9Ij4ke292LnRvRml4ZWQoMil9LzUuMDA8L3N0cm9uZz4uICLruYzrjZTqsIAg7JWE64uMIOy5tO2DiOuhnOq3uCIg7ZSE66CI7J6EIOyghO2ZmOyXkCDrjIDtlbQgS1QgRFMg64yA7ZGcwrdBWCBFeHBlcnTCt+yYgeyXhcK3S1Qg6re466O5IOyghOuetSA06rCcIO2OmOultOyGjOuCmOqwgCBHb+ulvCDrtoDsl6wuIOq4sOyhtCBBSSDtlIzrnqvtj7wg6rWQ7ZuI7J2EIOuwmOyYge2VnCBBZ2VudCDsubTtg4jroZzqt7gg66qo64247J2YIOyghOueteyggSDtg4Dri7nshLHsl5Ag6rCV7ZWcIO2VqeydmOqwgCDtmJXshLHrkJjsl4jsnLzrqbAsIOy5tO2DiOuhnOq3uCDsvZjthZDsuKAg7ZmV67O07JmAIO2SiOyniCDsnbjspp0g7LK06rOE6rCAIOyehOqzhCDqsr3roZzsnoXri4jri6QuPC9wPgogICAgPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJvdi1zZWMiPgogICAgICA8ZGl2IGNsYXNzPSJvdi1zZWMtbGJsIiBzdHlsZT0iY29sb3I6dmFyKC0tZ3IpIj7tlansnZgg7JiB7JetIOKAlCDsg4HsnIQg7Y+J6rCAIOy2lTwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJ0YWctcm93Ij4ke3RvcDMubWFwKCh7djp2YWwsaX0pPT5gPHNwYW4gY2xhc3M9InRhZyIgc3R5bGU9ImNvbG9yOnZhcigtLWdyKTtib3JkZXItY29sb3I6dmFyKC0tZ3ItbHQpO2JhY2tncm91bmQ6dmFyKC0tZ3ItYmcpIj4ke0FYRVNbaV0ubGFiZWx9ICR7dmFsLnRvRml4ZWQoMSl97KCQPC9zcGFuPmApLmpvaW4oJycpfTwvZGl2PgogICAgICA8cD4i6rKA7Kad65CcIEFnZW5066W8IOy5tO2DiOuhnOq3uOyXkOyEnCDshKDtg53Ct+uwsO2PrCLtlZjripQg66qo64247J20IOyxl+u0hyDtlLzroZzqsJAoUDcpwrfqtazstpUg7Jet65+JIOu2gOyhsShQOCnsnYQg7KeB7KCRIO2VtOqysO2VnOuLpOuKlCDsoJAsIOq3uOumrOqzoCBLVCDqt7jro7kgQVgg7KCE6561IOuwqe2WpeqzvOydmCDqsJXtlZwg7KCV7ZWp7ISx7JeQIOuMgO2VtCDrqqjrk6Ag7Y6Y66W07IaM64KY6rCAIOq4jeygleyggeyeheuLiOuLpC48L3A+CiAgICA8L2Rpdj4KICAgIDxkaXYgY2xhc3M9Im92LXNlYyI+CiAgICAgIDxkaXYgY2xhc3M9Im92LXNlYy1sYmwiIHN0eWxlPSJjb2xvcjp2YXIoLS1vcikiPuuztOyZhCDtlYTsmpQg4oCUIO2VmOychCDtj4nqsIAg7LaVPC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9InRhZy1yb3ciPiR7Ym90Mi5tYXAoKHt2OnZhbCxpfSk9PmA8c3BhbiBjbGFzcz0idGFnIiBzdHlsZT0iY29sb3I6dmFyKC0tb3IpO2JvcmRlci1jb2xvcjp2YXIoLS1vci1sdCk7YmFja2dyb3VuZDp2YXIoLS1vci1iZykiPiR7QVhFU1tpXS5sYWJlbH0gJHt2YWwudG9GaXhlZCgxKX3soJA8L3NwYW4+YCkuam9pbignJyl9PC9kaXY+CiAgICAgIDxwPuy5tO2DiOuhnOq3uCDstIjquLAg7L2Y7YWQ7LigKFByZS1idWlsdCBBZ2VudCkg7ZmV67O0IOyGjeuPhOyZgCBBZ2VudCDtkojsp4gg7J247KadIO2UhOugiOyehOybjO2BrCDqtazstpXsnbQgQ29uZGl0aW9uYWwg7YyQ7KCV7J2EIEdv66GcIOyghO2ZmOyLnO2CrCDtlbXsi6wg6rO87KCc7J6F64uI64ukLiDshpDtlbTsgqzsoJUgUG9DKCcyNi4wNinsmYAg7YyM7Yq464SIIEFnZW50IOyDne2DnOqzhCDqtazstpXsnbQg7ZiV7IOB7ZmUIOuLqOqzhCDsoIQg7ISg6rKwIOqzvOygnOyeheuLiOuLpC48L3A+CiAgICA8L2Rpdj4KICAgIDxkaXYgY2xhc3M9Im92LXNlYyI+CiAgICAgIDxkaXYgY2xhc3M9Im92LXNlYy1sYmwiIHN0eWxlPSJjb2xvcjp2YXIoLS1ibCkiPuyCrOyXhe2ZlCDtjJDri6gg6riw7KSA67OEIOyihe2VqTwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJvdi1jaGFydHMiPgogICAgICAgIDxkaXYgY2xhc3M9Im92LWNiIj4KICAgICAgICAgIDxkaXYgY2xhc3M9Im92LWNiLXQiPu2MkOuLqCDquLDspIDrs4Qg7KCQ7IiYICg17KCQIOunjOygkCk8L2Rpdj4KICAgICAgICAgICR7Yml6U2NvcmVzLm1hcChiPT57Y29uc3QgcGN0PShiLnZhbC81KSoxMDA7cmV0dXJuYDxkaXYgY2xhc3M9ImFiciI+PGRpdiBjbGFzcz0iYWJsIj4ke2IubGFiZWx9PC9kaXY+PGRpdiBjbGFzcz0iYWJ0Ij48ZGl2IGNsYXNzPSJhYmYiIHN0eWxlPSJ3aWR0aDoke3BjdH0lO2JhY2tncm91bmQ6JHtiLmNvbG9yfSI+PC9kaXY+PC9kaXY+PGRpdiBjbGFzcz0iYWJ2IiBzdHlsZT0iY29sb3I6JHtiLmNvbG9yfSI+JHtiLnZhbC50b0ZpeGVkKDEpfTwvZGl2PjwvZGl2PmA7fSkuam9pbignJyl9CiAgICAgICAgPC9kaXY+CiAgICAgICAgPGRpdiBjbGFzcz0ib3YtY2IiIHN0eWxlPSJ0ZXh0LWFsaWduOmNlbnRlciI+CiAgICAgICAgICA8ZGl2IGNsYXNzPSJvdi1jYi10Ij7sgqzsl4XtmZQg6riw7KSAIOugiOydtOuNlDwvZGl2PgogICAgICAgICAgPGNhbnZhcyBpZD0iYml6UmFkYXIiIHdpZHRoPSIyMzAiIGhlaWdodD0iMjEwIj48L2NhbnZhcz4KICAgICAgICA8L2Rpdj4KICAgICAgPC9kaXY+CiAgICA8L2Rpdj4KICAgIDxkaXYgY2xhc3M9Im92LXNlYyI+CiAgICAgIDxkaXYgY2xhc3M9Im92LXNlYy1sYmwiIHN0eWxlPSJjb2xvcjp2YXIoLS1wdSkiPjItMTAg7YyAIOqygO2GoCDslYjqsbQ8L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iYWctaXRlbSI+4pGgIDxzdHJvbmc+7Lm07YOI66Gc6re4IOy0iOq4sCDsvZjthZDsuKAg7KCE6561PC9zdHJvbmc+IOKAlCDrn7Dsua0g7IucIOy1nOyGjCBQcmUtYnVpbHQgQWdlbnQgMTDsooUg7ZmV67O0IOuwqeyViDog7J6Q7LK0IOqwnOuwnCB2cyDtjIztirjrhIggQWdlbnQgdnMg7Jik7ZSI7IaM7IqkIOuemO2VkTwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJhZy1pdGVtIj7ikaEgPHN0cm9uZz5BZ2VudCDtkojsp4gg7J247KadIOyytOqzhDwvc3Ryb25nPiDigJQg7Lm07YOI66Gc6re47JeQIOyYrOudvOqwgOuKlCBBZ2VudOydmCBIYWxsdWNpbmF0aW9uwrfsoJXtmZXrj4Qg6rKA7KadIO2UhOugiOyehOybjO2BrCDqtazstpUg67KU7JyEIOuwjyDsnbzsoJUgKOyImO2WieyhsOyngSDqsJXroKUg6raM6rOgKTwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJhZy1pdGVtIj7ikaIgPHN0cm9uZz7tjIztirjrhIggQWdlbnQg7IOd7YOc6rOEPC9zdHJvbmc+IOKAlCBJU1Yv7YyM7Yq464SI7IKsIEFnZW50IOqwnOuwnMK365Ox66GdwrfsiJjsnbXqs7XsnKAg6rWs7KGwIO2ZleyglSDrsI8g7LSI6riwIDPqsJzsgqwg7YyM7Yq464SIIO2ZleuztCDtg4DsnoTrnbzsnbg8L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iYWctaXRlbSI+4pGjIDxzdHJvbmc+S1Qg6re466O5IEFnZW50IOy5tO2DiOuhnOq3uCDsl63tlaAg66qF66y47ZmUPC9zdHJvbmc+IOKAlCBLVCDqt7jro7kgQVgg7KCE6561IO2YkeydmOyytOyXkOyEnCAi7JeU7YSw7ZSE65287J207KaIIEFnZW50IOy5tO2DiOuhnOq3uCA9IEtUIERTIOyghOuLtCIg6rO17Iud7ZmUIOuwjyDqt7jro7nsgqwgQWdlbnQg6rO16riJIOyxhOuEkCDtmZXrs7Q8L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iYWctaXRlbSI+4pGkIDxzdHJvbmc+6riw7KG0IEFJIO2UjOueq+2PvCDqtZDtm4gg67CY7JiBPC9zdHJvbmc+IOKAlCBBSTpPTi1VIOuTsSDquLDsobQg7ZSM656r7Y+87J2YIOyLnOyepSDqsqzsnbjroKUg67aA7KGxIOybkOyduCDrtoTshJ0g6rKw6rO866W8IOy5tO2DiOuhnOq3uCDrqqjrjbgg7ISk6rOE7JeQIOqzteyLnSDrsJjsmIE8L2Rpdj4KICAgIDwvZGl2PgogICAgPGRpdiBjbGFzcz0ib3YtZm9vdGVyIj4KICAgICAgPHNwYW4+7Y+J6rCA7J28OiAke25ldyBEYXRlKCkudG9Mb2NhbGVEYXRlU3RyaW5nKCdrby1LUicpfSDCtyDtj4nqsIAg67Cp7IudOiBBSSDrqYDti7Ag7Y6Y66W07IaM64KYIOyCrOyghCDtj4nqsIAgKFByb3RvdHlwZSBEZW1vKTwvc3Bhbj4KICAgICAgPHNwYW4+64uk7J2MIOuLqOqzhDogMi0xMCBBWEJE7YyAIOqzteycoCDqsoDthqAg4oaSIDPri6jqs4Qg7ZiV7IOB7ZmUKFByb3RvdHlwZSk8L3NwYW4+CiAgICA8L2Rpdj5gOwogIHNldFRpbWVvdXQoKCk9PnsKICAgIGNvbnN0IGJjdHg9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2JpelJhZGFyJyk/LmdldENvbnRleHQoJzJkJyk7CiAgICBpZighYmN0eClyZXR1cm47CiAgICBiaXpDaGFydD1uZXcgQ2hhcnQoYmN0eCx7dHlwZToncmFkYXInLAogICAgICBkYXRhOntsYWJlbHM6Yml6U2NvcmVzLm1hcChiPT5iLmxhYmVsKSwKICAgICAgICBkYXRhc2V0czpbe2RhdGE6Yml6U2NvcmVzLm1hcChiPT5iLnZhbCksYm9yZGVyQ29sb3I6JyM2YzYzZmYnLGJhY2tncm91bmRDb2xvcjoncmdiYSgxMDgsOTksMjU1LC4wOSknLAogICAgICAgICAgcG9pbnRCYWNrZ3JvdW5kQ29sb3I6Yml6U2NvcmVzLm1hcChiPT5iLmNvbG9yKSxwb2ludEJvcmRlckNvbG9yOicjZmZmJyxwb2ludEJvcmRlcldpZHRoOjIscG9pbnRSYWRpdXM6NCxib3JkZXJXaWR0aDoyfV19LAogICAgICBvcHRpb25zOntyZXNwb25zaXZlOmZhbHNlLHNjYWxlczp7cjp7bWluOjAsbWF4OjUsdGlja3M6e3N0ZXBTaXplOjEsZm9udDp7c2l6ZTo4fSxjb2xvcjonI2IwYjhjMScsYmFja2Ryb3BDb2xvcjondHJhbnNwYXJlbnQnfSwKICAgICAgICBncmlkOntjb2xvcjoncmdiYSgwLDAsMCwuMDUpJ30sYW5nbGVMaW5lczp7Y29sb3I6J3JnYmEoMCwwLDAsLjA1KSd9LHBvaW50TGFiZWxzOntmb250OntzaXplOjEwLHdlaWdodDonNjAwJ30sY29sb3I6JyM0ZTU5NjgnfX19LAogICAgICBwbHVnaW5zOntsZWdlbmQ6e2Rpc3BsYXk6ZmFsc2V9fX19KTsKICB9LDE1MCk7Cn0KCi8qIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAogICA3LiBJTklUCuKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkCAqLwpkb2N1bWVudC5hZGRFdmVudExpc3RlbmVyKCdET01Db250ZW50TG9hZGVkJywoKT0+ewogIGJ1aWxkQ2FyZHMoKTsKICBidWlsZFdzVGFicygpOwogIGJ1aWxkRWRpdG9yKCk7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2JyaWVmaW5nJykudmFsdWU9UFJFU0VUX0JSSUVGOwp9KTsKPC9zY3JpcHQ+CjwvYm9keT4KPC9odG1sPgo=";
+</script>
+</body>
+</html>

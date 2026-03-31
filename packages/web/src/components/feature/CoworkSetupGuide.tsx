@@ -1,7 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy, Monitor, Terminal } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Terminal,
+  Monitor,
+  Globe,
+  ChevronRight,
+  AlertCircle,
+  Lightbulb,
+  ExternalLink,
+  FolderOpen,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Card,
@@ -11,79 +22,200 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-type Environment = "cowork" | "claude-code";
+// ─── Types ───
 
-const steps: Array<{
+type Environment = "claude-code" | "claude-desktop" | "web";
+
+interface SetupStep {
   number: number;
   title: string;
   description: string;
-  commands: Record<Environment, string[]>;
-}> = [
-  {
-    number: 1,
-    title: "환경 확인",
-    description: "필수 도구가 설치되어 있는지 확인해요.",
-    commands: {
-      cowork: ["node --version  # v20 이상 필요", "cowork --version"],
-      "claude-code": [
-        "node --version  # v20 이상 필요",
-        "claude --version  # 최신 버전 권장",
-        "gh auth status  # GitHub CLI 인증 확인",
+  why?: string;
+  commands?: string[];
+  note?: string;
+  tip?: string;
+  warning?: string;
+  verify?: string;
+}
+
+// ─── Environment Configs ───
+
+const ENV_META: Record<
+  Environment,
+  { icon: typeof Terminal; label: string; badge: string; desc: string }
+> = {
+  "claude-code": {
+    icon: Terminal,
+    label: "Claude Code (터미널)",
+    badge: "권장",
+    desc: "터미널에서 claude 명령으로 실행. 76개 스킬 + 36개 커맨드 전부 사용 가능.",
+  },
+  "claude-desktop": {
+    icon: Monitor,
+    label: "Claude Desktop App",
+    badge: "",
+    desc: "Claude Desktop 앱의 Code 탭에서 폴더를 열어 사용. 터미널 없이 GUI로 실행.",
+  },
+  web: {
+    icon: Globe,
+    label: "Foundry-X 웹 (여기)",
+    badge: "",
+    desc: "별도 설치 없이 이 웹 대시보드에서 바로 사용. Discovery 프로세스 + 스킬 실행 가능.",
+  },
+};
+
+const PREREQUISITES: Record<Environment, string[]> = {
+  "claude-code": [
+    "Node.js v20 이상 (node --version 으로 확인)",
+    "Claude Code CLI 설치 (npm install -g @anthropic-ai/claude-code)",
+    "Git 설치 (git --version 으로 확인)",
+  ],
+  "claude-desktop": [
+    "Claude Desktop 앱 설치 (claude.ai/download)",
+    "Git 설치 (CLAUDE_AXBD 폴더 다운로드용)",
+  ],
+  web: [
+    "Foundry-X 계정 (이미 로그인되어 있다면 준비 완료!)",
+  ],
+};
+
+const STEPS: Record<Environment, SetupStep[]> = {
+  "claude-code": [
+    {
+      number: 1,
+      title: "CLAUDE_AXBD 폴더 다운로드",
+      description:
+        "팀 공용 스킬이 포함된 작업 폴더를 내 PC에 받아요.",
+      why: "이 폴더 안에 76개 분석 스킬, 36개 워크플로우, 프레임워크 실행 규칙이 모두 들어있어요.",
+      commands: [
+        "git clone https://github.com/KTDS-AXBD/CLAUDE_AXBD.git",
+        "cd CLAUDE_AXBD",
       ],
+      tip: "원하는 위치에 받으면 돼요. 예: ~/work/CLAUDE_AXBD 또는 바탕화면",
     },
-  },
-  {
-    number: 2,
-    title: "팀 스킬 설치",
-    description:
-      "KTDS-AXBD/ax-config 팀 리포에서 최신 스킬을 받아요.",
-    commands: {
-      cowork: ["cowork plugin install pm-skills ai-biz"],
-      "claude-code": [
-        "# 팀 리포에서 스킬 받기",
-        "git clone git@github.com:KTDS-AXBD/ax-config.git /tmp/ax-config",
-        "cp -r /tmp/ax-config/skills/ax-* ~/.claude/skills/",
-        "rm -rf /tmp/ax-config",
+    {
+      number: 2,
+      title: "Claude Code 실행",
+      description: "다운로드한 폴더에서 Claude Code를 실행해요.",
+      commands: ["claude"],
+      note: "CLAUDE_AXBD 폴더 안에서 실행해야 스킬이 자동으로 인식돼요.",
+      verify:
+        "실행 후 / 를 입력하면 자동완성 목록에 스킬이 표시되면 성공!",
+    },
+    {
+      number: 3,
+      title: "스킬 동작 확인",
+      description: "스킬이 정상적으로 로드됐는지 테스트해요.",
+      commands: [
+        "/swot-analysis 테스트 주제",
+        "/ai-biz-moat-analysis 테스트 주제",
       ],
+      tip: "두 개가 모두 응답하면 설치 완료! 76개 스킬 + 36개 커맨드를 자유롭게 사용하세요.",
     },
-  },
-  {
-    number: 3,
-    title: "설정 확인",
-    description: "설치된 스킬이 정상 동작하는지 확인해요.",
-    commands: {
-      cowork: ["cowork plugin list", "cowork plugin verify pm-skills ai-biz"],
-      "claude-code": [
-        "ls ~/.claude/skills/  # 20개 ax-* 스킬 확인",
-        "claude /ax-help  # 스킬 목록 + 사용법",
+    {
+      number: 4,
+      title: "발굴 프로세스 시작",
+      description:
+        "실제 사업 아이템으로 2단계 발굴 프로세스를 시작해요.",
+      commands: [
+        '# 대화 시작 예시:',
+        '나는 AX BD팀 [이름]입니다.',
+        '[사업 아이템명]에 대해 2단계 발굴을 시작합니다.',
+        '[아이템 설명 1~2문장]',
       ],
+      note: "AI가 자동으로 2-0 분류 대화를 시작해요. 5유형(I/M/P/T/S) 중 하나로 분류된 후, 유형에 맞는 분석 경로를 안내해요.",
     },
-  },
-  {
-    number: 4,
-    title: "팀 스킬 업데이트",
-    description:
-      "새 스킬이 추가되거나 변경되면 팀 리포에서 다시 받아요.",
-    commands: {
-      cowork: ["cowork plugin update pm-skills ai-biz"],
-      "claude-code": [
-        "# 최신 스킬로 업데이트",
-        "git clone git@github.com:KTDS-AXBD/ax-config.git /tmp/ax-config",
-        "cp -r /tmp/ax-config/skills/ax-* ~/.claude/skills/",
-        "rm -rf /tmp/ax-config",
+    {
+      number: 5,
+      title: "스킬 업데이트 (수시)",
+      description:
+        "새 스킬이 추가되면 최신 버전으로 업데이트해요.",
+      commands: [
+        "cd CLAUDE_AXBD",
+        "git pull origin main",
       ],
+      tip: "팀 Slack에서 스킬 업데이트 공지가 오면 git pull 한 번이면 끝!",
     },
-  },
-  {
-    number: 5,
-    title: "첫 실행",
-    description: "Discovery 프로세스를 시작해 보세요.",
-    commands: {
-      cowork: ["/ax-bd-discovery start [아이템명]"],
-      "claude-code": ["/ax-bd-discovery start [아이템명]"],
+  ],
+  "claude-desktop": [
+    {
+      number: 1,
+      title: "CLAUDE_AXBD 폴더 다운로드",
+      description:
+        "팀 공용 스킬 폴더를 내 PC에 받아요.",
+      commands: [
+        "git clone https://github.com/KTDS-AXBD/CLAUDE_AXBD.git",
+      ],
+      tip: "Git이 없다면, GitHub에서 'Code > Download ZIP'으로 다운로드 후 압축 해제해도 돼요.",
     },
-  },
-];
+    {
+      number: 2,
+      title: "Claude Desktop에서 폴더 열기",
+      description:
+        "Claude Desktop 앱을 열고 CLAUDE_AXBD 폴더를 연결해요.",
+      commands: [
+        '1. Claude Desktop 앱 실행',
+        '2. 좌측 하단 Code 탭 클릭',
+        '3. "Select folder" 클릭',
+        '4. 다운로드한 CLAUDE_AXBD 폴더 선택',
+      ],
+      note: "폴더를 선택하면 Claude가 CLAUDE.md를 자동으로 읽어 팀 컨텍스트를 로딩해요.",
+    },
+    {
+      number: 3,
+      title: "스킬 동작 확인 + 발굴 시작",
+      description: "대화창에서 바로 스킬을 호출하고, 발굴 프로세스를 시작해요.",
+      commands: [
+        '# 스킬 테스트',
+        '/swot-analysis 물류 AI 플랫폼',
+        '',
+        '# 발굴 시작',
+        '나는 AX BD팀 [이름]입니다.',
+        '[아이템명]에 대해 2단계 발굴을 시작합니다.',
+      ],
+      verify: "/ 입력 시 자동완성 목록이 표시되면 정상!",
+    },
+  ],
+  web: [
+    {
+      number: 1,
+      title: "Foundry-X 로그인",
+      description:
+        "이미 로그인되어 있다면 이 단계는 건너뛰세요.",
+      commands: [
+        '1. fx.minu.best 접속',
+        '2. 팀 계정으로 로그인',
+      ],
+      note: "계정이 없다면 관리자(서민원, 김기욱, 김정원)에게 요청하세요.",
+    },
+    {
+      number: 2,
+      title: "Discovery 페이지로 이동",
+      description:
+        "좌측 사이드바에서 Discovery를 클릭하면 발굴 프로세스 대시보드로 이동해요.",
+      commands: [
+        '1. 좌측 사이드바 → "Discovery" 클릭',
+        '2. 또는 주소창에 fx.minu.best/ax-bd/discovery 입력',
+      ],
+      tip: "이 페이지에서 스킬 카탈로그, 프로세스 가이드, 스킬 실행까지 모두 가능해요.",
+    },
+    {
+      number: 3,
+      title: "사업 아이템 등록 + 스킬 실행",
+      description:
+        "새 사업 아이템을 등록하고, 단계별 스킬을 웹에서 바로 실행해요.",
+      commands: [
+        '1. "새 아이템 추가" 버튼 클릭',
+        '2. 아이템명 + 설명 입력',
+        '3. AI가 5유형(I/M/P/T/S) 자동 분류',
+        '4. 각 단계에서 추천 스킬 클릭 → 실행',
+      ],
+      note: "실행 결과는 자동으로 저장되고, 진행 상황은 신호등(Go/Pivot/Drop)으로 추적돼요.",
+    },
+  ],
+};
+
+// ─── Components ───
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -99,7 +231,7 @@ function CopyButton({ text }: { text: string }) {
       variant="ghost"
       size="icon-xs"
       onClick={handleCopy}
-      className="shrink-0 opacity-0 group-hover/cmd:opacity-100 transition-opacity"
+      className="shrink-0 opacity-0 transition-opacity group-hover/cmd:opacity-100"
       aria-label="복사"
     >
       {copied ? (
@@ -111,77 +243,235 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
+function CommandBlock({ commands }: { commands: string[] }) {
+  return (
+    <div className="space-y-1 rounded-lg bg-muted/50 p-3">
+      {commands.map((cmd, i) => {
+        const isComment = cmd.startsWith("#");
+        const isInstruction = /^\d+\./.test(cmd);
+        const isEmpty = cmd === "";
+        if (isEmpty) return <div key={i} className="h-2" />;
+        return (
+          <div
+            key={i}
+            className={cn(
+              "group/cmd flex items-center justify-between gap-2 font-mono text-sm",
+              (isComment || isInstruction) && "text-muted-foreground",
+            )}
+          >
+            <code className="break-all">
+              {!isComment && !isInstruction && (
+                <span className="mr-1.5 select-none text-muted-foreground">
+                  $
+                </span>
+              )}
+              {isInstruction && (
+                <span className="mr-1 font-sans">{""}</span>
+              )}
+              {cmd}
+            </code>
+            {!isComment && !isInstruction && <CopyButton text={cmd} />}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function StepCard({ step }: { step: SetupStep }) {
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center gap-2.5 text-base">
+          <span className="flex size-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+            {step.number}
+          </span>
+          {step.title}
+        </CardTitle>
+        <p className="text-sm text-muted-foreground">{step.description}</p>
+        {step.why && (
+          <p className="mt-1 text-xs text-muted-foreground/80 italic">
+            {step.why}
+          </p>
+        )}
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {step.commands && <CommandBlock commands={step.commands} />}
+
+        {step.note && (
+          <div className="flex gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800 dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-300">
+            <AlertCircle className="mt-0.5 size-4 shrink-0" />
+            <span>{step.note}</span>
+          </div>
+        )}
+
+        {step.tip && (
+          <div className="flex gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300">
+            <Lightbulb className="mt-0.5 size-4 shrink-0" />
+            <span>{step.tip}</span>
+          </div>
+        )}
+
+        {step.warning && (
+          <div className="flex gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+            <AlertCircle className="mt-0.5 size-4 shrink-0" />
+            <span>{step.warning}</span>
+          </div>
+        )}
+
+        {step.verify && (
+          <div className="flex gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800 dark:border-green-900/50 dark:bg-green-950/30 dark:text-green-300">
+            <Check className="mt-0.5 size-4 shrink-0" />
+            <span>{step.verify}</span>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Resources Section ───
+
+function ResourcesSection() {
+  const resources = [
+    {
+      title: "스킬 카탈로그",
+      desc: "76개 스킬 + 36개 커맨드 전체 목록",
+      href: "/getting-started?tab=skills",
+      internal: true,
+    },
+    {
+      title: "프로세스 가이드",
+      desc: "2-0~2-10 발굴 프로세스 상세 설명",
+      href: "/getting-started?tab=process",
+      internal: true,
+    },
+    {
+      title: "Discovery 대시보드",
+      desc: "사업 아이템 등록 + 스킬 실행 + 진행 추적",
+      href: "/ax-bd/discovery",
+      internal: true,
+    },
+    {
+      title: "CLAUDE_AXBD GitHub",
+      desc: "팀 공용 스킬 폴더 (clone용)",
+      href: "https://github.com/KTDS-AXBD/CLAUDE_AXBD",
+      internal: false,
+    },
+  ];
+
+  return (
+    <div className="rounded-xl border border-dashed p-4">
+      <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+        <FolderOpen className="size-4" />
+        관련 리소스
+      </h3>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {resources.map((r) => (
+          <a
+            key={r.title}
+            href={r.href}
+            target={r.internal ? undefined : "_blank"}
+            rel={r.internal ? undefined : "noopener noreferrer"}
+            className="group flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-muted/50"
+          >
+            <ChevronRight className="size-3.5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+            <div>
+              <span className="font-medium">{r.title}</span>
+              {!r.internal && (
+                <ExternalLink className="ml-1 inline-block size-3 text-muted-foreground" />
+              )}
+              <p className="text-xs text-muted-foreground">{r.desc}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Component ───
+
 export default function CoworkSetupGuide() {
-  const [env, setEnv] = useState<Environment>("cowork");
+  const [env, setEnv] = useState<Environment>("claude-code");
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold font-display mb-1">설치 가이드</h2>
-        <p className="text-sm text-muted-foreground mb-4">
-          사용 환경을 선택하고 단계별로 따라해 보세요.
+        <h2 className="mb-1 font-display text-lg font-semibold">설치 가이드</h2>
+        <p className="mb-4 text-sm text-muted-foreground">
+          사용 환경을 선택하고 단계별로 따라해 보세요. 모든 환경에서 동일한
+          AX BD 2단계 발굴 프로세스(v8.2)를 사용할 수 있어요.
         </p>
       </div>
 
       {/* Environment Selector */}
-      <div className="flex gap-2">
-        <Button
-          variant={env === "cowork" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setEnv("cowork")}
-          className="gap-1.5"
-        >
-          <Monitor className="size-3.5" />
-          Cowork
-        </Button>
-        <Button
-          variant={env === "claude-code" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setEnv("claude-code")}
-          className="gap-1.5"
-        >
-          <Terminal className="size-3.5" />
-          Claude Code
-        </Button>
+      <div className="flex flex-wrap gap-2">
+        {(Object.entries(ENV_META) as [Environment, typeof ENV_META[Environment]][]).map(
+          ([key, meta]) => {
+            const Icon = meta.icon;
+            const isActive = env === key;
+            return (
+              <Button
+                key={key}
+                variant={isActive ? "default" : "outline"}
+                size="sm"
+                onClick={() => setEnv(key)}
+                className="gap-1.5"
+              >
+                <Icon className="size-3.5" />
+                {meta.label}
+                {meta.badge && (
+                  <span
+                    className={cn(
+                      "ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none",
+                      isActive
+                        ? "bg-primary-foreground/20 text-primary-foreground"
+                        : "bg-axis-primary/10 text-axis-primary",
+                    )}
+                  >
+                    {meta.badge}
+                  </span>
+                )}
+              </Button>
+            );
+          },
+        )}
       </div>
+
+      {/* Environment Description */}
+      <div className="rounded-lg border bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+        {ENV_META[env].desc}
+      </div>
+
+      {/* Prerequisites */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-semibold">
+            사전 요구사항
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-1.5">
+            {PREREQUISITES[env].map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm">
+                <Check className="mt-0.5 size-4 shrink-0 text-green-500" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
 
       {/* Step Cards */}
       <div className="space-y-4">
-        {steps.map((step) => (
-          <Card key={step.number}>
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <span className="flex size-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
-                  {step.number}
-                </span>
-                {step.title}
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">{step.description}</p>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-1.5 rounded-lg bg-muted/50 p-3">
-                {step.commands[env].map((cmd, i) => (
-                  <div
-                    key={i}
-                    className={cn(
-                      "group/cmd flex items-center justify-between gap-2 font-mono text-sm",
-                      cmd.startsWith("#") && "text-muted-foreground",
-                    )}
-                  >
-                    <code className="break-all">
-                      {!cmd.startsWith("#") && (
-                        <span className="mr-1.5 text-muted-foreground">$</span>
-                      )}
-                      {cmd}
-                    </code>
-                    {!cmd.startsWith("#") && <CopyButton text={cmd} />}
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+        {STEPS[env].map((step) => (
+          <StepCard key={step.number} step={step} />
         ))}
       </div>
+
+      {/* Resources */}
+      <ResourcesSection />
     </div>
   );
 }
