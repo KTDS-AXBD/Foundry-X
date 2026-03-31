@@ -1725,3 +1725,107 @@ export async function getPortfolioProgress(params?: {
 export async function getPortfolioSummary(): Promise<PortfolioSummary> {
   return fetchApi("/ax-bd/progress/summary");
 }
+
+// ── KG Ontology (F255) ──────────────────────
+
+export interface KgNode {
+  id: string;
+  orgId: string;
+  type: string;
+  name: string;
+  nameEn?: string;
+  description?: string;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface KgEdge {
+  id: string;
+  relationType: string;
+  weight: number;
+  label?: string;
+  sourceNodeId: string;
+  targetNodeId: string;
+}
+
+export interface PathResult {
+  path: Array<{ id: string; type: string; name: string }>;
+  edges: Array<{ id: string; relationType: string; weight: number; label?: string }>;
+  totalWeight: number;
+  hopCount: number;
+}
+
+export interface ImpactNode {
+  id: string;
+  type: string;
+  name: string;
+  impactLevel: "HIGH" | "MEDIUM" | "LOW";
+  impactScore: number;
+  pathFromSource: string[];
+  hopCount: number;
+}
+
+export interface ImpactResult {
+  sourceNode: { id: string; type: string; name: string };
+  affectedNodes: ImpactNode[];
+  totalAffected: number;
+  byLevel: { high: number; medium: number; low: number };
+}
+
+export interface KgStats {
+  totalNodes: number;
+  totalEdges: number;
+  nodesByType: Record<string, number>;
+  edgesByType: Record<string, number>;
+}
+
+export async function getKgNodes(params?: { type?: string; q?: string; page?: number; limit?: number }): Promise<{ items: KgNode[]; total: number }> {
+  const query = new URLSearchParams();
+  if (params?.type) query.set("type", params.type);
+  if (params?.q) query.set("q", params.q);
+  if (params?.page) query.set("page", String(params.page));
+  if (params?.limit) query.set("limit", String(params.limit));
+  const qs = query.toString();
+  return fetchApi(`/ax-bd/kg/nodes${qs ? `?${qs}` : ""}`);
+}
+
+export async function getKgNode(id: string): Promise<KgNode> {
+  return fetchApi(`/ax-bd/kg/nodes/${id}`);
+}
+
+export async function getKgNeighbors(nodeId: string, direction?: string): Promise<{ nodes: Array<{ id: string; type: string; name: string; name_en: string | null }>; edges: KgEdge[] }> {
+  const qs = direction ? `?direction=${direction}` : "";
+  return fetchApi(`/ax-bd/kg/nodes/${nodeId}/neighbors${qs}`);
+}
+
+export async function searchKgNodes(q: string): Promise<{ items: KgNode[] }> {
+  return fetchApi(`/ax-bd/kg/nodes/search?q=${encodeURIComponent(q)}`);
+}
+
+export async function getKgPaths(source: string, target: string, maxDepth?: number): Promise<{ paths: PathResult[] }> {
+  const query = new URLSearchParams({ source, target });
+  if (maxDepth) query.set("maxDepth", String(maxDepth));
+  return fetchApi(`/ax-bd/kg/path?${query}`);
+}
+
+export async function postKgImpact(body: { sourceNodeId: string; decayFactor?: number; threshold?: number; maxDepth?: number; relationTypes?: string[] }): Promise<ImpactResult> {
+  return postApi("/ax-bd/kg/impact", body);
+}
+
+export async function getKgSubgraph(nodeId: string, depth?: number): Promise<{ nodes: Array<{ id: string; type: string; name: string }>; edges: Array<{ id: string; source: string; target: string; relationType: string; weight: number }> }> {
+  const qs = depth ? `?depth=${depth}` : "";
+  return fetchApi(`/ax-bd/kg/subgraph/${nodeId}${qs}`);
+}
+
+export async function getKgStats(): Promise<KgStats> {
+  return fetchApi("/ax-bd/kg/stats");
+}
+
+export async function seedKgData(): Promise<{ ok: boolean; nodes: number; edges: number }> {
+  return postApi("/ax-bd/kg/seed");
+}
+
+export async function clearKgData(): Promise<void> {
+  return deleteApi("/ax-bd/kg/seed");
+}
