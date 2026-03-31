@@ -7,6 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 마일스톤 회고: Phase 7~8 (v1.7.0) — Sprint 79~85
+
+### 지표 변화
+| 지표 | Phase 6 종료 (v1.6.0) | 현재 | 변화 |
+|------|----------------------|------|------|
+| API 테스트 | 1,965 | 2,119 | +154 |
+| CLI 테스트 | 149 | 149 | - |
+| Web 테스트 | 121+ | 207 | +86 |
+| E2E specs | ~55 | 25 | -30 (Vite 전환 정리) |
+| 총 테스트 | 2,235+ | 2,475 | +240 |
+| API routes | 54 | 63 | +9 |
+| API services | 143 | 153 | +10 |
+| API schemas | 69 | 78 | +9 |
+| D1 migrations | 0001~0065 | 0001~0074 | +9 |
+| TS 코드 | - | 142,644 lines | - |
+
+### 주요 성과
+- **Phase 7 (Sprint 79~81)**: BD Pipeline E2E 9개 기능(F232~F240) 완료 — 파이프라인 대시보드, 산출물 공유, ORB/PRB 게이트, 사업제안서 자동생성, Offering Pack, MVP 추적, IR Bottom-up
+- **Phase 8 (Sprint 82~85)**: IA 구조 개선 + Next.js → Vite + React Router 전환 + GIVC 피치덱 PoC
+- **인프라 정비**: wrangler 3→4 업그레이드, CI deploy 파이프라인 최적화, Workers 재배포
+
+### 잘된 점
+- Sprint Pipeline 병렬화로 Sprint 79~81을 배치로 빠르게 완료
+- wrangler/인프라 정비를 Phase 경계에 배치하여 기술부채 누적 방지
+
+### 개선점
+- **WSL 메모리 이슈**: wrangler + Claude Code 동시 실행 시 메모리 소진 반복 → `.wslconfig` autoMemoryReclaim + swap 설정으로 완화
+- **Worktree 정리 지연**: Sprint 완료 후 worktree/branch 정리가 밀리는 패턴 → 세션 종료 시 자동 정리 검토
+- **SPEC drift 반복**: 수치/상태가 실제와 불일치하여 여러 세션에서 보정 작업 → 소급 갱신 자동화 검토
+
+### 결정 검증
+- 기존 결정 유지 (WSL wrangler 금지 → 메모리 여유 시 조건부 허용으로 운영)
+- Plumb Stay Track A (ADR-001) 유지, 재판정 2026-09-21
+
+### 다음 마일스톤 방향
+- **[P0]** F114: 내부 6명 실제 온보딩
+- Phase 7 회고 태그 (v1.7.0) 생성
+- Phase 9 로드맵 수립
+
+---
+
+### 세션 #149 (2026-03-31)
+**프로젝트 점검 + Workers 재배포 + Sprint 85 정리**:
+- ✅ 전체 빌드 검증: typecheck 5/5, API 2119/2119, CLI 149/149, Web 207/207, lint 0 errors
+- ✅ Workers 재배포: wrangler 3.114→4.78 업그레이드 + deploy 성공 (Version 42e92ca9)
+- ✅ D1 migrations 0001~0074 remote 전체 적용 확인
+- ✅ Sprint 85 worktree 제거 + sprint/85 branch 삭제
+- ✅ Phase 7~8 마일스톤 회고 작성
+
 ### 세션 #146 (2026-03-31)
 **GIVC 피치덱 버전 셀렉터 + SPEC.md §2 수치 보정**:
 - ✅ GIVC 피치덱 v0.9 반영 — 고객선제안 최신 HTML 배치 (77KB)

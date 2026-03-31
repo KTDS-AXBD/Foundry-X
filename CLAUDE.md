@@ -143,7 +143,7 @@ pnpm e2e                          # Playwright E2E (17 specs, ~59 tests)
 - **TSX 지원:** vitest.config에 `.test.tsx` 패턴 포함, tsconfig에 `jsx: "react-jsx"`
 - **Mock 전략:** Ink 컴포넌트는 실제 렌더링, 외부 서비스만 mock
 - **API 테스트:** Hono `app.request()` 직접 호출 방식, D1 mock은 in-memory SQLite
-- **E2E 테스트:** Playwright (`packages/web/e2e/`), 17 specs, `pnpm e2e`로 실행
+- **E2E 테스트:** Playwright (`packages/web/e2e/`), 25 specs, `pnpm e2e`로 실행
 - **ESLint 커스텀 룰 3종** (packages/api): `no-direct-db-in-route`, `require-zod-schema`, `no-orphan-plumb-import`
 
 ## Current Phase
@@ -171,13 +171,17 @@ pnpm e2e                          # Playwright E2E (17 specs, ~59 tests)
 ## Deployment
 
 ```bash
-# API 배포 (Workers)
-cd packages/api && wrangler deploy             # 프로덕션 배포
-wrangler d1 migrations apply --remote          # D1 마이그레이션 적용
+# API 배포 (Workers) — ⚠️ Windows PowerShell에서 실행 (WSL에서 wrangler 금지, 메모리 소진)
+cd C:\Users\sincl\work\axbd\Foundry-X\packages\api
+npx wrangler d1 migrations apply foundry-x-db --remote   # 마이그레이션 먼저
+npx wrangler deploy                                       # Workers 배포
 
-# Web 배포 (Pages — GitHub 연동 자동 배포, 수동 시)
-cd packages/web && pnpm build && wrangler pages deploy dist --project-name=foundry-x-web
+# Web 배포 (Pages — GitHub 연동 자동 배포, 수동 시) — Windows PowerShell
+cd C:\Users\sincl\work\axbd\Foundry-X\packages\web
+pnpm build && npx wrangler pages deploy dist --project-name=foundry-x-web
 ```
+
+- **WSL→Windows 동기화**: WSL에서 빌드 후, Windows에서 `git pull origin master` → `pnpm install` → 배포
 
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
 - **Pages**: `fx.minu.best` (Vite + React Router 7, CNAME → Cloudflare Pages)
