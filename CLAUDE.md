@@ -122,14 +122,14 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 
 # API 패키지 단독
 cd packages/api
-pnpm test                         # vitest run (2119 tests)
+pnpm test                         # vitest run (2250 tests)
 pnpm test -- --grep "agent"       # 특정 테스트 필터
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # 로컬 서버 실행
 
 # Web 패키지 단독
 cd packages/web
-pnpm test                         # vitest run (207 tests)
+pnpm test                         # vitest run (265 tests)
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # Vite dev server (localhost:3000)
 pnpm e2e                          # Playwright E2E (35 specs, ~146 tests)
@@ -143,7 +143,7 @@ pnpm e2e                          # Playwright E2E (35 specs, ~146 tests)
 - **TSX 지원:** vitest.config에 `.test.tsx` 패턴 포함, tsconfig에 `jsx: "react-jsx"`
 - **Mock 전략:** Ink 컴포넌트는 실제 렌더링, 외부 서비스만 mock
 - **API 테스트:** Hono `app.request()` 직접 호출 방식, D1 mock은 in-memory SQLite
-- **E2E 테스트:** Playwright (`packages/web/e2e/`), 28 specs (~100 tests), `pnpm e2e`로 실행
+- **E2E 테스트:** Playwright (`packages/web/e2e/`), 35 specs (~146 tests), `pnpm e2e`로 실행
 - **ESLint 커스텀 룰 3종** (packages/api): `no-direct-db-in-route`, `require-zod-schema`, `no-orphan-plumb-import`
 
 ## Current Phase
@@ -186,8 +186,8 @@ pnpm build && npx wrangler pages deploy dist --project-name=foundry-x-web
 
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
 - **Pages**: `fx.minu.best` (Vite + React Router 7, CNAME → Cloudflare Pages)
-- **D1**: 0001~0074 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
-- **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+- **D1**: 0001~0078 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
+- **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, OPENROUTER_API_KEY
 
 ## Dev Tools (Track B — Agent Evolution)
 
@@ -203,7 +203,7 @@ pnpm build && npx wrangler pages deploy dist --project-name=foundry-x-web
 - **D1 migrations**: 로컬 적용 후 `--remote` 반드시 별도 실행 (누락하면 프로덕션 500)
 - **PostToolUse hook**: .ts/.tsx 편집 시 자동 eslint --fix + typecheck 실행 (15s/60s timeout)
 - **git add**: 절대 `git add .` 금지 — 멀티 pane 환경에서 다른 세션 변경 포함 위험
-- **D1 migration 0040 중복**: `0040_prd_reviews.sql`과 `0040_sixhats_debates.sql` 공존 — 새 마이그레이션은 0075부터
+- **D1 migration 중복**: `0040_prd_reviews.sql`/`0040_sixhats_debates.sql` + `0078_help_agent.sql`/`0078_hitl_reviews.sql` 공존 — 새 마이그레이션은 0079부터
 
 ## 성공 지표 (구현 시 참고)
 
