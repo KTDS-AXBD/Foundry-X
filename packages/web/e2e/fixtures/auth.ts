@@ -19,7 +19,7 @@ export const test = base.extend<{ authenticatedPage: Page }>({
     // Store JWT in localStorage before navigating
     await page.goto("/");
     await page.evaluate((t) => {
-      localStorage.setItem("fx-token", t);
+      localStorage.setItem("token", t);
     }, token);
 
     await use(page);

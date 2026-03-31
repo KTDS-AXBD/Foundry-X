@@ -13,7 +13,7 @@ export const test = authTest.extend<{ orgPage: OrgContext }>({
     const createRes = await page.request.post("/api/orgs", {
       data: { name: orgName },
       headers: {
-        Authorization: `Bearer ${await page.evaluate(() => localStorage.getItem("fx-token"))}`,
+        Authorization: `Bearer ${await page.evaluate(() => localStorage.getItem("token"))}`,
       },
     });
     let orgId = "test-org-id";

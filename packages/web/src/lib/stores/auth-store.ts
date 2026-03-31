@@ -13,6 +13,7 @@ interface User {
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  isHydrated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, name: string, password: string) => Promise<void>;
@@ -88,6 +89,7 @@ export { refreshAccessToken, scheduleTokenRefresh };
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
+  isHydrated: false,
   isLoading: false,
 
   login: async (email, password) => {
@@ -180,28 +182,30 @@ export const useAuthStore = create<AuthState>((set) => ({
           if (ok) {
             try {
               const user = JSON.parse(userJson) as User;
-              set({ user, isAuthenticated: true });
+              set({ user, isAuthenticated: true, isHydrated: true });
               scheduleTokenRefresh();
             } catch {
-              set({ user: null, isAuthenticated: false });
+              set({ user: null, isAuthenticated: false, isHydrated: true });
             }
           } else {
             // refresh도 실패 → 로그아웃
             localStorage.removeItem("token");
             localStorage.removeItem("refreshToken");
             localStorage.removeItem("user");
-            set({ user: null, isAuthenticated: false });
+            set({ user: null, isAuthenticated: false, isHydrated: true });
           }
         });
         return;
       }
       try {
         const user = JSON.parse(userJson) as User;
-        set({ user, isAuthenticated: true });
+        set({ user, isAuthenticated: true, isHydrated: true });
         scheduleTokenRefresh();
       } catch {
-        set({ user: null, isAuthenticated: false });
+        set({ user: null, isAuthenticated: false, isHydrated: true });
       }
+    } else {
+      set({ isHydrated: true });
     }
   },
 }));

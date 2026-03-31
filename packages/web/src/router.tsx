@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "@/layouts/AppLayout";
 import { LandingLayout } from "@/layouts/LandingLayout";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
@@ -12,6 +13,8 @@ export const router = createBrowserRouter([
   { path: "login", lazy: () => import("@/routes/login") },
   { path: "invite", lazy: () => import("@/routes/invite") },
   {
+    element: <ProtectedRoute />,
+    children: [{
     element: <AppLayout />,
     children: [
       { path: "dashboard", lazy: () => import("@/routes/dashboard") },
@@ -50,5 +53,6 @@ export const router = createBrowserRouter([
       { path: "ax-bd/bmc/:id", lazy: () => import("@/routes/ax-bd/bmc-detail") },
       { path: "ax-bd/bdp/:bizItemId", lazy: () => import("@/routes/ax-bd/bdp-detail") },
     ],
+  }],
   },
 ]);

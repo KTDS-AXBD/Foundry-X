@@ -3,7 +3,7 @@ import { test, expect } from "./fixtures/org";
 test.describe("Slack Notification Config API", () => {
   test("알림 설정 CRUD", async ({ orgPage: { page, orgId } }) => {
     const token = await page.evaluate(() =>
-      localStorage.getItem("fx-token"),
+      localStorage.getItem("token"),
     );
     const headers = {
       Authorization: `Bearer ${token}`,
@@ -42,7 +42,7 @@ test.describe("Slack Notification Config API", () => {
 
   test("잘못된 카테고리 → 400", async ({ orgPage: { page, orgId } }) => {
     const token = await page.evaluate(() =>
-      localStorage.getItem("fx-token"),
+      localStorage.getItem("token"),
     );
 
     const res = await page.request.put(
