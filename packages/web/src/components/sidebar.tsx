@@ -36,6 +36,7 @@ import {
   GitBranch,
   Target,
   Library,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -72,6 +73,7 @@ interface NavGroup {
 const topItems: NavItem[] = [
   { href: "/getting-started", label: "시작하기", icon: Rocket },
   { href: "/dashboard", label: "홈", icon: LayoutDashboard },
+  { href: "/team-shared", label: "팀 공유", icon: Users },
 ];
 
 /* ── 프로세스 6단계: 수집→발굴→형상화→검증/공유→제품화→GTM ── */

@@ -7,6 +7,7 @@ export const FeedbackSubmitRequestSchema = z
     pagePath: z.string().max(200).optional(),
     sessionSeconds: z.number().int().min(0).optional(),
     feedbackType: z.enum(["nps", "feature", "bug", "general"]).default("nps"),
+    surveyId: z.string().optional(),
   })
   .openapi("FeedbackSubmitRequest");
 

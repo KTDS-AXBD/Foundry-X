@@ -1,10 +1,18 @@
+import { useCallback, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "@/components/sidebar";
 import { OnboardingTour } from "@/components/feature/OnboardingTour";
 import { FeedbackWidget } from "@/components/feature/FeedbackWidget";
 import { ProcessStageGuide } from "@/components/feature/ProcessStageGuide";
+import { NpsSurveyTrigger } from "@/components/feature/NpsSurveyTrigger";
 
 export function AppLayout() {
+  const [npsSurveyId, setNpsSurveyId] = useState<string | undefined>();
+
+  const handleNpsTrigger = useCallback((surveyId: string) => {
+    setNpsSurveyId(surveyId);
+  }, []);
+
   return (
     <div className="flex min-h-screen">
       <Sidebar />
@@ -13,7 +21,8 @@ export function AppLayout() {
         <Outlet />
       </main>
       <OnboardingTour />
-      <FeedbackWidget />
+      <FeedbackWidget surveyId={npsSurveyId} />
+      <NpsSurveyTrigger onTrigger={handleNpsTrigger} />
     </div>
   );
 }

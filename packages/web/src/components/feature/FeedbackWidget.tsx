@@ -16,7 +16,11 @@ const FEEDBACK_TYPES = [
 
 type FeedbackType = "nps" | "feature" | "bug" | "general";
 
-export function FeedbackWidget() {
+interface FeedbackWidgetProps {
+  surveyId?: string;
+}
+
+export function FeedbackWidget({ surveyId }: FeedbackWidgetProps = {}) {
   const [open, setOpen] = useState(false);
   const [feedbackType, setFeedbackType] = useState<FeedbackType>("nps");
   const [score, setScore] = useState<number | null>(null);
@@ -24,6 +28,14 @@ export function FeedbackWidget() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const { pathname } = useLocation();
+
+  // Auto-open for NPS survey trigger
+  useEffect(() => {
+    if (surveyId) {
+      setFeedbackType("nps");
+      setOpen(true);
+    }
+  }, [surveyId]);
 
   // Session time tracking
   const mountTimeRef = useRef(Date.now());
@@ -58,6 +70,7 @@ export function FeedbackWidget() {
         pagePath: pathname,
         sessionSeconds: getSessionSeconds(),
         feedbackType,
+        surveyId: surveyId || undefined,
       });
       setSubmitted(true);
       setTimeout(() => setOpen(false), 1500);
