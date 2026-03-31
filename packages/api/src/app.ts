@@ -34,6 +34,7 @@ import { srRoute } from "./routes/sr.js";
 import { auditRoute } from "./routes/audit.js";
 import { governanceRoute } from "./routes/governance.js";
 import { bizItemsRoute } from "./routes/biz-items.js";
+import { discoveryStagesRoute } from "./routes/discovery-stages.js";
 import { collectionRoute, ideaPortalWebhookRoute } from "./routes/collection.js";
 import { discoveryRoute } from "./routes/discovery.js";
 import { methodologyRoute } from "./routes/methodology.js";
@@ -234,6 +235,9 @@ app.route("/api", governanceRoute);
 
 // Sprint 51: BizItems — 사업 아이템 분류 + 멀티 페르소나 평가 (auth + tenant required)
 app.route("/api", bizItemsRoute);
+
+// Sprint 94: Discovery Stages — biz-item별 단계 진행 추적 (F263)
+app.route("/api", discoveryStagesRoute);
 
 // Sprint 57: Collection — 수집 채널 통합 (auth + tenant required)
 app.route("/api", collectionRoute);

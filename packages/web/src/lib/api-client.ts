@@ -1398,6 +1398,35 @@ export async function getBizItems(): Promise<{ items: BizItemSummary[] }> {
   return fetchApi("/biz-items");
 }
 
+// ─── Sprint 94: Discovery Stages API (F263) ───
+
+export interface StageProgress {
+  stage: string;
+  stageName: string;
+  status: string;
+  startedAt: string | null;
+  completedAt: string | null;
+}
+
+export interface DiscoveryProgress {
+  stages: StageProgress[];
+  currentStage: string | null;
+  completedCount: number;
+  totalCount: number;
+}
+
+export async function getDiscoveryProgress(bizItemId: string): Promise<DiscoveryProgress> {
+  return fetchApi(`/biz-items/${bizItemId}/discovery-progress`);
+}
+
+export async function updateDiscoveryStage(
+  bizItemId: string,
+  stage: string,
+  status: string,
+): Promise<{ ok: boolean; stage: string; status: string }> {
+  return postApi(`/biz-items/${bizItemId}/discovery-stage`, { stage, status });
+}
+
 // ─── Sprint 71: Skill Guide API (F215) ───
 
 export interface SkillGuideResponse {
