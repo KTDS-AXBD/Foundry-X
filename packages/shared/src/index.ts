@@ -184,3 +184,19 @@ export type {
   DiscoveryStatus,
   DiscoveryConfig,
 } from './discovery-x.js';
+
+// Sprint 92: KG Ontology types (F255)
+export type {
+  KgNodeType,
+  KgRelationType,
+  ImpactLevel,
+  KgNodeSummary,
+  KgEdgeSummary,
+} from './kg.js';
+
+export {
+  KG_NODE_TYPE_LABELS,
+  KG_RELATION_TYPE_LABELS,
+  KG_NODE_TYPES,
+  KG_RELATION_TYPES,
+} from './kg.js';

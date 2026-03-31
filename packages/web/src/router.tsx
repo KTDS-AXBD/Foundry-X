@@ -59,6 +59,7 @@ export const router = createBrowserRouter([
       { path: "ax-bd/artifacts", lazy: () => import("@/routes/ax-bd/artifacts") },
       { path: "ax-bd/artifacts/:id", lazy: () => import("@/routes/ax-bd/artifact-detail") },
       { path: "ax-bd/progress", lazy: () => import("@/routes/ax-bd/progress") },
+      { path: "ax-bd/ontology", lazy: () => import("@/routes/ax-bd/ontology") },
     ],
   }],
   },
