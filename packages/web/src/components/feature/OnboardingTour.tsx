@@ -5,9 +5,10 @@ import { createPortal } from "react-dom";
 import { X, ChevronRight, ChevronLeft, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useUserRole } from "@/hooks/useUserRole";
 
 /* ------------------------------------------------------------------ */
-/*  Tour Step 정의 — 3대 업무 동선 중심 6스텝                           */
+/*  Tour Step 정의 — 역할별 분기 (F252)                                */
 /* ------------------------------------------------------------------ */
 
 interface TourStep {
@@ -17,7 +18,7 @@ interface TourStep {
   position: "right" | "bottom";
 }
 
-const TOUR_STEPS: TourStep[] = [
+const BASE_STEPS: TourStep[] = [
   {
     target: "getting-started",
     title: "🚀 시작하기",
@@ -60,14 +61,63 @@ const TOUR_STEPS: TourStep[] = [
       "게이트 통과(ORB/PRB), MVP 제작, 시장 진출까지 나머지 단계를 진행하세요.",
     position: "right",
   },
+];
+
+const ADMIN_EXTRA_STEPS: TourStep[] = [
   {
-    target: "getting-started",
-    title: "🎉 투어 완료!",
+    target: "settings",
+    title: "⚙️ 팀 설정",
     description:
-      "이제 시작할 준비가 됐어요. 아래 '도움말' 메뉴에서 이 투어를 다시 볼 수 있어요.",
+      "Org 설정과 멤버 관리를 여기서 할 수 있어요. 팀원 초대와 역할 변경이 가능해요.",
+    position: "right",
+  },
+  {
+    target: "agents",
+    title: "🤖 에이전트 설정",
+    description:
+      "팀 에이전트를 커스터마이징하고 워크플로우 자동화를 구성하세요.",
+    position: "right",
+  },
+  {
+    target: "workspace",
+    title: "📊 워크스페이스",
+    description:
+      "팀 전체의 KPI와 워크플로우 분석을 대시보드에서 확인하세요.",
+    position: "right",
+  },
+  {
+    target: "tokens",
+    title: "🔑 토큰 관리",
+    description:
+      "API 토큰과 SSO 설정을 관리하세요. 외부 시스템 연동에 필요해요.",
     position: "right",
   },
 ];
+
+const MEMBER_EXTRA_STEPS: TourStep[] = [
+  {
+    target: "getting-started",
+    title: "💬 도움이 필요할 때",
+    description:
+      "이 페이지에서 업무 가이드, FAQ, 팀 연락처를 확인할 수 있어요. 언제든 다시 오세요.",
+    position: "right",
+  },
+];
+
+const FINISH_STEP: TourStep = {
+  target: "getting-started",
+  title: "🎉 투어 완료!",
+  description:
+    "이제 시작할 준비가 됐어요. 아래 '도움말' 메뉴에서 이 투어를 다시 볼 수 있어요.",
+  position: "right",
+};
+
+export function buildTourSteps(isAdmin: boolean): TourStep[] {
+  const extra = isAdmin ? ADMIN_EXTRA_STEPS : MEMBER_EXTRA_STEPS;
+  return [...BASE_STEPS, ...extra, FINISH_STEP];
+}
+
+export { BASE_STEPS, ADMIN_EXTRA_STEPS, MEMBER_EXTRA_STEPS };
 
 const STORAGE_KEY = "fx-tour-completed";
 
@@ -210,10 +260,13 @@ function SpotlightOverlay({
 /* ------------------------------------------------------------------ */
 
 export function OnboardingTour() {
+  const { isAdmin } = useUserRole();
   const [active, setActive] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const rafRef = useRef<number>(0);
+
+  const tourSteps = buildTourSteps(isAdmin);
 
   // 첫 로그인 시 자동 시작
   useEffect(() => {
@@ -228,13 +281,13 @@ export function OnboardingTour() {
   // 타겟 엘리먼트 위치 추적
   const updateRect = useCallback(() => {
     if (!active) return;
-    const step = TOUR_STEPS[stepIndex];
+    const step = tourSteps[stepIndex];
     const el = document.querySelector(`[data-tour="${step.target}"]`);
     if (el) {
       setTargetRect(el.getBoundingClientRect());
     }
     rafRef.current = requestAnimationFrame(updateRect);
-  }, [active, stepIndex]);
+  }, [active, stepIndex, tourSteps]);
 
   useEffect(() => {
     if (active) {
@@ -249,12 +302,12 @@ export function OnboardingTour() {
   }, []);
 
   const next = useCallback(() => {
-    if (stepIndex >= TOUR_STEPS.length - 1) {
+    if (stepIndex >= tourSteps.length - 1) {
       finish();
     } else {
       setStepIndex((i) => i + 1);
     }
-  }, [stepIndex, finish]);
+  }, [stepIndex, tourSteps.length, finish]);
 
   const prev = useCallback(() => {
     setStepIndex((i) => Math.max(0, i - 1));
@@ -262,7 +315,7 @@ export function OnboardingTour() {
 
   if (!active) return null;
 
-  const step = TOUR_STEPS[stepIndex];
+  const step = tourSteps[stepIndex];
 
   return createPortal(
     <>
@@ -270,7 +323,7 @@ export function OnboardingTour() {
       <TourTooltip
         step={step}
         stepIndex={stepIndex}
-        totalSteps={TOUR_STEPS.length}
+        totalSteps={tourSteps.length}
         targetRect={targetRect}
         onNext={next}
         onPrev={prev}

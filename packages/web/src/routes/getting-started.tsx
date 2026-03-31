@@ -41,6 +41,9 @@ import {
   type TeamFaqResponse,
 } from "@/lib/api-client";
 import { useRestartTour } from "@/components/feature/OnboardingTour";
+import { useUserRole } from "@/hooks/useUserRole";
+import AdminQuickGuide from "@/components/feature/AdminQuickGuide";
+import MemberQuickStart from "@/components/feature/MemberQuickStart";
 import CoworkSetupGuide from "@/components/feature/CoworkSetupGuide";
 import SkillReferenceTable from "@/components/feature/SkillReferenceTable";
 import ProcessLifecycleFlow from "@/components/feature/ProcessLifecycleFlow";
@@ -500,6 +503,7 @@ function GettingStartedContent() {
     TAB_KEYS.includes(initialTab as TabKey) ? initialTab : "start",
   );
 
+  const { isAdmin } = useUserRole();
   const [progress, setProgress] = useState<OnboardingProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -614,6 +618,8 @@ function GettingStartedContent() {
             progressPercent={progressPercent}
             onRestartTour={restartTour}
           />
+
+          {isAdmin ? <AdminQuickGuide /> : <MemberQuickStart />}
 
           <WorkflowQuickstart />
 
