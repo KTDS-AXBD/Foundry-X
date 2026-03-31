@@ -53,7 +53,7 @@ test.describe("Conflict Resolution Flow", () => {
     await page.getByRole("button", { name: /Spec 생성/ }).click();
 
     // Result should display
-    await expect(page.getByText("에이전트 토큰 사용량 차트")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("에이전트 토큰 사용량 차트").first()).toBeVisible({ timeout: 10000 });
     await expect(page.getByText(/Acceptance Criteria/)).toBeVisible();
   });
 
@@ -78,7 +78,7 @@ test.describe("Conflict Resolution Flow", () => {
     await page.getByRole("button", { name: /Spec 생성/ }).click();
 
     // Wait for result
-    await expect(page.getByText("에이전트 토큰 사용량 차트")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("에이전트 토큰 사용량 차트").first()).toBeVisible({ timeout: 10000 });
 
     // Conflict section should appear
     await expect(page.getByText(/충돌이 감지되었습니다/)).toBeVisible();

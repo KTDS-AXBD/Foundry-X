@@ -56,7 +56,7 @@ export default function AgentCard({ agent, taskStatus }: AgentCardProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Capabilities */}
-        {agent.capabilities.length > 0 && (
+        {agent.capabilities?.length > 0 && (
           <div>
             <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">
               Capabilities
@@ -94,7 +94,7 @@ export default function AgentCard({ agent, taskStatus }: AgentCardProps) {
         )}
 
         {/* Constraints */}
-        {agent.constraints.length > 0 && (
+        {agent.constraints?.length > 0 && (
           <div>
             <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">
               Constraints

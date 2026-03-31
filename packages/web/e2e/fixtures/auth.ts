@@ -23,6 +23,62 @@ const TEST_USER = {
   role: "admin",
 };
 
+const TEST_ORG = {
+  id: "test-org-e2e",
+  name: "Test Org",
+  slug: "test-org",
+  plan: "free",
+  createdAt: "2026-01-01T00:00:00Z",
+};
+
+/**
+ * Set up common API mocks that the app shell calls on every authenticated page load.
+ * Without these, OrgSwitcher / NpsSurveyTrigger / agents cause React render crashes.
+ */
+async function setupAppShellMocks(page: Page) {
+  // OrgSwitcher calls GET /api/orgs on mount
+  await page.route("**/api/orgs", (route) => {
+    if (route.request().method() === "GET") {
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([TEST_ORG]),
+      });
+    }
+    return route.continue();
+  });
+
+  // NpsSurveyTrigger calls GET /api/nps/check on mount
+  await page.route("**/api/nps/check", (route) => {
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ shouldShow: false, surveyId: null }),
+    });
+  });
+
+  // Agents page fetches GET /api/agents
+  await page.route("**/api/agents", (route) => {
+    if (route.request().method() === "GET") {
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([]),
+      });
+    }
+    return route.continue();
+  });
+
+  // SSE stream endpoint (agents real-time updates)
+  await page.route("**/api/agents/stream", (route) => {
+    return route.fulfill({
+      status: 200,
+      body: "",
+      headers: { "Content-Type": "text/event-stream" },
+    });
+  });
+}
+
 export const test = base.extend<{ authenticatedPage: Page }>({
   authenticatedPage: async ({ page }, use) => {
     const token = makeFakeJwt();
@@ -38,6 +94,9 @@ export const test = base.extend<{ authenticatedPage: Page }>({
       },
       { t: token, u: TEST_USER },
     );
+
+    // Set up common app shell mocks
+    await setupAppShellMocks(page);
 
     await use(page);
   },

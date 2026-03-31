@@ -9,12 +9,12 @@ test.describe("Production Critical Path", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // Features 링크 클릭
-    await page.getByRole("link", { name: "Features" }).first().click();
+    // 핵심 기능 링크 클릭 (한국어 IA)
+    await page.getByRole("link", { name: "핵심 기능" }).first().click();
 
-    // Core Pillars 섹션이 뷰포트에 보이는지 확인 (F74 개편 후)
+    // 핵심 기능 섹션이 뷰포트에 보이는지 확인
     await expect(
-      page.getByRole("heading", { name: /차별점|Core Pillars/i }),
+      page.getByRole("heading", { name: /핵심 기능|차별점|Core Pillars/i }),
     ).toBeVisible();
   });
 
@@ -26,8 +26,8 @@ test.describe("Production Critical Path", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // Architecture 링크가 있으면 클릭
-    const archLink = page.getByRole("link", { name: /Architecture/i }).first();
+    // 아키텍처 링크가 있으면 클릭 (한국어 IA)
+    const archLink = page.getByRole("link", { name: /아키텍처|Architecture/i }).first();
     if (await archLink.isVisible()) {
       await archLink.click();
       await page.waitForLoadState("networkidle");
@@ -45,8 +45,8 @@ test.describe("Production Critical Path", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // Roadmap 링크가 Navbar에 있으면 클릭
-    const roadmapLink = page.getByRole("link", { name: /Roadmap/i }).first();
+    // 로드맵 링크가 Navbar에 있으면 클릭 (한국어 IA)
+    const roadmapLink = page.getByRole("link", { name: /로드맵|Roadmap/i }).first();
     if (await roadmapLink.isVisible()) {
       await roadmapLink.click();
     }

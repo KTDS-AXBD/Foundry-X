@@ -20,8 +20,8 @@ test.describe("Workspace Navigation", () => {
   test("org members 네비게이션", async ({ authenticatedPage: page }) => {
     await page.goto("/workspace/org/members");
 
-    // Members heading or Loading state (depends on org being selected)
-    const heading = page.getByRole("heading", { name: /Members/i });
+    // Members heading (exact h1) or fallback states
+    const heading = page.getByRole("heading", { name: "Members", exact: true });
     const loading = page.getByText("Loading...");
     const noOrg = page.getByText("No organization selected.");
 

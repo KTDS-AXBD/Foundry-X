@@ -44,9 +44,9 @@ test.describe("Production Smoke", () => {
     // Navbar brand
     await expect(page.getByText("Foundry-X").first()).toBeVisible();
 
-    // 핵심 네비게이션 링크
+    // 핵심 네비게이션 링크 (한국어 IA)
     await expect(
-      page.getByRole("link", { name: "Features" }).first(),
+      page.getByRole("link", { name: "핵심 기능" }).first(),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Dashboard" }).first(),

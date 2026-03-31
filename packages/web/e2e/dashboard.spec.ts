@@ -4,29 +4,33 @@ test.describe("Dashboard", () => {
   test("sidebar navigation is visible", async ({ authenticatedPage: page }) => {
     await page.goto("/dashboard");
 
-    // 프로세스 6단계 기반 IA — 상단 + 관리 그룹 항목
+    // 상단 고정 링크
+    await expect(page.getByRole("link", { name: "시작하기" })).toBeVisible();
     await expect(page.getByRole("link", { name: "홈" }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: "에이전트" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "지식베이스" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "토큰 비용" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "아키텍처" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "팀 공유" })).toBeVisible();
+
+    // 프로세스 6단계 그룹 버튼
+    await expect(page.getByRole("button", { name: /1\. 수집/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /2\. 발굴/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /3\. 형상화/ })).toBeVisible();
   });
 
   test("sidebar 프로세스 6단계 그룹 항목 확인", async ({ authenticatedPage: page }) => {
     await page.goto("/dashboard");
 
-    // 수집 그룹 (기본 펼침)
+    // 수집 그룹 항목 (기본 펼침)
     await expect(page.getByRole("link", { name: "SR 목록" })).toBeVisible();
 
-    // 발굴 그룹 (기본 펼침)
+    // 발굴 그룹 항목 (기본 펼침)
     await expect(page.getByRole("link", { name: "아이디어 관리" })).toBeVisible();
     await expect(page.getByRole("link", { name: "BMC" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "진행률" })).toBeVisible();
 
-    // 형상화 그룹 (기본 펼침)
+    // 형상화 그룹 — 클릭해서 펼친 후 확인
+    await page.getByRole("button", { name: /3\. 형상화/ }).click();
     await expect(page.getByRole("link", { name: "Spec 생성" })).toBeVisible();
 
-    // 검증/공유 그룹 (기본 펼침)
+    // 검증/공유 그룹 — 클릭해서 펼친 후 확인
+    await page.getByRole("button", { name: /4\. 검증/ }).click();
     await expect(page.getByRole("link", { name: "파이프라인" })).toBeVisible();
   });
 

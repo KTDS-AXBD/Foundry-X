@@ -36,8 +36,8 @@ test.describe("Authentication Flow", () => {
     await expect(page.getByLabel("이메일")).toBeVisible();
     await expect(page.getByLabel("비밀번호")).toBeVisible();
 
-    // 로그인 버튼
-    await expect(page.getByRole("button", { name: "로그인" })).toBeVisible();
+    // 로그인 버튼 (폼 내부의 submit 버튼)
+    await expect(page.getByRole("button", { name: "로그인" }).first()).toBeVisible();
 
     // 회원가입 모드 전환
     await page.getByRole("button", { name: "회원가입" }).click();
@@ -63,7 +63,7 @@ test.describe("Authentication Flow", () => {
 
     await page.getByLabel("이메일").fill("wrong@example.com");
     await page.getByLabel("비밀번호").fill("wrong-password");
-    await page.getByRole("button", { name: "로그인" }).click();
+    await page.getByRole("button", { name: "로그인" }).first().click();
 
     // 에러 메시지가 표시되어야 함 (네트워크 에러 또는 인증 실패)
     // API 서버 미실행 환경에서는 네트워크 에러가 발생할 수 있음
