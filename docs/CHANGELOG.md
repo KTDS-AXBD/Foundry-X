@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #152 (2026-03-31)
+**Sprint 92~93 GIVC PoC 완료 + D1 0076 배포**:
+- ✅ Sprint 92 (F255): GIVC Ontology PoC 1차 — Property Graph 3-테이블 + 16 API + KG 탐색기 (PR #229)
+- ✅ Sprint 93 (F256+F257): GIVC PoC 2차 — 이벤트 연쇄 시나리오 MVP + BD 아이템 탐색 UI (PR #230)
+- ✅ D1 0076 remote 적용 + Workers 재배포 (Version 28a527e3)
+- ✅ 테스트: API 2190→2205(+15), Web 249→257(+8), 총 +23개
+
+**검증 결과**:
+- ✅ typecheck / lint / tests / D1 migration / Workers deploy
+
+---
+
 ## 마일스톤 회고: Phase 9a (v1.8.0) — Sprint 86~91
 
 ### 지표 변화
