@@ -52,6 +52,8 @@ export const router = createBrowserRouter([
       { path: "ax-bd/ideas/:id", lazy: () => import("@/routes/ax-bd/idea-detail") },
       { path: "ax-bd/bmc/:id", lazy: () => import("@/routes/ax-bd/bmc-detail") },
       { path: "ax-bd/bdp/:bizItemId", lazy: () => import("@/routes/ax-bd/bdp-detail") },
+      { path: "ax-bd/process-guide", lazy: () => import("@/routes/ax-bd/process-guide") },
+      { path: "ax-bd/skill-catalog", lazy: () => import("@/routes/ax-bd/skill-catalog") },
     ],
   }],
   },
