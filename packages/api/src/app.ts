@@ -67,6 +67,8 @@ import { gatePackageRoute } from "./routes/gate-package.js";
 import { offeringPacksRoute } from "./routes/offering-packs.js";
 import { mvpTrackingRoute } from "./routes/mvp-tracking.js";
 import { irProposalsRoute } from "./routes/ir-proposals.js";
+// Sprint 87: Admin bulk operations (F251)
+import { adminRoute } from "./routes/admin.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -280,6 +282,8 @@ app.route("/api", gatePackageRoute);
 app.route("/api", offeringPacksRoute);
 app.route("/api", mvpTrackingRoute);
 app.route("/api", irProposalsRoute);
+// Sprint 87: Admin bulk operations (F251)
+app.route("/api", adminRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
