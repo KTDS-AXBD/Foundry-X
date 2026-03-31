@@ -154,7 +154,7 @@ test.describe("Onboarding Flow (F252)", () => {
     await page.goto("/getting-started");
 
     // 5 tabs should be visible
-    const tabLabels = ["시작하기", "설치 가이드", "스킬 레퍼런스", "프로세스 가이드", "FAQ"];
+    const tabLabels = ["시작하기", "환경 설정", "스킬 레퍼런스", "프로세스 가이드", "FAQ"];
     for (const label of tabLabels) {
       await expect(page.getByRole("tab", { name: label })).toBeVisible();
     }
@@ -165,8 +165,8 @@ test.describe("Onboarding Flow (F252)", () => {
       "active",
     );
 
-    // Switch to "설치 가이드" tab
-    await page.getByRole("tab", { name: "설치 가이드" }).click();
+    // Switch to "환경 설정" tab
+    await page.getByRole("tab", { name: "환경 설정" }).click();
     await expect(page).toHaveURL(/tab=setup/);
 
     // Switch to "스킬 레퍼런스" tab
