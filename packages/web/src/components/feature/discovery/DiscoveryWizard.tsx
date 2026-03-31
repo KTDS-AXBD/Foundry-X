@@ -16,7 +16,9 @@ import {
   type BizItemSummary,
   type TrafficLightResponse,
   type StageProgress,
+  type HitlReview,
 } from "@/lib/api-client";
+import HitlReviewPanel from "./HitlReviewPanel";
 
 const TYPE_COLORS: Record<string, string> = {
   I: "bg-blue-100 text-blue-700 border-blue-200",
@@ -43,6 +45,7 @@ export default function DiscoveryWizard() {
   const [stages, setStages] = useState<StageProgress[]>([]);
   const [activeStage, setActiveStage] = useState("2-0");
   const [showOverview, setShowOverview] = useState(false);
+  const [hitlArtifact, setHitlArtifact] = useState<{ id: string; content: string | null } | null>(null);
 
   // Load biz-items
   useEffect(() => {
@@ -194,9 +197,24 @@ export default function DiscoveryWizard() {
               discoveryType={selectedItem?.discoveryType ?? undefined}
               bizItemId={selectedItemId}
               onStatusChange={handleStatusChange}
+              onArtifactReview={(id, content) => setHitlArtifact({ id, content })}
             />
           )}
         </>
+      )}
+
+      {/* HITL Review Panel */}
+      {hitlArtifact && (
+        <HitlReviewPanel
+          artifactId={hitlArtifact.id}
+          artifactContent={hitlArtifact.content}
+          onClose={() => setHitlArtifact(null)}
+          onActionComplete={(action) => {
+            if (action === "approved" && selectedItemId) {
+              getDiscoveryProgress(selectedItemId).then((p) => setStages(p.stages)).catch(() => {});
+            }
+          }}
+        />
       )}
 
       {/* Items List */}
