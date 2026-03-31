@@ -101,6 +101,7 @@ const processGroups: NavGroup[] = [
       { href: "/ax-bd/bmc", label: "BMC", icon: Blocks },
       { href: "/ax-bd/process-guide", label: "프로세스 가이드", icon: BookOpen },
       { href: "/ax-bd/skill-catalog", label: "스킬 카탈로그", icon: Library },
+      { href: "/ax-bd/artifacts", label: "산출물", icon: FileText },
       { href: "/discovery-progress", label: "진행률", icon: BarChart3 },
     ],
   },
