@@ -166,9 +166,8 @@ F265 (온보딩)        ← F252, F263 (같은 Sprint)
 F266 (HITL)          ← F260, F261, F263
 
 Sprint 94: F263 + F265 (병렬)
-Sprint 95: F264 (F263 완료 후)
-Sprint 96: F266 (F264 완료 후)
-Sprint 97: 통합 QA + 데모
+Sprint 95+96: F264 + F266 (병렬 — 코드 의존 없음, merge 시 충돌 2건 해결)
+Sprint 97: 통합 QA + 데모 (94~96 모두 merge 후)
 ```
 
 ## 리스크

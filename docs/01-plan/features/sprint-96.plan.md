@@ -19,7 +19,7 @@ references: "[[FX-SPEC-001]], [[FX-DSGN-FDU]]"
 | Feature | F266 HITL 인터랙션 + 결과물 확인 — 인라인 패널 (승인/수정/재생성/거부) |
 | Sprint | 96 |
 | 우선순위 | P0 |
-| 의존성 | F263(위저드, Sprint 94), F264(Help Agent, Sprint 95), F260(스킬 실행), F261(산출물) |
+| 의존성 | F263(위저드, Sprint 94), F260(스킬 실행), F261(산출물). F264(Help Agent)와 코드 의존 없음 → 병렬 가능 |
 | Design | docs/02-design/features/fx-discovery-ux.design.md §5 |
 
 ### Value Delivered
@@ -102,8 +102,8 @@ CREATE INDEX idx_hitl_artifact ON hitl_artifact_reviews(artifact_id, created_at)
 ## 사전 조건
 
 - [ ] Sprint 94 (F263) merge 완료
-- [ ] Sprint 95 (F264) merge 완료
 - [ ] bd-artifact-service에 status 필드 존재 확인
+- 참고: Sprint 95 (F264)와 코드 의존 없음 — 병렬 실행 가능
 
 ## 성공 기준
 
