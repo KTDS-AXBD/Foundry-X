@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #149 (2026-03-31)
+**Sprint 86: 인증 가드 + E2E 보강 + Workers 재배포**:
+- ✅ ProtectedRoute 래퍼: AppLayout 하위 36개 라우트 미인증 접근 차단 → /login 리다이렉트
+- ✅ auth-store isHydrated 상태 추가: 비동기 refresh 완료 대기 후 리다이렉트
+- ✅ E2E fixture fx-token→token 키 통일 4곳
+- ✅ auth-flow E2E 2→7개 시나리오 보강
+- ✅ Workers 재배포 (Version 42e92ca9, wrangler 4.78) + D1 0066~0074 remote 적용
+- ✅ CLAUDE.md drift 보정: Deployment WSL 제약 명시 + E2E 17→25 specs
+
+**검증 결과**:
+- ✅ typecheck / 207 unit tests / lint 0 error
+
+---
+
 ## 마일스톤 회고: Phase 7~8 (v1.7.0) — Sprint 79~85
 
 ### 지표 변화
