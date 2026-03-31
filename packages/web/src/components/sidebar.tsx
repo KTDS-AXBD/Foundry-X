@@ -38,6 +38,7 @@ import {
   Library,
   Users,
   Network,
+  Presentation,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -105,6 +106,7 @@ const processGroups: NavGroup[] = [
       { href: "/ax-bd/artifacts", label: "산출물", icon: FileText },
       { href: "/ax-bd/progress", label: "진행 추적", icon: BarChart3 },
       { href: "/ax-bd/ontology", label: "Ontology", icon: Network },
+      { href: "/ax-bd/demo", label: "데모 시나리오", icon: Presentation },
       { href: "/discovery-progress", label: "진행률", icon: BarChart3 },
     ],
   },
