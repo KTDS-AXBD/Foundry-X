@@ -1,6 +1,9 @@
 # bkit runtime state
 .bkit/
 
+# Team config (개인정보 포함)
+tools/team-config.json
+
 node_modules/
 dist/
 .foundry-x/

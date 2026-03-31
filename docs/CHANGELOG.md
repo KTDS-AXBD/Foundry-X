@@ -21,6 +21,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #149 (2026-03-31)
+**프로젝트 점검 + Phase 9 Sprint 87~88 완료 + Workers 재배포**:
+- ✅ Workers 재배포: wrangler 3→4 업그레이드 + Version 089a646a
+- ✅ D1 migration 0075 (nps_surveys) remote 적용
+- ✅ Phase 7~8 마일스톤 회고 (v1.7.0 태그)
+- ✅ Phase 9 로드맵 수립 (F251~F257, Sprint 87~90)
+- ✅ Sprint 87 (F251+F252): 팀 계정 일괄 생성 + 온보딩 가이드 고도화 (PR #224, Match 97%)
+- ✅ Sprint 88 (F253+F254): 팀 데이터 공유 + NPS 피드백 수집 (PR #226)
+- ✅ Sprint 85/87/88 worktree 정리
+- ✅ Sprint WT 실행 규칙 정립 (bash sprint() 함수 + tmux send-keys autopilot)
+- 현재 수치: API 2142 + CLI 149 + Web 230 = 2521 tests, 66 routes, 156 services, 81 schemas, D1 0001~0075
+
 ## 마일스톤 회고: Phase 7~8 (v1.7.0) — Sprint 79~85
 
 ### 지표 변화
