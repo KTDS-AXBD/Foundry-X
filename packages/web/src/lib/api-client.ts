@@ -1652,3 +1652,76 @@ export interface NpsOrgSummary {
 export async function getOrgNpsSummary(orgId: string): Promise<NpsOrgSummary> {
   return fetchApi(`/orgs/${orgId}/nps/summary`);
 }
+
+// ─── F262: BD 프로세스 진행 추적 ───
+
+export interface DiscoveryStageProgress {
+  stageId: string;
+  stageName: string;
+  hasArtifacts: boolean;
+  artifactCount: number;
+  checkpoint?: { decision: string; decidedAt: string };
+}
+
+export interface ProcessProgress {
+  bizItemId: string;
+  title: string;
+  status: string;
+  pipelineStage: string;
+  pipelineEnteredAt: string;
+  currentDiscoveryStage: string;
+  discoveryStages: DiscoveryStageProgress[];
+  completedStageCount: number;
+  totalStageCount: number;
+  trafficLight: {
+    overallSignal: "green" | "yellow" | "red";
+    go: number;
+    pivot: number;
+    drop: number;
+    pending: number;
+  };
+  commitGate: { decision: string; decidedAt: string } | null;
+  lastDecision: {
+    decision: string;
+    stage: string;
+    comment: string;
+    decidedAt: string;
+  } | null;
+}
+
+export interface PortfolioSummary {
+  totalItems: number;
+  bySignal: { green: number; yellow: number; red: number };
+  byPipelineStage: Record<string, number>;
+  avgCompletionRate: number;
+  bottleneck: { stageId: string; stageName: string; itemCount: number } | null;
+}
+
+export interface PortfolioProgressResponse {
+  items: ProcessProgress[];
+  summary: PortfolioSummary;
+  total: number;
+}
+
+export async function getProcessProgress(bizItemId: string): Promise<ProcessProgress> {
+  return fetchApi(`/ax-bd/progress/${bizItemId}`);
+}
+
+export async function getPortfolioProgress(params?: {
+  signal?: string;
+  pipelineStage?: string;
+  page?: number;
+  limit?: number;
+}): Promise<PortfolioProgressResponse> {
+  const query = new URLSearchParams();
+  if (params?.signal) query.set("signal", params.signal);
+  if (params?.pipelineStage) query.set("pipelineStage", params.pipelineStage);
+  if (params?.page) query.set("page", String(params.page));
+  if (params?.limit) query.set("limit", String(params.limit));
+  const qs = query.toString();
+  return fetchApi(`/ax-bd/progress${qs ? `?${qs}` : ""}`);
+}
+
+export async function getPortfolioSummary(): Promise<PortfolioSummary> {
+  return fetchApi("/ax-bd/progress/summary");
+}

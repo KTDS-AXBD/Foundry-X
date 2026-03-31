@@ -75,6 +75,8 @@ import { npsRoute } from "./routes/nps.js";
 // Sprint 90: BD 스킬 실행 + 산출물 (F260, F261)
 import { axBdSkillsRoute } from "./routes/ax-bd-skills.js";
 import { axBdArtifactsRoute } from "./routes/ax-bd-artifacts.js";
+// Sprint 91: BD 프로세스 진행 추적 (F262)
+import { axBdProgressRoute } from "./routes/ax-bd-progress.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -297,6 +299,8 @@ app.route("/api", npsRoute);
 // Sprint 90: BD 스킬 실행 + 산출물 (F260, F261)
 app.route("/api", axBdSkillsRoute);
 app.route("/api", axBdArtifactsRoute);
+// Sprint 91: BD 프로세스 진행 추적 (F262)
+app.route("/api", axBdProgressRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
