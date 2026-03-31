@@ -67,3 +67,11 @@ export const neighborQuerySchema = z.object({
 export const subgraphQuerySchema = z.object({
   depth: z.coerce.number().int().min(1).max(5).default(2),
 });
+
+// F256: Scenario simulation
+export const scenarioSimulateSchema = z.object({
+  eventNodeIds: z.array(z.string().min(1)).min(1).max(5),
+  decayFactor: z.number().min(0.1).max(1.0).default(0.7),
+  threshold: z.number().min(0).max(1).default(0.1),
+  maxDepth: z.number().int().min(1).max(10).default(5),
+});
