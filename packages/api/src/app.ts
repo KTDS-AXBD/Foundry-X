@@ -72,6 +72,9 @@ import { adminRoute } from "./routes/admin.js";
 // Sprint 88: Org shared data + NPS (F253, F254)
 import { orgSharedRoute } from "./routes/org-shared.js";
 import { npsRoute } from "./routes/nps.js";
+// Sprint 90: BD 스킬 실행 + 산출물 (F260, F261)
+import { axBdSkillsRoute } from "./routes/ax-bd-skills.js";
+import { axBdArtifactsRoute } from "./routes/ax-bd-artifacts.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -291,6 +294,9 @@ app.route("/api", adminRoute);
 // Sprint 88: Org shared data + NPS (F253, F254)
 app.route("/api", orgSharedRoute);
 app.route("/api", npsRoute);
+// Sprint 90: BD 스킬 실행 + 산출물 (F260, F261)
+app.route("/api", axBdSkillsRoute);
+app.route("/api", axBdArtifactsRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

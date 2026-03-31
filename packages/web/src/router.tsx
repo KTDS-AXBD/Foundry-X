@@ -56,6 +56,8 @@ export const router = createBrowserRouter([
       { path: "ax-bd/skill-catalog", lazy: () => import("@/routes/ax-bd/skill-catalog") },
       { path: "team-shared", lazy: () => import("@/routes/team-shared") },
       { path: "settings/nps", lazy: () => import("@/routes/nps-dashboard") },
+      { path: "ax-bd/artifacts", lazy: () => import("@/routes/ax-bd/artifacts") },
+      { path: "ax-bd/artifacts/:id", lazy: () => import("@/routes/ax-bd/artifact-detail") },
     ],
   }],
   },

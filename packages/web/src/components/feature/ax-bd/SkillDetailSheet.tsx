@@ -11,13 +11,16 @@ import {
 import { cn } from "@/lib/utils";
 import { CATEGORY_LABELS, CATEGORY_COLORS, type BdSkill } from "@/data/bd-skills";
 import { BD_STAGES } from "@/data/bd-process";
+import SkillExecutionForm from "./SkillExecutionForm";
 
 interface SkillDetailSheetProps {
   skill: BdSkill;
   onClose: () => void;
+  bizItemId?: string;
+  stageId?: string;
 }
 
-export default function SkillDetailSheet({ skill, onClose }: SkillDetailSheetProps) {
+export default function SkillDetailSheet({ skill, onClose, bizItemId, stageId }: SkillDetailSheetProps) {
   return (
     <Sheet open onOpenChange={(open) => !open && onClose()}>
       <SheetContent side="right" className="w-[400px] overflow-y-auto sm:w-[540px]">
@@ -69,22 +72,31 @@ export default function SkillDetailSheet({ skill, onClose }: SkillDetailSheetPro
           <div>
             <h4 className="mb-2 text-xs font-semibold text-muted-foreground">추천 단계</h4>
             <div className="space-y-1.5">
-              {skill.stages.map((stageId) => {
-                const stage = BD_STAGES.find((s) => s.id === stageId);
+              {skill.stages.map((sid) => {
+                const stage = BD_STAGES.find((s) => s.id === sid);
                 return (
                   <div
-                    key={stageId}
+                    key={sid}
                     className="flex items-center gap-2 rounded-md border px-3 py-1.5"
                   >
                     <Badge variant="outline" className="font-mono text-[10px]">
-                      {stageId}
+                      {sid}
                     </Badge>
-                    <span className="text-xs">{stage?.name ?? stageId}</span>
+                    <span className="text-xs">{stage?.name ?? sid}</span>
                   </div>
                 );
               })}
             </div>
           </div>
+
+          {/* Execution (F260) — only when bizItemId is provided */}
+          {bizItemId && skill.type === "skill" && (
+            <SkillExecutionForm
+              skill={skill}
+              bizItemId={bizItemId}
+              stageId={stageId ?? skill.stages[0] ?? "2-0"}
+            />
+          )}
         </div>
       </SheetContent>
     </Sheet>
