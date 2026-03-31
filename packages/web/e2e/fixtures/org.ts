@@ -7,24 +7,37 @@ interface OrgContext {
   orgName: string;
 }
 
+const TEST_ORG = {
+  id: "test-org-e2e",
+  name: "Test Org",
+  slug: "test-org",
+  plan: "free" as const,
+  createdAt: "2026-01-01T00:00:00Z",
+};
+
 export const test = authTest.extend<{ orgPage: OrgContext }>({
   orgPage: async ({ authenticatedPage: page }, use) => {
-    const orgName = `test-org-${Date.now()}`;
-    const createRes = await page.request.post("/api/orgs", {
-      data: { name: orgName },
-      headers: {
-        Authorization: `Bearer ${await page.evaluate(() => localStorage.getItem("token"))}`,
-      },
+    // Mock /api/orgs to return our test org — OrgSwitcher calls fetchOrgs() on mount
+    await page.route("**/api/orgs", (route) => {
+      if (route.request().method() === "GET") {
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify([TEST_ORG]),
+        });
+      }
+      // POST — org creation
+      if (route.request().method() === "POST") {
+        return route.fulfill({
+          status: 201,
+          contentType: "application/json",
+          body: JSON.stringify(TEST_ORG),
+        });
+      }
+      return route.continue();
     });
-    let orgId = "test-org-id";
-    if (createRes.ok()) {
-      const body = await createRes.json();
-      orgId = body.id ?? orgId;
-    }
-    await page.evaluate((id) => {
-      localStorage.setItem("fx-active-org", id);
-    }, orgId);
-    await use({ page, orgId, orgName });
+
+    await use({ page, orgId: TEST_ORG.id, orgName: TEST_ORG.name });
   },
 });
 

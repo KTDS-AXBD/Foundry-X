@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Phase 8 진행 중 (Sprint 86 진행 중, ~345 endpoints, 153 services, 2119 API + 149 CLI + 207 Web tests + ~59 E2E) — IA 구조 개선 + 인증 강화
+**현재 상태:** Phase 8 진행 중 (Sprint 86 진행 중, ~345 endpoints, 153 services, 2119 API + 149 CLI + 207 Web tests + 93 E2E) — IA 구조 개선 + 인증 강화
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -132,7 +132,7 @@ cd packages/web
 pnpm test                         # vitest run (207 tests)
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # Vite dev server (localhost:3000)
-pnpm e2e                          # Playwright E2E (17 specs, ~59 tests)
+pnpm e2e                          # Playwright E2E (27 specs, ~93 tests)
 ```
 
 ## Testing
@@ -143,7 +143,7 @@ pnpm e2e                          # Playwright E2E (17 specs, ~59 tests)
 - **TSX 지원:** vitest.config에 `.test.tsx` 패턴 포함, tsconfig에 `jsx: "react-jsx"`
 - **Mock 전략:** Ink 컴포넌트는 실제 렌더링, 외부 서비스만 mock
 - **API 테스트:** Hono `app.request()` 직접 호출 방식, D1 mock은 in-memory SQLite
-- **E2E 테스트:** Playwright (`packages/web/e2e/`), 25 specs, `pnpm e2e`로 실행
+- **E2E 테스트:** Playwright (`packages/web/e2e/`), 27 specs (~93 tests), `pnpm e2e`로 실행
 - **ESLint 커스텀 룰 3종** (packages/api): `no-direct-db-in-route`, `require-zod-schema`, `no-orphan-plumb-import`
 
 ## Current Phase
