@@ -1909,3 +1909,30 @@ export async function simulateScenario(input: {
 }): Promise<ScenarioResult> {
   return postApi("/ax-bd/kg/scenario/simulate", input);
 }
+
+// ── F266: HITL Review ──────────────────────────
+
+export interface HitlReview {
+  id: string;
+  tenantId: string;
+  artifactId: string;
+  reviewerId: string;
+  action: "approved" | "modified" | "regenerated" | "rejected";
+  reason: string | null;
+  modifiedContent: string | null;
+  previousVersion: string | null;
+  createdAt: string;
+}
+
+export async function submitHitlReview(input: {
+  artifactId: string;
+  action: "approved" | "modified" | "regenerated" | "rejected";
+  reason?: string;
+  modifiedContent?: string;
+}): Promise<HitlReview> {
+  return postApi("/hitl/review", input);
+}
+
+export async function getHitlHistory(artifactId: string): Promise<{ reviews: HitlReview[]; total: number }> {
+  return fetchApi(`/hitl/history/${artifactId}`);
+}

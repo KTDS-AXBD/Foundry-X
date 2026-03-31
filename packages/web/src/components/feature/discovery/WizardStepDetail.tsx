@@ -11,6 +11,7 @@ interface WizardStepDetailProps {
   discoveryType?: string;
   bizItemId: string;
   onStatusChange: (stage: string, status: string) => void;
+  onArtifactReview?: (artifactId: string, content: string | null) => void;
 }
 
 interface StageContent {
@@ -133,6 +134,7 @@ export default function WizardStepDetail({
   discoveryType,
   bizItemId,
   onStatusChange,
+  onArtifactReview,
 }: WizardStepDetailProps) {
   const content = STAGE_CONTENT[stage];
   if (!content) return null;
