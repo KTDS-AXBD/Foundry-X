@@ -1829,3 +1829,54 @@ export async function seedKgData(): Promise<{ ok: boolean; nodes: number; edges:
 export async function clearKgData(): Promise<void> {
   return deleteApi("/ax-bd/kg/seed");
 }
+
+// ── F256: KG Scenario Simulation ──
+
+export interface ScenarioPreset {
+  id: string;
+  name: string;
+  nameEn: string;
+  description: string;
+  eventNodeIds: string[];
+  category: "petrochemical" | "semiconductor" | "compound";
+}
+
+export interface EventContribution {
+  eventId: string;
+  eventName: string;
+  score: number;
+}
+
+export interface HotspotNode {
+  id: string;
+  type: string;
+  name: string;
+  nameEn?: string;
+  combinedScore: number;
+  impactLevel: "HIGH" | "MEDIUM" | "LOW";
+  eventContributions: EventContribution[];
+  eventCount: number;
+  isHotspot: boolean;
+}
+
+export interface ScenarioResult {
+  events: Array<{ id: string; name: string; nameEn?: string }>;
+  affectedNodes: HotspotNode[];
+  hotspots: HotspotNode[];
+  totalAffected: number;
+  hotspotCount: number;
+  byLevel: { high: number; medium: number; low: number };
+}
+
+export async function getScenarioPresets(): Promise<{ presets: ScenarioPreset[] }> {
+  return fetchApi("/ax-bd/kg/scenario/presets");
+}
+
+export async function simulateScenario(input: {
+  eventNodeIds: string[];
+  decayFactor?: number;
+  threshold?: number;
+  maxDepth?: number;
+}): Promise<ScenarioResult> {
+  return postApi("/ax-bd/kg/scenario/simulate", input);
+}

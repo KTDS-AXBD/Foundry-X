@@ -9,6 +9,7 @@ import { KgNodeService } from "../services/kg-node.js";
 import { KgEdgeService } from "../services/kg-edge.js";
 import { KgQueryService } from "../services/kg-query.js";
 import { KgSeedService } from "../services/kg-seed.js";
+import { KgScenarioService } from "../services/kg-scenario.js";
 import {
   createNodeSchema,
   updateNodeSchema,
@@ -18,6 +19,7 @@ import {
   impactBodySchema,
   neighborQuerySchema,
   subgraphQuerySchema,
+  scenarioSimulateSchema,
 } from "../schemas/kg-ontology.schema.js";
 
 export const axBdKgRoute = new Hono<{
@@ -173,6 +175,33 @@ axBdKgRoute.get("/ax-bd/kg/stats", async (c) => {
   const svc = new KgQueryService(c.env.DB);
   const stats = await svc.getStats(c.get("orgId"));
   return c.json(stats);
+});
+
+// ── Scenario ──────────────────────────────────────
+
+// GET /ax-bd/kg/scenario/presets — List scenario presets
+axBdKgRoute.get("/ax-bd/kg/scenario/presets", async (c) => {
+  const svc = new KgScenarioService(c.env.DB);
+  return c.json({ presets: svc.getPresets() });
+});
+
+// GET /ax-bd/kg/scenario/presets/:id — Get preset detail
+axBdKgRoute.get("/ax-bd/kg/scenario/presets/:id", async (c) => {
+  const svc = new KgScenarioService(c.env.DB);
+  const preset = svc.getPresetById(c.req.param("id"));
+  if (!preset) return c.json({ error: "Preset not found" }, 404);
+  return c.json(preset);
+});
+
+// POST /ax-bd/kg/scenario/simulate — Run scenario simulation
+axBdKgRoute.post("/ax-bd/kg/scenario/simulate", async (c) => {
+  const body = await c.req.json();
+  const parsed = scenarioSimulateSchema.safeParse(body);
+  if (!parsed.success) return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+
+  const svc = new KgScenarioService(c.env.DB);
+  const result = await svc.simulateScenario(parsed.data, c.get("orgId"));
+  return c.json(result);
 });
 
 // ── Seed ───────────────────────────────────────────
