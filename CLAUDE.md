@@ -63,11 +63,12 @@ foundry-x/
 │   │       └── index.ts
 │   ├── web/                # Vite 8 + React Router 7 Dashboard + Landing
 │   │   └── src/
-│   │       ├── app/(landing)/  # 랜딩 페이지 (Navbar + Footer)
-│   │       ├── app/(app)/      # 대시보드 (Sidebar): dashboard, agents, architecture, methodologies, projects, settings, spec-generator, tokens, wiki, workspace
+│   │       ├── routes/         # 파일 기반 라우팅 (landing, dashboard, agents, ax-bd, discovery, wiki 등 30+)
+│   │       ├── layouts/        # AppLayout (Sidebar) + LandingLayout (Navbar+Footer)
 │   │       ├── components/     # feature + landing + ui 컴포넌트
-│   │       └── lib/            # api-client, sse-client
-│   └── shared/             # 공유 타입 (types.ts, web.ts, agent.ts, plugin.ts, sso.ts)
+│   │       ├── hooks/          # 커스텀 React hooks
+│   │       └── lib/            # api-client, sse-client, stores (Zustand)
+│   └── shared/             # 공유 타입 (types, web, agent, plugin, sso, methodology, discovery-x, ax-bd, kg)
 ├── docs/
 │   ├── 01-plan/            # PLAN 문서
 │   ├── 02-design/          # DSGN 문서
@@ -96,6 +97,7 @@ foundry-x/
 | `docs/specs/prd-v8-final.md` | 현행 PRD (권위 문서, v8: AI 에이전트 오케스트레이션 플랫폼) |
 | `docs/specs/ax-bd-atoz/prd-final.md` | AX BD A-to-Z PRD (7단계 라이프사이클 + 시스템 통합) |
 | `docs/specs/fx-bd-v1/prd-final.md` | BD Pipeline E2E 통합 PRD (Phase 7, 9 F-items) |
+| `docs/specs/fx-discovery-ux/prd-final.md` | 발굴 UX 개선 PRD (Phase 9, F263~F266) |
 | `docs/specs/bizdevprocess-3/prd-ax-bd-v1.4.md` | AX BD Ideation MVP PRD (BMC + AI 에이전트) |
 | `docs/specs/axbd/` | AX BD 프로세스 v8.2 참고자료 (ai-biz 플러그인 포함) |
 | `docs/specs/FX-PLAN-012/` | Phase 6 Ecosystem Integration PRD |
@@ -153,7 +155,7 @@ pnpm e2e                          # Playwright E2E (35 specs, ~146 tests)
 - **Phase 7:** ✅ 완료 (Sprint 79~81) — BD Pipeline End-to-End 통합 (FX-BD-V1)
 - **Phase 8:** ✅ 완료 (Sprint 82~86) — IA 구조 개선 + 인증 강화
 - **Phase 9:** 🔧 진행 중 (Sprint 87~98) — 팀 온보딩 + BD 스킬 통합 + GIVC PoC + 발굴 UX(F263~F266 완료) + BD 스킬 배포(F267)
-- **현재 수치:** ~169 services, ~420 endpoints, 2250 API tests + CLI 149 + Web 265 + E2E 33 specs, D1 0001~0078
+- **현재 수치:** ~169 services, ~420 endpoints, 2250 API tests + CLI 149 + Web 265 + E2E 35 specs, D1 0001~0079
 - **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 
 ## Git Workflow
