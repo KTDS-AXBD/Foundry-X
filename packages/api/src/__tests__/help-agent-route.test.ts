@@ -86,8 +86,8 @@ describe("Help Agent Route Logic", () => {
 
     const history = await service.getHistory("conv-order", "org1");
     expect(history.messages.length).toBe(4); // 2 user + 2 assistant
-    expect(history.messages[0].role).toBe("user");
-    expect(history.messages[1].role).toBe("assistant");
+    expect(history.messages[0]!.role).toBe("user");
+    expect(history.messages[1]!.role).toBe("assistant");
   });
 
   it("tenant 격리: 다른 tenant의 이력은 조회 불가", async () => {

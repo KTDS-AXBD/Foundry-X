@@ -126,7 +126,7 @@ export class HelpAgentService {
       conversationId,
       messages: (result.results || []).map((r: Record<string, unknown>) => ({
         id: r.id as string,
-        role: r.role as string,
+        role: r.role as "system" | "user" | "assistant",
         content: r.content as string,
         isLocalResponse: r.is_local_response === 1,
         createdAt: r.created_at as string,

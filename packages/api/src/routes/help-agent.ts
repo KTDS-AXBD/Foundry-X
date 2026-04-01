@@ -35,7 +35,7 @@ const chatRoute = createRoute({
 
 helpAgentRoute.openapi(chatRoute, async (c) => {
   const body = c.req.valid("json");
-  const tenantId = c.get("tenantId");
+  const tenantId = c.get("orgId");
   const userId = c.get("userId");
 
   const apiKey = c.env.OPENROUTER_API_KEY;
@@ -81,7 +81,7 @@ const historyRoute = createRoute({
 
 helpAgentRoute.openapi(historyRoute, async (c) => {
   const { conversationId } = c.req.valid("query");
-  const tenantId = c.get("tenantId");
+  const tenantId = c.get("orgId");
 
   const openRouter = new OpenRouterService(c.env.OPENROUTER_API_KEY || "");
   const service = new HelpAgentService(c.env.DB, openRouter);

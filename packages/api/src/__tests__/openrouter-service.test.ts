@@ -26,7 +26,7 @@ describe("OpenRouterService", () => {
     );
 
     expect(fetchSpy).toHaveBeenCalledOnce();
-    const [url, init] = fetchSpy.mock.calls[0];
+    const [url, init] = fetchSpy.mock.calls[0]!;
     expect(url).toBe("https://openrouter.ai/api/v1/chat/completions");
     expect((init as RequestInit).method).toBe("POST");
 
@@ -50,7 +50,7 @@ describe("OpenRouterService", () => {
     const service = new OpenRouterService("key");
     await service.streamChat([], "system");
 
-    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]?.body as string);
+    const body = JSON.parse(vi.mocked(fetch).mock.calls[0]![1]?.body as string);
     expect(body.model).toBe("anthropic/claude-sonnet-4-6");
   });
 

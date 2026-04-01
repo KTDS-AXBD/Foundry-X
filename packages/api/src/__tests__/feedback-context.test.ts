@@ -19,10 +19,7 @@ describe("Feedback context fields (F174)", () => {
   beforeEach(async () => {
     env = createTestEnv();
 
-    // Add new columns to the in-memory DB (simulating 0032 migration)
-    (env.DB as any).exec("ALTER TABLE onboarding_feedback ADD COLUMN page_path TEXT DEFAULT NULL");
-    (env.DB as any).exec("ALTER TABLE onboarding_feedback ADD COLUMN session_seconds INTEGER DEFAULT NULL");
-    (env.DB as any).exec("ALTER TABLE onboarding_feedback ADD COLUMN feedback_type TEXT DEFAULT 'nps'");
+    // page_path, session_seconds, feedback_type are already in base schema (mock-d1)
 
     (env.DB as any).prepare(
       "INSERT OR IGNORE INTO users (id, email, name, role, created_at, updated_at) VALUES ('test-user', 'test@example.com', 'Test', 'admin', datetime('now'), datetime('now'))"
