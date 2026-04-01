@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #158 (2026-04-01)
+**정합성 전체 점검 + 코드 버그 3건 수정 + SPEC §2 수치 보정**:
+- ✅ help-agent.ts: `tenantId`→`orgId` 타입에러 수정 (TenantVariables 정합)
+- ✅ help-agent-service.ts: `role` 타입 `string`→`"system"|"user"|"assistant"` 좁히기
+- ✅ feedback-context.test.ts: 중복 ALTER TABLE 제거 (mock-d1 base schema 반영)
+- ✅ 테스트 파일 optional chaining 보정 (help-agent-route, openrouter-service)
+- ✅ SPEC.md §2 수치 보정 6건: API 2250, Web 265, E2E 35, routes 73, services 169, D1 0079
+
+**검증 결과**:
+- ✅ typecheck 0 errors / lint 0 errors / tests 2250+149+265 = 2664 / build PASS
+
 ### 세션 #152b (2026-03-31)
 **KG Ontology E2E + Sprint 94 merge + CLAUDE.md 수치 갱신**:
 - ✅ KG Ontology E2E 7개 추가 (28 specs, ~100 tests)
