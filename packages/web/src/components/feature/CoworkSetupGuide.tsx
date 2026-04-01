@@ -48,13 +48,13 @@ const ENV_META: Record<
     icon: Terminal,
     label: "Claude Code (터미널)",
     badge: "권장",
-    desc: "터미널에서 claude 명령으로 실행. 76개 스킬 + 36개 커맨드 전부 사용 가능.",
+    desc: "터미널에서 claude 명령으로 실행. ax plugin(20개 워크플로우 스킬) + CLAUDE_AXBD(76개 BD 분석 스킬) 모두 사용 가능.",
   },
   "claude-desktop": {
     icon: Monitor,
     label: "Claude Desktop App",
     badge: "",
-    desc: "Claude Desktop 앱의 Code 탭에서 폴더를 열어 사용. 터미널 없이 GUI로 실행.",
+    desc: "Claude Desktop 앱의 Code 탭에서 폴더를 열어 사용. CLAUDE_AXBD 스킬을 GUI로 실행.",
   },
   web: {
     icon: Globe,
@@ -69,6 +69,7 @@ const PREREQUISITES: Record<Environment, string[]> = {
     "Node.js v20 이상 (node --version 으로 확인)",
     "Claude Code CLI 설치 (npm install -g @anthropic-ai/claude-code)",
     "Git 설치 (git --version 으로 확인)",
+    "Claude Pro/Team 구독 (Plugin 설치에 필요)",
   ],
   "claude-desktop": [
     "Claude Desktop 앱 설치 (claude.ai/download)",
@@ -83,58 +84,85 @@ const STEPS: Record<Environment, SetupStep[]> = {
   "claude-code": [
     {
       number: 1,
-      title: "CLAUDE_AXBD 폴더 다운로드",
+      title: "ax 워크플로우 Plugin 설치",
       description:
-        "팀 공용 스킬이 포함된 작업 폴더를 내 PC에 받아요.",
-      why: "이 폴더 안에 76개 분석 스킬, 36개 워크플로우, 프레임워크 실행 규칙이 모두 들어있어요.",
+        "세션 관리, Sprint, 거버넌스, 요구사항 관리 등 20개 개발 워크플로우 스킬을 설치해요.",
+      why: "Plugin으로 설치하면 어떤 프로젝트 폴더에서든 ax:session-start, ax:sprint 등을 사용할 수 있어요.",
       commands: [
-        "git clone https://github.com/KTDS-AXBD/CLAUDE_AXBD.git",
-        "cd CLAUDE_AXBD",
+        "claude plugin install ax@ax-marketplace",
       ],
-      tip: "원하는 위치에 받으면 돼요. 예: ~/work/CLAUDE_AXBD 또는 바탕화면",
+      note: "marketplace가 아직 등록되지 않았다면 아래 명령을 먼저 실행하세요.",
+      tip: "설치 후 / 를 입력하면 ax:session-start, ax:sprint 등이 자동완성 목록에 표시돼요.",
     },
     {
       number: 2,
-      title: "Claude Code 실행",
-      description: "다운로드한 폴더에서 Claude Code를 실행해요.",
-      commands: ["claude"],
-      note: "CLAUDE_AXBD 폴더 안에서 실행해야 스킬이 자동으로 인식돼요.",
-      verify:
-        "실행 후 / 를 입력하면 자동완성 목록에 스킬이 표시되면 성공!",
+      title: "(선택) ax marketplace 등록",
+      description:
+        "Plugin 설치가 실패하면, marketplace를 수동으로 등록해야 할 수 있어요.",
+      commands: [
+        '# ~/.claude/settings.json의 extraKnownMarketplaces에 추가:',
+        '# "ax-marketplace": {',
+        '#   "source": { "source": "github", "repo": "KTDS-AXBD/ax-plugin" }',
+        '# }',
+        '',
+        '# 또는 직접 settings 편집:',
+        'claude settings edit',
+      ],
+      tip: "Step 1에서 설치가 성공했다면 이 단계는 건너뛰어도 돼요.",
     },
     {
       number: 3,
-      title: "스킬 동작 확인",
-      description: "스킬이 정상적으로 로드됐는지 테스트해요.",
+      title: "CLAUDE_AXBD BD 분석 스킬 설치",
+      description:
+        "사업 발굴 분석용 76개 전문 스킬이 포함된 작업 폴더를 받아요.",
+      why: "ax plugin(개발 워크플로우)과 별도로, BD 사업 분석에 특화된 스킬 세트예요.",
       commands: [
-        "/swot-analysis 테스트 주제",
-        "/ai-biz-moat-analysis 테스트 주제",
+        "git clone https://github.com/KTDS-AXBD/CLAUDE_AXBD.git",
+        "cd CLAUDE_AXBD",
+        "claude",
       ],
-      tip: "두 개가 모두 응답하면 설치 완료! 76개 스킬 + 36개 커맨드를 자유롭게 사용하세요.",
+      note: "CLAUDE_AXBD 폴더 안에서 Claude Code를 실행해야 BD 스킬이 인식돼요.",
     },
     {
       number: 4,
+      title: "스킬 동작 확인",
+      description: "두 가지 스킬 세트가 모두 정상 로드됐는지 테스트해요.",
+      commands: [
+        "# ax plugin 스킬 (어디서든 사용 가능)",
+        "/ax:help",
+        "",
+        "# BD 분석 스킬 (CLAUDE_AXBD 폴더에서만)",
+        "/swot-analysis 테스트 주제",
+      ],
+      verify:
+        "ax:help 이 응답하고, /swot-analysis 가 분석 결과를 보여주면 설치 완료!",
+    },
+    {
+      number: 5,
       title: "발굴 프로세스 시작",
       description:
         "실제 사업 아이템으로 2단계 발굴 프로세스를 시작해요.",
       commands: [
-        '# 대화 시작 예시:',
+        '# CLAUDE_AXBD 폴더에서 대화 시작:',
         '나는 AX BD팀 [이름]입니다.',
         '[사업 아이템명]에 대해 2단계 발굴을 시작합니다.',
         '[아이템 설명 1~2문장]',
       ],
-      note: "AI가 자동으로 2-0 분류 대화를 시작해요. 5유형(I/M/P/T/S) 중 하나로 분류된 후, 유형에 맞는 분석 경로를 안내해요.",
+      note: "AI가 자동으로 5유형(I/M/P/T/S) 중 하나로 분류하고, 유형에 맞는 분석 경로를 안내해요.",
     },
     {
-      number: 5,
-      title: "스킬 업데이트 (수시)",
+      number: 6,
+      title: "업데이트 (수시)",
       description:
         "새 스킬이 추가되면 최신 버전으로 업데이트해요.",
       commands: [
-        "cd CLAUDE_AXBD",
-        "git pull origin main",
+        "# ax plugin 업데이트",
+        "claude plugin update ax@ax-marketplace",
+        "",
+        "# BD 스킬 업데이트",
+        "cd CLAUDE_AXBD && git pull origin main",
       ],
-      tip: "팀 Slack에서 스킬 업데이트 공지가 오면 git pull 한 번이면 끝!",
+      tip: "팀 Slack에서 업데이트 공지가 오면 두 명령만 실행하면 끝!",
     },
   ],
   "claude-desktop": [
@@ -335,8 +363,20 @@ function StepCard({ step }: { step: SetupStep }) {
 function ResourcesSection() {
   const resources = [
     {
+      title: "ax plugin (개발 워크플로우)",
+      desc: "20개 워크플로우 스킬 — 세션/Sprint/거버넌스/요구사항",
+      href: "https://github.com/KTDS-AXBD/ax-plugin",
+      internal: false,
+    },
+    {
+      title: "CLAUDE_AXBD (BD 분석 스킬)",
+      desc: "76개 사업 분석 스킬 — SWOT/해자/타당성/원가모델 등",
+      href: "https://github.com/KTDS-AXBD/CLAUDE_AXBD",
+      internal: false,
+    },
+    {
       title: "스킬 카탈로그",
-      desc: "76개 스킬 + 36개 커맨드 전체 목록",
+      desc: "전체 스킬 레퍼런스 테이블",
       href: "/getting-started?tab=skills",
       internal: true,
     },
@@ -351,12 +391,6 @@ function ResourcesSection() {
       desc: "사업 아이템 등록 + 스킬 실행 + 진행 추적",
       href: "/ax-bd/discovery",
       internal: true,
-    },
-    {
-      title: "CLAUDE_AXBD GitHub",
-      desc: "팀 공용 스킬 폴더 (clone용)",
-      href: "https://github.com/KTDS-AXBD/CLAUDE_AXBD",
-      internal: false,
     },
   ];
 
@@ -398,10 +432,10 @@ export default function CoworkSetupGuide() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="mb-1 font-display text-lg font-semibold">설치 가이드</h2>
+        <h2 className="mb-1 font-display text-lg font-semibold">팀 개발 환경 설정</h2>
         <p className="mb-4 text-sm text-muted-foreground">
-          사용 환경을 선택하고 단계별로 따라해 보세요. 모든 환경에서 동일한
-          AX BD 2단계 발굴 프로세스(v8.2)를 사용할 수 있어요.
+          사용 환경을 선택하고 단계별로 따라해 보세요. ax plugin(개발 워크플로우)과
+          CLAUDE_AXBD(BD 분석 스킬)를 함께 설치하면 모든 기능을 사용할 수 있어요.
         </p>
       </div>
 
