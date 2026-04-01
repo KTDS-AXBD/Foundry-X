@@ -9,7 +9,7 @@ import ProcessFlowV82 from "@/components/feature/ProcessFlowV82";
 import TypeRoutingMatrix from "@/components/feature/TypeRoutingMatrix";
 import WizardStepper from "./WizardStepper";
 import WizardStepDetail from "./WizardStepDetail";
-import HelpAgentChat from "./HelpAgentChat";
+// HelpAgentChat removed — now rendered as side panel in AppLayout (F269)
 import {
   fetchApi,
   getDiscoveryProgress,
@@ -264,11 +264,7 @@ export default function DiscoveryWizard() {
         </div>
       </div>
 
-      {/* Help Agent FAB — 하단 우측 플로팅 챗 */}
-      <HelpAgentChat
-        bizItemId={selectedItemId ?? undefined}
-        stage={activeStage}
-      />
+      {/* Help Agent는 AppLayout의 HelpAgentPanel로 이동 (F269) */}
     </div>
   );
 }

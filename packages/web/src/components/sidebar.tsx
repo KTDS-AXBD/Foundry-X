@@ -76,6 +76,7 @@ const topItems: NavItem[] = [
   { href: "/getting-started", label: "시작하기", icon: Rocket },
   { href: "/dashboard", label: "홈", icon: LayoutDashboard },
   { href: "/team-shared", label: "팀 공유", icon: Users },
+  { href: "/ax-bd/demo", label: "데모 시나리오", icon: Presentation },
 ];
 
 /* ── 프로세스 6단계: 수집→발굴→형상화→검증/공유→제품화→GTM ── */
@@ -98,16 +99,9 @@ const processGroups: NavGroup[] = [
     icon: Search,
     stageColor: "bg-axis-violet",
     items: [
-      { href: "/ax-bd/discovery", label: "Discovery 프로세스", icon: Map },
-      { href: "/ax-bd/ideas", label: "아이디어 관리", icon: Lightbulb },
-      { href: "/ax-bd/bmc", label: "BMC", icon: Blocks },
-      { href: "/ax-bd/process-guide", label: "프로세스 가이드", icon: BookOpen },
-      { href: "/ax-bd/skill-catalog", label: "스킬 카탈로그", icon: Library },
-      { href: "/ax-bd/artifacts", label: "산출물", icon: FileText },
-      { href: "/ax-bd/progress", label: "진행 추적", icon: BarChart3 },
-      { href: "/ax-bd/ontology", label: "Ontology", icon: Network },
-      { href: "/ax-bd/demo", label: "데모 시나리오", icon: Presentation },
-      { href: "/discovery-progress", label: "진행률", icon: BarChart3 },
+      { href: "/ax-bd/discovery", label: "Discovery", icon: Map },
+      { href: "/ax-bd/ideas-bmc", label: "아이디어·BMC", icon: Lightbulb },
+      { href: "/ax-bd/discover-dashboard", label: "대시보드", icon: BarChart3 },
     ],
   },
   {
@@ -157,6 +151,8 @@ const knowledgeGroup: NavGroup = {
   items: [
     { href: "/wiki", label: "지식베이스", icon: BookOpen },
     { href: "/methodologies", label: "방법론 관리", icon: Library },
+    { href: "/ax-bd/skill-catalog", label: "스킬 카탈로그", icon: Library },
+    { href: "/ax-bd/ontology", label: "Ontology", icon: Network },
   ],
 };
 
@@ -396,7 +392,7 @@ function NavLinks({ onSelect }: { onSelect?: () => void }) {
         onSelect={onSelect}
       />
 
-      {/* 도움말 */}
+      {/* 도움말 — 시작하기 페이지로 이동 */}
       <NavLink
         item={{ href: "/getting-started", label: "도움말", icon: HelpCircle }}
         pathname={pathname}

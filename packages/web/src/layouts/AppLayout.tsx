@@ -1,10 +1,11 @@
-import { useCallback, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "@/components/sidebar";
 import { OnboardingTour } from "@/components/feature/OnboardingTour";
 import { FeedbackWidget } from "@/components/feature/FeedbackWidget";
 import { ProcessStageGuide } from "@/components/feature/ProcessStageGuide";
 import { NpsSurveyTrigger } from "@/components/feature/NpsSurveyTrigger";
+import { HelpAgentPanel } from "@/components/feature/HelpAgentPanel";
+import { useCallback, useState } from "react";
 
 export function AppLayout() {
   const [npsSurveyId, setNpsSurveyId] = useState<string | undefined>();
@@ -23,6 +24,7 @@ export function AppLayout() {
       <OnboardingTour />
       <FeedbackWidget surveyId={npsSurveyId} />
       <NpsSurveyTrigger onTrigger={handleNpsTrigger} />
+      <HelpAgentPanel />
     </div>
   );
 }
