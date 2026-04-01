@@ -96,15 +96,15 @@ const teamFaqData: TeamFaqResponse = {
 describe("CoworkSetupGuide", () => {
   it("renders step cards for default Claude Code environment", () => {
     render(<CoworkSetupGuide />);
-    expect(screen.getByText("CLAUDE_AXBD 폴더 다운로드")).toBeInTheDocument();
-    expect(screen.getByText("Claude Code 실행")).toBeInTheDocument();
+    expect(screen.getByText("ax 워크플로우 Plugin 설치")).toBeInTheDocument();
+    expect(screen.getByText("CLAUDE_AXBD BD 분석 스킬 설치")).toBeInTheDocument();
     expect(screen.getByText("스킬 동작 확인")).toBeInTheDocument();
     expect(screen.getByText("발굴 프로세스 시작")).toBeInTheDocument();
   });
 
   it("defaults to Claude Code environment (recommended)", () => {
     render(<CoworkSetupGuide />);
-    expect(screen.getByText("git clone https://github.com/KTDS-AXBD/CLAUDE_AXBD.git")).toBeInTheDocument();
+    expect(screen.getByText("claude plugin install ax@ax-marketplace")).toBeInTheDocument();
   });
 
   it("toggles to Claude Desktop environment", () => {
