@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #160 (2026-04-01)
+**F269 발굴 IA & Page 정리 (Sprint 100, Match 97%)**:
+- ✅ 사이드바 발굴 메뉴 10→3개 축소 (Discovery, 아이디어·BMC, 대시보드)
+- ✅ 데모 시나리오→시작하기, 스킬카탈로그·Ontology→지식 그룹 이동
+- ✅ Discovery 페이지: 위저드+프로세스가이드 탭 통합
+- ✅ 아이디어·BMC 탭 통합 페이지 신규
+- ✅ 발굴 대시보드 3탭 통합 (진행추적+기준달성률+산출물)
+- ✅ HelpAgent: 플로팅 FAB→Sheet 사이드 패널 전환 (FeedbackWidget 겹침 해소)
+- ✅ 기존 11개 라우트 전부 유지 (URL 호환성)
+
+**검증 결과**:
+- ✅ typecheck 0 errors / tests 265/265 PASS
+
 ### 세션 #158 (2026-04-01)
 **정합성 전체 점검 + 코드 버그 3건 수정 + SPEC §2 수치 보정**:
 - ✅ help-agent.ts: `tenantId`→`orgId` 타입에러 수정 (TenantVariables 정합)
