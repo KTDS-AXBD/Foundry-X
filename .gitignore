@@ -40,3 +40,12 @@ out/
 
 # Sprint worktree context (should only exist in worktrees, not master)
 .sprint-context
+
+# Tool caches / temp directories
+.firecrawl/
+_workspace-prev/
+
+# Binary reference docs (PDF, DOCX, HTML — 참고자료는 Git 외부 관리)
+docs/specs/**/*.pdf
+docs/specs/**/*.docx
+docs/specs/**/*.html
