@@ -1,3 +1,14 @@
+---
+code: FX-SPEC-TSA
+title: "F98 기술 스택 점검 — 호환성 매트릭스 & 통합 전략"
+version: 1.0
+status: Active
+category: SPEC
+created: 2026-03-22
+updated: 2026-03-22
+author: AX BD팀
+---
+
 # F98 기술 스택 점검 — 호환성 매트릭스 & 통합 전략
 
 ## 호환성 매트릭스

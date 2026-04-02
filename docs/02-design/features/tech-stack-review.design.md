@@ -1,3 +1,14 @@
+---
+code: FX-DSGN-TSR
+title: "기술 스택 검토서"
+version: 1.0
+status: Active
+category: DSGN
+created: 2026-03-16
+updated: 2026-03-16
+author: AX BD팀
+---
+
 # Foundry-X 기술 스택 검토서
 
 **버전:** v1

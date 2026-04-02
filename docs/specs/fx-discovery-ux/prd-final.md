@@ -1,3 +1,14 @@
+---
+code: FX-SPEC-FDUX
+title: "발굴 UX 개선 PRD — 사용자 관점 사용성 개선"
+version: 2.0
+status: Active
+category: SPEC
+created: 2026-03-31
+updated: 2026-03-31
+author: AX BD팀
+---
+
 # fx-discovery-ux PRD — 발굴 프로세스 사용자 관점 사용성 개선
 
 **버전:** v2

@@ -1,3 +1,14 @@
+---
+code: FX-PLAN-080
+title: "Sprint 80 — BDP 편집/버전관리 + ORB/PRB 게이트 + 사업제안서 자동 생성"
+version: 1.0
+status: Active
+category: PLAN
+created: 2026-03-30
+updated: 2026-03-30
+author: Sinclair Seo
+---
+
 # Sprint 80: BDP 편집/버전관리 + ORB/PRB 게이트 + 사업제안서 자동 생성
 
 > **Summary**: 사업계획서(BDP) 마크다운 에디터 + 버전 관리, ORB/PRB 게이트 문서 자동 패키징, BDP→사업제안서 LLM 요약 생성

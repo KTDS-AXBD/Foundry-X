@@ -1,3 +1,14 @@
+---
+code: FX-RPRT-IA
+title: "IA 구조 개선 완료 보고서 — Sprint 82~84 (F241~F244)"
+version: 1.0
+status: Active
+category: RPRT
+created: 2026-03-30
+updated: 2026-03-30
+author: Sinclair Seo
+---
+
 # Foundry-X IA 구조 개선 — 완료 보고서
 
 > **Feature**: ia-restructure

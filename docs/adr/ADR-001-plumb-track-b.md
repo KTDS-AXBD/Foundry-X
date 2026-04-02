@@ -1,3 +1,14 @@
+---
+code: FX-ADR-001
+title: "Plumb Track B 전환 판정"
+version: 1.0
+status: Accepted
+category: ADR
+created: 2026-03-21
+updated: 2026-03-21
+author: AX BD팀
+---
+
 # ADR-001: Plumb Track B 전환 판정
 
 ## Status

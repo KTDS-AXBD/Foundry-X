@@ -1,3 +1,14 @@
+---
+code: FX-SPEC-PRD-V8
+title: "Foundry-X PRD v8 — AI 에이전트 오케스트레이션 플랫폼"
+version: 8.0
+status: Active
+category: SPEC
+created: 2026-03-16
+updated: 2026-03-22
+author: AX BD팀
+---
+
 # Foundry-X PRD
 
 **버전:** v8 (정체성 재정의 — AI 에이전트 오케스트레이션 플랫폼)

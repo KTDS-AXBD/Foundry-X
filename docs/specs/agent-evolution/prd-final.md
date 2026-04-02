@@ -1,3 +1,14 @@
+---
+code: FX-SPEC-AGEV
+title: "Agent Evolution PRD — Track A/B 에이전트 진화"
+version: 1.0
+status: Active
+category: SPEC
+created: 2026-03-22
+updated: 2026-03-22
+author: AX BD팀
+---
+
 # Agent Evolution PRD
 
 **버전:** Final (v2 기반 + v3 선별 반영)

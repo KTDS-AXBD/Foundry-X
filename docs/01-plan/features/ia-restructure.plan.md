@@ -1,3 +1,14 @@
+---
+code: FX-PLAN-IA
+title: "IA 구조 개선 — 사이드바/메뉴 재구조화 + 온보딩 강화"
+version: 1.0
+status: Active
+category: PLAN
+created: 2026-03-30
+updated: 2026-03-30
+author: Sinclair Seo
+---
+
 # Foundry-X IA 구조 개선 Planning Document
 
 > **Summary**: AX BD 사업개발 프로세스 6단계 기반으로 사이드바/메뉴 재구조화 + 온보딩 강화 + UI/UX 개선

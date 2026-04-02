@@ -1,3 +1,14 @@
+---
+code: FX-DSGN-080
+title: "Sprint 80 — BDP 편집/버전관리 + ORB/PRB 게이트 + 사업제안서 설계"
+version: 1.0
+status: Active
+category: DSGN
+created: 2026-03-30
+updated: 2026-03-30
+author: Sinclair Seo
+---
+
 # Sprint 80 Design: BDP 편집/버전관리 + ORB/PRB 게이트 + 사업제안서
 
 > **Summary**: F234 BDP 에디터 + F235 게이트 패키지 + F237 사업제안서 LLM 생성

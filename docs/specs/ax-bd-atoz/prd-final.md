@@ -1,3 +1,14 @@
+---
+code: FX-SPEC-ATOZ
+title: "AX BD A-to-Z PRD — 7단계 라이프사이클 + 시스템 통합"
+version: 1.0
+status: Active
+category: SPEC
+created: 2026-03-25
+updated: 2026-03-25
+author: AX BD팀
+---
+
 # AX BD A-to-Z PRD
 
 **버전:** final

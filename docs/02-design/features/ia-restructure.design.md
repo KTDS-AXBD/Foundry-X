@@ -1,3 +1,14 @@
+---
+code: FX-DSGN-IA
+title: "IA 구조 개선 — 사이드바 재구조화 + 온보딩 상세 설계"
+version: 1.0
+status: Active
+category: DSGN
+created: 2026-03-30
+updated: 2026-03-30
+author: Sinclair Seo
+---
+
 # Foundry-X IA 구조 개선 Design Document
 
 > **Summary**: 사이드바 IA 재구조화 + 온보딩 가이드 + UI/UX 개선 상세 설계

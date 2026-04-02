@@ -1,3 +1,14 @@
+---
+code: FX-PLAN-BDV1
+title: "FX-BD-V1 — BD 파이프라인 End-to-End 통합 계획"
+version: 1.0
+status: Active
+category: PLAN
+created: 2026-03-30
+updated: 2026-03-30
+author: Sinclair Seo
+---
+
 # FX-BD-V1: AX BD 사업개발 파이프라인 End-to-End 통합 Planning Document
 
 > **Summary**: AX BD팀 6명이 수집→발굴→형상화→검증/공유→제품화까지 끊김 없이 업무를 수행할 수 있도록 Foundry-X의 파이프라인 갭 9개를 보강한다.

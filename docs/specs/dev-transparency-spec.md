@@ -1,3 +1,14 @@
+---
+code: FX-SPEC-TRANS
+title: "Foundry-X 개발 투명성·협업·진행관리 스펙"
+version: 1.0
+status: Active
+category: SPEC
+created: 2026-03-16
+updated: 2026-03-16
+author: AX BD팀
+---
+
 # Foundry-X 개발 투명성·협업·진행관리 스펙
 
 **버전:** v1

@@ -1,3 +1,14 @@
+---
+code: FX-DSGN-BDV1
+title: "FX-BD-V1 — BD 파이프라인 End-to-End 통합 설계"
+version: 1.0
+status: Active
+category: DSGN
+created: 2026-03-30
+updated: 2026-03-30
+author: Sinclair Seo
+---
+
 # FX-BD-V1 Design Document
 
 > **Summary**: AX BD 6단계 파이프라인 End-to-End 통합 — 대시보드·공유·의사결정·게이트·Offering Pack

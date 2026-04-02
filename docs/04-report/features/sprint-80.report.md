@@ -1,3 +1,14 @@
+---
+code: FX-RPRT-080
+title: "Sprint 80 완료 보고서 — BDP 편집 + ORB/PRB 게이트 + 사업제안서"
+version: 1.0
+status: Active
+category: RPRT
+created: 2026-03-30
+updated: 2026-03-30
+author: Sinclair Seo
+---
+
 # Sprint 80 Completion Report
 
 > **Summary**: F234 BDP 편집/버전관리 + F235 ORB/PRB 게이트 + F237 사업제안서 자동 생성 구현 완료

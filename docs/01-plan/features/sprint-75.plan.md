@@ -1,3 +1,14 @@
+---
+code: FX-PLAN-075
+title: "Sprint 75 — Brownfield-first Init + Changes Directory (F220+F222)"
+version: 1.0
+status: Active
+category: PLAN
+created: 2026-03-30
+updated: 2026-03-30
+author: Sinclair Seo
+---
+
 # Sprint 75 Planning Document
 
 > **Summary**: Brownfield-first Init 강화(F220) + Structured Changes Directory(F222) — Phase 6 Ecosystem Integration 첫 Sprint

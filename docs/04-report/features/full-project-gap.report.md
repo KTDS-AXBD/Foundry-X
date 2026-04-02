@@ -1,3 +1,14 @@
+---
+code: FX-RPRT-FPG
+title: "전체 프로젝트 Gap 분석 완료 보고서 (Sprint 1~44)"
+version: 1.0
+status: Active
+category: RPRT
+created: 2026-03-22
+updated: 2026-03-22
+author: Sinclair Seo
+---
+
 # 전체 프로젝트 Gap 분석 완료 보고서
 
 > **Status**: Complete

@@ -1,3 +1,14 @@
+---
+code: FX-PLAN-032
+title: "Sprint 32 — PRD v5 잔여 작업 점검 + Phase 4→5 전환"
+version: 1.0
+status: Draft
+category: PLAN
+created: 2026-03-22
+updated: 2026-03-22
+author: Sinclair Seo
+---
+
 # Sprint 32 Planning Document
 
 > **Summary**: PRD v5 통합플랫폼 잔여 작업 점검 + Phase 4→5 전환 로드맵 수립

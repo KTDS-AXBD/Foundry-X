@@ -1,3 +1,14 @@
+---
+code: FX-ANLS-FPG
+title: "전체 프로젝트 Gap 분석 (PRD v5 ↔ SPEC ↔ 구현)"
+version: 1.0
+status: Active
+category: ANLS
+created: 2026-03-22
+updated: 2026-03-22
+author: Sinclair Seo
+---
+
 # 전체 프로젝트 Gap 분석 (PRD v5 ↔ SPEC ↔ 구현)
 
 > **Analysis Type**: 3-Way Gap Analysis (PRD ↔ SPEC ↔ Code)

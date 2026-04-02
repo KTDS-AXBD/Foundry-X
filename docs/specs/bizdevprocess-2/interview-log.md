@@ -3,7 +3,9 @@ code: FX-SPEC-BDP-002-INT
 title: 사업개발 Harness Engineering 인터뷰 로그
 version: 1.0
 status: Active
+category: SPEC
 created: 2026-03-24
+updated: 2026-03-24
 author: Sinclair Seo
 ---
 
