@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Phase 10 진행 중 (Sprint 105 완료, ~441 endpoints, 176 services, 2351 API + 149 CLI + 265 Web tests + 35 E2E specs) — O-G-D Agent Loop(F270~F273 ✅) + Skill Evolution(F274~F276 ✅) + BD 데모 시딩(F279~F280 ✅)
+**현재 상태:** Phase 10 진행 중 (Sprint 110 완료, ~441 endpoints, 176 services, 2351 API + 149 CLI + 265 Web tests + 35 E2E specs) — O-G-D Agent Loop(F270~F273 ✅) + Skill Evolution(F274~F276 ✅) + BD 데모 시딩(F279~F280 ✅) + BD 형상화 Phase A+B+C(F282~F283 ✅)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -189,7 +189,7 @@ pnpm build && npx wrangler pages deploy dist --project-name=foundry-x-web
 
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
 - **Pages**: `fx.minu.best` (Vite + React Router 7, CNAME → Cloudflare Pages)
-- **D1**: 0001~0082 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
+- **D1**: 0001~0082 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote` — `0082` 2개 공존 (bd_demo_seed + derived_engine)
 - **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, OPENROUTER_API_KEY
 
 ## Dev Tools (Track B — Agent Evolution)
