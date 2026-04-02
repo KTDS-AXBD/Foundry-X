@@ -472,3 +472,68 @@ export interface SkillAuditEntry {
   details: string | null;
   createdAt: string;
 }
+
+// ─── F275: 스킬 레지스트리 타입 ───
+
+export type SkillSafetyGrade = "A" | "B" | "C" | "D" | "F" | "pending";
+export type SkillCategory = "general" | "bd-process" | "analysis" | "generation" | "validation" | "integration";
+export type SkillSourceType = "marketplace" | "custom" | "derived" | "captured";
+export type SkillStatus = "active" | "deprecated" | "draft" | "archived";
+
+export interface SkillRegistryEntry {
+  id: string;
+  tenantId: string;
+  skillId: string;
+  name: string;
+  description: string | null;
+  category: SkillCategory;
+  tags: string[];
+  status: SkillStatus;
+  safetyGrade: SkillSafetyGrade;
+  safetyScore: number;
+  safetyCheckedAt: string | null;
+  sourceType: SkillSourceType;
+  sourceRef: string | null;
+  promptTemplate: string | null;
+  modelPreference: string | null;
+  maxTokens: number;
+  tokenCostAvg: number;
+  successRate: number;
+  totalExecutions: number;
+  currentVersion: number;
+  createdBy: string;
+  updatedBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SkillSearchResult {
+  skillId: string;
+  name: string;
+  description: string | null;
+  category: SkillCategory;
+  tags: string[];
+  safetyGrade: SkillSafetyGrade;
+  score: number;
+}
+
+export interface SafetyCheckResult {
+  score: number;
+  grade: SkillSafetyGrade;
+  violations: SafetyViolation[];
+  checkedAt: string;
+}
+
+export interface SafetyViolation {
+  rule: string;
+  description: string;
+  severity: number;
+  matchedPattern: string;
+}
+
+export interface SkillEnrichedView {
+  registry: SkillRegistryEntry;
+  metrics: SkillMetricSummary | null;
+  versions: SkillVersionRecord[];
+  lineage: SkillLineageNode | null;
+}

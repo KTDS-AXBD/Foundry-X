@@ -43,6 +43,19 @@ export type {
   SkillAuditEntry,
 } from './types.js';
 
+// F275: Skill Registry types (Sprint 104)
+export type {
+  SkillSafetyGrade,
+  SkillCategory,
+  SkillSourceType,
+  SkillStatus,
+  SkillRegistryEntry,
+  SkillSearchResult,
+  SafetyCheckResult,
+  SafetyViolation,
+  SkillEnrichedView,
+} from './types.js';
+
 // Web Dashboard types (Sprint 5 Part A)
 export type {
   WikiPage,
