@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #161 (2026-04-02)
+**ax-daily-check 스킬 재생성 + CLAUDE.md 수치 보정**:
+- ✅ `ax-daily-check` 글로벌 스킬 신규 작성 (F268 commands 삭제 시 유실 복구)
+- ✅ 8항목 점검: Runtime, Git Sync, Dependencies, TypeScript, Hooks, D1 Migration, CLAUDE.md 정합성, Disk/Cache
+- ✅ Step 6b 추가: CLAUDE.md 수치 정합성 자동 감지 + 보정 (claude-md-improver 경량 내장)
+- ✅ CLAUDE.md D1 마이그레이션 수치 보정 (0078→0079)
+- ✅ Playwright 잔여물 18MB 삭제
+
+**검증 결과**:
+- ✅ typecheck 0 errors (turbo cached)
+
 ### 세션 #160 (2026-04-01)
 **F269 발굴 IA & Page 정리 (Sprint 100, Match 97%)**:
 - ✅ 사이드바 발굴 메뉴 10→3개 축소 (Discovery, 아이디어·BMC, 대시보드)
