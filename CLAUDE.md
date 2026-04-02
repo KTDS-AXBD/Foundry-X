@@ -84,7 +84,7 @@ foundry-x/
 
 ### .claude/ 프로젝트 설정
 - `.claude/hooks/` — PreToolUse (보호 파일 차단) + PostToolUse 외부 스크립트 (post-edit-format.sh, post-edit-typecheck.sh, post-edit-test-warn.sh)
-- `.claude/agents/` — 커스텀 에이전트 (deploy-verifier, spec-checker, build-validator)
+- `.claude/agents/` — 커스텀 에이전트 (deploy-verifier, spec-checker, build-validator, ogd-orchestrator, ogd-generator, ogd-discriminator)
 - `.claude/skills/ax-bd-discovery/` — AX BD 2단계 발굴 프로세스 오케스트레이터 (v8.2)
 - `.claude/skills/ai-biz/` — ai-biz 11종 서브스킬 (cost-model, feasibility-study 등)
 - `.claude/skills/npm-release/` — npm 배포 스킬
