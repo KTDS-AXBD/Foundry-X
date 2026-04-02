@@ -1,6 +1,9 @@
 # bkit runtime state
 .bkit/
 
+# O-G-D workspace (라운드 산출물 임시 저장)
+_workspace/
+
 # Team config (개인정보 포함)
 tools/team-config.json
 
