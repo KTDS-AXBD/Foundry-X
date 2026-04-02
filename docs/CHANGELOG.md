@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #169 (2026-04-02)
+**Sprint 104 F275 완료 — 스킬 레지스트리 (Skill Evolution Phase 2)**:
+- ✅ F275 스킬 레지스트리: D1 0081(2테이블) + API 8 endpoints + 40 tests (PR #233, Match 99%)
+- ✅ SkillRegistryService + SkillSearchService(TF-IDF Lite) + SafetyChecker(A~F 등급)
+- ✅ Shared 타입 65줄: SkillRegistryEntry, SkillSearchResult, SafetyCheckResult, SkillEnrichedView
+- ✅ D1 0081 remote 적용 + Workers 재배포 (Version 5a2ed549)
+
+**검증 결과**: typecheck ✅, API 2311/2311 ✅, Sprint Autopilot 25분 완료
+
 ### 세션 #168 (2026-04-02)
 **BD 형상화 PRD 리뷰 + 구현 계획 (F282~F287 SPEC 등록)**:
 - ✅ prd-shaping-v1.md 전체 리뷰: AI 초안 → 6건 의사결정 인터뷰 + 4건 피드백
