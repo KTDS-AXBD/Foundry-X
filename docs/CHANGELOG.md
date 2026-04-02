@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #163 (2026-04-02)
+**GOV-001 문서 정비 — INDEX.md 재생성 + frontmatter 22건 추가**:
+- ✅ Daily Check 8항목 전체 OK (수치 drift 0건)
+- ✅ INDEX.md 전체 재생성: 74줄→335줄, 241개 GOV 문서 등재
+- ✅ PRD v8-final 현행 권위 문서로 INDEX 등록 + SPEC frontmatter 추가
+- ✅ 레거시 핵심 문서 22개 GOV-001 frontmatter 소급 추가 (ADR 2 + PRD 5 + SPEC 3 + PLAN 5 + DSGN 4 + ANLS 1 + RPRT 3)
+- ✅ bizdevprocess-2/interview-log.md PARTIAL 보정 (category, updated)
+- ✅ specs/ 디렉토리 구조 가이드 + PRD 프로젝트 테이블 INDEX.md에 추가
+
+**검증 결과**:
+- ✅ typecheck 0 errors (turbo cached)
+- ✅ GOV 준수: 241/568 (42.4%), PARTIAL 0건
+
 ### 세션 #161 (2026-04-02)
 **ax-daily-check 스킬 재생성 + CLAUDE.md 수치 보정**:
 - ✅ `ax-daily-check` 글로벌 스킬 신규 작성 (F268 commands 삭제 시 유실 복구)
