@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #170 (2026-04-02)
+**Sprint 108 F279+F280 완료 — BD 데모 시딩 (Production Showcase)**:
+- ✅ F279+F280 BD 데모 시딩: D1 0082 마이그레이션, 18테이블 104 rows, 1383줄 SQL (PR #234, Match 100%)
+- ✅ 헬스케어AI(7단계 완주, offering) + GIVC chatGIVC(5단계, decision) 2개 아이디어
+- ✅ bd_artifacts 16건 한글 콘텐츠 (시장조사/경쟁분석/BMC/PRD/MVP 등 500~2000자)
+- ✅ Plan+Design 사전 준비 → Autopilot 7분 완료 (마이그레이션 0081→0082 자동 보정)
+- ✅ WT 정리 완료 (worktree + branch + tmux + signal)
+
+**검증 결과**: typecheck ✅, API 2311/2311 ✅, D1 0082 local 적용 ✅ (remote는 Sprint 109)
+
 ### 세션 #169 (2026-04-02)
 **Sprint 104 F275 완료 — 스킬 레지스트리 (Skill Evolution Phase 2)**:
 - ✅ F275 스킬 레지스트리: D1 0081(2테이블) + API 8 endpoints + 40 tests (PR #233, Match 99%)
