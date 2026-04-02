@@ -82,6 +82,11 @@ SWOT, Porter's 5 Forces, PESTLE, Blue Ocean (ERRC), Crossing the Chasm, Competit
 - **Disruption Risk Analysis** (T형·S형 핵심): 신규 경쟁자 잠식 위험 평가 — AI 네이티브 스타트업, 빅테크의 진입 가능성과 기존 시장 잠식 시나리오
 - **Imitation Difficulty Score**: 지속가능 우위 2개 이상 도출 + 모방 난이도 3단계(Low/Medium/High) 평가 — 데이터 해자, 기술 복잡도, 네트워크 효과, 규제 장벽 기준
 
+### 🔵 O-G-D 선택적 검증
+경쟁 분석 보고서의 품질을 검증하려면 "경쟁 분석 O-G-D 돌려줘"라고 요청하세요.
+R3(경쟁 차별성) 강화 Rubric으로 Generator가 보고서를 생성하고, Discriminator가 검증합니다.
+상세: `references/ogd-stage-rubrics.md`
+
 ### 💡 사업성 체크포인트
 > **"경쟁 상황을 보니, 우리만의 자리가 있을까요?"**
 > → **Go** / **포지셔닝 재검토** / **Drop**
@@ -174,6 +179,11 @@ Opportunity Scoring Matrix, ICE/RICE, McKinsey 9-Box, Prioritize Assumptions
 
 → **Commit** (확신 있게 진행) / **대안 탐색** (병렬 아이템 검토) / **Drop**
 
+### ✅ O-G-D 필수 검증 (Commit Gate 연동)
+Commit Gate 진입 전, 2-1~2-4 산출물을 O-G-D 루프로 종합 검증합니다.
+AI가 자동으로 O-G-D Orchestrator를 호출하고, 품질 보고서를 Commit Gate 논의와 함께 제시합니다.
+상세: `references/ogd-commit-gate.md`
+
 ---
 
 ## 2-6. 타겟 고객 정의 (Customer Persona & Journey)
@@ -245,6 +255,11 @@ BMC 완성, Lean Canvas, Unit Economics, 수익 시나리오 3안, Pricing Strat
 
 ### 추가 분석
 - **BM 변화 시뮬레이션** (S형 핵심): 기존 BM 대비 AI 적용 후 수익 구조 변화를 3개 시나리오로 비교
+
+### 🔵 O-G-D 선택적 검증
+BM 가설의 품질을 검증하려면 "BM O-G-D 돌려줘"라고 요청하세요.
+R4(수익 모델) 강화 Rubric으로 BMC/Unit Economics를 검증합니다.
+상세: `references/ogd-stage-rubrics.md`
 
 ### 💡 사업성 체크포인트
 > **"이 비즈니스 모델로 돈을 벌 수 있다고 믿나요? 아니면 희망사항인가요?"**
