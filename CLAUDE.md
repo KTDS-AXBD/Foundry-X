@@ -163,7 +163,7 @@ pnpm e2e                          # Playwright E2E (35 specs, ~146 tests)
 - **Branch Protection**: master에 직접 push 불가 — PR 필수 + 1명 Approve + Linear history
 - **Merge 전략**: Squash merge (기본) + Auto-delete branches
 - **Remote**: `https://github.com/KTDS-AXBD/Foundry-X.git` (HTTPS, PAT 인증)
-- **Sprint Worktree**: `sprint N` bash 명령으로 WT 탭 생성 → Sprint 탭에서 코드 작업 → Master에서 `/ax-sprint merge N`
+- **Sprint Worktree**: `sprint N` bash 명령으로 WT 탭 생성 → Sprint 탭에서 코드 작업 → Master에서 `/ax:sprint merge N`
 
 ## Design Decisions & Constraints
 
