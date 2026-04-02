@@ -7,6 +7,7 @@
 import { PromptGatewayService } from "./prompt-gateway.js";
 import { BdArtifactService } from "./bd-artifact-service.js";
 import { getSkillPrompt } from "./bd-skill-prompts.js";
+import { SkillMetricsService } from "./skill-metrics.js";
 import type { ExecuteSkillInput } from "../schemas/bd-artifact.js";
 import type { SkillExecutionResult } from "../schemas/bd-artifact.js";
 
@@ -103,6 +104,9 @@ export class BdSkillExecutor {
         durationMs,
       });
 
+      // F274: 스킬 실행 메트릭 기록
+      await this.recordMetrics(orgId, skillId, version, artifactId, input.bizItemId, userId, "completed", data.usage.input_tokens, data.usage.output_tokens, durationMs);
+
       return { artifactId, skillId, version, outputText, model: MODEL, tokensUsed, durationMs, status: "completed" };
     } catch (err) {
       const durationMs = Date.now() - startTime;
@@ -112,7 +116,38 @@ export class BdSkillExecutor {
         tokensUsed: 0,
         durationMs,
       });
+
+      // F274: 실패 메트릭도 기록
+      await this.recordMetrics(orgId, skillId, version, artifactId, input.bizItemId, userId, "failed", 0, 0, durationMs, errorMsg);
+
       return { artifactId, skillId, version, outputText: errorMsg, model: MODEL, tokensUsed: 0, durationMs, status: "failed" };
+    }
+  }
+
+  private async recordMetrics(
+    orgId: string, skillId: string, version: number, artifactId: string,
+    bizItemId: string, userId: string, status: "completed" | "failed",
+    inputTokens: number, outputTokens: number, durationMs: number, errorMessage?: string,
+  ): Promise<void> {
+    try {
+      const metricsService = new SkillMetricsService(this.db);
+      await metricsService.recordExecution({
+        tenantId: orgId,
+        skillId,
+        version,
+        bizItemId,
+        artifactId,
+        model: MODEL,
+        status,
+        inputTokens,
+        outputTokens,
+        costUsd: estimateCost(MODEL, inputTokens, outputTokens),
+        durationMs,
+        executedBy: userId,
+        errorMessage,
+      });
+    } catch {
+      // 메트릭 기록 실패는 스킬 실행 결과에 영향 주지 않음
     }
   }
 
@@ -130,4 +165,13 @@ function generateId(): string {
   const t = Date.now().toString(36);
   const r = Math.random().toString(36).substring(2, 10);
   return `art_${t}${r}`;
+}
+
+function estimateCost(model: string, inputTokens: number, outputTokens: number): number {
+  // Haiku 4.5 pricing: $0.80/1M input, $4.00/1M output
+  if (model.includes("haiku")) {
+    return (inputTokens * 0.8 + outputTokens * 4.0) / 1_000_000;
+  }
+  // Sonnet: $3/1M input, $15/1M output
+  return (inputTokens * 3 + outputTokens * 15) / 1_000_000;
 }

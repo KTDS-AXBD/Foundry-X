@@ -84,6 +84,8 @@ import { axBdKgRoute } from "./routes/ax-bd-kg.js";
 import { helpAgentRoute } from "./routes/help-agent.js";
 // Sprint 96: HITL 인터랙션 패널 (F266)
 import { hitlReviewRoute } from "./routes/hitl-review.js";
+// Sprint 103: 스킬 실행 메트릭 (F274)
+import { skillMetricsRoute } from "./routes/skill-metrics.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -316,6 +318,8 @@ app.route("/api", axBdKgRoute);
 app.route("/api", helpAgentRoute);
 // Sprint 96: HITL 인터랙션 패널 (F266)
 app.route("/api", hitlReviewRoute);
+// Sprint 103: 스킬 실행 메트릭 (F274)
+app.route("/api", skillMetricsRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
