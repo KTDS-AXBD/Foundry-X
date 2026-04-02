@@ -188,7 +188,7 @@ pnpm build && npx wrangler pages deploy dist --project-name=foundry-x-web
 
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
 - **Pages**: `fx.minu.best` (Vite + React Router 7, CNAME → Cloudflare Pages)
-- **D1**: 0001~0078 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
+- **D1**: 0001~0079 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
 - **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, OPENROUTER_API_KEY
 
 ## Dev Tools (Track B — Agent Evolution)
