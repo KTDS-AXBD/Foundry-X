@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Phase 10 진행 중 (Sprint 103 완료, ~425 endpoints, 170 services, 2271 API + 149 CLI + 265 Web tests + 35 E2E specs) — O-G-D Agent Loop(F270~F273 ✅) + Skill Evolution(F274 ✅, F275~)
+**현재 상태:** Phase 10 진행 중 (Sprint 104 완료, ~433 endpoints, 173 services, 2311 API + 149 CLI + 265 Web tests + 35 E2E specs) — O-G-D Agent Loop(F270~F273 ✅) + Skill Evolution(F274~F275 ✅, F276~)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -155,8 +155,8 @@ pnpm e2e                          # Playwright E2E (35 specs, ~146 tests)
 - **Phase 7:** ✅ 완료 (Sprint 79~81) — BD Pipeline End-to-End 통합 (FX-BD-V1)
 - **Phase 8:** ✅ 완료 (Sprint 82~86) — IA 구조 개선 + 인증 강화
 - **Phase 9:** ✅ 완료 (Sprint 87~100) — 팀 온보딩 + BD 스킬 통합 + GIVC PoC + 발굴 UX(F263~F266) + BD 스킬 배포(F267) + Plugin 전환(F268) + 발굴 IA 정리(F269)
-- **Phase 10:** 🔧 진행 중 (Sprint 101~103) — O-G-D Agent Loop(F270~F273 ✅) + Skill Evolution(F274 ✅, F275~)
-- **현재 수치:** ~170 services, ~425 endpoints, 2271 API tests + CLI 149 + Web 265 + E2E 35 specs, D1 0001~0080
+- **Phase 10:** 🔧 진행 중 (Sprint 101~104) — O-G-D Agent Loop(F270~F273 ✅) + Skill Evolution(F274~F275 ✅, F276~)
+- **현재 수치:** ~173 services, ~433 endpoints, 2311 API tests + CLI 149 + Web 265 + E2E 35 specs, D1 0001~0081
 - **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 
 ## Git Workflow
