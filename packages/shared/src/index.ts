@@ -33,6 +33,16 @@ export {
   BROWNFIELD_WEIGHTS,
 } from './types.js';
 
+// F274: Skill Metrics types (Sprint 103)
+export type {
+  SkillMetricSummary,
+  SkillDetailMetrics,
+  SkillVersionRecord,
+  SkillExecutionRecord,
+  SkillLineageNode,
+  SkillAuditEntry,
+} from './types.js';
+
 // Web Dashboard types (Sprint 5 Part A)
 export type {
   WikiPage,

@@ -410,3 +410,65 @@ export interface WorkspaceConfig {
   repositories: RepoRef[];
   specRepository?: string;
 }
+
+// ─── F274: 스킬 실행 메트릭 타입 ───
+
+export interface SkillMetricSummary {
+  skillId: string;
+  totalExecutions: number;
+  successCount: number;
+  failedCount: number;
+  successRate: number;
+  avgDurationMs: number;
+  totalCostUsd: number;
+  avgTokensPerExecution: number;
+  lastExecutedAt: string | null;
+}
+
+export interface SkillDetailMetrics extends SkillMetricSummary {
+  versions: SkillVersionRecord[];
+  recentExecutions: SkillExecutionRecord[];
+  costTrend: { date: string; cost: number; executions: number }[];
+}
+
+export interface SkillVersionRecord {
+  id: string;
+  skillId: string;
+  version: number;
+  promptHash: string;
+  model: string;
+  maxTokens: number;
+  changelog: string | null;
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface SkillExecutionRecord {
+  id: string;
+  skillId: string;
+  version: number;
+  model: string;
+  status: "completed" | "failed" | "timeout" | "cancelled";
+  totalTokens: number;
+  costUsd: number;
+  durationMs: number;
+  executedBy: string;
+  executedAt: string;
+}
+
+export interface SkillLineageNode {
+  skillId: string;
+  derivationType: "manual" | "derived" | "captured" | "forked";
+  children: SkillLineageNode[];
+  parents: { skillId: string; derivationType: string }[];
+}
+
+export interface SkillAuditEntry {
+  id: string;
+  entityType: "execution" | "version" | "lineage" | "skill";
+  entityId: string;
+  action: "created" | "updated" | "deleted" | "executed" | "versioned";
+  actorId: string;
+  details: string | null;
+  createdAt: string;
+}
