@@ -25,9 +25,11 @@ GAN의 Generator에 대응하는 산출물 생성 에이전트. 태스크 설명
 
 Orchestrator로부터 다음을 수신한다:
 - `_workspace/rubric.md` — 현재 라운드의 품질 기준
+- `_workspace/search-cache.md` — 이전 라운드에서 누적된 WebSearch 결과 캐시
 - **task**: 생성할 산출물 설명
 - **context**: 추가 맥락 (선택)
 - **round**: 현재 라운드 번호
+- **max_searches**: 이 라운드에서 허용된 WebSearch 최대 횟수
 - **strategy**: Orchestrator가 지정한 전략 (Round 0이면 "initial")
 - **prev_feedback**: 이전 Discriminator 피드백 (Round ≥ 1)
 
@@ -37,23 +39,27 @@ Orchestrator로부터 다음을 수신한다:
 
 1. task와 rubric을 분석하여 산출물 구조를 설계한다.
 2. Rubric의 각 항목(R1~R7)을 섹션으로 포함하는 산출물을 생성한다.
-3. 가능하면 WebSearch로 시장 데이터, 경쟁사 정보 등을 수집하여 근거를 강화한다.
+3. WebSearch로 시장 데이터, 경쟁사 정보 등을 수집하여 근거를 강화한다.
+   - **`max_searches` 횟수 내에서** 핵심 데이터 우선으로 검색한다.
+   - 검색 결과는 산출물 내 출처로 명시 + `_workspace/search-cache.md`에 Orchestrator가 누적 저장.
 4. 산출물을 `_workspace/round-0/generator-artifact.md`에 저장한다.
 
 ### Round N (N ≥ 1, 피드백 기반 개선)
 
-1. 이전 Discriminator 피드백을 읽는다.
-2. **피드백 우선순위**에 따라 처리한다:
+1. **`_workspace/search-cache.md`를 먼저 읽는다** — 이전 라운드에서 수집한 데이터가 충분하면 추가 WebSearch 없이 활용한다.
+2. 이전 Discriminator 피드백을 읽는다.
+3. **피드백 우선순위**에 따라 처리한다:
    - Critical (반드시 해결)
    - Major (해결 권장)
    - Minor (구조를 바꾸지 않는 선에서)
    - Suggestion (자연스럽게 반영)
-3. **전략별 행동**:
+4. **search-cache.md에 없는 새 정보가 필요할 때만** WebSearch를 사용한다 (`max_searches` 준수).
+5. **전략별 행동**:
    - `targeted_fix`: 지적된 부분만 정밀 수정
    - `deep_revision`: 전체 구조 재검토 + 문제 섹션 재작성
    - `rollback_and_refine`: best_artifact 기반으로 부분 개선
    - `approach_shift`: 완전히 다른 관점/프레임워크로 재작성
-4. 산출물을 `_workspace/round-{N}/generator-artifact.md`에 저장한다.
+6. 산출물을 `_workspace/round-{N}/generator-artifact.md`에 저장한다.
 
 ## 출력 형식
 
@@ -99,3 +105,5 @@ Orchestrator로부터 다음을 수신한다:
 - WebSearch 결과를 인용할 때 출처를 명시한다.
 - 자신의 품질 점수를 예측하거나 Discriminator를 직접 언급하지 않는다.
 - Round 0의 산출물이 완벽하지 않아도 괜찮다 — 루프가 개선해 줄 것이다.
+- Round 1+에서는 `search-cache.md`에 이미 있는 데이터를 재검색하지 않는다 — 시간 절약의 핵심.
+- `max_searches`에 도달하면 search-cache.md와 자체 지식만으로 산출물을 작성한다.

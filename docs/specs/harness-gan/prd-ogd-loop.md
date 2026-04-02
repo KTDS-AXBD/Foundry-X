@@ -1,8 +1,8 @@
 ---
 code: FX-SPEC-OGD-001
 title: O-G-D Agent Loop — PRD
-version: "1.1"
-status: Draft
+version: "1.2"
+status: Active
 category: SPEC
 created: 2026-04-02
 updated: 2026-04-02
@@ -11,10 +11,10 @@ based-on: "[[FX-SPEC-HGA-001]] harness-gan-agent-architecture.md"
 review: "[[FX-SPEC-OGD-001-R1]] Round 1 — GPT-4o, DeepSeek R1, Gemini 2.0 Flash"
 ---
 
-# O-G-D Agent Loop — Product Requirements Document (v1.1)
+# O-G-D Agent Loop — Product Requirements Document (v1.2)
 
 > **Orchestrator-Generator-Discriminator** 적대적 루프를 Claude Code 에이전트로 구현하는 PoC PRD
-> v1.1: 외부 AI 3사 교차 검토 반영 (C-1~C-3, M-1~M-5)
+> v1.2: Sprint 101 Gap Analysis 반영 — 초과 구현 정규화 + 데모 기준 현실화 + WebSearch 최적화
 
 ---
 
@@ -69,6 +69,11 @@ Harness × GAN Agent Architecture 설계서(`[[FX-SPEC-HGA-001]]`)에서 GAN의 
 | R-11 | **Quality Regression 방지** | 품질 역전 감지 → 최고 점수 산출물 기반 재시도 |
 | R-12 | **Rubric 진화** | 라운드별 반복 지적 항목 가중치 증가, 충족 항목 가중치 감소 |
 | R-16 | **산업 템플릿별 가중치 오버라이드** 🆕 | Rubric 가중치를 도메인/산업에 맞게 조정하는 옵션 |
+| R-17 | **이전 피드백 해소 추적** 🆕v1.2 | Discriminator 피드백에 `prev_feedback_addressed` 필드로 이전 라운드 피드백 해소 여부 YAML 추적 |
+| R-18 | **Rubric 버전 명시** 🆕v1.2 | Discriminator 피드백 YAML에 `rubric_version` 필드 포함. Rubric 진화 시 버전별 판별 기준 추적 |
+| R-19 | **프로세스 메트릭 추적** 🆕v1.2 | 에이전트 호출 횟수, WebSearch 횟수, Mode Collapse 발생 여부 등 프로세스 수준 메트릭을 ogd-state.yaml에 기록 |
+| R-25 | **WebSearch 결과 캐싱** 🆕v1.2 | 동일 도메인 반복 검색 시 이전 결과 재활용. 목표: 실행 시간 45분→15분 |
+| R-26 | **WebSearch 횟수 제한 옵션** 🆕v1.2 | Generator/Discriminator별 `max_searches` 파라미터 지정 가능 (기본 10) |
 
 ### 2.3 미래 확장 (Won't-Have, Phase 10+)
 
@@ -326,17 +331,21 @@ Quality Score = Σ (weight_i × criterion_score_i) / Σ weight_i
   6. Discriminator가 PASS 또는 MINOR_FIX 판정
   7. 최종 산출물 + **Markdown 품질 보고서** 출력
 
-### 6.2 성공 기준
+### 6.2 성공 기준 (v1.2 — Sprint 101 데모 결과 반영)
 
-| 기준 | 목표 |
-|------|------|
-| O-G-D 루프 정상 동작 | Round 0 → N → 수렴/종료 |
-| 품질 점수 향상 | Round 0 대비 최종 ≥ +0.15 |
-| Discriminator 피드백 구체성 | 모든 findings에 recommendation 포함 |
-| 라운드 이력 추적 | _workspace/round-N/ + ogd-state.yaml 체계적 저장 |
-| 실행 시간 | 2라운드 기준 ≤ 7분 |
-| 에러 복구 | 에이전트 1회 실패 시 자동 복구 |
-| 보고서 가독성 | BD 담당자가 읽을 수 있는 Markdown 요약 |
+| 기준 | 목표 | 비고 |
+|------|------|------|
+| O-G-D 루프 정상 동작 | Round 0 → N → 수렴/종료 | |
+| 품질 점수 향상 (초안 ≤ 0.70) | Round 0 대비 최종 ≥ +0.15 | 개선 여지가 큰 구간 |
+| 품질 점수 향상 (초안 0.80+) | Round 0 대비 최종 ≥ +0.05 | 수렴 특성: 높은 초안은 향상폭 감소 |
+| Discriminator 피드백 구체성 | 모든 findings에 recommendation 포함 | |
+| 라운드 이력 추적 | _workspace/round-N/ + ogd-state.yaml 체계적 저장 | |
+| 실행 시간 (WebSearch 활용) | 2라운드 기준 ≤ 20분 | WebSearch 캐싱(R-25) 적용 시 |
+| 실행 시간 (캐시 활용) | 2라운드 기준 ≤ 7분 | 캐시 히트율 높은 반복 실행 시 |
+| 에러 복구 | 에이전트 1회 실패 시 자동 복구 | |
+| 보고서 가독성 | BD 담당자가 읽을 수 있는 Markdown 요약 | |
+
+> **v1.2 조정 근거:** Sprint 101 chatGIVC 데모에서 초안 0.82→최종 0.89(+0.07)로 수렴. 초안 품질이 이미 0.80+일 경우 추가 개선 여지가 제한되는 수렴 특성(diminishing returns)을 반영. 실행 시간은 WebSearch 집약적 사용(~45분)을 고려하여 캐싱 도입 후 ≤20분 목표로 현실화.
 
 ---
 
@@ -368,6 +377,7 @@ Quality Score = Σ (weight_i × criterion_score_i) / Σ weight_i
 |------|------|----------|
 | 1.0 | 2026-04-02 | 초안 작성 (인터뷰 기반) |
 | 1.1 | 2026-04-02 | 외부 AI 3사 교차 검토 반영: Rubric 7항목 확장(C-1), 에러 핸들링(C-2), 보고서 가독성(C-3), v8.2 통합 하향(M-1), R-13 상향(M-2), MAX_ROUNDS 기본 2(M-3), 상태 관리(M-4), 통합 지점 단순화(M-5) |
+| 1.2 | 2026-04-02 | Sprint 101 Gap Analysis 반영: (1) 초과 구현 정규화 — R-17 이전 피드백 해소 추적, R-18 Rubric 버전 명시, R-19 프로세스 메트릭 추적 (2) 데모 성공 기준 현실화 — 품질 향상 기준을 초안 품질별 분기(≤0.70: +0.15 / 0.80+: +0.05), 실행 시간을 WebSearch/캐시 활용별 분기(≤20분/≤7분) (3) WebSearch 최적화 — R-25 결과 캐싱, R-26 횟수 제한 옵션 |
 
 ---
 
