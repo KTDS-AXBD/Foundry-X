@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ✅ Plan+Design 사전 작성 → Autopilot 즉시 Implement 진입 (Plan/Design 건너뜀)
 
 **검증 결과**: typecheck ✅, API 2351/2351 ✅
+**배포**: D1 0082 remote 적용 ✅ (116 commands) + Workers 재배포 (Version 05e93d4e) ✅
 
 ### 세션 #170 (2026-04-02)
 **Sprint 108 F279+F280 완료 — BD 데모 시딩 (Production Showcase)**:
