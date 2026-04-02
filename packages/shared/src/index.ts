@@ -56,6 +56,20 @@ export type {
   SkillEnrichedView,
 } from './types.js';
 
+// F276: DERIVED 엔진 타입 (Sprint 105)
+export type {
+  DerivedPatternType,
+  DerivedPatternStatus,
+  DerivedReviewStatus,
+  PipelineStage,
+  DerivedPattern,
+  DerivedPatternDetail,
+  DerivedCandidate,
+  DerivedCandidateDetail,
+  DerivedReview,
+  DerivedStats,
+} from './types.js';
+
 // Web Dashboard types (Sprint 5 Part A)
 export type {
   WikiPage,

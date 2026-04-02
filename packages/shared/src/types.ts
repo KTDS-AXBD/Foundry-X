@@ -537,3 +537,83 @@ export interface SkillEnrichedView {
   versions: SkillVersionRecord[];
   lineage: SkillLineageNode | null;
 }
+
+// ─── F276: DERIVED 엔진 타입 ───
+
+export type DerivedPatternType = "single" | "chain";
+export type DerivedPatternStatus = "active" | "consumed" | "expired";
+export type DerivedReviewStatus = "pending" | "approved" | "rejected" | "revision_requested";
+export type PipelineStage = "collection" | "discovery" | "shaping" | "validation" | "productization" | "gtm";
+
+export interface DerivedPattern {
+  id: string;
+  tenantId: string;
+  pipelineStage: PipelineStage;
+  discoveryStage: string | null;
+  patternType: DerivedPatternType;
+  skillIds: string[];
+  successRate: number;
+  sampleCount: number;
+  avgCostUsd: number;
+  avgDurationMs: number;
+  confidence: number;
+  status: DerivedPatternStatus;
+  extractedAt: string;
+  expiresAt: string | null;
+}
+
+export interface DerivedPatternDetail extends DerivedPattern {
+  skills: SkillRegistryEntry[];
+  sampleExecutions: SkillExecutionRecord[];
+}
+
+export interface DerivedCandidate {
+  id: string;
+  tenantId: string;
+  patternId: string;
+  name: string;
+  description: string | null;
+  category: SkillCategory;
+  promptTemplate: string;
+  sourceSkills: { skillId: string; contribution: number }[];
+  similarityScore: number;
+  safetyGrade: SkillSafetyGrade;
+  safetyScore: number;
+  reviewStatus: DerivedReviewStatus;
+  registeredSkillId: string | null;
+  createdAt: string;
+  reviewedAt: string | null;
+  reviewedBy: string | null;
+}
+
+export interface DerivedCandidateDetail extends DerivedCandidate {
+  pattern: DerivedPattern;
+  reviews: DerivedReview[];
+  sourceSkillEntries: SkillRegistryEntry[];
+}
+
+export interface DerivedReview {
+  id: string;
+  tenantId: string;
+  candidateId: string;
+  action: "approved" | "rejected" | "revision_requested";
+  comment: string | null;
+  modifiedPrompt: string | null;
+  reviewerId: string;
+  createdAt: string;
+}
+
+export interface DerivedStats {
+  totalPatterns: number;
+  activePatterns: number;
+  consumedPatterns: number;
+  expiredPatterns: number;
+  totalCandidates: number;
+  pendingCandidates: number;
+  approvedCandidates: number;
+  rejectedCandidates: number;
+  approvalRate: number;
+  registeredSkills: number;
+  avgConfidence: number;
+  topStages: { stage: string; patternCount: number }[];
+}
