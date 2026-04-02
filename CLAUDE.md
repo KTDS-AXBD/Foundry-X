@@ -189,7 +189,7 @@ pnpm build && npx wrangler pages deploy dist --project-name=foundry-x-web
 
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
 - **Pages**: `fx.minu.best` (Vite + React Router 7, CNAME → Cloudflare Pages)
-- **D1**: 0001~0080 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
+- **D1**: 0001~0082 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
 - **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, OPENROUTER_API_KEY
 
 ## Dev Tools (Track B — Agent Evolution)
@@ -206,7 +206,7 @@ pnpm build && npx wrangler pages deploy dist --project-name=foundry-x-web
 - **D1 migrations**: 로컬 적용 후 `--remote` 반드시 별도 실행 (누락하면 프로덕션 500)
 - **PostToolUse hook**: .ts/.tsx 편집 시 자동 eslint --fix + typecheck 실행 (15s/60s timeout)
 - **git add**: 절대 `git add .` 금지 — 멀티 pane 환경에서 다른 세션 변경 포함 위험
-- **D1 migration 중복**: `0040` 2개 + `0075` 2개 공존 (remote 적용 완료) — 새 마이그레이션은 0080부터
+- **D1 migration 중복**: `0040` 2개 + `0075` 2개 공존 (remote 적용 완료) — 새 마이그레이션은 0083부터
 
 ## 성공 지표 (구현 시 참고)
 
