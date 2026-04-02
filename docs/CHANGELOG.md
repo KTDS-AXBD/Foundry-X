@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #172 (2026-04-03)
+**리포 정리 — gitignore + 미추적 문서 일괄 등록**:
+- ✅ .gitignore: 바이너리 참고자료(PDF/DOCX/HTML) + 임시 디렉토리(.firecrawl/, _workspace-prev/) 추가
+- ✅ 프로젝트 문서 39파일 커밋 (FX-PLAN-012 PRD, axbd 참고자료+ai-biz 플러그인, openspec PRD+리뷰, demo-scenario)
+- ✅ Dirty files 17 → 0 정리 완료
+
+**검증 결과**: typecheck ✅ (5 tasks, 3 cached)
+
 ### 세션 #171 (2026-04-03)
 **Sprint 105+110 병렬 완료 — DERIVED 엔진 + BD 형상화 Phase A+B+C**:
 - ✅ Sprint 110 F282+F283: ax-bd-shaping 스킬 + shaping-{orchestrator,generator,discriminator} 에이전트 3종 + Rubric 5차원 + 참조 3종 (PR #235, Match 100%, 12분 autopilot)
