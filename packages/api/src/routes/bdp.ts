@@ -7,6 +7,8 @@ import type { TenantVariables } from "../middleware/tenant.js";
 import { BdpService, BdpFinalizedError } from "../services/bdp-service.js";
 import { ProposalGenerator, NoBdpError } from "../services/proposal-generator.js";
 import { CreateBdpVersionSchema, BdpDiffParamsSchema, GenerateProposalSchema } from "../schemas/bdp.schema.js";
+import { BdpReviewService } from "../services/bdp-review-service.js";
+import { sectionReviewSchema } from "../schemas/hitl-section.schema.js";
 
 export const bdpRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
@@ -101,6 +103,44 @@ bdpRoute.get("/bdp/:bizItemId/diff/:v1/:v2", async (c) => {
   }
 
   return c.json(diff);
+});
+
+// POST /bdp/:bizItemId/sections/:sectionId/review — 섹션 리뷰 제출 (F292)
+bdpRoute.post("/bdp/:bizItemId/sections/:sectionId/review", async (c) => {
+  const orgId = c.get("orgId");
+  const bizItemId = c.req.param("bizItemId");
+  const sectionId = c.req.param("sectionId");
+  const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? "";
+
+  const body = await c.req.json();
+  const parsed = sectionReviewSchema.safeParse({ ...body, sectionId });
+  if (!parsed.success) {
+    return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+  }
+
+  const svc = new BdpReviewService(c.env.DB);
+  const review = await svc.reviewSection(orgId, bizItemId, parsed.data, userId);
+  return c.json(review, 201);
+});
+
+// GET /bdp/:bizItemId/reviews — 리뷰 목록 (F292)
+bdpRoute.get("/bdp/:bizItemId/reviews", async (c) => {
+  const orgId = c.get("orgId");
+  const bizItemId = c.req.param("bizItemId");
+
+  const svc = new BdpReviewService(c.env.DB);
+  const reviews = await svc.listReviews(orgId, bizItemId);
+  return c.json(reviews);
+});
+
+// GET /bdp/:bizItemId/review-summary — 상태 요약 (F292)
+bdpRoute.get("/bdp/:bizItemId/review-summary", async (c) => {
+  const orgId = c.get("orgId");
+  const bizItemId = c.req.param("bizItemId");
+
+  const svc = new BdpReviewService(c.env.DB);
+  const summary = await svc.getSummary(orgId, bizItemId);
+  return c.json(summary);
 });
 
 // POST /bdp/:bizItemId/generate-proposal — 사업제안서 자동 생성 (F237)

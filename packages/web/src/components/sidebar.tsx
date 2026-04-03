@@ -44,6 +44,7 @@ import {
   Presentation,
   ClipboardCheck,
   TestTubes,
+  Code,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -148,6 +149,7 @@ const processGroups: NavGroup[] = [
       { href: "/shaping/prd", label: "PRD", icon: FileText },
       { href: "/shaping/proposal", label: "사업제안서", icon: FileSignature },
       { href: "/shaping/review", label: "형상화 리뷰", icon: ClipboardCheck },
+      { href: "/shaping/prototype", label: "Prototype", icon: Code },
       { href: "/shaping/offering", label: "Offering Pack", icon: Package },
     ],
   },

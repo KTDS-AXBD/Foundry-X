@@ -9,6 +9,8 @@ import { PrototypeService } from "../services/prototype-service.js";
 import { PocEnvService } from "../services/poc-env-service.js";
 import { TechReviewService } from "../services/tech-review-service.js";
 import { PocEnvProvisionSchema } from "../schemas/prototype-ext.js";
+import { PrototypeReviewService } from "../services/prototype-review-service.js";
+import { sectionReviewSchema } from "../schemas/hitl-section.schema.js";
 
 export const axBdPrototypesRoute = new Hono<{
   Bindings: Env;
@@ -104,4 +106,42 @@ axBdPrototypesRoute.get("/ax-bd/prototypes/:id/tech-review", async (c) => {
   const review = await svc.getByPrototype(c.req.param("id"), c.get("orgId"));
   if (!review) return c.json({ error: "Tech review not found" }, 404);
   return c.json(review);
+});
+
+// POST /ax-bd/prototypes/:id/sections/:sectionId/review — 섹션 리뷰 제출 (F297)
+axBdPrototypesRoute.post("/ax-bd/prototypes/:id/sections/:sectionId/review", async (c) => {
+  const orgId = c.get("orgId");
+  const prototypeId = c.req.param("id");
+  const sectionId = c.req.param("sectionId");
+  const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? (c.get("userId") as string) ?? "";
+
+  const body = await c.req.json();
+  const parsed = sectionReviewSchema.safeParse({ ...body, sectionId });
+  if (!parsed.success) {
+    return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+  }
+
+  const svc = new PrototypeReviewService(c.env.DB);
+  const review = await svc.reviewSection(orgId, prototypeId, parsed.data, userId, body.framework);
+  return c.json(review, 201);
+});
+
+// GET /ax-bd/prototypes/:id/reviews — 리뷰 목록 (F297)
+axBdPrototypesRoute.get("/ax-bd/prototypes/:id/reviews", async (c) => {
+  const orgId = c.get("orgId");
+  const prototypeId = c.req.param("id");
+
+  const svc = new PrototypeReviewService(c.env.DB);
+  const reviews = await svc.listReviews(orgId, prototypeId);
+  return c.json(reviews);
+});
+
+// GET /ax-bd/prototypes/:id/review-summary — 상태 요약 (F297)
+axBdPrototypesRoute.get("/ax-bd/prototypes/:id/review-summary", async (c) => {
+  const orgId = c.get("orgId");
+  const prototypeId = c.req.param("id");
+
+  const svc = new PrototypeReviewService(c.env.DB);
+  const summary = await svc.getSummary(orgId, prototypeId);
+  return c.json(summary);
 });

@@ -41,6 +41,7 @@ export const router = createBrowserRouter([
       // ── 3단계 형상화 (shaping) ──
       { path: "shaping/prd", lazy: () => import("@/routes/spec-generator") },
       { path: "shaping/proposal", lazy: () => import("@/routes/ax-bd/index") },
+      { path: "shaping/prototype", lazy: () => import("@/routes/shaping-prototype") },
       { path: "shaping/review", lazy: () => import("@/routes/ax-bd/shaping") },
       { path: "shaping/review/:runId", lazy: () => import("@/routes/ax-bd/shaping-detail") },
       { path: "shaping/offering", lazy: () => import("@/routes/offering-packs") },
