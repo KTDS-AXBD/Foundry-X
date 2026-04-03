@@ -176,22 +176,28 @@ pnpm e2e                          # Playwright E2E (35 specs, ~146 tests)
 ## Deployment
 
 ```bash
-# API 배포 (Workers) — ⚠️ Windows PowerShell에서 실행 (WSL에서 wrangler 금지, 메모리 소진)
-cd C:\Users\sincl\work\axbd\Foundry-X\packages\api
-npx wrangler d1 migrations apply foundry-x-db --remote   # 마이그레이션 먼저
-npx wrangler deploy                                       # Workers 배포
+# 자동 배포 (권장) — master push 시 GitHub Actions가 마이그레이션 + deploy 자동 실행
+git push origin master   # deploy.yml: d1 migrations apply --remote → wrangler deploy → smoke test
 
-# Web 배포 (Pages — GitHub 연동 자동 배포, 수동 시) — Windows PowerShell
-cd C:\Users\sincl\work\axbd\Foundry-X\packages\web
+# 수동 배포 (WSL에서 직접 실행 가능 — wrangler 4.75.0 기준 184~271MB)
+cd packages/api
+npx wrangler d1 migrations apply foundry-x-db --remote   # 마이그레이션 먼저 (184MB, 1.5초)
+npx wrangler deploy                                       # Workers 배포 (271MB, 9초)
+
+# 긴급 마이그레이션 (wrangler 없이 Cloudflare REST API 직접 호출)
+./scripts/d1-migrate-remote.sh                            # 미적용 마이그레이션 자동 감지+적용
+./scripts/d1-migrate-remote.sh 0083_captured_engine.sql   # 특정 파일만 실행
+
+# Web 배포 (Pages — GitHub 연동 자동 배포, 수동 시)
+cd packages/web
 pnpm build && npx wrangler pages deploy dist --project-name=foundry-x-web
 ```
 
-- **WSL→Windows 동기화**: WSL에서 빌드 후, Windows에서 `git pull origin master` → `pnpm install` → 배포
-
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
 - **Pages**: `fx.minu.best` (Vite + React Router 7, CNAME → Cloudflare Pages)
-- **D1**: 0001~0082 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote` — `0082` 2개 공존 (bd_demo_seed + derived_engine)
+- **D1**: 0001~0083 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
 - **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, OPENROUTER_API_KEY
+- **CI/CD**: `.github/workflows/deploy.yml` — master push 시 D1 마이그레이션 + Workers deploy + smoke test 자동
 
 ## Dev Tools (Track B — Agent Evolution)
 
@@ -204,10 +210,10 @@ pnpm build && npx wrangler pages deploy dist --project-name=foundry-x-web
 - **Zone.Identifier**: WSL 환경에서 Windows 파일 복사 시 생성 — `.gitignore`에 `*:Zone.Identifier` 추가 권장
 - **CORS**: Pages→Workers 크로스오리진 — `packages/api/src/app.ts` CORS 미들웨어 필수
 - **API URL**: `VITE_API_URL`에 `/api` 경로 포함 필수 (빠뜨리면 404)
-- **D1 migrations**: 로컬 적용 후 `--remote` 반드시 별도 실행 (누락하면 프로덕션 500)
+- **D1 migrations**: CI/CD가 자동 적용하지만, 수동 시 `--remote` 별도 실행 필수 (누락하면 프로덕션 500)
 - **PostToolUse hook**: .ts/.tsx 편집 시 자동 eslint --fix + typecheck 실행 (15s/60s timeout)
 - **git add**: 절대 `git add .` 금지 — 멀티 pane 환경에서 다른 세션 변경 포함 위험
-- **D1 migration 중복**: `0040` 2개 + `0075` 2개 공존 (remote 적용 완료) — 새 마이그레이션은 0083부터
+- **D1 migration 중복**: `0040` 2개 + `0075` 2개 + `0082` 2개 공존 (remote 적용 완료) — 새 마이그레이션은 0084부터
 
 ## 성공 지표 (구현 시 참고)
 
