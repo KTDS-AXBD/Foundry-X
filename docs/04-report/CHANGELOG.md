@@ -2,6 +2,19 @@
 
 > Automatic changelog of PDCA cycle completions. Updated when `/pdca report` is executed.
 
+## [2026-04-03] - 세션 #173: ax plugin 자율점검 + 인프라 정비
+
+### Changed
+- **CLAUDE.md**: ax-bd-shaping 스킬 + shaping 에이전트 3종 목록 추가 (Phase 0c drift 해소)
+- **infra-selfcheck/SKILL.md**: C1 검증 대상을 legacy commands → plugin skills로 전환, C4 참조 검증도 skills 기반으로 업데이트, Gotchas 추가
+- **sprint/SKILL.md**: merge 단계 7b에 CLAUDE.md 스킬 테이블 자동 동기화 추가 (Sprint merge 시 drift 방지)
+
+### Fixed
+- **docs/04-report/**: sprint-*.report.md 5건을 features/ 서브디렉토리로 이동 (문서 위치 규칙 준수)
+
+### 검증 결과
+- ✅ selfcheck 8항목: 5 PASS, 1 SKIP, 2 WARN → 수정 후 전항목 정상
+
 ## [2026-04-01] - Sprint 100: F269 발굴 IA & Page 정리
 
 ### Added
