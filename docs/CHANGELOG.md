@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #186 (2026-04-03)
+**Phase 11 배치 파이프라인 — Sprint 114~120 (7 Sprint, 11 F-items)**:
+- ✅ Sprint 114 (F290): Route namespace 마이그레이션 — 22경로 전환 + 16 redirect (PR #243, ~11분)
+- ✅ 배치 1 (Sprint 115/116/117): F291 수집 Agent + F294+F295 검증 2-tier + F296 평가 결과서 (PR #244/#245/#246, 병렬 ~24분)
+- ✅ 배치 2 (Sprint 118/119/120): F292+F297 HITL dual + F293 Offering Brief + F298 PoC 관리 (PR #247/#248/#249, 병렬 ~20분)
+- Phase 11: 11/12 완료 (F299 대고객 선제안 GTM 미착수)
+- D1 0085~0087 (3건 마이그레이션 추가), routes 79→83, services 184→192, schemas 93→98
+- app.ts/sidebar.tsx rebase 충돌 2회 해소 (양쪽 추가 유형)
+
+**검증**: typecheck ✅ / Web 314 pass / API 일부 D1 mock 환경 이슈 (WT 개별 pass)
+
 ### 세션 #184 (2026-04-03)
 **Phase 11 IA 대개편 등록 + Sprint 113 F288+F289 완료**:
 - ✅ FX-IA-Change-Plan-v1.1.docx 갭 분석 — 13개 Figma 갭(G1~G13) + 구조적 변경 5건 → 17건 갭 도출

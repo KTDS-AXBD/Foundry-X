@@ -20,13 +20,10 @@ test.describe("Workspace Navigation", () => {
   test("org members 네비게이션", async ({ authenticatedPage: page }) => {
     await page.goto("/workspace/org/members");
 
-    // Members heading (exact h1) or fallback states
-    const heading = page.getByRole("heading", { name: "Members", exact: true });
-    const loading = page.getByText("Loading...");
-    const noOrg = page.getByText("No organization selected.");
-
-    await expect(heading.or(loading).or(noOrg)).toBeVisible({
-      timeout: 10000,
-    });
+    // Members 페이지가 렌더되면 heading이 보임
+    // OrgSwitcher mock이 org를 제공하므로 Members heading이 나와야 함
+    await expect(
+      page.getByRole("heading", { name: "Members", exact: true }),
+    ).toBeVisible({ timeout: 10000 });
   });
 });

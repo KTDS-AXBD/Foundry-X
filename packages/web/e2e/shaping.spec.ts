@@ -68,7 +68,8 @@ test.describe("BD 형상화", () => {
 
     await page.goto("/shaping/review/run-1");
     await expect(page.getByText("전문가 리뷰")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText("TA")).toBeVisible();
+    // expertRole "TA" displayed as badge + full name
+    await expect(page.getByText(/TA|Technical Architect/).first()).toBeVisible();
   });
 
   test("Six Hats 토론 표시", async ({ authenticatedPage: page }) => {
