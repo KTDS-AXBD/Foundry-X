@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchApi } from "@/lib/api-client";
+import { fetchApi, postApi } from "@/lib/api-client";
 import { Building2, Check, X } from "lucide-react";
 
 interface ValidationItem {
@@ -37,10 +37,7 @@ export function Component() {
 
   const handleSubmit = async (bizItemId: string, decision: "approve" | "reject") => {
     try {
-      await fetchApi("/validation/company/submit", {
-        method: "POST",
-        body: JSON.stringify({ bizItemId, decision, comment: "" }),
-      });
+      await postApi("/validation/company/submit", { bizItemId, decision, comment: "" });
       await loadItems();
     } catch {
       // ignore

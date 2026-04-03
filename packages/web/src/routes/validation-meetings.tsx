@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchApi } from "@/lib/api-client";
+import { fetchApi, postApi } from "@/lib/api-client";
 import { CalendarDays, Plus } from "lucide-react";
 import {
   Sheet,
@@ -57,10 +57,7 @@ export function Component() {
   const handleCreate = async () => {
     if (!title || !bizItemId || !scheduledAt) return;
     try {
-      await fetchApi("/validation/meetings", {
-        method: "POST",
-        body: JSON.stringify({ bizItemId, title, scheduledAt, location: location || undefined }),
-      });
+      await postApi("/validation/meetings", { bizItemId, title, scheduledAt, location: location || undefined });
       setSheetOpen(false);
       setTitle("");
       setBizItemId("");
