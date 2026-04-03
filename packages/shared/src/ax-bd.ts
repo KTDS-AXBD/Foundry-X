@@ -145,3 +145,89 @@ export interface PortfolioSummary {
   byStatus: Record<EvalStatus, number>;
   recentChanges: EvalHistoryEntry[];
 }
+
+// Sprint 112: F286+F287 BD 형상화 Phase F
+
+export type ShapingRunStatus = "running" | "completed" | "failed" | "escalated";
+export type ShapingMode = "hitl" | "auto";
+export type ShapingPhase = "A" | "B" | "C" | "D" | "E" | "F";
+export type PhaseVerdict = "PASS" | "MINOR_FIX" | "MAJOR_ISSUE" | "ESCALATED";
+export type ExpertRole = "TA" | "AA" | "CA" | "DA" | "QA";
+export type HatColor = "white" | "red" | "black" | "yellow" | "green" | "blue";
+export type HatVerdict = "accept" | "concern" | "reject";
+export type ReviewAction = "approved" | "revision_requested" | "rejected";
+
+export interface ShapingRun {
+  id: string;
+  tenantId: string;
+  discoveryPrdId: string;
+  status: ShapingRunStatus;
+  mode: ShapingMode;
+  currentPhase: ShapingPhase;
+  totalIterations: number;
+  maxIterations: number;
+  qualityScore: number | null;
+  tokenCost: number;
+  tokenLimit: number;
+  gitPath: string | null;
+  createdAt: string;
+  completedAt: string | null;
+}
+
+export interface ShapingPhaseLog {
+  id: string;
+  runId: string;
+  phase: ShapingPhase;
+  round: number;
+  inputSnapshot: string | null;
+  outputSnapshot: string | null;
+  verdict: PhaseVerdict | null;
+  qualityScore: number | null;
+  findings: string | null;
+  durationMs: number | null;
+  createdAt: string;
+}
+
+export interface ShapingExpertReview {
+  id: string;
+  runId: string;
+  expertRole: ExpertRole;
+  reviewBody: string;
+  findings: string | null;
+  qualityScore: number | null;
+  createdAt: string;
+}
+
+export interface ShapingSixHats {
+  id: string;
+  runId: string;
+  hatColor: HatColor;
+  round: number;
+  opinion: string;
+  verdict: HatVerdict | null;
+  createdAt: string;
+}
+
+export interface ShapingRunDetail extends ShapingRun {
+  phaseLogs: ShapingPhaseLog[];
+  expertReviews: ShapingExpertReview[];
+  sixHats: ShapingSixHats[];
+}
+
+export interface ReviewResult {
+  runId: string;
+  section: string;
+  action: ReviewAction;
+  newStatus: ShapingRunStatus;
+}
+
+export interface AutoReviewResult {
+  runId: string;
+  results: Array<{
+    persona: string;
+    pass: boolean;
+    reasoning: string;
+  }>;
+  consensus: "approved" | "escalated";
+  newStatus: ShapingRunStatus;
+}

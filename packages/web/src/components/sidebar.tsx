@@ -39,6 +39,7 @@ import {
   Users,
   Network,
   Presentation,
+  ClipboardCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -112,6 +113,7 @@ const processGroups: NavGroup[] = [
     items: [
       { href: "/spec-generator", label: "Spec 생성", icon: FileText },
       { href: "/ax-bd", label: "사업제안서", icon: FileSignature },
+      { href: "/ax-bd/shaping", label: "형상화 리뷰", icon: ClipboardCheck },
       { href: "/offering-packs", label: "Offering Pack", icon: Package },
     ],
   },
