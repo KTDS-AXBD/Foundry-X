@@ -91,6 +91,8 @@ import { skillRegistryRoute } from "./routes/skill-registry.js";
 import { derivedEngineRoute } from "./routes/derived-engine.js";
 // Sprint 106: CAPTURED 엔진 (F277)
 import { capturedEngineRoute } from "./routes/captured-engine.js";
+// Sprint 112: BD 형상화 Phase F (F286, F287)
+import { shapingRoute } from "./routes/shaping.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -331,6 +333,8 @@ app.route("/api", skillRegistryRoute);
 app.route("/api", derivedEngineRoute);
 // Sprint 106: CAPTURED 엔진 (F277)
 app.route("/api", capturedEngineRoute);
+// Sprint 112: BD 형상화 Phase F (F286, F287)
+app.route("/api", shapingRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

@@ -63,6 +63,8 @@ export const router = createBrowserRouter([
       { path: "ax-bd/demo", lazy: () => import("@/routes/ax-bd/demo-scenario") },
       { path: "ax-bd/ideas-bmc", lazy: () => import("@/routes/ax-bd/ideas-bmc") },
       { path: "ax-bd/discover-dashboard", lazy: () => import("@/routes/ax-bd/discover-dashboard") },
+      { path: "ax-bd/shaping", lazy: () => import("@/routes/ax-bd/shaping") },
+      { path: "ax-bd/shaping/:runId", lazy: () => import("@/routes/ax-bd/shaping-detail") },
     ],
   }],
   },
