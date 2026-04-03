@@ -1967,3 +1967,91 @@ export async function submitHitlReview(input: {
 export async function getHitlHistory(artifactId: string): Promise<{ reviews: HitlReview[]; total: number }> {
   return fetchApi(`/hitl/history/${artifactId}`);
 }
+
+// ─── Sprint 121: GTM Outreach (F299) ───
+
+export interface GtmCustomer {
+  id: string;
+  orgId: string;
+  companyName: string;
+  industry: string | null;
+  contactName: string | null;
+  contactEmail: string | null;
+  contactRole: string | null;
+  companySize: string | null;
+  notes: string | null;
+  tags: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GtmOutreach {
+  id: string;
+  orgId: string;
+  customerId: string;
+  offeringPackId: string | null;
+  title: string;
+  status: string;
+  proposalContent: string | null;
+  proposalGeneratedAt: string | null;
+  sentAt: string | null;
+  responseNote: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  customerName?: string;
+  offeringPackTitle?: string;
+}
+
+export interface OutreachStats {
+  total: number;
+  byStatus: Record<string, number>;
+  conversionRate: number;
+}
+
+export async function fetchGtmCustomers(params?: Record<string, string>): Promise<{ items: GtmCustomer[]; total: number }> {
+  const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+  return fetchApi(`/gtm/customers${qs}`);
+}
+
+export async function createGtmCustomer(data: Partial<GtmCustomer>): Promise<GtmCustomer> {
+  return postApi("/gtm/customers", data);
+}
+
+export async function fetchGtmCustomer(id: string): Promise<GtmCustomer> {
+  return fetchApi(`/gtm/customers/${id}`);
+}
+
+export async function updateGtmCustomer(id: string, data: Partial<GtmCustomer>): Promise<GtmCustomer> {
+  return patchApi(`/gtm/customers/${id}`, data);
+}
+
+export async function fetchGtmOutreachList(params?: Record<string, string>): Promise<{ items: GtmOutreach[]; total: number }> {
+  const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+  return fetchApi(`/gtm/outreach${qs}`);
+}
+
+export async function createGtmOutreach(data: { customerId: string; offeringPackId?: string; title: string }): Promise<GtmOutreach> {
+  return postApi("/gtm/outreach", data);
+}
+
+export async function fetchGtmOutreach(id: string): Promise<GtmOutreach> {
+  return fetchApi(`/gtm/outreach/${id}`);
+}
+
+export async function updateGtmOutreachStatus(id: string, status: string, responseNote?: string): Promise<GtmOutreach> {
+  return patchApi(`/gtm/outreach/${id}/status`, { status, responseNote });
+}
+
+export async function deleteGtmOutreach(id: string): Promise<void> {
+  return deleteApi(`/gtm/outreach/${id}`);
+}
+
+export async function generateOutreachProposal(id: string): Promise<{ content: string }> {
+  return postApi(`/gtm/outreach/${id}/generate`);
+}
+
+export async function fetchOutreachStats(): Promise<OutreachStats> {
+  return fetchApi("/gtm/outreach/stats");
+}

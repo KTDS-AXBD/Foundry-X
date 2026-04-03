@@ -102,6 +102,8 @@ import { validationMeetingsRoute } from "./routes/validation-meetings.js";
 import { evaluationReportRoute } from "./routes/evaluation-report.js";
 // Sprint 120: PoC 관리 분리 (F298)
 import { pocRoute } from "./routes/poc.js";
+import { gtmCustomersRoute } from "./routes/gtm-customers.js";
+import { gtmOutreachRoute } from "./routes/gtm-outreach.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -353,6 +355,10 @@ app.route("/api", validationMeetingsRoute);
 app.route("/api", evaluationReportRoute);
 // Sprint 120: PoC 관리 분리 (F298)
 app.route("/api", pocRoute);
+
+// Sprint 121: GTM Outreach (F299)
+app.route("/api", gtmCustomersRoute);
+app.route("/api", gtmOutreachRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
