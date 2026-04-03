@@ -689,3 +689,80 @@ export interface CapturedStats {
   avgConfidence: number;
   avgSuccessRate: number;
 }
+
+// ─── F278: BD ROI 벤치마크 타입 (Sprint 107) ───
+
+export interface RoiBenchmark {
+  id: string;
+  tenantId: string;
+  skillId: string;
+  coldThreshold: number;
+  coldExecutions: number;
+  warmExecutions: number;
+  coldAvgCostUsd: number;
+  warmAvgCostUsd: number;
+  coldAvgDurationMs: number;
+  warmAvgDurationMs: number;
+  coldAvgTokens: number;
+  warmAvgTokens: number;
+  coldSuccessRate: number;
+  warmSuccessRate: number;
+  costSavingsPct: number | null;
+  durationSavingsPct: number | null;
+  tokenSavingsPct: number | null;
+  pipelineStage: string | null;
+  createdAt: string;
+}
+
+export interface SkillExecutionSummary {
+  id: string;
+  costUsd: number;
+  durationMs: number;
+  totalTokens: number;
+  status: string;
+  executedAt: string;
+}
+
+export interface RoiBenchmarkDetail extends RoiBenchmark {
+  coldExecutionsList: SkillExecutionSummary[];
+  warmExecutionsList: SkillExecutionSummary[];
+}
+
+export interface RoiByStage {
+  pipelineStage: string;
+  skillCount: number;
+  avgCostSavingsPct: number;
+  avgDurationSavingsPct: number;
+  totalWarmSavingsUsd: number;
+}
+
+export interface SignalValuation {
+  id: string;
+  tenantId: string;
+  signalType: "go" | "pivot" | "drop";
+  valueUsd: number;
+  description: string | null;
+  updatedBy: string;
+  updatedAt: string;
+}
+
+export interface BdRoiSummary {
+  period: { days: number; from: string; to: string };
+  bdRoi: number;
+  totalInvestment: number;
+  totalSavings: number;
+  signalValue: number;
+  breakdown: {
+    warmRunSavings: {
+      totalSaved: number;
+      avgSavingsPerExecution: number;
+      warmExecutionCount: number;
+    };
+    signalBreakdown: {
+      go: { count: number; valuePerUnit: number; total: number };
+      pivot: { count: number; valuePerUnit: number; total: number };
+      drop: { count: number; valuePerUnit: number; total: number };
+    };
+  };
+  topSkillsBySavings: Array<{ skillId: string; savingsPct: number }>;
+}
