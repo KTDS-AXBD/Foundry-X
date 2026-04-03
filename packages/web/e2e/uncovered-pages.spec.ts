@@ -48,7 +48,7 @@ test.describe("미커버 페이지 렌더링 검증", () => {
       route.fulfill({ json: {} }),
     );
 
-    await page.goto("/projects");
+    await page.goto("/gtm/projects");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
   });
 
@@ -60,7 +60,7 @@ test.describe("미커버 페이지 렌더링 검증", () => {
       route.fulfill({ json: { items: [], total: 0 } }),
     );
 
-    await page.goto("/sr");
+    await page.goto("/collection/sr");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
   });
 
@@ -86,7 +86,7 @@ test.describe("미커버 페이지 렌더링 검증", () => {
       }),
     );
 
-    await page.goto("/discovery-progress");
+    await page.goto("/discovery/progress");
     await expect(page.getByRole("heading", { name: "Discovery 진행률" })).toBeVisible();
     await expect(page.getByText("전체 사업 아이템의 Discovery 9기준 달성 현황")).toBeVisible();
   });

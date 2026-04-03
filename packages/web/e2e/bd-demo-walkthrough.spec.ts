@@ -107,7 +107,7 @@ test.describe("BD 데모 워크쓰루", () => {
       route.fulfill({ json: { items: [], summary: { total: 0, green: 0, yellow: 0, red: 0 } } }),
     );
 
-    await page.goto("/ax-bd/discover-dashboard");
+    await page.goto("/discovery/dashboard");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("발굴 대시보드")).toBeVisible();
   });

@@ -45,7 +45,7 @@ test.describe("BD 형상화", () => {
       route.fulfill({ json: mockRunList }),
     );
 
-    await page.goto("/ax-bd/shaping");
+    await page.goto("/shaping/review");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("BD 형상화")).toBeVisible();
     await expect(page.getByText("prd-001")).toBeVisible();
@@ -56,7 +56,7 @@ test.describe("BD 형상화", () => {
       route.fulfill({ json: mockRunDetail }),
     );
 
-    await page.goto("/ax-bd/shaping/run-1");
+    await page.goto("/shaping/review/run-1");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("Phase E")).toBeVisible();
   });
@@ -66,7 +66,7 @@ test.describe("BD 형상화", () => {
       route.fulfill({ json: mockRunDetail }),
     );
 
-    await page.goto("/ax-bd/shaping/run-1");
+    await page.goto("/shaping/review/run-1");
     await expect(page.getByText("전문가 리뷰")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("TA")).toBeVisible();
   });
@@ -76,7 +76,7 @@ test.describe("BD 형상화", () => {
       route.fulfill({ json: mockRunDetail }),
     );
 
-    await page.goto("/ax-bd/shaping/run-1");
+    await page.goto("/shaping/review/run-1");
     await expect(page.getByText("Six Hats 토론")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("white")).toBeVisible();
   });
@@ -86,7 +86,7 @@ test.describe("BD 형상화", () => {
       route.fulfill({ json: mockRunDetail }),
     );
 
-    await page.goto("/ax-bd/shaping/run-1");
+    await page.goto("/shaping/review/run-1");
     await expect(page.getByText("자동 리뷰 실행")).toBeVisible({ timeout: 10000 });
   });
 });

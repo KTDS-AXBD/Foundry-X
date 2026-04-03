@@ -111,7 +111,7 @@ export function Component() {
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link
-          to="/ax-bd"
+          to="/shaping/proposal"
           className="text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />

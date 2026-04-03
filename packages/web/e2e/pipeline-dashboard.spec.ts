@@ -43,7 +43,7 @@ test.describe("Pipeline Dashboard (F232)", () => {
   });
 
   test("파이프라인 페이지 렌더링 + 칸반 기본 뷰", async ({ authenticatedPage: page }) => {
-    await page.goto("/pipeline");
+    await page.goto("/validation/pipeline");
 
     // 제목 확인
     await expect(page.getByRole("heading", { name: "BD 파이프라인" })).toBeVisible();
@@ -59,7 +59,7 @@ test.describe("Pipeline Dashboard (F232)", () => {
   });
 
   test("파이프라인 뷰 전환", async ({ authenticatedPage: page }) => {
-    await page.goto("/pipeline");
+    await page.goto("/validation/pipeline");
 
     // 칸반 로딩 완료 대기
     await expect(page.getByRole("heading", { name: "BD 파이프라인" })).toBeVisible({ timeout: 10000 });
@@ -74,7 +74,7 @@ test.describe("Pipeline Dashboard (F232)", () => {
   });
 
   test("칸반 스테이지 컬럼 7개 표시", async ({ authenticatedPage: page }) => {
-    await page.goto("/pipeline");
+    await page.goto("/validation/pipeline");
 
     // 7개 스테이지 레이블 확인
     for (const label of ["등록", "발굴", "형상화", "리뷰", "의사결정", "Offering", "MVP"]) {
@@ -83,7 +83,7 @@ test.describe("Pipeline Dashboard (F232)", () => {
   });
 
   test("빈 스테이지에 항목 없음 표시", async ({ authenticatedPage: page }) => {
-    await page.goto("/pipeline");
+    await page.goto("/validation/pipeline");
 
     // 칸반 로딩 완료 대기 (아이템이 있는 카드가 먼저 렌더링)
     await expect(page.getByText("AI 챗봇 PoC")).toBeVisible({ timeout: 10000 });

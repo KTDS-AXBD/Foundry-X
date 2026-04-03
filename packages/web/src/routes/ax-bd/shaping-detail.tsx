@@ -107,7 +107,7 @@ export function Component() {
 
   return (
     <div className="mx-auto max-w-6xl p-6">
-      <Link to="/ax-bd/shaping" className="text-sm text-muted-foreground hover:underline">
+      <Link to="/shaping/review" className="text-sm text-muted-foreground hover:underline">
         ← 형상화 목록
       </Link>
 

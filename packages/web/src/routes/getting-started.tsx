@@ -53,7 +53,7 @@ import TeamFaqSection from "@/components/feature/TeamFaqSection";
 
 const workflowCards = [
   {
-    href: "/sr",
+    href: "/collection/sr",
     icon: Inbox,
     title: "📥 SR 처리하기",
     subtitle: "SR 접수 → AI 분류 → 제안서",
@@ -65,7 +65,7 @@ const workflowCards = [
     border: "border-axis-primary/20",
   },
   {
-    href: "/spec-generator",
+    href: "/shaping/prd",
     icon: FileText,
     title: "📝 아이디어 → 명세",
     subtitle: "아이디어 → Spec 생성 → 에이전트 실행",
@@ -89,7 +89,7 @@ const workflowCards = [
     border: "border-axis-green/20",
   },
   {
-    href: "/ax-bd/discovery",
+    href: "/discovery/items",
     icon: Blocks,
     title: "🔍 Discovery 프로세스",
     subtitle: "5유형 분류 → 7단계 발굴 → 신호등",

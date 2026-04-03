@@ -19,7 +19,7 @@ const ADMIN_CARDS = [
     cta: "멤버 관리로 이동",
   },
   {
-    href: "/projects",
+    href: "/gtm/projects",
     icon: FolderKanban,
     title: "프로젝트 설정",
     description: "새 프로젝트를 생성하고 리포지토리를 연결하세요.",
