@@ -33,7 +33,7 @@ export function Component() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link to="/offering-packs" className="text-muted-foreground hover:text-foreground"><ArrowLeft className="size-5" /></Link>
+        <Link to="/shaping/offering" className="text-muted-foreground hover:text-foreground"><ArrowLeft className="size-5" /></Link>
         <h1 className="text-2xl font-bold">{pack.title}</h1>
         <Badge>{pack.status}</Badge>
       </div>

@@ -24,7 +24,7 @@ test.describe("Authentication Flow", () => {
   });
 
   test("미인증 사용자 → /offering-packs 접근 시 /login으로 리다이렉트", async ({ page }) => {
-    await page.goto("/offering-packs");
+    await page.goto("/shaping/offering");
     await page.waitForURL("**/login", { timeout: 5000 });
     await expect(page).toHaveURL(/\/login/);
   });

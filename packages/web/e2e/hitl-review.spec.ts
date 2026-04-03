@@ -104,7 +104,7 @@ test.describe("HITL Review Panel (F266)", () => {
     authenticatedPage: page,
   }) => {
     await setupMocks(page);
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
     await expect(
       page.locator("[data-tour='discovery-wizard']"),
     ).toBeVisible({ timeout: 10000 });
@@ -138,7 +138,7 @@ test.describe("HITL Review Panel (F266)", () => {
 
     // HITL 패널을 직접 트리거하기 위해 discovery-detail 페이지 사용
     // 또는 evaluate를 통한 직접 상태 주입
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
     await expect(
       page.locator("[data-tour='discovery-wizard']"),
     ).toBeVisible({ timeout: 10000 });
@@ -178,7 +178,7 @@ test.describe("HITL Review Panel (F266)", () => {
     authenticatedPage: page,
   }) => {
     await setupMocks(page);
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
     await expect(
       page.locator("[data-tour='discovery-wizard']"),
     ).toBeVisible({ timeout: 10000 });
@@ -223,7 +223,7 @@ test.describe("HITL Review Panel (F266)", () => {
     authenticatedPage: page,
   }) => {
     await setupMocks(page);
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
     await expect(
       page.locator("[data-tour='discovery-wizard']"),
     ).toBeVisible({ timeout: 10000 });

@@ -72,7 +72,7 @@ test.describe("Discovery Tour (F265)", () => {
     await setupBaseMocks(page);
     // tour 완료 플래그 설정 안 함 → 자동 시작
 
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
 
     // 위저드 렌더링 대기
     await expect(
@@ -93,7 +93,7 @@ test.describe("Discovery Tour (F265)", () => {
   }) => {
     await setupBaseMocks(page);
 
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
     await expect(
       page.locator("[data-tour='discovery-wizard']"),
     ).toBeVisible({ timeout: 10000 });
@@ -149,7 +149,7 @@ test.describe("Discovery Tour (F265)", () => {
       localStorage.setItem("fx-discovery-tour-completed", "true");
     });
 
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
     await expect(
       page.locator("[data-tour='discovery-wizard']"),
     ).toBeVisible({ timeout: 10000 });

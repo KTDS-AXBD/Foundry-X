@@ -11,7 +11,7 @@ test.describe("AX BD Hub", () => {
       route.fulfill({ json: { items: [], total: 0, page: 1, limit: 20 } }),
     );
 
-    await page.goto("/ax-bd");
+    await page.goto("/shaping/proposal");
 
     // /ax-bd/ideas로 리다이렉트되어야 함
     await page.waitForURL("**/ax-bd/ideas", { timeout: 10000 });
@@ -46,7 +46,7 @@ test.describe("AX BD Hub", () => {
   });
 
   test("Discovery 프로세스 페이지 — ServiceContainer 렌더링", async ({ authenticatedPage: page }) => {
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
     // ServiceContainer (iframe 기반)가 렌더링되는지 확인
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
   });

@@ -26,7 +26,7 @@ export function Component() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link to="/ax-bd/discovery" className="text-muted-foreground hover:text-foreground"><ArrowLeft className="size-5" /></Link>
+        <Link to="/discovery/items" className="text-muted-foreground hover:text-foreground"><ArrowLeft className="size-5" /></Link>
         <h1 className="text-2xl font-bold">{item.title}</h1>
         {item.discoveryType && <Badge variant="outline">Type {item.discoveryType} — {TYPE_LABELS[item.discoveryType] ?? ""}</Badge>}
         <Badge>{item.status}</Badge>

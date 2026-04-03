@@ -12,7 +12,7 @@ import {
 
 const MEMBER_CARDS = [
   {
-    href: "/sr",
+    href: "/collection/sr",
     icon: Inbox,
     title: "첫 SR 처리하기",
     description: "고객 서비스 요청(SR)을 접수하면 AI가 자동으로 분류해요.",

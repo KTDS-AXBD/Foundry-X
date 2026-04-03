@@ -99,7 +99,7 @@ test.describe("Discovery Wizard (F263)", () => {
     authenticatedPage: page,
   }) => {
     await setupMocks(page);
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
 
     // 위저드 컨테이너 렌더링
     await expect(
@@ -119,7 +119,7 @@ test.describe("Discovery Wizard (F263)", () => {
     authenticatedPage: page,
   }) => {
     await setupMocks(page);
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
 
     await expect(
       page.locator("[data-tour='discovery-wizard']"),
@@ -138,7 +138,7 @@ test.describe("Discovery Wizard (F263)", () => {
     authenticatedPage: page,
   }) => {
     await setupMocks(page);
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
 
     await expect(
       page.locator("[data-tour='discovery-stepper']"),
@@ -195,7 +195,7 @@ test.describe("Discovery Wizard (F263)", () => {
       route.fulfill({ json: { content: "mock" } }),
     );
 
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
 
     await expect(
       page.locator("[data-tour='discovery-step-detail']"),

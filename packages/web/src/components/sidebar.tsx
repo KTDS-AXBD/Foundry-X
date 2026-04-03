@@ -117,9 +117,9 @@ const processGroups: NavGroup[] = [
     icon: Inbox,
     stageColor: "bg-axis-blue",
     items: [
-      { href: "/sr", label: "SR 목록", icon: ClipboardList },
-      { href: "/discovery/collection", label: "Field 수집", icon: Radio },
-      { href: "/ir-proposals", label: "IDEA Portal", icon: ArrowUpFromLine },
+      { href: "/collection/sr", label: "SR 목록", icon: ClipboardList },
+      { href: "/collection/field", label: "Field 수집", icon: Radio },
+      { href: "/collection/ideas", label: "IDEA Portal", icon: ArrowUpFromLine },
     ],
   },
   {
@@ -128,9 +128,9 @@ const processGroups: NavGroup[] = [
     icon: Search,
     stageColor: "bg-axis-violet",
     items: [
-      { href: "/ax-bd/discovery", label: "Discovery", icon: Map },
-      { href: "/ax-bd/ideas-bmc", label: "아이디어·BMC", icon: Lightbulb },
-      { href: "/ax-bd/discover-dashboard", label: "대시보드", icon: BarChart3 },
+      { href: "/discovery/items", label: "Discovery", icon: Map },
+      { href: "/discovery/ideas-bmc", label: "아이디어·BMC", icon: Lightbulb },
+      { href: "/discovery/dashboard", label: "대시보드", icon: BarChart3 },
     ],
   },
   {
@@ -139,10 +139,10 @@ const processGroups: NavGroup[] = [
     icon: PenTool,
     stageColor: "bg-axis-warm",
     items: [
-      { href: "/spec-generator", label: "PRD", icon: FileText },
-      { href: "/ax-bd", label: "사업제안서", icon: FileSignature },
-      { href: "/ax-bd/shaping", label: "형상화 리뷰", icon: ClipboardCheck },
-      { href: "/offering-packs", label: "Offering Pack", icon: Package },
+      { href: "/shaping/prd", label: "PRD", icon: FileText },
+      { href: "/shaping/proposal", label: "사업제안서", icon: FileSignature },
+      { href: "/shaping/review", label: "형상화 리뷰", icon: ClipboardCheck },
+      { href: "/shaping/offering", label: "Offering Pack", icon: Package },
     ],
   },
   {
@@ -151,7 +151,7 @@ const processGroups: NavGroup[] = [
     icon: CheckCircle,
     stageColor: "bg-axis-green",
     items: [
-      { href: "/pipeline", label: "파이프라인", icon: GitBranch },
+      { href: "/validation/pipeline", label: "파이프라인", icon: GitBranch },
     ],
   },
   {
@@ -160,7 +160,7 @@ const processGroups: NavGroup[] = [
     icon: Rocket,
     stageColor: "bg-axis-indigo",
     items: [
-      { href: "/mvp-tracking", label: "MVP 추적", icon: Target },
+      { href: "/product/mvp", label: "MVP 추적", icon: Target },
     ],
   },
   {
@@ -169,7 +169,7 @@ const processGroups: NavGroup[] = [
     icon: TrendingUp,
     stageColor: "bg-axis-rose",
     items: [
-      { href: "/projects", label: "프로젝트 현황", icon: FolderKanban },
+      { href: "/gtm/projects", label: "프로젝트 현황", icon: FolderKanban },
     ],
   },
 ];
@@ -212,8 +212,8 @@ const externalGroup: NavGroup = {
   icon: Link2,
   visibility: "admin",
   items: [
-    { href: "/discovery", label: "Discovery-X", icon: Search },
-    { href: "/foundry", label: "AI Foundry", icon: FlaskConical },
+    { href: "/external/discovery-x", label: "Discovery-X", icon: Search },
+    { href: "/external/foundry", label: "AI Foundry", icon: FlaskConical },
   ],
 };
 

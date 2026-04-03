@@ -131,10 +131,10 @@ function ProcessPipeline({ stats }: { stats: PipelineStats | null }) {
 /* ------------------------------------------------------------------ */
 
 const quickActions = [
-  { label: "SR 등록", href: "/sr", icon: ClipboardList },
+  { label: "SR 등록", href: "/collection/sr", icon: ClipboardList },
   { label: "아이디어 추가", href: "/ax-bd/ideas", icon: Lightbulb },
-  { label: "Spec 생성", href: "/spec-generator", icon: FileText },
-  { label: "파이프라인", href: "/pipeline", icon: GitBranch },
+  { label: "Spec 생성", href: "/shaping/prd", icon: FileText },
+  { label: "파이프라인", href: "/validation/pipeline", icon: GitBranch },
 ];
 
 function QuickActions() {

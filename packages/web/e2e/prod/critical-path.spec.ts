@@ -65,7 +65,7 @@ test.describe("Production Critical Path", () => {
    * /pipeline 경로가 정상 렌더링되는지 확인해요. (Sprint 79 F232)
    */
   test("pipeline page renders", async ({ page }) => {
-    await page.goto("/pipeline");
+    await page.goto("/validation/pipeline");
     await page.waitForLoadState("networkidle");
 
     // 파이프라인 페이지가 렌더링됨 (인증 없이도 기본 UI)

@@ -71,7 +71,7 @@ test.describe("Help Agent (F264)", () => {
       route.fulfill({ json: { content: "mock" } }),
     );
 
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
     await expect(
       page.locator("[data-tour='discovery-wizard']"),
     ).toBeVisible({ timeout: 10000 });
@@ -116,7 +116,7 @@ test.describe("Help Agent (F264)", () => {
       }),
     );
 
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
     await expect(
       page.locator("[data-tour='discovery-wizard']"),
     ).toBeVisible({ timeout: 10000 });
@@ -165,7 +165,7 @@ test.describe("Help Agent (F264)", () => {
       });
     });
 
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
     await expect(
       page.locator("[data-tour='discovery-wizard']"),
     ).toBeVisible({ timeout: 10000 });
@@ -195,7 +195,7 @@ test.describe("Help Agent (F264)", () => {
       }),
     );
 
-    await page.goto("/ax-bd/discovery");
+    await page.goto("/discovery/items");
     await expect(
       page.locator("[data-tour='discovery-wizard']"),
     ).toBeVisible({ timeout: 10000 });

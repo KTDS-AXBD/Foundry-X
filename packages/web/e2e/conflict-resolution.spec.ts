@@ -39,7 +39,7 @@ test.describe("Conflict Resolution Flow", () => {
       }),
     );
 
-    await page.goto("/spec-generator");
+    await page.goto("/shaping/prd");
 
     await expect(
       page.getByRole("heading", { name: /NL → Spec Generator/i }),
@@ -70,7 +70,7 @@ test.describe("Conflict Resolution Flow", () => {
       }),
     );
 
-    await page.goto("/spec-generator");
+    await page.goto("/shaping/prd");
 
     const textarea = page.getByRole("textbox").first();
     await textarea.fill("사용자가 에이전트별 토큰 사용량을 일별 차트로 확인할 수 있어야 합니다");
@@ -108,7 +108,7 @@ test.describe("Conflict Resolution Flow", () => {
       }),
     );
 
-    await page.goto("/spec-generator");
+    await page.goto("/shaping/prd");
 
     const textarea = page.getByRole("textbox").first();
     await textarea.fill("사용자가 에이전트별 토큰 사용량을 일별 차트로 확인할 수 있어야 합니다");

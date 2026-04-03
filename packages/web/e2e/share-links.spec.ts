@@ -49,7 +49,7 @@ test.describe("Share Links (F233)", () => {
       route.fulfill({ json: { totalItems: 1, byStage: { REGISTERED: 1 }, avgDaysInStage: {} } }),
     );
 
-    await page.goto("/pipeline");
+    await page.goto("/validation/pipeline");
     await expect(page.getByText("공유 테스트 아이템")).toBeVisible();
   });
 });

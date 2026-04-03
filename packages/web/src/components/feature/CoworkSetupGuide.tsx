@@ -389,7 +389,7 @@ function ResourcesSection() {
     {
       title: "Discovery 대시보드",
       desc: "사업 아이템 등록 + 스킬 실행 + 진행 추적",
-      href: "/ax-bd/discovery",
+      href: "/discovery/items",
       internal: true,
     },
   ];

@@ -44,8 +44,8 @@ const STAGES: StageInfo[] = [
       "고객 요청(SR), IR 제안, 외부 채널에서 사업 아이디어를 수집하는 단계예요. 다양한 출처에서 원석을 모으는 것이 목표예요.",
     agentHelp:
       "AI가 SR을 자동 분류하고, 유사 아이템을 감지하여 중복 등록을 방지해요.",
-    nextAction: { label: "아이디어 발굴로 이동", href: "/ax-bd/discovery" },
-    paths: ["/sr", "/discovery/collection", "/ir-proposals"],
+    nextAction: { label: "아이디어 발굴로 이동", href: "/discovery/items" },
+    paths: ["/collection/sr", "/collection/field", "/collection/ideas"],
   },
   {
     stage: 2,
@@ -56,8 +56,8 @@ const STAGES: StageInfo[] = [
       "수집된 아이디어를 5유형(I/M/P/T/S)으로 분류하고, Discovery 프로세스를 통해 사업성을 평가하는 단계예요.",
     agentHelp:
       "AI가 시장 분석, 경쟁사 조사, BMC 초안 자동 생성을 도와요. Six Hats 토론으로 다각도 검증도 가능해요.",
-    nextAction: { label: "Spec 형상화로 이동", href: "/spec-generator" },
-    paths: ["/ax-bd/discovery", "/ax-bd/ideas", "/ax-bd/bmc", "/discovery-progress"],
+    nextAction: { label: "Spec 형상화로 이동", href: "/shaping/prd" },
+    paths: ["/discovery/items", "/ax-bd/ideas", "/ax-bd/bmc", "/discovery/progress"],
   },
   {
     stage: 3,
@@ -68,8 +68,8 @@ const STAGES: StageInfo[] = [
       "검증된 아이디어를 Spec 문서, 사업제안서, Offering Pack으로 구체화하는 단계예요.",
     agentHelp:
       "AI가 NL(자연어) 요구사항을 Spec으로 변환하고, 사업제안서 초안을 자동 생성해요.",
-    nextAction: { label: "파이프라인 검증으로", href: "/pipeline" },
-    paths: ["/spec-generator", "/ax-bd", "/offering-packs"],
+    nextAction: { label: "파이프라인 검증으로", href: "/validation/pipeline" },
+    paths: ["/shaping/prd", "/shaping/proposal", "/shaping/offering"],
   },
   {
     stage: 4,
@@ -80,8 +80,8 @@ const STAGES: StageInfo[] = [
       "ORB/PRB 게이트를 통과하고, 산출물을 공유하여 팀과 의사결정자의 승인을 받는 단계예요.",
     agentHelp:
       "AI가 게이트 문서 패키지를 자동 수집하고, 산출물 공유 링크를 생성해요.",
-    nextAction: { label: "MVP 제작으로", href: "/mvp-tracking" },
-    paths: ["/pipeline"],
+    nextAction: { label: "MVP 제작으로", href: "/product/mvp" },
+    paths: ["/validation/pipeline"],
   },
   {
     stage: 5,
@@ -92,8 +92,8 @@ const STAGES: StageInfo[] = [
       "승인된 아이템의 MVP를 제작하고, PoC 배포를 진행하는 단계예요.",
     agentHelp:
       "AI가 MVP 상태를 추적하고, 프로토타입 자동 생성 파이프라인을 지원해요.",
-    nextAction: { label: "GTM 준비로", href: "/projects" },
-    paths: ["/mvp-tracking"],
+    nextAction: { label: "GTM 준비로", href: "/gtm/projects" },
+    paths: ["/product/mvp"],
   },
   {
     stage: 6,
@@ -105,7 +105,7 @@ const STAGES: StageInfo[] = [
     agentHelp:
       "AI가 KPI를 자동 수집하고, 프로젝트 건강도를 실시간으로 추적해요.",
     nextAction: { label: "대시보드로", href: "/dashboard" },
-    paths: ["/projects"],
+    paths: ["/gtm/projects"],
   },
 ];
 

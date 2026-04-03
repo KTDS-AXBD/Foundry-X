@@ -43,7 +43,7 @@ export function Component() {
     <div className="mx-auto max-w-5xl space-y-6 p-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Link to="/ax-bd/discovery" className="text-muted-foreground hover:text-foreground">
+        <Link to="/discovery/items" className="text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <div>
