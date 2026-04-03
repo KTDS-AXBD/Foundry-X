@@ -49,6 +49,9 @@ export const router = createBrowserRouter([
 
       // ── 4단계 검증/공유 (validation) ──
       { path: "validation/pipeline", lazy: () => import("@/routes/pipeline") },
+      { path: "validation/division", lazy: () => import("@/routes/validation-division") },
+      { path: "validation/company", lazy: () => import("@/routes/validation-company") },
+      { path: "validation/meetings", lazy: () => import("@/routes/validation-meetings") },
 
       // ── 5단계 제품화 (product) ──
       { path: "product/mvp", lazy: () => import("@/routes/mvp-tracking") },

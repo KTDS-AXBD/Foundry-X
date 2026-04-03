@@ -34,6 +34,9 @@ import {
   Package,
   CheckCircle,
   GitBranch,
+  Shield,
+  Building2,
+  CalendarDays,
   Target,
   Library,
   Users,
@@ -154,6 +157,9 @@ const processGroups: NavGroup[] = [
     stageColor: "bg-axis-green",
     items: [
       { href: "/validation/pipeline", label: "파이프라인", icon: GitBranch },
+      { href: "/validation/division", label: "본부 검증", icon: Shield },
+      { href: "/validation/company", label: "전사 검증", icon: Building2 },
+      { href: "/validation/meetings", label: "미팅 관리", icon: CalendarDays },
     ],
   },
   {
