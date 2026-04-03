@@ -56,6 +56,7 @@ export const router = createBrowserRouter([
 
       // ── 5단계 제품화 (product) ──
       { path: "product/mvp", lazy: () => import("@/routes/mvp-tracking") },
+      { path: "product/poc", lazy: () => import("@/routes/product-poc") },
 
       // ── 6단계 GTM ──
       { path: "gtm/projects", lazy: () => import("@/routes/projects") },
