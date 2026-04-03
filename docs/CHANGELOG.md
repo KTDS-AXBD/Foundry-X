@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #185 (2026-04-03)
+**Sprint 122 F300 — E2E 테스트 종합 정비**:
+- ✅ E2E 감사: 158 tests (135 pass / 16 fail / 7 skip) → 실패 원인 분류
+- ✅ Phase A: 16 fail 수정 (react-markdown 의존성 + 셀렉터 현행화)
+- ✅ Phase B: API-only 5 spec 삭제 (443 LOC — sprint81-apis/bdp-editor/gate-package/decisions-workflow/slack-config)
+- ✅ Phase C: redirect-routes.spec.ts 신규 (F290 16건 redirect 검증) + uncovered-pages 8p 확장
+- ✅ Phase D: waitForTimeout 5건 제거 + fixture 중복 정리 + BFF mock 보강
+- 결과: 31 specs, 161 tests (153 pass / 0 fail / 6 skip), 1.1분
+- Match Rate: 90% (FX-ANLS-S122)
+
 ### 세션 #186 (2026-04-03)
 **Phase 11 배치 파이프라인 — Sprint 114~120 (7 Sprint, 11 F-items)**:
 - ✅ Sprint 114 (F290): Route namespace 마이그레이션 — 22경로 전환 + 16 redirect (PR #243, ~11분)
