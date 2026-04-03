@@ -28,6 +28,7 @@ export const router = createBrowserRouter([
       { path: "collection/sr/:id", lazy: () => import("@/routes/sr-detail") },
       { path: "collection/field", lazy: () => import("@/routes/discovery-collection") },
       { path: "collection/ideas", lazy: () => import("@/routes/ir-proposals") },
+      { path: "collection/agent", lazy: () => import("@/routes/collection-agent") },
 
       // ── 2단계 발굴 (discovery) ──
       { path: "discovery/items", lazy: () => import("@/routes/ax-bd/discovery") },
