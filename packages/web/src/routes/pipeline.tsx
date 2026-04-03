@@ -50,7 +50,7 @@ export function Component() {
   }, [loadData]);
 
   const handleItemClick = (id: string) => {
-    navigate(`/ax-bd/${id}`);
+    navigate(`/discovery/items/${id}`);
   };
 
   return (

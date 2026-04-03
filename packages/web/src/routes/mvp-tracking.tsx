@@ -199,7 +199,7 @@ export function Component() {
                   <td className="px-4 py-3 font-mono text-xs">
                     {item.bizItemId ? (
                       <Link
-                        to={`/ax-bd/${item.bizItemId}`}
+                        to={`/discovery/items/${item.bizItemId}`}
                         className="text-blue-600 hover:underline"
                       >
                         {item.bizItemId.slice(0, 8)}...
