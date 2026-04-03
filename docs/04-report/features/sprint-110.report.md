@@ -7,7 +7,7 @@ category: RPRT
 created: 2026-04-02
 updated: 2026-04-02
 author: Sinclair Seo
-references: "[[FX-SPEC-001]], [[FX-REQ-274]], [[FX-REQ-275]], [[FX-PLAN-S110]], [[FX-DSGN-S110]]"
+references: "[[FX-SPEC-001]], [[FX-REQ-274]], [[FX-REQ-275]], [[FX-PLAN-S110]], [[FX-DSGN-S110]], [[FX-ANLS-110]]"
 ---
 
 # Sprint 110: F282+F283 BD 형상화 Phase A+B+C 완료 보고서
@@ -89,9 +89,9 @@ references: "[[FX-SPEC-001]], [[FX-REQ-274]], [[FX-REQ-275]], [[FX-PLAN-S110]], 
 
 | Sprint | 내용 | 상태 |
 |--------|------|------|
-| Sprint 109 | F281 데모 E2E 검증 | 대기 (Sprint 108 선행) |
-| Sprint 111 | F284+F285 Phase D(기술 검증) + Phase E(내부 리뷰) | 대기 |
-| Sprint 112 | F286+F287 Phase F(최종 게이트) + 통합 테스트 | 대기 |
+| Sprint 109 | F281 데모 E2E 검증 | ✅ 완료 (PR #238) |
+| Sprint 111 | F284+F285 Phase D+E (교차 검토 + 전문가 리뷰) | ✅ 완료 (PR #239, 9분) |
+| Sprint 112 | F286+F287 Phase F (HITL/자동 + D1/E2E) | ✅ 완료 (PR #240, 18분) |
 
 ---
 
@@ -101,5 +101,5 @@ references: "[[FX-SPEC-001]], [[FX-REQ-274]], [[FX-REQ-275]], [[FX-PLAN-S110]], 
 |------|------|
 | Plan | [[FX-PLAN-S110]] |
 | Design | [[FX-DSGN-S110]] |
-| Analysis | 본 보고서 §기능 검증 |
+| Analysis | [[FX-ANLS-110]] (Sprint 110~112 통합, V-01~V-10) |
 | Report | [[FX-RPRT-S110]] (본 문서) |
