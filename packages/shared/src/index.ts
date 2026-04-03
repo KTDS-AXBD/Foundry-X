@@ -81,6 +81,16 @@ export type {
   CapturedStats,
 } from './types.js';
 
+// F278: BD ROI 벤치마크 타입 (Sprint 107)
+export type {
+  RoiBenchmark,
+  RoiBenchmarkDetail,
+  SkillExecutionSummary,
+  RoiByStage,
+  SignalValuation,
+  BdRoiSummary,
+} from './types.js';
+
 // Web Dashboard types (Sprint 5 Part A)
 export type {
   WikiPage,
