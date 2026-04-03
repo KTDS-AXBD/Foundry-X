@@ -130,3 +130,116 @@ verdict 확인:
 - `{workspace}/search-cache.md`는 라운드 간 누적 -- Round 1+에서 동일 검색 반복 방지
 - `max_searches` 초과 시 Generator/Discriminator에게 "search-cache.md만 참조" 지시
 - 기존 ogd-orchestrator와 동일한 루프 구조를 유지하되, Rubric S1~S5와 Phase A+B 컨텍스트가 핵심 차이
+
+## Phase D: 다중 AI 모델 교차 검토 + Six Hats 토론
+
+Phase C 수렴 완료 (quality_score >= 0.85) 후 Phase D를 실행한다.
+
+### 트리거 조건
+
+Phase C의 `shaping-state.yaml`에서 `status: converged` 확인 후 자동 진행.
+
+### 실행 절차
+
+1. **교차 검토** — Phase C 최종 PRD (`phase-c-final.md`)를 3관점으로 독립 검토
+   - 기술 실현성 중심
+   - 사업성 중심
+   - 사용자 경험 중심
+   - 각 관점별 PRD 섹션 평가 → 합의 매트릭스 생성
+   - 산출물: `{workspace}/phase-d-cross-review.md`
+
+2. **합의 판정**
+   - 2/3 이상 approve 항목 → 확정
+   - 불일치 항목 → Six Hats 토론 이관
+
+3. **Six Hats 토론** (불일치 항목이 있는 경우)
+   - `six-hats-moderator` Agent 호출
+   - 입력: cross-review + phase-c-final.md
+   - 프로토콜: `.claude/skills/ax-bd-shaping/references/six-hats-protocol.md`
+   - 산출물: `{workspace}/phase-d-six-hats.md`
+
+4. **Phase D 수렴 판정**
+   - PASS (5/6+ accept): Phase E 진행
+   - CONDITIONAL_PASS (4/6): 조건부 Phase E 진행
+   - FAIL (3/6-): Phase C 회귀 — Six Hats 피드백을 Generator에 주입
+
+### Phase C 회귀 시 피드백 주입
+
+```
+Phase D FAIL 피드백:
+  - Six Hats 미합의 항목 목록
+  - 각 모자별 핵심 의견 요약
+  - 반론 교환에서 도출된 합의 불가 사유
+→ shaping-generator의 다음 라운드에 주입
+```
+
+## Phase E: 전문가 AI 페르소나 리뷰
+
+Phase D 통과 후 Phase E를 실행한다.
+
+### 실행 절차
+
+1. **5종 전문가 에이전트 병렬 호출**
+   - expert-ta (Technical Architect)
+   - expert-aa (Application Architect)
+   - expert-ca (Cloud Architect)
+   - expert-da (Data Architect)
+   - expert-qa (Quality Assurance)
+   - 각 에이전트에 `prd_path` + `workspace` 전달
+   - 산출물: `phase-e-review-{ta,aa,ca,da,qa}.md` (5개)
+
+2. **교차 영향 분석**
+   - 5종 전문가의 Critical/Major findings 수집
+   - 교차 영향 매트릭스: Synergy / Conflict / Dependency 분류
+   - 산출물: `{workspace}/phase-e-cross-impact.md`
+
+3. **통합 리뷰 보고서**
+   - 전문가별 Score/Severity 집계
+   - Conflict 우선순위 결정
+   - 통합 권고사항
+   - 산출물: `{workspace}/phase-e-integrated-report.md`
+
+4. **Phase E 수렴 판정**
+   - PASS: Critical 0건 + 평균 Score >= 0.85 + 개별 Score >= 0.70
+   - FAIL: Phase C 회귀 — Major findings + 전문가 권고사항 Generator 주입
+
+### Phase C 회귀 시 피드백 주입
+
+```
+Phase E FAIL 피드백:
+  - Critical findings 전문 (있는 경우)
+  - Major findings 목록 + 해당 전문가 권고사항
+  - 교차 영향 Conflict 항목
+→ shaping-generator의 다음 라운드에 주입
+```
+
+## 전체 파이프라인 상태 관리
+
+Phase D/E 결과를 `shaping-state.yaml`에 반영:
+
+```yaml
+# Phase D 결과 추가
+phase_d:
+  status: pass | conditional_pass | fail
+  cross_review_items: N
+  consensus_items: N
+  disputed_items: N
+  six_hats_accept_ratio: "N/6"
+  timestamp: "..."
+
+# Phase E 결과 추가
+phase_e:
+  status: pass | fail
+  avg_score: 0.XX
+  critical_count: N
+  major_count: N
+  expert_scores:
+    ta: 0.XX
+    aa: 0.XX
+    ca: 0.XX
+    da: 0.XX
+    qa: 0.XX
+  synergies: N
+  conflicts: N
+  timestamp: "..."
+```
