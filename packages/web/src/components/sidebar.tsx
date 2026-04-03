@@ -2,7 +2,7 @@
 
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   LayoutDashboard,
   BookOpen,
@@ -53,16 +53,26 @@ import {
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { OrgSwitcher } from "@/components/feature/OrgSwitcher";
+import { useUserRole } from "@/hooks/useUserRole";
 import type { LucideIcon } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
 /*  Navigation Structure — AX BD 프로세스 6단계 기반 그룹               */
 /* ------------------------------------------------------------------ */
 
+export type Visibility = "all" | "admin" | "conditional";
+
+export interface VisibilityContext {
+  isAdmin: boolean;
+  onboardingComplete: boolean;
+}
+
 interface NavItem {
   href: string;
   label: string;
   icon: LucideIcon;
+  visibility?: Visibility;
+  condition?: (ctx: VisibilityContext) => boolean;
 }
 
 interface NavGroup {
@@ -71,10 +81,28 @@ interface NavGroup {
   icon: LucideIcon;
   items: NavItem[];
   stageColor?: string; // 프로세스 단계 그룹에만 사용 — AXIS 색상 뱃지
+  visibility?: Visibility;
+  condition?: (ctx: VisibilityContext) => boolean;
+}
+
+export function isVisible(
+  entry: { visibility?: Visibility; condition?: (ctx: VisibilityContext) => boolean },
+  ctx: VisibilityContext,
+): boolean {
+  if (!entry.visibility || entry.visibility === "all") return true;
+  if (entry.visibility === "admin") return ctx.isAdmin;
+  if (entry.visibility === "conditional" && entry.condition) return entry.condition(ctx);
+  return true;
 }
 
 const topItems: NavItem[] = [
-  { href: "/getting-started", label: "시작하기", icon: Rocket },
+  {
+    href: "/getting-started",
+    label: "시작하기",
+    icon: Rocket,
+    visibility: "conditional",
+    condition: (ctx) => !ctx.onboardingComplete,
+  },
   { href: "/dashboard", label: "홈", icon: LayoutDashboard },
   { href: "/team-shared", label: "팀 공유", icon: Users },
   { href: "/ax-bd/demo", label: "데모 시나리오", icon: Presentation },
@@ -90,8 +118,8 @@ const processGroups: NavGroup[] = [
     stageColor: "bg-axis-blue",
     items: [
       { href: "/sr", label: "SR 목록", icon: ClipboardList },
-      { href: "/discovery/collection", label: "수집 채널", icon: Radio },
-      { href: "/ir-proposals", label: "IR Bottom-up", icon: ArrowUpFromLine },
+      { href: "/discovery/collection", label: "Field 수집", icon: Radio },
+      { href: "/ir-proposals", label: "IDEA Portal", icon: ArrowUpFromLine },
     ],
   },
   {
@@ -111,7 +139,7 @@ const processGroups: NavGroup[] = [
     icon: PenTool,
     stageColor: "bg-axis-warm",
     items: [
-      { href: "/spec-generator", label: "Spec 생성", icon: FileText },
+      { href: "/spec-generator", label: "PRD", icon: FileText },
       { href: "/ax-bd", label: "사업제안서", icon: FileSignature },
       { href: "/ax-bd/shaping", label: "형상화 리뷰", icon: ClipboardCheck },
       { href: "/offering-packs", label: "Offering Pack", icon: Package },
@@ -151,10 +179,10 @@ const knowledgeGroup: NavGroup = {
   label: "지식",
   icon: BookOpen,
   items: [
-    { href: "/wiki", label: "지식베이스", icon: BookOpen },
-    { href: "/methodologies", label: "방법론 관리", icon: Library },
+    { href: "/wiki", label: "지식베이스", icon: BookOpen, visibility: "admin" },
+    { href: "/methodologies", label: "방법론 관리", icon: Library, visibility: "admin" },
     { href: "/ax-bd/skill-catalog", label: "스킬 카탈로그", icon: Library },
-    { href: "/ax-bd/ontology", label: "Ontology", icon: Network },
+    { href: "/ax-bd/ontology", label: "Ontology", icon: Network, visibility: "admin" },
   ],
 };
 
@@ -162,6 +190,7 @@ const adminGroup: NavGroup = {
   key: "admin",
   label: "관리",
   icon: Settings,
+  visibility: "admin",
   items: [
     { href: "/analytics", label: "Analytics", icon: BarChart3 },
     { href: "/agents", label: "에이전트", icon: Bot },
@@ -172,10 +201,16 @@ const adminGroup: NavGroup = {
   ],
 };
 
+const memberBottomItems: NavItem[] = [
+  { href: "/getting-started", label: "도움말", icon: HelpCircle },
+  { href: "/settings/jira", label: "설정", icon: Settings },
+];
+
 const externalGroup: NavGroup = {
   key: "external",
   label: "외부 서비스",
   icon: Link2,
+  visibility: "admin",
   items: [
     { href: "/discovery", label: "Discovery-X", icon: Search },
     { href: "/foundry", label: "AI Foundry", icon: FlaskConical },
@@ -318,39 +353,83 @@ function CollapsibleGroup({
 function NavLinks({ onSelect }: { onSelect?: () => void }) {
   const { pathname } = useLocation();
   const { openGroups, toggle } = useGroupState();
+  const { isAdmin } = useUserRole();
 
-  const allGroups = [...processGroups, knowledgeGroup, adminGroup, externalGroup];
+  const onboardingComplete = useMemo(() => {
+    try {
+      return localStorage.getItem("onboarding_progress") === "100";
+    } catch {
+      return false;
+    }
+  }, []);
+
+  const ctx: VisibilityContext = useMemo(
+    () => ({ isAdmin, onboardingComplete }),
+    [isAdmin, onboardingComplete],
+  );
+
+  const filteredTopItems = useMemo(
+    () => topItems.filter((item) => isVisible(item, ctx)),
+    [ctx],
+  );
+
+  const filteredProcessGroups = useMemo(
+    () => processGroups
+      .filter((g) => isVisible(g, ctx))
+      .map((g) => ({ ...g, items: g.items.filter((item) => isVisible(item, ctx)) }))
+      .filter((g) => g.items.length > 0),
+    [ctx],
+  );
+
+  const filteredKnowledge = useMemo(() => {
+    if (!isVisible(knowledgeGroup, ctx)) return null;
+    const items = knowledgeGroup.items.filter((item) => isVisible(item, ctx));
+    return items.length > 0 ? { ...knowledgeGroup, items } : null;
+  }, [ctx]);
+
+  const filteredAdmin = useMemo(
+    () => (isVisible(adminGroup, ctx) ? adminGroup : null),
+    [ctx],
+  );
+
+  const filteredExternal = useMemo(
+    () => (isVisible(externalGroup, ctx) ? externalGroup : null),
+    [ctx],
+  );
+
+  const allVisibleGroups = useMemo(
+    () => [
+      ...filteredProcessGroups,
+      ...(filteredKnowledge ? [filteredKnowledge] : []),
+      ...(filteredAdmin ? [filteredAdmin] : []),
+      ...(filteredExternal ? [filteredExternal] : []),
+    ],
+    [filteredProcessGroups, filteredKnowledge, filteredAdmin, filteredExternal],
+  );
 
   // 활성 경로가 포함된 그룹은 자동 펼침
   useEffect(() => {
-    for (const group of allGroups) {
+    for (const group of allVisibleGroups) {
       if (group.items.some((item) => pathname === item.href || pathname.startsWith(item.href + "/"))) {
         if (!openGroups.has(group.key)) {
           toggle(group.key);
         }
       }
     }
-    // pathname 변경 시에만 실행
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   return (
     <nav className="flex flex-col gap-0.5">
-      {/* 시작하기 + 홈 */}
-      {topItems.map((item) => (
-        <NavLink
-          key={item.href}
-          item={item}
-          pathname={pathname}
-          onSelect={onSelect}
-        />
+      {/* 시작하기(조건부) + 홈 + 팀공유 + 데모 */}
+      {filteredTopItems.map((item) => (
+        <NavLink key={item.href} item={item} pathname={pathname} onSelect={onSelect} />
       ))}
 
-      {/* 구분선 */}
       <div className="my-2 border-t border-border/40" />
 
       {/* 프로세스 6단계 */}
-      {processGroups.map((group) => (
+      {filteredProcessGroups.map((group) => (
         <CollapsibleGroup
           key={group.key}
           group={group}
@@ -361,45 +440,52 @@ function NavLinks({ onSelect }: { onSelect?: () => void }) {
         />
       ))}
 
-      {/* 구분선 */}
       <div className="my-2 border-t border-border/40" />
 
-      {/* 지식 */}
-      <CollapsibleGroup
-        group={knowledgeGroup}
-        pathname={pathname}
-        isOpen={openGroups.has(knowledgeGroup.key)}
-        onToggle={() => toggle(knowledgeGroup.key)}
-        onSelect={onSelect}
-      />
+      {/* 지식 (필터링 후 아이템이 있을 때만) */}
+      {filteredKnowledge && (
+        <CollapsibleGroup
+          group={filteredKnowledge}
+          pathname={pathname}
+          isOpen={openGroups.has(filteredKnowledge.key)}
+          onToggle={() => toggle(filteredKnowledge.key)}
+          onSelect={onSelect}
+        />
+      )}
 
-      {/* 관리 */}
-      <CollapsibleGroup
-        group={adminGroup}
-        pathname={pathname}
-        isOpen={openGroups.has(adminGroup.key)}
-        onToggle={() => toggle(adminGroup.key)}
-        onSelect={onSelect}
-      />
+      {/* 관리 (Admin 전용) */}
+      {filteredAdmin && (
+        <CollapsibleGroup
+          group={filteredAdmin}
+          pathname={pathname}
+          isOpen={openGroups.has(filteredAdmin.key)}
+          onToggle={() => toggle(filteredAdmin.key)}
+          onSelect={onSelect}
+        />
+      )}
 
-      {/* 구분선 */}
-      <div className="my-2 border-t border-border/40" />
+      {filteredExternal && (
+        <>
+          <div className="my-2 border-t border-border/40" />
+          <CollapsibleGroup
+            group={filteredExternal}
+            pathname={pathname}
+            isOpen={openGroups.has(filteredExternal.key)}
+            onToggle={() => toggle(filteredExternal.key)}
+            onSelect={onSelect}
+          />
+        </>
+      )}
 
-      {/* 외부 서비스 */}
-      <CollapsibleGroup
-        group={externalGroup}
-        pathname={pathname}
-        isOpen={openGroups.has(externalGroup.key)}
-        onToggle={() => toggle(externalGroup.key)}
-        onSelect={onSelect}
-      />
-
-      {/* 도움말 — 시작하기 페이지로 이동 */}
-      <NavLink
-        item={{ href: "/getting-started", label: "도움말", icon: HelpCircle }}
-        pathname={pathname}
-        onSelect={onSelect}
-      />
+      {/* Member 하단: 도움말 + 설정 */}
+      {!isAdmin && (
+        <>
+          <div className="my-2 border-t border-border/40" />
+          {memberBottomItems.map((item) => (
+            <NavLink key={item.href} item={item} pathname={pathname} onSelect={onSelect} />
+          ))}
+        </>
+      )}
     </nav>
   );
 }
