@@ -100,6 +100,8 @@ import { validationTierRoute } from "./routes/validation-tier.js";
 import { validationMeetingsRoute } from "./routes/validation-meetings.js";
 // Sprint 117: 통합 평가 결과서 (F296)
 import { evaluationReportRoute } from "./routes/evaluation-report.js";
+// Sprint 120: PoC 관리 분리 (F298)
+import { pocRoute } from "./routes/poc.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -349,6 +351,8 @@ app.route("/api", validationTierRoute);
 app.route("/api", validationMeetingsRoute);
 // Sprint 117: 통합 평가 결과서 (F296)
 app.route("/api", evaluationReportRoute);
+// Sprint 120: PoC 관리 분리 (F298)
+app.route("/api", pocRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

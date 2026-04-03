@@ -43,6 +43,7 @@ import {
   Network,
   Presentation,
   ClipboardCheck,
+  TestTubes,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -169,6 +170,7 @@ const processGroups: NavGroup[] = [
     stageColor: "bg-axis-indigo",
     items: [
       { href: "/product/mvp", label: "MVP 추적", icon: Target },
+      { href: "/product/poc", label: "PoC 관리", icon: TestTubes },
     ],
   },
   {
