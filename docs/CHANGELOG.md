@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #181 (2026-04-03)
+**Sprint 107 F278 — BD ROI 벤치마크 완료**:
+- ✅ Plan+Design 작성 → Sprint WT autopilot ~26분 → PR #241 merge, Match 99%
+- ✅ D1 0084: `roi_benchmarks` + `roi_signal_valuations` 2테이블
+- ✅ 서비스 3종: RoiBenchmarkService (Cold/Warm 분류) + SignalValuationService (신호등 달러 환산) + BdRoiCalculatorService (BD_ROI 공식)
+- ✅ API 8 endpoints (`/api/roi/benchmark/*`, `/api/roi/summary`, `/api/roi/signal-valuations`)
+- ✅ 39 tests 전체 통과 (기존 2393 + 신규 39 = 2432)
+- ✅ Skill Evolution Track E 완성: F274(메트릭) → F275(레지스트리) → F276(DERIVED) → F277(CAPTURED) → F278(ROI) 5-Track 완결
+
+**산출물**: 14 files, +2257 lines, D1 2테이블, API 8ep, 서비스 3종, Shared 타입 6종
+
 ### 세션 #180 (2026-04-03)
 **Sprint 112 F286+F287 — BD 형상화 Phase F 완료 + Production 배포**:
 - ✅ PRD 확인 → Plan+Design 작성 → Sprint WT autopilot 18분 → PR #240 merge
