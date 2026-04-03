@@ -95,6 +95,9 @@ import { capturedEngineRoute } from "./routes/captured-engine.js";
 import { roiBenchmarkRoute } from "./routes/roi-benchmark.js";
 // Sprint 112: BD 형상화 Phase F (F286, F287)
 import { shapingRoute } from "./routes/shaping.js";
+// Sprint 116: 2-tier 검증 + 미팅 관리 (F294, F295)
+import { validationTierRoute } from "./routes/validation-tier.js";
+import { validationMeetingsRoute } from "./routes/validation-meetings.js";
 // Sprint 117: 통합 평가 결과서 (F296)
 import { evaluationReportRoute } from "./routes/evaluation-report.js";
 import { handleScheduled } from "./scheduled.js";
@@ -341,6 +344,9 @@ app.route("/api", capturedEngineRoute);
 app.route("/api", roiBenchmarkRoute);
 // Sprint 112: BD 형상화 Phase F (F286, F287)
 app.route("/api", shapingRoute);
+// Sprint 116: 2-tier 검증 + 미팅 관리 (F294, F295)
+app.route("/api", validationTierRoute);
+app.route("/api", validationMeetingsRoute);
 // Sprint 117: 통합 평가 결과서 (F296)
 app.route("/api", evaluationReportRoute);
 
