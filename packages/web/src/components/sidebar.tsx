@@ -131,6 +131,7 @@ const processGroups: NavGroup[] = [
       { href: "/discovery/items", label: "Discovery", icon: Map },
       { href: "/discovery/ideas-bmc", label: "아이디어·BMC", icon: Lightbulb },
       { href: "/discovery/dashboard", label: "대시보드", icon: BarChart3 },
+      { href: "/discovery/report", label: "평가 결과서", icon: ClipboardCheck },
     ],
   },
   {

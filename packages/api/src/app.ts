@@ -95,6 +95,8 @@ import { capturedEngineRoute } from "./routes/captured-engine.js";
 import { roiBenchmarkRoute } from "./routes/roi-benchmark.js";
 // Sprint 112: BD 형상화 Phase F (F286, F287)
 import { shapingRoute } from "./routes/shaping.js";
+// Sprint 117: 통합 평가 결과서 (F296)
+import { evaluationReportRoute } from "./routes/evaluation-report.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -339,6 +341,8 @@ app.route("/api", capturedEngineRoute);
 app.route("/api", roiBenchmarkRoute);
 // Sprint 112: BD 형상화 Phase F (F286, F287)
 app.route("/api", shapingRoute);
+// Sprint 117: 통합 평가 결과서 (F296)
+app.route("/api", evaluationReportRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

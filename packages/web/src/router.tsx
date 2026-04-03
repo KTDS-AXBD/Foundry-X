@@ -35,6 +35,7 @@ export const router = createBrowserRouter([
       { path: "discovery/ideas-bmc", lazy: () => import("@/routes/ax-bd/ideas-bmc") },
       { path: "discovery/dashboard", lazy: () => import("@/routes/ax-bd/discover-dashboard") },
       { path: "discovery/progress", lazy: () => import("@/routes/discovery-progress") },
+      { path: "discovery/report", lazy: () => import("@/routes/ax-bd/evaluation-report") },
 
       // ── 3단계 형상화 (shaping) ──
       { path: "shaping/prd", lazy: () => import("@/routes/spec-generator") },
