@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ExternalLink, FileText, Monitor, BookOpen, DollarSign } from "lucide-react";
+import { ArrowLeft, ExternalLink, FileText, Monitor, BookOpen, DollarSign, FileSpreadsheet } from "lucide-react";
 import { fetchOfferingPackDetail, type OfferingPackDetail } from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
 
@@ -32,10 +32,18 @@ export function Component() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Link to="/shaping/offering" className="text-muted-foreground hover:text-foreground"><ArrowLeft className="size-5" /></Link>
-        <h1 className="text-2xl font-bold">{pack.title}</h1>
-        <Badge>{pack.status}</Badge>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Link to="/shaping/offering" className="text-muted-foreground hover:text-foreground"><ArrowLeft className="size-5" /></Link>
+          <h1 className="text-2xl font-bold">{pack.title}</h1>
+          <Badge>{pack.status}</Badge>
+        </div>
+        <Link
+          to={`/shaping/offering/${id}/brief`}
+          className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground hover:bg-primary/90"
+        >
+          <FileSpreadsheet className="size-4" /> 미팅 브리프
+        </Link>
       </div>
       {pack.description && <p className="text-muted-foreground max-w-2xl">{pack.description}</p>}
 
