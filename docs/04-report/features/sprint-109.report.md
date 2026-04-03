@@ -1,18 +1,24 @@
 ---
 code: FX-RPRT-109
 title: "Sprint 109 — F281 데모 데이터 E2E 검증 완료 보고서"
-version: "1.0"
+version: "1.1"
 status: Active
 category: RPRT
 created: 2026-04-03
 updated: 2026-04-03
-author: Claude Autopilot
+author: Sinclair Seo
 sprint: 109
 f_items: [F281]
 req: [FX-REQ-273]
 ---
 
 # Sprint 109 Report — F281 데모 데이터 E2E 검증
+
+> **References**
+> - Plan: [[FX-PLAN-109]] `docs/01-plan/features/sprint-109.plan.md`
+> - Design: [[FX-DSGN-109]] `docs/02-design/features/sprint-109.design.md`
+> - Analysis: [[FX-ANLS-109]] `docs/03-analysis/features/sprint-109.analysis.md`
+> - PR: #238 (`2182a83`)
 
 ## Executive Summary
 
@@ -71,14 +77,34 @@ req: [FX-REQ-273]
 | E2E spec 생성 | ✅ 6 tests |
 | 기존 테스트 regression | ✅ 0건 |
 
-## §3 범위 변경
+## §3 Design ↔ Implementation Gap Analysis
 
-Design 대비 변경:
-- `discover-dashboard.tsx`, `progress.tsx`: 이미 empty state 처리가 완비되어 수정 불필요 (No-Op)
-- evaluations/progress API 테스트: 별도 테이블 의존성으로 제외, Markdown 콘텐츠 검증으로 대체
+> 상세: [[FX-ANLS-109]] `docs/03-analysis/features/sprint-109.analysis.md`
+
+| # | Design 파일 | 구현 | Match | 비고 |
+|---|-------------|:----:|:-----:|------|
+| 1 | `packages/web/package.json` | ✅ | ✅ | react-markdown ^10.1.0 + remark-gfm ^4.0.1 |
+| 2 | `ArtifactDetail.tsx` | ✅ | ✅ | ReactMarkdown + remarkGfm + dark:prose-invert |
+| 3 | `demo-scenario.tsx` | ✅ | ✅ | D1 0082 체크리스트 + 시드 아이디어명 |
+| 4 | `discover-dashboard.tsx` | — | ✅ | 기존 empty state 방어로 충족 |
+| 5 | `progress.tsx` | — | ✅ | 기존 empty state 방어로 충족 |
+| 6 | `bd-demo-seed.test.ts` | ✅ | ✅ | 7건 (5 CRUD + 2 Markdown 검증) |
+| 7 | `bd-demo-walkthrough.spec.ts` | ✅ | ✅ | 6 specs API mock 기반 |
+
+**의도적 변경**: react-markdown ^9.0.0(Design) → ^10.1.0(Implementation) — 최신 안정 버전
+
+**Match Rate: 100%** — 핵심 5파일 구현 + 2파일 기존 구현 충족
 
 ## §4 다음 단계
 
-- Production 배포 (Windows에서 `wrangler deploy`)
-- BD 팀 데모 시연 (시드 데이터 기반 6단계 워크쓰루)
-- F284+F285 BD 형상화 Phase D+E (Sprint 111)
+- ~~F284+F285 BD 형상화 Phase D+E (Sprint 111)~~ ✅ 완료 (PR #239)
+- F278 BD ROI 벤치마크 (Sprint 107) — plan 작성 완료, 구현 대기
+- F286+F287 BD 형상화 Phase F + D1/E2E (Sprint 112)
+- D1 0083 remote 적용 + Production 배포
+
+## Version History
+
+| Version | Date | Changes | Author |
+|---------|------|---------|--------|
+| 1.0 | 2026-04-03 | Initial report (autopilot) | Claude Autopilot |
+| 1.1 | 2026-04-03 | Analysis 참조 추가 + Gap 대조표 + 다음 단계 갱신 | Sinclair Seo |
