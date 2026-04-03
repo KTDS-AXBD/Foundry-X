@@ -154,8 +154,8 @@ test.describe("Discovery Tour (F265)", () => {
       page.locator("[data-tour='discovery-wizard']"),
     ).toBeVisible({ timeout: 10000 });
 
-    // 1초 대기 후 투어가 뜨지 않는지 확인
-    await page.waitForTimeout(1500);
+    // 페이지 안정화 후 투어가 뜨지 않는지 확인
+    await page.waitForLoadState("networkidle");
     await expect(page.getByText("1 / 5")).not.toBeVisible();
   });
 });

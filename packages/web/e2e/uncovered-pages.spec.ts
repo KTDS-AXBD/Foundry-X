@@ -90,4 +90,56 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     await expect(page.getByRole("heading", { name: "Discovery 진행률" })).toBeVisible();
     await expect(page.getByText("전체 사업 아이템의 Discovery 9기준 달성 현황")).toBeVisible();
   });
+
+  // ── Sprint 122 추가: 미커버 라우트 확장 ──
+
+  test("invite 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.goto("/invite");
+    await expect(page.locator("main, body")).toBeVisible({ timeout: 10000 });
+  });
+
+  test("collection/field 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/**", (route) => route.fulfill({ json: [] }));
+    await page.goto("/collection/field");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+  });
+
+  test("collection/ideas 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/**", (route) => route.fulfill({ json: [] }));
+    await page.goto("/collection/ideas");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+  });
+
+  test("product/mvp 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/mvp-tracking/**", (route) =>
+      route.fulfill({ json: {} }),
+    );
+    await page.goto("/product/mvp");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+  });
+
+  test("discovery/ideas-bmc 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/ax-bd/**", (route) =>
+      route.fulfill({ json: { items: [], total: 0 } }),
+    );
+    await page.goto("/discovery/ideas-bmc");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+  });
+
+  test("ax-bd/process-guide 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.goto("/ax-bd/process-guide");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+  });
+
+  test("ax-bd/skill-catalog 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/**", (route) => route.fulfill({ json: [] }));
+    await page.goto("/ax-bd/skill-catalog");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+  });
+
+  test("settings/jira 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/**", (route) => route.fulfill({ json: {} }));
+    await page.goto("/settings/jira");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+  });
 });

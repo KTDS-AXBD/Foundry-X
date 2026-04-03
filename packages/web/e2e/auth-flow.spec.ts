@@ -48,8 +48,8 @@ test.describe("Authentication Flow", () => {
   test("랜딩 페이지(/)는 인증 없이 접근 가능", async ({ page }) => {
     await page.goto("/");
     await expect(page).toHaveURL("/");
-    // 랜딩 페이지는 리다이렉트 없이 유지
-    await page.waitForTimeout(1000);
+    // 랜딩 페이지는 리다이렉트 없이 유지 — networkidle로 안정화 대기
+    await page.waitForLoadState("networkidle");
     await expect(page).toHaveURL("/");
   });
 
@@ -65,10 +65,8 @@ test.describe("Authentication Flow", () => {
     await page.getByLabel("비밀번호").fill("wrong-password");
     await page.getByRole("button", { name: "로그인" }).first().click();
 
-    // 에러 메시지가 표시되어야 함 (네트워크 에러 또는 인증 실패)
-    // API 서버 미실행 환경에서는 네트워크 에러가 발생할 수 있음
-    await page.waitForTimeout(3000);
-    // 로그인 페이지에 머물러야 함
+    // 에러 메시지가 표시되어야 함 — 로그인 페이지에 머물러야 함
+    await page.waitForLoadState("networkidle");
     await expect(page).toHaveURL(/\/login/);
   });
 

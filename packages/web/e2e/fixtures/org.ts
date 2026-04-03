@@ -1,4 +1,4 @@
-import { test as authTest } from "./auth";
+import { test as authTest, TEST_ORG } from "./auth";
 import type { Page } from "@playwright/test";
 
 interface OrgContext {
@@ -6,14 +6,6 @@ interface OrgContext {
   orgId: string;
   orgName: string;
 }
-
-const TEST_ORG = {
-  id: "test-org-e2e",
-  name: "Test Org",
-  slug: "test-org",
-  plan: "free" as const,
-  createdAt: "2026-01-01T00:00:00Z",
-};
 
 export const test = authTest.extend<{ orgPage: OrgContext }>({
   orgPage: async ({ authenticatedPage: page }, use) => {

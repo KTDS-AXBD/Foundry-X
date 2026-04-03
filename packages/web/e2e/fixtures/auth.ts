@@ -23,11 +23,11 @@ const TEST_USER = {
   role: "admin",
 };
 
-const TEST_ORG = {
+export const TEST_ORG = {
   id: "test-org-e2e",
   name: "Test Org",
   slug: "test-org",
-  plan: "free",
+  plan: "free" as const,
   createdAt: "2026-01-01T00:00:00Z",
 };
 
