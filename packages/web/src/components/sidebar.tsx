@@ -120,6 +120,7 @@ const processGroups: NavGroup[] = [
       { href: "/collection/sr", label: "SR 목록", icon: ClipboardList },
       { href: "/collection/field", label: "Field 수집", icon: Radio },
       { href: "/collection/ideas", label: "IDEA Portal", icon: ArrowUpFromLine },
+      { href: "/collection/agent", label: "Agent 수집", icon: Bot },
     ],
   },
   {

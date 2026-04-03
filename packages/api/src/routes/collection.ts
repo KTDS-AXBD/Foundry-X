@@ -5,10 +5,11 @@
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
-import { AgentCollectSchema, IdeaPortalWebhookSchema, ScreeningRejectSchema } from "../schemas/collection.js";
+import { AgentCollectSchema, IdeaPortalWebhookSchema, ScreeningRejectSchema, AgentScheduleCreateSchema, AgentRunsQuerySchema, AgentTriggerSchema } from "../schemas/collection.js";
 import { CollectionPipelineService } from "../services/collection-pipeline.js";
 import { AgentCollector, CollectorError } from "../services/agent-collector.js";
 import { createAgentRunner } from "../services/agent-runner.js";
+import { AgentCollectionService } from "../services/agent-collection.js";
 
 export const collectionRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
@@ -132,6 +133,81 @@ collectionRoute.post("/collection/screening-queue/:id/reject", async (c) => {
   await pipeline.rejectItem(id, parsed.success ? parsed.data.reason : undefined);
 
   return c.json({ id, status: "rejected" });
+});
+
+// ─── POST /collection/agent-schedule — 자동 수집 스케줄 설정 ───
+
+collectionRoute.post("/collection/agent-schedule", async (c) => {
+  const body = await c.req.json();
+  const parsed = AgentScheduleCreateSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: "INVALID_SCHEDULE", details: parsed.error.flatten() }, 400);
+  }
+
+  const orgId = c.get("orgId");
+  const svc = new AgentCollectionService(c.env.DB);
+  const schedule = await svc.createSchedule(orgId, parsed.data);
+
+  return c.json({ schedule }, 201);
+});
+
+// ─── GET /collection/agent-runs — 수집 실행 이력 ───
+
+collectionRoute.get("/collection/agent-runs", async (c) => {
+  const orgId = c.get("orgId");
+  const limit = c.req.query("limit") ? Number(c.req.query("limit")) : undefined;
+  const status = c.req.query("status") || undefined;
+
+  const parsed = AgentRunsQuerySchema.safeParse({ limit, status });
+  if (!parsed.success) {
+    return c.json({ error: "INVALID_QUERY", details: parsed.error.flatten() }, 400);
+  }
+
+  const svc = new AgentCollectionService(c.env.DB);
+  const result = await svc.listRuns(orgId, parsed.data);
+
+  return c.json(result);
+});
+
+// ─── POST /collection/agent-trigger — 즉시 수집 실행 ───
+
+collectionRoute.post("/collection/agent-trigger", async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = AgentTriggerSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: "INVALID_TRIGGER", details: parsed.error.flatten() }, 400);
+  }
+
+  const orgId = c.get("orgId");
+  const svc = new AgentCollectionService(c.env.DB);
+
+  const source = parsed.data.source ?? "market";
+  const run = await svc.createRun(orgId, source);
+
+  // 비동기 수집 — run 생성 즉시 응답, 실제 수집은 백그라운드
+  const runner = createAgentRunner(c.env);
+  const collector = new AgentCollector(runner);
+  const keywords = parsed.data.keywords ?? [];
+
+  const collectTask = (async () => {
+    try {
+      const result = await collector.collect({ keywords, maxItems: 5, focusArea: source });
+      const pipeline = new CollectionPipelineService(c.env.DB);
+      const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? "";
+      await pipeline.ingest(orgId, userId, result.items, run.id);
+      await svc.completeRun(run.id, result.items.length);
+    } catch (e) {
+      await svc.failRun(run.id, e instanceof Error ? e.message : "Unknown error");
+    }
+  })();
+
+  try {
+    c.executionCtx.waitUntil(collectTask);
+  } catch {
+    // Workers 밖 환경(테스트 등)에서는 waitUntil 없음 — fire and forget
+  }
+
+  return c.json({ runId: run.id, status: "running" }, 201);
 });
 
 // ─── POST /webhooks/idea-portal — 외부 IDEA Portal Webhook ───
