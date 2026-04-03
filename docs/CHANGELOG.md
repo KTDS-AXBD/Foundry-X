@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #175 (2026-04-03)
+**SPEC.md drift 보정 + session-end 3-way 수치 동기화 추가**:
+- ✅ SPEC.md §1 Phase 9→10, §2 수치 보정 (tests 2250→2351, routes 73→76, services 169→176, schemas 87→90, D1 0080→0082)
+- ✅ Sprint 104/105 완료 행 SPEC.md §2에 추가
+- ✅ ax:session-end Phase 2에 SPEC.md §2 수치 자동 갱신 로직 추가
+- ✅ ax:session-end Phase 5c에 SPEC↔MEMORY↔CLAUDE 3-way 교차 검증 추가
+- ✅ feedback_claude_md_drift.md 보정 범위 확대 (CLAUDE.md only → 3-way)
+
+**검증 결과**: SPEC↔MEMORY↔CLAUDE 수치 일치 확인 (76/176/90/2351)
+
 ### 세션 #174 (2026-04-03)
 **gh CLI 설치 + session-end Phase 3c/6 활성화**:
 - ✅ gh CLI v2.45.0 설치 + PAT 인증 연동 (AXBD-Team)
