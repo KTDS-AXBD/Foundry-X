@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #180 (2026-04-03)
+**Sprint 112 F286+F287 — BD 형상화 Phase F 완료 + Production 배포**:
+- ✅ PRD 확인 → Plan+Design 작성 → Sprint WT autopilot 18분 → PR #240 merge
+- ✅ F287 (P0): D1 0084 shaping 4테이블 (shaping_runs/phase_logs/expert_reviews/six_hats) + API 13ep + Zod 10종 + 28 tests
+- ✅ F286 (P1): auto-reviewer 에이전트 (3 AI 페르소나) + Web PRD 에디터 (/ax-bd/shaping) + 섹션별 승인/수정/반려 + E2E
+- ✅ CI/CD 배포 완료: D1 0083+0084 remote 적용, Workers + Pages deploy, smoke-test + prod-e2e 통과
+- ✅ BD 형상화 6 Phase 파이프라인 완성 (A~F): 2단계→4단계 자동화 루프 닫힘
+
+**산출물**: 19 files, +1998 lines, D1 4테이블, API 13ep, 에이전트 1개, Web 2페이지+3컴포넌트
+
 ### 세션 #179 (2026-04-03)
 **Sprint 108~109 PDCA 분석 — Gap Analysis + Report 보강**:
 - ✅ FX-ANLS-109 신규: Sprint 109 F281 Design ↔ 구현 7파일 대조, Match 100% (V-01~V-08 전항목 통과)

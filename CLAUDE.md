@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Phase 10 진행 중 (Sprint 111 완료, ~449 endpoints, 176 services, 2800 API + 149 CLI + 265 Web tests + 35 E2E specs) — O-G-D Agent Loop(F270~F273 ✅) + Skill Evolution(F274~F277 ✅) + BD 데모 시딩(F279~F281 ✅) + BD 형상화 Phase A+B+C(F282~F283 ✅) + BD 형상화 Phase D+E(F284~F285 ✅)
+**현재 상태:** Phase 10 진행 중 (Sprint 112 완료, ~462 endpoints, 181 services, 2800 API + 149 CLI + 265 Web tests + 35 E2E specs) — O-G-D Agent Loop(F270~F273 ✅) + Skill Evolution(F274~F277 ✅) + BD 데모 시딩(F279~F281 ✅) + BD 형상화 Phase A~E(F282~F285 ✅) + BD 형상화 Phase F(F286~F287 ✅)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -57,9 +57,9 @@ foundry-x/
 │   │       └── index.ts
 │   ├── api/                # Hono API Server (Phase 2)
 │   │   └── src/
-│   │       ├── routes/     # 76개 — 목록은 `ls packages/api/src/routes/` 참조
-│   │       ├── services/   # 176개 — 목록은 `ls packages/api/src/services/` 참조
-│   │       ├── schemas/    # 90개 Zod 스키마 — 목록은 `ls packages/api/src/schemas/` 참조
+│   │       ├── routes/     # 78개 — 목록은 `ls packages/api/src/routes/` 참조
+│   │       ├── services/   # 181개 — 목록은 `ls packages/api/src/services/` 참조
+│   │       ├── schemas/    # 92개 Zod 스키마 — 목록은 `ls packages/api/src/schemas/` 참조
 │   │       └── index.ts
 │   ├── web/                # Vite 8 + React Router 7 Dashboard + Landing
 │   │   └── src/
@@ -84,7 +84,7 @@ foundry-x/
 
 ### .claude/ 프로젝트 설정
 - `.claude/hooks/` — PreToolUse (보호 파일 차단) + PostToolUse 외부 스크립트 (post-edit-format.sh, post-edit-typecheck.sh, post-edit-test-warn.sh)
-- `.claude/agents/` — 커스텀 에이전트 15종 (deploy-verifier, spec-checker, build-validator, ogd-{orchestrator,generator,discriminator}, shaping-{orchestrator,generator,discriminator}, six-hats-moderator, expert-{ta,aa,ca,da,qa})
+- `.claude/agents/` — 커스텀 에이전트 16종 (deploy-verifier, spec-checker, build-validator, ogd-{orchestrator,generator,discriminator}, shaping-{orchestrator,generator,discriminator}, six-hats-moderator, expert-{ta,aa,ca,da,qa}, auto-reviewer)
 - `.claude/skills/ax-bd-discovery/` — AX BD 2단계 발굴 프로세스 오케스트레이터 (v8.2)
 - `.claude/skills/ax-bd-shaping/` — AX BD 형상화 파이프라인 (Stage 3→4, Phase A~E)
 - `.claude/skills/ai-biz/` — ai-biz 11종 서브스킬 (cost-model, feasibility-study 등)
@@ -157,7 +157,7 @@ pnpm e2e                          # Playwright E2E (35 specs, ~146 tests)
 - **Phase 8:** ✅ 완료 (Sprint 82~86) — IA 구조 개선 + 인증 강화
 - **Phase 9:** ✅ 완료 (Sprint 87~100) — 팀 온보딩 + BD 스킬 통합 + GIVC PoC + 발굴 UX(F263~F266) + BD 스킬 배포(F267) + Plugin 전환(F268) + 발굴 IA 정리(F269)
 - **Phase 10:** 🔧 진행 중 (Sprint 101~106, 108~111) — O-G-D Agent Loop(F270~F273 ✅) + Skill Evolution(F274~F277 ✅) + BD 데모(F279~F281 ✅) + BD 형상화 A~E(F282~F285 ✅)
-- **현재 수치:** ~176 services, ~449 endpoints, 2800 API tests + CLI 149 + Web 265 + E2E 35 specs, D1 0001~0083
+- **현재 수치:** ~181 services, ~462 endpoints, 2800 API tests + CLI 149 + Web 265 + E2E 35 specs, D1 0001~0084
 - **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 
 ## Git Workflow
@@ -195,7 +195,7 @@ pnpm build && npx wrangler pages deploy dist --project-name=foundry-x-web
 
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
 - **Pages**: `fx.minu.best` (Vite + React Router 7, CNAME → Cloudflare Pages)
-- **D1**: 0001~0083 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
+- **D1**: 0001~0084 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
 - **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, OPENROUTER_API_KEY
 - **CI/CD**: `.github/workflows/deploy.yml` — master push 시 D1 마이그레이션 + Workers deploy + smoke test 자동
 
@@ -213,7 +213,7 @@ pnpm build && npx wrangler pages deploy dist --project-name=foundry-x-web
 - **D1 migrations**: CI/CD가 자동 적용하지만, 수동 시 `--remote` 별도 실행 필수 (누락하면 프로덕션 500)
 - **PostToolUse hook**: .ts/.tsx 편집 시 자동 eslint --fix + typecheck 실행 (15s/60s timeout)
 - **git add**: 절대 `git add .` 금지 — 멀티 pane 환경에서 다른 세션 변경 포함 위험
-- **D1 migration 중복**: `0040` 2개 + `0075` 2개 + `0082` 2개 공존 (remote 적용 완료) — 새 마이그레이션은 0084부터
+- **D1 migration 중복**: `0040` 2개 + `0075` 2개 + `0082` 2개 공존 (remote 적용 완료) — 새 마이그레이션은 0085부터
 
 ## 성공 지표 (구현 시 참고)
 
