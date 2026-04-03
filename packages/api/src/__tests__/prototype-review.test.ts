@@ -67,7 +67,7 @@ function createApp(db: unknown) {
     c.set("orgId", "org_test");
     c.set("userId", "user_1");
     c.set("orgRole", "admin");
-    c.set("jwtPayload" as never, { sub: "user_1" });
+    c.set("jwtPayload" as any, { sub: "user_1" });
     (c as any).env = { DB: db };
     await next();
   });
