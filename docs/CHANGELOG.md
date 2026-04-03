@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #177 추가 (2026-04-03)
+**토큰 절약 최적화 — 플러그인 정리 + Sprint WT Sonnet 전환**:
+- ✅ 플러그인 16→7개 비활성화: plugin-dev, pr-review-toolkit, feature-dev, skill-creator, agent-sdk-dev, skill-framework, ralph-loop, frontend-design, claude-code-setup 제거 (턴당 ~3k~5k 토큰 절감)
+- ✅ `ccs-sonnet` 래퍼 생성: Sprint WT autopilot을 Sonnet 4.6으로 실행 (Opus 대비 토큰 대폭 절감)
+- ✅ sprint() 배너에 `ccs-sonnet` 옵션 안내 추가
+- ✅ 글로벌 룰 갱신: WSL PATH fallback + tmux→Claude Code TUI 키 전달 패턴
+
 ### 세션 #178 (2026-04-03)
 **Sprint 106 F277 CAPTURED 엔진 + WSL 배포 개선**:
 - ✅ Sprint 106 F277: CAPTURED 엔진 — D1 0083 3테이블 + API 8 endpoints + 35 tests (PR #237, Match 100%, 13분 autopilot)
