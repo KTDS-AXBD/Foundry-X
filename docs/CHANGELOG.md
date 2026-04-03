@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #177 (2026-04-03)
+**Sprint 111 F284+F285 BD 형상화 Phase D+E 완료**:
+- ✅ Sprint 111: six-hats-moderator + expert-{ta,aa,ca,da,qa} 5종 에이전트 + 참조 2종 + SKILL.md/orchestrator 확장 = 10파일 +1143줄 (PR #239, Match 100%, 9분 autopilot)
+- ✅ CLAUDE.md 에이전트 15종 동기화 + Phase 10 수치 갱신
+- ✅ 글로벌 룰 갱신: WSL PATH fallback 패턴 + tmux→Claude Code TUI 키 전달 패턴
+
+**검증 결과**: PR #239 merged, SPEC/MEMORY/CLAUDE 3-way 동기화 완료
+
+### 세션 #176 (2026-04-03)
+**Sprint 109 F281 데모 E2E 검증 완료 + sprint() wt.exe fallback 수정**:
+- ✅ Sprint 109 F281: react-markdown+remark-gfm 도입, ArtifactDetail Markdown 렌더링, API 7 tests + E2E 6 specs (PR #238, Match 100%, 11분 autopilot)
+- ✅ `.bashrc` sprint() 함수: wt.exe 절대경로 fallback 추가 — Claude Code 환경에서 WT 탭 자동 생성
+- ✅ Sprint 109 WT 생성→autopilot→merge→정리 풀사이클 완료
+
+**검증 결과**: PR #238 merged, Cloudflare Pages 자동 배포 진행 중
+
 ### 세션 #175 (2026-04-03)
 **SPEC.md drift 보정 + session-end 3-way 수치 동기화 추가**:
 - ✅ SPEC.md §1 Phase 9→10, §2 수치 보정 (tests 2250→2351, routes 73→76, services 169→176, schemas 87→90, D1 0080→0082)
