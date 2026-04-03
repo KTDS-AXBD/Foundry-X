@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { Component as MvpTrackingPage } from "@/routes/mvp-tracking";
 
 vi.mock("../lib/api-client", () => ({
@@ -36,33 +37,33 @@ describe("MvpTrackingPage", () => {
   });
 
   it("renders MVP tracking page", () => {
-    const { getByText } = render(<MvpTrackingPage />);
+    const { getByText } = render(<MemoryRouter><MvpTrackingPage /></MemoryRouter>);
     expect(getByText("MVP 추적")).toBeDefined();
     expect(getByText("MVP 개발 현황 및 배포 파이프라인 관리")).toBeDefined();
   });
 
   it("displays MVP list in table format", async () => {
     vi.mocked(fetchApi).mockResolvedValueOnce(mockMvps);
-    const { findByText } = render(<MvpTrackingPage />);
+    const { findByText } = render(<MemoryRouter><MvpTrackingPage /></MemoryRouter>);
     expect(await findByText("AX 어시스턴트 MVP")).toBeDefined();
     expect(await findByText("문서 자동화 MVP")).toBeDefined();
   });
 
   it("shows status badges", async () => {
     vi.mocked(fetchApi).mockResolvedValueOnce(mockMvps);
-    const { findAllByText } = render(<MvpTrackingPage />);
+    const { findAllByText } = render(<MemoryRouter><MvpTrackingPage /></MemoryRouter>);
     const devBadges = await findAllByText("개발중");
     expect(devBadges.length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders register button", () => {
-    const { getByText } = render(<MvpTrackingPage />);
+    const { getByText } = render(<MemoryRouter><MvpTrackingPage /></MemoryRouter>);
     expect(getByText("MVP 등록")).toBeDefined();
   });
 
   it("handles empty state", async () => {
     vi.mocked(fetchApi).mockResolvedValueOnce([]);
-    const { findByText } = render(<MvpTrackingPage />);
+    const { findByText } = render(<MemoryRouter><MvpTrackingPage /></MemoryRouter>);
     expect(
       await findByText("등록된 MVP가 없어요. 첫 MVP를 등록해보세요."),
     ).toBeDefined();
