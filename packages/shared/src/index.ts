@@ -70,6 +70,17 @@ export type {
   DerivedStats,
 } from './types.js';
 
+// F277: CAPTURED 엔진 타입 (Sprint 106)
+export type {
+  CapturedPatternStatus,
+  CapturedWorkflowPattern,
+  CapturedWorkflowPatternDetail,
+  CapturedCandidate,
+  CapturedCandidateDetail,
+  CapturedReview,
+  CapturedStats,
+} from './types.js';
+
 // Web Dashboard types (Sprint 5 Part A)
 export type {
   WikiPage,

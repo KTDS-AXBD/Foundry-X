@@ -617,3 +617,75 @@ export interface DerivedStats {
   avgConfidence: number;
   topStages: { stage: string; patternCount: number }[];
 }
+
+// ─── F277: CAPTURED 엔진 타입 ───
+
+export type CapturedPatternStatus = "active" | "consumed" | "expired";
+
+export interface CapturedWorkflowPattern {
+  id: string;
+  tenantId: string;
+  methodologyId: string | null;
+  pipelineStage: PipelineStage;
+  workflowStepSequence: { stepId: string; stepName: string; action: string }[];
+  skillSequence: string[];
+  successRate: number;
+  sampleCount: number;
+  avgCostUsd: number;
+  avgDurationMs: number;
+  confidence: number;
+  status: CapturedPatternStatus;
+  extractedAt: string;
+  expiresAt: string | null;
+}
+
+export interface CapturedWorkflowPatternDetail extends CapturedWorkflowPattern {
+  candidateCount: number;
+  approvedCount: number;
+}
+
+export interface CapturedCandidate {
+  id: string;
+  tenantId: string;
+  patternId: string;
+  name: string;
+  description: string | null;
+  category: SkillCategory;
+  promptTemplate: string;
+  sourceWorkflowSteps: { stepId: string; stepName: string }[];
+  sourceSkills: { skillId: string; contribution: number }[];
+  similarityScore: number;
+  safetyGrade: SkillSafetyGrade;
+  safetyScore: number;
+  reviewStatus: DerivedReviewStatus;
+  registeredSkillId: string | null;
+  createdAt: string;
+  reviewedAt: string | null;
+  reviewedBy: string | null;
+}
+
+export interface CapturedCandidateDetail extends CapturedCandidate {
+  pattern: CapturedWorkflowPattern;
+  reviews: CapturedReview[];
+}
+
+export interface CapturedReview {
+  id: string;
+  candidateId: string;
+  action: DerivedReviewStatus;
+  comment: string | null;
+  modifiedPrompt: string | null;
+  reviewerId: string;
+  createdAt: string;
+}
+
+export interface CapturedStats {
+  totalPatterns: number;
+  activePatterns: number;
+  totalCandidates: number;
+  pendingCandidates: number;
+  approvedCandidates: number;
+  rejectedCandidates: number;
+  avgConfidence: number;
+  avgSuccessRate: number;
+}
