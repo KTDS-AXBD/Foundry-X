@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #184 (2026-04-03)
+**Phase 11 IA 대개편 등록 + Sprint 113 F288+F289 완료**:
+- ✅ FX-IA-Change-Plan-v1.1.docx 갭 분석 — 13개 Figma 갭(G1~G13) + 구조적 변경 5건 → 17건 갭 도출
+- ✅ Phase 11 F288~F299 (12건) SPEC.md §5 등록 — 11-A(구조 P1 3건) + 11-B(기능 P2 6건) + 11-C(고도화 P3~P4 3건)
+- ✅ Sprint 113 Plan+Design 작성 → WT autopilot ~26분 → PR #242 merge, Match 92%
+- ✅ F288: Role-based sidebar visibility — NavItem.visibility 속성 + useMemo 필터링 (Member 29→18메뉴)
+- ✅ F289: 사이드바 리브랜딩 3건 (수집채널→Field수집, IR Bottom-up→IDEA Portal, Spec생성→PRD) + 시작하기 조건부 숨김
+- ✅ sidebar-visibility.test.tsx 14건 신규 (Web 265→287)
+
+**검증 결과**:
+- ✅ typecheck / lint / Web tests 287/287 / sidebar 14/14
+
 ### 세션 #183 (2026-04-03)
 **Sprint 103~107 PDCA 분석 보충 + 5-Track 종합 보고서**:
 - ✅ FX-ANLS-S103: Sprint 103 Gap Analysis (F274 메트릭 수집, Match 100%)
