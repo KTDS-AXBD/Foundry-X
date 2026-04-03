@@ -323,10 +323,10 @@ export function Component() {
             <Check className="h-4 w-4" /> 사전 준비 체크리스트
           </h2>
           <ul className="grid gap-x-8 sm:grid-cols-2">
-            <ChecklistItem>Workers 배포 (D1 0077~0078)</ChecklistItem>
+            <ChecklistItem>Workers 배포 (D1 0082 시드 적용)</ChecklistItem>
             <ChecklistItem>Pages 배포</ChecklistItem>
             <ChecklistItem>OPENROUTER_API_KEY 설정</ChecklistItem>
-            <ChecklistItem>테스트 biz-item 1건 등록</ChecklistItem>
+            <ChecklistItem>시드 데이터 확인 (헬스케어AI + GIVC)</ChecklistItem>
             <ChecklistItem>Feature Flag 활성화</ChecklistItem>
             <ChecklistItem>발표자 계정 로그인</ChecklistItem>
             <ChecklistItem>화면 공유 준비</ChecklistItem>
@@ -354,7 +354,7 @@ export function Component() {
             steps={[
               '사이드바 <strong class="text-teal-400">"2. 발굴 → 🧭 발굴 위저드"</strong> 클릭',
               '<strong class="text-teal-400">인터랙티브 투어 자동 시작</strong> — 아이템 선택 → 단계 확인 → 스킬 실행 → 결과 확인 → 다음 단계',
-              '투어 완료 → "이제 직접 해볼까요?"',
+              '투어 완료 → "이제 직접 해볼까요?" (시드 데이터: 헬스케어 AI, GIVC)',
             ]}
             talkingPoint='"처음 오신 분은 이 투어가 자동으로 시작돼요. 다시 보고 싶으면 투어 다시 보기 버튼!"'
           />
@@ -368,7 +368,7 @@ export function Component() {
             icon={MapPin}
             scenario="사전 등록한 biz-item으로 프로세스 단계 탐색"
             steps={[
-              'BizItem 드롭다운에서 <strong class="text-violet-400">"AI 기반 제조 품질 예측"</strong> 선택',
+              'BizItem 드롭다운에서 <strong class="text-violet-400">"헬스케어 AI 진단 보조"</strong> 또는 <strong class="text-violet-400">"GIVC 플랫폼"</strong> 선택',
               '좌측 스텝퍼에서 <strong class="text-violet-400">2-0 (분류)</strong> 단계 확인',
               '각 단계 클릭 — <strong class="text-violet-400">목적, 추천 스킬, 산출물, 체크포인트</strong>',
               '<strong class="text-violet-400">"시작하기"</strong> 버튼 → IN_PROGRESS 전환',

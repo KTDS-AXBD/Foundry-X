@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { fetchApi } from "@/lib/api-client";
@@ -93,8 +95,14 @@ export default function ArtifactDetail({ artifactId }: ArtifactDetailProps) {
       {/* Output */}
       <div>
         <h3 className="mb-2 text-sm font-semibold">산출물</h3>
-        <div className="prose prose-sm max-w-none rounded-lg border p-4 whitespace-pre-wrap">
-          {artifact.outputText ?? "(결과 없음)"}
+        <div className="prose prose-sm max-w-none rounded-lg border p-4 dark:prose-invert">
+          {artifact.outputText ? (
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {artifact.outputText}
+            </ReactMarkdown>
+          ) : (
+            <span className="text-muted-foreground">(결과 없음)</span>
+          )}
         </div>
       </div>
 
