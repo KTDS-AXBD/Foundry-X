@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #178 (2026-04-03)
+**Sprint 106 F277 CAPTURED 엔진 + WSL 배포 개선**:
+- ✅ Sprint 106 F277: CAPTURED 엔진 — D1 0083 3테이블 + API 8 endpoints + 35 tests (PR #237, Match 100%, 13분 autopilot)
+- ✅ CI/CD D1 마이그레이션 자동화: deploy.yml에 `d1 migrations apply --remote` 단계 추가
+- ✅ WSL wrangler 금지 해제: v4.75.0 실측 184~271MB (과거 추정 300~800MB 대비 대폭 감소)
+- ✅ `scripts/d1-migrate-remote.sh`: curl 기반 긴급 마이그레이션 스크립트 추가
+- ✅ workflow_dispatch E2E 검증: D1 마이그레이션 단계 정상 동작 확인
+
+**검증 결과**: PR #237 merged, D1 0083 remote 적용 완료, CI/CD deploy-api ✅ (workflow_dispatch)
+
 ### 세션 #177 (2026-04-03)
 **Sprint 111 F284+F285 BD 형상화 Phase D+E 완료**:
 - ✅ Sprint 111: six-hats-moderator + expert-{ta,aa,ca,da,qa} 5종 에이전트 + 참조 2종 + SKILL.md/orchestrator 확장 = 10파일 +1143줄 (PR #239, Match 100%, 9분 autopilot)
