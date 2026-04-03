@@ -5,6 +5,7 @@ import { Hono } from "hono";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 import { OfferingPackService } from "../services/offering-pack-service.js";
+import { OfferingBriefService } from "../services/offering-brief-service.js";
 import {
   CreateOfferingPackSchema,
   CreatePackItemSchema,
@@ -12,6 +13,7 @@ import {
   CreatePackShareSchema,
   OfferingPackFilterSchema,
 } from "../schemas/offering-pack.schema.js";
+import { CreateOfferingBriefSchema, OfferingBriefFilterSchema } from "../schemas/offering-brief.schema.js";
 
 export const offeringPacksRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
@@ -125,4 +127,68 @@ offeringPacksRoute.post("/offering-packs/:id/share", async (c) => {
     if (msg.includes("not found")) return c.json({ error: msg }, 404);
     return c.json({ error: msg }, 400);
   }
+});
+
+// ─── Sprint 119: Offering Brief (F293) ───
+
+// POST /offering-packs/:id/brief — 브리프 생성
+offeringPacksRoute.post("/offering-packs/:id/brief", async (c) => {
+  const orgId = c.get("orgId");
+  const packId = c.req.param("id");
+
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = CreateOfferingBriefSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+  }
+
+  const packSvc = new OfferingPackService(c.env.DB);
+  const pack = await packSvc.getById(packId, orgId);
+  if (!pack) {
+    return c.json({ error: "Offering pack not found" }, 404);
+  }
+
+  const briefSvc = new OfferingBriefService(c.env.DB);
+  const brief = await briefSvc.createWithContent(
+    {
+      orgId,
+      offeringPackId: packId,
+      title: `${pack.title} — Brief`,
+      targetAudience: parsed.data.targetAudience,
+      meetingType: parsed.data.meetingType,
+    },
+    pack,
+  );
+
+  return c.json(brief, 201);
+});
+
+// GET /offering-packs/:id/brief — 최신 브리프 조회
+offeringPacksRoute.get("/offering-packs/:id/brief", async (c) => {
+  const orgId = c.get("orgId");
+  const packId = c.req.param("id");
+
+  const svc = new OfferingBriefService(c.env.DB);
+  const brief = await svc.getLatest(packId, orgId);
+  if (!brief) {
+    return c.json({ error: "No brief found for this offering pack" }, 404);
+  }
+
+  return c.json(brief);
+});
+
+// GET /offering-packs/:id/briefs — 브리프 목록
+offeringPacksRoute.get("/offering-packs/:id/briefs", async (c) => {
+  const orgId = c.get("orgId");
+  const packId = c.req.param("id");
+
+  const query = c.req.query();
+  const parsed = OfferingBriefFilterSchema.safeParse(query);
+  if (!parsed.success) {
+    return c.json({ error: "Invalid filters", details: parsed.error.flatten() }, 400);
+  }
+
+  const svc = new OfferingBriefService(c.env.DB);
+  const briefs = await svc.list(packId, orgId, parsed.data);
+  return c.json({ items: briefs });
 });

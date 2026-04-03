@@ -1609,6 +1609,37 @@ export async function fetchOfferingPackDetail(id: string): Promise<OfferingPackD
   return fetchApi(`/offering-packs/${id}`);
 }
 
+// ─── Sprint 119: Offering Brief (F293) ───
+
+export interface OfferingBrief {
+  id: string;
+  orgId: string;
+  offeringPackId: string;
+  title: string;
+  content: string;
+  targetAudience: string | null;
+  meetingType: string;
+  generatedBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function createOfferingBrief(
+  packId: string,
+  data?: { targetAudience?: string; meetingType?: string },
+): Promise<OfferingBrief> {
+  return postApi(`/offering-packs/${packId}/brief`, data ?? {});
+}
+
+export async function fetchOfferingBriefLatest(packId: string): Promise<OfferingBrief> {
+  return fetchApi(`/offering-packs/${packId}/brief`);
+}
+
+export async function fetchOfferingBriefs(packId: string): Promise<OfferingBrief[]> {
+  const res = await fetchApi<{ items: OfferingBrief[] }>(`/offering-packs/${packId}/briefs`);
+  return res.items;
+}
+
 export async function fetchBdpLatest(bizItemId: string): Promise<BdpVersion> {
   return fetchApi(`/bdp/${bizItemId}`);
 }
