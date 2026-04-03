@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchApi } from "@/lib/api-client";
@@ -24,6 +25,7 @@ interface PipelineStats {
 type ViewMode = "kanban" | "pipeline";
 
 export function Component() {
+  const navigate = useNavigate();
   const [view, setView] = useState<ViewMode>("kanban");
   const [kanbanData, setKanbanData] = useState<KanbanColumn[] | null>(null);
   const [stats, setStats] = useState<PipelineStats | null>(null);
@@ -48,8 +50,7 @@ export function Component() {
   }, [loadData]);
 
   const handleItemClick = (id: string) => {
-    // Navigate to item detail (future: side panel)
-    window.location.href = `/ax-bd/${id}`;
+    navigate(`/ax-bd/${id}`);
   };
 
   return (

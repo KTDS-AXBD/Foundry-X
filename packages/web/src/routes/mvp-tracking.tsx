@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchApi, postApi } from "@/lib/api-client";
@@ -195,8 +196,17 @@ export function Component() {
               {filtered.map((item) => (
                 <tr key={item.id} className="border-b last:border-0 hover:bg-muted/20">
                   <td className="px-4 py-3 font-medium">{item.title}</td>
-                  <td className="px-4 py-3 text-muted-foreground font-mono text-xs">
-                    {item.bizItemId ?? "-"}
+                  <td className="px-4 py-3 font-mono text-xs">
+                    {item.bizItemId ? (
+                      <Link
+                        to={`/ax-bd/${item.bizItemId}`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        {item.bizItemId.slice(0, 8)}...
+                      </Link>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <span
