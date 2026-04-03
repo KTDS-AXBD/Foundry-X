@@ -194,6 +194,7 @@
 | FX-ANLS-S89 | Sprint 89 — Gap 분석 | 1.0 | Active | [03-analysis/features/sprint-89.analysis.md](03-analysis/features/sprint-89.analysis.md) |
 | FX-ANLS-S90 | Sprint 90 Gap Analysis — BD 스킬 실행 엔진 + 산출물 저장 | 1.0 | Active | [03-analysis/features/sprint-90.analysis.md](03-analysis/features/sprint-90.analysis.md) |
 | FX-ANLS-S97 | Sprint 97 — 갭 분석 | 1.0 | Active | [03-analysis/features/sprint-97.analysis.md](03-analysis/features/sprint-97.analysis.md) |
+| FX-ANLS-S122 | Sprint 122 — E2E 테스트 종합 정비 Gap Analysis | 1.0 | Active | [03-analysis/features/sprint-122.analysis.md](03-analysis/features/sprint-122.analysis.md) |
 
 ## RPRT
 
