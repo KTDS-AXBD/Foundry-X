@@ -766,3 +766,52 @@ export interface BdRoiSummary {
   };
   topSkillsBySavings: Array<{ skillId: string; savingsPct: number }>;
 }
+
+// ─── Sprint 121: GTM Outreach (F299) ───
+
+export type CompanySize = "startup" | "smb" | "mid" | "enterprise";
+
+export type OutreachStatus =
+  | "draft"
+  | "proposal_ready"
+  | "sent"
+  | "opened"
+  | "responded"
+  | "meeting_set"
+  | "converted"
+  | "declined"
+  | "archived";
+
+export interface GtmCustomer {
+  id: string;
+  orgId: string;
+  companyName: string;
+  industry: string | null;
+  contactName: string | null;
+  contactEmail: string | null;
+  contactRole: string | null;
+  companySize: CompanySize | null;
+  notes: string | null;
+  tags: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GtmOutreach {
+  id: string;
+  orgId: string;
+  customerId: string;
+  offeringPackId: string | null;
+  title: string;
+  status: OutreachStatus;
+  proposalContent: string | null;
+  proposalGeneratedAt: string | null;
+  sentAt: string | null;
+  responseNote: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  customerName?: string;
+  offeringPackTitle?: string;
+}

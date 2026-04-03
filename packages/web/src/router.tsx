@@ -61,6 +61,8 @@ export const router = createBrowserRouter([
 
       // ── 6단계 GTM ──
       { path: "gtm/projects", lazy: () => import("@/routes/projects") },
+      { path: "gtm/outreach", lazy: () => import("@/routes/gtm-outreach") },
+      { path: "gtm/outreach/:id", lazy: () => import("@/routes/gtm-outreach-detail") },
 
       // ── ax-bd 하위 (현행 유지) ──
       { path: "ax-bd/ideas", lazy: () => import("@/routes/ax-bd/ideas") },

@@ -45,6 +45,7 @@ import {
   ClipboardCheck,
   TestTubes,
   Code,
+  Send,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -182,6 +183,7 @@ const processGroups: NavGroup[] = [
     stageColor: "bg-axis-rose",
     items: [
       { href: "/gtm/projects", label: "프로젝트 현황", icon: FolderKanban },
+      { href: "/gtm/outreach", label: "선제안", icon: Send },
     ],
   },
 ];
