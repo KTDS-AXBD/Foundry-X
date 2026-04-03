@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #174 (2026-04-03)
+**gh CLI 설치 + session-end Phase 3c/6 활성화**:
+- ✅ gh CLI v2.45.0 설치 + PAT 인증 연동 (AXBD-Team)
+- ✅ Phase 3c (GitHub Issues 동기화), Phase 3c-5 (Project Status), Phase 6 (CI/CD Run) 활성화 검증
+- ✅ 매 session-end에서 건너뛰던 3개 Phase 해소
+
+**검증 결과**: gh repo/issues/runs API 모두 정상 동작
+
+### 세션 #173 (2026-04-03)
+**ax plugin 자율점검 + 인프라 정비**:
+- ✅ selfcheck 8항목 실행 → C2(CLAUDE.md 스킬 누락) + C8(report 위치) 수정
+- ✅ infra-selfcheck C1을 plugin skills 기반으로 전환
+- ✅ sprint merge에 CLAUDE.md 스킬 동기화 단계 추가
+
 ### 세션 #172 (2026-04-03)
 **리포 정리 — gitignore + 미추적 문서 일괄 등록**:
 - ✅ .gitignore: 바이너리 참고자료(PDF/DOCX/HTML) + 임시 디렉토리(.firecrawl/, _workspace-prev/) 추가
