@@ -6,7 +6,7 @@ interface Props {
 
 const cards = [
   { key: "totalExecutions", label: "실행 횟수", format: (v: number) => String(v) },
-  { key: "successRate", label: "성공률", format: (v: number) => `${(v * 100).toFixed(0)}%` },
+  { key: "successRate", label: "성공률", format: (v: number) => `${v > 1 ? Math.round(v) : (v * 100).toFixed(0)}%` },
   { key: "totalCostUsd", label: "총 비용", format: (v: number) => `$${v.toFixed(2)}` },
   { key: "avgTokensPerExecution", label: "평균 토큰", format: (v: number) => v.toLocaleString() },
 ] as const;
