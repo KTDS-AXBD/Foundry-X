@@ -8,6 +8,7 @@ import {
   updateSkillSchema,
   listSkillsQuerySchema,
   searchSkillsSchema,
+  bulkRegisterSkillSchema,
 } from "../schemas/skill-registry.js";
 
 export const skillRegistryRoute = new Hono<{
@@ -53,6 +54,24 @@ skillRegistryRoute.get("/skills/search", async (c) => {
     limit: parsed.data.limit,
   });
   return c.json({ results, total: results.length, query: parsed.data.q });
+});
+
+// POST /skills/registry/bulk �� 벌크 등록/업서트 (admin only, F304)
+skillRegistryRoute.post("/skills/registry/bulk", async (c) => {
+  const role = c.get("orgRole") as string;
+  if (role !== "admin" && role !== "owner") {
+    return c.json({ error: "Admin access required" }, 403);
+  }
+
+  const body = await c.req.json();
+  const parsed = bulkRegisterSkillSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: "Invalid input", details: parsed.error.flatten() }, 400);
+  }
+
+  const svc = new SkillRegistryService(c.env.DB);
+  const result = await svc.bulkUpsert(c.get("orgId"), parsed.data.skills, c.get("userId"));
+  return c.json(result, 200);
 });
 
 // GET /skills/registry/:skillId — 스킬 상세

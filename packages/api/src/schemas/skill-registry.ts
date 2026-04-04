@@ -46,7 +46,24 @@ export const searchSkillsSchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).optional().default(20),
 });
 
+export const bulkRegisterSkillSchema = z.object({
+  skills: z.array(
+    z.object({
+      skillId: z.string().min(1).max(100),
+      name: z.string().min(1).max(200),
+      description: z.string().max(2000).optional(),
+      category: z
+        .enum(["general", "bd-process", "analysis", "generation", "validation", "integration"])
+        .default("general"),
+      tags: z.array(z.string()).max(20).optional(),
+      sourceType: z.enum(["marketplace", "custom", "derived", "captured"]).default("marketplace"),
+      sourceRef: z.string().optional(),
+    }),
+  ).min(1).max(500),
+});
+
 export type RegisterSkillInput = z.infer<typeof registerSkillSchema>;
 export type UpdateSkillInput = z.infer<typeof updateSkillSchema>;
 export type ListSkillsQuery = z.infer<typeof listSkillsQuerySchema>;
 export type SearchSkillsQuery = z.infer<typeof searchSkillsSchema>;
+export type BulkRegisterSkillInput = z.infer<typeof bulkRegisterSkillSchema>;

@@ -1,4 +1,4 @@
-import type { ModelQualityResponse, AgentModelMatrixResponse } from "@foundry-x/shared";
+import type { ModelQualityResponse, AgentModelMatrixResponse, SkillRegistryEntry, SkillSearchResult, SkillEnrichedView } from "@foundry-x/shared";
 import { refreshAccessToken, scheduleTokenRefresh } from "./stores/auth-store";
 
 export const BASE_URL = import.meta.env.VITE_API_URL || "/api";
@@ -2054,4 +2054,62 @@ export async function generateOutreachProposal(id: string): Promise<{ content: s
 
 export async function fetchOutreachStats(): Promise<OutreachStats> {
   return fetchApi("/gtm/outreach/stats");
+}
+
+// ─── Skill Registry (F303) ───
+
+export interface SkillRegistryListParams {
+  category?: string;
+  status?: string;
+  safetyGrade?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface SkillRegistryListResponse {
+  skills: SkillRegistryEntry[];
+  total: number;
+}
+
+export interface SkillSearchResponse {
+  results: SkillSearchResult[];
+  total: number;
+  query: string;
+}
+
+export async function getSkillRegistryList(
+  params?: SkillRegistryListParams,
+): Promise<SkillRegistryListResponse> {
+  const qs = new URLSearchParams();
+  if (params?.category) qs.set("category", params.category);
+  if (params?.status) qs.set("status", params.status);
+  if (params?.safetyGrade) qs.set("safetyGrade", params.safetyGrade);
+  if (params?.limit) qs.set("limit", String(params.limit));
+  if (params?.offset) qs.set("offset", String(params.offset));
+  const query = qs.toString();
+  return fetchApi<SkillRegistryListResponse>(
+    `/skills/registry${query ? `?${query}` : ""}`,
+  );
+}
+
+export async function searchSkillRegistry(
+  q: string,
+  opts?: { category?: string; limit?: number },
+): Promise<SkillSearchResponse> {
+  const qs = new URLSearchParams({ q });
+  if (opts?.category) qs.set("category", opts.category);
+  if (opts?.limit) qs.set("limit", String(opts.limit));
+  return fetchApi<SkillSearchResponse>(`/skills/search?${qs}`);
+}
+
+export async function getSkillRegistryDetail(
+  skillId: string,
+): Promise<SkillRegistryEntry> {
+  return fetchApi<SkillRegistryEntry>(`/skills/registry/${skillId}`);
+}
+
+export async function getSkillEnriched(
+  skillId: string,
+): Promise<SkillEnrichedView> {
+  return fetchApi<SkillEnrichedView>(`/skills/registry/${skillId}/enriched`);
 }

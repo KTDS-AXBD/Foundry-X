@@ -10,7 +10,7 @@ import type {
   SkillSourceType,
   SkillStatus,
 } from "@foundry-x/shared";
-import type { RegisterSkillInput, UpdateSkillInput } from "../schemas/skill-registry.js";
+import type { RegisterSkillInput, UpdateSkillInput, BulkRegisterSkillInput } from "../schemas/skill-registry.js";
 import { SkillSearchService } from "./skill-search.js";
 import { SkillMetricsService } from "./skill-metrics.js";
 import { SafetyChecker } from "./safety-checker.js";
@@ -302,6 +302,105 @@ export class SkillRegistryService {
       versions,
       lineage,
     };
+  }
+
+  async bulkUpsert(
+    tenantId: string,
+    items: BulkRegisterSkillInput["skills"],
+    actorId: string,
+  ): Promise<{ created: number; updated: number; errors: Array<{ skillId: string; error: string }>; total: number }> {
+    const result = { created: 0, updated: 0, errors: [] as Array<{ skillId: string; error: string }>, total: items.length };
+    const BATCH_SIZE = 50;
+
+    for (let i = 0; i < items.length; i += BATCH_SIZE) {
+      const batch = items.slice(i, i + BATCH_SIZE);
+      const stmts: D1PreparedStatement[] = [];
+      const batchCreated: string[] = [];
+      const batchUpdated: string[] = [];
+
+      for (const item of batch) {
+        try {
+          const existing = await this.db
+            .prepare("SELECT id FROM skill_registry WHERE tenant_id = ? AND skill_id = ?")
+            .bind(tenantId, item.skillId)
+            .first<{ id: string }>();
+
+          if (existing) {
+            stmts.push(
+              this.db.prepare(
+                `UPDATE skill_registry
+                 SET name = ?, description = ?, category = ?, tags = ?,
+                     source_type = ?, source_ref = ?, updated_by = ?, updated_at = datetime('now')
+                 WHERE tenant_id = ? AND skill_id = ?`,
+              ).bind(
+                item.name,
+                item.description ?? null,
+                item.category,
+                item.tags ? JSON.stringify(item.tags) : null,
+                item.sourceType,
+                item.sourceRef ?? null,
+                actorId,
+                tenantId,
+                item.skillId,
+              ),
+            );
+            batchUpdated.push(item.skillId);
+          } else {
+            const id = generateId("sr");
+            stmts.push(
+              this.db.prepare(
+                `INSERT INTO skill_registry
+                  (id, tenant_id, skill_id, name, description, category, tags,
+                   source_type, source_ref, created_by)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              ).bind(
+                id,
+                tenantId,
+                item.skillId,
+                item.name,
+                item.description ?? null,
+                item.category,
+                item.tags ? JSON.stringify(item.tags) : null,
+                item.sourceType,
+                item.sourceRef ?? null,
+                actorId,
+              ),
+            );
+            batchCreated.push(item.skillId);
+          }
+        } catch (e) {
+          result.errors.push({
+            skillId: item.skillId,
+            error: e instanceof Error ? e.message : "Unknown error",
+          });
+        }
+      }
+
+      // Execute statements individually (D1 batch uses .all() which fails on INSERT/UPDATE in mock)
+      for (const stmt of stmts) {
+        await stmt.run();
+      }
+
+      result.created += batchCreated.length;
+      result.updated += batchUpdated.length;
+
+      // Build search indexes
+      for (const item of batch) {
+        if (result.errors.some((e) => e.skillId === item.skillId)) continue;
+        try {
+          await this.searchService.buildIndex(tenantId, item.skillId, {
+            name: item.name,
+            description: item.description,
+            tags: item.tags,
+            category: item.category,
+          });
+        } catch {
+          // Search index failure is non-fatal
+        }
+      }
+    }
+
+    return result;
   }
 
   async syncMetrics(tenantId: string, skillId: string): Promise<void> {

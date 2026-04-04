@@ -35,6 +35,40 @@ export const CATEGORY_COLORS: Record<SkillCategory, string> = {
   "command": "bg-slate-100 text-slate-700",
 };
 
+// API SkillCategory → BdSkill SkillCategory 매핑 (F303)
+import type { SkillCategory as ApiSkillCategory } from "@foundry-x/shared";
+
+const API_TO_LOCAL_CATEGORY: Record<ApiSkillCategory, SkillCategory> = {
+  "bd-process": "pm-skills",
+  "analysis": "ai-biz",
+  "integration": "anthropic",
+  "general": "ai-framework",
+  "validation": "management",
+  "generation": "command",
+};
+
+export const API_CATEGORY_LABELS: Record<ApiSkillCategory, string> = {
+  "bd-process": "PM Skills",
+  "analysis": "AI Biz",
+  "integration": "Anthropic",
+  "general": "AI Framework",
+  "validation": "경영전략",
+  "generation": "커맨드",
+};
+
+export const API_CATEGORY_COLORS: Record<ApiSkillCategory, string> = {
+  "bd-process": "bg-sky-100 text-sky-700",
+  "analysis": "bg-violet-100 text-violet-700",
+  "integration": "bg-orange-100 text-orange-700",
+  "general": "bg-teal-100 text-teal-700",
+  "validation": "bg-pink-100 text-pink-700",
+  "generation": "bg-slate-100 text-slate-700",
+};
+
+export function apiCategoryToLocal(apiCat: ApiSkillCategory): SkillCategory {
+  return API_TO_LOCAL_CATEGORY[apiCat] ?? "ai-framework";
+}
+
 export const BD_SKILLS: BdSkill[] = [
   // === ai-biz (11) ===
   {
