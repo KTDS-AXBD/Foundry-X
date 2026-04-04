@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS skill_registry (
   current_version INTEGER DEFAULT 1, created_by TEXT NOT NULL,
   updated_by TEXT, created_at TEXT DEFAULT (datetime('now')),
   updated_at TEXT DEFAULT (datetime('now')), deleted_at TEXT,
+  skill_md_content TEXT, skill_md_generated_at TEXT,
   UNIQUE(tenant_id, skill_id)
 );
 CREATE TABLE IF NOT EXISTS skill_lineage (
@@ -120,9 +121,14 @@ describe("DerivedReviewService (F276)", () => {
     const skill = await db
       .prepare("SELECT * FROM skill_registry WHERE tenant_id = ? AND skill_id LIKE 'derived_%'")
       .bind(TENANT)
-      .first<{ skill_id: string; source_type: string }>();
+      .first<{ skill_id: string; source_type: string; skill_md_content: string | null; skill_md_generated_at: string | null }>();
     expect(skill).not.toBeNull();
     expect(skill!.source_type).toBe("derived");
+
+    // F306: SKILL.md 자동 생성 확인
+    expect(skill!.skill_md_content).not.toBeNull();
+    expect(skill!.skill_md_content).toContain("Test Derived Skill");
+    expect(skill!.skill_md_generated_at).not.toBeNull();
   });
 
   it("approves candidate → records lineage", async () => {

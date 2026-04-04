@@ -9,7 +9,9 @@ import {
   listSkillsQuerySchema,
   searchSkillsSchema,
   bulkRegisterSkillSchema,
+  deploySkillSchema,
 } from "../schemas/skill-registry.js";
+import { SkillMdGeneratorService } from "../services/skill-md-generator.js";
 
 export const skillRegistryRoute = new Hono<{
   Bindings: Env;
@@ -105,6 +107,60 @@ skillRegistryRoute.delete("/skills/registry/:skillId", async (c) => {
   const svc = new SkillRegistryService(c.env.DB);
   await svc.softDelete(c.get("orgId"), skillId, c.get("userId"));
   return c.json({ deleted: true });
+});
+
+// POST /skills/registry/:skillId/deploy — SKILL.md 생성 (F306, admin only)
+skillRegistryRoute.post("/skills/registry/:skillId/deploy", async (c) => {
+  const role = c.get("orgRole") as string;
+  if (role !== "admin" && role !== "owner") {
+    return c.json({ error: "Admin access required" }, 403);
+  }
+
+  const skillId = c.req.param("skillId");
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = deploySkillSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: "Invalid input", details: parsed.error.flatten() }, 400);
+  }
+
+  const svc = new SkillRegistryService(c.env.DB);
+  const entry = await svc.getById(c.get("orgId"), skillId);
+  if (!entry) {
+    return c.json({ error: "Skill not found" }, 404);
+  }
+
+  const mdGenerator = new SkillMdGeneratorService();
+  const skillMd = mdGenerator.generate({
+    skillId: entry.skillId,
+    name: entry.name,
+    description: entry.description ?? "",
+    category: entry.category,
+    tags: entry.tags,
+    sourceType: entry.sourceType,
+    promptTemplate: entry.promptTemplate ?? undefined,
+    version: entry.currentVersion,
+  });
+
+  // D1에 SKILL.md 캐시 저장
+  await c.env.DB.prepare(
+    "UPDATE skill_registry SET skill_md_content = ?, skill_md_generated_at = datetime('now') WHERE tenant_id = ? AND skill_id = ?"
+  ).bind(skillMd, c.get("orgId"), skillId).run();
+
+  if (parsed.data.format === "download") {
+    return new Response(skillMd, {
+      headers: {
+        "Content-Type": "text/markdown",
+        "Content-Disposition": `attachment; filename="SKILL.md"`,
+      },
+    });
+  }
+
+  return c.json({
+    skillId,
+    skillMd,
+    fileName: `${skillId}/SKILL.md`,
+    generatedAt: new Date().toISOString(),
+  });
 });
 
 // POST /skills/registry/:skillId/safety-check — 안전성 검사

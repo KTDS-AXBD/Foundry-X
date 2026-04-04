@@ -66,4 +66,9 @@ export type RegisterSkillInput = z.infer<typeof registerSkillSchema>;
 export type UpdateSkillInput = z.infer<typeof updateSkillSchema>;
 export type ListSkillsQuery = z.infer<typeof listSkillsQuerySchema>;
 export type SearchSkillsQuery = z.infer<typeof searchSkillsSchema>;
+export const deploySkillSchema = z.object({
+  format: z.enum(["preview", "download"]).optional().default("preview"),
+});
+
 export type BulkRegisterSkillInput = z.infer<typeof bulkRegisterSkillSchema>;
+export type DeploySkillInput = z.infer<typeof deploySkillSchema>;
