@@ -76,7 +76,7 @@ interface Props {
   metrics: SkillMetricSummary | null;
 }
 
-// 4개 stat 카드: totalExecutions, successRate, tokenCostAvg, avgDurationMs
+// 4개 stat 카���: totalExecutions, successRate, totalCostUsd, avgTokensPerExecution
 // 메트릭 없으면 "데이터 없음" placeholder
 ```
 
