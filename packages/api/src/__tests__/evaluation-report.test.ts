@@ -51,8 +51,8 @@ function seedArtifacts(db: D1Database, bizItemId: string, skills: string[]) {
   const promises = skills.map((skillId) => {
     const id = `art-${++seedCounter}`;
     return exec(
-      `INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, output_text, status)
-       VALUES ('${id}', 'org_test', '${bizItemId}', '${skillId}', '${"A".repeat(600)}', 'completed')`,
+      `INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, output_text, status, created_by)
+       VALUES ('${id}', 'org_test', '${bizItemId}', '${skillId}', '2-3', '${"A".repeat(600)}', 'completed', 'user-test')`,
     );
   });
   return Promise.all(promises);
