@@ -90,7 +90,10 @@ export default function HelpAgentChat({ bizItemId, stage }: HelpAgentChatProps) 
                 즉시 응답
               </span>
             )}
-            <div className="whitespace-pre-wrap">{msg.content}</div>
+            <div
+              className="whitespace-pre-wrap [&_strong]:font-semibold [&_code]:rounded [&_code]:bg-black/10 [&_code]:px-1 [&_code]:text-xs"
+              dangerouslySetInnerHTML={{ __html: renderChatMarkdown(msg.content) }}
+            />
           </div>
         ))}
 
@@ -133,4 +136,14 @@ export default function HelpAgentChat({ bizItemId, stage }: HelpAgentChatProps) 
       </div>
     </div>
   );
+}
+
+/** Lightweight markdown→HTML for chat bubbles */
+function renderChatMarkdown(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="underline text-indigo-400" target="_blank" rel="noopener">$1</a>');
 }
