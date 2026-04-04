@@ -6,12 +6,41 @@ import {
   skillMetricsQuerySchema,
   skillDetailQuerySchema,
   auditLogQuerySchema,
+  recordSkillExecutionSchema,
 } from "../schemas/skill-metrics.js";
 
 export const skillMetricsRoute = new Hono<{
   Bindings: Env;
   Variables: TenantVariables;
 }>();
+
+// POST /skills/metrics/record — 스킬 실행 기록 (F305)
+skillMetricsRoute.post("/skills/metrics/record", async (c) => {
+  const body = await c.req.json();
+  const parsed = recordSkillExecutionSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: "Invalid input", details: parsed.error.flatten() }, 400);
+  }
+
+  const svc = new SkillMetricsService(c.env.DB);
+  const result = await svc.recordExecution({
+    tenantId: c.get("orgId"),
+    skillId: parsed.data.skillId,
+    version: parsed.data.version,
+    bizItemId: parsed.data.bizItemId,
+    artifactId: parsed.data.artifactId,
+    model: parsed.data.model,
+    status: parsed.data.status,
+    inputTokens: parsed.data.inputTokens,
+    outputTokens: parsed.data.outputTokens,
+    costUsd: parsed.data.costUsd,
+    durationMs: parsed.data.durationMs,
+    executedBy: c.get("userId"),
+    errorMessage: parsed.data.errorMessage,
+  });
+
+  return c.json(result, 201);
+});
 
 // GET /skills/metrics — 전체 스킬 메트릭 요약
 skillMetricsRoute.get("/skills/metrics", async (c) => {
