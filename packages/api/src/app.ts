@@ -104,6 +104,8 @@ import { evaluationReportRoute } from "./routes/evaluation-report.js";
 import { pocRoute } from "./routes/poc.js";
 import { gtmCustomersRoute } from "./routes/gtm-customers.js";
 import { gtmOutreachRoute } from "./routes/gtm-outreach.js";
+// Sprint 132: Discovery Pipeline 오케스트레이션 (F312, F313)
+import { discoveryPipelineRoute } from "./routes/discovery-pipeline.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -359,6 +361,9 @@ app.route("/api", pocRoute);
 // Sprint 121: GTM Outreach (F299)
 app.route("/api", gtmCustomersRoute);
 app.route("/api", gtmOutreachRoute);
+
+// Sprint 132: Discovery Pipeline 오케스트레이션 (F312, F313)
+app.route("/api", discoveryPipelineRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

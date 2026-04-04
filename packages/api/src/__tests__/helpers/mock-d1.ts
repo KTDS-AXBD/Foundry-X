@@ -470,6 +470,62 @@ export class MockD1Database {
         FOREIGN KEY (org_id) REFERENCES organizations(id)
       );
 
+      -- 0075: BD Artifacts (F260, F261)
+      CREATE TABLE IF NOT EXISTS bd_artifacts (
+        id TEXT PRIMARY KEY,
+        org_id TEXT NOT NULL,
+        biz_item_id TEXT NOT NULL,
+        skill_id TEXT NOT NULL,
+        stage_id TEXT NOT NULL,
+        version INTEGER NOT NULL DEFAULT 1,
+        input_text TEXT NOT NULL DEFAULT '',
+        output_text TEXT,
+        model TEXT NOT NULL DEFAULT 'test-model',
+        tokens_used INTEGER DEFAULT 0,
+        duration_ms INTEGER DEFAULT 0,
+        status TEXT NOT NULL DEFAULT 'pending',
+        created_by TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+
+      -- 0090: discovery pipeline (F312, F313)
+      CREATE TABLE IF NOT EXISTS discovery_pipeline_runs (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        tenant_id TEXT NOT NULL,
+        biz_item_id TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'idle'
+          CHECK(status IN ('idle','discovery_running','discovery_complete','shaping_queued','shaping_running','shaping_complete','paused','failed','aborted')),
+        current_step TEXT,
+        discovery_start_at TEXT,
+        discovery_end_at TEXT,
+        shaping_run_id TEXT,
+        trigger_mode TEXT NOT NULL DEFAULT 'manual',
+        retry_count INTEGER NOT NULL DEFAULT 0,
+        max_retries INTEGER NOT NULL DEFAULT 3,
+        error_message TEXT,
+        created_by TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX IF NOT EXISTS idx_dpr_tenant_status ON discovery_pipeline_runs(tenant_id, status);
+
+      CREATE TABLE IF NOT EXISTS pipeline_events (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        pipeline_run_id TEXT NOT NULL,
+        event_type TEXT NOT NULL
+          CHECK(event_type IN ('START','STEP_COMPLETE','STEP_FAILED','RETRY','SKIP','ABORT','PAUSE','RESUME','TRIGGER_SHAPING','SHAPING_PHASE_COMPLETE','COMPLETE')),
+        from_status TEXT,
+        to_status TEXT,
+        step_id TEXT,
+        payload TEXT,
+        error_code TEXT,
+        error_message TEXT,
+        created_by TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX IF NOT EXISTS idx_pe_run ON pipeline_events(pipeline_run_id, created_at);
+
       CREATE TABLE IF NOT EXISTS agent_collection_runs (
         id TEXT PRIMARY KEY,
         org_id TEXT NOT NULL,
