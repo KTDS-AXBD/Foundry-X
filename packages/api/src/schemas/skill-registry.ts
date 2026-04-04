@@ -34,7 +34,7 @@ export const listSkillsQuerySchema = z.object({
     .optional(),
   status: z.enum(["active", "deprecated", "draft", "archived"]).optional(),
   safetyGrade: z.enum(["A", "B", "C", "D", "F", "pending"]).optional(),
-  limit: z.coerce.number().int().min(1).max(100).optional().default(50),
+  limit: z.coerce.number().int().min(1).max(500).optional().default(50),
   offset: z.coerce.number().int().min(0).optional().default(0),
 });
 

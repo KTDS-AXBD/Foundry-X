@@ -55,7 +55,7 @@ export default function SkillCatalog() {
   // API 데이터 fetch
   const { items: apiItems, total: apiTotal, loading, error } = useSkillList({
     category: selectedApiCategory ?? undefined,
-    limit: 100,
+    limit: 500,
   });
 
   // API 검색 (디바운스)

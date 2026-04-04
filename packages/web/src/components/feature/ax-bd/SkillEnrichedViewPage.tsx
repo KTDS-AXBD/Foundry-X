@@ -142,19 +142,90 @@ export default function SkillEnrichedViewPage({ skillId }: Props) {
           </div>
         )}
 
-        {registry.sourceType === "marketplace" && (
-          <div className="rounded border border-blue-200 bg-blue-50 p-3 text-xs text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200">
-            <strong>사용법:</strong> Claude Code에서 <code className="rounded bg-blue-100 px-1 dark:bg-blue-900">/ax:{registry.skillId}</code> 명령으로 실행하거나,
-            BD Hub 발굴 프로세스에서 자동으로 호출돼요.
-          </div>
-        )}
+        {/* 사용 가이드 */}
+        <div className="space-y-3">
+          <h3 className="text-xs font-medium text-muted-foreground">사용 방법</h3>
 
-        {(registry.sourceType === "derived" || registry.sourceType === "captured") && (
-          <div className="rounded border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
-            <strong>AI 생성 스킬:</strong> 이 스킬은 {registry.sourceType === "derived" ? "패턴 분석" : "워크플로우 캡처"}을 통해
-            자동 생성됐어요. SKILL.md가 생성되면 CC에서 바로 실행할 수 있어요.
+          {registry.sourceType === "marketplace" && registry.skillId.startsWith("ax:") && (
+            <div className="space-y-2 text-sm">
+              <div className="rounded border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950">
+                <p className="mb-2 font-medium text-blue-800 dark:text-blue-200">Claude Code에서 실행</p>
+                <code className="block rounded bg-blue-100 px-2 py-1 text-xs dark:bg-blue-900">
+                  /{registry.skillId}
+                </code>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Claude Code 세션에서 위 명령을 입력하면 자동 실행돼요.
+                BD Hub 발굴 프로세스에서도 단계에 따라 자동 호출될 수 있어요.
+              </p>
+            </div>
+          )}
+
+          {registry.sourceType === "marketplace" && !registry.skillId.startsWith("ax:") && (
+            <div className="space-y-2 text-sm">
+              <div className="rounded border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950">
+                <p className="mb-2 font-medium text-blue-800 dark:text-blue-200">BD 프로세스 내 활용</p>
+                <p className="text-xs text-blue-700 dark:text-blue-300">
+                  이 스킬은 BD 발굴 프로세스의 해당 단계에서 자동 또는 수동으로 호출돼요.
+                  발굴 아이템 상세 → 추천 스킬에서 실행할 수 있어요.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {registry.sourceType === "custom" && (
+            <div className="rounded border border-green-200 bg-green-50 p-3 text-sm dark:border-green-800 dark:bg-green-950">
+              <p className="mb-1 font-medium text-green-800 dark:text-green-200">프로젝트 전용 스킬</p>
+              <p className="text-xs text-green-700 dark:text-green-300">
+                이 스킬은 Foundry-X 프로젝트 내 <code className="rounded bg-green-100 px-1 dark:bg-green-900">.claude/skills/</code>에
+                정의된 전용 스킬이에요. SKILL.md 파일을 편집하여 동작을 커스터마이징할 수 있어요.
+              </p>
+            </div>
+          )}
+
+          {(registry.sourceType === "derived" || registry.sourceType === "captured") && (
+            <div className="rounded border border-amber-200 bg-amber-50 p-3 text-sm dark:border-amber-800 dark:bg-amber-950">
+              <p className="mb-1 font-medium text-amber-800 dark:text-amber-200">AI 자동 생성 스킬</p>
+              <p className="text-xs text-amber-700 dark:text-amber-300">
+                {registry.sourceType === "derived"
+                  ? "반복 패턴을 분석하여 AI가 자동으로 생성한 스킬이에요. 패턴의 성공률과 샘플 수를 기반으로 최적화됐어요."
+                  : "워크플로우 실행 이력을 캡처하여 AI가 자동으로 생성한 메타 스킬이에요. 여러 단계의 스킬을 하나로 통합했어요."}
+              </p>
+              <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
+                Deploy API로 SKILL.md를 생성하면 CC에서 바로 실행할 수 있어요.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* 입출력 안내 (카테고리별) */}
+        <div className="space-y-2">
+          <h3 className="text-xs font-medium text-muted-foreground">입출력</h3>
+          <div className="grid gap-2 text-xs sm:grid-cols-2">
+            <div className="rounded border bg-muted/30 p-2.5">
+              <span className="font-medium">입력</span>
+              <p className="mt-1 text-muted-foreground">
+                {registry.category === "analysis" && "분석 대상 데이터, 사업 아이디어, 시장 정보"}
+                {registry.category === "bd-process" && "발굴 아이템 컨텍스트, 단계별 산출물"}
+                {registry.category === "validation" && "검증 대상 문서, 코드, 설계 산출물"}
+                {registry.category === "generation" && "생성 요청 프롬프트, 참조 자료"}
+                {registry.category === "integration" && "연동 대상 시스템 컨텍스트, 설정 정보"}
+                {registry.category === "general" && "자연어 프롬프트, 컨텍스트 정보"}
+              </p>
+            </div>
+            <div className="rounded border bg-muted/30 p-2.5">
+              <span className="font-medium">출력</span>
+              <p className="mt-1 text-muted-foreground">
+                {registry.category === "analysis" && "분석 보고서, 점수/등급, 시각화 데이터"}
+                {registry.category === "bd-process" && "프로세스 산출물, 다음 단계 가이드"}
+                {registry.category === "validation" && "검증 결과, 통과/실패 판정, 개선 제안"}
+                {registry.category === "generation" && "생성된 문서/코드/콘텐츠"}
+                {registry.category === "integration" && "동기화 결과, 상태 보고"}
+                {registry.category === "general" && "자연어 응답, 구조화된 결과"}
+              </p>
+            </div>
           </div>
-        )}
+        </div>
       </section>
 
       {/* Prompt Template */}
