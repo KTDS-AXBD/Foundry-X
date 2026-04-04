@@ -158,6 +158,7 @@ pnpm e2e                          # Playwright E2E
 - **Phase 9:** ✅ 완료 (Sprint 87~100) — 팀 온보딩 + BD 스킬 통합 + GIVC PoC + 발굴 UX(F263~F266) + BD 스킬 배포(F267) + Plugin 전환(F268) + 발굴 IA 정리(F269)
 - **Phase 10:** ✅ 완료 (Sprint 101~112) — O-G-D Agent Loop(F270~F273 ✅) + Skill Evolution(F274~F278 ✅) + BD 데모(F279~F281 ✅) + BD 형상화 A~F(F282~F287 ✅)
 - **Phase 11:** ✅ 완료 (Sprint 113~121) — IA 대개편 F288~F299 (12/12 완료). 11-A ✅ 구조 기반 + 11-B ✅ 기능 확장 + 11-C ✅ 고도화+GTM
+- **Phase 12:** 📋 계획 (Sprint 125~128) — Skill Unification: 3개 스킬 시스템 통합 (F303~F308). PRD: `docs/specs/fx-skill-unify/prd-final.md`
 - **수치 확인:** `/ax:daily-check` 실행 또는 SPEC.md §2 "실시간 수치" 블록 참조 (하드코딩 금지 — drift 방지)
 - **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 
