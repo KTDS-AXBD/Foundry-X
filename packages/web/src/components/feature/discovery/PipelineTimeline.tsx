@@ -1,7 +1,11 @@
 /**
- * F312: PipelineTimeline — 발굴→형상화 파이프라인 진행 타임라인
+ * F312+F314: PipelineTimeline — 발굴→형상화 파이프라인 진행 타임라인
+ * F314: HITL 체크포인트 마커 추가 (2-1, 2-3, 2-5, 2-7)
  */
 import { PipelineStatusBadge } from "./PipelineStatusBadge";
+
+const CHECKPOINT_STEPS = new Set(["2-1", "2-3", "2-5", "2-7"]);
+const COMMIT_GATE_STEP = "2-5";
 
 interface TimelineStep {
   id: string;
@@ -20,8 +24,15 @@ interface PipelineRun {
   }>;
 }
 
+interface PipelineCheckpoint {
+  stepId: string;
+  status: string;
+  checkpointType: string;
+}
+
 interface Props {
   run: PipelineRun;
+  checkpoints?: PipelineCheckpoint[];
   onStepClick?: (stepId: string) => void;
 }
 
@@ -47,7 +58,8 @@ function getStepStatus(
   return "pending";
 }
 
-export function PipelineTimeline({ run, onStepClick }: Props) {
+export function PipelineTimeline({ run, checkpoints = [], onStepClick }: Props) {
+  const checkpointMap = new Map(checkpoints.map((cp) => [cp.stepId, cp]));
   const completedSteps = new Set<string>();
   let failedStep: string | null = null;
 
@@ -91,18 +103,32 @@ export function PipelineTimeline({ run, onStepClick }: Props) {
       <div>
         <p className="text-xs font-medium text-gray-500 mb-1">Discovery (2-0 ~ 2-10)</p>
         <div className="flex items-center gap-1">
-          {steps.slice(0, 11).map((step, i) => (
-            <button
-              key={step.id}
-              onClick={() => onStepClick?.(step.id)}
-              className="flex flex-col items-center group"
-              title={`${step.label} — ${step.status}`}
-            >
-              <div className={`w-6 h-6 rounded-full ${statusColors[step.status]} flex items-center justify-center`}>
-                <span className="text-[10px] text-white font-bold">{i}</span>
-              </div>
-            </button>
-          ))}
+          {steps.slice(0, 11).map((step, i) => {
+            const isCheckpoint = CHECKPOINT_STEPS.has(step.id);
+            const isCommitGate = step.id === COMMIT_GATE_STEP;
+            const cp = checkpointMap.get(step.id);
+            const cpPending = cp?.status === "pending";
+
+            return (
+              <button
+                key={step.id}
+                onClick={() => onStepClick?.(step.id)}
+                className="flex flex-col items-center group relative"
+                title={`${step.label} — ${step.status}${isCheckpoint ? " (체크포인트)" : ""}`}
+              >
+                <div className={`w-6 h-6 rounded-full ${statusColors[step.status]} flex items-center justify-center ${
+                  isCheckpoint ? `ring-2 ${isCommitGate ? "ring-red-400" : "ring-yellow-400"}` : ""
+                } ${cpPending ? "animate-pulse" : ""}`}>
+                  <span className="text-[10px] text-white font-bold">{i}</span>
+                </div>
+                {isCheckpoint && (
+                  <span className="text-[8px] mt-0.5 text-gray-400">
+                    {isCommitGate ? "🛡️" : "⚡"}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
