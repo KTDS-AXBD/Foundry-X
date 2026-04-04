@@ -281,7 +281,13 @@ cd packages/web && pnpm e2e
 # - 전체: 169 + 10 + 4 = ~183 tests, 0 fail
 ```
 
-## 7. 비고
+## 7. hitl-review Skip 재활성화 불가 사유
+
+- **UI 미완**: `WizardStepDetail` 컴포넌트가 산출물/리뷰 텍스트를 렌더링하지 않음
+- **콜백 미연결**: `onArtifactReview` 콜백은 props로 전달되지만 UI에 연결되지 않은 상태
+- **결론**: Mock 주입으로는 해결 불가. 향후 UI 완성 시 재검토
+
+## 8. 비고
 
 - offering-brief는 `fetchOfferingPackDetail` + `fetchOfferingBriefs` 2개 API를 동시 호출하므로 둘 다 mock 필요
 - outreach-detail은 `fetchGtmOutreach` → `fetchGtmCustomer` 체인 — 순차 호출이므로 두 API 모두 mock

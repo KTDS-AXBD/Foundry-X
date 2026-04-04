@@ -1,7 +1,7 @@
 ---
 code: FX-ANLS-S124
 title: "E2E 상세 페이지(:id) 커버리지 확장 — 갭 분석"
-version: "1.0"
+version: "1.1"
 status: Active
 category: ANLS
 feature: F302
@@ -20,7 +20,7 @@ ref: "[[FX-DSGN-S124]]"
 | Sprint | 124 |
 | Design | `docs/02-design/features/sprint-124.design.md` |
 | 구현 파일 | `e2e/fixtures/mock-factory.ts` (신규), `e2e/detail-pages.spec.ts` (신규) |
-| **Overall Match Rate** | **95%** |
+| **Overall Match Rate** | **95% → 97%** (iteration 후) |
 
 ## 2. Mock Factory 비교 (Design §3 vs 구현)
 
@@ -42,16 +42,16 @@ ref: "[[FX-DSGN-S124]]"
 
 | # | 테스트 | Mock | Assertion | 결과 |
 |---|--------|------|-----------|------|
-| 1 | discovery/items/:id | ✅ + artifacts mock 추가 | "AI 헬스케어 플랫폼" | ✅ PASS |
-| 2 | ax-bd/ideas/:id | ✅ | "스마트 팩토리 솔루션" | ✅ PASS |
-| 3 | ax-bd/bmc/:id | ✅ | "스마트 팩토리 BMC" (title) | ✅ PASS |
+| 1 | discovery/items/:id | ✅ + artifacts mock 추가 | "AI 헬스케어 플랫폼" + `main a[href="/discovery/items"]` | ✅ PASS |
+| 2 | ax-bd/ideas/:id | ✅ | "스마트 팩토리 솔루션" + "AI" (tag Badge) | ✅ PASS |
+| 3 | ax-bd/bmc/:id | ✅ | "스마트 팩토리 BMC" + "가치 제안" (BLOCK_LABELS) | ✅ PASS |
 | 4 | ax-bd/bdp/:bizItemId | `review-summary` + `reviews` | heading "사업제안서" | ✅ PASS |
-| 5 | collection/sr/:id | ✅ | "시장 조사 리포트" | ✅ PASS |
-| 6 | shaping/offering/:id | ✅ | "AI 헬스케어 제안 패키지" | ✅ PASS |
-| 7 | shaping/offering/:id/brief | ✅ | "AI 헬스케어 제안 패키지" | ✅ PASS |
-| 8 | gtm/outreach/:id | ✅ | "AI 헬스케어 제안" (title) | ✅ PASS |
-| 9 | shaping/review/:runId | ✅ | "완료" status | ✅ PASS |
-| 10 | ax-bd/artifacts/:id | ✅ | "feasibility-study" (skillId) | ✅ PASS |
+| 5 | collection/sr/:id | ✅ | "시장 조사 리포트" + "market_research" (sr_type badge) | ✅ PASS |
+| 6 | shaping/offering/:id | ✅ | "AI 헬스케어 제안 패키지" + "draft" (status badge) | ✅ PASS |
+| 7 | shaping/offering/:id/brief | ✅ | "AI 헬스케어 제안 패키지" + "아직 생성된 브리프가 없어요." | ✅ PASS |
+| 8 | gtm/outreach/:id | ✅ | "AI 헬스케어 제안" + "테스트 고객사" (customer.companyName) | ✅ PASS |
+| 9 | shaping/review/:runId | ✅ | "완료" + `/Quality:/` (qualityScore) | ✅ PASS |
+| 10 | ax-bd/artifacts/:id | ✅ | "feasibility-study" + "입력" (inputText section) | ✅ PASS |
 
 ## 4. hitl-review Skip 재활성화
 
@@ -81,6 +81,16 @@ Design에서 4건 재활성화를 설계했으나, 조사 결과 **UI 구현 미
 
 ## 7. 차이 요약
 
-- 🔴 **Missing 1건**: hitl-review skip 재활성화 불가 (UI 미완, 의도적 제외)
+- 🔴 **Missing 1건**: hitl-review skip 재활성화 불가 (UI 미완, 의도적 제외. 사유: Design §7 참조)
 - 🟡 **Added 1건**: `makeDiscoveryProgress` factory
 - 🔵 **Changed 5건**: BMC/BDP/Outreach/Customer/Artifact mock 필드 — 실제 API 스키마 반영
+- ✅ **Iteration 보강 (v1.0→v1.1)**: PARTIAL 9건 assertion 강화 → 모두 PASS 전환
+  - discovery/items: 뒤로가기 링크 (`main a[href="/discovery/items"]`) 추가
+  - ideas: tags Badge ("AI") 추가
+  - bmc: BMC block label ("가치 제안") 추가
+  - sr: sr_type badge ("market_research") 추가
+  - offering: status badge ("draft") 추가
+  - offering/brief: empty state 텍스트 추가
+  - outreach: customer.companyName ("테스트 고객사") 추가
+  - shaping-review: qualityScore (`/Quality:/`) 추가
+  - artifacts: 입력 섹션 h3 ("입력") 추가

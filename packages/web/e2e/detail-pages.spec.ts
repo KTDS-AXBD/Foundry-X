@@ -36,6 +36,7 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
     await page.goto("/discovery/items/biz-item-1");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("AI 헬스케어 플랫폼")).toBeVisible();
+    await expect(page.locator('main a[href="/discovery/items"]')).toBeVisible();
   });
 
   test("ax-bd/ideas/:id — 아이디어 상세", async ({
@@ -50,6 +51,7 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
     await page.goto("/ax-bd/ideas/idea-1");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("스마트 팩토리 솔루션")).toBeVisible();
+    await expect(page.getByText("AI", { exact: true })).toBeVisible();
   });
 
   test("ax-bd/bmc/:id — BMC 상세", async ({ authenticatedPage: page }) => {
@@ -62,6 +64,7 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
     await page.goto("/ax-bd/bmc/bmc-1");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("스마트 팩토리 BMC")).toBeVisible();
+    await expect(page.getByText("가치 제안")).toBeVisible();
   });
 
   test("ax-bd/bdp/:bizItemId — BDP 상세", async ({
@@ -98,6 +101,7 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
     await page.goto("/collection/sr/sr-1");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("시장 조사 리포트")).toBeVisible();
+    await expect(page.getByText("market_research")).toBeVisible();
   });
 
   test("shaping/offering/:id — 오퍼링 팩 상세", async ({
@@ -111,6 +115,7 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
     await page.goto("/shaping/offering/pack-1");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("AI 헬스케어 제안 패키지")).toBeVisible();
+    await expect(page.getByText("draft")).toBeVisible();
   });
 
   test("shaping/offering/:id/brief — 오퍼링 브리프", async ({
@@ -127,6 +132,7 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
     await page.goto("/shaping/offering/pack-1/brief");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("AI 헬스케어 제안 패키지")).toBeVisible();
+    await expect(page.getByText("아직 생성된 브리프가 없어요.")).toBeVisible();
   });
 
   test("gtm/outreach/:id — 아웃리치 상세", async ({
@@ -144,6 +150,7 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
     await page.goto("/gtm/outreach/outreach-1");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("AI 헬스케어 제안")).toBeVisible();
+    await expect(page.getByText("테스트 고객사")).toBeVisible();
   });
 
   test("shaping/review/:runId — 형상화 리뷰 상세", async ({
@@ -157,6 +164,7 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
     await page.goto("/shaping/review/run-1");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("완료")).toBeVisible();
+    await expect(page.getByText(/Quality:/)).toBeVisible();
   });
 
   test("ax-bd/artifacts/:id — 산출물 상세", async ({
@@ -174,5 +182,6 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
     await page.goto("/ax-bd/artifacts/artifact-1");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("feasibility-study")).toBeVisible();
+    await expect(page.getByText("입력")).toBeVisible();
   });
 });
