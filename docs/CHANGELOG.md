@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #194 (2026-04-05)
+**Daily Check + Flaky Test 안��화**:
+- ✅ Daily Check 8항목 점검: Runtime/Git/Dependencies/TypeScript/Hooks/D1/SPEC/Disk 전체 OK
+- ✅ SPEC.md 수치 drift 보정: routes 85→86, services 195→200, schemas 100→101, D1 0088→0090
+- ✅ CLAUDE.md 디렉토리 트리 수치 3건 갱신
+- ✅ .gitignore: TinaCMS admin/ + Playwright test-results/ 추가 (dirty files 해소)
+- ✅ Vitest pool threads→forks 전환: flaky test 10건 해소 + 숨겨진 테스트 26개 복구
+- ✅ 테스트: 250 files 0 fail, 3148 tests (기존 247 files 10 fail, 3061 tests)
+- ✅ 실행시간 46s→30s (35% 단축)
+
+**검증 결���**:
+- ✅ typecheck 4 packages PASS / tests 3148 (0 fail) / lint OK
+
 ### 세션 #191 (2026-04-04)
 **Sprint 124 F302 — E2E 상세 페이지(:id) 커버리지 확장 + 스킬 개선**:
 - ✅ Sprint 124 Full Auto (~19분): Plan → Design → Implement → Analyze(95%) → Report → PR #259
