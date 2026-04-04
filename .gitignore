@@ -49,3 +49,6 @@ _workspace-prev/
 docs/specs/**/*.pdf
 docs/specs/**/*.docx
 docs/specs/**/*.html
+
+# TinaCMS generated
+packages/web/tina/__generated__
