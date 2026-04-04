@@ -142,4 +142,87 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     await page.goto("/settings/jira");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
   });
+
+  // ── 세션 #189 추가: 감사 기반 미커버 라우트 보강 (8건) ──
+
+  test("collection/agent 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/collection/agent-runs*", (route) =>
+      route.fulfill({ json: { runs: [], total: 0 } }),
+    );
+    await page.route("**/api/collection/agent-schedule*", (route) =>
+      route.fulfill({ json: null }),
+    );
+    await page.goto("/collection/agent");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "Agent 수집" })).toBeVisible();
+  });
+
+  test("discovery/report 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/ax-bd/evaluation-reports*", (route) =>
+      route.fulfill({ json: { items: [], total: 0 } }),
+    );
+    await page.goto("/discovery/report");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "평가 결과서" })).toBeVisible();
+  });
+
+  test("gtm/outreach 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/gtm/outreach*", (route) =>
+      route.fulfill({ json: { items: [], total: 0 } }),
+    );
+    await page.route("**/api/gtm/outreach/stats*", (route) =>
+      route.fulfill({ json: { total: 0, byStatus: {} } }),
+    );
+    await page.route("**/api/gtm/customers*", (route) =>
+      route.fulfill({ json: { items: [] } }),
+    );
+    await page.goto("/gtm/outreach");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "선제안 아웃리치" })).toBeVisible();
+  });
+
+  test("product/poc 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/poc*", (route) =>
+      route.fulfill({ json: [] }),
+    );
+    await page.goto("/product/poc");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "PoC 관리" })).toBeVisible();
+  });
+
+  test("shaping/prototype 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/ax-bd/prototypes*", (route) =>
+      route.fulfill({ json: { items: [] } }),
+    );
+    await page.goto("/shaping/prototype");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "Prototype HITL" })).toBeVisible();
+  });
+
+  test("validation/company 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/validation/company/items*", (route) =>
+      route.fulfill({ json: { items: [], total: 0 } }),
+    );
+    await page.goto("/validation/company");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "전사 검증" })).toBeVisible();
+  });
+
+  test("validation/division 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/validation/division/items*", (route) =>
+      route.fulfill({ json: { items: [], total: 0 } }),
+    );
+    await page.goto("/validation/division");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "본부 검증" })).toBeVisible();
+  });
+
+  test("validation/meetings 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/validation/meetings*", (route) =>
+      route.fulfill({ json: { items: [], total: 0 } }),
+    );
+    await page.goto("/validation/meetings");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "미팅 관리" })).toBeVisible();
+  });
 });

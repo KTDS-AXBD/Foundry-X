@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Phase 11 ✅ 완료 (Sprint 123 완료, ~520 endpoints, 195 services, 2590 API + 149 CLI + 322 Web tests + 31 E2E specs) — Phase 11 IA 대개편 12/12 완료(F288~F299 ✅) + F300 E2E ✅ + F301 BD UX ✅
+**현재 상태:** Phase 11 ✅ 완료 (Sprint 123) — IA 대개편 12/12 완료(F288~F299 ✅) + F300 E2E ✅ + F301 BD UX ✅
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -117,7 +117,7 @@ turbo typecheck                   # 전체 타입체크
 
 # CLI 패키지 단독
 cd packages/cli
-pnpm test                         # vitest run (149 tests)
+pnpm test                         # vitest run
 pnpm test -- --grep "Header"      # 특정 테스트 필터
 pnpm lint                         # eslint src/ (flat config)
 pnpm typecheck                    # tsc --noEmit
@@ -125,17 +125,17 @@ pnpm dev                          # tsx src/index.ts (개발 실행)
 
 # API 패키지 단독
 cd packages/api
-pnpm test                         # vitest run (2250 tests)
+pnpm test                         # vitest run
 pnpm test -- --grep "agent"       # 특정 테스트 필터
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # 로컬 서버 실행
 
 # Web 패키지 단독
 cd packages/web
-pnpm test                         # vitest run (265 tests)
+pnpm test                         # vitest run
 pnpm typecheck                    # tsc --noEmit
 pnpm dev                          # Vite dev server (localhost:3000)
-pnpm e2e                          # Playwright E2E (31 specs, 161 tests)
+pnpm e2e                          # Playwright E2E
 ```
 
 ## Testing
@@ -146,7 +146,7 @@ pnpm e2e                          # Playwright E2E (31 specs, 161 tests)
 - **TSX 지원:** vitest.config에 `.test.tsx` 패턴 포함, tsconfig에 `jsx: "react-jsx"`
 - **Mock 전략:** Ink 컴포넌트는 실제 렌더링, 외부 서비스만 mock
 - **API 테스트:** Hono `app.request()` 직접 호출 방식, D1 mock은 in-memory SQLite
-- **E2E 테스트:** Playwright (`packages/web/e2e/`), 35 specs (~146 tests), `pnpm e2e`로 실행
+- **E2E 테스트:** Playwright (`packages/web/e2e/`), `pnpm e2e`로 실행
 - **ESLint 커스텀 룰 3종** (packages/api): `no-direct-db-in-route`, `require-zod-schema`, `no-orphan-plumb-import`
 
 ## Current Phase
@@ -158,7 +158,7 @@ pnpm e2e                          # Playwright E2E (31 specs, 161 tests)
 - **Phase 9:** ✅ 완료 (Sprint 87~100) — 팀 온보딩 + BD 스킬 통합 + GIVC PoC + 발굴 UX(F263~F266) + BD 스킬 배포(F267) + Plugin 전환(F268) + 발굴 IA 정리(F269)
 - **Phase 10:** ✅ 완료 (Sprint 101~112) — O-G-D Agent Loop(F270~F273 ✅) + Skill Evolution(F274~F278 ✅) + BD 데모(F279~F281 ✅) + BD 형상화 A~F(F282~F287 ✅)
 - **Phase 11:** ✅ 완료 (Sprint 113~121) — IA 대개편 F288~F299 (12/12 완료). 11-A ✅ 구조 기반 + 11-B ✅ 기능 확장 + 11-C ✅ 고도화+GTM
-- **현재 수치:** ~195 services, ~520 endpoints, 2590 API tests + CLI 149 + Web 322 + E2E 31 specs, D1 0001~0088
+- **수치 확인:** `/ax:daily-check` 실행 또는 SPEC.md §2 "실시간 수치" 블록 참조 (하드코딩 금지 — drift 방지)
 - **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 
 ## Git Workflow
@@ -196,7 +196,7 @@ pnpm build && npx wrangler pages deploy dist --project-name=foundry-x-web
 
 - **Workers**: `foundry-x-api.ktds-axbd.workers.dev` (Hono, wrangler deploy)
 - **Pages**: `fx.minu.best` (Vite + React Router 7, CNAME → Cloudflare Pages)
-- **D1**: 0001~0084 마이그레이션 (`packages/api/src/db/migrations/`), `wrangler d1 migrations apply --remote`
+- **D1**: `packages/api/src/db/migrations/*.sql`, `wrangler d1 migrations apply --remote`
 - **Secrets**: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, OPENROUTER_API_KEY
 - **CI/CD**: `.github/workflows/deploy.yml` — master push 시 D1 마이그레이션 + Workers deploy + smoke test 자동
 
@@ -214,7 +214,7 @@ pnpm build && npx wrangler pages deploy dist --project-name=foundry-x-web
 - **D1 migrations**: CI/CD가 자동 적용하지만, 수동 시 `--remote` 별도 실행 필수 (누락하면 프로덕션 500)
 - **PostToolUse hook**: .ts/.tsx 편집 시 자동 eslint --fix + typecheck 실행 (15s/60s timeout)
 - **git add**: 절대 `git add .` 금지 — 멀티 pane 환경에서 다른 세션 변경 포함 위험
-- **D1 migration 중복**: `0040` 2개 + `0075` 2개 + `0082` 2개 공존 (remote 적용 완료) — 새 마이그레이션은 0085부터
+- **D1 migration 중복**: `0040` 2개 + `0075` 2개 + `0082` 2개 공존 (remote 적용 완료) — 새 번호는 `ls packages/api/src/db/migrations/*.sql | sort | tail -1`로 확인
 
 ## 성공 지표 (구현 시 참고)
 

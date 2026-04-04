@@ -104,7 +104,19 @@ test.describe("BD 데모 워크쓰루", () => {
 
   test("발굴 대시보드 — 탭 네비게이션", async ({ authenticatedPage: page }) => {
     await page.route("**/api/ax-bd/progress*", (route) =>
-      route.fulfill({ json: { items: [], summary: { total: 0, green: 0, yellow: 0, red: 0 } } }),
+      route.fulfill({
+        json: {
+          items: [],
+          summary: {
+            totalItems: 0,
+            bySignal: { green: 0, yellow: 0, red: 0 },
+            byPipelineStage: {},
+            avgCompletionRate: 0,
+            bottleneck: null,
+          },
+          total: 0,
+        },
+      }),
     );
 
     await page.goto("/discovery/dashboard");
