@@ -4,7 +4,7 @@
 import { PipelineStateMachine } from "./pipeline-state-machine.js";
 import type { StepAction } from "../schemas/discovery-pipeline.js";
 
-export interface FailureResult {
+interface FailureResult {
   retryable: boolean;
   retryCount: number;
   maxRetries: number;

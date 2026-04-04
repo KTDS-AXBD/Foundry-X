@@ -3,7 +3,7 @@
  */
 import type { DiscoveryPipelineStatus, PipelineEventType } from "../schemas/discovery-pipeline.js";
 
-export interface TransitionResult {
+interface TransitionResult {
   fromStatus: DiscoveryPipelineStatus;
   toStatus: DiscoveryPipelineStatus;
   valid: boolean;
