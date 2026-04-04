@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ✅ sprint 스킬: start 서브커맨드에 session-start 자동 위임 안내 추가
 - ✅ PR #259 merged → CI/CD 전체 통과 → Issue #253 closed
 
+- ✅ PDCA iterate: assertion 보강 9건 (Match 88%→97%) — badge/tag/link/content 기능 검증 수준
+- ✅ Insight 반영: CLAUDE.md Testing 3줄 + rules/ PDCA Gap 패턴 + feedback 메모리 신규
+
 **검증 결과**:
 - ✅ E2E 179 tests (172 pass / 1 기존fail / 6 skip) / typecheck pass / CI/CD success
 
