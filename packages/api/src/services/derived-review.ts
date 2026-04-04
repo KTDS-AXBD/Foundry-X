@@ -9,6 +9,7 @@ import type {
 } from "@foundry-x/shared";
 import type { ReviewCandidateInput } from "../schemas/derived-engine.js";
 import { SafetyChecker } from "./safety-checker.js";
+import { SkillMdGeneratorService } from "./skill-md-generator.js";
 
 export class DerivedReviewService {
   constructor(private db: D1Database) {}
@@ -136,6 +137,28 @@ export class DerivedReviewService {
     await this.db
       .prepare("UPDATE derived_patterns SET status = 'consumed' WHERE id = ?")
       .bind(candidate.pattern_id)
+      .run();
+
+    // 6. F306: SKILL.md 자동 생성
+    const parsedTags: string[] = parseJson(candidate.source_skills, [])
+      .map((s: { skillId: string }) => s.skillId);
+    const mdGenerator = new SkillMdGeneratorService();
+    const skillMd = mdGenerator.generate({
+      skillId: newSkillId,
+      name: candidate.name,
+      description: candidate.description ?? "",
+      category: candidate.category,
+      tags: parsedTags,
+      sourceType: "derived",
+      promptTemplate: promptTemplate,
+      version: 1,
+    });
+
+    await this.db
+      .prepare(
+        "UPDATE skill_registry SET skill_md_content = ?, skill_md_generated_at = datetime('now') WHERE tenant_id = ? AND skill_id = ?"
+      )
+      .bind(skillMd, tenantId, newSkillId)
       .run();
   }
 
