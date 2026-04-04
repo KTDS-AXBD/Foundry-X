@@ -176,3 +176,48 @@ export function makeDiscoveryProgress(overrides?: Record<string, unknown>) {
     ...overrides,
   };
 }
+
+// ── Pipeline Run (discovery-pipeline/runs) — F314/F316 ──
+export function makePipelineRun(overrides?: Record<string, unknown>) {
+  return {
+    id: "run-1",
+    bizItemId: "biz-item-1",
+    orgId: "test-org-e2e",
+    status: "discovery_running",
+    currentStep: "2-3",
+    autoAdvanceEnabled: true,
+    startedAt: "2026-04-01T00:00:00Z",
+    completedAt: null,
+    steps: [
+      { stepId: "2-0", status: "completed", startedAt: "2026-04-01T00:00:00Z", completedAt: "2026-04-01T00:05:00Z" },
+      { stepId: "2-1", status: "completed", startedAt: "2026-04-01T00:05:00Z", completedAt: "2026-04-01T00:10:00Z" },
+      { stepId: "2-2", status: "completed", startedAt: "2026-04-01T00:10:00Z", completedAt: "2026-04-01T00:15:00Z" },
+      { stepId: "2-3", status: "in_progress", startedAt: "2026-04-01T00:15:00Z", completedAt: null },
+      { stepId: "2-4", status: "pending", startedAt: null, completedAt: null },
+    ],
+    createdAt: "2026-04-01T00:00:00Z",
+    ...overrides,
+  };
+}
+
+// ── Checkpoint (discovery-pipeline/runs/:id/checkpoints) — F314/F316 ──
+export function makeCheckpoint(overrides?: Record<string, unknown>) {
+  return {
+    id: "cp-1",
+    pipelineRunId: "run-1",
+    stepId: "2-5",
+    checkpointType: "commit_gate",
+    status: "pending",
+    questions: [
+      { question: "시장 규모가 충분한가?", required: true },
+      { question: "기술 실현 가능성은?", required: true },
+      { question: "경쟁 우위 요소는?", required: true },
+      { question: "투자 대비 ROI 예상은?", required: true },
+    ],
+    deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    decidedBy: null,
+    decidedAt: null,
+    createdAt: "2026-04-01T00:15:00Z",
+    ...overrides,
+  };
+}
