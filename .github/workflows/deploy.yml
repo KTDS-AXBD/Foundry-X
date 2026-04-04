@@ -109,7 +109,7 @@ jobs:
         working-directory: packages/web
         run: npx tinacms build
         env:
-          TINA_PUBLIC_CLIENT_ID: ${{ secrets.VITE_TINA_CLIENT_ID }}
+          VITE_TINA_CLIENT_ID: ${{ secrets.VITE_TINA_CLIENT_ID }}
           TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
       - run: pnpm --filter @foundry-x/web build
         env:
