@@ -5,6 +5,7 @@ import { FeedbackWidget } from "@/components/feature/FeedbackWidget";
 import { ProcessStageGuide } from "@/components/feature/ProcessStageGuide";
 import { NpsSurveyTrigger } from "@/components/feature/NpsSurveyTrigger";
 import { HelpAgentPanel } from "@/components/feature/HelpAgentPanel";
+import { MarkerWidget } from "@/components/MarkerWidget";
 import { useCallback, useState } from "react";
 
 export function AppLayout() {
@@ -25,6 +26,7 @@ export function AppLayout() {
       <FeedbackWidget surveyId={npsSurveyId} />
       <NpsSurveyTrigger onTrigger={handleNpsTrigger} />
       <HelpAgentPanel />
+      <MarkerWidget />
     </div>
   );
 }
