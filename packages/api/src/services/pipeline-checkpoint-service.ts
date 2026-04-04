@@ -135,14 +135,15 @@ export class PipelineCheckpointService {
     checkpointId: string,
     userId: string,
     decision: CheckpointDecision,
+    approverRole?: string,
   ): Promise<{ checkpoint: PipelineCheckpoint; resumed: boolean }> {
     await this.db
       .prepare(
         `UPDATE pipeline_checkpoints
-         SET status = 'approved', response = ?, decided_by = ?, decided_at = datetime('now'), updated_at = datetime('now')
+         SET status = 'approved', response = ?, decided_by = ?, decided_at = datetime('now'), approver_role = ?, updated_at = datetime('now')
          WHERE id = ? AND status = 'pending'`,
       )
-      .bind(JSON.stringify(decision), userId, checkpointId)
+      .bind(JSON.stringify(decision), userId, approverRole ?? null, checkpointId)
       .run();
 
     const row = await this.db

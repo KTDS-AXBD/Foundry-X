@@ -539,12 +539,66 @@ export class MockD1Database {
         response TEXT,
         decided_by TEXT,
         decided_at TEXT,
+        approver_role TEXT,
         deadline TEXT,
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
         updated_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
       CREATE INDEX IF NOT EXISTS idx_pc_run ON pipeline_checkpoints(pipeline_run_id, step_id);
       CREATE INDEX IF NOT EXISTS idx_pc_status ON pipeline_checkpoints(status);
+
+      -- 0092: pipeline monitoring (F315)
+      CREATE TABLE IF NOT EXISTS pipeline_permissions (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        pipeline_run_id TEXT NOT NULL,
+        user_id TEXT,
+        min_role TEXT NOT NULL DEFAULT 'member'
+          CHECK(min_role IN ('viewer', 'member', 'admin', 'owner')),
+        can_approve INTEGER NOT NULL DEFAULT 1,
+        can_abort INTEGER NOT NULL DEFAULT 0,
+        granted_by TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX IF NOT EXISTS idx_pp_run ON pipeline_permissions(pipeline_run_id);
+      CREATE INDEX IF NOT EXISTS idx_pp_user ON pipeline_permissions(user_id);
+
+      -- notifications stub for pipeline tests (F315)
+      CREATE TABLE IF NOT EXISTS notifications (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        org_id TEXT NOT NULL DEFAULT '',
+        recipient_id TEXT NOT NULL DEFAULT '',
+        type TEXT NOT NULL DEFAULT '',
+        biz_item_id TEXT,
+        title TEXT NOT NULL DEFAULT '',
+        body TEXT,
+        actor_id TEXT,
+        read_at TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+
+      -- tenant_members stub for pipeline tests (F315)
+      CREATE TABLE IF NOT EXISTS tenant_members (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        tenant_id TEXT NOT NULL DEFAULT '',
+        user_id TEXT NOT NULL DEFAULT '',
+        role TEXT NOT NULL DEFAULT 'member',
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+
+      -- biz_items stub for pipeline tests (F315)
+      CREATE TABLE IF NOT EXISTS biz_items (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        org_id TEXT,
+        title TEXT NOT NULL DEFAULT '',
+        description TEXT,
+        source TEXT NOT NULL DEFAULT 'field',
+        status TEXT NOT NULL DEFAULT 'draft',
+        type TEXT NOT NULL DEFAULT 'idea',
+        tenant_id TEXT,
+        created_by TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
 
       -- bd_skills stub for SkillPipelineRunner tests
       CREATE TABLE IF NOT EXISTS bd_skills (

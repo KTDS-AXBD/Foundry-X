@@ -12,7 +12,9 @@ function createTestApp(db: any) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     c.set("orgId" as any, "org_test");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    c.set("jwtPayload" as any, { sub: "test-user" });
+    c.set("orgRole" as any, "admin");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    c.set("jwtPayload" as any, { sub: "test-user", role: "admin" });
     await next();
   });
   app.route("/api", discoveryPipelineRoute);
