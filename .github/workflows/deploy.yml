@@ -105,6 +105,12 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @foundry-x/shared build
+      - name: TinaCMS build (admin UI)
+        working-directory: packages/web
+        run: npx tinacms build
+        env:
+          TINA_PUBLIC_CLIENT_ID: ${{ secrets.VITE_TINA_CLIENT_ID }}
+          TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
       - run: pnpm --filter @foundry-x/web build
         env:
           VITE_MARKER_PROJECT_ID: ${{ secrets.VITE_MARKER_PROJECT_ID }}
