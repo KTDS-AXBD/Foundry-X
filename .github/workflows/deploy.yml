@@ -106,6 +106,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @foundry-x/shared build
       - run: pnpm --filter @foundry-x/web build
+        env:
+          VITE_MARKER_PROJECT_ID: ${{ secrets.VITE_MARKER_PROJECT_ID }}
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
