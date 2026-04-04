@@ -24,25 +24,42 @@ import {
   TestTube,
   Timer,
 } from "lucide-react";
+import { parseFrontmatter, type HeroContent } from "@/lib/content-loader";
+import heroRaw from "../../content/landing/hero.md?raw";
 
 /* ═══════════════════════════════════════════════
-   DATA — PRD v8 기반
+   DATA — PRD v8 기반 (TinaCMS content with fallback)
    ═══════════════════════════════════════════════ */
 
-const SITE_META = {
+const SITE_META_FALLBACK = {
   sprint: "Sprint 71",
   phase: "Phase 5f 완료",
   phaseTitle: "AX BD 사업개발 체계 수립",
   tagline: "AX 사업개발 AI 오케스트레이션 플랫폼",
 } as const;
 
-const stats = [
+const STATS_FALLBACK = [
   { value: "304", label: "API Endpoints" },
   { value: "135", label: "Services" },
   { value: "2,032+", label: "Tests" },
   { value: "60", label: "D1 Migrations" },
   { value: "71", label: "Sprints" },
 ];
+
+// Build-time content from TinaCMS-managed Markdown
+const heroContent = parseFrontmatter<HeroContent>(heroRaw);
+
+const SITE_META = {
+  sprint: SITE_META_FALLBACK.sprint,
+  phase: heroContent.data.phase ?? SITE_META_FALLBACK.phase,
+  phaseTitle: heroContent.data.phaseTitle ?? SITE_META_FALLBACK.phaseTitle,
+  tagline: heroContent.data.tagline ?? SITE_META_FALLBACK.tagline,
+} as const;
+
+const stats =
+  heroContent.data.stats && heroContent.data.stats.length > 0
+    ? heroContent.data.stats
+    : STATS_FALLBACK;
 
 const pillars = [
   {
