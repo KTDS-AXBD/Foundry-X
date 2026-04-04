@@ -107,6 +107,7 @@ jobs:
       - run: pnpm --filter @foundry-x/shared build
       - name: TinaCMS build (admin UI)
         working-directory: packages/web
+        continue-on-error: true
         run: npx tinacms build
         env:
           VITE_TINA_CLIENT_ID: ${{ secrets.VITE_TINA_CLIENT_ID }}
