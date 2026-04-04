@@ -1,0 +1,305 @@
+{
+  "generated": "2026-04-04T07:52:05.925Z",
+  "totalItems": 49,
+  "byType": {
+    "flaw": 1,
+    "gap": 12,
+    "risk": 33
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "논리적 완결성\n\n**강점**\n- 현재 문제(수동 프로세스, E2E 부재, 프로세스 단절) → 목표(자동화, HITL 최소화, E2E 회귀 방지) → 성공기준(KPI, MVP 기준)으로 논리 흐름이 비교적 명확하게 이어집니다.\n- 실패/예외 플로우(재시도/건너뛰기/복구 등)와 상태 관리 목표도 구체적으로 언급되어 있습니다.\n\n**개선 포인트**\n- “파이프라",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**상세 UX 플로우/와이어프레임**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트/QA 전략**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영/배포/Hotfix 룰북**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**권한/접근 제어 상세 정책**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**장애/지연 대응 정책**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**외부 시스템 계약/테스트 환경**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**인력/운영 리소스 부족**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**외부 시스템 연동 복잡성**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**사용자 UX 불만 및 도구 미채택**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**데이터 무결성 및 복구 실패**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트 커버리지 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영 중 장애/알림 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "실행 가능성\n\n**강점**\n- 일정, 마일스톤, 기술스택, 필요 인력 및 리스크가 명확히 정의되어 있습니다.\n- 외부 연동/상태 머신/CLI-Web 통합 등 기술적 난점에 대한 인식이 상세합니다.\n\n**개선 포인트**\n- “AI+1명”으로 설계/개발/QA/운영/배포/교육까지 처리한다는 계획은 명백히 비현실적입니다. (별도 인력 3~4명 필요 명시가 있으나 ",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**상세 UX 플로우/와이어프레임**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트/QA 전략**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/배포/Hotfix 룰북**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**권한/접근 제어 상세 정책**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**장애/지연 대응 정책**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**외부 시스템 계약/테스트 환경**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**인력/운영 리소스 부족**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**외부 시스템 연동 복잡성**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**사용자 UX 불만 및 도구 미채택**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**데이터 무결성 및 복구 실패**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트 커버리지 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영 중 장애/알림 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실투입 인력(설계, 개발, QA, 운영) 3명 이상 확보 및 역할 분장 명확화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**HITL 및 실패/복구 플로우의 상세 UX 설계/와이어프레임/프로토타입 선행**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트/QA 전략 및 주요 시나리오(정상/예외/중단/복구/알림) 구체화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**외부 연동(특히 CLI ↔ Web, 장기 실행) 설계/PoC/Mock 환경 우선 구축**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/배포/알림/핫픽스/롤백 룰북 및 담당자 지정**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**권한/접근 제어 정책 상세화 및 DB/이력 설계 명확화**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**인력 확보 및 명확한 역할 정의:** \"최소 3~4명\"의 인력 배정 계획이 **실제 확정되고 투입되어야** 합니다. 이 인력들은 백엔드, 프론트엔드, DevOps/인프라, QA 등의 명확한 역할을 가지고 전담되어야 합니다. \"Claude Code Agent + 사용자 1명\"으로는 결코 달성할 수 없는 프로젝트입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**핵심 아키텍처 설계 완료:** \"오픈 이슈\" 섹션에 나열된 P0/P1 우선순위의 설계 단계 이슈들(CLI ↔ Web 통합 계층, 장기 실행 워크플로우 관리, 파이프라인 상태 저장 스키마, 실패 복구 전략 등)이 **개발 착수 전 선행 설계 단계에서 완료되어야** 합니다. 이는 단순한 기능 구현을 넘어선 시스템의 근간을 이루는 부분입니다. 필요하다면 1~",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**Cloudflare Workers 장기 실행 솔루션 검증:** 장기 실행 에이전트(O-G-D 루프)가 Cloudflare Workers 환경에서 안정적으로 동작할 수 있는 Queue/Batch Worker 아키텍처에 대한 **기술 검증(PoC) 및 구체적인 설계가 확정**되어야 합니다. 이는 전체 파이프라인의 안정성에 직결되는 핵심 요소입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**발굴→형상화 데이터 계약 확정:** 발굴 산출물을 형상화 입력으로 전달하기 위한 JSON Schema 기반의 **데이터 계약이 명확하게 정의**되어야 합니다. 이는 두 시스템 간의 인터페이스를 견고하게 만들고, 향후 유지보수 및 확장성을 보장합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**에지 케이스 처리**: 네트워크 일시적 장애, CLI 스킬의 비정상 종료(exit code ≠ 0), 외부 API rate limiting, 사용자 HITL 응답 지연/거부 등 수십 가지 에지 케이스에 대한 명확한 처리 로직이 설계에 포함되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**동시성 제어**: 동일한 아이템에 대해 사용자가 수동 개입(재시도/건너뛰기)을 시도하는 동안 파이프라인이 백그라운드에서 진행되는 상황에 대한 동시성 제어 메커니즘이 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**데이터 버전 관리 및 롤포워드**: \"완전한 롤백은 불가\"하지만, 실패 단계부터 재시작하기 위해서는 각 단계의 입력/출력 데이터를 버전 관리하고 저장해야 합니다. 이는 기존 DB 스키마에 큰 부담을 줄 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**장기 실행 워크플로우와 서버리스 환경의 불일치**: O-G-D 루프가 Cloudflare Workers 환경에서 안정적으로 실행될지 검증되지 않았습니다. 이는 P0 기능의 핵심 위험 요소입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**CLI 의존성으로 인한 취약성**: CLI 스킬 실행은 프로세스 생성, 권한, 환경 변수 등 플랫폼 의존성이 높아 배포와 운영을 복잡하게 만듭니다. Web API 기반으로의 점진적 마이그레이션이 장기적으로 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**E2E 테스트의 유지보수 비용**: Playwright를 이용한 15건 이상의 E2E 테스트는 UI 변경에 매우 취약합니다. 테스트 스위트의 유지보수에 상당한 리소스가 지속적으로 필요할 것입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**운영 인프라 및 모니터링 부재**: \"AI+1명\" 인력으로 설계, 개발, QA, 운영까지 담당하기에는 운영 복잡도가 너무 높습니다. 24/7 파이프라인 모니터링, 알림, 장애 대응 체계가 구축되지 않으면 프로덕션 신뢰도를 확보할 수 없습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**프로토타입 검증 완료**: P0 기능(형상화 자동 전환)의 엔드투엔드 흐름을 **Queue 기반 아키텍처로 프로토타입** 구현하여, 장기 실행(Phase C)이 실제 환경에서 동작 가능함을 검증해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**데이터 계약 및 상태 머신 상세 설계 확정**: 모든 단계의 입출력 데이터 형식(JSON Schema)과 상태 전이 다이어그램을 명시적으로 정의하고, 기존 스킬들과의 호환성을 검증해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**운영 및 모니터링 계획 수립**: 파이프라인 운영 담당자, 24/7 모니터링 체계(Cloudflare Alerts + Slack), 장애 대응 프로세스(Hotfix/롤백)가 문서화되고 리소스가 확보되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}

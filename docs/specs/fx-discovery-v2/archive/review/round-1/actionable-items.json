@@ -1,0 +1,419 @@
+{
+  "generated": "2026-04-04T07:45:22.252Z",
+  "totalItems": 68,
+  "byType": {
+    "flaw": 7,
+    "gap": 8,
+    "risk": 50
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**문제 → 해결책 → 성공기준** 흐름이 전반적으로 논리적으로 기술되어 있습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**실패/예외 플로우의 상세화**: 주요 자동화 흐름에서 실패 발생 시(예: 스킬 실행 오류, 네트워크 이슈, 데이터 불일치 등) 사용자의 선택지는 무엇이며, 자동화 플로우가 어디서 어떻게 멈추고 재개되는지 구체적으로 적시 필요.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**HITL 체크포인트의 사용자 경험**: 어떤 정보가 사용자에게 제공되어야 하고, 승인이 지연/거부/실수로 이루어질 경우의 예외 처리 정책(예: 자동 타임아웃, 알림 등)이 명확히 정의되어야 함.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**성공 기준의 검증 방법 구체화**: E2E 데모의 \"시연 가능\"이 구체적으로 무엇을 의미하는지(실제 업무 시나리오, 데이터셋, 데모 환경 등) 명확히 해야 함.",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**롤백/재시도/예외 관리 상세 정책**: 자동화된 파이프라인에서 실패 발생 시, 어떤 조건에서 자동 재시도/수동 개입/건너뛰기/전체 취소 등의 정책과 UX가 구체적으로 명시되어야 합니다. (오픈 이슈에 일부 언급만 있음)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**알림 및 모니터링**: 파이프라인 진행 상황, 실패/에러, HITL 대기 등 이벤트에 대해 실시간 알림(Slack/이메일 등) 및 상태 모니터링이 필요하나, 설계에 누락됨.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**권한/접근 제어**: HITL 승인, 파이프라인 실행/중단 등 주요 액션에 최소한의 권한 관리(실수 방지)가 필요함. 현재는 실제 사용자 구분/권한 정책 언급이 없음.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**데이터 백업 및 복구 시나리오**: 자동화 오류로 데이터 손실/누락 우려가 있으므로, 산출물 백업/복구 방안이 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영/배포 계획**: 배포 후 운영/모니터링/Hotfix/롤백 등 운영계획 및 책임자 지정이 빠짐.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**문제 → 해결책 → 성공기준** 흐름이 전반적으로 논리적으로 기술되어 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실패/예외 플로우의 상세화**: 주요 자동화 흐름에서 실패 발생 시(예: 스킬 실행 오류, 네트워크 이슈, 데이터 불일치 등) 사용자의 선택지는 무엇이며, 자동화 플로우가 어디서 어떻게 멈추고 재개되는지 구체적으로 적시 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**HITL 체크포인트의 사용자 경험**: 어떤 정보가 사용자에게 제공되어야 하고, 승인이 지연/거부/실수로 이루어질 경우의 예외 처리 정책(예: 자동 타임아웃, 알림 등)이 명확히 정의되어야 함.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**성공 기준의 검증 방법 구체화**: E2E 데모의 \"시연 가능\"이 구체적으로 무엇을 의미하는지(실제 업무 시나리오, 데이터셋, 데모 환경 등) 명확히 해야 함.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**범위**: 7명 소규모 팀, 정해진 스킬/에이전트 활용, 신규 기능보다는 자동화 및 연결성 강화에 집중되어 있어 범위는 적절하게 보입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**일정**: 5 Sprint(2.5~3개월 예상) 내 완료 목표. 기존 코드/인프라 활용 전제이나, 아래 부분이 과소평가된 경향이 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**E2E 테스트**: 기존에 거의 없는 상태에서 15건 이상 신규 구축은 Playwright 등 도구에 익숙하지 않은 팀원일 경우 러닝 커브가 큼. (테스트 데이터/Mock 환경 구축 시간 포함 필요)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실패 복구/상태 관리**: 파이프라인 자동화는 중간 실패/중단/재시도/롤백 등 상태 머신 설계가 핵심인데, 이 부분이 실제 구현에서는 상당히 복잡해질 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Web UI 연동**: CLI 스킬 결과를 Web에서 어떤 UX로 시각화할지, 프론트엔드/백엔드간 데이터 교환 구조 설계에 추가 시간이 소요될 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**인력**: \"Claude Code Agent + 사용자 1명\"으로 되어 있는데, 실질적 개발/테스트/QA/릴리즈/사용자 교육까지 포함하면 리소스 부족 우려가 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**E2E 테스트 구현 난이도**: 신규 테스트 설계/구현, CI/CD 통합, Mock 데이터 생성 등에 충분한 버퍼 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**상태 전이/복구 흐름 설계**: 파이프라인 상태 변경, 실패시 롤백/재시도/이력 트래킹 등 설계 및 코드 작업량 과소평가.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 사용자 UAT(인수테스트) 및 피드백 루프 반영 시간**: HITL 구간은 실제 사용자와의 인터뷰/테스트 반복이 필수인데, 이에 대한 추가 일정 고려 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**인력**: 최소 설계, 개발, QA, 운영 1명씩은 필요. 현재 인력 배정이 지나치게 미흡.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**롤백/재시도/예외 관리 상세 정책**: 자동화된 파이프라인에서 실패 발생 시, 어떤 조건에서 자동 재시도/수동 개입/건너뛰기/전체 취소 등의 정책과 UX가 구체적으로 명시되어야 합니다. (오픈 이슈에 일부 언급만 있음)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**알림 및 모니터링**: 파이프라인 진행 상황, 실패/에러, HITL 대기 등 이벤트에 대해 실시간 알림(Slack/이메일 등) 및 상태 모니터링이 필요하나, 설계에 누락됨.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**권한/접근 제어**: HITL 승인, 파이프라인 실행/중단 등 주요 액션에 최소한의 권한 관리(실수 방지)가 필요함. 현재는 실제 사용자 구분/권한 정책 언급이 없음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**데이터 백업 및 복구 시나리오**: 자동화 오류로 데이터 손실/누락 우려가 있으므로, 산출물 백업/복구 방안이 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/배포 계획**: 배포 후 운영/모니터링/Hotfix/롤백 등 운영계획 및 책임자 지정이 빠짐.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**파이프라인 자동화의 복잡성**: 여러 단계가 연속·자동화되며, 중간에 실패/오류가 발생하면 전체 데이터 흐름이 꼬일 수 있음. 상태 동기화 실패, 중복 실행, 데이터 손실 등이 현실적 리스크.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**HITL(사람 개입) 구간의 병목**: 승인 대기 중 파이프라인이 장시간 멈추거나, 사용자가 실수/지연/오류 승인할 경우 전체 자동화 신뢰성이 저하될 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트 커버리지 미흡 및 CI/CD 미정립**: 신규 자동화 기능들이 실제 운영 환경에서 예기치 못한 버그를 유발할 수 있는데, E2E 테스트 체계가 미흡하면 회귀 방지 불가.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**인력/리소스 부족**: 실제 개발/QA/운영에 투입 가능한 인력이 부족하면, 일정 지연 및 품질 저하 가능성 큼.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**CLI 스킬과 Web UI의 통합 난이도**: CLI 기반 스킬의 출력/입력 구조가 Web 환경과 맞지 않거나, 예기치 못한 변환 오류 발생 가능.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 사용자의 도구 채택률 저하**: 자동화 신뢰도가 낮거나, 사용자 경험이 복잡하면 팀 내 도입이 실패할 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실패/예외 처리 정책 및 상태 모델링 상세화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**HITL 승인 구간의 정책/UX 상세 설계**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**E2E 테스트 및 파이프라인 모니터링/알림 설계 포함**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**인력/역할 분담 명확화**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "사실 확인\n\nPRD에 포함된 가정이나 수치 중 검증이 필요한 부분은 다음과 같습니다.\n\n*   **\"Claude Code Agent + 사용자 1명\"의 개발 효율성:**\n    *   '인력/예산' 섹션에서 \"투입: Claude Code Agent + 사용자 1명 (HITL 검토)\"으로 명시되어 있습니다. AI 코드 에이전트의 발전은 놀랍지만, 복잡한 E2",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "사용자 관점\n\n목표 사용자인 AX BD팀 담당자들이 이 솔루션을 받아들일 가능성이 매우 높습니다.\n\n**도입 장벽이 낮을 것으로 예상되는 이유:**\n\n*   **명확한 고통 해소:** '수십 회 수동 클릭'과 '파이프라인 단절'이라는 현재의 가장 큰 불만을 직접적으로 해소해줍니다. 이는 사용자들이 솔루션 도입에 긍정적으로 반응할 강력한 동기 부여가 됩니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**\"Claude Code Agent + 사용자 1명\"의 개발 역량 및 일정 현실성:** 5 Sprint라는 짧은 기간 내에 복잡한 E2E 파이프라인(CLI 스킬 연동, Web UI 렌더링, DB 스키마 설계, 에러 복구 등)을 Claude Code Agent와 사용자 1명의 조합으로 완성하는 것은 매우 도전적이며, 현실적인 검증이 필요합니다. AI 코드 ",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**AI 에이전트 출력물의 품질 및 신뢰성 확보 방안:** 파이프라인의 자동화 자체는 중요하지만, 그 결과물인 '발굴 산출물'과 '형상화 산출물'의 품질이 낮다면 사용자 채택률은 물론 비즈니스 가치 창출에도 실패할 수 있습니다. HITL 체크포인트 외에, AI 에이전트의 산출물 품질을 어떻게 측정하고, 어떤 메커니즘으로 지속적으로 개선해 나갈 것인지에 대한",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**이벤트 기반 아키텍처의 부재**: \"수동 클릭 → 자동 파이프라인\"으로의 전환은 본질적으로 이벤트 기반 아키텍처를 요구합니다. 현재 PRD는 단순한 순차 실행으로 접근하고 있으나, HITL 체크포인트, 실패 복구, 상태 추적을 고려하면 **상태 머신(State Machine) 기반의 파이프라인 오케스트레이션 레이어**가 필수적입니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**모놀리식 파이프라인 설계**: 발굴(2-0~2-10)과 형상화(Phase A~F)를 하나의 긴 선형 파이프라인으로 묶는 것은 유연성을 떨어뜨립니다. 단계별 독립성, 재시작, 병렬 실행 가능성을 고려해 **모듈형 서비스/워크플로우 단위로 분리**하는 설계가 더 적합합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**데이터 흐름의 불명확성**: \"발굴 산출물을 형상화 입력으로 전달\"한다고 명시했지만, 데이터 형식, 저장 위치(메모리/DB/파일), 변환 로직에 대한 정의가 전혀 없습니다. 이는 가장 큰 아키텍처 결함 중 하나입니다.",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**CLI ↔ Web 통합의 복잡성**: 기존 CLI 스킬(ax-bd-shaping/discovery)을 Web 파이프라인에 통합하는 방식이 명확하지 않습니다. CLI 출력을 실시간으로 Web UI에 스트리밍하고 상태를 추적하려면 상당한 중간 계층(WebSocket, 로그 파서, 상태 매퍼)이 필요합니다. 현재 PRD에는 이에 대한 설계가 누락되어 있습니다",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**에이전트 루프의 장기 실행 문제**: Phase C(O-G-D 루프)는 장시간 실행될 수 있는 에이전트 프로세스입니다. Cloudflare Workers의 30초/10분(Unbound) 타임아웃 제한과 충돌할 위험이 큽니다. 백엔드 아키텍처 재고가 필요할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**다중 외부 시스템 연동**: BdSkillExecutor API, CLI subprocess, D1 DB, O-G-D Agent Loop를 동시에 조율해야 합니다. 부분 실패 시 트랜잭션 보장과 데이터 일관성 유지가 매우 어려울 것입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**CLI ↔ Web 통합의 복잡성**: 기존 CLI 스킬(ax-bd-shaping/discovery)을 Web 파이프라인에 통합하는 방식이 명확하지 않습니다. CLI 출력을 실시간으로 Web UI에 스트리밍하고 상태를 추적하려면 상당한 중간 계층(WebSocket, 로그 파서, 상태 매퍼)이 필요합니다. 현재 PRD에는 이에 대한 설계가 누락되어 있습니다",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**에이전트 루프의 장기 실행 문제**: Phase C(O-G-D 루프)는 장시간 실행될 수 있는 에이전트 프로세스입니다. Cloudflare Workers의 30초/10분(Unbound) 타임아웃 제한과 충돌할 위험이 큽니다. 백엔드 아키텍처 재고가 필요할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**다중 외부 시스템 연동**: BdSkillExecutor API, CLI subprocess, D1 DB, O-G-D Agent Loop를 동시에 조율해야 합니다. 부분 실패 시 트랜잭션 보장과 데이터 일관성 유지가 매우 어려울 것입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**이벤트 기반 아키텍처의 부재**: \"수동 클릭 → 자동 파이프라인\"으로의 전환은 본질적으로 이벤트 기반 아키텍처를 요구합니다. 현재 PRD는 단순한 순차 실행으로 접근하고 있으나, HITL 체크포인트, 실패 복구, 상태 추적을 고려하면 **상태 머신(State Machine) 기반의 파이프라인 오케스트레이션 레이어**가 필수적입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**모놀리식 파이프라인 설계**: 발굴(2-0~2-10)과 형상화(Phase A~F)를 하나의 긴 선형 파이프라인으로 묶는 것은 유연성을 떨어뜨립니다. 단계별 독립성, 재시작, 병렬 실행 가능성을 고려해 **모듈형 서비스/워크플로우 단위로 분리**하는 설계가 더 적합합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**데이터 흐름의 불명확성**: \"발굴 산출물을 형상화 입력으로 전달\"한다고 명시했지만, 데이터 형식, 저장 위치(메모리/DB/파일), 변환 로직에 대한 정의가 전혀 없습니다. 이는 가장 큰 아키텍처 결함 중 하나입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**부분 실패와 회복(Recovery)**: 20개 이상의 단계를 가진 파이프라인에서 중간 단계(특히 외부 API/CLI 호출)가 실패할 경우, 전체 파이프라인을 재시작할지, 해당 단계부터 재시도할지, 수동 개입을 요청할지에 대한 정책이 미비합니다. **롤백(rollback) 메커니즘은 거의 불가능**에 가깝습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**동시성 및 상태 경쟁 조건**: 동일한 아이템에 대해 사용자가 HITL 응답을 기다리는 동안 다른 작업이 발생하거나, 파이프라인 상태를 업데이트하는 다중 요청이 들어올 경우, 상태 불일치가 발생하기 쉽습니다. 낙관적 락(optimistic lock)이나 상태 버전 관리가 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**장기 실행 상태 관리**: 파이프라인이 시간 단위로 실행될 경우, Cloudflare Worker 인스턴스가 중간에 재시작되거나 연결이 끊길 수 있습니다. **지속성 있는 상태 저장과 하이드레이션(hydration) 메커니즘**이 필수적이지만 설계되지 않았습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**에러 처리 및 디버깅**: 다양한 소스(CLI stderr, API error response, DB constraint error)의 에러를 통일된 형식으로 사용자에게 표시하고, 디버깅을 위한 충분한 컨텍스트를 제공하는 것은 예상보다 훨씬 복잡합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**데이터 파이프라인 무결성 손상 (High Risk)**: 발굴 단계의 출력을 형상화 단계가 올바르게 소비하지 못하거나, 중간 데이터가 유실될 경우 전체 BD 프로세스의 신뢰성이 붕괴됩니다. 이는 \"실패 조건\"에 명시된 것보다 훨씬 발생 가능성이 높습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**장기 실행 워크플로우와 Serverless 환경의 불일치 (High Risk)**: Cloudflare Workers의 실행 모델은 단기 요청에 최적화되어 있습니다. 수 분에서 수 시간 걸리는 파이프라인을 관리하려면 **전용 큐(Queue) 서비스(예: Cloudflare Queues)와 배치 처리(Batch Processing) 아키텍처**로의 전환이",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**기존 CLI 스킬과의 통합 복잡도 (Medium-High Risk)**: CLI 스킬들은 독립 실행을 가정하고 설계되었을 가능성이 높습니다. 입력/출력 인터페이스, 환경 변수, 의존성, 에러 코드 등을 표준화하지 않고 통합하면, 각 스킬별로 어댑터(adapter)를 만들어야 하는 **유지보수 악몽**이 시작될 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**아키텍처 설계 보강**: 이벤트 기반 상태 머신 오케스트레이션 레이어의 상세 설계와, 장기 실행 작업을 처리하기 위한 아키텍처(Queue + Worker 배치) 선택이 명시되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**데이터 계약(Data Contract) 정의**: 발굴 단계와 형상화 단계 간에 전달되는 데이터의 정확한 스키마(JSON Schema 등), 저장소, 생명주기가 문서화되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**실패 처리 및 회복 전략 명세**: \"오픈 이슈 #3\"을 넘어서, 각 실패 유형(네트워크 타임아웃, 스킬 실패, 데이터 오류)에 대한 시스템의 표준 응답(재시도 정책, 알림, 수복 절차)이 정의되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**프로토타입 검증 계획**: 가장 리스크가 높은 \"형상화 자동 전환(P0)\"에 대해, 엔드투엔드 데이터 흐름만을 검증하는 소규모 프로토타입(스케치 코드 포함)을 M1 이전에 수행할 계획이 수립되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}
