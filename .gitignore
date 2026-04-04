@@ -52,3 +52,7 @@ docs/specs/**/*.html
 
 # TinaCMS generated
 packages/web/tina/__generated__
+packages/web/public/admin/
+
+# Playwright test results
+packages/web/test-results/
