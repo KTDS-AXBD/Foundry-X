@@ -108,6 +108,7 @@ jobs:
       - run: pnpm --filter @foundry-x/web build
         env:
           VITE_MARKER_PROJECT_ID: ${{ secrets.VITE_MARKER_PROJECT_ID }}
+          VITE_TINA_CLIENT_ID: ${{ secrets.VITE_TINA_CLIENT_ID }}
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
