@@ -61,6 +61,24 @@ const LOCAL_PATTERNS: LocalPattern[] = [
       return `**사업성 체크포인트 (2-1 ~ 2-7)**\n\n각 단계 완료 시 Go/Pivot/Drop 결정을 내려요.\n\n특히 **2-5 Commit Gate**에서는 4대 질문으로 최종 투자 결정을 해요:\n1. 이 문제가 충분히 크고 급한가?\n2. 우리가 풀 수 있는 역량이 있는가?\n3. 시장 타이밍이 맞는가?\n4. 수익 모델이 지속 가능한가?`;
     },
   },
+  {
+    regex: /marker\.?io|피드백.*도구|비주얼.*피드백|visual.*feedback|화면.*피드백/i,
+    handler: () => {
+      return `**Marker.io 비주얼 피드백 사용법**\n\n1. 로그인 후 대시보드에서 우측 하단 **말풍선 버튼** 클릭\n2. 화면에서 문제 위치를 **클릭** → 자동 스크린샷\n3. 어노테이션 추가(화살표, 사각형) + 피드백 입력\n4. **Submit** → GitHub Issue 자동 생성 (\`visual-feedback\` 라벨)\n\n계정 불필요! Guest로 바로 사용 가능해요.\n\n📖 상세 가이드: 사이드바 → **도구 가이드** 메뉴`;
+    },
+  },
+  {
+    regex: /tina|tinacms|콘텐츠.*편집|콘텐츠.*수정|텍스트.*수정|인라인.*에디팅|\/admin/i,
+    handler: () => {
+      return `**TinaCMS 콘텐츠 편집 사용법**\n\n1. **fx.minu.best/admin** 접속\n2. **Authenticate With GitHub** 클릭 → 로그인\n3. 좌측에서 **Landing Pages** 또는 **Wiki Pages** 선택\n4. 텍스트 수정 → **Save** 클릭\n5. 자동으로 GitHub PR이 생성돼요 (개발자 리뷰 후 반영)\n\n⚠️ 편집 권한이 필요해요 — 관리자에게 TinaCloud 등록 요청\n\n📖 상세 가이드: 사이드바 → **도구 가이드** 메뉴`;
+    },
+  },
+  {
+    regex: /도구.*가이드|도구.*사용법|tools.*guide/i,
+    handler: () => {
+      return `**팀 협업 도구 가이드**\n\n현재 2가지 도구를 사용할 수 있어요:\n\n1. **Marker.io** — 화면에 직접 피드백 핀 → GitHub Issue 자동 생성\n2. **TinaCMS** — 브라우저에서 콘텐츠 직접 수정 → GitHub PR 자동 생성\n\n📖 상세 가이드: 사이드바 → **도구 가이드** 메뉴\n\n각 도구에 대해 더 자세히 알고 싶으면 "Marker.io 사용법" 또는 "TinaCMS 사용법"이라고 물어보세요!`;
+    },
+  },
 ];
 
 function parseStageNum(stage?: string): number {
@@ -148,13 +166,18 @@ export class HelpAgentService {
     const stageInfo = STAGE_INFO[stageKey];
     const stageName = stageInfo ? stageInfo.name : "알 수 없음";
 
-    return `당신은 Foundry-X Help Agent입니다. AX 사업개발 프로세스를 안내하는 AI 비서예요.
+    return `당신은 Foundry-X Help Agent입니다. AX 사업개발 프로세스와 팀 협업 도구를 안내하는 AI 비서예요.
 
 현재 사용자 상태:
 - 사업 아이템 ID: ${params.bizItemId || "미선택"}
 - 현재 단계: ${stageKey} (${stageName})
 
-AX BD 프로세스 2단계 발굴의 맥락에서 답변하세요.
+팀 협업 도구:
+- Marker.io: 화면에 직접 피드백 핀 → GitHub Issue 자동 생성. 대시보드 우측 하단 말풍선 버튼. 계정 불필요.
+- TinaCMS: fx.minu.best/admin에서 콘텐츠 직접 편집 → GitHub PR 자동 생성. GitHub 로그인 필요.
+- 도구 가이드: 사이드바 "도구 가이드" 메뉴에서 상세 안내 확인 가능.
+
+AX BD 프로세스 2단계 발굴 및 팀 도구 관련 질문에 답변하세요.
 - 한국어로 답변하세요 (영어 질문에도 한국어로)
 - 간결하고 실용적으로 답변하세요
 - 프로세스와 관련 없는 질문에는 정중하게 범위 밖임을 안내하세요`;

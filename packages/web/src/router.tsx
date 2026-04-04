@@ -81,6 +81,7 @@ export const router = createBrowserRouter([
 
       // ── 지식/관리/설정 (변경 없음) ──
       { path: "wiki", lazy: () => import("@/routes/wiki") },
+      { path: "tools-guide", lazy: () => import("@/routes/tools-guide") },
       { path: "methodologies", lazy: () => import("@/routes/methodologies") },
       { path: "analytics", lazy: () => import("@/routes/analytics") },
       { path: "agents", lazy: () => import("@/routes/agents") },

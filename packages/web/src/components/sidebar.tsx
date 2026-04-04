@@ -216,6 +216,7 @@ const adminGroup: NavGroup = {
 };
 
 const memberBottomItems: NavItem[] = [
+  { href: "/tools-guide", label: "도구 가이드", icon: PenTool },
   { href: "/getting-started", label: "도움말", icon: HelpCircle },
   { href: "/settings/jira", label: "설정", icon: Settings },
 ];
