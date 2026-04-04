@@ -19,6 +19,8 @@ import {
 } from "../schemas/discovery-pipeline.js";
 import { SkillPipelineRunner } from "../services/skill-pipeline-runner.js";
 import { PipelineCheckpointService } from "../services/pipeline-checkpoint-service.js";
+import { PipelineNotificationService } from "../services/pipeline-notification-service.js";
+import { PipelinePermissionService } from "../services/pipeline-permission-service.js";
 
 export const discoveryPipelineRoute = new Hono<{
   Bindings: Env;
@@ -107,6 +109,7 @@ discoveryPipelineRoute.post("/discovery-pipeline/runs/:id/step-failed", async (c
   }
 
   const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? "";
+  const orgId = c.get("orgId");
   const svc = new DiscoveryPipelineService(c.env.DB);
   const result = await svc.reportStepFailed(
     c.req.param("id"),
@@ -115,6 +118,11 @@ discoveryPipelineRoute.post("/discovery-pipeline/runs/:id/step-failed", async (c
     parsed.data.errorMessage,
     userId,
   );
+
+  // F315: 실패 알림 발행
+  const notifSvc = new PipelineNotificationService(c.env.DB);
+  await notifSvc.notifyStepFailed(c.req.param("id"), parsed.data.stepId, parsed.data.errorMessage, orgId).catch(() => {});
+
   return c.json(result);
 });
 
@@ -127,8 +135,28 @@ discoveryPipelineRoute.post("/discovery-pipeline/runs/:id/action", async (c) => 
   }
 
   const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? "";
+  const userRole = ((c.get("jwtPayload") as Record<string, string> | undefined)?.role ?? c.get("orgRole") ?? "viewer") as string;
+  const orgId = c.get("orgId");
+  const runId = c.req.param("id");
+
+  // F315: abort 시 권한 검증
+  if (parsed.data.action === "abort") {
+    const permSvc = new PipelinePermissionService(c.env.DB);
+    const canAbort = await permSvc.canAbort(runId, userId, userRole);
+    if (!canAbort) {
+      return c.json({ error: "Insufficient permissions to abort pipeline" }, 403);
+    }
+  }
+
   const svc = new DiscoveryPipelineService(c.env.DB);
-  const result = await svc.handleAction(c.req.param("id"), parsed.data, userId);
+  const result = await svc.handleAction(runId, parsed.data, userId);
+
+  // F315: abort 시 알림 발행
+  if (parsed.data.action === "abort") {
+    const notifSvc = new PipelineNotificationService(c.env.DB);
+    await notifSvc.notifyAborted(runId, orgId).catch(() => {});
+  }
+
   return c.json(result);
 });
 
@@ -216,7 +244,7 @@ discoveryPipelineRoute.get("/discovery-pipeline/runs/:id/checkpoints", async (c)
   return c.json({ checkpoints });
 });
 
-// 13) POST /discovery-pipeline/runs/:id/checkpoints/:cpId/approve — 체크포인트 승인
+// 13) POST /discovery-pipeline/runs/:id/checkpoints/:cpId/approve — 체크포인트 승인 (F315: 권한 검증)
 discoveryPipelineRoute.post("/discovery-pipeline/runs/:id/checkpoints/:cpId/approve", async (c) => {
   const body = await c.req.json();
   const parsed = checkpointDecisionSchema.safeParse(body);
@@ -225,17 +253,37 @@ discoveryPipelineRoute.post("/discovery-pipeline/runs/:id/checkpoints/:cpId/appr
   }
 
   const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? "";
+  const userRole = ((c.get("jwtPayload") as Record<string, string> | undefined)?.role ?? c.get("orgRole") ?? "viewer") as string;
+  const runId = c.req.param("id");
+
+  // F315: 승인 권한 검증
+  const permSvc = new PipelinePermissionService(c.env.DB);
+  const allowed = await permSvc.canApprove(runId, userId, userRole);
+  if (!allowed) {
+    return c.json({ error: "Insufficient permissions to approve checkpoint" }, 403);
+  }
+
   const cpService = new PipelineCheckpointService(c.env.DB);
-  const result = await cpService.approve(c.req.param("cpId"), userId, parsed.data);
+  const result = await cpService.approve(c.req.param("cpId"), userId, parsed.data, userRole);
   return c.json(result);
 });
 
-// 14) POST /discovery-pipeline/runs/:id/checkpoints/:cpId/reject — 체크포인트 거부
+// 14) POST /discovery-pipeline/runs/:id/checkpoints/:cpId/reject — 체크포인트 거부 (F315: 권한 검증)
 discoveryPipelineRoute.post("/discovery-pipeline/runs/:id/checkpoints/:cpId/reject", async (c) => {
   const body = await c.req.json().catch(() => ({}));
   const reason = typeof body.reason === "string" ? body.reason : undefined;
 
   const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? "";
+  const userRole = ((c.get("jwtPayload") as Record<string, string> | undefined)?.role ?? c.get("orgRole") ?? "viewer") as string;
+  const runId = c.req.param("id");
+
+  // F315: 승인 권한 검증 (거부도 동일 권한)
+  const permSvc = new PipelinePermissionService(c.env.DB);
+  const allowed = await permSvc.canApprove(runId, userId, userRole);
+  if (!allowed) {
+    return c.json({ error: "Insufficient permissions to reject checkpoint" }, 403);
+  }
+
   const cpService = new PipelineCheckpointService(c.env.DB);
   const checkpoint = await cpService.reject(c.req.param("cpId"), userId, reason);
   return c.json(checkpoint);

@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const NOTIFICATION_TYPES = [
   "stage_change", "review_request", "decision_made", "share_created", "comment_added",
+  "pipeline_checkpoint_pending", "pipeline_step_failed", "pipeline_completed", "pipeline_aborted",
 ] as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
