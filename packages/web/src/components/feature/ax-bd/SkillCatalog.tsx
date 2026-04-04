@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,7 @@ function getSkillTags(item: SkillItem): string[] {
 }
 
 export default function SkillCatalog() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedApiCategory, setSelectedApiCategory] = useState<ApiCategory | null>(null);
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
@@ -274,7 +276,13 @@ export default function SkillCatalog() {
             <SkillCard
               key={getSkillId(item)}
               item={item}
-              onClick={() => setSelectedItem(item)}
+              onClick={() => {
+                if (item.source === "api") {
+                  navigate(`/ax-bd/skill-catalog/${item.entry.skillId}`);
+                } else {
+                  setSelectedItem(item);
+                }
+              }}
             />
           ))}
         </div>

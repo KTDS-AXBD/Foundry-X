@@ -1,7 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, fireEvent, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import SkillCatalog from "../components/feature/ax-bd/SkillCatalog";
 import { BD_SKILLS } from "../data/bd-skills";
+
+function Wrapper({ children }: { children: React.ReactNode }) {
+  return <MemoryRouter>{children}</MemoryRouter>;
+}
 
 // Mock api-client
 vi.mock("@/lib/api-client", () => ({
@@ -33,25 +38,25 @@ vi.mock("@/hooks/useSkillRegistry", () => ({
 
 describe("SkillCatalog (fallback mode)", () => {
   it("renders header with total count from static data", () => {
-    const { getByText } = render(<SkillCatalog />);
+    const { getByText } = render(<SkillCatalog />, { wrapper: Wrapper });
     expect(getByText("BD 스킬 카탈로그")).toBeDefined();
     expect(getByText(new RegExp(`${BD_SKILLS.length}개 스킬`))).toBeDefined();
   });
 
   it("renders search input", () => {
-    const { getByPlaceholderText } = render(<SkillCatalog />);
+    const { getByPlaceholderText } = render(<SkillCatalog />, { wrapper: Wrapper });
     expect(getByPlaceholderText(/스킬 검색/)).toBeDefined();
   });
 
   it("renders category filter badges", () => {
-    const { getAllByText } = render(<SkillCatalog />);
+    const { getAllByText } = render(<SkillCatalog />, { wrapper: Wrapper });
     expect(getAllByText(/PM Skills/).length).toBeGreaterThanOrEqual(1);
     expect(getAllByText(/AI Biz/).length).toBeGreaterThanOrEqual(1);
     expect(getAllByText(/경영전략/).length).toBeGreaterThanOrEqual(1);
   });
 
   it("filters by search query (local fallback)", () => {
-    const { getByPlaceholderText, getByText } = render(<SkillCatalog />);
+    const { getByPlaceholderText, getByText } = render(<SkillCatalog />, { wrapper: Wrapper });
     const input = getByPlaceholderText(/스킬 검색/);
     fireEvent.change(input, { target: { value: "생태계" } });
     expect(getByText("AI 생태계 맵핑")).toBeDefined();
@@ -59,7 +64,7 @@ describe("SkillCatalog (fallback mode)", () => {
   });
 
   it("renders skill cards", () => {
-    const { getByText } = render(<SkillCatalog />);
+    const { getByText } = render(<SkillCatalog />, { wrapper: Wrapper });
     expect(getByText("AI 생태계 맵핑")).toBeDefined();
     expect(getByText("AI 경쟁 해자 분석")).toBeDefined();
   });
@@ -136,7 +141,7 @@ describe("SkillCatalog (API mode)", () => {
       refetch: vi.fn(),
     });
 
-    const { getByText } = render(<SkillCatalog />);
+    const { getByText } = render(<SkillCatalog />, { wrapper: Wrapper });
     await waitFor(() => {
       expect(getByText("AI 생태계 맵핑")).toBeDefined();
       expect(getByText("AI 경쟁 해자 분석")).toBeDefined();
@@ -154,7 +159,7 @@ describe("SkillCatalog (API mode)", () => {
       refetch: vi.fn(),
     });
 
-    const { getByText } = render(<SkillCatalog />);
+    const { getByText } = render(<SkillCatalog />, { wrapper: Wrapper });
     expect(getByText(/로딩 중/)).toBeDefined();
   });
 });
