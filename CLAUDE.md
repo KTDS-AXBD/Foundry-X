@@ -147,6 +147,9 @@ pnpm e2e                          # Playwright E2E
 - **Mock 전략:** Ink 컴포넌트는 실제 렌더링, 외부 서비스만 mock
 - **API 테스트:** Hono `app.request()` 직접 호출 방식, D1 mock은 in-memory SQLite
 - **E2E 테스트:** Playwright (`packages/web/e2e/`), `pnpm e2e`로 실행
+- **E2E Mock Factory:** `packages/web/e2e/fixtures/mock-factory.ts` — make*() + spread override 패턴 (CLI test-data.ts와 동일)
+- **E2E Assertion 수준:** title 존재만 확인하는 smoke test가 아니라, badge/tag/link/content 등 세부 요소까지 검증하는 **기능 검증** 수준을 목표로 한다 (Sprint 124 교훈: smoke→functional로 올리면 UI 리팩토링 시 회귀 감지 능력 대폭 향상)
+- **E2E Skip 사유 추적:** 코드로 해결 불가한 skip(UI 미완 등)은 Design 문서에 사유를 기록하여 "왜 skip인가?" 추적 가능하게 한다
 - **ESLint 커스텀 룰 3종** (packages/api): `no-direct-db-in-route`, `require-zod-schema`, `no-orphan-plumb-import`
 
 ## Current Phase
