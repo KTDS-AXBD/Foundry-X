@@ -97,7 +97,8 @@ test.describe("BD 스킬 카탈로그", () => {
 
   test("카테고리 필터 '전체' 배지 표시", async ({ authenticatedPage: page }) => {
     await page.goto("/ax-bd/skill-catalog");
-    await expect(page.getByText("전체", { exact: false })).toBeVisible();
+    // "전체 (N)" 형태의 카테고리 필터 배지 — API/fallback 모두 표시
+    await expect(page.getByText(/전체\s*\(\d+\)/)).toBeVisible({ timeout: 10000 });
   });
 
   test("API 스킬 카드 2개 표시", async ({ authenticatedPage: page }) => {

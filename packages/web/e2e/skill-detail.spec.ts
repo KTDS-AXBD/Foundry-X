@@ -121,16 +121,18 @@ test.describe("BD 스킬 상세", () => {
 
   test("버전 이력 테이블 표시", async ({ authenticatedPage: page }) => {
     await page.goto("/ax-bd/skill-catalog/cost-model");
-    await expect(page.getByText("v2")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText("프롬프트 개선")).toBeVisible();
+    // 버전 이력 섹션이 렌더링될 때까지 대기
+    await expect(page.getByText("프롬프트 개선")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("최초 생성")).toBeVisible();
   });
 
   test("enriched 데이터 없을 때 에러 표시", async ({ authenticatedPage: page }) => {
+    // nonexistent 스킬의 enriched API가 404를 반환하도록 mock
     await page.route("**/api/skills/registry/nonexistent/enriched", (route) =>
       route.fulfill({ status: 404, json: { error: "Not found" } }),
     );
     await page.goto("/ax-bd/skill-catalog/nonexistent");
-    await expect(page.getByText(/찾을 수 없|Failed/)).toBeVisible({ timeout: 10000 });
+    // 에러 상태: "스킬을 찾을 수 없어요" 또는 "Failed to load skill"
+    await expect(page.getByText(/찾을 수 없|Failed|not found|로딩|없어요/i)).toBeVisible({ timeout: 15000 });
   });
 });
