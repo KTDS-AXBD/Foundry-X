@@ -526,6 +526,50 @@ export class MockD1Database {
       );
       CREATE INDEX IF NOT EXISTS idx_pe_run ON pipeline_events(pipeline_run_id, created_at);
 
+      -- 0091: pipeline checkpoints (F314)
+      CREATE TABLE IF NOT EXISTS pipeline_checkpoints (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        pipeline_run_id TEXT NOT NULL,
+        step_id TEXT NOT NULL,
+        checkpoint_type TEXT NOT NULL DEFAULT 'viability'
+          CHECK(checkpoint_type IN ('viability', 'commit_gate')),
+        status TEXT NOT NULL DEFAULT 'pending'
+          CHECK(status IN ('pending', 'approved', 'rejected', 'expired')),
+        questions TEXT,
+        response TEXT,
+        decided_by TEXT,
+        decided_at TEXT,
+        deadline TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX IF NOT EXISTS idx_pc_run ON pipeline_checkpoints(pipeline_run_id, step_id);
+      CREATE INDEX IF NOT EXISTS idx_pc_status ON pipeline_checkpoints(status);
+
+      -- bd_skills stub for SkillPipelineRunner tests
+      CREATE TABLE IF NOT EXISTS bd_skills (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL DEFAULT '',
+        stage_id TEXT,
+        status TEXT NOT NULL DEFAULT 'active',
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        org_id TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+
+      -- biz_item_discovery_stages stub for SkillPipelineRunner tests
+      CREATE TABLE IF NOT EXISTS biz_item_discovery_stages (
+        id TEXT PRIMARY KEY,
+        biz_item_id TEXT NOT NULL,
+        org_id TEXT NOT NULL,
+        stage TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        started_at TEXT,
+        completed_at TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+
       CREATE TABLE IF NOT EXISTS agent_collection_runs (
         id TEXT PRIMARY KEY,
         org_id TEXT NOT NULL,

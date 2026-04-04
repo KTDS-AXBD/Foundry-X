@@ -60,3 +60,25 @@ export const stepFailedSchema = z.object({
   errorMessage: z.string().max(5000),
 });
 export type StepFailedInput = z.infer<typeof stepFailedSchema>;
+
+// ── HITL Checkpoint (F314) ──
+export const CHECKPOINT_STEPS = ["2-1", "2-3", "2-5", "2-7"] as const;
+export const COMMIT_GATE_STEP = "2-5" as const;
+
+export const checkpointDecisionSchema = z.object({
+  decision: z.enum(["approved", "rejected"]),
+  responses: z.array(z.object({
+    question: z.string(),
+    answer: z.string(),
+    signal: z.enum(["go", "pivot", "drop"]).optional(),
+  })).optional(),
+  reason: z.string().max(2000).optional(),
+});
+export type CheckpointDecision = z.infer<typeof checkpointDecisionSchema>;
+
+// ── Auto Advance (F314) ──
+export const autoAdvanceSchema = z.object({
+  fromStep: z.string().min(1).optional(),
+  skipCheckpoints: z.boolean().default(false),
+});
+export type AutoAdvanceInput = z.infer<typeof autoAdvanceSchema>;

@@ -14,7 +14,11 @@ import {
   stepFailedSchema,
   stepActionSchema,
   triggerShapingSchema,
+  autoAdvanceSchema,
+  checkpointDecisionSchema,
 } from "../schemas/discovery-pipeline.js";
+import { SkillPipelineRunner } from "../services/skill-pipeline-runner.js";
+import { PipelineCheckpointService } from "../services/pipeline-checkpoint-service.js";
 
 export const discoveryPipelineRoute = new Hono<{
   Bindings: Env;
@@ -173,4 +177,66 @@ discoveryPipelineRoute.get("/discovery-pipeline/runs/:id/events", async (c) => {
   const svc = new DiscoveryPipelineService(c.env.DB);
   const events = await svc.getEvents(c.req.param("id"));
   return c.json({ events });
+});
+
+// ── F314: 자동 파이프라인 + HITL 체크포인트 ──
+
+// 11) POST /discovery-pipeline/runs/:id/auto-advance — 다음 단계 자동 실행
+discoveryPipelineRoute.post("/discovery-pipeline/runs/:id/auto-advance", async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = autoAdvanceSchema.safeParse(body);
+  const options = parsed.success ? parsed.data : { skipCheckpoints: false };
+
+  const runId = c.req.param("id");
+  const orgId = c.get("orgId");
+  const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? "";
+
+  const runner = new SkillPipelineRunner(c.env.DB, c.env.ANTHROPIC_API_KEY);
+  const result = await runner.runNextStep(runId, orgId, userId, options.skipCheckpoints);
+
+  // 형상화 트리거 시 자동 연동
+  if (result.status === "shaping_triggered") {
+    const svc = new DiscoveryPipelineService(c.env.DB);
+    await svc.triggerShaping(runId, userId);
+
+    const run = await svc.getRun(runId, orgId);
+    const orchestrator = new ShapingOrchestratorService(c.env.DB);
+    const shapingRunId = await orchestrator.startAutoShaping(runId, run!.bizItemId, orgId);
+
+    return c.json({ ...result, shapingRunId });
+  }
+
+  return c.json(result);
+});
+
+// 12) GET /discovery-pipeline/runs/:id/checkpoints — 체크포인트 목록
+discoveryPipelineRoute.get("/discovery-pipeline/runs/:id/checkpoints", async (c) => {
+  const cpService = new PipelineCheckpointService(c.env.DB);
+  const checkpoints = await cpService.listByRun(c.req.param("id"));
+  return c.json({ checkpoints });
+});
+
+// 13) POST /discovery-pipeline/runs/:id/checkpoints/:cpId/approve — 체크포인트 승인
+discoveryPipelineRoute.post("/discovery-pipeline/runs/:id/checkpoints/:cpId/approve", async (c) => {
+  const body = await c.req.json();
+  const parsed = checkpointDecisionSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: "Invalid input", details: parsed.error.flatten() }, 400);
+  }
+
+  const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? "";
+  const cpService = new PipelineCheckpointService(c.env.DB);
+  const result = await cpService.approve(c.req.param("cpId"), userId, parsed.data);
+  return c.json(result);
+});
+
+// 14) POST /discovery-pipeline/runs/:id/checkpoints/:cpId/reject — 체크포인트 거부
+discoveryPipelineRoute.post("/discovery-pipeline/runs/:id/checkpoints/:cpId/reject", async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const reason = typeof body.reason === "string" ? body.reason : undefined;
+
+  const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? "";
+  const cpService = new PipelineCheckpointService(c.env.DB);
+  const checkpoint = await cpService.reject(c.req.param("cpId"), userId, reason);
+  return c.json(checkpoint);
 });
