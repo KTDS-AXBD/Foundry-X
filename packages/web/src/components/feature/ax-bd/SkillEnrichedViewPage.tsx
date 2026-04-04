@@ -157,6 +157,18 @@ export default function SkillEnrichedViewPage({ skillId }: Props) {
         )}
       </section>
 
+      {/* Prompt Template */}
+      {registry.promptTemplate && (
+        <section>
+          <h2 className="mb-3 text-sm font-semibold">프롬프트 템플릿</h2>
+          <div className="rounded-lg border bg-muted/30 p-4">
+            <pre className="whitespace-pre-wrap text-xs leading-relaxed text-foreground/80">
+              {registry.promptTemplate}
+            </pre>
+          </div>
+        </section>
+      )}
+
       {/* Metrics */}
       <section>
         <h2 className="mb-3 text-sm font-semibold">실행 메트릭</h2>
