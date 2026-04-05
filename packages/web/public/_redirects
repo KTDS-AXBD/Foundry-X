@@ -1,4 +1,4 @@
-/admin    /admin/index.html  200
+/admin    /admin/  301
 /admin/*  /admin/index.html  200
 /api/*  https://foundry-x-api.ktds-axbd.workers.dev/api/:splat  200
 /*      /index.html   200
