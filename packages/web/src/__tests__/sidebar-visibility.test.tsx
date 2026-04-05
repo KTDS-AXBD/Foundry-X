@@ -115,23 +115,21 @@ describe("Sidebar role-based visibility", () => {
   it("T-06: Admin 로그인 시 관리 그룹 헤더 노출", () => {
     mockedUseUserRole.mockReturnValue({ role: "admin", isAdmin: true });
     renderSidebar();
-    // CollapsibleGroup은 닫혀있으면 내부 아이템이 DOM에 없으므로, 그룹 헤더(label)로 검증
+    // F322: 외부 서비스 그룹 제거, 관리 그룹만 검증
     expect(screen.getAllByText("관리").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("외부 서비스").length).toBeGreaterThan(0);
   });
 
-  it("T-07: 리브랜딩 — 'Field 수집' 존재", () => {
+  it("T-07: F322 — 수집 그룹은 collapsed+TBD (items visible:false)", () => {
     mockedUseUserRole.mockReturnValue({ role: "admin", isAdmin: true });
     renderSidebar();
-    expect(screen.getAllByText("Field 수집").length).toBeGreaterThan(0);
-    expect(screen.queryByText("수집 채널")).not.toBeInTheDocument();
+    // 수집 그룹 헤더는 존재하지만, items는 collapsed 상태로 DOM에 없음
+    expect(screen.getAllByText("1. 수집").length).toBeGreaterThan(0);
   });
 
-  it("T-08: 리브랜딩 — 'IDEA Portal' 존재", () => {
+  it("T-08: F322 — GTM 그룹도 collapsed+TBD", () => {
     mockedUseUserRole.mockReturnValue({ role: "admin", isAdmin: true });
     renderSidebar();
-    expect(screen.getAllByText("IDEA Portal").length).toBeGreaterThan(0);
-    expect(screen.queryByText("IR Bottom-up")).not.toBeInTheDocument();
+    expect(screen.getAllByText("6. GTM").length).toBeGreaterThan(0);
   });
 
   it("T-09: 리브랜딩 — 'PRD' 존재 (Spec 생성 대신)", () => {
@@ -141,33 +139,29 @@ describe("Sidebar role-based visibility", () => {
     expect(screen.queryByText("Spec 생성")).not.toBeInTheDocument();
   });
 
-  it("T-10: Member: 지식 그룹 헤더 노출 (아이템 필터링은 isVisible 유닛테스트에서 검증)", () => {
+  it("T-10: F322 — Member: 지식/외부 서비스 그룹 제거됨, Admin 그룹 미노출", () => {
     mockedUseUserRole.mockReturnValue({ role: "member", isAdmin: false });
     renderSidebar();
-    // 지식 그룹은 스킬 카탈로그(all) 1개가 남으므로 그룹 헤더는 표시
-    expect(screen.getAllByText("지식").length).toBeGreaterThan(0);
+    // F322: 지식/외부 서비스 그룹 제거
+    expect(screen.queryByText("지식")).not.toBeInTheDocument();
+    expect(screen.queryByText("외부 서비스")).not.toBeInTheDocument();
     // Admin 전용 그룹은 미노출
     expect(screen.queryByText("관리")).not.toBeInTheDocument();
   });
 
-  it("Member: 외부 서비스 그룹 미노출", () => {
+  it("Member: 하단에 위키+설정 표시", () => {
     mockedUseUserRole.mockReturnValue({ role: "member", isAdmin: false });
     renderSidebar();
-    expect(screen.queryByText("Discovery-X")).not.toBeInTheDocument();
-    expect(screen.queryByText("AI Foundry")).not.toBeInTheDocument();
-  });
-
-  it("Member: 하단에 도움말+설정 표시", () => {
-    mockedUseUserRole.mockReturnValue({ role: "member", isAdmin: false });
-    renderSidebar();
-    expect(screen.getAllByText("도움말").length).toBeGreaterThan(0);
+    // F322: 하단 고정 = 위키 + 설정 (도움말은 Help Agent 위젯으로 전환)
+    expect(screen.getAllByText("위키").length).toBeGreaterThan(0);
     expect(screen.getAllByText("설정").length).toBeGreaterThan(0);
   });
 
-  it("Admin: memberBottomItems 미렌더링", () => {
+  it("Admin: 하단 위키+설정도 표시됨 (공통)", () => {
     mockedUseUserRole.mockReturnValue({ role: "admin", isAdmin: true });
     renderSidebar();
-    // Admin은 memberBottomItems가 렌더링되지 않으므로 "도움말" 미노출
-    expect(screen.queryByText("도움말")).not.toBeInTheDocument();
+    // F322: 하단 bottomItems는 Member/Admin 공통
+    expect(screen.getAllByText("위키").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("설정").length).toBeGreaterThan(0);
   });
 });
