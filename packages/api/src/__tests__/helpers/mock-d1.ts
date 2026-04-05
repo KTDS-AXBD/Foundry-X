@@ -677,6 +677,64 @@ export class MockD1Database {
       CREATE INDEX IF NOT EXISTS idx_feedback_queue_status ON feedback_queue(status);
       CREATE INDEX IF NOT EXISTS idx_feedback_queue_org ON feedback_queue(org_id);
       CREATE UNIQUE INDEX IF NOT EXISTS idx_feedback_queue_issue ON feedback_queue(org_id, github_issue_number);
+
+      -- Sprint 154: F342 Discovery UI/UX v2 (4 tables)
+      CREATE TABLE IF NOT EXISTS ax_persona_configs (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        org_id TEXT NOT NULL,
+        item_id TEXT NOT NULL,
+        persona_id TEXT NOT NULL,
+        persona_name TEXT NOT NULL,
+        persona_role TEXT NOT NULL DEFAULT '',
+        weights TEXT NOT NULL DEFAULT '{}',
+        context_json TEXT NOT NULL DEFAULT '{}',
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(item_id, persona_id)
+      );
+
+      CREATE TABLE IF NOT EXISTS ax_persona_evals (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        org_id TEXT NOT NULL,
+        item_id TEXT NOT NULL,
+        persona_id TEXT NOT NULL,
+        scores TEXT NOT NULL DEFAULT '{}',
+        verdict TEXT NOT NULL DEFAULT 'Conditional'
+          CHECK(verdict IN ('Go', 'Conditional', 'NoGo')),
+        summary TEXT NOT NULL DEFAULT '',
+        concern TEXT,
+        condition TEXT,
+        eval_model TEXT NOT NULL DEFAULT 'claude-sonnet-4-5-20250514',
+        eval_duration_ms INTEGER,
+        eval_cost_usd REAL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(item_id, persona_id)
+      );
+
+      CREATE TABLE IF NOT EXISTS ax_discovery_reports (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        org_id TEXT NOT NULL,
+        item_id TEXT NOT NULL,
+        report_json TEXT NOT NULL DEFAULT '{}',
+        overall_verdict TEXT DEFAULT NULL,
+        team_decision TEXT DEFAULT NULL,
+        shared_token TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(item_id)
+      );
+
+      CREATE TABLE IF NOT EXISTS ax_team_reviews (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        org_id TEXT NOT NULL,
+        item_id TEXT NOT NULL,
+        reviewer_id TEXT NOT NULL,
+        reviewer_name TEXT NOT NULL DEFAULT '',
+        decision TEXT NOT NULL CHECK(decision IN ('Go', 'Hold', 'Drop')),
+        comment TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(item_id, reviewer_id)
+      );
     `);
     this.db.prepare("INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)").run("org_test", "Test Org", "test");
   }

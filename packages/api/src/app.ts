@@ -118,6 +118,11 @@ import { taskStateRoute } from "./routes/task-state.js";
 import { executionEventsRoute } from "./routes/execution-events.js";
 // Sprint 150: Orchestration Loop (F335, Phase 14)
 import { orchestrationRoute } from "./routes/orchestration.js";
+// Sprint 154: Discovery UI/UX v2 — 페르소나 설정/평가 + 리포트 + 팀 검토 (F342)
+import { personaConfigsRoute } from "./routes/persona-configs.js";
+import { personaEvalsRoute } from "./routes/persona-evals.js";
+import { discoveryReportsRoute } from "./routes/discovery-reports.js";
+import { teamReviewsRoute } from "./routes/team-reviews.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -397,6 +402,12 @@ app.route("/api", taskStateRoute);
 app.route("/api", executionEventsRoute);
 // Sprint 150: Orchestration Loop (F335, Phase 14)
 app.route("/api", orchestrationRoute);
+
+// Sprint 154: Discovery UI/UX v2 (F342)
+app.route("/api", personaConfigsRoute);
+app.route("/api", personaEvalsRoute);
+app.route("/api", discoveryReportsRoute);
+app.route("/api", teamReviewsRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
