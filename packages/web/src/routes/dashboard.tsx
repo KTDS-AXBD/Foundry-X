@@ -21,6 +21,8 @@ import {
   GitBranch,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TodoSection } from "@/components/feature/TodoSection";
+import { WorkGuideSection } from "@/components/feature/WorkGuideSection";
 
 /* ------------------------------------------------------------------ */
 /*  Hooks                                                              */
@@ -309,6 +311,12 @@ export function Component() {
           )}
         </DashboardCard>
       </div>
+
+      {/* F323: ToDo List + 업무 가이드 */}
+      <section className="mt-8 space-y-6">
+        <TodoSection />
+        <WorkGuideSection />
+      </section>
     </div>
   );
 }
