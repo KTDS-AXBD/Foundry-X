@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Phase 12 ✅ 완료 (Sprint 128) — Skill Unification F303~F308 ✅ (D1~D4 4대 단절 해소)
+**현재 상태:** Phase 13 ✅ 완료 (Sprint 143) — IA 재설계 v1.3 F322~F328 ✅ (Member 25→12 메뉴, 탭 통합, 버전관리)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -163,6 +163,7 @@ pnpm e2e                          # Playwright E2E
 - **Phase 10:** ✅ 완료 (Sprint 101~112) — O-G-D Agent Loop(F270~F273 ✅) + Skill Evolution(F274~F278 ✅) + BD 데모(F279~F281 ✅) + BD 형상화 A~F(F282~F287 ✅)
 - **Phase 11:** ✅ 완료 (Sprint 113~121) — IA 대개편 F288~F299 (12/12 완료). 11-A ✅ 구조 기반 + 11-B ✅ 기능 확장 + 11-C ✅ 고도화+GTM
 - **Phase 12:** ✅ 완료 (Sprint 125~128) — Skill Unification: 3개 스킬 시스템 통합 (F303~F308 ✅). D1~D4 4대 단절 해소. PRD: `docs/specs/fx-skill-unify/prd-final.md`
+- **Phase 13:** ✅ 완료 (Sprint 139~143) — IA 재설계 v1.3: Member 25→12 메뉴(52% 축소), 탭 통합 3건(발굴/검증/제품화), 버전관리 패턴, 대시보드 ToDo. F322~F328 ✅ (7/7). 근거: `docs/specs/FX-IA-Change-Plan-v1.3.docx`
 - **수치 확인:** `/ax:daily-check` 실행 또는 SPEC.md §2 "실시간 수치" 블록 참조 (하드코딩 금지 — drift 방지)
 - **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 
