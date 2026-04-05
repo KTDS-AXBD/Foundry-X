@@ -177,6 +177,24 @@ export class TaskStateService {
     return { state, history, availableTransitions };
   }
 
+  // ─── F337: 상태별 집계 (Sprint 152) ───
+
+  /** 상태별 태스크 수 집계 */
+  async getSummary(tenantId: string): Promise<{ counts: Record<string, number>; total: number }> {
+    const { results } = await this.db.prepare(
+      "SELECT current_state, COUNT(*) as count FROM task_states WHERE tenant_id = ? GROUP BY current_state"
+    ).bind(tenantId).all();
+
+    const counts: Record<string, number> = {};
+    let total = 0;
+    for (const r of results ?? []) {
+      const count = r.count as number;
+      counts[r.current_state as string] = count;
+      total += count;
+    }
+    return { counts, total };
+  }
+
   // ─── Private helpers ───
 
   private toRecord(row: Record<string, unknown>): TaskStateRecord {
