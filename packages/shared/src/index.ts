@@ -307,28 +307,15 @@ export type {
   AgentExecutionContext,
   AgentResult,
   AgentAdapter,
-  AgentAdapterSource,
-  AgentMetadata,
   LoopStartParams,
   ExecutionEventRecord,
 } from './orchestration.js';
 
-// F342: Discovery UI/UX v2 types (Sprint 154, Phase 15)
-export {
-  INTENSITY_MATRIX,
-  INTENSITY_LABELS,
-  DISCOVERY_TYPE_NAMES_V2,
-  DEFAULT_WEIGHTS,
-  DEFAULT_PERSONAS,
-  WEIGHT_AXES,
-} from './discovery-v2.js';
-
+// F346+F347: Discovery Report types (Sprint 156, Phase 15)
 export type {
-  PersonaWeights,
-  PersonaConfig,
-  PersonaEval,
-  DiscoveryReport,
-  TeamReview,
-  Intensity,
-  DiscoveryTypeV2,
-} from './discovery-v2.js';
+  ReferenceAnalysisData,
+  MarketValidationData,
+  CompetitiveLandscapeData,
+  OpportunityIdeationData,
+  DiscoveryReportResponse,
+} from './discovery-report.js';

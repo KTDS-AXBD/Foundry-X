@@ -31,6 +31,18 @@
     --axis-warm: oklch(0.65 0.16 55);
     --axis-indigo: oklch(0.55 0.22 270);
     --axis-rose: oklch(0.60 0.19 15);
+
+    /* Discovery 시맨틱 토큰 (Phase 15, F346) */
+    --discovery-mint: #00b493;
+    --discovery-blue: #3182f6;
+    --discovery-amber: #f59e0b;
+    --discovery-red: #f04452;
+    --discovery-purple: #8b5cf6;
+    --discovery-mint-bg: #e6f9f4;
+    --discovery-blue-bg: #e8f1fe;
+    --discovery-amber-bg: #fef3c7;
+    --discovery-red-bg: #fee2e2;
+    --discovery-purple-bg: #f3e8ff;
 }
 
 .dark {

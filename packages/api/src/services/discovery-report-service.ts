@@ -1,18 +1,27 @@
 /**
- * Sprint 154: F342 DiscoveryReportService — 발굴 완료 리포트 관리
+ * Sprint 156: F346 — 발굴 완료 리포트 집계 서비스
+ * biz_item_discovery_stages (진행 상태) + bd_artifacts (스킬 결과)를 합쳐 리포트 구성
  */
-import type { UpsertDiscoveryReportInput } from "../schemas/discovery-report-schema.js";
+import type { DiscoveryReportResponse } from "@foundry-x/shared";
 
-interface DiscoveryReportRow {
+interface StageRow {
+  stage: string;
+  status: string;
+}
+
+interface ArtifactRow {
+  stage_id: string;
+  output_text: string | null;
+}
+
+interface BizItemRow {
   id: string;
-  org_id: string;
-  item_id: string;
-  report_json: string;
-  overall_verdict: string | null;
-  team_decision: string | null;
-  shared_token: string | null;
-  created_at: string;
-  updated_at: string;
+  title: string;
+  discovery_type: string | null;
+}
+
+interface ReportRow {
+  id: string;
 }
 
 function generateId(): string {
@@ -23,64 +32,121 @@ function generateId(): string {
     .join("");
 }
 
-function generateToken(): string {
-  const bytes = new Uint8Array(32);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes)
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+function safeParseJson(raw: string | null): unknown {
+  if (!raw) return undefined;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return raw; // JSON이 아니면 원본 텍스트 반환
+  }
 }
+
+const TOTAL_STAGES = 9; // 2-1 ~ 2-9
 
 export class DiscoveryReportService {
   constructor(private db: D1Database) {}
 
-  async getByItem(itemId: string): Promise<DiscoveryReportRow | null> {
-    return this.db
-      .prepare("SELECT * FROM ax_discovery_reports WHERE item_id = ?")
-      .bind(itemId)
-      .first<DiscoveryReportRow>();
-  }
+  async getReport(
+    bizItemId: string,
+    orgId: string,
+  ): Promise<DiscoveryReportResponse | null> {
+    // 1. biz_item 존재 확인
+    const item = await this.db
+      .prepare("SELECT id, title FROM biz_items WHERE id = ? AND org_id = ?")
+      .bind(bizItemId, orgId)
+      .first<BizItemRow>();
 
-  async upsert(itemId: string, orgId: string, input: UpsertDiscoveryReportInput): Promise<DiscoveryReportRow> {
-    const id = generateId();
-    const reportJson = JSON.stringify(input.reportJson);
+    // discovery_type은 별도 조회 (컬럼 존재 여부에 안전)
+    let discoveryType: string | null = null;
+    if (item) {
+      try {
+        const typeRow = await this.db
+          .prepare("SELECT discovery_type FROM biz_items WHERE id = ?")
+          .bind(bizItemId)
+          .first<{ discovery_type: string | null }>();
+        discoveryType = typeRow?.discovery_type ?? null;
+      } catch {
+        // mock DB 등에서 컬럼 미존재 시 무시
+      }
+    }
 
-    await this.db
+    if (!item) return null;
+
+    // 2. stages 진행 상태 조회
+    const { results: stages } = await this.db
       .prepare(
-        `INSERT INTO ax_discovery_reports (id, org_id, item_id, report_json, overall_verdict, team_decision)
-         VALUES (?, ?, ?, ?, ?, ?)
-         ON CONFLICT(item_id) DO UPDATE SET
-           report_json = excluded.report_json,
-           overall_verdict = excluded.overall_verdict,
-           team_decision = excluded.team_decision,
-           updated_at = datetime('now')`,
+        `SELECT stage, status
+         FROM biz_item_discovery_stages
+         WHERE biz_item_id = ? AND org_id = ?
+         ORDER BY stage`,
       )
-      .bind(id, orgId, itemId, reportJson, input.overallVerdict ?? null, input.teamDecision ?? null)
-      .run();
+      .bind(bizItemId, orgId)
+      .all<StageRow>();
 
-    return (await this.getByItem(itemId))!;
-  }
+    const completedStages = stages
+      .filter((s) => s.status === "completed")
+      .map((s) => s.stage);
 
-  async setTeamDecision(itemId: string, decision: string): Promise<void> {
-    await this.db
-      .prepare("UPDATE ax_discovery_reports SET team_decision = ?, updated_at = datetime('now') WHERE item_id = ?")
-      .bind(decision, itemId)
-      .run();
-  }
+    // 3. bd_artifacts에서 최신 버전의 output_text 조회 (스테이지별)
+    const { results: artifacts } = await this.db
+      .prepare(
+        `SELECT stage_id, output_text
+         FROM bd_artifacts
+         WHERE biz_item_id = ? AND org_id = ? AND status = 'completed'
+         ORDER BY stage_id, version DESC`,
+      )
+      .bind(bizItemId, orgId)
+      .all<ArtifactRow>();
 
-  async generateShareToken(itemId: string): Promise<string> {
-    const token = generateToken();
-    await this.db
-      .prepare("UPDATE ax_discovery_reports SET shared_token = ?, updated_at = datetime('now') WHERE item_id = ?")
-      .bind(token, itemId)
-      .run();
-    return token;
-  }
+    // stage_id별 최신 artifact만 사용
+    const tabs: Record<string, unknown> = {};
+    const seen = new Set<string>();
+    for (const art of artifacts) {
+      if (!seen.has(art.stage_id) && art.output_text) {
+        seen.add(art.stage_id);
+        tabs[art.stage_id] = safeParseJson(art.output_text);
+      }
+    }
 
-  async getByShareToken(token: string): Promise<DiscoveryReportRow | null> {
-    return this.db
-      .prepare("SELECT * FROM ax_discovery_reports WHERE shared_token = ?")
-      .bind(token)
-      .first<DiscoveryReportRow>();
+    const overallProgress = stages.length > 0
+      ? Math.round((completedStages.length / TOTAL_STAGES) * 100)
+      : 0;
+
+    // 4. 리포트 캐시 upsert
+    const existing = await this.db
+      .prepare("SELECT id FROM ax_discovery_reports WHERE biz_item_id = ?")
+      .bind(bizItemId)
+      .first<ReportRow>();
+
+    const reportId = existing?.id ?? generateId();
+
+    if (existing) {
+      await this.db
+        .prepare(
+          `UPDATE ax_discovery_reports
+           SET report_json = ?, updated_at = datetime('now')
+           WHERE biz_item_id = ?`,
+        )
+        .bind(JSON.stringify(tabs), bizItemId)
+        .run();
+    } else {
+      await this.db
+        .prepare(
+          `INSERT INTO ax_discovery_reports (id, biz_item_id, org_id, report_json)
+           VALUES (?, ?, ?, ?)`,
+        )
+        .bind(reportId, bizItemId, orgId, JSON.stringify(tabs))
+        .run();
+    }
+
+    return {
+      id: reportId,
+      bizItemId: item.id,
+      title: item.title,
+      type: (discoveryType as DiscoveryReportResponse["type"]),
+      completedStages,
+      overallProgress,
+      tabs,
+    };
   }
 }
