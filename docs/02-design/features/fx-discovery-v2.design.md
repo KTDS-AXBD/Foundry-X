@@ -562,32 +562,53 @@ function isHitlCheckpoint(step: string): boolean {
 
 ## 10. Implementation Guide
 
-### 10.1 Sprint 132 파일 구조
+### 10.1 실제 구현 파일 구조
+
+> **Note**: 구현 시 명칭 체계가 의도적으로 변경됨 (도메인 명확화 + SRP 분리)
 
 ```
 packages/api/src/
 ├── db/migrations/
-│   └── 0090_pipeline_orchestration.sql        ← 신규
+│   ├── 0090_discovery_pipeline.sql            ← Sprint 132 (FSM + 이벤트)
+│   ├── 0091_pipeline_checkpoints.sql          ← Sprint 133 (HITL)
+│   ├── 0092_pipeline_monitoring.sql           ← Sprint 134 (권한+알림)
+│   └── 0093_backup_metadata.sql               ← Sprint 136 (백업)
 ├── schemas/
-│   └── pipeline-orchestration.schema.ts       ← 신규
+│   ├── discovery-pipeline.ts                  ← Zod (8 schema + 6 types)
+│   ├── pipeline-monitoring.schema.ts          ← 모니터링 스키마
+│   └── backup-restore.ts                      ← 백업 스키마
 ├── services/
-│   └── pipeline-orchestration-service.ts      ← 신규 (핵심)
+│   ├── pipeline-state-machine.ts              ← FSM (상태 9종)
+│   ├── discovery-pipeline-service.ts          ← CRUD + 형상화 트리거
+│   ├── shaping-orchestrator-service.ts        ← Phase A~F 자동 실행
+│   ├── pipeline-error-handler.ts              ← 에러 분류 + 복구
+│   ├── skill-pipeline-runner.ts               ← 자동 순차 실행 (Sprint 133)
+│   ├── pipeline-checkpoint-service.ts         ← HITL 승인/거부 (Sprint 133)
+│   ├── pipeline-notification-service.ts       ← 알림 발행 (Sprint 134)
+│   ├── pipeline-permission-service.ts         ← 권한 관리 (Sprint 134)
+│   └── backup-restore-service.ts              ← 백업/복구 (Sprint 136)
 ├── routes/
-│   └── pipeline-orchestration.ts              ← 신규
+│   ├── discovery-pipeline.ts                  ← 14 EP (Sprint 132+133)
+│   ├── pipeline-monitoring.ts                 ← 4 EP (Sprint 134)
+│   └── backup-restore.ts                      ← 5 EP (Sprint 136)
 
 packages/web/src/
 ├── components/feature/discovery/
-│   ├── PipelineControlPanel.tsx               ← 신규
-│   ├── PipelineStatusBar.tsx                  ← 신규
-│   ├── HitlCheckpointDialog.tsx               ← 신규
-│   └── PipelineFailurePanel.tsx               ← 신규
-├── hooks/
-│   └── usePipelineOrchestration.ts            ← 신규 (폴링 + 상태 관리)
-└── routes/ax-bd/
-    └── discovery-detail.tsx                   ← 수정 (파이프라인 컴포넌트 통합)
-
-packages/shared/src/
-└── types/pipeline-orchestration.ts            ← 신규 (공유 타입)
+│   ├── PipelineStatusBadge.tsx                ← 상태 배지 (Sprint 132)
+│   ├── PipelineTimeline.tsx                   ← 단계별 타임라인 (Sprint 132+133)
+│   ├── PipelineErrorPanel.tsx                 ← 실패 복구 UI (Sprint 132)
+│   ├── ShapingTriggerPanel.tsx                ← 형상화 전환 (Sprint 132)
+│   ├── CheckpointReviewPanel.tsx              ← HITL 승인 UI (Sprint 133)
+│   ├── AutoAdvanceToggle.tsx                  ← 자동 진행 토글 (Sprint 133)
+│   ├── PipelineMonitorDashboard.tsx           ← 대시보드 (Sprint 134)
+│   ├── PipelinePermissionEditor.tsx           ← 권한 설정 (Sprint 134)
+│   └── CheckpointApproverInfo.tsx             ← 승인자 이력 (Sprint 134)
+├── routes/
+│   └── backup.tsx                             ← 백업 관리 페이지 (Sprint 136)
+└── e2e/
+    ├── discovery-wizard-advanced.spec.ts      ← 4 E2E (Sprint 135)
+    ├── discovery-detail-advanced.spec.ts      ← 3 E2E (Sprint 135)
+    └── discovery-pipeline-api.spec.ts         ← 3 E2E (Sprint 135)
 ```
 
 ### 10.2 Implementation Order (Sprint 132)
