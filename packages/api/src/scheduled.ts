@@ -3,6 +3,7 @@ import { GitHubService } from "./services/github.js";
 import { ReconciliationService } from "./services/reconciliation.js";
 import { KpiLogger } from "./services/kpi-logger.js";
 import { parseSpecRequirements } from "./services/spec-parser.js";
+import { BackupRestoreService } from "./services/backup-restore-service.js";
 
 // ─── Cloudflare Workers Cron Trigger Handler ───
 
@@ -27,4 +28,12 @@ export async function handleScheduled(
   });
 
   ctx.waitUntil(Promise.allSettled(tasks));
+
+  // F317: 자동 백업 — UTC 18시 (KST 03시)에만 실행
+  const now = new Date();
+  if (now.getUTCHours() === 18) {
+    const backupService = new BackupRestoreService(env.DB);
+    const backupTasks = orgs.map((org) => backupService.autoBackup(org.id));
+    ctx.waitUntil(Promise.allSettled(backupTasks));
+  }
 }

@@ -212,6 +212,7 @@ const adminGroup: NavGroup = {
     { href: "/architecture", label: "아키텍처", icon: Blocks },
     { href: "/workspace", label: "내 작업", icon: FolderKanban },
     { href: "/settings/jira", label: "설정", icon: Settings },
+    { href: "/backup", label: "백업 관리", icon: Shield },
   ],
 };
 

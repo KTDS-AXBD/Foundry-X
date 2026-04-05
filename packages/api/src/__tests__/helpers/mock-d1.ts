@@ -636,6 +636,25 @@ export class MockD1Database {
         completed_at TEXT,
         FOREIGN KEY (org_id) REFERENCES organizations(id)
       );
+
+      -- 0093: backup_metadata (F317)
+      CREATE TABLE IF NOT EXISTS backup_metadata (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        tenant_id TEXT NOT NULL,
+        backup_type TEXT NOT NULL DEFAULT 'manual'
+          CHECK(backup_type IN ('manual', 'auto', 'pre_deploy')),
+        scope TEXT NOT NULL DEFAULT 'full'
+          CHECK(scope IN ('full', 'item')),
+        biz_item_id TEXT,
+        tables_included TEXT NOT NULL,
+        item_count INTEGER NOT NULL DEFAULT 0,
+        size_bytes INTEGER NOT NULL DEFAULT 0,
+        payload TEXT NOT NULL,
+        created_by TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX IF NOT EXISTS idx_bm_tenant ON backup_metadata(tenant_id, created_at);
+      CREATE INDEX IF NOT EXISTS idx_bm_type ON backup_metadata(backup_type);
     `);
     this.db.prepare("INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)").run("org_test", "Test Org", "test");
   }
