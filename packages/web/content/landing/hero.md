@@ -1,22 +1,20 @@
 ---
-title: "Foundry-X Hero"
-section: "hero"
+title: Foundry-X
+section: hero
 sort_order: 0
-tagline: "AX 사업개발 AI 오케스트레이션 플랫폼"
-phase: "Phase 12 완료"
-phaseTitle: "Skill Unification"
+tagline: "사업기회 발굴부터 데모까지, AI가 자동화하는 BD 플랫폼"
+phase: "Phase 13 진행 중"
+phaseTitle: "IA 재설계"
 stats:
-  - value: "~89"
-    label: "API Routes"
-  - value: "~206"
-    label: "Services"
-  - value: "3,148+"
-    label: "Tests"
-  - value: "101"
-    label: "D1 Migrations"
-  - value: "138"
+  - value: "6"
+    label: "BD 파이프라인"
+  - value: "10+"
+    label: "AI 에이전트"
+  - value: "22"
+    label: "자동화 스킬"
+  - value: "147"
     label: "Sprints"
 ---
 
-AI 에이전트와 사람이 함께 만드는 조직 협업 플랫폼.
-Git이 진실, Foundry-X는 렌즈.
+사업기회 발굴부터 데모까지, AI가 자동화하는 BD 플랫폼.
+BDP 6단계를 AI 에이전트가 자동으로 처리해요.
