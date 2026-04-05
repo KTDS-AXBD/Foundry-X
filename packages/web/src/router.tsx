@@ -50,6 +50,7 @@ export const router = createBrowserRouter([
       { path: "discovery/dashboard", lazy: () => import("@/routes/ax-bd/discover-dashboard") },
       { path: "discovery/progress", lazy: () => import("@/routes/discovery-progress") },
       { path: "discovery/report", lazy: () => import("@/routes/ax-bd/evaluation-report") },
+      { path: "discovery/persona-eval/:itemId", lazy: () => import("@/routes/ax-bd/persona-eval") },
 
       // ── 3단계 형상화 (shaping) ──
       { path: "shaping/prd", lazy: () => import("@/routes/spec-generator") },
