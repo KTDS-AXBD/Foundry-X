@@ -48,6 +48,8 @@ import {
   Send,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { loadSidebarConfig, getIcon } from "@/lib/navigation-loader";
+import type { SidebarConfig } from "@/lib/navigation-loader";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import {
@@ -101,7 +103,7 @@ export function isVisible(
   return true;
 }
 
-const topItems: NavItem[] = [
+const DEFAULT_TOP_ITEMS: NavItem[] = [
   {
     href: "/getting-started",
     label: "시작하기",
@@ -116,7 +118,7 @@ const topItems: NavItem[] = [
 
 /* ── 프로세스 6단계: 수집→발굴→형상화→검증/공유→제품화→GTM ── */
 
-const processGroups: NavGroup[] = [
+const DEFAULT_PROCESS_GROUPS: NavGroup[] = [
   {
     key: "collect",
     label: "1. 수집",
@@ -216,7 +218,7 @@ const adminGroup: NavGroup = {
   ],
 };
 
-const memberBottomItems: NavItem[] = [
+const DEFAULT_MEMBER_BOTTOM_ITEMS: NavItem[] = [
   { href: "/tools-guide", label: "도구 가이드", icon: PenTool },
   { href: "/getting-started", label: "도움말", icon: HelpCircle },
   { href: "/settings/jira", label: "설정", icon: Settings },
@@ -232,6 +234,46 @@ const externalGroup: NavGroup = {
     { href: "/external/foundry", label: "AI Foundry", icon: FlaskConical },
   ],
 };
+
+/* ------------------------------------------------------------------ */
+/*  CMS-driven Navigation (TinaCMS content → NavItem/NavGroup)         */
+/* ------------------------------------------------------------------ */
+
+const cmsNav: SidebarConfig | null = loadSidebarConfig();
+
+function cmsItemToNav(item: { href: string; label: string; iconKey: string }): NavItem {
+  return { href: item.href, label: item.label, icon: getIcon(item.iconKey) };
+}
+
+const topItems: NavItem[] = cmsNav
+  ? cmsNav.topItems
+      .filter((i) => i.visible !== false)
+      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+      .map(cmsItemToNav)
+  : DEFAULT_TOP_ITEMS;
+
+const processGroups: NavGroup[] = cmsNav
+  ? cmsNav.processGroups
+      .filter((g) => g.visible !== false)
+      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+      .map((g) => ({
+        key: g.key,
+        label: g.label,
+        icon: getIcon(g.iconKey ?? g.items[0]?.iconKey ?? "HelpCircle"),
+        stageColor: g.stageColor,
+        items: g.items
+          .filter((i) => i.visible !== false)
+          .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+          .map(cmsItemToNav),
+      }))
+  : DEFAULT_PROCESS_GROUPS;
+
+const memberBottomItems: NavItem[] = cmsNav
+  ? cmsNav.bottomItems
+      .filter((i) => i.visible !== false)
+      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+      .map(cmsItemToNav)
+  : DEFAULT_MEMBER_BOTTOM_ITEMS;
 
 /* ------------------------------------------------------------------ */
 /*  Collapsible Group State (localStorage 영속)                        */
