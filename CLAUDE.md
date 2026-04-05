@@ -100,6 +100,7 @@ foundry-x/
 | `docs/specs/ax-bd-atoz/prd-final.md` | AX BD A-to-Z PRD (7단계 라이프사이클 + 시스템 통합) |
 | `docs/specs/fx-bd-v1/prd-final.md` | BD Pipeline E2E 통합 PRD (Phase 7, 9 F-items) |
 | `docs/specs/fx-discovery-ux/prd-final.md` | 발굴 UX 개선 PRD (Phase 9, F263~F266) |
+| `docs/specs/fx-discovery-ui-v2/prd-final.md` | Discovery UI/UX 고도화 v2 PRD (Phase 15, F342~F350) |
 | `docs/specs/bizdevprocess-3/prd-ax-bd-v1.4.md` | AX BD Ideation MVP PRD (BMC + AI 에이전트) |
 | `docs/specs/axbd/` | AX BD 프로세스 v8.2 참고자료 (ai-biz 플러그인 포함) |
 | `docs/specs/FX-PLAN-012/` | Phase 6 Ecosystem Integration PRD |
@@ -165,6 +166,7 @@ pnpm e2e                          # Playwright E2E
 - **Phase 12:** ✅ 완료 (Sprint 125~128) — Skill Unification: 3개 스킬 시스템 통합 (F303~F308 ✅). D1~D4 4대 단절 해소. PRD: `docs/specs/fx-skill-unify/prd-final.md`
 - **Phase 13:** ✅ 완료 (Sprint 139~143) — IA 재설계 v1.3: Member 25→12 메뉴(52% 축소), 탭 통합 3건(발굴/검증/제품화), 버전관리 패턴, 대시보드 ToDo. F322~F328 ✅ (7/7). 근거: `docs/specs/FX-IA-Change-Plan-v1.3.docx`
 - **Phase 14:** 🔧 진행 중 (Sprint 148 ✅) — Agent Orchestration Infrastructure: TaskState Machine(F333 ✅) + Hook+EventBus(F334) + OrchestrationLoop(F335) + AgentAdapter(F336) + Dashboard(F337). 근거: `docs/specs/FX-Unified-Integration-Plan.md`
+- **Phase 15:** 📋 등록 (Sprint 154~157) — Discovery UI/UX 고도화 v2: 멀티 페르소나 평가(F344~F345) + 9탭 리포트(F346~F348) + 팀 검토(F349) + Export(F350). Phase 14와 독립 병렬. PRD: `docs/specs/fx-discovery-ui-v2/prd-final.md`
 - **수치 확인:** `/ax:daily-check` 실행 또는 SPEC.md §2 "실시간 수치" 블록 참조 (하드코딩 금지 — drift 방지)
 - **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 
