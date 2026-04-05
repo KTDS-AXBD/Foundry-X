@@ -116,6 +116,9 @@ jobs:
         env:
           VITE_MARKER_PROJECT_ID: ${{ secrets.VITE_MARKER_PROJECT_ID }}
           VITE_TINA_CLIENT_ID: ${{ secrets.VITE_TINA_CLIENT_ID }}
+      - name: SPA fallback (404.html = index.html)
+        working-directory: packages/web
+        run: cp dist/index.html dist/404.html
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
