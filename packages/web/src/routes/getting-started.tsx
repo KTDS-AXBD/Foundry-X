@@ -15,6 +15,9 @@ import {
   TrendingUp,
   RotateCcw,
   ArrowRight,
+  Library,
+  Presentation,
+  PenTool,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -106,28 +109,36 @@ const workflowCards = [
 
 const featureCards = [
   {
-    href: "/agents",
+    href: "/wiki",
+    icon: Library,
+    title: "BD 스킬 가이드",
+    description: "68개 발굴 스킬의 용도와 실행 방법",
+    color: "text-axis-violet",
+    bg: "bg-axis-violet/10",
+  },
+  {
+    href: "/getting-started?tab=setup",
     icon: Bot,
-    title: "에이전트",
-    description: "AI 에이전트의 작업 현황과 PR 파이프라인 관리",
+    title: "Cowork / Claude Code",
+    description: "AI 에이전트 협업 환경 설정과 사용법",
     color: "text-axis-primary",
     bg: "bg-axis-primary/10",
   },
   {
-    href: "/architecture",
-    icon: Blocks,
-    title: "아키텍처",
-    description: "코드 아키텍처를 4가지 뷰로 시각화",
-    color: "text-axis-warm",
-    bg: "bg-axis-warm/10",
+    href: "/ax-bd/demo",
+    icon: Presentation,
+    title: "데모 시나리오",
+    description: "헬스케어 AI + GIVC 시드 데이터 체험",
+    color: "text-axis-accent",
+    bg: "bg-axis-accent/10",
   },
   {
-    href: "/wiki",
-    icon: BookOpen,
-    title: "지식베이스",
-    description: "팀 지식을 구조화하고 AI가 자동 업데이트",
-    color: "text-axis-violet",
-    bg: "bg-axis-violet/10",
+    href: "/getting-started?tab=skills",
+    icon: PenTool,
+    title: "도구 가이드",
+    description: "Marker.io, TinaCMS 등 팀 도구 사용법",
+    color: "text-axis-warm",
+    bg: "bg-axis-warm/10",
   },
 ];
 
@@ -268,7 +279,7 @@ function FeatureCardsSection() {
   return (
     <section>
       <h2 className="mb-4 text-lg font-semibold">더 알아보기</h2>
-      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
         {featureCards.map((card) => (
           <Card key={card.href} className="flex flex-col">
             <CardHeader className="pb-2">
