@@ -7,6 +7,7 @@ import { githubIssueEventSchema, githubPrEventSchema, githubCommentEventSchema }
 import { LLMService } from "../services/llm.js";
 import { ReviewerAgent } from "../services/reviewer-agent.js";
 import { GitHubReviewService, parseFoundryCommand, ReviewCooldownError, HELP_COMMENT, formatStatusComment } from "../services/github-review.js";
+import { FeedbackQueueService } from "../services/feedback-queue-service.js";
 import type { Env } from "../env.js";
 
 export const webhookRoute = new OpenAPIHono<{ Bindings: Env }>();
@@ -67,9 +68,29 @@ webhookRoute.openapi(gitWebhookRoute, async (c) => {
     if (!parsed.success) {
       return c.json({ error: "Invalid issue event payload" }, 400);
     }
+
+    // ── visual-feedback 라벨 감지 → 피드백 큐 등록 (F319) ──
+    let feedbackQueued = false;
+    const hasVisualFeedback = parsed.data.issue.labels.some(
+      (l) => l.name === "visual-feedback"
+    );
+    if (hasVisualFeedback && (parsed.data.action === "opened" || parsed.data.action === "labeled")) {
+      const queueService = new FeedbackQueueService(c.env.DB);
+      const issueUrl = `https://github.com/${parsed.data.repository.full_name}/issues/${parsed.data.issue.number}`;
+      await queueService.enqueue(orgId, {
+        number: parsed.data.issue.number,
+        url: issueUrl,
+        title: parsed.data.issue.title,
+        body: parsed.data.issue.body,
+        labels: parsed.data.issue.labels.map((l) => l.name),
+      });
+      feedbackQueued = true;
+    }
+
+    // 기존 syncIssueToTask 유지
     const sync = new GitHubSyncService(github, c.env.DB, orgId);
     const result = await sync.syncIssueToTask(parsed.data);
-    return c.json({ event: "issues", ...result });
+    return c.json({ event: "issues", ...result, feedbackQueued });
   }
 
   // ─── Pull Request event ───
