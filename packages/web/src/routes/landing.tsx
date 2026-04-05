@@ -26,6 +26,48 @@ import {
 } from "lucide-react";
 import { parseFrontmatter, type HeroContent } from "@/lib/content-loader";
 import heroRaw from "../../content/landing/hero.md?raw";
+import featuresRaw from "../../content/landing/features.md?raw";
+import statsRaw from "../../content/landing/stats.md?raw";
+import ctaRaw from "../../content/landing/cta.md?raw";
+
+interface LandingSectionContent {
+  title: string;
+  section: string;
+  sort_order?: number;
+}
+
+// Build-time content from TinaCMS-managed Markdown — used for section ordering
+const sectionContents = [
+  parseFrontmatter<LandingSectionContent>(heroRaw),
+  parseFrontmatter<LandingSectionContent>(statsRaw),
+  parseFrontmatter<LandingSectionContent>(featuresRaw),
+  parseFrontmatter<LandingSectionContent>(ctaRaw),
+];
+
+// Section key → sort_order map (CMS-driven ordering)
+const sectionOrder: Record<string, number> = {};
+for (const s of sectionContents) {
+  if (s.data.section) {
+    sectionOrder[s.data.section] = s.data.sort_order ?? 99;
+  }
+}
+
+// Default section order (fallback when no sort_order in content)
+const DEFAULT_SECTION_ORDER: Record<string, number> = {
+  hero: 0,
+  stats: 1,
+  process: 2,
+  features: 3,
+  agents: 4,
+  architecture: 5,
+  ecosystem: 6,
+  roadmap: 7,
+  cta: 8,
+};
+
+function getSectionOrder(section: string): number {
+  return sectionOrder[section] ?? DEFAULT_SECTION_ORDER[section] ?? 99;
+}
 
 /* ═══════════════════════════════════════════════
    DATA — PRD v8 기반 (TinaCMS content with fallback)
@@ -383,11 +425,10 @@ function RoadmapTimeline() {
    PAGE
    ═══════════════════════════════════════════════ */
 
-export function Component() {
+// Section components — each keyed for sort_order-based rendering
+function HeroSection() {
   return (
-    <div className="grain-overlay relative overflow-hidden">
-      {/* ═══ HERO ═══ */}
-      <section className="axis-grid relative flex min-h-[92vh] items-center justify-center px-6 pt-16">
+    <section className="axis-grid relative flex min-h-[92vh] items-center justify-center px-6 pt-16">
         {/* Background effects */}
         <div className="pointer-events-none absolute inset-0" aria-hidden="true">
           <div className="absolute top-1/4 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-axis-primary/5 blur-[120px]" />
@@ -458,142 +499,195 @@ export function Component() {
           </div>
         </div>
       </section>
+  );
+}
 
-      {/* ═══ STATS BAR ═══ */}
-      <section className="border-y border-border/30 bg-muted/20">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-6">
-          {stats.map((stat) => (
-            <div key={stat.label} className="flex flex-col items-center gap-0.5">
-              <span className="font-display text-2xl font-bold text-axis-primary sm:text-3xl">{stat.value}</span>
-              <span className="font-mono text-[10px] tracking-wider text-muted-foreground uppercase">{stat.label}</span>
+function StatsSection() {
+  return (
+    <section className="border-y border-border/30 bg-muted/20">
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-6">
+        {stats.map((stat) => (
+          <div key={stat.label} className="flex flex-col items-center gap-0.5">
+            <span className="font-display text-2xl font-bold text-axis-primary sm:text-3xl">{stat.value}</span>
+            <span className="font-mono text-[10px] tracking-wider text-muted-foreground uppercase">{stat.label}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ProcessSection() {
+  return (
+    <section id="process" className="relative px-6 py-24 md:py-32">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-16 text-center">
+          <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">How It Works</span>
+          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">BDP{" "}<span className="text-axis-primary">7단계</span> 프로세스</h2>
+          <p className="mt-4 text-lg text-muted-foreground">수집에서 평가까지, AI 에이전트가 사업개발 전 과정을 자동화해요.</p>
+        </div>
+        <ProcessFlow />
+      </div>
+    </section>
+  );
+}
+
+function FeaturesSection() {
+  return (
+    <section id="features" className="relative bg-muted/10 px-6 py-24 md:py-32">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-16 text-center">
+          <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Core Pillars</span>
+          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">세 가지{" "}<span className="text-axis-primary">차별점</span></h2>
+          <p className="mt-4 text-lg text-muted-foreground">BDP 라이프사이클, AI 에이전트, SDD Triangle.</p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-3">
+          {pillars.map((p, i) => (
+            <div key={p.title} className={`animate-fade-in-up stagger-${i + 1} axis-glass group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:border-axis-primary/20 hover:bg-axis-primary/5`}>
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex size-11 items-center justify-center rounded-xl transition-colors group-hover:bg-axis-primary/20" style={{ backgroundColor: `color-mix(in oklch, var(--${p.color}) 10%, transparent)` }}>
+                  <p.icon className="size-5" style={{ color: `var(--${p.color})` }} />
+                </div>
+                <div>
+                  <span className="rounded-md px-2 py-0.5 font-mono text-[10px] font-medium" style={{ backgroundColor: `color-mix(in oklch, var(--${p.color}) 10%, transparent)`, color: `var(--${p.color})` }}>{p.label}</span>
+                </div>
+              </div>
+              <h3 className="mb-2 font-display text-lg font-semibold">{p.title}</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
+              <div className="mt-4 border-t border-border/30 pt-3">
+                <span className="font-mono text-[11px] text-muted-foreground/60">{p.detail}</span>
+              </div>
             </div>
           ))}
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      {/* ═══ PROCESS ═══ */}
-      <section id="process" className="relative px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-16 text-center">
-            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">How It Works</span>
-            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">BDP{" "}<span className="text-axis-primary">7단계</span> 프로세스</h2>
-            <p className="mt-4 text-lg text-muted-foreground">수집에서 평가까지, AI 에이전트가 사업개발 전 과정을 자동화해요.</p>
-          </div>
-          <ProcessFlow />
+function AgentsSection() {
+  return (
+    <section id="agents" className="relative px-6 py-24 md:py-32">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-16 text-center">
+          <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Agent Ecosystem</span>
+          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">6종{" "}<span className="text-axis-primary">AI 에이전트</span></h2>
+          <p className="mt-4 text-lg text-muted-foreground">사업기회 형상화부터 코드 검증까지. 멀티모델 파이프라인으로 품질을 보장해요.</p>
         </div>
-      </section>
+        <AgentGrid />
+      </div>
+    </section>
+  );
+}
 
-      {/* ═══ 3 PILLARS ═══ */}
-      <section id="features" className="relative bg-muted/10 px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-16 text-center">
-            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Core Pillars</span>
-            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">세 가지{" "}<span className="text-axis-primary">차별점</span></h2>
-            <p className="mt-4 text-lg text-muted-foreground">BDP 라이프사이클, AI 에이전트, SDD Triangle.</p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {pillars.map((p, i) => (
-              <div key={p.title} className={`animate-fade-in-up stagger-${i + 1} axis-glass group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:border-axis-primary/20 hover:bg-axis-primary/5`}>
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex size-11 items-center justify-center rounded-xl transition-colors group-hover:bg-axis-primary/20" style={{ backgroundColor: `color-mix(in oklch, var(--${p.color}) 10%, transparent)` }}>
-                    <p.icon className="size-5" style={{ color: `var(--${p.color})` }} />
-                  </div>
-                  <div>
-                    <span className="rounded-md px-2 py-0.5 font-mono text-[10px] font-medium" style={{ backgroundColor: `color-mix(in oklch, var(--${p.color}) 10%, transparent)`, color: `var(--${p.color})` }}>{p.label}</span>
-                  </div>
-                </div>
-                <h3 className="mb-2 font-display text-lg font-semibold">{p.title}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
-                <div className="mt-4 border-t border-border/30 pt-3">
-                  <span className="font-mono text-[11px] text-muted-foreground/60">{p.detail}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+function ArchitectureSection() {
+  return (
+    <section id="architecture" className="relative bg-muted/10 px-6 py-24 md:py-32">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-16 text-center">
+          <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Architecture</span>
+          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">4-Layer{" "}<span className="text-axis-primary">아키텍처</span></h2>
+          <p className="mt-4 text-lg text-muted-foreground">CLI에서 데이터까지, 모든 레이어가 유기적으로 연결돼요.</p>
         </div>
-      </section>
+        <ArchitectureBlueprint />
+      </div>
+    </section>
+  );
+}
 
-      {/* ═══ AGENTS ═══ */}
-      <section id="agents" className="relative px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-16 text-center">
-            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Agent Ecosystem</span>
-            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">6종{" "}<span className="text-axis-primary">AI 에이전트</span></h2>
-            <p className="mt-4 text-lg text-muted-foreground">사업기회 형상화부터 코드 검증까지. 멀티모델 파이프라인으로 품질을 보장해요.</p>
-          </div>
-          <AgentGrid />
+function EcosystemSection() {
+  return (
+    <section id="ecosystem" className="relative px-6 py-24 md:py-32">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-16 text-center">
+          <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Ecosystem</span>
+          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">AX{" "}<span className="text-axis-primary">생태계</span></h2>
+          <p className="mt-4 text-lg text-muted-foreground">수집 · 오케스트레이션 · 디자인을 연결해요.</p>
         </div>
-      </section>
+        <EcosystemDiagram />
+      </div>
+    </section>
+  );
+}
 
-      {/* ═══ ARCHITECTURE ═══ */}
-      <section id="architecture" className="relative bg-muted/10 px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-16 text-center">
-            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Architecture</span>
-            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">4-Layer{" "}<span className="text-axis-primary">아키텍처</span></h2>
-            <p className="mt-4 text-lg text-muted-foreground">CLI에서 데이터까지, 모든 레이어가 유기적으로 연결돼요.</p>
-          </div>
-          <ArchitectureBlueprint />
+function RoadmapSection() {
+  return (
+    <section id="roadmap" className="relative bg-muted/10 px-6 py-24 md:py-32">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-16 text-center">
+          <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Roadmap</span>
+          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">Phase 5{" "}<span className="text-axis-primary">로드맵</span></h2>
+          <p className="mt-4 text-lg text-muted-foreground">CLI에서 시작해 BDP 자동화까지. 71 Sprint를 거치며 사업개발 플랫폼을 구축했어요.</p>
         </div>
-      </section>
+        <RoadmapTimeline />
+      </div>
+    </section>
+  );
+}
 
-      {/* ═══ ECOSYSTEM ═══ */}
-      <section id="ecosystem" className="relative px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-16 text-center">
-            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Ecosystem</span>
-            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">AX{" "}<span className="text-axis-primary">생태계</span></h2>
-            <p className="mt-4 text-lg text-muted-foreground">수집 · 오케스트레이션 · 디자인을 연결해요.</p>
-          </div>
-          <EcosystemDiagram />
+function CtaSection() {
+  return (
+    <section className="relative px-6 py-24 md:py-32">
+      <div className="mx-auto max-w-3xl text-center">
+        <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+          AI 에이전트와 함께
+          <br />
+          <span className="text-axis-primary">사업개발을 자동화하세요</span>
+        </h2>
+        <p className="mt-6 text-lg text-muted-foreground">
+          Foundry-X는 AX 사업개발의 전체 라이프사이클을 자동화해요.
+          <br />
+          수집에서 평가까지, BDP 7단계를 한 곳에서.
+        </p>
+        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <Link
+            to="/dashboard"
+            className="axis-glow-strong group inline-flex h-12 items-center gap-2 rounded-xl bg-axis-primary px-7 text-sm font-bold text-white transition-all hover:bg-axis-primary-hover"
+          >
+            시작하기
+            <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+          <a
+            href="https://github.com/KTDS-AXBD/Foundry-X"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-12 items-center gap-2 rounded-xl border border-border/50 bg-background/50 px-7 text-sm font-medium backdrop-blur transition-all hover:border-axis-primary/30 hover:bg-axis-primary/5"
+          >
+            GitHub
+            <ArrowUpRight className="size-3" />
+          </a>
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      {/* ═══ ROADMAP ═══ */}
-      <section id="roadmap" className="relative bg-muted/10 px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-16 text-center">
-            <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Roadmap</span>
-            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">Phase 5{" "}<span className="text-axis-primary">로드맵</span></h2>
-            <p className="mt-4 text-lg text-muted-foreground">CLI에서 시작해 BDP 자동화까지. 71 Sprint를 거치며 사업개발 플랫폼을 구축했어요.</p>
-          </div>
-          <RoadmapTimeline />
-        </div>
-      </section>
+/* ═══════════════════════════════════════════════
+   Section registry — CMS sort_order 기반 동적 정렬
+   ═══════════════════════════════════════════════ */
 
-      {/* ═══ CTA SECTION ═══ */}
-      <section className="relative px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            AI 에이전트와 함께
-            <br />
-            <span className="text-axis-primary">사업개발을 자동화하세요</span>
-          </h2>
-          <p className="mt-6 text-lg text-muted-foreground">
-            Foundry-X는 AX 사업개발의 전체 라이프사이클을 자동화해요.
-            <br />
-            수집에서 평가까지, BDP 7단계를 한 곳에서.
-          </p>
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link
-              to="/dashboard"
-              className="axis-glow-strong group inline-flex h-12 items-center gap-2 rounded-xl bg-axis-primary px-7 text-sm font-bold text-white transition-all hover:bg-axis-primary-hover"
-            >
-              시작하기
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-            <a
-              href="https://github.com/KTDS-AXBD/Foundry-X"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-12 items-center gap-2 rounded-xl border border-border/50 bg-background/50 px-7 text-sm font-medium backdrop-blur transition-all hover:border-axis-primary/30 hover:bg-axis-primary/5"
-            >
-              GitHub
-              <ArrowUpRight className="size-3" />
-            </a>
-          </div>
-        </div>
-      </section>
+const landingSections = [
+  { key: "hero", Component: HeroSection },
+  { key: "stats", Component: StatsSection },
+  { key: "process", Component: ProcessSection },
+  { key: "features", Component: FeaturesSection },
+  { key: "agents", Component: AgentsSection },
+  { key: "architecture", Component: ArchitectureSection },
+  { key: "ecosystem", Component: EcosystemSection },
+  { key: "roadmap", Component: RoadmapSection },
+  { key: "cta", Component: CtaSection },
+].sort((a, b) => getSectionOrder(a.key) - getSectionOrder(b.key));
+
+/* ═══════════════════════════════════════════════
+   PAGE
+   ═══════════════════════════════════════════════ */
+
+export function Component() {
+  return (
+    <div className="grain-overlay relative overflow-hidden">
+      {landingSections.map(({ key, Component: Section }) => (
+        <Section key={key} />
+      ))}
     </div>
   );
 }

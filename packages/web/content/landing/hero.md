@@ -1,6 +1,7 @@
 ---
 title: "Foundry-X Hero"
 section: "hero"
+sort_order: 0
 tagline: "AX 사업개발 AI 오케스트레이션 플랫폼"
 phase: "Phase 5f 완료"
 phaseTitle: "AX BD 사업개발 체계 수립"
