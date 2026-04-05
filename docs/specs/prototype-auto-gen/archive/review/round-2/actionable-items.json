@@ -1,0 +1,425 @@
+{
+  "generated": "2026-04-05T10:09:45.620Z",
+  "totalItems": 69,
+  "byType": {
+    "flaw": 3,
+    "gap": 17,
+    "risk": 46
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**문제와 성공지표의 정렬**: “실사용자 피드백 루프”나 “QA 자동화”의 GAP, 리스크, 성공지표는 언급은 있으나, 실제 설계·로드맵에는 “선택적(Phase D)” 또는 “확장 예정”으로 밀려 있습니다. 품질 Loop가 필수적이라면 최소한 1차 출시(Phase C) 내에 일부라도 포함되어야 합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**장애 복구/Dead-letter flow** 등은 “필요성” 언급에 그치고 실제 플로우/운영 상세가 없습니다. 실운영 기준에서 복구/수동介入 시나리오가 구체적으로 보강되어야 합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**API 비용 $0 근거**: “구독 기반이므로 $0” 주장에 대해, fallback 전환/운영비용/보안 리스크(구독 계정 탈취 등)까지 성공기준에 명확히 반영되지 않았습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**문제와 성공지표의 정렬**: “실사용자 피드백 루프”나 “QA 자동화”의 GAP, 리스크, 성공지표는 언급은 있으나, 실제 설계·로드맵에는 “선택적(Phase D)” 또는 “확장 예정”으로 밀려 있습니다. 품질 Loop가 필수적이라면 최소한 1차 출시(Phase C) 내에 일부라도 포함되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**장애 복구/Dead-letter flow** 등은 “필요성” 언급에 그치고 실제 플로우/운영 상세가 없습니다. 실운영 기준에서 복구/수동介入 시나리오가 구체적으로 보강되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**API 비용 $0 근거**: “구독 기반이므로 $0” 주장에 대해, fallback 전환/운영비용/보안 리스크(구독 계정 탈취 등)까지 성공기준에 명확히 반영되지 않았습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실시간 장애 감지/운영 대시보드**: Polling 기반만 존재, 실시간 장애 감지/운영 대시보드/SLA 기반 알림 체계(예: Sentry, PagerDuty 등)가 구체적으로 설계되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**보안/개인정보 자동 탐지·차단**: 모든 PRD/Prototype에 개인정보/민감정보가 포함될 수 있어, 자동 스캐닝/차단(PII Detection), 배포 전 보안 체크 플로우가 누락되어 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**접근제어/인가**: Prototype 배포 URL 접근제어(비공개, 사내 인증 등)가 실제로 필요할 수 있는데, 설계에 빠져있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**PRD 입력 표준화/유효성 검사**: Dry-run에서 조차 “체크리스트 추출 실패”가 주요 리스크였으나, 실제 PRD에 대한 표준 형식, 유효성 검사, 에러시 운영자介入 flow가 약함.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**정기적 Drift 감지/품질 테스트**: 템플릿/프롬프트 drift, 라이브러리 버전 업데이트 자동 감지 및 품질 회귀 테스트 플로우가 실제로 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Rollback/재배포/Job 재시도 운영 플로우**: 장애 시 Job 상태 불일치, 재시도/rollback/운영介入 절차가 상세하지 않습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**문제와 성공지표의 정렬**: “실사용자 피드백 루프”나 “QA 자동화”의 GAP, 리스크, 성공지표는 언급은 있으나, 실제 설계·로드맵에는 “선택적(Phase D)” 또는 “확장 예정”으로 밀려 있습니다. 품질 Loop가 필수적이라면 최소한 1차 출시(Phase C) 내에 일부라도 포함되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**장애 복구/Dead-letter flow** 등은 “필요성” 언급에 그치고 실제 플로우/운영 상세가 없습니다. 실운영 기준에서 복구/수동介入 시나리오가 구체적으로 보강되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**API 비용 $0 근거**: “구독 기반이므로 $0” 주장에 대해, fallback 전환/운영비용/보안 리스크(구독 계정 탈취 등)까지 성공기준에 명확히 반영되지 않았습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**인력 투입**: QA, DevOps, 운영(특히 장애 대응) 인력을 Sprint별로 분리했으나, 실제로는 QA/운영/DevOps 이슈(빌드 실패율, 장애, 보안, 피드백 Loop 등)가 최소 Phase B부터 상시 투입되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영 자동화/복구**: Polling 기반 장애, 상태머신 미흡 등은 실 배포/운영 시 인력 추가 투입(운영/DevOps)이 반드시 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**설계/구현 일정**: Dry-run은 단일 PRD로 실험한 결과입니다. 실제 다양한 복잡도 PRD, 실사용자 피드백, 반복 QA 등 도입시 일정이 1.5~2배 늘어날 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Cloudflare Pages/CLI 정책의 불확실성**: “공식 정책 확인”은 체크리스트에 그쳤으나, 미확정인 상태에서 개발 진행시 전체 일정이 중단될 리스크가 큽니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실시간 장애 감지/운영 대시보드**: Polling 기반만 존재, 실시간 장애 감지/운영 대시보드/SLA 기반 알림 체계(예: Sentry, PagerDuty 등)가 구체적으로 설계되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**보안/개인정보 자동 탐지·차단**: 모든 PRD/Prototype에 개인정보/민감정보가 포함될 수 있어, 자동 스캐닝/차단(PII Detection), 배포 전 보안 체크 플로우가 누락되어 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**접근제어/인가**: Prototype 배포 URL 접근제어(비공개, 사내 인증 등)가 실제로 필요할 수 있는데, 설계에 빠져있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**PRD 입력 표준화/유효성 검사**: Dry-run에서 조차 “체크리스트 추출 실패”가 주요 리스크였으나, 실제 PRD에 대한 표준 형식, 유효성 검사, 에러시 운영자介入 flow가 약함.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**정기적 Drift 감지/품질 테스트**: 템플릿/프롬프트 drift, 라이브러리 버전 업데이트 자동 감지 및 품질 회귀 테스트 플로우가 실제로 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Rollback/재배포/Job 재시도 운영 플로우**: 장애 시 Job 상태 불일치, 재시도/rollback/운영介入 절차가 상세하지 않습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Anthropic/Claude CLI 정책 불확실성**: 서버/자동화 환경에서의 CLI 사용 허용 여부, rate limit, 정책 변경에 따라 전체 서비스가 중단될 수 있습니다. 공식 확인 없이 착수하면 위험합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**장애 복구/운영 미흡**: Polling 기반, 단일 서버/디렉토리 환경, dead-letter queue/상태머신 미흡은 장애시 운영팀 부하와 데이터 유실, 장기 장애로 이어질 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실사용자(피드백) Loop/QA 부재**: 실제 생성 Prototype의 품질, 업무 적합성 확보가 미흡하여 “자동”의 목적이 무색해질 수 있습니다. 이 부분이 Phase D로 밀리면 현업 활용도가 낮아질 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**보안/격리/접근제어**: Docker 격리는 “확장 예정”일 뿐, 초기에 미적용 시 개인정보/계정 탈취/파일 충돌 등 치명적 사고가 발생할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**PRD 입력 표준화 부재**: 자유양식/불명확 PRD로 인해 전체 파이프라인이 불안정해질 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Anthropic/Claude Code CLI의 프로덕션/서버 환경 공식 허용 여부** 및 rate limit, 정책 변경 가능성에 대해 Anthropic 측 공식 회신 확보.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/보안 설계**: 최소한 Phase B 내에",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**PRD 입력 표준화/유효성 검사**: PRD 전처리 실패/모호성에 대한 운영介入 및 표준 체크리스트 자동화 설계.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실사용자 피드백/QA Loop의 명확한 실현 시기**: Phase C 내 최소 MVP 형태로 포함(예: 피드백 입력, Loop 연동, QA 체크리스트 자동화).",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "사실 확인\n\nPRD에 포함된 가정이나 수치 중 검증이 필요한 것들은 다음과 같습니다.\n\n*   **Claude Code CLI의 프로덕션 서버/자동화 환경 사용 정책 및 Rate Limit (Critical):**\n    *   가장 중요한 검증 사항입니다. PRD에서도 명시하고 있듯이, Anthropic이 Max 구독 계정으로 `claude` CLI를 *",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**Anthropic에 Claude Code CLI의 Max 구독 계정을 활용한 프로덕션 서버/자동화 환경에서의 비대화형 사용이 공식적으로 허용되는지, 그리고 이에 대한 명확한 서비스 약관 및 Rate Limit이 무엇인지 확인하고 문서화해야 합니다.** (필수)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "`--dangerously-skip-permissions` 플래그 사용과 관련하여, 서버 환경에서의 잠재적 보안 취약점 및 운영 리스크에 대한 심층적인 기술 검토 및 보안 아키텍처 설계가 선행되어야 합니다. (필수)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**G8 (실사용자 피드백 루프 부재) 및 G9 (자동 QA/테스트 부재)에 대한 Phase C/D에서의 구체적인 구현 계획 및 리소스 배정**이 초기 사용자 만족도 및 신뢰 확보를 위해 중요합니다. (강력 권고)",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**핵심 리스크**: Anthropic의 Claude Code CLI가 **프로덕션 서버/자동화 환경에서의 사용을 공식적으로 허용하는지 명확하지 않음**. 현재는 개발자 도구로 제공되며, 대규모 자동화에 대한 사용 제한이나 정책 변경 가능성이 높음.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**Rate Limit 미확인**: Max 구독 계정의 시간당/일일 호출 제한이 공개되지 않아 용량 계획 불가능. 30턴/건 × 다수 Job 시 빠르게 제한에 도달할 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**파일 충돌**: 동시성 관리 실패 시 작업 디렉토리 오염",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**보안 취약**: 한 Job의 악성 코드가 전체 서버 파일 시스템 접근 가능",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**개인정보 노출**: PRD에 포함된 민감정보가 다른 Job에 노출될 수 있음",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**분산 트랜잭션 문제**: Builder Server 장애 시 Job이 영구 \"building\" 상태 고착",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**재시도/복구 메커니즘 부재**: 빌드 타임아웃 시 자동 롤백 없음",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**Dead-letter queue 미구성**: 반복 실패 Job이 큐를 막을 수 있음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**핵심 리스크**: Anthropic의 Claude Code CLI가 **프로덕션 서버/자동화 환경에서의 사용을 공식적으로 허용하는지 명확하지 않음**. 현재는 개발자 도구로 제공되며, 대규모 자동화에 대한 사용 제한이나 정책 변경 가능성이 높음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Rate Limit 미확인**: Max 구독 계정의 시간당/일일 호출 제한이 공개되지 않아 용량 계획 불가능. 30턴/건 × 다수 Job 시 빠르게 제한에 도달할 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**파일 충돌**: 동시성 관리 실패 시 작업 디렉토리 오염",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**보안 취약**: 한 Job의 악성 코드가 전체 서버 파일 시스템 접근 가능",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**개인정보 노출**: PRD에 포함된 민감정보가 다른 Job에 노출될 수 있음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**분산 트랜잭션 문제**: Builder Server 장애 시 Job이 영구 \"building\" 상태 고착",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**재시도/복구 메커니즘 부재**: 빌드 타임아웃 시 자동 롤백 없음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Dead-letter queue 미구성**: 반복 실패 Job이 큐를 막을 수 있음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**빌드 무한 루프**: Claude Code가 수정-빌드 실패 사이클에 빠질 경우",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**대형 PRD 처리**: 1000줄 이상 PRD의 컨텍스트 한계(Claude 토큰 제한)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**네트워크 불안정**: 배포 중 Cloudflare API 실패 시 부분 배포 상태 처리",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**CLI 정책 변경 리스크 (가장 치명적)**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**생성 품질 불확실성으로 인한 신뢰도 상실**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**보안 사고 가능성**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**운영 부담 과다**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Anthropic 공식 확인**: Claude Code CLI의 프로덕션 서버 자동화 사용 허용 및 rate limit 명확화",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**격리 환경 구현**: Docker 컨테이너 기반 Job 격리를 Phase A에 포함 (옵션이 아닌 필수)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**상태 관리 강화**: 상태 머신 패턴 도입과 dead-letter queue 구현 계획 수립",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**품질 검증 레이어 추가**: 빌드 성공 외 기능 정합성 기본 검증 로직 설계",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Fallback 전략 구체화**: Claude API 전환 시 비용 예산 및 승인 프로세스 확보",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}
