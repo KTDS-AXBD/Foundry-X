@@ -17,11 +17,24 @@ export const router = createBrowserRouter([
     children: [{
     element: <AppLayout />,
     children: [
-      // ── 비프로세스 (변경 없음) ──
+      // ── 비프로세스 ──
       { path: "dashboard", lazy: () => import("@/routes/dashboard") },
       { path: "getting-started", lazy: () => import("@/routes/getting-started") },
       { path: "team-shared", lazy: () => import("@/routes/team-shared") },
       { path: "ax-bd/demo", lazy: () => import("@/routes/ax-bd/demo-scenario") },
+
+      // ── Phase 13 v1.3 신규 경로 ──
+      { path: "discovery", lazy: () => import("@/routes/ax-bd/discover-dashboard") },
+      { path: "validation", lazy: () => import("@/routes/validation-division") },
+      { path: "product", lazy: () => import("@/routes/mvp-tracking") },
+      { path: "shaping/business-plan", lazy: () => import("@/routes/ax-bd/index") },
+      { path: "validation/share", lazy: () => import("@/routes/team-shared") },
+      { path: "product/offering-pack", lazy: () => import("@/routes/offering-packs") },
+      { path: "product/offering-pack/givc-pitch", lazy: () => import("@/routes/offering-pack-givc-pitch") },
+      { path: "product/offering-pack/:id", lazy: () => import("@/routes/offering-pack-detail") },
+      { path: "product/offering-pack/:id/brief", lazy: () => import("@/routes/offering-brief") },
+      { path: "nps-dashboard", lazy: () => import("@/routes/nps-dashboard") },
+      { path: "settings", lazy: () => import("@/routes/settings-jira") },
 
       // ── 1단계 수집 (collection) ──
       { path: "collection/sr", lazy: () => import("@/routes/sr") },
@@ -98,7 +111,7 @@ export const router = createBrowserRouter([
       { path: "external/discovery-x", lazy: () => import("@/routes/discovery") },
       { path: "external/foundry", lazy: () => import("@/routes/foundry") },
 
-      // ── Redirects (16건) — 기존 경로 → 새 경로 ──
+      // ── Redirects (기존 16건) — 기존 경로 → 새 경로 ──
       { path: "sr", element: <Navigate to="/collection/sr" replace /> },
       { path: "discovery/collection", element: <Navigate to="/collection/field" replace /> },
       { path: "ir-proposals", element: <Navigate to="/collection/ideas" replace /> },
@@ -113,8 +126,23 @@ export const router = createBrowserRouter([
       { path: "pipeline", element: <Navigate to="/validation/pipeline" replace /> },
       { path: "mvp-tracking", element: <Navigate to="/product/mvp" replace /> },
       { path: "projects", element: <Navigate to="/gtm/projects" replace /> },
-      { path: "discovery", element: <Navigate to="/external/discovery-x" replace /> },
+      // discovery redirect 제거 — /discovery는 Phase 13에서 실제 라우트로 전환
       { path: "foundry", element: <Navigate to="/external/foundry" replace /> },
+
+      // ── Phase 13 Redirects (v1.3 IA 재설계, 13건) ──
+      { path: "team-shared", element: <Navigate to="/validation/share" replace /> },
+      { path: "ax-bd/demo", element: <Navigate to="/getting-started" replace /> },
+      { path: "discovery/items", element: <Navigate to="/discovery" replace /> },
+      { path: "discovery/ideas-bmc", element: <Navigate to="/discovery" replace /> },
+      { path: "discovery/dashboard", element: <Navigate to="/discovery" replace /> },
+      { path: "shaping/proposal", element: <Navigate to="/shaping/business-plan" replace /> },
+      { path: "shaping/review", element: <Navigate to="/dashboard" replace /> },
+      { path: "validation/pipeline", element: <Navigate to="/validation" replace /> },
+      { path: "product/mvp", element: <Navigate to="/product" replace /> },
+      { path: "product/poc", element: <Navigate to="/product" replace /> },
+      { path: "tools-guide", element: <Navigate to="/getting-started" replace /> },
+      { path: "analytics", element: <Navigate to="/nps-dashboard" replace /> },
+      { path: "settings/jira", element: <Navigate to="/settings" replace /> },
     ],
   }],
   },

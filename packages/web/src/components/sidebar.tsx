@@ -13,20 +13,16 @@ import {
   BarChart3,
   Menu,
   Search,
-  FlaskConical,
   LogIn,
   LogOut,
   Rocket,
   FileText,
   FolderKanban,
   ChevronRight,
-  HelpCircle,
-  Link2,
   Inbox,
   TrendingUp,
   Settings,
   Map,
-  Lightbulb,
   Radio,
   ArrowUpFromLine,
   PenTool,
@@ -34,16 +30,10 @@ import {
   Package,
   CheckCircle,
   GitBranch,
-  Shield,
-  Building2,
-  CalendarDays,
   Target,
   Library,
   Users,
-  Network,
-  Presentation,
   ClipboardCheck,
-  TestTubes,
   Code,
   Send,
 } from "lucide-react";
@@ -91,6 +81,8 @@ interface NavGroup {
   stageColor?: string; // 프로세스 단계 그룹에만 사용 — AXIS 색상 뱃지
   visibility?: Visibility;
   condition?: (ctx: VisibilityContext) => boolean;
+  collapsed?: boolean;
+  badge?: string;
 }
 
 export function isVisible(
@@ -104,16 +96,8 @@ export function isVisible(
 }
 
 const DEFAULT_TOP_ITEMS: NavItem[] = [
-  {
-    href: "/getting-started",
-    label: "시작하기",
-    icon: Rocket,
-    visibility: "conditional",
-    condition: (ctx) => !ctx.onboardingComplete,
-  },
-  { href: "/dashboard", label: "홈", icon: LayoutDashboard },
-  { href: "/team-shared", label: "팀 공유", icon: Users },
-  { href: "/ax-bd/demo", label: "데모 시나리오", icon: Presentation },
+  { href: "/dashboard", label: "대시보드", icon: LayoutDashboard },
+  { href: "/getting-started", label: "시작하기", icon: Rocket },
 ];
 
 /* ── 프로세스 6단계: 수집→발굴→형상화→검증/공유→제품화→GTM ── */
@@ -124,11 +108,12 @@ const DEFAULT_PROCESS_GROUPS: NavGroup[] = [
     label: "1. 수집",
     icon: Inbox,
     stageColor: "bg-axis-blue",
+    collapsed: true,
+    badge: "TBD",
     items: [
-      { href: "/collection/sr", label: "SR 목록", icon: ClipboardList },
       { href: "/collection/field", label: "Field 수집", icon: Radio },
       { href: "/collection/ideas", label: "IDEA Portal", icon: ArrowUpFromLine },
-      { href: "/collection/agent", label: "Agent 수집", icon: Bot },
+      { href: "/collection/screening", label: "스크리닝", icon: ClipboardList },
     ],
   },
   {
@@ -137,9 +122,7 @@ const DEFAULT_PROCESS_GROUPS: NavGroup[] = [
     icon: Search,
     stageColor: "bg-axis-violet",
     items: [
-      { href: "/discovery/items", label: "Discovery", icon: Map },
-      { href: "/discovery/ideas-bmc", label: "아이디어·BMC", icon: Lightbulb },
-      { href: "/discovery/dashboard", label: "대시보드", icon: BarChart3 },
+      { href: "/discovery", label: "발굴", icon: Map },
       { href: "/discovery/report", label: "평가 결과서", icon: ClipboardCheck },
     ],
   },
@@ -149,23 +132,20 @@ const DEFAULT_PROCESS_GROUPS: NavGroup[] = [
     icon: PenTool,
     stageColor: "bg-axis-warm",
     items: [
+      { href: "/shaping/business-plan", label: "사업기획서", icon: FileSignature },
+      { href: "/shaping/offering", label: "Offering", icon: Package },
       { href: "/shaping/prd", label: "PRD", icon: FileText },
-      { href: "/shaping/proposal", label: "사업제안서", icon: FileSignature },
-      { href: "/shaping/review", label: "형상화 리뷰", icon: ClipboardCheck },
       { href: "/shaping/prototype", label: "Prototype", icon: Code },
-      { href: "/shaping/offering", label: "Offering Pack", icon: Package },
     ],
   },
   {
     key: "validate",
-    label: "4. 검증/공유",
+    label: "4. 검증",
     icon: CheckCircle,
     stageColor: "bg-axis-green",
     items: [
-      { href: "/validation/pipeline", label: "파이프라인", icon: GitBranch },
-      { href: "/validation/division", label: "본부 검증", icon: Shield },
-      { href: "/validation/company", label: "전사 검증", icon: Building2 },
-      { href: "/validation/meetings", label: "미팅 관리", icon: CalendarDays },
+      { href: "/validation", label: "검증", icon: CheckCircle },
+      { href: "/validation/share", label: "산출물 공유", icon: Users },
     ],
   },
   {
@@ -174,8 +154,8 @@ const DEFAULT_PROCESS_GROUPS: NavGroup[] = [
     icon: Rocket,
     stageColor: "bg-axis-indigo",
     items: [
-      { href: "/product/mvp", label: "MVP 추적", icon: Target },
-      { href: "/product/poc", label: "PoC 관리", icon: TestTubes },
+      { href: "/product", label: "제품화", icon: Target },
+      { href: "/product/offering-pack", label: "Offering Pack", icon: Package },
     ],
   },
   {
@@ -183,57 +163,35 @@ const DEFAULT_PROCESS_GROUPS: NavGroup[] = [
     label: "6. GTM",
     icon: TrendingUp,
     stageColor: "bg-axis-rose",
+    collapsed: true,
+    badge: "TBD",
     items: [
-      { href: "/gtm/projects", label: "프로젝트 현황", icon: FolderKanban },
-      { href: "/gtm/outreach", label: "선제안", icon: Send },
+      { href: "/gtm/outreach", label: "대고객 선제안", icon: Send },
+      { href: "/gtm/pipeline", label: "파이프라인", icon: GitBranch },
     ],
   },
 ];
 
-const knowledgeGroup: NavGroup = {
-  key: "knowledge",
-  label: "지식",
-  icon: BookOpen,
-  items: [
-    { href: "/wiki", label: "지식베이스", icon: BookOpen, visibility: "admin" },
-    { href: "/methodologies", label: "방법론 관리", icon: Library, visibility: "admin" },
-    { href: "/ax-bd/skill-catalog", label: "스킬 카탈로그", icon: Library },
-    { href: "/ax-bd/ontology", label: "Ontology", icon: Network, visibility: "admin" },
-  ],
-};
-
-const adminGroup: NavGroup = {
-  key: "admin",
+const DEFAULT_ADMIN_GROUP: NavGroup = {
+  key: "admin-manage",
   label: "관리",
   icon: Settings,
   visibility: "admin",
   items: [
-    { href: "/analytics", label: "Analytics", icon: BarChart3 },
+    { href: "/tokens", label: "토큰/모델", icon: Coins },
+    { href: "/workspace", label: "워크스페이스", icon: FolderKanban },
     { href: "/agents", label: "에이전트", icon: Bot },
-    { href: "/tokens", label: "토큰 비용", icon: Coins },
     { href: "/architecture", label: "아키텍처", icon: Blocks },
-    { href: "/workspace", label: "내 작업", icon: FolderKanban },
-    { href: "/settings/jira", label: "설정", icon: Settings },
-    { href: "/backup", label: "백업 관리", icon: Shield },
+    { href: "/methodologies", label: "방법론", icon: Library },
+    { href: "/projects", label: "프로젝트", icon: FolderKanban },
+    { href: "/nps-dashboard", label: "NPS 대시보드", icon: BarChart3 },
   ],
 };
 
 const DEFAULT_MEMBER_BOTTOM_ITEMS: NavItem[] = [
-  { href: "/tools-guide", label: "도구 가이드", icon: PenTool },
-  { href: "/getting-started", label: "도움말", icon: HelpCircle },
-  { href: "/settings/jira", label: "설정", icon: Settings },
+  { href: "/wiki", label: "위키", icon: BookOpen },
+  { href: "/settings", label: "설정", icon: Settings },
 ];
-
-const externalGroup: NavGroup = {
-  key: "external",
-  label: "외부 서비스",
-  icon: Link2,
-  visibility: "admin",
-  items: [
-    { href: "/external/discovery-x", label: "Discovery-X", icon: Search },
-    { href: "/external/foundry", label: "AI Foundry", icon: FlaskConical },
-  ],
-};
 
 /* ------------------------------------------------------------------ */
 /*  CMS-driven Navigation (TinaCMS content → NavItem/NavGroup)         */
@@ -261,6 +219,8 @@ const processGroups: NavGroup[] = cmsNav
         label: g.label,
         icon: getIcon(g.iconKey ?? g.items[0]?.iconKey ?? "HelpCircle"),
         stageColor: g.stageColor,
+        collapsed: g.collapsed,
+        badge: g.badge,
         items: g.items
           .filter((i) => i.visible !== false)
           .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
@@ -275,6 +235,22 @@ const memberBottomItems: NavItem[] = cmsNav
       .map(cmsItemToNav)
   : DEFAULT_MEMBER_BOTTOM_ITEMS;
 
+const adminGroups: NavGroup[] = cmsNav?.adminGroups
+  ? cmsNav.adminGroups
+      .filter((g) => g.visible !== false)
+      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+      .map((g) => ({
+        key: g.key,
+        label: g.label,
+        icon: getIcon(g.iconKey ?? "Settings"),
+        visibility: "admin" as Visibility,
+        items: g.items
+          .filter((i) => i.visible !== false)
+          .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+          .map(cmsItemToNav),
+      }))
+  : [DEFAULT_ADMIN_GROUP];
+
 /* ------------------------------------------------------------------ */
 /*  Collapsible Group State (localStorage 영속)                        */
 /* ------------------------------------------------------------------ */
@@ -283,7 +259,7 @@ const STORAGE_KEY = "fx-sidebar-groups";
 
 function useGroupState() {
   const [openGroups, setOpenGroups] = useState<Set<string>>(
-    () => new Set(["collect", "discover", "shape", "validate", "productize", "gtm"]), // 프로세스 6단계 기본 펼침
+    () => new Set(["discover", "shape", "validate", "productize"]), // 수집/GTM 제외 (collapsed 그룹)
   );
 
   useEffect(() => {
@@ -354,6 +330,7 @@ function CollapsibleGroup({
   onSelect?: () => void;
 }) {
   const hasActive = group.items.some((item) => pathname === item.href || pathname.startsWith(item.href + "/"));
+  const isCollapsed = group.collapsed && !hasActive;
 
   return (
     <div data-tour={`group-${group.key}`}>
@@ -380,6 +357,11 @@ function CollapsibleGroup({
           <group.icon className="size-4 shrink-0" />
         )}
         <span className="flex-1 text-left">{group.label}</span>
+        {group.badge && (
+          <span className="ml-auto mr-1 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+            {group.badge}
+          </span>
+        )}
         <ChevronRight
           className={cn(
             "size-3.5 shrink-0 text-muted-foreground/60 transition-transform duration-200",
@@ -387,7 +369,7 @@ function CollapsibleGroup({
           )}
         />
       </button>
-      {isOpen && (
+      {isOpen && !isCollapsed && (
         <div className={cn(
           "ml-4 flex flex-col gap-0.5 border-l pl-2",
           group.stageColor && hasActive
@@ -402,6 +384,11 @@ function CollapsibleGroup({
               onSelect={onSelect}
             />
           ))}
+        </div>
+      )}
+      {isOpen && isCollapsed && (
+        <div className="ml-4 px-3 py-2 text-xs text-muted-foreground">
+          준비 중이에요
         </div>
       )}
     </div>
@@ -434,35 +421,18 @@ function NavLinks({ onSelect }: { onSelect?: () => void }) {
   const filteredProcessGroups = useMemo(
     () => processGroups
       .filter((g) => isVisible(g, ctx))
-      .map((g) => ({ ...g, items: g.items.filter((item) => isVisible(item, ctx)) }))
-      .filter((g) => g.items.length > 0),
+      .map((g) => ({ ...g, items: g.items.filter((item) => isVisible(item, ctx)) })),
     [ctx],
   );
 
-  const filteredKnowledge = useMemo(() => {
-    if (!isVisible(knowledgeGroup, ctx)) return null;
-    const items = knowledgeGroup.items.filter((item) => isVisible(item, ctx));
-    return items.length > 0 ? { ...knowledgeGroup, items } : null;
-  }, [ctx]);
-
-  const filteredAdmin = useMemo(
-    () => (isVisible(adminGroup, ctx) ? adminGroup : null),
-    [ctx],
-  );
-
-  const filteredExternal = useMemo(
-    () => (isVisible(externalGroup, ctx) ? externalGroup : null),
+  const filteredAdminGroups = useMemo(
+    () => adminGroups.filter((g) => isVisible(g, ctx)),
     [ctx],
   );
 
   const allVisibleGroups = useMemo(
-    () => [
-      ...filteredProcessGroups,
-      ...(filteredKnowledge ? [filteredKnowledge] : []),
-      ...(filteredAdmin ? [filteredAdmin] : []),
-      ...(filteredExternal ? [filteredExternal] : []),
-    ],
-    [filteredProcessGroups, filteredKnowledge, filteredAdmin, filteredExternal],
+    () => [...filteredProcessGroups, ...filteredAdminGroups],
+    [filteredProcessGroups, filteredAdminGroups],
   );
 
   // 활성 경로가 포함된 그룹은 자동 펼침
@@ -479,14 +449,14 @@ function NavLinks({ onSelect }: { onSelect?: () => void }) {
 
   return (
     <nav className="flex flex-col gap-0.5">
-      {/* 시작하기(조건부) + 홈 + 팀공유 + 데모 */}
+      {/* 상단: 대시보드 + 시작하기 */}
       {filteredTopItems.map((item) => (
         <NavLink key={item.href} item={item} pathname={pathname} onSelect={onSelect} />
       ))}
 
       <div className="my-2 border-t border-border/40" />
 
-      {/* 프로세스 6단계 */}
+      {/* 프로세스 6단계 (collapsed/badge 지원) */}
       {filteredProcessGroups.map((group) => (
         <CollapsibleGroup
           key={group.key}
@@ -500,47 +470,24 @@ function NavLinks({ onSelect }: { onSelect?: () => void }) {
 
       <div className="my-2 border-t border-border/40" />
 
-      {/* 지식 (필터링 후 아이템이 있을 때만) */}
-      {filteredKnowledge && (
-        <CollapsibleGroup
-          group={filteredKnowledge}
-          pathname={pathname}
-          isOpen={openGroups.has(filteredKnowledge.key)}
-          onToggle={() => toggle(filteredKnowledge.key)}
-          onSelect={onSelect}
-        />
-      )}
+      {/* 하단 고정: 위키 + 설정 (Member + Admin 공통) */}
+      {memberBottomItems.map((item) => (
+        <NavLink key={item.href} item={item} pathname={pathname} onSelect={onSelect} />
+      ))}
 
-      {/* 관리 (Admin 전용) */}
-      {filteredAdmin && (
-        <CollapsibleGroup
-          group={filteredAdmin}
-          pathname={pathname}
-          isOpen={openGroups.has(filteredAdmin.key)}
-          onToggle={() => toggle(filteredAdmin.key)}
-          onSelect={onSelect}
-        />
-      )}
-
-      {filteredExternal && (
+      {/* Admin 전용 관리 그룹 */}
+      {isAdmin && (
         <>
           <div className="my-2 border-t border-border/40" />
-          <CollapsibleGroup
-            group={filteredExternal}
-            pathname={pathname}
-            isOpen={openGroups.has(filteredExternal.key)}
-            onToggle={() => toggle(filteredExternal.key)}
-            onSelect={onSelect}
-          />
-        </>
-      )}
-
-      {/* Member 하단: 도움말 + 설정 */}
-      {!isAdmin && (
-        <>
-          <div className="my-2 border-t border-border/40" />
-          {memberBottomItems.map((item) => (
-            <NavLink key={item.href} item={item} pathname={pathname} onSelect={onSelect} />
+          {filteredAdminGroups.map((group) => (
+            <CollapsibleGroup
+              key={group.key}
+              group={group}
+              pathname={pathname}
+              isOpen={openGroups.has(group.key)}
+              onToggle={() => toggle(group.key)}
+              onSelect={onSelect}
+            />
           ))}
         </>
       )}

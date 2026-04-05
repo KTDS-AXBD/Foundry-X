@@ -1,67 +1,110 @@
 {
   "navId": "main-sidebar",
   "topItems": [
-    { "href": "/getting-started", "label": "시작하기", "iconKey": "Rocket", "visible": true, "sortOrder": 0 },
-    { "href": "/dashboard", "label": "홈", "iconKey": "LayoutDashboard", "visible": true, "sortOrder": 1 },
-    { "href": "/team-shared", "label": "팀 공유", "iconKey": "Users", "visible": true, "sortOrder": 2 },
-    { "href": "/ax-bd/demo", "label": "데모 시나리오", "iconKey": "Presentation", "visible": true, "sortOrder": 3 }
+    { "href": "/dashboard", "label": "대시보드", "iconKey": "LayoutDashboard", "visible": true, "sortOrder": 0 },
+    { "href": "/getting-started", "label": "시작하기", "iconKey": "Rocket", "visible": true, "sortOrder": 1 }
   ],
   "processGroups": [
     {
-      "key": "collect", "label": "1. 수집", "iconKey": "Inbox", "stageColor": "bg-axis-blue", "sortOrder": 0, "visible": true,
+      "key": "collect",
+      "label": "1. 수집",
+      "iconKey": "Inbox",
+      "stageColor": "bg-axis-blue",
+      "sortOrder": 0,
+      "visible": true,
+      "collapsed": true,
+      "badge": "TBD",
       "items": [
-        { "href": "/collection/sr", "label": "SR 목록", "iconKey": "ClipboardList", "visible": true, "sortOrder": 0 },
-        { "href": "/collection/field", "label": "Field 수집", "iconKey": "Radio", "visible": true, "sortOrder": 1 },
-        { "href": "/collection/ideas", "label": "IDEA Portal", "iconKey": "ArrowUpFromLine", "visible": true, "sortOrder": 2 },
-        { "href": "/collection/agent", "label": "Agent 수집", "iconKey": "Bot", "visible": true, "sortOrder": 3 }
+        { "href": "/collection/field", "label": "Field 수집", "iconKey": "Radio", "visible": false, "sortOrder": 0 },
+        { "href": "/collection/ideas", "label": "IDEA Portal", "iconKey": "ArrowUpFromLine", "visible": false, "sortOrder": 1 },
+        { "href": "/collection/screening", "label": "스크리닝", "iconKey": "ClipboardList", "visible": false, "sortOrder": 2 }
       ]
     },
     {
-      "key": "discover", "label": "2. 발굴", "iconKey": "Search", "stageColor": "bg-axis-violet", "sortOrder": 1, "visible": true,
+      "key": "discover",
+      "label": "2. 발굴",
+      "iconKey": "Search",
+      "stageColor": "bg-axis-violet",
+      "sortOrder": 1,
+      "visible": true,
       "items": [
-        { "href": "/discovery/items", "label": "Discovery", "iconKey": "Map", "visible": true, "sortOrder": 0 },
-        { "href": "/discovery/ideas-bmc", "label": "아이디어·BMC", "iconKey": "Lightbulb", "visible": true, "sortOrder": 1 },
-        { "href": "/discovery/dashboard", "label": "대시보드", "iconKey": "BarChart3", "visible": true, "sortOrder": 2 },
-        { "href": "/discovery/report", "label": "평가 결과서", "iconKey": "ClipboardCheck", "visible": true, "sortOrder": 3 }
+        { "href": "/discovery", "label": "발굴", "iconKey": "Map", "visible": true, "sortOrder": 0 },
+        { "href": "/discovery/report", "label": "평가 결과서", "iconKey": "ClipboardCheck", "visible": true, "sortOrder": 1 }
       ]
     },
     {
-      "key": "shape", "label": "3. 형상화", "iconKey": "PenTool", "stageColor": "bg-axis-warm", "sortOrder": 2, "visible": true,
+      "key": "shape",
+      "label": "3. 형상화",
+      "iconKey": "PenTool",
+      "stageColor": "bg-axis-warm",
+      "sortOrder": 2,
+      "visible": true,
       "items": [
-        { "href": "/shaping/prd", "label": "PRD", "iconKey": "FileText", "visible": true, "sortOrder": 0 },
-        { "href": "/shaping/proposal", "label": "사업제안서", "iconKey": "FileSignature", "visible": true, "sortOrder": 1 },
-        { "href": "/shaping/review", "label": "형상화 리뷰", "iconKey": "ClipboardCheck", "visible": true, "sortOrder": 2 },
-        { "href": "/shaping/prototype", "label": "Prototype", "iconKey": "Code", "visible": true, "sortOrder": 3 },
-        { "href": "/shaping/offering", "label": "Offering Pack", "iconKey": "Package", "visible": true, "sortOrder": 4 }
+        { "href": "/shaping/business-plan", "label": "사업기획서", "iconKey": "FileSignature", "visible": true, "sortOrder": 0 },
+        { "href": "/shaping/offering", "label": "Offering", "iconKey": "Package", "visible": true, "sortOrder": 1 },
+        { "href": "/shaping/prd", "label": "PRD", "iconKey": "FileText", "visible": true, "sortOrder": 2 },
+        { "href": "/shaping/prototype", "label": "Prototype", "iconKey": "Code", "visible": true, "sortOrder": 3 }
       ]
     },
     {
-      "key": "validate", "label": "4. 검증/공유", "iconKey": "CheckCircle", "stageColor": "bg-axis-green", "sortOrder": 3, "visible": true,
+      "key": "validate",
+      "label": "4. 검증",
+      "iconKey": "CheckCircle",
+      "stageColor": "bg-axis-green",
+      "sortOrder": 3,
+      "visible": true,
       "items": [
-        { "href": "/validation/pipeline", "label": "파이프라인", "iconKey": "GitBranch", "visible": true, "sortOrder": 0 },
-        { "href": "/validation/division", "label": "본부 검증", "iconKey": "Shield", "visible": true, "sortOrder": 1 },
-        { "href": "/validation/company", "label": "전사 검증", "iconKey": "Building2", "visible": true, "sortOrder": 2 },
-        { "href": "/validation/meetings", "label": "미팅 관리", "iconKey": "CalendarDays", "visible": true, "sortOrder": 3 }
+        { "href": "/validation", "label": "검증", "iconKey": "CheckCircle", "visible": true, "sortOrder": 0 },
+        { "href": "/validation/share", "label": "산출물 공유", "iconKey": "Users", "visible": true, "sortOrder": 1 }
       ]
     },
     {
-      "key": "productize", "label": "5. 제품화", "iconKey": "Rocket", "stageColor": "bg-axis-indigo", "sortOrder": 4, "visible": true,
+      "key": "productize",
+      "label": "5. 제품화",
+      "iconKey": "Rocket",
+      "stageColor": "bg-axis-indigo",
+      "sortOrder": 4,
+      "visible": true,
       "items": [
-        { "href": "/product/mvp", "label": "MVP 추적", "iconKey": "Target", "visible": true, "sortOrder": 0 },
-        { "href": "/product/poc", "label": "PoC 관리", "iconKey": "TestTubes", "visible": true, "sortOrder": 1 }
+        { "href": "/product", "label": "제품화", "iconKey": "Target", "visible": true, "sortOrder": 0 },
+        { "href": "/product/offering-pack", "label": "Offering Pack", "iconKey": "Package", "visible": true, "sortOrder": 1 }
       ]
     },
     {
-      "key": "gtm", "label": "6. GTM", "iconKey": "TrendingUp", "stageColor": "bg-axis-rose", "sortOrder": 5, "visible": true,
+      "key": "gtm",
+      "label": "6. GTM",
+      "iconKey": "TrendingUp",
+      "stageColor": "bg-axis-rose",
+      "sortOrder": 5,
+      "visible": true,
+      "collapsed": true,
+      "badge": "TBD",
       "items": [
-        { "href": "/gtm/projects", "label": "프로젝트 현황", "iconKey": "FolderKanban", "visible": true, "sortOrder": 0 },
-        { "href": "/gtm/outreach", "label": "선제안", "iconKey": "Send", "visible": true, "sortOrder": 1 }
+        { "href": "/gtm/outreach", "label": "대고객 선제안", "iconKey": "Send", "visible": false, "sortOrder": 0 },
+        { "href": "/gtm/pipeline", "label": "파이프라인", "iconKey": "GitBranch", "visible": false, "sortOrder": 1 }
       ]
     }
   ],
   "bottomItems": [
-    { "href": "/tools-guide", "label": "도구 가이드", "iconKey": "PenTool", "visible": true, "sortOrder": 0 },
-    { "href": "/getting-started", "label": "도움말", "iconKey": "HelpCircle", "visible": true, "sortOrder": 1 },
-    { "href": "/settings/jira", "label": "설정", "iconKey": "Settings", "visible": true, "sortOrder": 2 }
+    { "href": "/wiki", "label": "위키", "iconKey": "BookOpen", "visible": true, "sortOrder": 0 },
+    { "href": "/settings", "label": "설정", "iconKey": "Settings", "visible": true, "sortOrder": 1 }
+  ],
+  "adminGroups": [
+    {
+      "key": "admin-manage",
+      "label": "관리",
+      "iconKey": "Settings",
+      "sortOrder": 0,
+      "visible": true,
+      "items": [
+        { "href": "/tokens", "label": "토큰/모델", "iconKey": "Coins", "visible": true, "sortOrder": 0 },
+        { "href": "/workspace", "label": "워크스페이스", "iconKey": "FolderKanban", "visible": true, "sortOrder": 1 },
+        { "href": "/agents", "label": "에이전트", "iconKey": "Bot", "visible": true, "sortOrder": 2 },
+        { "href": "/architecture", "label": "아키텍처", "iconKey": "Blocks", "visible": true, "sortOrder": 3 },
+        { "href": "/methodologies", "label": "방법론", "iconKey": "Library", "visible": true, "sortOrder": 4 },
+        { "href": "/projects", "label": "프로젝트", "iconKey": "FolderKanban", "visible": true, "sortOrder": 5 },
+        { "href": "/nps-dashboard", "label": "NPS 대시보드", "iconKey": "BarChart3", "visible": true, "sortOrder": 6 }
+      ]
+    }
   ]
 }
