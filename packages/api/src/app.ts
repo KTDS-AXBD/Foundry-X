@@ -112,6 +112,8 @@ import { pipelineMonitoringRoute } from "./routes/pipeline-monitoring.js";
 import { backupRestoreRoute } from "./routes/backup-restore.js";
 // Sprint 137: Marker.io Feedback Queue (F319, F320)
 import { feedbackQueueRoute } from "./routes/feedback-queue.js";
+// Sprint 148: TaskState Machine (F333, Phase 14)
+import { taskStateRoute } from "./routes/task-state.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -376,6 +378,8 @@ app.route("/api", pipelineMonitoringRoute);
 app.route("/api", backupRestoreRoute);
 // Sprint 137: Feedback Queue — Marker.io automation (F319, F320)
 app.route("/api", feedbackQueueRoute);
+// Sprint 148: TaskState Machine (F333, Phase 14)
+app.route("/api", taskStateRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

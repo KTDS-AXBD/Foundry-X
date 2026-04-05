@@ -258,3 +258,21 @@ export {
   KG_NODE_TYPES,
   KG_RELATION_TYPES,
 } from './kg.js';
+
+// F333: TaskState Machine (Sprint 148, Phase 14)
+export {
+  TaskState,
+  TASK_STATES,
+  TRANSITIONS,
+  FEEDBACK_LOOP_TRIGGERS,
+  isValidTransition,
+  getAvailableTransitions,
+} from './task-state.js';
+
+export type {
+  EventSource,
+  TransitionRequest,
+  TransitionResult,
+  TaskStateRecord,
+  TaskStateHistoryRecord,
+} from './task-state.js';
