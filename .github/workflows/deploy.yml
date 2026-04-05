@@ -105,13 +105,6 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @foundry-x/shared build
-      - name: TinaCMS build (admin UI)
-        working-directory: packages/web
-        continue-on-error: true  # TinaCloud 스키마 동기화 대기 중 — 동기화 완료 후 제거
-        run: npx tinacms build
-        env:
-          VITE_TINA_CLIENT_ID: ${{ secrets.VITE_TINA_CLIENT_ID }}
-          TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
       - run: pnpm --filter @foundry-x/web build
         env:
           VITE_MARKER_PROJECT_ID: ${{ secrets.VITE_MARKER_PROJECT_ID }}
@@ -119,6 +112,16 @@ jobs:
       - name: SPA fallback (404.html = index.html)
         working-directory: packages/web
         run: cp dist/index.html dist/404.html
+      - name: TinaCMS build (admin UI → dist/admin/)
+        working-directory: packages/web
+        continue-on-error: true
+        run: |
+          npx tinacms build
+          cp -r public/admin/* dist/admin/ 2>/dev/null || true
+          ls -la dist/admin/ 2>/dev/null || echo "No admin dir"
+        env:
+          VITE_TINA_CLIENT_ID: ${{ secrets.VITE_TINA_CLIENT_ID }}
+          TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
