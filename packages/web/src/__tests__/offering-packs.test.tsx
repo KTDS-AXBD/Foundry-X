@@ -44,7 +44,7 @@ describe("OfferingPacksPage", () => {
 
   it("renders offering pack list page", () => {
     const { getByText } = renderWithRouter(<OfferingPacksPage />);
-    expect(getByText("Offering Pack")).toBeDefined();
+    expect(getByText("Offering")).toBeDefined();
     expect(getByText("영업·제안용 번들 패키지 관리")).toBeDefined();
   });
 

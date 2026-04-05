@@ -38,7 +38,7 @@ describe("SpecGeneratorPage", () => {
 
   it("renders form elements", () => {
     render(<SpecGeneratorPage />);
-    expect(screen.getByText("NL → Spec Generator")).toBeInTheDocument();
+    expect(screen.getByText("PRD")).toBeInTheDocument();
     expect(screen.getByText("Spec 생성")).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/에이전트별/)).toBeInTheDocument();
   });
