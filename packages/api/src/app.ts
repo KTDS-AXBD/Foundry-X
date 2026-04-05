@@ -108,6 +108,8 @@ import { gtmOutreachRoute } from "./routes/gtm-outreach.js";
 import { discoveryPipelineRoute } from "./routes/discovery-pipeline.js";
 // Sprint 134: Pipeline Monitoring + Permissions (F315)
 import { pipelineMonitoringRoute } from "./routes/pipeline-monitoring.js";
+// Sprint 136: Backup/Restore (F317)
+import { backupRestoreRoute } from "./routes/backup-restore.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -368,6 +370,8 @@ app.route("/api", gtmOutreachRoute);
 app.route("/api", discoveryPipelineRoute);
 // Sprint 134: Pipeline Monitoring + Permissions (F315)
 app.route("/api", pipelineMonitoringRoute);
+// Sprint 136: Backup/Restore (F317)
+app.route("/api", backupRestoreRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

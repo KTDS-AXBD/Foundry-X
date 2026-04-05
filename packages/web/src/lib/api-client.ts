@@ -2113,3 +2113,73 @@ export async function getSkillEnriched(
 ): Promise<SkillEnrichedView> {
   return fetchApi<SkillEnrichedView>(`/skills/registry/${skillId}/enriched`);
 }
+
+// ─── F317: Backup/Restore ───────────────────────
+
+export interface BackupMeta {
+  id: string;
+  tenantId: string;
+  backupType: "manual" | "auto" | "pre_deploy";
+  scope: "full" | "item";
+  bizItemId: string | null;
+  tablesIncluded: string[];
+  itemCount: number;
+  sizeBytes: number;
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface ImportResult {
+  inserted: number;
+  skipped: number;
+  deleted: number;
+  tables: Record<string, { inserted: number; skipped: number }>;
+}
+
+export async function exportBackup(params: {
+  backupType?: "manual" | "auto" | "pre_deploy";
+  scope?: "full" | "item";
+  bizItemId?: string;
+}): Promise<BackupMeta> {
+  return fetchApi<BackupMeta>("/backup/export", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
+}
+
+export async function importBackup(params: {
+  backupId: string;
+  strategy?: "replace" | "merge";
+}): Promise<ImportResult> {
+  return fetchApi<ImportResult>("/backup/import", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
+}
+
+export async function listBackups(params?: {
+  backupType?: string;
+  scope?: string;
+  bizItemId?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<{ items: BackupMeta[]; total: number }> {
+  const qs = new URLSearchParams();
+  if (params?.backupType) qs.set("backupType", params.backupType);
+  if (params?.scope) qs.set("scope", params.scope);
+  if (params?.bizItemId) qs.set("bizItemId", params.bizItemId);
+  if (params?.limit) qs.set("limit", String(params.limit));
+  if (params?.offset) qs.set("offset", String(params.offset));
+  const query = qs.toString();
+  return fetchApi<{ items: BackupMeta[]; total: number }>(
+    `/backup/list${query ? `?${query}` : ""}`,
+  );
+}
+
+export async function getBackup(id: string): Promise<BackupMeta> {
+  return fetchApi<BackupMeta>(`/backup/${id}`);
+}
+
+export async function deleteBackup(id: string): Promise<void> {
+  await fetchApi(`/backup/${id}`, { method: "DELETE" });
+}

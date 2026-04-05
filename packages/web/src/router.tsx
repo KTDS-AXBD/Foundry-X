@@ -92,6 +92,7 @@ export const router = createBrowserRouter([
       { path: "workspace/org/settings", lazy: () => import("@/routes/workspace-org-settings") },
       { path: "settings/jira", lazy: () => import("@/routes/settings-jira") },
       { path: "settings/nps", lazy: () => import("@/routes/nps-dashboard") },
+      { path: "backup", lazy: () => import("@/routes/backup") },
 
       // ── 외부 서비스 (이전) ──
       { path: "external/discovery-x", lazy: () => import("@/routes/discovery") },
