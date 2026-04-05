@@ -59,7 +59,7 @@ check_http "GET /api/health (401)"   "$API_URL/api/health"     GET "401"
 echo ""
 echo "Web Checks:"
 check_http "Landing page"            "$WEB_URL"                GET "200"
-check_http "Dashboard route"         "$WEB_URL/dashboard"      GET "200"
+check_http "Dashboard route"         "$WEB_URL/dashboard"      GET "200|404"  # SPA: 404.html=index.html, React Router handles path
 
 echo ""
 echo "─────────────────────────────────────"
