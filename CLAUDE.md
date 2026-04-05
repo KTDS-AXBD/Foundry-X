@@ -57,9 +57,9 @@ foundry-x/
 │   │       └── index.ts
 │   ├── api/                # Hono API Server (Phase 2)
 │   │   └── src/
-│   │       ├── routes/     # 87개 — 목록은 `ls packages/api/src/routes/` 참조
-│   │       ├── services/   # 204개 — 목록은 `ls packages/api/src/services/` 참조
-│   │       ├── schemas/    # 102개 Zod 스키마 — 목록은 `ls packages/api/src/schemas/` 참조
+│   │       ├── routes/     # 88개 — 목록은 `ls packages/api/src/routes/` 참조
+│   │       ├── services/   # 205개 — 목록은 `ls packages/api/src/services/` 참조
+│   │       ├── schemas/    # 103개 Zod 스키마 — 목록은 `ls packages/api/src/schemas/` 참조
 │   │       └── index.ts
 │   ├── web/                # Vite 8 + React Router 7 Dashboard + Landing
 │   │   └── src/
