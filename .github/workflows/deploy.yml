@@ -118,6 +118,7 @@ jobs:
         run: |
           npx tinacms build
           cp -r public/admin/* dist/admin/ 2>/dev/null || true
+          cp public/_redirects dist/_redirects
           ls -la dist/admin/ 2>/dev/null || echo "No admin dir"
         env:
           VITE_TINA_CLIENT_ID: ${{ secrets.VITE_TINA_CLIENT_ID }}
