@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Sprint 156: F346 — 9탭 발굴 완료 리포트 프레임
+ * Sprint 156+157: F346~F350 — 9탭 발굴 완료 리포트 + 팀 검토 + 공유/PDF
  * URL: /discovery/items/:id/report?tab=2-1
  */
 import { useEffect, useState, lazy, Suspense } from "react";
@@ -11,10 +11,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { fetchDiscoveryReport, type DiscoveryReportData } from "@/lib/api-client";
 
+// Sprint 156: 선 구현 4탭
 const ReferenceAnalysisTab = lazy(() => import("@/components/feature/discovery/report/tabs/ReferenceAnalysisTab"));
 const MarketValidationTab = lazy(() => import("@/components/feature/discovery/report/tabs/MarketValidationTab"));
 const CompetitiveLandscapeTab = lazy(() => import("@/components/feature/discovery/report/tabs/CompetitiveLandscapeTab"));
 const OpportunityIdeationTab = lazy(() => import("@/components/feature/discovery/report/tabs/OpportunityIdeationTab"));
+// Sprint 157: 나머지 5탭
+const OpportunityScoringTab = lazy(() => import("@/components/feature/discovery/report/tabs/OpportunityScoringTab"));
+const CustomerPersonaTab = lazy(() => import("@/components/feature/discovery/report/tabs/CustomerPersonaTab"));
+const BusinessModelTab = lazy(() => import("@/components/feature/discovery/report/tabs/BusinessModelTab"));
+const PackagingTab = lazy(() => import("@/components/feature/discovery/report/tabs/PackagingTab"));
+const PersonaEvalResultTab = lazy(() => import("@/components/feature/discovery/report/tabs/PersonaEvalResultTab"));
+// Sprint 157: 팀 검토 + 공유/PDF
+const TeamReviewPanel = lazy(() => import("@/components/feature/discovery/report/TeamReviewPanel"));
+const ShareReportButton = lazy(() => import("@/components/feature/discovery/report/ShareReportButton"));
+const ExportPdfButton = lazy(() => import("@/components/feature/discovery/report/ExportPdfButton"));
 
 const TYPE_LABELS: Record<string, string> = {
   I: "아이디어형", M: "시장·타겟형", P: "고객문제형", T: "기술형", S: "서비스형",
@@ -31,15 +42,6 @@ const TAB_CONFIG = [
   { id: "2-8", label: "패키징", color: "var(--discovery-red)" },
   { id: "2-9", label: "페르소나 평가", color: "var(--discovery-purple)" },
 ] as const;
-
-function ComingSoon({ label }: { label: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-      <p className="text-lg font-medium">{label}</p>
-      <p className="text-sm mt-1">Sprint 157에서 구현 예정이에요</p>
-    </div>
-  );
-}
 
 function TabLoading() {
   return (
@@ -68,7 +70,7 @@ export function Component() {
   if (!report) return <div className="p-8 text-muted-foreground">리포트 로딩 중...</div>;
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6 p-6" data-report-root>
       {/* 헤더 */}
       <div className="flex items-center gap-3">
         <Link
@@ -130,14 +132,37 @@ export function Component() {
             <OpportunityIdeationTab data={report.tabs["2-4"]} />
           </TabsContent>
 
-          {/* Sprint 157 탭 — Coming Soon */}
-          <TabsContent value="2-5"><ComingSoon label="기회 선정" /></TabsContent>
-          <TabsContent value="2-6"><ComingSoon label="고객 페르소나" /></TabsContent>
-          <TabsContent value="2-7"><ComingSoon label="비즈니스 모델" /></TabsContent>
-          <TabsContent value="2-8"><ComingSoon label="패키징" /></TabsContent>
-          <TabsContent value="2-9"><ComingSoon label="페르소나 평가" /></TabsContent>
+          {/* Sprint 157: 나머지 5탭 */}
+          <TabsContent value="2-5">
+            <OpportunityScoringTab data={report.tabs["2-5"]} />
+          </TabsContent>
+          <TabsContent value="2-6">
+            <CustomerPersonaTab data={report.tabs["2-6"]} />
+          </TabsContent>
+          <TabsContent value="2-7">
+            <BusinessModelTab data={report.tabs["2-7"]} />
+          </TabsContent>
+          <TabsContent value="2-8">
+            <PackagingTab data={report.tabs["2-8"]} />
+          </TabsContent>
+          <TabsContent value="2-9">
+            <PersonaEvalResultTab data={report.tabs["2-9"]} />
+          </TabsContent>
         </Suspense>
       </Tabs>
+
+      {/* Sprint 157: 팀 검토 & Handoff */}
+      <Suspense fallback={<TabLoading />}>
+        <TeamReviewPanel itemId={id!} />
+      </Suspense>
+
+      {/* Sprint 157: 공유/PDF 버튼 (하단 액션) */}
+      <div className="flex justify-end gap-2 pt-4 border-t">
+        <Suspense fallback={null}>
+          <ShareReportButton itemId={id!} title={report.title} />
+          <ExportPdfButton />
+        </Suspense>
+      </div>
     </div>
   );
 }

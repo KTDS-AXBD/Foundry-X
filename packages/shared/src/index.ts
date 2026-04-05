@@ -312,10 +312,40 @@ export type {
 } from './orchestration.js';
 
 // F346+F347: Discovery Report types (Sprint 156, Phase 15)
+
+// F342: Discovery UI/UX v2 types (Sprint 154, Phase 15)
+export {
+  INTENSITY_MATRIX,
+  INTENSITY_LABELS,
+  DISCOVERY_TYPE_NAMES_V2,
+  DEFAULT_WEIGHTS,
+  DEFAULT_PERSONAS,
+  WEIGHT_AXES,
+} from './discovery-v2.js';
+
+export type {
+  PersonaWeights,
+  PersonaConfig,
+  PersonaEval,
+  DiscoveryReport,
+  TeamReview,
+  Intensity,
+  DiscoveryTypeV2,
+} from './discovery-v2.js';
+
+// F346+F347+F348+F349: Discovery Report types (Sprint 156~157, Phase 15)
 export type {
   ReferenceAnalysisData,
   MarketValidationData,
   CompetitiveLandscapeData,
   OpportunityIdeationData,
+  OpportunityScoringData,
+  CustomerPersonaData,
+  BusinessModelData,
+  PackagingData,
+  PersonaEvalResultData,
+  TeamReviewVote,
+  ExecutiveSummaryData,
+  HandoffCheckItem,
   DiscoveryReportResponse,
 } from './discovery-report.js';

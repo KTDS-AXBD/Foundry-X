@@ -1,8 +1,7 @@
 /**
- * Sprint 156: F346 — 발굴 완료 리포트 집계 서비스
- * biz_item_discovery_stages (진행 상태) + bd_artifacts (스킬 결과)를 합쳐 리포트 구성
+ * Sprint 156+157: F346+F349 — 발굴 완료 리포트 집계 + Executive Summary
  */
-import type { DiscoveryReportResponse } from "@foundry-x/shared";
+import type { DiscoveryReportResponse, ExecutiveSummaryData } from "@foundry-x/shared";
 
 interface StageRow {
   stage: string;
@@ -149,4 +148,68 @@ export class DiscoveryReportService {
       tabs,
     };
   }
+
+  /**
+   * Sprint 157: F349 — Executive Summary 생성
+   * report_json 기반 rule-based 집계 (AI 호출 없음)
+   */
+  async getSummary(
+    bizItemId: string,
+    orgId: string,
+  ): Promise<ExecutiveSummaryData | null> {
+    const report = await this.getReport(bizItemId, orgId);
+    if (!report) return null;
+
+    const tabs = report.tabs;
+    const ref = tabs["2-1"] as Record<string, unknown> | undefined;
+    const market = tabs["2-2"] as Record<string, unknown> | undefined;
+    const comp = tabs["2-3"] as Record<string, unknown> | undefined;
+    const biz = tabs["2-7"] as Record<string, unknown> | undefined;
+    const pkg = tabs["2-8"] as Record<string, unknown> | undefined;
+    const eval9 = tabs["2-9"] as Record<string, unknown> | undefined;
+
+    const pkgSummary = pkg && typeof pkg === "object"
+      ? (pkg as { executiveSummary?: Record<string, string> }).executiveSummary
+      : undefined;
+
+    return {
+      oneLiner: pkgSummary?.problem
+        ? `${report.title}: ${pkgSummary.problem}`
+        : `${report.title} 발굴 리포트`,
+      problem: pkgSummary?.problem ?? extractFirst(ref, "jtbd", "job") ?? "미작성",
+      solution: pkgSummary?.solution ?? extractFirst(biz, "bmc", "valuePropositions") ?? "미작성",
+      market: extractMarketSize(market) ?? "미작성",
+      competition: extractFirst(comp, "swot", "strengths") ?? "미작성",
+      businessModel: pkgSummary?.businessModel ?? "미작성",
+      recommendation: (eval9 as { overallVerdict?: string } | undefined)?.overallVerdict ?? "Conditional",
+      openQuestions: [],
+    };
+  }
+}
+
+function extractFirst(obj: unknown, key1: string, key2: string): string | null {
+  if (!obj || typeof obj !== "object") return null;
+  const nested = (obj as Record<string, unknown>)[key1];
+  if (!nested) return null;
+  if (Array.isArray(nested) && nested.length > 0) {
+    const first = nested[0];
+    if (typeof first === "string") return first;
+    if (typeof first === "object" && first && key2 in first) {
+      return String((first as Record<string, unknown>)[key2]);
+    }
+  }
+  if (typeof nested === "object" && !Array.isArray(nested)) {
+    const val = (nested as Record<string, unknown>)[key2];
+    if (Array.isArray(val) && val.length > 0) return String(val[0]);
+    if (typeof val === "string") return val;
+  }
+  return null;
+}
+
+function extractMarketSize(market: unknown): string | null {
+  if (!market || typeof market !== "object") return null;
+  const m = market as Record<string, { value?: number; unit?: string }>;
+  if (m.tam?.value) return `TAM ${m.tam.value}${m.tam.unit ?? ""}`;
+  if (m.sam?.value) return `SAM ${m.sam.value}${m.sam.unit ?? ""}`;
+  return null;
 }
