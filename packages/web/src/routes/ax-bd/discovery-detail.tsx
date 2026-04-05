@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, FileBarChart } from "lucide-react";
 import { fetchBizItemDetail, getDiscoveryProgress, type BizItemDetail, type DiscoveryProgress } from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
 import ArtifactList from "@/components/feature/ax-bd/ArtifactList";
@@ -83,6 +83,17 @@ export function Component() {
             {progress.completedCount}/{progress.totalCount} 단계 완료
           </p>
         </div>
+      )}
+
+      {/* Report Link */}
+      {id && (
+        <Link
+          to={`/discovery/items/${id}/report`}
+          className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium hover:bg-muted/50 transition-colors"
+        >
+          <FileBarChart className="size-4" />
+          발굴 완료 리포트 보기
+        </Link>
       )}
 
       {/* Artifacts */}

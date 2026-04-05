@@ -2178,3 +2178,19 @@ export async function deleteBackup(id: string): Promise<void> {
   const url = `${BASE_URL}/backup/${id}`;
   await requestWithRetry(url, { method: "DELETE", headers: getAuthHeaders() }, true);
 }
+
+// ─── F346: Discovery Report (Sprint 156) ───
+
+export interface DiscoveryReportData {
+  id: string;
+  bizItemId: string;
+  title: string;
+  type: "I" | "M" | "P" | "T" | "S" | null;
+  completedStages: string[];
+  overallProgress: number;
+  tabs: Record<string, unknown>;
+}
+
+export async function fetchDiscoveryReport(itemId: string): Promise<DiscoveryReportData> {
+  return fetchApi<DiscoveryReportData>(`/ax-bd/discovery-report/${itemId}`);
+}
