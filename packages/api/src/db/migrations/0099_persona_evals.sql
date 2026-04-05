@@ -1,22 +1,16 @@
--- Sprint 154: F342 페르소나 평가 결과 — 페르소나별 7축 점수 + 판정
+-- Sprint 155 F345: 페르소나별 AI 평가 결과
 CREATE TABLE IF NOT EXISTS ax_persona_evals (
   id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+  item_id TEXT NOT NULL REFERENCES ax_discovery_items(id),
   org_id TEXT NOT NULL,
-  item_id TEXT NOT NULL REFERENCES biz_items(id) ON DELETE CASCADE,
   persona_id TEXT NOT NULL,
   scores TEXT NOT NULL DEFAULT '{}',
-  verdict TEXT NOT NULL DEFAULT 'Conditional'
-    CHECK(verdict IN ('Go', 'Conditional', 'NoGo')),
-  summary TEXT NOT NULL DEFAULT '',
-  concern TEXT,
+  verdict TEXT NOT NULL DEFAULT 'pending',
+  summary TEXT,
+  concerns TEXT,
   condition TEXT,
-  eval_model TEXT NOT NULL DEFAULT 'claude-sonnet-4-5-20250514',
-  eval_duration_ms INTEGER,
-  eval_cost_usd REAL,
+  eval_metadata TEXT DEFAULT '{}',
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE(item_id, persona_id)
 );
-
-CREATE INDEX IF NOT EXISTS idx_ape_item ON ax_persona_evals(item_id);
-CREATE INDEX IF NOT EXISTS idx_ape_org ON ax_persona_evals(org_id);
-CREATE INDEX IF NOT EXISTS idx_ape_verdict ON ax_persona_evals(verdict);
+CREATE INDEX IF NOT EXISTS idx_persona_evals_item ON ax_persona_evals(item_id);

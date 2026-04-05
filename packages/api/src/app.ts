@@ -125,6 +125,8 @@ import { personaConfigsRoute } from "./routes/persona-configs.js";
 import { personaEvalsRoute } from "./routes/persona-evals.js";
 import { discoveryReportsRoute } from "./routes/discovery-reports.js";
 import { teamReviewsRoute } from "./routes/team-reviews.js";
+// Sprint 155: 멀티 페르소나 평가 (F344, F345, Phase 15)
+import { axBdPersonaEvalRoute } from "./routes/ax-bd-persona-eval.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -412,6 +414,8 @@ app.route("/api", personaConfigsRoute);
 app.route("/api", personaEvalsRoute);
 app.route("/api", discoveryReportsRoute);
 app.route("/api", teamReviewsRoute);
+// Sprint 155: 멀티 페르소나 평가 (F344, F345, Phase 15)
+app.route("/api", axBdPersonaEvalRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
