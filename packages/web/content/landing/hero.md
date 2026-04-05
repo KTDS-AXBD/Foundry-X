@@ -14,7 +14,7 @@ stats:
     label: "Tests"
   - value: "101"
     label: "D1 Migrations"
-  - value: "137"
+  - value: "138"
     label: "Sprints"
 ---
 
