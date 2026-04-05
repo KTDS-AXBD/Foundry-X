@@ -276,3 +276,19 @@ export type {
   TaskStateRecord,
   TaskStateHistoryRecord,
 } from './task-state.js';
+
+// F334: TaskEvent + Event Bus types (Sprint 149, Phase 14)
+export { createTaskEvent } from './task-event.js';
+
+export type {
+  EventSeverity,
+  TaskEventSource,
+  TaskEvent,
+  TaskEventPayload,
+  HookEventPayload,
+  CIEventPayload,
+  ReviewEventPayload,
+  DiscriminatorEventPayload,
+  SyncEventPayload,
+  ManualEventPayload,
+} from './task-event.js';
