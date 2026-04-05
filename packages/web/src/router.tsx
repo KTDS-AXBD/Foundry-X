@@ -25,7 +25,7 @@ export const router = createBrowserRouter([
 
       // ── Phase 13 v1.3 신규 경로 ──
       { path: "discovery", lazy: () => import("@/routes/discovery-unified") },
-      { path: "validation", lazy: () => import("@/routes/validation-division") },
+      { path: "validation", lazy: () => import("@/routes/validation-unified") },
       { path: "product", lazy: () => import("@/routes/mvp-tracking") },
       { path: "shaping/business-plan", lazy: () => import("@/routes/ax-bd/index") },
       { path: "validation/share", lazy: () => import("@/routes/team-shared") },
