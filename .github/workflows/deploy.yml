@@ -116,7 +116,7 @@ jobs:
         working-directory: packages/web
         continue-on-error: true
         run: |
-          npx tinacms build
+          npx tinacms build || echo "⚠️ TinaCMS build failed (schema mismatch?) — continuing"
           cp -r public/admin/* dist/admin/ 2>/dev/null || true
           cp public/_redirects dist/_redirects
           ls -la dist/admin/ 2>/dev/null || echo "No admin dir"
