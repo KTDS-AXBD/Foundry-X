@@ -16,10 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ✅ SPEC.md 수치 보정: routes ~89, services ~206, schemas ~104, D1 0094
 - ✅ Blueprint CSS 디자인 시스템: bp-bg, bp-box, bp-line, bp-diamond 등 (다크 모드 지원)
 - ✅ design-shotgun 3변형 생성: Forge/Signal/Blueprint → **Blueprint(C) 승인**
-- ⏭️ Blueprint 랜딩 비주얼 전환: 별도 Sprint으로 분리 (600줄+ 리라이트)
+- ✅ **Sprint 145 F329 완료** (PR #274, Match 97%, 14분 autopilot): landing.tsx 7섹션 Blueprint 전면 전환
+- ✅ prod-e2e 수정: br 분할 텍스트 매칭 (`dcb0726`)
+- ✅ 프로덕션 배포 확인: fx.minu.best Blueprint 라이브 (Desktop/Mobile × Light/Dark 4종 검증)
 
 **검증 결과**:
-- ✅ typecheck 통과 (web 패키지)
+- ✅ CI/CD Run #23994532637 — test + deploy-web + smoke-test + prod-e2e 전체 통과
+- ✅ fx.minu.best 200 OK (Blueprint 디자인 라이브)
 
 ### 세션 #196 (2026-04-05)
 **fx-discovery-v2 전체 완료 — 발굴→형상화 파이프라인 자동화**:
