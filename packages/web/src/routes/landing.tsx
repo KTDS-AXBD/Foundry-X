@@ -74,18 +74,18 @@ function getSectionOrder(section: string): number {
    ═══════════════════════════════════════════════ */
 
 const SITE_META_FALLBACK = {
-  sprint: "Sprint 71",
-  phase: "Phase 5f 완료",
-  phaseTitle: "AX BD 사업개발 체계 수립",
+  sprint: "Sprint 137",
+  phase: "Phase 12 완료",
+  phaseTitle: "Skill Unification",
   tagline: "AX 사업개발 AI 오케스트레이션 플랫폼",
 } as const;
 
 const STATS_FALLBACK = [
-  { value: "304", label: "API Endpoints" },
-  { value: "135", label: "Services" },
-  { value: "2,032+", label: "Tests" },
-  { value: "60", label: "D1 Migrations" },
-  { value: "71", label: "Sprints" },
+  { value: "~89", label: "API Routes" },
+  { value: "~206", label: "Services" },
+  { value: "3,148+", label: "Tests" },
+  { value: "101", label: "D1 Migrations" },
+  { value: "137", label: "Sprints" },
 ];
 
 // Build-time content from TinaCMS-managed Markdown
@@ -125,7 +125,7 @@ const pillars = [
     title: "SDD Triangle",
     label: "Spec ↔ Code ↔ Test",
     desc: "명세, 코드, 테스트가 항상 동기화돼요. Git이 진실, Foundry-X는 렌즈.",
-    detail: "304 endpoints, 2,032+ tests, 60 D1 migrations — 자동 정합성 검증",
+    detail: "~89 routes, 3,148+ tests, 101 D1 migrations — 자동 정합성 검증",
     color: "axis-green",
   },
 ];
@@ -141,9 +141,9 @@ const agents = [
 
 const architecture = [
   { layer: "CLI Layer", items: ["foundry-x init", "foundry-x sync", "foundry-x status"], tech: "TypeScript + Commander + Ink TUI" },
-  { layer: "API Layer", items: ["304 Endpoints", "135 Services", "47 Route Modules"], tech: "Hono on Cloudflare Workers" },
+  { layer: "API Layer", items: ["~89 Routes", "~206 Services", "~104 Schemas"], tech: "Hono on Cloudflare Workers" },
   { layer: "Agent Layer", items: ["BMCAgent", "InsightAgent", "ReviewAgent", "ArchitectAgent + 3종"], tech: "Orchestrator + MCP + Multi-Model" },
-  { layer: "Data Layer", items: ["D1 SQLite (60 Migrations)", "KV Cache", "Git (SSOT)"], tech: "Cloudflare D1 + simple-git" },
+  { layer: "Data Layer", items: ["D1 SQLite (101 Migrations)", "KV Cache", "Git (SSOT)"], tech: "Cloudflare D1 + simple-git" },
 ];
 
 const roadmap: {
@@ -153,20 +153,18 @@ const roadmap: {
   status: "done" | "current" | "planned";
   items: string[];
 }[] = [
-  { phase: "Phase 1~4", title: "CLI + API + Web + 멀티테넌시", version: "v0.1 → v2.1", status: "done",
-    items: ["CLI 3커맨드 + Ink TUI", "304 API Endpoints", "Next.js Dashboard", "SSO + RBAC"] },
-  { phase: "Phase 5a", title: "Agent Evolution", version: "Sprint 32~47", status: "done",
-    items: ["6종 에이전트", "모델 라우팅", "PRD v8 확정"] },
-  { phase: "Phase 5b", title: "BDP 자동화", version: "Sprint 48~58", status: "done",
-    items: ["Discovery 9기준", "다중 AI 검토", "Six Hats 토론", "수집 채널 통합"] },
-  { phase: "Phase 5c", title: "방법론 플러그인", version: "Sprint 59~60", status: "done",
-    items: ["레지스트리 + 인터페이스", "BDP 모듈화", "pm-skills 모듈"] },
-  { phase: "Phase 5d", title: "Ideation MVP", version: "Sprint 61~67", status: "done",
-    items: ["BMC CRUD + AI", "아이디어-BMC 연결", "인사이트 + 평가", "Discovery-X 연동"] },
-  { phase: "Phase 5f", title: "사업개발 체계 수립", version: "Sprint 68~71", status: "done",
-    items: ["ai-biz 11스킬 CC전환", "API v8.2 (5유형+체크포인트)", "Discovery 대시보드", "팀 가이드"] },
-  { phase: "Phase 5g", title: "Test Agent + TDD", version: "Sprint 72~74", status: "planned",
-    items: ["TestAgent Web UI 활성화", "Agent SDK PoC", "TDD 자동화 CC Skill"] },
+  { phase: "Phase 1~5", title: "Foundation", version: "Sprint 1~74", status: "done",
+    items: ["CLI + Ink TUI", "API + Web Dashboard", "SSO + RBAC 멀티테넌시", "6종 AI Agent + TDD"] },
+  { phase: "Phase 6~7", title: "Ecosystem + BD Pipeline", version: "Sprint 75~81", status: "done",
+    items: ["BMAD/OpenSpec 벤치마킹", "BD Pipeline E2E 통합", "Discovery-X 연동"] },
+  { phase: "Phase 8~9", title: "IA + 팀 온보딩", version: "Sprint 82~100", status: "done",
+    items: ["IA 구조 개선 + 인증 강화", "BD 스킬 배포 + Plugin 전환", "발굴 UX (GIVC PoC)"] },
+  { phase: "Phase 10", title: "O-G-D + Skill Evolution", version: "Sprint 101~112", status: "done",
+    items: ["O-G-D Agent Loop", "BD 형상화 A~F", "BD ROI 벤치마크"] },
+  { phase: "Phase 11", title: "IA 대개편", version: "Sprint 113~121", status: "done",
+    items: ["12 F-items 전체 완료", "구조 기반 + 기능 확장", "GTM 선제안 아웃리치"] },
+  { phase: "Phase 12", title: "Skill Unification", version: "Sprint 125~128", status: "done",
+    items: ["3개 스킬 시스템 통합", "D1~D4 4대 단절 해소", "메트릭 수집 + 대시보드"] },
 ];
 
 const ecosystem = [
@@ -616,8 +614,8 @@ function RoadmapSection() {
       <div className="mx-auto max-w-5xl">
         <div className="mb-16 text-center">
           <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Roadmap</span>
-          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">Phase 5{" "}<span className="text-axis-primary">로드맵</span></h2>
-          <p className="mt-4 text-lg text-muted-foreground">CLI에서 시작해 BDP 자동화까지. 71 Sprint를 거치며 사업개발 플랫폼을 구축했어요.</p>
+          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">Phase 1~12{" "}<span className="text-axis-primary">로드맵</span></h2>
+          <p className="mt-4 text-lg text-muted-foreground">CLI에서 시작해 Skill Unification까지. 137 Sprint를 거치며 사업개발 플랫폼을 구축했어요.</p>
         </div>
         <RoadmapTimeline />
       </div>
