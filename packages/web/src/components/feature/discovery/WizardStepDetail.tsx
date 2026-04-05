@@ -1,15 +1,29 @@
 "use client";
 
-import { ArrowRight, CheckCircle2, Play, BookOpen, Wrench, FileText, HelpCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, Play, BookOpen, Wrench, FileText, HelpCircle, SkipForward } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import IntensityIndicator from "./IntensityIndicator";
+import type { IntensityLevel } from "./IntensityIndicator";
+
+/** 5유형×7단계 강도 매트릭스 (analysis-path-v82.ts 기준) */
+const INTENSITY_MATRIX: Record<string, Record<string, IntensityLevel>> = {
+  "2-1": { I: "light", M: "normal", P: "light", T: "core", S: "core" },
+  "2-2": { I: "core", M: "core", P: "core", T: "core", S: "light" },
+  "2-3": { I: "normal", M: "core", P: "core", T: "core", S: "core" },
+  "2-4": { I: "core", M: "normal", P: "core", T: "core", S: "core" },
+  "2-5": { I: "core", M: "core", P: "core", T: "core", S: "normal" },
+  "2-6": { I: "core", M: "core", P: "core", T: "normal", S: "normal" },
+  "2-7": { I: "normal", M: "normal", P: "core", T: "normal", S: "core" },
+};
 
 interface WizardStepDetailProps {
   stage: string;
   status: string;
   discoveryType?: string;
   bizItemId: string;
+  intensity?: IntensityLevel;
   onStatusChange: (stage: string, status: string) => void;
   onArtifactReview?: (artifactId: string, content: string | null) => void;
 }
@@ -133,6 +147,7 @@ export default function WizardStepDetail({
   status,
   discoveryType,
   bizItemId,
+  intensity: intensityProp,
   onStatusChange,
   onArtifactReview,
 }: WizardStepDetailProps) {
@@ -140,6 +155,11 @@ export default function WizardStepDetail({
   if (!content) return null;
 
   const stageName = STAGE_NAMES[stage] ?? stage;
+
+  // 강도 결정: prop 우선, 없으면 discoveryType + 매트릭스에서 자동 계산
+  const intensity: IntensityLevel | undefined =
+    intensityProp ??
+    (discoveryType ? INTENSITY_MATRIX[stage]?.[discoveryType] : undefined);
 
   return (
     <div className="rounded-xl border bg-card p-5 space-y-4" data-tour="discovery-step-detail">
@@ -162,12 +182,23 @@ export default function WizardStepDetail({
             >
               {status === "completed" ? "완료" : status === "in_progress" ? "진행 중" : status === "skipped" ? "건너뜀" : "대기"}
             </Badge>
+            {intensity && <IntensityIndicator intensity={intensity} />}
           </div>
           <h3 className="text-lg font-bold mt-1">{stageName}</h3>
         </div>
 
         {/* Status Change Button */}
-        <div>
+        <div className="flex gap-2">
+          {status === "pending" && intensity === "light" && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => onStatusChange(stage, "skipped")}
+              className="gap-1 text-muted-foreground"
+            >
+              <SkipForward className="h-3 w-3" /> 건너뛰기
+            </Button>
+          )}
           {status === "pending" && (
             <Button
               size="sm"
