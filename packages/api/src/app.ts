@@ -110,6 +110,8 @@ import { discoveryPipelineRoute } from "./routes/discovery-pipeline.js";
 import { pipelineMonitoringRoute } from "./routes/pipeline-monitoring.js";
 // Sprint 136: Backup/Restore (F317)
 import { backupRestoreRoute } from "./routes/backup-restore.js";
+// Sprint 137: Marker.io Feedback Queue (F319, F320)
+import { feedbackQueueRoute } from "./routes/feedback-queue.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -372,6 +374,8 @@ app.route("/api", discoveryPipelineRoute);
 app.route("/api", pipelineMonitoringRoute);
 // Sprint 136: Backup/Restore (F317)
 app.route("/api", backupRestoreRoute);
+// Sprint 137: Feedback Queue — Marker.io automation (F319, F320)
+app.route("/api", feedbackQueueRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
