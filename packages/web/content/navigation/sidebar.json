@@ -1,5 +1,5 @@
 {
-  "id": "main-sidebar",
+  "navId": "main-sidebar",
   "topItems": [
     { "href": "/getting-started", "label": "시작하기", "iconKey": "Rocket", "visible": true, "sortOrder": 0 },
     { "href": "/dashboard", "label": "홈", "iconKey": "LayoutDashboard", "visible": true, "sortOrder": 1 },

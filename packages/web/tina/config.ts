@@ -54,8 +54,8 @@ export default defineConfig({
         fields: [
           {
             type: "string",
-            name: "id",
-            label: "ID",
+            name: "navId",
+            label: "Navigation ID",
             isTitle: true,
             required: true,
           },
