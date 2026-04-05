@@ -29,8 +29,8 @@ test.describe("Production Smoke", () => {
       page.getByRole("heading", { name: /AI 에이전트가/i }),
     ).toBeVisible();
 
-    // Hero 브랜딩 텍스트
-    await expect(page.getByText("일하는 방식을 설계하다")).toBeVisible();
+    // Hero 브랜딩 텍스트 (Blueprint: br 태그로 분할됨)
+    await expect(page.getByText("설계하다")).toBeVisible();
   });
 
   /**
