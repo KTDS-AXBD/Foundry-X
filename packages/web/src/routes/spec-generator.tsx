@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ConflictCard } from "@/components/feature/ConflictCard";
+import { VersionBadge } from "@/components/feature/VersionBadge";
 
 export function Component() {
   const [text, setText] = useState("");
@@ -49,7 +50,10 @@ export function Component() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold">NL → Spec Generator</h1>
+      <div className="mb-6 flex items-center gap-3">
+        <h1 className="text-2xl font-bold font-display">PRD</h1>
+        <VersionBadge artifactType="prd" />
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Input */}

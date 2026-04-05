@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchApi, postApi } from "@/lib/api-client";
 import { Package, Plus, Presentation, ArrowRight } from "lucide-react";
+import { VersionBadge } from "@/components/feature/VersionBadge";
 
 interface OfferingPack {
   id: string;
@@ -83,7 +84,10 @@ export function Component() {
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Offering Pack</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold font-display">Offering</h1>
+            <VersionBadge artifactType="offering" />
+          </div>
           <p className="text-muted-foreground">영업·제안용 번들 패키지 관리</p>
         </div>
         <Button onClick={() => setShowCreate(true)}>

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import HitlSectionReview from "@/components/feature/hitl/HitlSectionReview";
 import ReviewStatusBadge from "@/components/feature/hitl/ReviewStatusBadge";
 import ReviewSummaryBar from "@/components/feature/hitl/ReviewSummaryBar";
+import { VersionBadge } from "@/components/feature/VersionBadge";
 
 interface PrototypeItem {
   id: string;
@@ -68,7 +69,10 @@ export function Component() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Prototype HITL</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold font-display">Prototype</h1>
+          <VersionBadge artifactType="prototype" />
+        </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">프레임워크:</span>
           {FRAMEWORK_OPTIONS.map((fw) => (
