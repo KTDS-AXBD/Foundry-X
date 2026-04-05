@@ -29,15 +29,15 @@ export function Navbar() {
       className={cn(
         "fixed top-0 right-0 left-0 z-50 transition-all duration-300",
         scrolled
-          ? "border-b border-axis-primary/10 bg-background/80 backdrop-blur-xl"
+          ? "border-b border-current/10 bp-bg backdrop-blur-sm"
           : "bg-transparent",
       )}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-axis-primary/10">
-            <Anvil className="size-4 text-axis-primary" />
+          <div className="bp-box flex size-8 items-center justify-center rounded-lg">
+            <Anvil className="size-4 bp-line" />
           </div>
           <span className="font-display text-lg font-bold tracking-tight">
             Foundry-X
@@ -50,7 +50,7 @@ export function Navbar() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-axis-primary"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:bp-line"
             >
               {link.label}
             </a>
@@ -62,7 +62,7 @@ export function Navbar() {
           <ThemeToggle />
           <Link
             to="/dashboard"
-            className="axis-glow inline-flex h-9 items-center rounded-lg bg-axis-primary px-4 text-sm font-semibold text-white transition-all hover:bg-axis-primary-hover"
+            className="bp-box inline-flex h-9 items-center rounded-lg px-4 text-sm font-bold bp-line transition-colors hover:bg-[oklch(0.55_0.15_250/10%)]"
           >
             Dashboard
           </Link>
@@ -101,7 +101,7 @@ export function Navbar() {
               <Link
                 to="/dashboard"
                 onClick={() => setOpen(false)}
-                className="axis-glow inline-flex h-9 flex-1 items-center justify-center rounded-lg bg-axis-primary text-sm font-semibold text-white"
+                className="bp-box inline-flex h-9 flex-1 items-center justify-center rounded-lg text-sm font-bold bp-line"
               >
                 Dashboard
               </Link>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import { Link } from "react-router-dom";
 import {
   Anvil,
@@ -13,16 +14,13 @@ import {
   Layers,
   Lightbulb,
   Megaphone,
-  Network,
   PenTool,
   Rocket,
   Scan,
   Shield,
   ShieldCheck,
-  Sparkles,
   Target,
   TestTube,
-  Timer,
 } from "lucide-react";
 import { parseFrontmatter, type HeroContent } from "@/lib/content-loader";
 import heroRaw from "../../content/landing/hero.md?raw";
@@ -55,14 +53,13 @@ for (const s of sectionContents) {
 // Default section order (fallback when no sort_order in content)
 const DEFAULT_SECTION_ORDER: Record<string, number> = {
   hero: 0,
-  stats: 1,
-  process: 2,
-  features: 3,
-  agents: 4,
-  architecture: 5,
-  ecosystem: 6,
-  roadmap: 7,
-  cta: 8,
+  process: 1,
+  features: 2,
+  agents: 3,
+  architecture: 4,
+  ecosystem: 5,
+  roadmap: 6,
+  cta: 7,
 };
 
 function getSectionOrder(section: string): number {
@@ -110,7 +107,6 @@ const pillars = [
     label: "7단계 자동화",
     desc: "수집→발굴→형상화→검증→제품화→GTM→평가. 사업개발 전체를 한 곳에서.",
     detail: "AX BD 프로세스 v8.2 기반, 5유형(I/M/P/T/S) 강도 라우팅 + 사업성 체크포인트",
-    color: "axis-primary",
   },
   {
     icon: Target,
@@ -118,7 +114,6 @@ const pillars = [
     label: "BMCAgent + InsightAgent",
     desc: "BMC 초안 자동 작성, 인사이트 도출, 다중 AI 검토까지. 에이전트가 사업기회를 형상화해요.",
     detail: "Anthropic + OpenAI + Gemini + DeepSeek 멀티모델 파이프라인",
-    color: "axis-blue",
   },
   {
     icon: Shield,
@@ -126,7 +121,6 @@ const pillars = [
     label: "Spec ↔ Code ↔ Test",
     desc: "명세, 코드, 테스트가 항상 동기화돼요. Git이 진실, Foundry-X는 렌즈.",
     detail: "~89 routes, 3,148+ tests, 101 D1 migrations — 자동 정합성 검증",
-    color: "axis-green",
   },
 ];
 
@@ -168,9 +162,9 @@ const roadmap: {
 ];
 
 const ecosystem = [
-  { name: "Discovery-X", role: "수집 엔진", desc: "시장/트렌드/경쟁사 데이터 수집 → API로 Foundry-X에 공급", arrow: "API 연동", color: "axis-green" },
-  { name: "Foundry-X", role: "베이스캠프", desc: "발굴→형상화→검증→제품화→GTM→평가 전 단계 오케스트레이션", arrow: "중심", color: "axis-primary" },
-  { name: "AXIS DS", role: "UI 일관성", desc: "디자인 토큰 + React 컴포넌트 시스템", arrow: "컴포넌트 공급", color: "axis-blue" },
+  { name: "Discovery-X", role: "수집 엔진", desc: "시장/트렌드/경쟁사 데이터 수집 → API로 Foundry-X에 공급", arrow: "API 연동" },
+  { name: "Foundry-X", role: "베이스캠프", desc: "발굴→형상화→검증→제품화→GTM→평가 전 단계 오케스트레이션", arrow: "중심" },
+  { name: "AXIS DS", role: "UI 일관성", desc: "디자인 토큰 + React 컴포넌트 시스템", arrow: "컴포넌트 공급" },
 ];
 
 const processSteps = [
@@ -184,59 +178,127 @@ const processSteps = [
 ];
 
 /* ═══════════════════════════════════════════════
-   COMPONENTS
+   SHARED COMPONENTS
    ═══════════════════════════════════════════════ */
 
-function AgentGrid() {
+function SectionHeader({ label, title, desc }: { label: string; title: React.ReactNode; desc: string }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {agents.map((agent) => (
-        <div
-          key={agent.name}
-          className="axis-glass group relative overflow-hidden rounded-2xl p-5 transition-all duration-300 hover:border-axis-primary/20 hover:bg-axis-primary/5"
-        >
-          <div className="mb-3 flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-axis-primary/10 transition-colors group-hover:bg-axis-primary/20">
-              <agent.icon className="size-5 text-axis-primary" />
+    <div className="mb-16 text-center">
+      <span className="bp-annotation mb-4 inline-block uppercase tracking-widest">{label}</span>
+      <h2 className="bp-line font-display text-3xl font-bold tracking-tight sm:text-4xl">{title}</h2>
+      <p className="mt-4 text-lg text-muted-foreground">{desc}</p>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════
+   SECTION COMPONENTS — Blueprint Style
+   ═══════════════════════════════════════════════ */
+
+function ProcessFlow() {
+  return (
+    <div className="flex flex-col items-center gap-2 md:flex-row md:flex-wrap md:justify-center md:gap-3">
+      {processSteps.map((step, i) => (
+        <Fragment key={step.step}>
+          {/* Diamond decision node */}
+          {i > 0 && (
+            <>
+              <span className="bp-line hidden text-lg md:inline">→</span>
+              <div className="bp-diamond shrink-0 md:block hidden" />
+              <span className="bp-line hidden text-lg md:inline">→</span>
+              {/* mobile vertical separator */}
+              <div className="h-4 w-px bg-current/20 md:hidden" />
+            </>
+          )}
+          {/* Process box */}
+          <div className="bp-box group relative px-4 py-3 transition-colors hover:bg-[oklch(0.55_0.15_250/5%)] w-full md:w-auto">
+            <div className="flex items-center gap-2">
+              <span className="bp-annotation font-bold">{step.step}</span>
+              <step.icon className="size-4 bp-line" />
             </div>
-            <div>
-              <h3 className="font-display text-sm font-bold">{agent.name}</h3>
-              <span className="font-mono text-[10px] text-muted-foreground">
-                {agent.role}
-              </span>
+            <h3 className="bp-line mt-1 font-display text-sm font-bold">{step.title}</h3>
+            {/* Hover tooltip */}
+            <div className="pointer-events-none absolute top-full left-0 z-20 mt-1 hidden w-48 p-3 text-xs text-muted-foreground opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 md:block bp-box">
+              {step.desc}
             </div>
+            {/* Mobile: always show desc */}
+            <p className="mt-1 text-xs text-muted-foreground md:hidden">{step.desc}</p>
           </div>
-          <p className="text-[13px] leading-relaxed text-muted-foreground">
-            {agent.desc}
-          </p>
+        </Fragment>
+      ))}
+    </div>
+  );
+}
+
+function PillarGrid() {
+  return (
+    <div className="grid gap-6 md:grid-cols-3">
+      {pillars.map((p) => (
+        <div key={p.title} className="bp-box p-6 transition-colors hover:bg-[oklch(0.55_0.15_250/5%)]">
+          <div className="mb-4 flex items-center gap-3">
+            <p.icon className="size-6 bp-line" />
+            <span className="bp-annotation uppercase">{p.label}</span>
+          </div>
+          <h3 className="bp-line font-display text-lg font-bold">{p.title}</h3>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
+          <div className="mt-4 border-t border-current/10 pt-3">
+            <span className="bp-annotation">{p.detail}</span>
+          </div>
         </div>
       ))}
     </div>
   );
 }
 
-function ProcessFlow() {
+function AgentGrid() {
   return (
-    <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
-      {processSteps.map((step, i) => (
-        <div key={step.step} className="relative">
-          {/* Connector */}
-          {i < processSteps.length - 1 && (
-            <div className="absolute top-8 right-0 hidden h-px w-6 translate-x-full bg-gradient-to-r from-axis-primary/40 to-transparent md:block" />
-          )}
-          <div className="flex flex-col items-center text-center">
-            <div className="relative mb-4 flex size-16 items-center justify-center rounded-2xl border border-axis-primary/20 bg-axis-primary/5">
-              <step.icon className="size-6 text-axis-primary" />
-              <span className="absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full bg-axis-primary font-mono text-[10px] font-bold text-white">
-                {step.step}
-              </span>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {agents.map((agent) => (
+        <div key={agent.name} className="bp-box group relative p-5 transition-colors hover:bg-[oklch(0.55_0.15_250/5%)]">
+          {/* Left pin marker */}
+          <div className="absolute top-1/2 left-0 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-background bg-[oklch(0.55_0.15_250)]" />
+          <div className="mb-3 flex items-center gap-3">
+            <agent.icon className="size-5 bp-line" />
+            <div>
+              <h3 className="bp-line font-display text-sm font-bold">{agent.name}</h3>
+              <span className="bp-annotation">{agent.role}</span>
             </div>
-            <h3 className="font-display text-sm font-bold">{step.title}</h3>
-            <p className="mt-1.5 text-[12px] leading-relaxed text-muted-foreground">
-              {step.desc}
-            </p>
           </div>
+          <p className="text-[13px] leading-relaxed text-muted-foreground">{agent.desc}</p>
         </div>
+      ))}
+    </div>
+  );
+}
+
+function ArchitectureBlueprint() {
+  return (
+    <div className="bp-bg space-y-0 rounded-lg p-6">
+      {architecture.map((layer, i) => (
+        <Fragment key={layer.layer}>
+          <div className="bp-box relative p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+              <div className="min-w-[120px]">
+                <span className="bp-line font-display text-sm font-bold">{layer.layer}</span>
+                <br />
+                <span className="bp-annotation">{layer.tech}</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {layer.items.map((item) => (
+                  <span key={item} className="bp-box px-2.5 py-1 font-mono text-[11px] bp-line">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+          {/* Arrow between layers */}
+          {i < architecture.length - 1 && (
+            <div className="flex justify-center py-1">
+              <span className="bp-line text-lg">↓</span>
+            </div>
+          )}
+        </Fragment>
       ))}
     </div>
   );
@@ -244,89 +306,28 @@ function ProcessFlow() {
 
 function EcosystemDiagram() {
   return (
-    <div className="relative mx-auto w-full max-w-2xl py-8">
-      {/* Center node */}
-      <div className="relative z-10 mx-auto flex w-fit flex-col items-center">
-        <div className="animate-pulse-ring flex size-28 items-center justify-center rounded-2xl border-2 border-axis-primary/40 bg-axis-primary/10 backdrop-blur-sm">
+    <div className="relative mx-auto max-w-2xl py-8">
+      {/* Central node */}
+      <div className="mx-auto flex w-fit flex-col items-center">
+        <div className="bp-box flex size-28 items-center justify-center rounded-full">
           <div className="flex flex-col items-center gap-1">
-            <Anvil className="size-8 text-axis-primary" />
-            <span className="font-display text-xs font-bold text-axis-primary">
-              Foundry-X
-            </span>
+            <Anvil className="size-8 bp-line" />
+            <span className="bp-line font-display text-xs font-bold">Foundry-X</span>
           </div>
         </div>
-        <span className="mt-2 font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
-          오케스트레이션
-        </span>
+        <span className="bp-annotation mt-2 uppercase tracking-widest">오케스트레이션</span>
       </div>
-
-      {/* Satellite nodes */}
-      <div className="mt-10 grid grid-cols-3 gap-4">
+      {/* Connection lines + satellite nodes */}
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
         {ecosystem.map((svc) => (
           <div key={svc.name} className="flex flex-col items-center gap-3">
-            <div className="flex flex-col items-center gap-1">
-              <div className="h-6 w-px bg-gradient-to-b from-transparent via-axis-primary/30 to-axis-primary/60" />
-              <span className="font-mono text-[9px] text-muted-foreground/70">
-                {svc.arrow}
-              </span>
-              <div className="h-3 w-px bg-axis-primary/40" />
-            </div>
-            <div
-              className="flex w-full flex-col items-center rounded-xl border p-4 transition-all"
-              style={{
-                borderColor: `color-mix(in oklch, var(--${svc.color}) 20%, transparent)`,
-                backgroundColor: `color-mix(in oklch, var(--${svc.color}) 5%, transparent)`,
-              }}
-            >
-              <span className="font-display text-sm font-bold">
-                {svc.name}
-              </span>
-              <span className="font-mono text-[10px] text-muted-foreground">
-                {svc.role}
-              </span>
-              <span className="mt-1 text-center text-[11px] leading-tight text-muted-foreground/70">
-                {svc.desc}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ArchitectureBlueprint() {
-  return (
-    <div className="blueprint-grid relative overflow-hidden rounded-2xl border border-axis-blue/10 p-1">
-      <div className="relative z-10 space-y-1">
-        {architecture.map((layer, i) => (
-          <div
-            key={layer.layer}
-            className="group relative overflow-hidden rounded-xl border border-border/30 bg-background/80 backdrop-blur-sm transition-all hover:border-axis-primary/20"
-          >
-            <div
-              className="absolute top-0 left-0 h-full w-1 bg-gradient-to-b from-axis-primary/80 to-axis-accent/40"
-              style={{ opacity: 1 - i * 0.2 }}
-            />
-            <div className="flex items-start gap-4 p-4 pl-5">
-              <div className="flex min-w-[120px] flex-col">
-                <span className="font-display text-sm font-bold text-axis-primary">
-                  {layer.layer}
-                </span>
-                <span className="font-mono text-[10px] text-muted-foreground/60">
-                  {layer.tech}
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {layer.items.map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-md border border-border/40 bg-muted/30 px-2.5 py-1 font-mono text-[11px] text-muted-foreground transition-colors group-hover:border-axis-primary/20 group-hover:text-foreground"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
+            <div className="h-8 w-px bg-current/20" />
+            <span className="bp-annotation">{svc.arrow}</span>
+            <div className="bp-box w-full p-4 text-center">
+              <span className="bp-line font-display text-sm font-bold">{svc.name}</span>
+              <br />
+              <span className="bp-annotation">{svc.role}</span>
+              <p className="mt-1 text-[11px] text-muted-foreground">{svc.desc}</p>
             </div>
           </div>
         ))}
@@ -337,179 +338,94 @@ function ArchitectureBlueprint() {
 
 function RoadmapTimeline() {
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-      {roadmap.map((phase, i) => {
-        const isDone = phase.status === "done";
-        const isCurrent = phase.status === "current";
-        return (
-          <div key={phase.phase} className="relative">
-            {i < roadmap.length - 1 && (
-              <div className="absolute top-5 right-0 hidden h-px w-4 translate-x-full bg-border/40 md:block" />
-            )}
-            <div
-              className={`h-full rounded-xl border p-5 transition-all ${
-                isCurrent
-                  ? "border-axis-primary/30 bg-axis-primary/5"
-                  : isDone
-                    ? "border-border/30 bg-muted/20"
-                    : "border-dashed border-border/20 bg-transparent"
-              }`}
-            >
-              <div className="mb-3 flex items-center gap-2">
-                <span
-                  className={`inline-flex items-center rounded-md px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider ${
-                    isCurrent
-                      ? "bg-axis-primary/20 text-axis-primary"
-                      : isDone
-                        ? "bg-muted text-muted-foreground"
-                        : "bg-muted/50 text-muted-foreground/50"
-                  }`}
-                >
-                  {phase.phase}
-                </span>
-                <span className="font-mono text-[10px] text-muted-foreground/50">
-                  {phase.version}
-                </span>
-                {isDone && (
-                  <span className="ml-auto text-[10px] text-axis-primary">
-                    ✓
-                  </span>
-                )}
-                {isCurrent && (
-                  <span className="ml-auto size-1.5 animate-pulse rounded-full bg-axis-primary" />
-                )}
-              </div>
-              <h4
-                className={`font-display text-sm font-bold ${
-                  phase.status === "planned"
-                    ? "text-muted-foreground/50"
-                    : "text-foreground"
-                }`}
-              >
-                {phase.title}
-              </h4>
-              <ul className="mt-3 space-y-1.5">
-                {phase.items.map((item) => (
-                  <li
-                    key={item}
-                    className={`flex items-center gap-2 text-[12px] ${
-                      phase.status === "planned"
-                        ? "text-muted-foreground/40"
-                        : "text-muted-foreground"
-                    }`}
-                  >
-                    <span
-                      className={`size-1 rounded-full ${
-                        isDone
-                          ? "bg-axis-primary/60"
-                          : isCurrent
-                            ? "bg-axis-primary"
-                            : "bg-muted-foreground/20"
-                      }`}
-                    />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+    <div className="space-y-3">
+      {roadmap.map((phase) => (
+        <div key={phase.phase} className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
+          {/* Phase label */}
+          <div className="w-28 shrink-0">
+            <span className="bp-line font-display text-sm font-bold">{phase.phase}</span>
+            <br />
+            <span className="bp-annotation">{phase.version}</span>
+          </div>
+          {/* Gantt bar */}
+          <div className="flex-1">
+            <div className="bp-box flex flex-wrap items-center gap-3 px-4 py-2">
+              <span className="bp-line text-sm font-bold">{phase.title}</span>
+              <span className="text-xs text-muted-foreground">
+                {phase.items.join(" · ")}
+              </span>
+              {phase.status === "done" && (
+                <span className="ml-auto bp-annotation">✓ DONE</span>
+              )}
+              {phase.status === "current" && (
+                <span className="ml-auto bp-annotation">● NOW</span>
+              )}
             </div>
           </div>
-        );
-      })}
+        </div>
+      ))}
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════
-   PAGE
+   PAGE SECTIONS
    ═══════════════════════════════════════════════ */
 
-// Section components — each keyed for sort_order-based rendering
 function HeroSection() {
   return (
-    <section className="axis-grid relative flex min-h-[92vh] items-center justify-center px-6 pt-16">
-        {/* Background effects */}
-        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div className="absolute top-1/4 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-axis-primary/5 blur-[120px]" />
-          <div className="absolute right-0 bottom-0 h-[400px] w-[400px] rounded-full bg-axis-blue/3 blur-[100px]" />
-          <div className="absolute top-0 left-0 h-[300px] w-[300px] rounded-full bg-axis-accent/4 blur-[80px]" />
-        </div>
-
-        <div className="relative z-10 mx-auto max-w-4xl text-center">
+    <section className="bp-bg relative min-h-[92vh] px-6 pt-16">
+      <div className="mx-auto flex max-w-6xl items-center" style={{ minHeight: "calc(92vh - 4rem)" }}>
+        <div className="w-full">
           {/* Phase badge */}
-          <div className="animate-fade-in-up mb-8 inline-flex items-center gap-2 rounded-full border border-axis-primary/20 bg-axis-primary/5 px-4 py-1.5">
-            <Sparkles className="size-3.5 text-axis-primary" />
-            <span className="font-mono text-xs font-medium text-axis-primary">
-              {SITE_META.sprint} · {SITE_META.phase} {SITE_META.phaseTitle}
-            </span>
+          <div className="bp-annotation mb-6 inline-block border border-current/20 px-3 py-1">
+            {SITE_META.sprint} · {SITE_META.phase} {SITE_META.phaseTitle}
           </div>
 
-          {/* Headline */}
-          <h1 className="animate-fade-in-up stagger-1 font-display text-5xl leading-[1.08] font-bold tracking-tight sm:text-6xl md:text-7xl">
-            AI 에이전트가
-            <br />
-            <span className="bg-gradient-to-r from-axis-primary via-axis-primary-hover to-axis-accent bg-clip-text text-transparent">
-              일하는 방식을 설계하다
-            </span>
-          </h1>
-
-          {/* Subheading */}
-          <p className="animate-fade-in-up stagger-2 mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            수집→발굴→형상화→검증→제품화→GTM→평가 —
-            <br className="hidden sm:block" />
-            <span className="text-foreground/80">
-              BDP 7단계를 AI 에이전트가 자동화해요.
-            </span>
-          </p>
-
-          {/* Value proposition */}
-          <div className="animate-fade-in-up stagger-3 mx-auto mt-8 flex max-w-lg flex-col gap-2">
-            {[
-              { icon: Timer, text: "85% 단축", desc: "사업기회 발굴→PoC 구축 — 2~4주에서 3일 이내로" },
-              { icon: Network, text: "BDP 7단계", desc: "수집 · 발굴 · 형상화 · 검증 · 제품화 · GTM · 평가" },
-              { icon: GitBranch, text: "Git = 진실", desc: "Spec ↔ Code ↔ Test 동기화 — 자동 정합성 검증" },
-            ].map((step) => (
-              <div key={step.text} className="flex items-center gap-3 rounded-lg border border-border/20 bg-background/40 px-4 py-2.5 backdrop-blur-sm">
-                <step.icon className="size-4 shrink-0 text-axis-primary" />
-                <span className="w-24 font-display text-sm font-bold text-axis-primary">{step.text}</span>
-                <span className="text-left text-sm text-muted-foreground">{step.desc}</span>
+          <div className="grid gap-12 lg:grid-cols-12">
+            {/* Left: headline + CTA */}
+            <div className="lg:col-span-7">
+              <h1 className="bp-line font-display text-5xl font-bold leading-[1.1] sm:text-6xl md:text-7xl">
+                AI 에이전트가
+                <br />
+                일하는 방식을
+                <br />
+                설계하다
+              </h1>
+              <p className="mt-6 max-w-lg text-lg text-muted-foreground">
+                수집→발굴→형상화→검증→제품화→GTM→평가 —
+                BDP 7단계를 AI 에이전트가 자동화해요.
+              </p>
+              {/* CTA buttons — bp-box style */}
+              <div className="mt-8 flex flex-wrap gap-4">
+                <Link to="/dashboard" className="bp-box inline-flex items-center gap-2 px-6 py-3 font-bold bp-line transition-colors hover:bg-[oklch(0.55_0.15_250/10%)]">
+                  Dashboard 열기
+                  <ArrowRight className="size-4" />
+                </Link>
+                <a
+                  href="https://github.com/KTDS-AXBD/Foundry-X"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bp-box inline-flex items-center gap-2 px-6 py-3 bp-line/60 transition-colors hover:bg-[oklch(0.55_0.15_250/5%)]"
+                >
+                  <GitBranch className="size-4" />
+                  GitHub
+                  <ArrowUpRight className="size-3" />
+                </a>
               </div>
-            ))}
-          </div>
+            </div>
 
-          {/* CTAs */}
-          <div className="animate-fade-in-up stagger-4 mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link
-              to="/dashboard"
-              className="axis-glow-strong group inline-flex h-12 items-center gap-2 rounded-xl bg-axis-primary px-7 text-sm font-bold text-white transition-all hover:bg-axis-primary-hover"
-            >
-              Dashboard 열기
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-            <a
-              href="https://github.com/KTDS-AXBD/Foundry-X"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-12 items-center gap-2 rounded-xl border border-border/50 bg-background/50 px-7 text-sm font-medium backdrop-blur transition-all hover:border-axis-primary/30 hover:bg-axis-primary/5"
-            >
-              <GitBranch className="size-4 text-axis-primary" />
-              GitHub에서 보기
-            </a>
+            {/* Right: measurement annotations (stats) */}
+            <div className="flex flex-col justify-center gap-4 lg:col-span-5">
+              {stats.map((stat) => (
+                <div key={stat.label} className="bp-box flex items-baseline gap-3 p-4">
+                  <span className="bp-line font-display text-3xl font-bold">{stat.value}</span>
+                  <span className="bp-annotation uppercase tracking-widest">{stat.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </section>
-  );
-}
-
-function StatsSection() {
-  return (
-    <section className="border-y border-border/30 bg-muted/20">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-6">
-        {stats.map((stat) => (
-          <div key={stat.label} className="flex flex-col items-center gap-0.5">
-            <span className="font-display text-2xl font-bold text-axis-primary sm:text-3xl">{stat.value}</span>
-            <span className="font-mono text-[10px] tracking-wider text-muted-foreground uppercase">{stat.label}</span>
-          </div>
-        ))}
       </div>
     </section>
   );
@@ -519,11 +435,11 @@ function ProcessSection() {
   return (
     <section id="process" className="relative px-6 py-24 md:py-32">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-16 text-center">
-          <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">How It Works</span>
-          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">BDP{" "}<span className="text-axis-primary">7단계</span> 프로세스</h2>
-          <p className="mt-4 text-lg text-muted-foreground">수집에서 평가까지, AI 에이전트가 사업개발 전 과정을 자동화해요.</p>
-        </div>
+        <SectionHeader
+          label="How It Works"
+          title="BDP 7단계 프로세스"
+          desc="수집에서 평가까지, AI 에이전트가 사업개발 전 과정을 자동화해요."
+        />
         <ProcessFlow />
       </div>
     </section>
@@ -532,32 +448,14 @@ function ProcessSection() {
 
 function FeaturesSection() {
   return (
-    <section id="features" className="relative bg-muted/10 px-6 py-24 md:py-32">
+    <section id="features" className="relative px-6 py-24 md:py-32">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-16 text-center">
-          <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Core Pillars</span>
-          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">세 가지{" "}<span className="text-axis-primary">차별점</span></h2>
-          <p className="mt-4 text-lg text-muted-foreground">BDP 라이프사이클, AI 에이전트, SDD Triangle.</p>
-        </div>
-        <div className="grid gap-6 md:grid-cols-3">
-          {pillars.map((p, i) => (
-            <div key={p.title} className={`animate-fade-in-up stagger-${i + 1} axis-glass group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:border-axis-primary/20 hover:bg-axis-primary/5`}>
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex size-11 items-center justify-center rounded-xl transition-colors group-hover:bg-axis-primary/20" style={{ backgroundColor: `color-mix(in oklch, var(--${p.color}) 10%, transparent)` }}>
-                  <p.icon className="size-5" style={{ color: `var(--${p.color})` }} />
-                </div>
-                <div>
-                  <span className="rounded-md px-2 py-0.5 font-mono text-[10px] font-medium" style={{ backgroundColor: `color-mix(in oklch, var(--${p.color}) 10%, transparent)`, color: `var(--${p.color})` }}>{p.label}</span>
-                </div>
-              </div>
-              <h3 className="mb-2 font-display text-lg font-semibold">{p.title}</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
-              <div className="mt-4 border-t border-border/30 pt-3">
-                <span className="font-mono text-[11px] text-muted-foreground/60">{p.detail}</span>
-              </div>
-            </div>
-          ))}
-        </div>
+        <SectionHeader
+          label="Core Pillars"
+          title="세 가지 차별점"
+          desc="BDP 라이프사이클, AI 에이전트, SDD Triangle."
+        />
+        <PillarGrid />
       </div>
     </section>
   );
@@ -567,11 +465,11 @@ function AgentsSection() {
   return (
     <section id="agents" className="relative px-6 py-24 md:py-32">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-16 text-center">
-          <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Agent Ecosystem</span>
-          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">6종{" "}<span className="text-axis-primary">AI 에이전트</span></h2>
-          <p className="mt-4 text-lg text-muted-foreground">사업기회 형상화부터 코드 검증까지. 멀티모델 파이프라인으로 품질을 보장해요.</p>
-        </div>
+        <SectionHeader
+          label="Agent Ecosystem"
+          title="6종 AI 에이전트"
+          desc="사업기회 형상화부터 코드 검증까지. 멀티모델 파이프라인으로 품질을 보장해요."
+        />
         <AgentGrid />
       </div>
     </section>
@@ -580,13 +478,13 @@ function AgentsSection() {
 
 function ArchitectureSection() {
   return (
-    <section id="architecture" className="relative bg-muted/10 px-6 py-24 md:py-32">
+    <section id="architecture" className="relative px-6 py-24 md:py-32">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-16 text-center">
-          <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Architecture</span>
-          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">4-Layer{" "}<span className="text-axis-primary">아키텍처</span></h2>
-          <p className="mt-4 text-lg text-muted-foreground">CLI에서 데이터까지, 모든 레이어가 유기적으로 연결돼요.</p>
-        </div>
+        <SectionHeader
+          label="Architecture"
+          title="4-Layer 아키텍처"
+          desc="CLI에서 데이터까지, 모든 레이어가 유기적으로 연결돼요."
+        />
         <ArchitectureBlueprint />
       </div>
     </section>
@@ -597,11 +495,11 @@ function EcosystemSection() {
   return (
     <section id="ecosystem" className="relative px-6 py-24 md:py-32">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-16 text-center">
-          <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Ecosystem</span>
-          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">AX{" "}<span className="text-axis-primary">생태계</span></h2>
-          <p className="mt-4 text-lg text-muted-foreground">수집 · 오케스트레이션 · 디자인을 연결해요.</p>
-        </div>
+        <SectionHeader
+          label="Ecosystem"
+          title="AX 생태계"
+          desc="수집 · 오케스트레이션 · 디자인을 연결해요."
+        />
         <EcosystemDiagram />
       </div>
     </section>
@@ -610,13 +508,13 @@ function EcosystemSection() {
 
 function RoadmapSection() {
   return (
-    <section id="roadmap" className="relative bg-muted/10 px-6 py-24 md:py-32">
+    <section id="roadmap" className="relative px-6 py-24 md:py-32">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-16 text-center">
-          <span className="mb-4 inline-block font-mono text-xs tracking-widest text-axis-primary uppercase">Roadmap</span>
-          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">Phase 1~12{" "}<span className="text-axis-primary">로드맵</span></h2>
-          <p className="mt-4 text-lg text-muted-foreground">CLI에서 시작해 Skill Unification까지. 137 Sprint를 거치며 사업개발 플랫폼을 구축했어요.</p>
-        </div>
+        <SectionHeader
+          label="Roadmap"
+          title="Phase 1~12 로드맵"
+          desc="CLI에서 시작해 Skill Unification까지. 137 Sprint를 거치며 사업개발 플랫폼을 구축했어요."
+        />
         <RoadmapTimeline />
       </div>
     </section>
@@ -627,10 +525,10 @@ function CtaSection() {
   return (
     <section className="relative px-6 py-24 md:py-32">
       <div className="mx-auto max-w-3xl text-center">
-        <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+        <h2 className="bp-line font-display text-3xl font-bold">
           AI 에이전트와 함께
           <br />
-          <span className="text-axis-primary">사업개발을 자동화하세요</span>
+          사업개발을 자동화하세요
         </h2>
         <p className="mt-6 text-lg text-muted-foreground">
           Foundry-X는 AX 사업개발의 전체 라이프사이클을 자동화해요.
@@ -640,16 +538,16 @@ function CtaSection() {
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link
             to="/dashboard"
-            className="axis-glow-strong group inline-flex h-12 items-center gap-2 rounded-xl bg-axis-primary px-7 text-sm font-bold text-white transition-all hover:bg-axis-primary-hover"
+            className="bp-box inline-flex items-center gap-2 px-7 py-3 font-bold bp-line transition-colors hover:bg-[oklch(0.55_0.15_250/10%)]"
           >
             시작하기
-            <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRight className="size-4" />
           </Link>
           <a
             href="https://github.com/KTDS-AXBD/Foundry-X"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-12 items-center gap-2 rounded-xl border border-border/50 bg-background/50 px-7 text-sm font-medium backdrop-blur transition-all hover:border-axis-primary/30 hover:bg-axis-primary/5"
+            className="bp-box inline-flex items-center gap-2 px-7 py-3 bp-line/60 transition-colors hover:bg-[oklch(0.55_0.15_250/5%)]"
           >
             GitHub
             <ArrowUpRight className="size-3" />
@@ -666,7 +564,6 @@ function CtaSection() {
 
 const landingSections = [
   { key: "hero", Component: HeroSection },
-  { key: "stats", Component: StatsSection },
   { key: "process", Component: ProcessSection },
   { key: "features", Component: FeaturesSection },
   { key: "agents", Component: AgentsSection },
@@ -682,7 +579,7 @@ const landingSections = [
 
 export function Component() {
   return (
-    <div className="grain-overlay relative overflow-hidden">
+    <div className="bp-bg relative overflow-hidden">
       {landingSections.map(({ key, Component: Section }) => (
         <Section key={key} />
       ))}

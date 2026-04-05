@@ -77,7 +77,7 @@ landing.tsx 전면 리라이트 — 기존 데이터 구조 유지, 렌더링만
         <h1 className="bp-line font-display text-5xl font-bold leading-[1.1] sm:text-6xl md:text-7xl">
           AI 에이전트가<br/>일하는 방식을<br/>설계하다
         </h1>
-        <p className="bp-line/70 mt-6 max-w-lg text-lg">
+        <p className="mt-6 max-w-lg text-lg text-muted-foreground">
           수집→발굴→형상화→검증→제품화→GTM→평가 —
           BDP 7단계를 AI 에이전트가 자동화해요.
         </p>

@@ -21,14 +21,14 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/50">
+    <footer className="border-t border-current/20">
       <div className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-12 md:grid-cols-4">
           {/* Brand */}
           <div className="md:col-span-1">
             <Link to="/" className="mb-4 flex items-center gap-2.5">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-axis-primary/10">
-                <Anvil className="size-4 text-axis-primary" />
+              <div className="bp-box flex size-8 items-center justify-center rounded-lg">
+                <Anvil className="size-4 bp-line" />
               </div>
               <span className="font-display text-lg font-bold tracking-tight">
                 Foundry-X
@@ -52,7 +52,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       to={link.href}
-                      className="text-sm text-muted-foreground transition-colors hover:text-axis-primary"
+                      className="text-sm text-muted-foreground transition-colors hover:bp-line"
                     >
                       {link.label}
                     </Link>
@@ -64,7 +64,7 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border/50 pt-8 sm:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-current/20 pt-8 sm:flex-row">
           <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} KTDS AX BD. All rights reserved.
           </p>
