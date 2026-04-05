@@ -1,6 +1,7 @@
 /**
- * Sprint 156: F346 — 발굴 완료 리포트 라우트
+ * Sprint 156+157: F346+F349 — 발굴 완료 리포트 + Executive Summary
  * GET /ax-bd/discovery-report/:itemId
+ * GET /ax-bd/discovery-report/:itemId/summary
  */
 import { Hono } from "hono";
 import type { Env } from "../env.js";
@@ -36,5 +37,22 @@ discoveryReportRoute.get(
     }
 
     return c.json(report);
+  },
+);
+
+// ─── GET /ax-bd/discovery-report/:itemId/summary (Sprint 157: F349) ───
+discoveryReportRoute.get(
+  "/ax-bd/discovery-report/:itemId/summary",
+  async (c) => {
+    const itemId = c.req.param("itemId");
+    const orgId = c.get("orgId");
+    const svc = new DiscoveryReportService(c.env.DB);
+    const summary = await svc.getSummary(itemId, orgId);
+
+    if (!summary) {
+      return c.json({ error: "Report not found" }, 404);
+    }
+
+    return c.json(summary);
   },
 );

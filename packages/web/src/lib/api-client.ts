@@ -2194,3 +2194,17 @@ export interface DiscoveryReportData {
 export async function fetchDiscoveryReport(itemId: string): Promise<DiscoveryReportData> {
   return fetchApi<DiscoveryReportData>(`/ax-bd/discovery-report/${itemId}`);
 }
+
+// Sprint 157: F349 — Executive Summary
+export async function fetchExecutiveSummary(itemId: string) {
+  return fetchApi<import("@foundry-x/shared").ExecutiveSummaryData>(
+    `/ax-bd/discovery-report/${itemId}/summary`,
+  );
+}
+
+// Sprint 157: F349 — Team Reviews
+export async function fetchTeamReviews(itemId: string) {
+  return fetchApi<{ data: import("@foundry-x/shared").TeamReviewVote[] }>(
+    `/ax-bd/team-reviews/${itemId}`,
+  );
+}
