@@ -226,6 +226,16 @@ app.use("/api/github/*", authMiddleware);
 app.use("/api/github/*", tenantGuard);
 app.route("/api", githubRoute);
 
+// F340: Feedback Queue — Webhook Secret 인증 (JWT 면제, consumer용)
+app.use("/api/feedback-queue/*", async (c, next) => {
+  const secret = c.req.header("X-Webhook-Secret");
+  if (secret && c.env.WEBHOOK_SECRET && secret === c.env.WEBHOOK_SECRET) {
+    return next();
+  }
+  return c.json({ error: "Unauthorized — X-Webhook-Secret required" }, 401);
+});
+app.route("/api", feedbackQueueRoute);
+
 // Protected API routes — JWT required + tenant isolation
 app.use("/api/*", authMiddleware);
 app.use("/api/*", tenantGuard);
@@ -376,8 +386,7 @@ app.route("/api", discoveryPipelineRoute);
 app.route("/api", pipelineMonitoringRoute);
 // Sprint 136: Backup/Restore (F317)
 app.route("/api", backupRestoreRoute);
-// Sprint 137: Feedback Queue — Marker.io automation (F319, F320)
-app.route("/api", feedbackQueueRoute);
+// Sprint 137: Feedback Queue — moved above auth middleware (F340 JWT fix)
 // Sprint 148: TaskState Machine (F333, Phase 14)
 app.route("/api", taskStateRoute);
 
