@@ -32,7 +32,7 @@ export function Component() {
   const [exporting, setExporting] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [filterType, setFilterType] = useState<string>("");
-  const { currentOrg } = useOrgStore();
+  const { activeOrgId } = useOrgStore();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -51,8 +51,8 @@ export function Component() {
   }, [filterType]);
 
   useEffect(() => {
-    if (currentOrg) load();
-  }, [currentOrg, load]);
+    if (activeOrgId) load();
+  }, [activeOrgId, load]);
 
   const handleExport = async (scope: "full" | "item") => {
     setExporting(true);

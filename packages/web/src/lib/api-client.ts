@@ -2141,20 +2141,14 @@ export async function exportBackup(params: {
   scope?: "full" | "item";
   bizItemId?: string;
 }): Promise<BackupMeta> {
-  return fetchApi<BackupMeta>("/backup/export", {
-    method: "POST",
-    body: JSON.stringify(params),
-  });
+  return postApi<BackupMeta>("/backup/export", params);
 }
 
 export async function importBackup(params: {
   backupId: string;
   strategy?: "replace" | "merge";
 }): Promise<ImportResult> {
-  return fetchApi<ImportResult>("/backup/import", {
-    method: "POST",
-    body: JSON.stringify(params),
-  });
+  return postApi<ImportResult>("/backup/import", params);
 }
 
 export async function listBackups(params?: {
@@ -2181,5 +2175,6 @@ export async function getBackup(id: string): Promise<BackupMeta> {
 }
 
 export async function deleteBackup(id: string): Promise<void> {
-  await fetchApi(`/backup/${id}`, { method: "DELETE" });
+  const url = `${BASE_URL}/backup/${id}`;
+  await requestWithRetry(url, { method: "DELETE", headers: getAuthHeaders() }, true);
 }
