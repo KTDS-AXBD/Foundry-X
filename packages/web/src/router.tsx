@@ -24,7 +24,7 @@ export const router = createBrowserRouter([
       { path: "ax-bd/demo", lazy: () => import("@/routes/ax-bd/demo-scenario") },
 
       // ── Phase 13 v1.3 신규 경로 ──
-      { path: "discovery", lazy: () => import("@/routes/ax-bd/discover-dashboard") },
+      { path: "discovery", lazy: () => import("@/routes/discovery-unified") },
       { path: "validation", lazy: () => import("@/routes/validation-division") },
       { path: "product", lazy: () => import("@/routes/mvp-tracking") },
       { path: "shaping/business-plan", lazy: () => import("@/routes/ax-bd/index") },
