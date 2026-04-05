@@ -7,8 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-### 세션 #203 (2026-04-05)
-**랜딩 콘텐츠 리뉴얼 + Dashboard 404 근본 해결**:
+### 세션 #204 (2026-04-05)
+**Sprint 153 운영이슈 4건 등록+수정 + Sprint 148 merge**:
+- ✅ F338~F341 SPEC 등록 (FX-REQ-330~333, P1) + GitHub Issues #280~#283
+- ✅ F338 SPA 404: deploy.yml restore 단계 분리 + _redirects 검증 (grep 실패 시 배포 중��)
+- ✅ F340 JWT: feedback-queue Webhook Secret 인증 (authMiddleware 면제)
+- ✅ F341 TinaCMS Navigation: tina-lock.json 재빌드 (navigation collection 등록)
+- ✅ F333 Sprint 148 merge (PR #284): TaskState Machine, Phase 14 Foundation v1
+- 📋 F339 Marker.io: 시크릿 모드 테스트 가이드 (코드 외 이슈)
+- PR #285 생성 (F338+F341 코드)
+
+**검증 결과**:
+- ✅ typecheck (Sprint 148 task-state 에러는 shared 타입 미export — 별도 이슈)
+
+### 세��� #203 (2026-04-05)
+**랜딩 콘텐츠 리뉴얼 + Dashboard 404 ���본 해결**:
 - ✅ req-interview 3회: 타겟(KT 내부팀), BDP 6+1, 에이전트 3그룹, 히어로 직설형 등 8개 결정
 - ✅ F332 SPEC 등록 (FX-REQ-324, P1) + Plan (FX-PLAN-016) + Design (FX-DSGN-016)
 - ✅ **Sprint 147 F332 완료** (PR #279, Match 100%, ~8분 autopilot): 랜딩 콘텐츠 전면 재구성

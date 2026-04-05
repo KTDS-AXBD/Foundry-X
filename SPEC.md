@@ -1,10 +1,10 @@
 ---
 code: FX-SPEC-001
 title: Foundry-X Project Specification
-version: 5.61
+version: 5.62
 status: Active
 category: SPEC
-system-version: Sprint 147
+system-version: Sprint 148
 created: 2026-03-16
 updated: 2026-04-05
 author: Sinclair Seo
@@ -18,9 +18,9 @@ Foundry-X CLI — 사람과 AI 에이전트가 동등한 팀원으로 협업하�
 핵심 철학: "Git이 진실, Foundry-X는 렌즈"
 
 - **PRD**: [[FX-SPEC-PRD-V8]] (`docs/specs/prd-v8-final.md`) + [[FX-BD-V1]] (`docs/specs/fx-bd-v1/prd-final.md`)
-- **Phase**: **Phase 13** ✅ 완료 (Sprint 139~143) — IA 재설계 v1.3 F322~F328 ✅ (7/7)
-- **Sprint**: 147 (완료) — 랜딩 콘텐츠 리뉴얼 (F332), PR #279
-- **다음 Phase**: Phase 14 — Agent Orchestration Infrastructure (F333~F337, Sprint 148~152)
+- **Phase**: **Phase 14** 🔧 진행 중 — Agent Orchestration Infrastructure F333~F337
+- **Sprint**: 148 (✅ 완료) — TaskState Machine (F333), PR #284
+- **다음**: Sprint 149 (F334 Hook+EventBus) → 150 (F335 OrchestrationLoop) → 151~152 (F336~F337)
 - **Phase 14 근거**: `docs/specs/FX-Unified-Integration-Plan.md` (GAN R2 CONDITIONAL_PASS)
 - **Package Versions**: cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
@@ -212,7 +212,7 @@ Foundry-X CLI — 사람과 AI 에이전트가 동등한 팀원으로 협업하�
 > ls packages/api/src/db/migrations/*.sql | sort | tail -1  # D1 latest
 > turbo test --output-logs=errors-only    # 테스트 수 (전체 실행)
 > ```
-> **마지막 실측** (Sprint 147, 2026-04-05): ~90 routes, ~208 services, ~105 schemas, D1 0095, tests ~3148 (0 fail)
+> **마지막 실측** (Sprint 148, 2026-04-05): ~90 routes, ~208 services, ~105 schemas, D1 0095, tests ~3148 (0 fail)
 
 ## §3 마일스톤
 
