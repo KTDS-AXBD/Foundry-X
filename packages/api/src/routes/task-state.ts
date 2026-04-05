@@ -6,6 +6,7 @@ import {
   TaskStateDetailSchema,
   TaskStateListSchema,
   TaskStateRecordSchema,
+  TaskStateSummarySchema,
   CreateTaskStateRequestSchema,
   TransitionRequestSchema,
   TransitionResultSchema,
@@ -21,6 +22,28 @@ export const taskStateRoute = new OpenAPIHono<{ Bindings: Env; Variables: Tenant
 function getService(db: D1Database) {
   return new TaskStateService(db, createDefaultGuard());
 }
+
+// ─── F337: GET /task-states/summary — 상태별 집계 (Sprint 152) ───
+
+const summaryRoute = createRoute({
+  method: "get",
+  path: "/task-states/summary",
+  tags: ["TaskState"],
+  summary: "상태별 태스크 수 집계",
+  responses: {
+    200: {
+      content: { "application/json": { schema: TaskStateSummarySchema } },
+      description: "집계",
+    },
+  },
+});
+
+taskStateRoute.openapi(summaryRoute, async (c) => {
+  const orgId = c.get("orgId");
+  const svc = getService(c.env.DB);
+  const summary = await svc.getSummary(orgId);
+  return c.json(summary);
+});
 
 // ─── GET /task-states — 목록 조회 ───
 

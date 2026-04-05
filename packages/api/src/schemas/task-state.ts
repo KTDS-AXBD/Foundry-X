@@ -66,3 +66,10 @@ export const TransitionResultSchema = z.object({
   timestamp: z.string(),
   guardMessage: z.string().optional(),
 }).openapi("TransitionResult");
+
+// ─── F337: 집계 스키마 (Sprint 152) ───
+
+export const TaskStateSummarySchema = z.object({
+  counts: z.record(z.number()),
+  total: z.number(),
+}).openapi("TaskStateSummary");

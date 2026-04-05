@@ -458,3 +458,86 @@ describe("TaskState Routes (F333)", () => {
     expect(body.total).toBe(2);
   });
 });
+
+// ─── F337: getSummary + Route 테스트 (Sprint 152) ───
+
+describe("TaskStateService.getSummary (F337)", () => {
+  let db: D1Database;
+  let svc: TaskStateService;
+
+  beforeEach(async () => {
+    db = createMockD1() as unknown as D1Database;
+    await exec(db, DDL);
+    svc = new TaskStateService(db, createDefaultGuard());
+  });
+
+  it("returns empty counts when no tasks", async () => {
+    const summary = await svc.getSummary("org_test");
+    expect(summary.counts).toEqual({});
+    expect(summary.total).toBe(0);
+  });
+
+  it("counts tasks by state", async () => {
+    await svc.createTask("task-1", "org_test");
+    await svc.createTask("task-2", "org_test");
+    await svc.createTask("task-3", "org_test");
+    await svc.transition({ taskId: "task-2", toState: TaskState.SPEC_DRAFTING }, "org_test");
+    await svc.transition({ taskId: "task-3", toState: TaskState.SPEC_DRAFTING }, "org_test");
+
+    const summary = await svc.getSummary("org_test");
+    expect(summary.counts["INTAKE"]).toBe(1);
+    expect(summary.counts["SPEC_DRAFTING"]).toBe(2);
+    expect(summary.total).toBe(3);
+  });
+
+  it("isolates by tenant", async () => {
+    await svc.createTask("task-1", "org_test");
+    await svc.createTask("task-2", "org_other");
+    const summary = await svc.getSummary("org_test");
+    expect(summary.total).toBe(1);
+  });
+});
+
+describe("TaskState Summary Route (F337)", () => {
+  let db: D1Database;
+  let app: ReturnType<typeof createApp>;
+
+  beforeEach(async () => {
+    db = createMockD1() as unknown as D1Database;
+    await exec(db, DDL);
+    app = createApp(db);
+  });
+
+  it("GET /task-states/summary → 200 empty", async () => {
+    const res = await app.request("/api/task-states/summary");
+    expect(res.status).toBe(200);
+    const body = await res.json() as Record<string, any>;
+    expect(body.counts).toEqual({});
+    expect(body.total).toBe(0);
+  });
+
+  it("GET /task-states/summary → counts by state", async () => {
+    await app.request("/api/task-states", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ taskId: "task-1" }),
+    });
+    await app.request("/api/task-states", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ taskId: "task-2" }),
+    });
+    await app.request("/api/task-states/task-2/transition", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ toState: "SPEC_DRAFTING" }),
+    });
+
+    const res = await app.request("/api/task-states/summary");
+    expect(res.status).toBe(200);
+    const body = await res.json() as Record<string, any>;
+    expect(body.counts["INTAKE"]).toBe(1);
+    expect(body.counts["SPEC_DRAFTING"]).toBe(1);
+    expect(body.total).toBe(2);
+  });
+});
