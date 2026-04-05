@@ -109,20 +109,25 @@ jobs:
         env:
           VITE_MARKER_PROJECT_ID: ${{ secrets.VITE_MARKER_PROJECT_ID }}
           VITE_TINA_CLIENT_ID: ${{ secrets.VITE_TINA_CLIENT_ID }}
-      - name: SPA fallback (404.html = index.html)
-        working-directory: packages/web
-        run: cp dist/index.html dist/404.html
       - name: TinaCMS build (admin UI → dist/admin/)
         working-directory: packages/web
         continue-on-error: true
         run: |
           npx tinacms build || echo "⚠️ TinaCMS build failed (schema mismatch?) — continuing"
           cp -r public/admin/* dist/admin/ 2>/dev/null || true
-          cp public/_redirects dist/_redirects
-          ls -la dist/admin/ 2>/dev/null || echo "No admin dir"
         env:
           VITE_TINA_CLIENT_ID: ${{ secrets.VITE_TINA_CLIENT_ID }}
           TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
+      - name: Restore _redirects + _headers and verify (F338 — SPA 404 근본 수정)
+        working-directory: packages/web
+        run: |
+          cp public/_redirects dist/_redirects
+          cp public/_headers dist/_headers
+          cp dist/index.html dist/404.html
+          echo "=== dist/_redirects ==="
+          cat dist/_redirects
+          echo "=== Verification ==="
+          grep -q '/\*.*index.html.*200' dist/_redirects && echo "✅ SPA catch-all OK" || (echo "❌ SPA catch-all MISSING" && exit 1)
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
