@@ -7,6 +7,7 @@ tools:
   - Grep
   - Glob
 color: green
+role: generator
 ---
 
 # Application Architect Review — Phase E

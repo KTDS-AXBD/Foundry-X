@@ -85,10 +85,24 @@ export interface AgentResult {
   artifacts?: Record<string, unknown>;
 }
 
+// ─── F336: Agent Adapter Metadata (Sprint 151) ───
+
+export type AgentAdapterSource = "yaml" | "service" | "mcp";
+
+export interface AgentMetadata {
+  source: AgentAdapterSource;
+  originalService?: string;
+  capabilities?: string[];
+  modelTier?: string;
+}
+
 export interface AgentAdapter {
   name: string;
   role: AgentRole;
   execute(context: AgentExecutionContext): Promise<AgentResult>;
+  /** Optional feedback handler — default: feedback passed via context.previousFeedback */
+  handleFeedback?(feedback: string[], context: AgentExecutionContext): Promise<void>;
+  metadata?: AgentMetadata;
 }
 
 // ─── Loop Start Params ───

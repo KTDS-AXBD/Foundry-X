@@ -6,6 +6,7 @@ tools:
   - Read
   - Grep
   - Glob
+role: discriminator
 ---
 
 # Auto Reviewer

@@ -7,6 +7,7 @@ tools:
   - Grep
   - Glob
 color: magenta
+role: generator
 ---
 
 # Quality Assurance Review — Phase E

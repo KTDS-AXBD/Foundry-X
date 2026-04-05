@@ -7,6 +7,7 @@ tools:
   - Grep
   - Glob
 color: red
+role: generator
 ---
 
 # Technical Architect Review — Phase E

@@ -8,6 +8,7 @@ tools:
   - WebSearch
   - WebFetch
 color: red
+role: discriminator
 ---
 
 # O-G-D Discriminator

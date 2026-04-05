@@ -9,6 +9,7 @@ tools:
   - Grep
   - Agent
 color: magenta
+role: orchestrator
 ---
 
 # O-G-D Orchestrator

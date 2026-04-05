@@ -8,6 +8,7 @@ tools:
   - Grep
   - Glob
 color: green
+role: discriminator
 ---
 
 # Deploy Verifier

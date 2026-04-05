@@ -7,6 +7,7 @@ tools:
   - Grep
   - Glob
 color: cyan
+role: generator
 ---
 
 # Cloud Architect Review — Phase E
