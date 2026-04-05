@@ -1,6 +1,6 @@
 /**
- * E2E: F290 Route Redirect 검증 — 기존 경로 → 새 경로 16건
- * Sprint 122 F300 Phase C
+ * E2E: Route Redirect 검증 — 기존 경로 → 새 경로
+ * Sprint 122 F300 Phase C + Sprint 139 F322 Phase 13 갱신
  */
 import { test, expect } from "./fixtures/auth";
 
@@ -19,11 +19,11 @@ const REDIRECTS = [
   { from: "/pipeline", to: "/validation/pipeline" },
   { from: "/mvp-tracking", to: "/product/mvp" },
   { from: "/projects", to: "/gtm/projects" },
-  { from: "/discovery", to: "/external/discovery-x" },
+  // F322: /discovery는 실제 라우트로 전환 (redirect 아님)
   { from: "/foundry", to: "/external/foundry" },
 ] as const;
 
-test.describe("F290 Route Redirects (16건)", () => {
+test.describe("Route Redirects (15건)", () => {
   for (const { from, to } of REDIRECTS) {
     test(`${from} → ${to}`, async ({ authenticatedPage: page }) => {
       await page.goto(from);
@@ -31,4 +31,12 @@ test.describe("F290 Route Redirects (16건)", () => {
       expect(page.url()).toContain(to);
     });
   }
+});
+
+test.describe("F322 Phase 13 — /discovery is direct route", () => {
+  test("/discovery loads discover dashboard (not redirect)", async ({ authenticatedPage: page }) => {
+    await page.goto("/discovery");
+    expect(page.url()).toContain("/discovery");
+    await expect(page.locator("h1, h2, [data-testid]").first()).toBeVisible({ timeout: 5000 });
+  });
 });

@@ -63,6 +63,8 @@ export interface SidebarNavGroup {
   stageColor?: string;
   sortOrder?: number;
   visible?: boolean;
+  collapsed?: boolean;
+  badge?: string;
   items: SidebarNavItem[];
 }
 
@@ -71,6 +73,7 @@ export interface SidebarConfig {
   topItems: SidebarNavItem[];
   processGroups: SidebarNavGroup[];
   bottomItems: SidebarNavItem[];
+  adminGroups?: SidebarNavGroup[];
 }
 
 /* ── Icon registry ── */
