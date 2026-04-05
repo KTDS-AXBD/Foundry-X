@@ -24,13 +24,13 @@ test.describe("Production Smoke", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // Hero headline — PRD v8 정체성 반영
+    // Hero headline — 사업개발 자동화 직설형 메시지
     await expect(
-      page.getByRole("heading", { name: /AI 에이전트가/i }),
+      page.getByRole("heading", { name: /사업기회 발굴부터/i }),
     ).toBeVisible();
 
     // Hero 브랜딩 텍스트 (Blueprint: br 태그로 분할됨)
-    await expect(page.getByText("설계하다")).toBeVisible();
+    await expect(page.getByText("자동화해요")).toBeVisible();
   });
 
   /**

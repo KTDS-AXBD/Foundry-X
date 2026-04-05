@@ -3,7 +3,6 @@
 import { Fragment } from "react";
 import { Link } from "react-router-dom";
 import {
-  Anvil,
   ArrowRight,
   ArrowUpRight,
   BarChart3,
@@ -18,7 +17,6 @@ import {
   Rocket,
   Scan,
   Shield,
-  ShieldCheck,
   Target,
   TestTube,
 } from "lucide-react";
@@ -71,18 +69,17 @@ function getSectionOrder(section: string): number {
    ═══════════════════════════════════════════════ */
 
 const SITE_META_FALLBACK = {
-  sprint: "Sprint 137",
-  phase: "Phase 12 완료",
-  phaseTitle: "Skill Unification",
-  tagline: "AX 사업개발 AI 오케스트레이션 플랫폼",
+  sprint: "Sprint 147",
+  phase: "Phase 13 진행 중",
+  phaseTitle: "IA 재설계",
+  tagline: "사업기회 발굴부터 데모까지, AI가 자동화하는 BD 플랫폼",
 } as const;
 
 const STATS_FALLBACK = [
-  { value: "~89", label: "API Routes" },
-  { value: "~206", label: "Services" },
-  { value: "3,148+", label: "Tests" },
-  { value: "101", label: "D1 Migrations" },
-  { value: "137", label: "Sprints" },
+  { value: "6", label: "BD 파이프라인" },
+  { value: "10+", label: "AI 에이전트" },
+  { value: "22", label: "자동화 스킬" },
+  { value: "147", label: "Sprints" },
 ];
 
 // Build-time content from TinaCMS-managed Markdown
@@ -104,77 +101,110 @@ const pillars = [
   {
     icon: Brain,
     title: "BDP 라이프사이클",
-    label: "7단계 자동화",
-    desc: "수집→발굴→형상화→검증→제품화→GTM→평가. 사업개발 전체를 한 곳에서.",
-    detail: "AX BD 프로세스 v8.2 기반, 5유형(I/M/P/T/S) 강도 라우팅 + 사업성 체크포인트",
+    label: "6단계 자동화",
+    desc: "수집→발굴→형상화→검증→제품화→GTM. 사업개발 전체를 한 곳에서.",
+    detail: "AX BD 프로세스 v8.2 기반, 5유형(I/M/P/T/S) 분류 + 사업성 체크포인트",
   },
   {
     icon: Target,
-    title: "AI 에이전트 하네스",
-    label: "BMCAgent + InsightAgent",
-    desc: "BMC 초안 자동 작성, 인사이트 도출, 다중 AI 검토까지. 에이전트가 사업기회를 형상화해요.",
+    title: "AI 에이전트 파이프라인",
+    label: "10+ 에이전트 · 멀티모델",
+    desc: "BMC 초안, 인사이트 도출, 다중 AI 검토, PRD 자동 생성. 발굴에서 실행까지.",
     detail: "Anthropic + OpenAI + Gemini + DeepSeek 멀티모델 파이프라인",
   },
   {
-    icon: Shield,
-    title: "SDD Triangle",
-    label: "Spec ↔ Code ↔ Test",
-    desc: "명세, 코드, 테스트가 항상 동기화돼요. Git이 진실, Foundry-X는 렌즈.",
-    detail: "~89 routes, 3,148+ tests, 101 D1 migrations — 자동 정합성 검증",
+    icon: Layers,
+    title: "오케스트레이션",
+    label: "에이전트 조율 · 품질 보장",
+    desc: "에이전트들이 병렬로 일하고, 결과를 자동 검증하고, 품질 기준을 강제해요.",
+    detail: "O-G-D 적대적 루프 + Gap Analysis 90%+ 통과 + Sprint 자동화",
   },
 ];
 
-const agents = [
-  { name: "BMCAgent", role: "BMC 초안 · AI 자동 생성", desc: "9블록 BMC를 아이디어 기반으로 자동 작성. 업계 트렌드와 경쟁사 데이터를 반영해요.", icon: PenTool },
-  { name: "InsightAgent", role: "인사이트 · 기회 발굴", desc: "수집 데이터에서 패턴을 발견하고, 사업기회 인사이트를 자동 도출해요.", icon: Lightbulb },
-  { name: "ReviewAgent", role: "다중 AI 검토 · Six Hats", desc: "ChatGPT, Gemini, DeepSeek로 BMC/PRD를 교차 검토. Six Hats 토론으로 다각도 분석.", icon: Eye },
-  { name: "ArchitectAgent", role: "아키텍처 분석 · 설계 리뷰", desc: "코드베이스 구조를 분석하고, 의존성 관계를 파악하며, 설계 품질을 평가해요.", icon: Layers },
-  { name: "TestAgent", role: "테스트 생성 · 커버리지 분석", desc: "테스트 케이스를 자동 생성하고, 커버리지 갭과 엣지 케이스를 탐지해요.", icon: TestTube },
-  { name: "SecurityAgent", role: "OWASP 스캔 · PR 보안 분석", desc: "보안 취약점을 사전에 탐지하고, PR diff를 분석해 위험 요소를 리포트해요.", icon: ShieldCheck },
+interface AgentGroup {
+  group: string;
+  label: string;
+  agents: { name: string; role: string; icon: typeof Brain }[];
+}
+
+const agentGroups: AgentGroup[] = [
+  {
+    group: "발굴",
+    label: "Discover · 기회를 찾다",
+    agents: [
+      { name: "InsightAgent", role: "아이디어→기회 발굴", icon: Lightbulb },
+      { name: "BMCAgent", role: "BMC 자동 작성", icon: PenTool },
+      { name: "DiscoveryAgent", role: "시장/트렌드 수집", icon: Scan },
+    ],
+  },
+  {
+    group: "형상화",
+    label: "Shape · 기회를 구체화하다",
+    agents: [
+      { name: "ShapingAgent", role: "PRD 자동 생성", icon: PenTool },
+      { name: "OGD Loop", role: "적대적 품질 검증", icon: Shield },
+      { name: "SixHats", role: "다각도 토론", icon: Brain },
+      { name: "ReviewAgent", role: "멀티AI 교차 검토", icon: Eye },
+    ],
+  },
+  {
+    group: "실행",
+    label: "Execute · 구현하고 배포하다",
+    agents: [
+      { name: "SprintAgent", role: "자동 구현 (Plan→Code)", icon: Rocket },
+      { name: "TestAgent", role: "테스트 자동 생성", icon: TestTube },
+      { name: "DeployAgent", role: "배포 자동화", icon: ArrowUpRight },
+    ],
+  },
 ];
 
-const architecture = [
-  { layer: "CLI Layer", items: ["foundry-x init", "foundry-x sync", "foundry-x status"], tech: "TypeScript + Commander + Ink TUI" },
-  { layer: "API Layer", items: ["~89 Routes", "~206 Services", "~104 Schemas"], tech: "Hono on Cloudflare Workers" },
-  { layer: "Agent Layer", items: ["BMCAgent", "InsightAgent", "ReviewAgent", "ArchitectAgent + 3종"], tech: "Orchestrator + MCP + Multi-Model" },
-  { layer: "Data Layer", items: ["D1 SQLite (101 Migrations)", "KV Cache", "Git (SSOT)"], tech: "Cloudflare D1 + simple-git" },
+interface SystemNode {
+  name: string;
+  desc: string;
+  tech: string;
+  icon: typeof Brain;
+}
+
+const systemFlow: SystemNode[] = [
+  { name: "사용자", desc: "웹 브라우저", tech: "fx.minu.best", icon: Eye },
+  { name: "Web Dashboard", desc: "시각화 · 관리", tech: "React + Vite", icon: Layers },
+  { name: "API Server", desc: "비즈니스 로직", tech: "Hono on CF Workers", icon: GitBranch },
+  { name: "AI 에이전트", desc: "자동화 파이프라인", tech: "멀티모델 오케스트레이션", icon: Brain },
+  { name: "Data Store", desc: "영속 저장소", tech: "D1 SQLite + Git", icon: Shield },
+];
+
+const openSourcePartners = [
+  { name: "gstack", role: "코드리뷰 · QA · 배포", desc: "AI 기반 코드 리뷰, QA 자동화, 원클릭 배포" },
+  { name: "bkit", role: "PDCA 사이클 관리", desc: "Plan→Design→Do→Check→Act 전체 사이클 자동화" },
+  { name: "OpenSpec", role: "명세 자동화", desc: "Spec ↔ Code ↔ Test 동기화 엔진" },
+  { name: "TinaCMS", role: "콘텐츠 관리", desc: "랜딩 페이지·위키 콘텐츠를 Git 기반으로 편집" },
+  { name: "Marker.io", role: "피드백 수집", desc: "스크린샷 기반 시각 피드백 → 자동 이슈 생성" },
 ];
 
 const roadmap: {
   phase: string;
-  title: string;
   version: string;
   status: "done" | "current" | "planned";
   items: string[];
 }[] = [
-  { phase: "Phase 1~5", title: "Foundation", version: "Sprint 1~74", status: "done",
-    items: ["CLI + Ink TUI", "API + Web Dashboard", "SSO + RBAC 멀티테넌시", "6종 AI Agent + TDD"] },
-  { phase: "Phase 6~7", title: "Ecosystem + BD Pipeline", version: "Sprint 75~81", status: "done",
-    items: ["BMAD/OpenSpec 벤치마킹", "BD Pipeline E2E 통합", "Discovery-X 연동"] },
-  { phase: "Phase 8~9", title: "IA + 팀 온보딩", version: "Sprint 82~100", status: "done",
-    items: ["IA 구조 개선 + 인증 강화", "BD 스킬 배포 + Plugin 전환", "발굴 UX (GIVC PoC)"] },
-  { phase: "Phase 10", title: "O-G-D + Skill Evolution", version: "Sprint 101~112", status: "done",
-    items: ["O-G-D Agent Loop", "BD 형상화 A~F", "BD ROI 벤치마크"] },
-  { phase: "Phase 11", title: "IA 대개편", version: "Sprint 113~121", status: "done",
-    items: ["12 F-items 전체 완료", "구조 기반 + 기능 확장", "GTM 선제안 아웃리치"] },
-  { phase: "Phase 12", title: "Skill Unification", version: "Sprint 125~128", status: "done",
-    items: ["3개 스킬 시스템 통합", "D1~D4 4대 단절 해소", "메트릭 수집 + 대시보드"] },
-];
-
-const ecosystem = [
-  { name: "Discovery-X", role: "수집 엔진", desc: "시장/트렌드/경쟁사 데이터 수집 → API로 Foundry-X에 공급", arrow: "API 연동" },
-  { name: "Foundry-X", role: "베이스캠프", desc: "발굴→형상화→검증→제품화→GTM→평가 전 단계 오케스트레이션", arrow: "중심" },
-  { name: "AXIS DS", role: "UI 일관성", desc: "디자인 토큰 + React 컴포넌트 시스템", arrow: "컴포넌트 공급" },
+  { phase: "기반 구축", version: "Sprint 1~74", status: "done",
+    items: ["CLI + API + Web Dashboard", "SSO + RBAC 멀티테넌시", "6종 AI Agent 기반"] },
+  { phase: "BD 자동화", version: "Sprint 75~121", status: "done",
+    items: ["BD Pipeline E2E 통합", "O-G-D Agent Loop", "IA 대개편 12 F-items"] },
+  { phase: "현재", version: "Sprint 122~147", status: "current",
+    items: ["Skill Unification", "TinaCMS + Marker.io", "IA 재설계 v1.3"] },
+  { phase: "다음 목표", version: "Phase 14+", status: "planned",
+    items: ["평가 프레임워크", "팀 확산 온보딩", "외부 공개 준비"] },
 ];
 
 const processSteps = [
-  { step: "01", title: "수집", desc: "시장/트렌드/경쟁사 데이터 자동 수집 (Discovery-X 연동)", icon: Scan },
-  { step: "02", title: "발굴", desc: "아이디어 등록 + 5유형(I/M/P/T/S) 분류 + 사업성 체크포인트", icon: Lightbulb },
-  { step: "03", title: "형상화", desc: "BMC 에디터 + AI 초안 (BMCAgent) + PRD 자동 작성", icon: PenTool },
-  { step: "04", title: "검증", desc: "다중 AI 검토 + Six Hats 토론 + 팀 승인", icon: CheckCircle2 },
-  { step: "05", title: "제품화", desc: "PoC/MVP 자동 구축 — AI 에이전트가 코드·테스트·배포 처리", icon: Rocket },
-  { step: "06", title: "GTM", desc: "제안서·발표자료·데모 환경 자동 생성", icon: Megaphone },
-  { step: "07", title: "평가", desc: "KPI 추적 + 포트폴리오 대시보드 + Go/Kill 판단", icon: BarChart3 },
+  { step: "01", title: "수집", desc: "시장/트렌드/경쟁사 데이터 자동 수집 (Discovery-X 연동)", icon: Scan, active: true },
+  { step: "02", title: "발굴", desc: "아이디어 등록 + 5유형(I/M/P/T/S) 분류 + 사업성 체크포인트", icon: Lightbulb, active: true },
+  { step: "03", title: "형상화", desc: "BMC 에디터 + AI 초안 + PRD 자동 작성 + 다중 AI 검토", icon: PenTool, active: true },
+  { step: "04", title: "검증", desc: "본부/전사/임원 3단계 검증 + Go/Hold/Drop 의사결정", icon: CheckCircle2, active: true },
+  { step: "05", title: "제품화", desc: "PoC/MVP 자동 구축 — AI 에이전트가 코드·테스트·배포 처리", icon: Rocket, active: true },
+  { step: "06", title: "GTM", desc: "제안서·Offering Pack·데모 환경 자동 생성", icon: Megaphone, active: true },
+  { step: "07", title: "평가", desc: "KPI 추적 + 포트폴리오 대시보드 + Go/Kill 판단", icon: BarChart3, active: false },
 ];
 
 /* ═══════════════════════════════════════════════
@@ -211,12 +241,15 @@ function ProcessFlow() {
             </>
           )}
           {/* Process box */}
-          <div className="bp-box group relative px-4 py-3 transition-colors hover:bg-[oklch(0.55_0.15_250/5%)] w-full md:w-auto">
+          <div className={`bp-box group relative px-4 py-3 transition-colors w-full md:w-auto ${!step.active ? "opacity-40 border-dashed" : "hover:bg-[oklch(0.55_0.15_250/5%)]"}`}>
             <div className="flex items-center gap-2">
               <span className="bp-annotation font-bold">{step.step}</span>
               <step.icon className="size-4 bp-line" />
             </div>
             <h3 className="bp-line mt-1 font-display text-sm font-bold">{step.title}</h3>
+            {!step.active && (
+              <span className="bp-annotation text-[10px]">향후 구현</span>
+            )}
             {/* Hover tooltip */}
             <div className="pointer-events-none absolute top-full left-0 z-20 mt-1 hidden w-48 p-3 text-xs text-muted-foreground opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 md:block bp-box">
               {step.desc}
@@ -250,88 +283,77 @@ function PillarGrid() {
   );
 }
 
-function AgentGrid() {
+function AgentGroupGrid() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {agents.map((agent) => (
-        <div key={agent.name} className="bp-box group relative p-5 transition-colors hover:bg-[oklch(0.55_0.15_250/5%)]">
-          {/* Left pin marker */}
-          <div className="absolute top-1/2 left-0 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-background bg-[oklch(0.55_0.15_250)]" />
-          <div className="mb-3 flex items-center gap-3">
-            <agent.icon className="size-5 bp-line" />
-            <div>
-              <h3 className="bp-line font-display text-sm font-bold">{agent.name}</h3>
-              <span className="bp-annotation">{agent.role}</span>
-            </div>
+    <div className="grid gap-6 md:grid-cols-3">
+      {agentGroups.map((group, gi) => (
+        <div key={group.group} className="relative">
+          {/* Group header */}
+          <div className="bp-box border-b-0 rounded-b-none px-4 py-3">
+            <span className="bp-annotation uppercase tracking-widest">{group.group}</span>
+            <h3 className="bp-line font-display text-sm font-bold mt-1">{group.label}</h3>
           </div>
-          <p className="text-[13px] leading-relaxed text-muted-foreground">{agent.desc}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ArchitectureBlueprint() {
-  return (
-    <div className="bp-bg space-y-0 rounded-lg p-6">
-      {architecture.map((layer, i) => (
-        <Fragment key={layer.layer}>
-          <div className="bp-box relative p-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
-              <div className="min-w-[120px]">
-                <span className="bp-line font-display text-sm font-bold">{layer.layer}</span>
-                <br />
-                <span className="bp-annotation">{layer.tech}</span>
+          {/* Agent cards inside group */}
+          <div className="bp-box rounded-t-none space-y-2 p-4">
+            {group.agents.map((agent) => (
+              <div key={agent.name} className="flex items-center gap-3 py-1.5">
+                <agent.icon className="size-4 bp-line shrink-0" />
+                <div>
+                  <span className="bp-line text-sm font-bold">{agent.name}</span>
+                  <span className="ml-2 bp-annotation">{agent.role}</span>
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {layer.items.map((item) => (
-                  <span key={item} className="bp-box px-2.5 py-1 font-mono text-[11px] bp-line">
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
-          {/* Arrow between layers */}
-          {i < architecture.length - 1 && (
-            <div className="flex justify-center py-1">
-              <span className="bp-line text-lg">↓</span>
+          {/* Arrow to next group (except last) */}
+          {gi < agentGroups.length - 1 && (
+            <div className="absolute top-1/2 -right-3 z-10 hidden md:block">
+              <span className="bp-line text-lg">→</span>
             </div>
           )}
-        </Fragment>
+        </div>
       ))}
     </div>
   );
 }
 
-function EcosystemDiagram() {
+function SystemFlowDiagram() {
   return (
-    <div className="relative mx-auto max-w-2xl py-8">
-      {/* Central node */}
-      <div className="mx-auto flex w-fit flex-col items-center">
-        <div className="bp-box flex size-28 items-center justify-center rounded-full">
-          <div className="flex flex-col items-center gap-1">
-            <Anvil className="size-8 bp-line" />
-            <span className="bp-line font-display text-xs font-bold">Foundry-X</span>
-          </div>
-        </div>
-        <span className="bp-annotation mt-2 uppercase tracking-widest">오케스트레이션</span>
-      </div>
-      {/* Connection lines + satellite nodes */}
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {ecosystem.map((svc) => (
-          <div key={svc.name} className="flex flex-col items-center gap-3">
-            <div className="h-8 w-px bg-current/20" />
-            <span className="bp-annotation">{svc.arrow}</span>
-            <div className="bp-box w-full p-4 text-center">
-              <span className="bp-line font-display text-sm font-bold">{svc.name}</span>
-              <br />
-              <span className="bp-annotation">{svc.role}</span>
-              <p className="mt-1 text-[11px] text-muted-foreground">{svc.desc}</p>
+    <div className="bp-bg rounded-lg p-6">
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-center md:gap-0">
+        {systemFlow.map((node, i) => (
+          <Fragment key={node.name}>
+            {/* Node */}
+            <div className="bp-box px-4 py-3 text-center min-w-[120px]">
+              <node.icon className="mx-auto size-5 bp-line mb-1" />
+              <span className="bp-line font-display text-sm font-bold block">{node.name}</span>
+              <span className="bp-annotation block">{node.desc}</span>
+              <span className="text-[10px] text-muted-foreground block mt-1">{node.tech}</span>
             </div>
-          </div>
+            {/* Arrow */}
+            {i < systemFlow.length - 1 && (
+              <>
+                <span className="bp-line hidden md:inline text-lg mx-2">→</span>
+                <div className="h-4 w-px bg-current/20 mx-auto md:hidden" />
+              </>
+            )}
+          </Fragment>
         ))}
       </div>
+    </div>
+  );
+}
+
+function OpenSourcePartnersGrid() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {openSourcePartners.map((partner) => (
+        <div key={partner.name} className="bp-box p-5 transition-colors hover:bg-[oklch(0.55_0.15_250/5%)]">
+          <span className="bp-line font-display text-lg font-bold">{partner.name}</span>
+          <span className="ml-2 bp-annotation">{partner.role}</span>
+          <p className="mt-2 text-sm text-muted-foreground">{partner.desc}</p>
+        </div>
+      ))}
     </div>
   );
 }
@@ -340,7 +362,7 @@ function RoadmapTimeline() {
   return (
     <div className="space-y-3">
       {roadmap.map((phase) => (
-        <div key={phase.phase} className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
+        <div key={phase.phase} className={`flex flex-col gap-2 md:flex-row md:items-center md:gap-4 ${phase.status === "planned" ? "opacity-60" : ""}`}>
           {/* Phase label */}
           <div className="w-28 shrink-0">
             <span className="bp-line font-display text-sm font-bold">{phase.phase}</span>
@@ -349,8 +371,7 @@ function RoadmapTimeline() {
           </div>
           {/* Gantt bar */}
           <div className="flex-1">
-            <div className="bp-box flex flex-wrap items-center gap-3 px-4 py-2">
-              <span className="bp-line text-sm font-bold">{phase.title}</span>
+            <div className={`bp-box flex flex-wrap items-center gap-3 px-4 py-2 ${phase.status === "planned" ? "border-dashed" : ""}`}>
               <span className="text-xs text-muted-foreground">
                 {phase.items.join(" · ")}
               </span>
@@ -359,6 +380,9 @@ function RoadmapTimeline() {
               )}
               {phase.status === "current" && (
                 <span className="ml-auto bp-annotation">● NOW</span>
+              )}
+              {phase.status === "planned" && (
+                <span className="ml-auto bp-annotation">○ NEXT</span>
               )}
             </div>
           </div>
@@ -386,15 +410,15 @@ function HeroSection() {
             {/* Left: headline + CTA */}
             <div className="lg:col-span-7">
               <h1 className="bp-line font-display text-5xl font-bold leading-[1.1] sm:text-6xl md:text-7xl">
-                AI 에이전트가
+                사업기회 발굴부터
                 <br />
-                일하는 방식을
+                데모까지,
                 <br />
-                설계하다
+                AI가 자동화해요
               </h1>
               <p className="mt-6 max-w-lg text-lg text-muted-foreground">
-                수집→발굴→형상화→검증→제품화→GTM→평가 —
-                BDP 7단계를 AI 에이전트가 자동화해요.
+                BDP 6단계를 AI 에이전트가 자동으로 처리해요.
+                수집→발굴→형상화→검증→제품화→GTM.
               </p>
               {/* CTA buttons — bp-box style */}
               <div className="mt-8 flex flex-wrap gap-4">
@@ -437,8 +461,8 @@ function ProcessSection() {
       <div className="mx-auto max-w-5xl">
         <SectionHeader
           label="How It Works"
-          title="BDP 7단계 프로세스"
-          desc="수집에서 평가까지, AI 에이전트가 사업개발 전 과정을 자동화해요."
+          title="BDP 6+1 프로세스"
+          desc="수집에서 GTM까지, AI 에이전트가 사업개발 전 과정을 자동화해요."
         />
         <ProcessFlow />
       </div>
@@ -453,7 +477,7 @@ function FeaturesSection() {
         <SectionHeader
           label="Core Pillars"
           title="세 가지 차별점"
-          desc="BDP 라이프사이클, AI 에이전트, SDD Triangle."
+          desc="BDP 라이프사이클, AI 에이전트 파이프라인, 오케스트레이션."
         />
         <PillarGrid />
       </div>
@@ -467,10 +491,10 @@ function AgentsSection() {
       <div className="mx-auto max-w-5xl">
         <SectionHeader
           label="Agent Ecosystem"
-          title="6종 AI 에이전트"
-          desc="사업기회 형상화부터 코드 검증까지. 멀티모델 파이프라인으로 품질을 보장해요."
+          title="10+ AI 에이전트 · 3개 파이프라인"
+          desc="발굴에서 배포까지. 에이전트 그룹이 사업개발 전 과정을 자동화해요."
         />
-        <AgentGrid />
+        <AgentGroupGrid />
       </div>
     </section>
   );
@@ -481,11 +505,11 @@ function ArchitectureSection() {
     <section id="architecture" className="relative px-6 py-24 md:py-32">
       <div className="mx-auto max-w-5xl">
         <SectionHeader
-          label="Architecture"
-          title="4-Layer 아키텍처"
-          desc="CLI에서 데이터까지, 모든 레이어가 유기적으로 연결돼요."
+          label="System"
+          title="시스템 구성도"
+          desc="사용자부터 데이터까지, 요청이 흐르는 경로를 한눈에."
         />
-        <ArchitectureBlueprint />
+        <SystemFlowDiagram />
       </div>
     </section>
   );
@@ -496,11 +520,11 @@ function EcosystemSection() {
     <section id="ecosystem" className="relative px-6 py-24 md:py-32">
       <div className="mx-auto max-w-5xl">
         <SectionHeader
-          label="Ecosystem"
-          title="AX 생태계"
-          desc="수집 · 오케스트레이션 · 디자인을 연결해요."
+          label="Open Source"
+          title="오픈소스 연계"
+          desc="혼자 하지 않아요 — 검증된 오픈소스와 함께."
         />
-        <EcosystemDiagram />
+        <OpenSourcePartnersGrid />
       </div>
     </section>
   );
@@ -512,8 +536,8 @@ function RoadmapSection() {
       <div className="mx-auto max-w-5xl">
         <SectionHeader
           label="Roadmap"
-          title="Phase 1~12 로드맵"
-          desc="CLI에서 시작해 Skill Unification까지. 137 Sprint를 거치며 사업개발 플랫폼을 구축했어요."
+          title="로드맵"
+          desc="147 Sprint를 거치며 사업개발 자동화 플랫폼을 구축해왔어요."
         />
         <RoadmapTimeline />
       </div>
@@ -526,14 +550,12 @@ function CtaSection() {
     <section className="relative px-6 py-24 md:py-32">
       <div className="mx-auto max-w-3xl text-center">
         <h2 className="bp-line font-display text-3xl font-bold">
-          AI 에이전트와 함께
-          <br />
-          사업개발을 자동화하세요
+          사업개발, 수동으로 하고 계신가요?
         </h2>
         <p className="mt-6 text-lg text-muted-foreground">
-          Foundry-X는 AX 사업개발의 전체 라이프사이클을 자동화해요.
+          Foundry-X가 발굴부터 데모까지 자동화해요.
           <br />
-          수집에서 평가까지, BDP 7단계를 한 곳에서.
+          우리 팀의 BD 프로세스를 한 단계 올려보세요.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link
