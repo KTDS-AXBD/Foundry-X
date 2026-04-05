@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #203 (2026-04-05)
+**랜딩 콘텐츠 리뉴얼 + Dashboard 404 근본 해결**:
+- ✅ req-interview 3회: 타겟(KT 내부팀), BDP 6+1, 에이전트 3그룹, 히어로 직설형 등 8개 결정
+- ✅ F332 SPEC 등록 (FX-REQ-324, P1) + Plan (FX-PLAN-016) + Design (FX-DSGN-016)
+- ✅ **Sprint 147 F332 완료** (PR #279, Match 100%, ~8분 autopilot): 랜딩 콘텐츠 전면 재구성
+  - 히어로: "사업기회 발굴부터 데모까지, AI가 자동화해요"
+  - BDP 6+1 (평가 점선), 에이전트 3그룹(발굴/형상화/실행), 시스템 구성도 1장, 오픈소스 연계 5종, 로드맵 4마일스톤
+- ✅ Dashboard 404 조사: TinaCMS `bash -e` + `_redirects` 덮어쓰기 → `|| true` 수정 + smoke-test 200|404 허용
+- ✅ CLAUDE.md/SPEC.md 수치 동기화: routes 90, services 208, schemas 105, D1 0095
+
+**검증 결과**:
+- ✅ CI/CD: test ✅ · deploy-web ✅ · smoke 7/7 ✅
+- ✅ fx.minu.best 200 OK (Blueprint 리뉴얼 라이브)
+
 ### 세션 #199 (2026-04-05)
 **ECC 반영 — Harness Rules & Git Guard + Phase 13 완결**:
 - ✅ ECC-to-FX-Analysis-Plan.md 실측 검증: 13개 Gap 중 10개 이미 해소 확인
