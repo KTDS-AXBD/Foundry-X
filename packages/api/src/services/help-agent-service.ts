@@ -64,7 +64,7 @@ const LOCAL_PATTERNS: LocalPattern[] = [
   {
     regex: /marker\.?io|피드백.*도구|비주얼.*피드백|visual.*feedback|화면.*피드백/i,
     handler: () => {
-      return `**Marker.io 비주얼 피드백 사용법**\n\n1. 로그인 후 대시보드에서 우측 하단 **말풍선 버튼** 클릭\n2. 화면에서 문제 위치를 **클릭** → 자동 스크린샷\n3. 어노테이션 추가(화살표, 사각형) + 피드백 입력\n4. **Submit** → GitHub Issue 자동 생성 (\`visual-feedback\` 라벨)\n\n계정 불필요! Guest로 바로 사용 가능해요.\n\n📖 상세 가이드: 사이드바 → **도구 가이드** 메뉴`;
+      return `**Marker.io 비주얼 피드백 사용법**\n\n1. 로그인 후 대시보드 우측 사이드의 주황색 **Report issue** 탭 클릭\n2. 화면에서 문제 위치를 **클릭** → 자동 스크린샷\n3. 어노테이션 추가(화살표, 사각형) + 피드백 입력\n4. **Submit** → GitHub Issue 자동 생성 (\`visual-feedback\` 라벨)\n\n계정 불필요! Guest로 바로 사용 가능해요.\n\n상세 가이드: 사이드바 → **도구 가이드** 메뉴`;
     },
   },
   {

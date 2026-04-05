@@ -37,10 +37,10 @@ interface Step {
 const markerSteps: Step[] = [
   {
     icon: MousePointer2,
-    title: "1. 위젯 버튼 클릭",
-    description: "대시보드 우측 하단의 말풍선 버튼을 클릭해요.",
-    detail: "로그인 후 모든 대시보드 페이지에서 위젯이 표시돼요. 랜딩 페이지에서는 보이지 않아요.",
-    simulation: "우측 하단 → 💬 클릭",
+    title: "1. Report Issue 탭 클릭",
+    description: "화면 우측 사이드에 주황색 'Report issue' 세로 탭을 클릭해요.",
+    detail: "로그인 후 모든 대시보드 페이지에서 우측 사이드에 주황색 탭이 표시돼요. 클릭하면 피드백 패널이 열려요.",
+    simulation: "우측 사이드 → 🟧 Report issue 클릭",
   },
   {
     icon: Camera,

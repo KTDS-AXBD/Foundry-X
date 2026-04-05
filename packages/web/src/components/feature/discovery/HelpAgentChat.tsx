@@ -143,6 +143,11 @@ function renderChatMarkdown(text: string): string {
   return text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
+    .replace(/^### (.*$)/gm, '<strong class="block mt-2 text-xs uppercase tracking-wide text-indigo-400">$1</strong>')
+    .replace(/^## (.*$)/gm, '<strong class="block mt-3 mb-1">$1</strong>')
+    .replace(/^---$/gm, '<hr class="my-2 border-border/50" />')
+    .replace(/^\d+\. (.*)$/gm, '<div class="ml-3">• $1</div>')
+    .replace(/^- (.*)$/gm, '<div class="ml-3">• $1</div>')
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="underline text-indigo-400" target="_blank" rel="noopener">$1</a>');
