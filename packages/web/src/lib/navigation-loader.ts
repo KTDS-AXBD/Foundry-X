@@ -67,7 +67,7 @@ export interface SidebarNavGroup {
 }
 
 export interface SidebarConfig {
-  id: string;
+  navId: string;
   topItems: SidebarNavItem[];
   processGroups: SidebarNavGroup[];
   bottomItems: SidebarNavItem[];
