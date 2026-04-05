@@ -292,3 +292,21 @@ export type {
   SyncEventPayload,
   ManualEventPayload,
 } from './task-event.js';
+
+// F335: Orchestration Loop types (Sprint 150, Phase 14)
+export { DEFAULT_CONVERGENCE } from './orchestration.js';
+
+export type {
+  LoopMode,
+  ConvergenceCriteria,
+  LoopRoundResult,
+  LoopContextStatus,
+  FeedbackLoopContext,
+  LoopOutcome,
+  AgentRole,
+  AgentExecutionContext,
+  AgentResult,
+  AgentAdapter,
+  LoopStartParams,
+  ExecutionEventRecord,
+} from './orchestration.js';

@@ -116,6 +116,8 @@ import { feedbackQueueRoute } from "./routes/feedback-queue.js";
 import { taskStateRoute } from "./routes/task-state.js";
 // Sprint 149: Execution Events (F334, Phase 14)
 import { executionEventsRoute } from "./routes/execution-events.js";
+// Sprint 150: Orchestration Loop (F335, Phase 14)
+import { orchestrationRoute } from "./routes/orchestration.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -393,6 +395,8 @@ app.route("/api", backupRestoreRoute);
 app.route("/api", taskStateRoute);
 // Sprint 149: Execution Events (F334, Phase 14)
 app.route("/api", executionEventsRoute);
+// Sprint 150: Orchestration Loop (F335, Phase 14)
+app.route("/api", orchestrationRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
