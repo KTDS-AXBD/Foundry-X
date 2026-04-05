@@ -7,6 +7,7 @@ tools:
   - Grep
   - Glob
 color: yellow
+role: generator
 ---
 
 # Data Architect Review — Phase E

@@ -8,6 +8,7 @@ tools:
   - WebSearch
   - WebFetch
 color: green
+role: generator
 ---
 
 # Shaping Generator

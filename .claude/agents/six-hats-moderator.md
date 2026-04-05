@@ -8,6 +8,7 @@ tools:
   - Glob
   - Grep
 color: blue
+role: orchestrator
 ---
 
 # Six Hats Moderator

@@ -7,6 +7,7 @@ tools:
   - Bash
   - Read
 color: blue
+role: discriminator
 ---
 
 # Build Validator

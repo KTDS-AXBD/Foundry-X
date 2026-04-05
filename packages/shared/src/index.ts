@@ -307,6 +307,8 @@ export type {
   AgentExecutionContext,
   AgentResult,
   AgentAdapter,
+  AgentAdapterSource,
+  AgentMetadata,
   LoopStartParams,
   ExecutionEventRecord,
 } from './orchestration.js';
