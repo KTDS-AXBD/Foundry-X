@@ -12,4 +12,4 @@
 
 /admin/assets/*
   Cache-Control: public, max-age=31536000, immutable
-/* TinaCMS admin deploy trigger */
+/* SPA _redirects restore — deploy trigger */
