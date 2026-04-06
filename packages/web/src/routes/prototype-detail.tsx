@@ -8,9 +8,12 @@ import {
   fetchOgdSummary,
   fetchPrototypeFeedback,
   submitPrototypeFeedback,
+  submitUserEvaluation,
+  fetchUserEvaluations,
   type PrototypeJobDetail,
   type OgdSummaryResponse,
   type FeedbackItem,
+  type UserEvaluationItem,
 } from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,6 +21,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BuildLogViewer from "@/components/feature/BuildLogViewer";
 import FeedbackForm from "@/components/feature/FeedbackForm";
+import UserEvaluationModal from "@/components/feature/builder/UserEvaluationModal";
 import QualityScoreChart from "@/components/feature/QualityScoreChart";
 
 function formatDate(ts: number | null): string {
@@ -47,20 +51,24 @@ export function Component() {
   const [job, setJob] = useState<PrototypeJobDetail | null>(null);
   const [ogdSummary, setOgdSummary] = useState<OgdSummaryResponse | null>(null);
   const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
+  const [evaluations, setEvaluations] = useState<UserEvaluationItem[]>([]);
+  const [showEvalModal, setShowEvalModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     if (!id) return;
     setLoading(true);
     try {
-      const [jobData, ogd, fb] = await Promise.all([
+      const [jobData, ogd, fb, evals] = await Promise.all([
         fetchPrototypeJob(id),
         fetchOgdSummary(id).catch(() => null),
         fetchPrototypeFeedback(id).catch(() => ({ items: [] })),
+        fetchUserEvaluations(id).catch(() => ({ items: [] })),
       ]);
       setJob(jobData);
       setOgdSummary(ogd?.summary ?? null);
       setFeedbacks(fb.items);
+      setEvaluations(evals.items);
     } catch {
       setJob(null);
     } finally {
@@ -108,6 +116,9 @@ export function Component() {
         <Badge variant={job.status === "live" ? "default" : "outline"}>
           {STATUS_LABEL[job.status] ?? job.status}
         </Badge>
+        <Button size="sm" variant="outline" onClick={() => setShowEvalModal(true)}>
+          수동 평가
+        </Button>
       </div>
 
       {/* Meta Info */}
@@ -146,6 +157,9 @@ export function Component() {
           <TabsTrigger value="ogd">O-G-D</TabsTrigger>
           <TabsTrigger value="feedback">
             피드백 ({feedbacks.length})
+          </TabsTrigger>
+          <TabsTrigger value="evaluations">
+            수동 평가 ({evaluations.length})
           </TabsTrigger>
         </TabsList>
 
@@ -243,7 +257,47 @@ export function Component() {
             </div>
           )}
         </TabsContent>
+
+        <TabsContent value="evaluations" className="mt-4 space-y-3">
+          {evaluations.length > 0 ? (
+            evaluations.map((ev) => (
+              <Card key={ev.id} className="p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="outline" className="text-xs">{ev.evaluatorRole}</Badge>
+                  <span className="text-xs text-muted-foreground">{ev.createdAt}</span>
+                  <span className="text-xs font-medium ml-auto">전체: {ev.overallScore}/5</span>
+                </div>
+                <div className="grid grid-cols-5 gap-2 text-xs">
+                  <div>Build: {ev.buildScore}</div>
+                  <div>UI: {ev.uiScore}</div>
+                  <div>기능: {ev.functionalScore}</div>
+                  <div>PRD: {ev.prdScore}</div>
+                  <div>코드: {ev.codeScore}</div>
+                </div>
+                {ev.comment && (
+                  <p className="text-sm text-muted-foreground mt-2">{ev.comment}</p>
+                )}
+              </Card>
+            ))
+          ) : (
+            <div className="text-sm text-muted-foreground italic">
+              아직 수동 평가가 없어요. 상단의 &quot;수동 평가&quot; 버튼으로 등록하세요.
+            </div>
+          )}
+        </TabsContent>
       </Tabs>
+
+      {/* User Evaluation Modal */}
+      {showEvalModal && id && (
+        <UserEvaluationModal
+          jobId={id}
+          onSubmit={async (data) => {
+            await submitUserEvaluation(data);
+            await load();
+          }}
+          onClose={() => setShowEvalModal(false)}
+        />
+      )}
     </div>
   );
 }

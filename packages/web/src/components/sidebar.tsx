@@ -184,6 +184,7 @@ const DEFAULT_ADMIN_GROUP: NavGroup = {
     { href: "/workspace", label: "워크스페이스", icon: FolderKanban },
     { href: "/agents", label: "에이전트", icon: Bot },
     { href: "/prototype-dashboard", label: "Prototype", icon: FlaskConical },
+    { href: "/builder-quality", label: "Quality", icon: BarChart3 },
     { href: "/orchestration", label: "오케스트레이션", icon: Activity },
     { href: "/architecture", label: "아키텍처", icon: Blocks },
     { href: "/methodologies", label: "방법론", icon: Library },
