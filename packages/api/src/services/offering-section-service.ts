@@ -65,6 +65,10 @@ export class OfferingSectionService {
       sets.push("content = ?");
       params.push(input.content);
     }
+    if (input.isIncluded !== undefined) {
+      sets.push("is_included = ?");
+      params.push(input.isIncluded ? 1 : 0);
+    }
 
     params.push(sectionId);
     await this.db

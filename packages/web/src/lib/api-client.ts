@@ -2309,3 +2309,96 @@ export async function fetchPrototypeFeedback(
 ): Promise<{ items: FeedbackItem[] }> {
   return fetchApi(`/prototype-jobs/${jobId}/feedback`);
 }
+
+// ─── Offering Editor & Validate (F376, F377, Sprint 170) ───
+
+export interface OfferingDetail {
+  id: string;
+  orgId: string;
+  bizItemId: string;
+  title: string;
+  purpose: "report" | "proposal" | "review";
+  format: "html" | "pptx";
+  status: "draft" | "generating" | "review" | "approved" | "shared";
+  currentVersion: number;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OfferingSectionItem {
+  id: string;
+  offeringId: string;
+  sectionKey: string;
+  title: string;
+  content: string | null;
+  sortOrder: number;
+  isRequired: boolean;
+  isIncluded: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OfferingValidationItem {
+  id: string;
+  offeringId: string;
+  orgId: string;
+  mode: "full" | "quick";
+  status: "running" | "passed" | "failed" | "error";
+  ogdRunId: string | null;
+  ganScore: number | null;
+  ganFeedback: string | null;
+  sixhatsSummary: string | null;
+  expertSummary: string | null;
+  overallScore: number | null;
+  createdBy: string;
+  createdAt: string;
+  completedAt: string | null;
+}
+
+export async function fetchOfferingDetail(id: string): Promise<OfferingDetail> {
+  return fetchApi(`/offerings/${id}`);
+}
+
+export async function fetchOfferingSections(offeringId: string): Promise<OfferingSectionItem[]> {
+  const res = await fetchApi<{ sections: OfferingSectionItem[] }>(`/offerings/${offeringId}/sections`);
+  return res.sections;
+}
+
+export async function updateOfferingSection(
+  offeringId: string,
+  sectionId: string,
+  data: { title?: string; content?: string; isIncluded?: boolean },
+): Promise<OfferingSectionItem> {
+  return putApi(`/offerings/${offeringId}/sections/${sectionId}`, data);
+}
+
+export async function reorderOfferingSections(
+  offeringId: string,
+  sectionIds: string[],
+): Promise<{ sections: OfferingSectionItem[] }> {
+  return putApi(`/offerings/${offeringId}/sections/reorder`, { sectionIds });
+}
+
+export async function fetchOfferingHtmlPreview(offeringId: string): Promise<string> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(`${BASE_URL}/offerings/${offeringId}/export?format=html`, {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+  if (!res.ok) throw new ApiError(res.status, "Failed to fetch HTML preview");
+  return res.text();
+}
+
+export async function triggerOfferingValidation(
+  offeringId: string,
+  mode: "full" | "quick" = "full",
+): Promise<OfferingValidationItem> {
+  return postApi(`/offerings/${offeringId}/validate`, { mode });
+}
+
+export async function fetchOfferingValidations(offeringId: string): Promise<OfferingValidationItem[]> {
+  const res = await fetchApi<{ validations: OfferingValidationItem[]; total: number }>(`/offerings/${offeringId}/validations`);
+  return res.validations;
+}

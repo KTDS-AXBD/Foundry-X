@@ -8,6 +8,7 @@ import { z } from "zod";
 export const UpdateSectionSchema = z.object({
   title: z.string().min(1).max(200).optional(),
   content: z.string().optional(),
+  isIncluded: z.boolean().optional(),
 });
 export type UpdateSectionInput = z.infer<typeof UpdateSectionSchema>;
 

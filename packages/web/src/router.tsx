@@ -63,6 +63,8 @@ export const router = createBrowserRouter([
       { path: "shaping/offering/givc-pitch", lazy: () => import("@/routes/offering-pack-givc-pitch") },
       { path: "shaping/offering/:id", lazy: () => import("@/routes/offering-pack-detail") },
       { path: "shaping/offering/:id/brief", lazy: () => import("@/routes/offering-brief") },
+      { path: "shaping/offering/:id/edit", lazy: () => import("@/routes/offering-editor") },
+      { path: "shaping/offering/:id/validate", lazy: () => import("@/routes/offering-validate") },
 
       // ── 4단계 검증/공유 (validation) ──
       { path: "validation/pipeline", lazy: () => import("@/routes/pipeline") },

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ExternalLink, FileText, Monitor, BookOpen, DollarSign, FileSpreadsheet } from "lucide-react";
+import { ArrowLeft, ExternalLink, FileText, Monitor, BookOpen, DollarSign, FileSpreadsheet, Edit, Shield } from "lucide-react";
 import { fetchOfferingPackDetail, type OfferingPackDetail } from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
 
@@ -38,12 +38,26 @@ export function Component() {
           <h1 className="text-2xl font-bold">{pack.title}</h1>
           <Badge>{pack.status}</Badge>
         </div>
-        <Link
-          to={`/shaping/offering/${id}/brief`}
-          className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground hover:bg-primary/90"
-        >
-          <FileSpreadsheet className="size-4" /> 미팅 브리프
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            to={`/shaping/offering/${id}/edit`}
+            className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted/50"
+          >
+            <Edit className="size-4" /> 섹션 에디터
+          </Link>
+          <Link
+            to={`/shaping/offering/${id}/validate`}
+            className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted/50"
+          >
+            <Shield className="size-4" /> 교차검증
+          </Link>
+          <Link
+            to={`/shaping/offering/${id}/brief`}
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground hover:bg-primary/90"
+          >
+            <FileSpreadsheet className="size-4" /> 미팅 브리프
+          </Link>
+        </div>
       </div>
       {pack.description && <p className="text-muted-foreground max-w-2xl">{pack.description}</p>}
 
