@@ -69,7 +69,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} KTDS AX BD. All rights reserved.
           </p>
           <p className="font-mono text-xs text-muted-foreground/60">
-            Sprint 147 &middot; Phase 13
+            Sprint 164 &middot; Phase 17
           </p>
         </div>
       </div>
