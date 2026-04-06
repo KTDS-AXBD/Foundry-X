@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #210b (2026-04-06)
+
+**Sprint 161~164 검증 + E2E 대규모 안정화 (26 fail → 2 flaky)**:
+- ✅ Sprint 161~164 코드 구조 검증: 38파일 전체 확인, typecheck 0 errors, 54 unit tests pass
+- ✅ E2E 신규 2 specs: dashboard-metrics (7 tests) + guard-rail (1 test)
+- ✅ E2E 근본 해결: localStorage `onboarding_progress=100` in auth fixture — 모달 일괄 해소
+- ✅ E2E strict mode 수정 7건: TAM/SAM/SOM, Porter, 포지셔닝맵, 산출물, 아이디어형, 시장·타겟형 등
+- ✅ dismissGuideModal fixture 통합 → 근본 해결로 전량 제거 (-21줄)
+- ✅ playwright retries: 0 → 1 (로컬 flaky 대응)
+- **결과**: 208 pass → 232 pass (+24), 26 fail → 2 flaky
+
+---
+
 ### 세션 #210 (2026-04-06)
 
 **Phase 17 Self-Evolving Harness v2 완료 — Guard Rail 자동 제안 + O-G-D 범용화 + 운영 지표**:
