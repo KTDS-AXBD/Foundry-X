@@ -298,6 +298,85 @@ export const SHARED_STAGES = {
   ],
 };
 
+// ── Offering (F370 offerings 테이블) ──
+export function makeOffering(overrides?: Record<string, unknown>) {
+  return {
+    id: "offering-1",
+    orgId: "test-org-e2e",
+    bizItemId: "biz-item-1",
+    title: "AI 헬스케어 사업기획서",
+    purpose: "report",
+    format: "html",
+    status: "draft",
+    currentVersion: 1,
+    createdBy: "test-user-id",
+    createdAt: "2026-04-01T00:00:00Z",
+    updatedAt: "2026-04-01T00:00:00Z",
+    ...overrides,
+  };
+}
+
+// ── Offering Section (F371 offering_sections 테이블) ──
+export function makeOfferingSection(overrides?: Record<string, unknown>) {
+  return {
+    id: "section-1",
+    offeringId: "offering-1",
+    sectionKey: "exec_summary",
+    title: "Executive Summary",
+    content: "## 요약\n\nAI 헬스케어 사업 기획",
+    sortOrder: 1,
+    isRequired: true,
+    isEnabled: true,
+    updatedAt: "2026-04-01T00:00:00Z",
+    ...overrides,
+  };
+}
+
+// ── Offering Version ──
+export function makeOfferingVersion(overrides?: Record<string, unknown>) {
+  return {
+    id: "ver-1",
+    offeringId: "offering-1",
+    version: 1,
+    snapshot: null,
+    changeSummary: "초기 생성",
+    createdBy: "test-user-id",
+    createdAt: "2026-04-01T00:00:00Z",
+    ...overrides,
+  };
+}
+
+// ── Offering Validation (F373 offering_validations) ──
+export function makeOfferingValidation(overrides?: Record<string, unknown>) {
+  return {
+    id: "val-1",
+    offeringId: "offering-1",
+    status: "completed",
+    overallScore: 82,
+    ganResult: { pro: "시장 잠재력 높음", con: "경쟁 심화 우려" },
+    sixHatsResult: [],
+    expertReviews: [],
+    createdBy: "test-user-id",
+    createdAt: "2026-04-01T00:00:00Z",
+    ...overrides,
+  };
+}
+
+// ── Offering Metrics Summary (F383) ──
+export function makeOfferingMetrics(overrides?: Record<string, unknown>) {
+  return {
+    totalCreated: 12,
+    totalExported: 8,
+    totalValidated: 6,
+    totalPrototypes: 4,
+    avgCreationTimeMs: 180000,
+    avgExportTimeMs: 45000,
+    validationPassRate: 83,
+    period: { days: 30 },
+    ...overrides,
+  };
+}
+
 export function makeArtifacts(overrides?: Record<string, unknown>[]) {
   const defaults = [
     { id: "art-1", stageId: "2-1", skillId: "market-analysis", title: "시장 분석", content: "## 분석 결과\n내용", createdAt: "2026-03-30T10:00:00Z" },
