@@ -1,64 +1,59 @@
 /**
  * F372: Offering Export Service (Sprint 168)
- * Offering + Sections → HTML 렌더링
+ * F380: PPTX Export 추가 (Sprint 172)
+ * Offering + Sections → HTML / PPTX 렌더링
  */
+import {
+  renderPptx,
+  type OfferingRow,
+  type SectionRow,
+  type DesignTokenRow,
+} from "./pptx-renderer.js";
 
-interface OfferingRow {
-  id: string;
-  org_id: string;
-  title: string;
-  purpose: string;
-  format: string;
-  status: string;
-  current_version: number;
-  created_at: string;
-}
-
-interface SectionRow {
-  id: string;
-  offering_id: string;
-  section_key: string;
-  title: string;
-  content: string | null;
-  sort_order: number;
-  is_included: number;
-}
-
-interface DesignTokenRow {
-  token_key: string;
-  token_value: string;
-  token_category: string;
-}
+export type { OfferingRow, SectionRow, DesignTokenRow };
 
 export class OfferingExportService {
   constructor(private db: D1Database) {}
 
-  async exportHtml(orgId: string, offeringId: string): Promise<string | null> {
-    // 1. Offering 존재 확인
+  private async getOfferingData(
+    orgId: string,
+    offeringId: string,
+  ): Promise<{ offering: OfferingRow; sections: SectionRow[]; tokens: DesignTokenRow[] } | null> {
     const offering = await this.db
       .prepare("SELECT * FROM offerings WHERE id = ? AND org_id = ?")
       .bind(offeringId, orgId)
       .first<OfferingRow>();
     if (!offering) return null;
 
-    // 2. Sections 조회 (is_included=1, sort_order ASC)
     const sectionsResult = await this.db
       .prepare(
         "SELECT * FROM offering_sections WHERE offering_id = ? AND is_included = 1 ORDER BY sort_order ASC",
       )
       .bind(offeringId)
       .all<SectionRow>();
-    const sections = sectionsResult.results;
 
-    // 3. Design tokens 조회
     const tokensResult = await this.db
       .prepare("SELECT token_key, token_value, token_category FROM offering_design_tokens WHERE offering_id = ?")
       .bind(offeringId)
       .all<DesignTokenRow>();
-    const tokens = tokensResult.results;
 
-    // 4. HTML 조합
-    return this.renderHtml(offering, sections, tokens);
+    return {
+      offering,
+      sections: sectionsResult.results,
+      tokens: tokensResult.results,
+    };
+  }
+
+  async exportHtml(orgId: string, offeringId: string): Promise<string | null> {
+    const data = await this.getOfferingData(orgId, offeringId);
+    if (!data) return null;
+    return this.renderHtml(data.offering, data.sections, data.tokens);
+  }
+
+  async exportPptx(orgId: string, offeringId: string): Promise<Uint8Array | null> {
+    const data = await this.getOfferingData(orgId, offeringId);
+    if (!data) return null;
+    return renderPptx(data);
   }
 
   private renderHtml(

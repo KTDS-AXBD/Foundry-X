@@ -3,7 +3,7 @@
  */
 import { z } from "zod";
 
-export const ExportFormatSchema = z.enum(["html"]);
+export const ExportFormatSchema = z.enum(["html", "pptx"]);
 export type ExportFormat = z.infer<typeof ExportFormatSchema>;
 
 export const ExportQuerySchema = z.object({
