@@ -172,7 +172,7 @@ pnpm e2e                          # Playwright E2E
 - **Phase 16:** ✅ 완료 (Sprint 158~160) — Prototype Auto-Gen F351~F356. PRD: `docs/specs/prototype-auto-gen/prd-final.md`
 - **Phase 17:** ✅ 완료 (Sprint 161~164) — Self-Evolving Harness v2 F357~F362. Guard Rail 자동 제안 + O-G-D 4도메인 범용화 + 운영 지표 대시보드. PRD: `docs/specs/fx-harness-evolution/prd-final.md`. 전략: `docs/specs/self-evolving-harness-strategy.md`
 - **Phase 18:** 📋 계획 (Sprint 165~174) — Offering Pipeline F363~F383. PRD: `docs/specs/fx-offering-pipeline/prd-final.md`
-- **Phase 19:** 📋 계획 (Sprint 175~178) — Builder Evolution F384~F391. Prototype 품질 자동화 + CLI 구독 비용 최적화. PRD: `docs/specs/fx-builder-evolution/prd-final.md`
+- **Phase 19:** ✅ 완료 (Sprint 175~178) — Builder Evolution F384~F391. 5차원 품질 스코어링 + CLI 듀얼모드 + Enhanced O-G-D + Quality Dashboard. PRD: `docs/specs/fx-builder-evolution/prd-final.md`
 - **수치 확인:** `/ax:daily-check` 실행 또는 SPEC.md §2 "실시간 수치" 블록 참조 (하드코딩 금지 — drift 방지)
 - **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 
