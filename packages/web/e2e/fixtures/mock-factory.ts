@@ -167,6 +167,57 @@ export function makeArtifact(overrides?: Record<string, unknown>) {
   };
 }
 
+// ── Persona Config (ax-bd/persona-configs/:itemId) ──
+export function makePersonaConfig(overrides?: Record<string, unknown>) {
+  return {
+    id: "pc-1",
+    itemId: "biz-item-1",
+    orgId: "test-org-e2e",
+    personaId: "strategy",
+    personaName: "전략 담당",
+    personaRole: "사업전략 관점에서 시장성과 전략 적합성을 평가",
+    weights: {
+      strategic_fit: 25,
+      market_potential: 20,
+      technical_feasibility: 15,
+      financial_viability: 15,
+      competitive_advantage: 10,
+      risk_assessment: 10,
+      team_readiness: 5,
+    },
+    contextJson: {},
+    createdAt: "2026-01-01T00:00:00Z",
+    updatedAt: "2026-01-01T00:00:00Z",
+    ...overrides,
+  };
+}
+
+// ── Persona Eval (ax-bd/persona-evals/:itemId) ──
+export function makePersonaEval(overrides?: Record<string, unknown>) {
+  return {
+    id: "pe-1",
+    itemId: "biz-item-1",
+    orgId: "test-org-e2e",
+    personaId: "strategy",
+    scores: {
+      strategic_fit: 85,
+      market_potential: 78,
+      technical_feasibility: 72,
+      financial_viability: 68,
+      competitive_advantage: 80,
+      risk_assessment: 65,
+      team_readiness: 75,
+    },
+    verdict: "Go",
+    summary: "전략적 적합성이 높고 시장 잠재력이 우수함",
+    concerns: null,
+    condition: null,
+    evalMetadata: { model: "claude-sonnet-4-5-20250514", durationMs: 2500, costUsd: 0.03 },
+    createdAt: "2026-01-01T00:00:00Z",
+    ...overrides,
+  };
+}
+
 // ── Discovery Progress (discovery/items/:id 보조) ──
 export function makeDiscoveryProgress(overrides?: Record<string, unknown>) {
   return {

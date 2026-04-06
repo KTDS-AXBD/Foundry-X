@@ -1,10 +1,11 @@
 /**
  * Sprint 154: F342 TeamReviews Route — Go/Hold/Drop 투표 + 집계
+ * Sprint 154+: F349 팀장 최종결정 (POST /ax-bd/team-reviews/:itemId/decide)
  */
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
-import { SubmitTeamReviewSchema } from "../schemas/team-review-schema.js";
+import { SubmitTeamReviewSchema, TeamDecideSchema } from "../schemas/team-review-schema.js";
 
 export const teamReviewsRoute = new Hono<{
   Bindings: Env;
@@ -71,4 +72,56 @@ teamReviewsRoute.get("/ax-bd/team-reviews/:itemId/summary", async (c) => {
 
   const total = (summary.Go ?? 0) + (summary.Hold ?? 0) + (summary.Drop ?? 0);
   return c.json({ data: { ...summary, total } });
+});
+
+// POST /ax-bd/team-reviews/:itemId/decide — 팀장 최종결정
+teamReviewsRoute.post("/ax-bd/team-reviews/:itemId/decide", async (c) => {
+  const body = await c.req.json();
+  const parsed = TeamDecideSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+  }
+
+  const itemId = c.req.param("itemId");
+  const orgId = c.get("orgId");
+  const { finalDecision, reason } = parsed.data;
+  const decidedBy = c.get("userId");
+  const decidedAt = new Date().toISOString();
+
+  // ax_discovery_reports 테이블에 최종 결정 기록
+  const existing = await c.env.DB
+    .prepare("SELECT id FROM ax_discovery_reports WHERE item_id = ? OR biz_item_id = ?")
+    .bind(itemId, itemId)
+    .first<{ id: string }>();
+
+  if (!existing) {
+    // 리포트가 없으면 생성 후 결정 기록
+    const id = generateId();
+    await c.env.DB
+      .prepare(
+        `INSERT INTO ax_discovery_reports (id, org_id, biz_item_id, report_json, team_decision, updated_at)
+         VALUES (?, ?, ?, '{}', ?, datetime('now'))`,
+      )
+      .bind(id, orgId, itemId, finalDecision)
+      .run();
+  } else {
+    await c.env.DB
+      .prepare(
+        `UPDATE ax_discovery_reports
+         SET team_decision = ?, updated_at = datetime('now')
+         WHERE id = ?`,
+      )
+      .bind(finalDecision, existing.id)
+      .run();
+  }
+
+  return c.json({
+    data: {
+      itemId,
+      finalDecision,
+      reason,
+      decidedBy,
+      decidedAt,
+    },
+  }, 200);
 });

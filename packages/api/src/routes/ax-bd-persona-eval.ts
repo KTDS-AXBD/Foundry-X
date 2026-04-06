@@ -1,6 +1,6 @@
 /**
  * Sprint 155 F344+F345: 멀티 페르소나 평가 API 라우트
- * - POST /ax-bd/persona-eval — SSE 스트리밍 평가
+ * - POST /ax-bd/persona-eval — SSE 스트리밍 평가 (rate limit: IP 기반 1분 5회)
  * - GET /ax-bd/persona-configs/:itemId — 설정 조회
  * - PUT /ax-bd/persona-configs/:itemId — 설정 저장
  * - GET /ax-bd/persona-evals/:itemId — 결과 조회
@@ -13,6 +13,35 @@ import { UpsertPersonaConfigsSchema } from "../schemas/persona-config.js";
 import { PersonaConfigService } from "../services/persona-config-service.js";
 import { PersonaEvalService } from "../services/persona-eval-service.js";
 
+/** IP 기반 Rate Limiter — KV 슬라이딩 윈도우 (1분 5회) */
+async function checkRateLimit(
+  kv: KVNamespace,
+  ip: string,
+  limit = 5,
+  windowSec = 60,
+): Promise<{ allowed: boolean; remaining: number; resetAt: number }> {
+  const key = `rl:persona-eval:${ip}`;
+  const now = Math.floor(Date.now() / 1000);
+  const windowStart = now - windowSec;
+
+  const raw = await kv.get(key);
+  const timestamps: number[] = raw ? (JSON.parse(raw) as number[]) : [];
+
+  // 윈도우 밖 타임스탬프 제거
+  const valid = timestamps.filter((t) => t > windowStart);
+  const remaining = Math.max(0, limit - valid.length);
+  const allowed = valid.length < limit;
+
+  if (allowed) {
+    valid.push(now);
+    await kv.put(key, JSON.stringify(valid), { expirationTtl: windowSec + 5 });
+  }
+
+  const oldest = valid[0];
+  const resetAt = oldest !== undefined ? oldest + windowSec : now + windowSec;
+  return { allowed, remaining, resetAt };
+}
+
 export const axBdPersonaEvalRoute = new Hono<{
   Bindings: Env;
   Variables: TenantVariables;
@@ -20,6 +49,25 @@ export const axBdPersonaEvalRoute = new Hono<{
 
 // POST /ax-bd/persona-eval — SSE 스트리밍 평가
 axBdPersonaEvalRoute.post("/ax-bd/persona-eval", async (c) => {
+  // Rate Limit 체크 (IP 기반 1분 5회)
+  const ip =
+    c.req.header("cf-connecting-ip") ??
+    c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ??
+    "unknown";
+
+  const { allowed, remaining, resetAt } = await checkRateLimit(c.env.CACHE, ip);
+
+  if (!allowed) {
+    return c.json(
+      {
+        error: "Too Many Requests",
+        message: "페르소나 평가는 1분당 최대 5회까지 실행할 수 있어요.",
+        resetAt,
+      },
+      429,
+    );
+  }
+
   const body = await c.req.json();
   const parsed = StartEvalSchema.safeParse(body);
   if (!parsed.success) {
@@ -41,7 +89,10 @@ axBdPersonaEvalRoute.post("/ax-bd/persona-eval", async (c) => {
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
-      Connection: "keep-alive",
+      "Connection": "keep-alive",
+      "X-RateLimit-Limit": "5",
+      "X-RateLimit-Remaining": String(remaining),
+      "X-RateLimit-Reset": String(resetAt),
     },
   });
 });
