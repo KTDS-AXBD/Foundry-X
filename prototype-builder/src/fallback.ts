@@ -1,10 +1,14 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { PrototypeJob } from './types.js';
 import { buildGeneratorPrompt } from './executor.js';
 
-export type FallbackLevel = 'cli' | 'api' | 'ensemble';
+const execFileAsync = promisify(execFile);
+
+export type FallbackLevel = 'max-cli' | 'api' | 'ensemble';
 
 export interface FallbackResult {
   level: FallbackLevel;
@@ -221,39 +225,72 @@ export async function fallbackToApi(
 }
 
 /**
- * 3단계 Fallback 전략 실행
+ * Claude Max CLI --bare 모드로 코드 생성 (구독 $0)
+ */
+export async function runMaxCli(
+  job: PrototypeJob,
+  round: number,
+  cliPath: string = 'claude',
+): Promise<{ success: boolean; output: string }> {
+  const prompt = buildGeneratorPrompt(job, round);
+  const args = [
+    '--bare',
+    '-p', prompt,
+    '--allowedTools', 'Bash,Read,Edit,Write',
+    '--max-turns', '15',
+    '--output-format', 'json',
+  ];
+
+  try {
+    const { stdout } = await execFileAsync(cliPath, args, {
+      cwd: job.workDir,
+      timeout: 5 * 60 * 1000,  // 5분 (Max 구독은 여유)
+      env: { ...process.env },  // ANTHROPIC_API_KEY 불필요 (구독 인증)
+    });
+
+    const filesWritten = await writeGeneratedFiles(stdout, job.workDir);
+    return { success: filesWritten > 0, output: stdout };
+  } catch {
+    return { success: false, output: '' };
+  }
+}
+
+/**
+ * 4단계 Fallback 전략 실행
+ * Level 0: Max CLI (구독 $0) → Level 1: API → Level 2: ensemble
  * SKIP_CLI=true 환경변수로 CLI 단계 건너뛰기 가능 (Docker 환경용)
  */
 export async function executeWithFallback(
   job: PrototypeJob,
   round: number,
-  cliRunner: (job: PrototypeJob, round: number) => Promise<{ stdout: string; exitCode: number }>,
+  _cliRunner?: (job: PrototypeJob, round: number) => Promise<{ stdout: string; exitCode: number }>,
 ): Promise<FallbackResult> {
   const skipCli = process.env['SKIP_CLI'] === 'true';
 
-  // Level 1: CLI (Docker에서는 skip)
+  // Level 0: Max CLI (구독, $0)
   if (!skipCli) {
-    console.log(`[Builder] Trying CLI generator...`);
-    const cliResult = await cliRunner(job, round);
-    if (cliResult.exitCode === 0) {
-      return { level: 'cli', output: cliResult.stdout, success: true };
+    const cliPath = process.env['CLAUDE_CLI_PATH'] ?? 'claude';
+    console.log(`[Builder] Trying Max CLI generator (${cliPath})...`);
+    const maxCliResult = await runMaxCli(job, round, cliPath);
+    if (maxCliResult.success) {
+      return { level: 'max-cli', output: maxCliResult.output, success: true };
     }
-    console.log(`[Builder] CLI failed (exit ${cliResult.exitCode}), falling back to API`);
+    console.log(`[Builder] Max CLI failed, falling back to API`);
   } else {
     console.log(`[Builder] SKIP_CLI=true, using API directly`);
   }
 
-  // Level 2: API (with file writing)
+  // Level 1: API (pay-per-token)
   const apiResult = await fallbackToApi(job, round);
   if (apiResult.success) {
     return apiResult;
   }
 
-  // Level 3: 모두 실패
+  // Level 2: 모두 실패
   return {
     level: 'ensemble',
     output: '',
     success: false,
-    error: `${skipCli ? 'CLI skipped' : 'CLI failed'}, API failed: ${apiResult.error}`,
+    error: `${skipCli ? 'CLI skipped' : 'Max CLI failed'}, API failed: ${apiResult.error}`,
   };
 }
