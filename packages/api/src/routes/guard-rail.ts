@@ -10,10 +10,12 @@ import {
   ProposalListSchema,
   ProposalUpdateSchema,
   GenerateResultSchema,
+  DeployResultSchema,
 } from "../schemas/guard-rail-schema.js";
 import { DataDiagnosticService } from "../services/data-diagnostic-service.js";
 import { PatternDetectorService } from "../services/pattern-detector-service.js";
 import { RuleGeneratorService } from "../services/rule-generator-service.js";
+import { GuardRailDeployService, DeployError } from "../services/guard-rail-deploy-service.js";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 
@@ -250,4 +252,48 @@ guardRailRoute.openapi(proposalUpdateRoute, async (c) => {
     },
     200,
   );
+});
+
+// ── POST /guard-rail/proposals/:id/deploy — F359: Rule 배치 ────────────────────
+
+const proposalDeployRoute = createRoute({
+  method: "post",
+  path: "/guard-rail/proposals/{id}/deploy",
+  tags: ["GuardRail"],
+  request: {
+    params: z.object({ id: z.string() }),
+  },
+  responses: {
+    200: {
+      description: "Deploy result with file content",
+      content: { "application/json": { schema: DeployResultSchema } },
+    },
+    400: {
+      description: "Proposal not in approved state",
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+    },
+    404: {
+      description: "Proposal not found",
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+    },
+  },
+});
+
+guardRailRoute.openapi(proposalDeployRoute, async (c) => {
+  const tenantId = c.get("orgId");
+  const { id } = c.req.valid("param");
+
+  try {
+    const svc = new GuardRailDeployService(c.env.DB);
+    const result = await svc.generateRuleFile(id, tenantId);
+    return c.json(result, 200);
+  } catch (err) {
+    if (err instanceof DeployError) {
+      return c.json(
+        { error: err.message },
+        err.statusCode as 400 | 404,
+      );
+    }
+    throw err;
+  }
 });

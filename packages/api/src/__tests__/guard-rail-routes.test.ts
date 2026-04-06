@@ -142,4 +142,52 @@ describe("Guard Rail Routes", () => {
       expect(body.reviewedBy).toBe("user-1");
     });
   });
+
+  // ── F359: POST /guard-rail/proposals/:id/deploy ───────────────
+  describe("POST /api/guard-rail/proposals/:id/deploy", () => {
+    async function seedApprovedProposal(id = "gp-d1") {
+      await (env.DB as any).exec(`
+        INSERT INTO failure_patterns (id, tenant_id, pattern_key, occurrence_count, first_seen, last_seen, status, created_at, updated_at)
+        VALUES ('fp-d', 'org_test', 'lint:warning', 8, '2026-03-01', '2026-04-06', 'resolved', datetime('now'), datetime('now'))
+      `);
+      await (env.DB as any).exec(`
+        INSERT INTO guard_rail_proposals (id, tenant_id, pattern_id, rule_content, rule_filename, rationale, llm_model, status, reviewed_at, reviewed_by, created_at)
+        VALUES ('${id}', 'org_test', 'fp-d', '# Always lint before commit', 'auto-guard-001.md', 'lint:warning 8 times', 'haiku', 'approved', '2026-04-06T10:00:00Z', 'user-1', datetime('now'))
+      `);
+    }
+
+    it("200 — approved proposal deploy 성공", async () => {
+      await seedApprovedProposal();
+      const res = await req("POST", "/api/guard-rail/proposals/gp-d1/deploy");
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.filename).toMatch(/^auto-guard-\d{3}\.md$/);
+      expect(body.content).toContain("source: auto-generated");
+      expect(body.content).toContain("# Always lint before commit");
+      expect(body.content).toContain("## 근거");
+      expect(body.proposalId).toBe("gp-d1");
+      expect(body.patternId).toBe("fp-d");
+    });
+
+    it("400 — pending proposal deploy 거부", async () => {
+      await (env.DB as any).exec(`
+        INSERT INTO failure_patterns (id, tenant_id, pattern_key, occurrence_count, first_seen, last_seen, status, created_at, updated_at)
+        VALUES ('fp-p', 'org_test', 'test:fail', 3, '2026-03-01', '2026-04-06', 'detected', datetime('now'), datetime('now'))
+      `);
+      await (env.DB as any).exec(`
+        INSERT INTO guard_rail_proposals (id, tenant_id, pattern_id, rule_content, rule_filename, rationale, llm_model, status, created_at)
+        VALUES ('gp-p1', 'org_test', 'fp-p', '# Rule', 'auto-guard-001.md', 'test', 'haiku', 'pending', datetime('now'))
+      `);
+
+      const res = await req("POST", "/api/guard-rail/proposals/gp-p1/deploy");
+      expect(res.status).toBe(400);
+      const body = (await res.json()) as any;
+      expect(body.error).toContain("approved");
+    });
+
+    it("404 — 존재하지 않는 proposal", async () => {
+      const res = await req("POST", "/api/guard-rail/proposals/nonexistent/deploy");
+      expect(res.status).toBe(404);
+    });
+  });
 });

@@ -74,3 +74,11 @@ export const GenerateResultSchema = z.object({
   proposalsCreated: z.number(),
   proposals: z.array(ProposalSchema),
 });
+
+// POST /guard-rail/proposals/:id/deploy — F359
+export const DeployResultSchema = z.object({
+  filename: z.string(),
+  content: z.string(),
+  proposalId: z.string(),
+  patternId: z.string(),
+});
