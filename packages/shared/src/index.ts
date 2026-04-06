@@ -394,4 +394,5 @@ export type {
   DetectPatternsRequest,
   DetectPatternsResult,
   GenerateRulesResult,
+  DeployResult,
 } from './guard-rail.js';
