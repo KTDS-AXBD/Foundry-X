@@ -77,7 +77,7 @@ describe("O-G-D Quality Routes", () => {
       body: JSON.stringify({ jobId: "job_1", prdContent: "Test PRD for dashboard app" }),
     });
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = await res.json() as any;
     expect(body.summary.totalRounds).toBeGreaterThanOrEqual(1);
   });
 

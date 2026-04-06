@@ -68,7 +68,7 @@ describe("Prototype Feedback Routes", () => {
       body: JSON.stringify({ category: "ux", content: "버튼이 너무 작아요" }),
     });
     expect(res.status).toBe(201);
-    const body = await res.json();
+    const body = await res.json() as any;
     expect(body.feedback.category).toBe("ux");
     expect(body.jobStatus).toBe("feedback_pending");
   });
@@ -99,7 +99,7 @@ describe("Prototype Feedback Routes", () => {
     });
     const res = await app.request("/api/prototype-jobs/job_1/feedback");
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = await res.json() as any;
     expect(body.items).toHaveLength(1);
   });
 });
