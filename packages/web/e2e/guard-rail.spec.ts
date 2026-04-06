@@ -8,7 +8,7 @@
  * 참고: Guard Rail의 핵심 기능은 API + CLI(session-start) 기반이라
  * E2E는 대시보드 내 Guard Rail 관련 표시/링크 검증에 집중
  */
-import { test, expect } from "./fixtures/auth";
+import { test, expect, dismissGuideModal } from "./fixtures/auth";
 
 const MOCK_PROPOSALS = [
   {
@@ -72,23 +72,6 @@ async function setupGuardRailMocks(page: import("@playwright/test").Page) {
   await page.route("**/api/guard-rail/diagnostic", (route) =>
     route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(MOCK_DIAGNOSTIC) }),
   );
-}
-
-/** Dismiss onboarding guide modal if present */
-async function dismissGuideModal(page: import("@playwright/test").Page) {
-  for (let i = 0; i < 12; i++) {
-    const nextBtn = page.getByRole("button", { name: /다음/ }).first();
-    const skipBtn = page.getByRole("button", { name: /건너뛰기|닫기|skip|close/i }).first();
-    if (await nextBtn.isVisible({ timeout: 500 }).catch(() => false)) {
-      await nextBtn.click();
-      await page.waitForTimeout(300);
-    } else if (await skipBtn.isVisible({ timeout: 500 }).catch(() => false)) {
-      await skipBtn.click();
-      await page.waitForTimeout(300);
-    } else {
-      break;
-    }
-  }
 }
 
 test.describe("Guard Rail (F357~F359)", () => {

@@ -8,7 +8,7 @@
  * - Section 4개 (RuleEffectChart, AgentUsageChart, SkillReuseChart, UnusedHighlight)
  * - 빈 데이터 + 데이터 있는 경우 모두 검증
  */
-import { test, expect } from "./fixtures/auth";
+import { test, expect, dismissGuideModal } from "./fixtures/auth";
 
 // ─── Mock Data ───
 
@@ -88,31 +88,6 @@ async function setupMetricsMocks(page: import("@playwright/test").Page) {
   await page.route("**/api/metrics/skill-reuse", (route) =>
     route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(MOCK_SKILL_REUSE) }),
   );
-}
-
-// ─── Helpers ───
-
-/** Dismiss onboarding guide modal if present */
-async function dismissGuideModal(page: import("@playwright/test").Page) {
-  // Try clicking through guide steps — look for "다음" button
-  for (let i = 0; i < 12; i++) {
-    const nextBtn = page.getByRole("button", { name: /다음/ }).first();
-    const skipBtn = page.getByRole("button", { name: /건너뛰기|닫기|skip|close/i }).first();
-    if (await nextBtn.isVisible({ timeout: 500 }).catch(() => false)) {
-      await nextBtn.click();
-      await page.waitForTimeout(300);
-    } else if (await skipBtn.isVisible({ timeout: 500 }).catch(() => false)) {
-      await skipBtn.click();
-      await page.waitForTimeout(300);
-    } else {
-      break;
-    }
-  }
-  // Also try clicking backdrop to close
-  const backdrop = page.locator("[data-testid='guide-backdrop'], .modal-backdrop").first();
-  if (await backdrop.isVisible({ timeout: 300 }).catch(() => false)) {
-    await backdrop.click();
-  }
 }
 
 // ─── Tests ───

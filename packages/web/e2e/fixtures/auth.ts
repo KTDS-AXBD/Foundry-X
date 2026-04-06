@@ -102,4 +102,27 @@ export const test = base.extend<{ authenticatedPage: Page }>({
   },
 });
 
+/**
+ * Dismiss onboarding guide modal if present.
+ * Call after page.goto() — the guide appears on authenticated page load.
+ * Clicks through "다음" buttons or "건너뛰기/닫기" to clear the overlay.
+ */
+export async function dismissGuideModal(page: Page) {
+  for (let i = 0; i < 12; i++) {
+    const nextBtn = page.getByRole("button", { name: /다음/ }).first();
+    const skipBtn = page
+      .getByRole("button", { name: /건너뛰기|닫기|skip|close/i })
+      .first();
+    if (await nextBtn.isVisible({ timeout: 500 }).catch(() => false)) {
+      await nextBtn.click();
+      await page.waitForTimeout(300);
+    } else if (await skipBtn.isVisible({ timeout: 500 }).catch(() => false)) {
+      await skipBtn.click();
+      await page.waitForTimeout(300);
+    } else {
+      break;
+    }
+  }
+}
+
 export { expect } from "@playwright/test";
