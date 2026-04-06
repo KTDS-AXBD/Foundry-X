@@ -8,8 +8,10 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   queued: ["building"],
   building: ["deploying", "failed"],
   deploying: ["live", "deploy_failed"],
+  live: ["feedback_pending"],
   failed: ["queued", "dead_letter"],
   deploy_failed: ["queued", "dead_letter"],
+  feedback_pending: ["building"],
 };
 
 const MAX_RETRY = 3;

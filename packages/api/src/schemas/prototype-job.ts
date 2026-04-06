@@ -4,7 +4,7 @@ import { z } from "@hono/zod-openapi";
 
 export const JOB_STATUSES = [
   "queued", "building", "deploying", "live",
-  "failed", "deploy_failed", "dead_letter",
+  "failed", "deploy_failed", "dead_letter", "feedback_pending",
 ] as const;
 
 export const BUILDER_TYPES = ["cli", "api", "ensemble"] as const;

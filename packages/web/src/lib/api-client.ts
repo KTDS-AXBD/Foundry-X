@@ -2208,3 +2208,104 @@ export async function fetchTeamReviews(itemId: string) {
     `/ax-bd/team-reviews/${itemId}`,
   );
 }
+
+// ─── Sprint 160: Prototype Dashboard + O-G-D (F355, F356) ───
+
+export interface PrototypeJobItem {
+  id: string;
+  orgId: string;
+  prdTitle: string;
+  status: string;
+  builderType: string;
+  pagesUrl: string | null;
+  costUsd: number;
+  modelUsed: string;
+  fallbackUsed: boolean;
+  retryCount: number;
+  qualityScore: number | null;
+  ogdRounds: number;
+  createdAt: number;
+  updatedAt: number;
+  startedAt: number | null;
+  completedAt: number | null;
+}
+
+export interface PrototypeJobDetail extends PrototypeJobItem {
+  prdContent: string;
+  buildLog: string;
+  errorMessage: string | null;
+  feedbackContent: string | null;
+}
+
+export interface OgdRoundItem {
+  id: string;
+  jobId: string;
+  roundNumber: number;
+  qualityScore: number | null;
+  feedback: string | null;
+  inputTokens: number;
+  outputTokens: number;
+  costUsd: number;
+  modelUsed: string;
+  passed: boolean;
+  createdAt: number;
+}
+
+export interface OgdSummaryResponse {
+  jobId: string;
+  totalRounds: number;
+  bestScore: number;
+  bestRound: number;
+  passed: boolean;
+  totalCostUsd: number;
+  rounds: OgdRoundItem[];
+}
+
+export interface FeedbackItem {
+  id: string;
+  jobId: string;
+  orgId: string;
+  authorId: string | null;
+  category: string;
+  content: string;
+  status: string;
+  createdAt: number;
+}
+
+export async function fetchPrototypeJobs(params?: {
+  status?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<{ items: PrototypeJobItem[]; total: number }> {
+  const qs = new URLSearchParams();
+  if (params?.status) qs.set("status", params.status);
+  if (params?.limit) qs.set("limit", String(params.limit));
+  if (params?.offset) qs.set("offset", String(params.offset));
+  const q = qs.toString();
+  return fetchApi(`/prototype-jobs${q ? `?${q}` : ""}`);
+}
+
+export async function fetchPrototypeJob(id: string): Promise<PrototypeJobDetail> {
+  return fetchApi(`/prototype-jobs/${id}`);
+}
+
+export async function fetchOgdSummary(jobId: string): Promise<{ summary: OgdSummaryResponse }> {
+  return fetchApi(`/ogd/summary/${jobId}`);
+}
+
+export async function fetchOgdRounds(jobId: string): Promise<{ rounds: OgdRoundItem[] }> {
+  return fetchApi(`/ogd/rounds/${jobId}`);
+}
+
+export async function submitPrototypeFeedback(
+  jobId: string,
+  data: { category: string; content: string },
+): Promise<{ feedback: FeedbackItem; jobStatus: string }> {
+  return postApi(`/prototype-jobs/${jobId}/feedback`, data);
+}
+
+export async function fetchPrototypeFeedback(
+  jobId: string,
+): Promise<{ items: FeedbackItem[] }> {
+  return fetchApi(`/prototype-jobs/${jobId}/feedback`);
+}

@@ -94,6 +94,10 @@ export const router = createBrowserRouter([
       { path: "ax-bd/progress", lazy: () => import("@/routes/ax-bd/progress") },
       { path: "ax-bd/ontology", lazy: () => import("@/routes/ax-bd/ontology") },
 
+      // ── Sprint 160: Prototype Dashboard (F356) ──
+      { path: "prototype-dashboard", lazy: () => import("@/routes/prototype-dashboard") },
+      { path: "prototype-dashboard/:id", lazy: () => import("@/routes/prototype-detail") },
+
       // ── 지식/관리/설정 (변경 없음) ──
       { path: "wiki", lazy: () => import("@/routes/wiki") },
       { path: "tools-guide", lazy: () => import("@/routes/tools-guide") },

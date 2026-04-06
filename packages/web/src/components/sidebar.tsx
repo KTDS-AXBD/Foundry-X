@@ -37,6 +37,7 @@ import {
   Code,
   Send,
   Activity,
+  FlaskConical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { loadSidebarConfig, getIcon } from "@/lib/navigation-loader";
@@ -182,6 +183,7 @@ const DEFAULT_ADMIN_GROUP: NavGroup = {
     { href: "/tokens", label: "토큰/모델", icon: Coins },
     { href: "/workspace", label: "워크스페이스", icon: FolderKanban },
     { href: "/agents", label: "에이전트", icon: Bot },
+    { href: "/prototype-dashboard", label: "Prototype", icon: FlaskConical },
     { href: "/orchestration", label: "오케스트레이션", icon: Activity },
     { href: "/architecture", label: "아키텍처", icon: Blocks },
     { href: "/methodologies", label: "방법론", icon: Library },
