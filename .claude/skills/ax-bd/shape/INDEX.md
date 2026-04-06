@@ -15,7 +15,7 @@ AX BD 프로세스 6단계 중 3단계: 발굴 산출물 → 사업기획서 형
 | # | Skill | Input | Output | Format | Status |
 |---|-------|-------|--------|--------|--------|
 | 3-1 | [offering-html](offering-html/SKILL.md) | DiscoveryPackage + OfferingConfig | OfferingHTML | HTML | Active |
-| 3-2 | [offering-pptx](offering-pptx/SKILL.md) | DiscoveryPackage + OfferingConfig | OfferingPPTX | PPTX | Stub |
+| 3-2 | [offering-pptx](offering-pptx/SKILL.md) | DiscoveryPackage + OfferingConfig | OfferingPPTX | PPTX | Active |
 | 3-P | [prototype-builder](prototype-builder/SKILL.md) | OfferingArtifact + PrototypeConfig | Prototype | React/HTML | Stub |
 
 ## OfferingConfig Schema
