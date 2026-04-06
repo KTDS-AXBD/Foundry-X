@@ -2310,6 +2310,55 @@ export async function fetchPrototypeFeedback(
   return fetchApi(`/prototype-jobs/${jobId}/feedback`);
 }
 
+// ─── Offerings List & Create Wizard (F374, F375, Sprint 169) ───
+
+export interface OfferingListItem {
+  id: string;
+  orgId: string;
+  bizItemId: string | null;
+  title: string;
+  purpose: "report" | "proposal" | "review";
+  format: "html" | "pptx";
+  status: "draft" | "generating" | "review" | "approved" | "shared";
+  currentVersion: number;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function fetchOfferings(params?: {
+  status?: string;
+  page?: number;
+  limit?: number;
+}): Promise<{ items: OfferingListItem[]; total: number }> {
+  const query = new URLSearchParams();
+  if (params?.status && params.status !== "all") query.set("status", params.status);
+  if (params?.page) query.set("page", String(params.page));
+  if (params?.limit) query.set("limit", String(params.limit));
+  const qs = query.toString();
+  return fetchApi(`/offerings${qs ? `?${qs}` : ""}`);
+}
+
+export async function createOffering(data: {
+  bizItemId?: string;
+  title: string;
+  purpose: "report" | "proposal" | "review";
+  format: "html" | "pptx";
+}): Promise<OfferingListItem> {
+  return postApi("/offerings", data);
+}
+
+export async function deleteOffering(id: string): Promise<void> {
+  return deleteApi(`/offerings/${id}`);
+}
+
+export async function toggleOfferingSection(
+  offeringId: string,
+  sectionId: string,
+): Promise<OfferingSectionItem> {
+  return patchApi(`/offerings/${offeringId}/sections/${sectionId}/toggle`, {});
+}
+
 // ─── Offering Editor & Validate (F376, F377, Sprint 170) ───
 
 export interface OfferingDetail {
