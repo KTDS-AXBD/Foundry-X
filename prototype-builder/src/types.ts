@@ -22,6 +22,8 @@ export interface OgdResult {
   score: number;
   rounds: number;
   totalCost: number;
+  qualityScore?: QualityScore;
+  converged: boolean;
 }
 
 export interface OgdEvaluation {

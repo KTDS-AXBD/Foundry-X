@@ -53,6 +53,23 @@ export class CostTracker {
   }
 
   /**
+   * CLI 구독 모드 비용 기록 ($0)
+   */
+  recordCli(jobId: string, round: number): CostRecord {
+    const entry: CostRecord = {
+      jobId,
+      round,
+      model: 'cli-subscription',
+      inputTokens: 0,
+      outputTokens: 0,
+      cost: 0,
+      timestamp: Date.now(),
+    };
+    this.records.push(entry);
+    return entry;
+  }
+
+  /**
    * 특정 Job의 총 비용
    */
   getJobCost(jobId: string): number {
