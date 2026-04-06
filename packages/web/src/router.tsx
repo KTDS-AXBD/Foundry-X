@@ -119,7 +119,7 @@ export const router = createBrowserRouter([
       { path: "external/discovery-x", lazy: () => import("@/routes/discovery") },
       { path: "external/foundry", lazy: () => import("@/routes/foundry") },
 
-      // ── Redirects (기존 16건) — 기존 경로 → 새 경로 ──
+      // ── Redirects (기존 15건, Phase 13 dead code 13건 제거 후) ──
       { path: "sr", element: <Navigate to="/collection/sr" replace /> },
       { path: "discovery/collection", element: <Navigate to="/collection/field" replace /> },
       { path: "ir-proposals", element: <Navigate to="/collection/ideas" replace /> },
@@ -137,20 +137,11 @@ export const router = createBrowserRouter([
       // discovery redirect 제거 — /discovery는 Phase 13에서 실제 라우트로 전환
       { path: "foundry", element: <Navigate to="/external/foundry" replace /> },
 
-      // ── Phase 13 Redirects (v1.3 IA 재설계, 13건) ──
-      { path: "team-shared", element: <Navigate to="/validation/share" replace /> },
-      { path: "ax-bd/demo", element: <Navigate to="/getting-started" replace /> },
-      { path: "discovery/items", element: <Navigate to="/discovery" replace /> },
-      { path: "discovery/ideas-bmc", element: <Navigate to="/discovery" replace /> },
-      { path: "discovery/dashboard", element: <Navigate to="/discovery" replace /> },
-      { path: "shaping/proposal", element: <Navigate to="/shaping/business-plan" replace /> },
-      { path: "shaping/review", element: <Navigate to="/dashboard" replace /> },
-      { path: "validation/pipeline", element: <Navigate to="/validation" replace /> },
-      { path: "product/mvp", element: <Navigate to="/product" replace /> },
-      { path: "product/poc", element: <Navigate to="/product" replace /> },
-      { path: "tools-guide", element: <Navigate to="/getting-started" replace /> },
-      { path: "analytics", element: <Navigate to="/nps-dashboard" replace /> },
-      { path: "settings/jira", element: <Navigate to="/settings" replace /> },
+      // Phase 13 Redirects 13건 삭제 (2026-04-06 E2E 감사)
+      // 각 path에 lazy route가 선행하여 Navigate가 도달 불가 (dead code)
+      // 삭제 대상: team-shared, ax-bd/demo, discovery/items, discovery/ideas-bmc,
+      // discovery/dashboard, shaping/proposal, shaping/review, validation/pipeline,
+      // product/mvp, product/poc, tools-guide, analytics, settings/jira
     ],
   }],
   },
