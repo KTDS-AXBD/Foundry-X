@@ -7,7 +7,7 @@ const execFileAsync = promisify(execFile);
 
 /**
  * Cloudflare Pages에 빌드 산출물 배포
- * wrangler pages deploy dist/ --project-name=proto-{name}
+ * 프로젝트가 없으면 자동 생성 후 재시도
  */
 export async function deployToPages(
   workDir: string,
@@ -15,6 +15,24 @@ export async function deployToPages(
   config: Pick<BuilderConfig, 'cloudflareApiToken' | 'cloudflareAccountId'>,
 ): Promise<DeployResult> {
   const distDir = path.join(workDir, 'dist');
+  const env = {
+    ...process.env,
+    CLOUDFLARE_API_TOKEN: config.cloudflareApiToken,
+    CLOUDFLARE_ACCOUNT_ID: config.cloudflareAccountId,
+  };
+
+  // 프로젝트 생성 시도 (이미 있으면 에러 무시)
+  try {
+    await execFileAsync(
+      'npx',
+      ['wrangler', 'pages', 'project', 'create', projectName, '--production-branch=main'],
+      { cwd: workDir, timeout: 30_000, env },
+    );
+    console.log(`[Builder] Pages project created: ${projectName}`);
+  } catch {
+    // 이미 존재하면 에러 — 무시
+    console.log(`[Builder] Pages project already exists or creation skipped: ${projectName}`);
+  }
 
   const { stdout } = await execFileAsync(
     'npx',
@@ -25,12 +43,8 @@ export async function deployToPages(
     ],
     {
       cwd: workDir,
-      timeout: 3 * 60 * 1000, // 3분
-      env: {
-        ...process.env,
-        CLOUDFLARE_API_TOKEN: config.cloudflareApiToken,
-        CLOUDFLARE_ACCOUNT_ID: config.cloudflareAccountId,
-      },
+      timeout: 3 * 60 * 1000,
+      env,
     },
   );
 
@@ -38,6 +52,7 @@ export async function deployToPages(
   const urlMatch = stdout.match(/https:\/\/[\w-]+\.[\w-]+\.pages\.dev/);
   const url = urlMatch ? urlMatch[0]! : `https://${projectName}.pages.dev`;
 
+  console.log(`[Builder] Deployed: ${url}`);
   return { url, projectName };
 }
 
