@@ -366,3 +366,22 @@ export type {
   HandoffCheckItem,
   DiscoveryReportResponse,
 } from './discovery-report.js';
+
+// F355: O-G-D Quality Loop types (Sprint 160, Phase 16)
+export {
+  OGD_THRESHOLD,
+  OGD_MAX_ROUNDS,
+} from './ogd.js';
+
+export type {
+  OgdStatus,
+  OgdRound,
+  OgdSummary,
+} from './ogd.js';
+
+// F356: Prototype Feedback types (Sprint 160, Phase 16)
+export type {
+  FeedbackCategory,
+  FeedbackStatus,
+  PrototypeFeedback,
+} from './prototype-feedback.js';
