@@ -105,6 +105,7 @@ export const router = createBrowserRouter([
       { path: "analytics", lazy: () => import("@/routes/analytics") },
       { path: "agents", lazy: () => import("@/routes/agents") },
       { path: "orchestration", lazy: () => import("@/routes/orchestration") },
+      { path: "dashboard/metrics", lazy: () => import("@/routes/dashboard.metrics") },
       { path: "tokens", lazy: () => import("@/routes/tokens") },
       { path: "architecture", lazy: () => import("@/routes/architecture") },
       { path: "workspace", lazy: () => import("@/routes/workspace") },
