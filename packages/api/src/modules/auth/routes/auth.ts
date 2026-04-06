@@ -1,12 +1,12 @@
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { verify } from "hono/jwt";
 import { eq } from "drizzle-orm";
-import { hashPassword, verifyPassword } from "../utils/crypto.js";
-import { createTokenPair } from "../middleware/auth.js";
-import type { JwtPayload } from "../middleware/auth.js";
-import { getDb } from "../db/index.js";
-import { users, refreshTokens } from "../db/schema.js";
-import type { Env } from "../env.js";
+import { hashPassword, verifyPassword } from "../../../utils/crypto.js";
+import { createTokenPair } from "../../../middleware/auth.js";
+import type { JwtPayload } from "../../../middleware/auth.js";
+import { getDb } from "../../../db/index.js";
+import { users, refreshTokens } from "../../../db/schema.js";
+import type { Env } from "../../../env.js";
 import {
   SignupSchema,
   LoginSchema,
@@ -18,7 +18,7 @@ import {
   SetupPasswordSchema,
   SetupPasswordResponseSchema,
 } from "../schemas/auth.js";
-import { ErrorSchema, validationHook } from "../schemas/common.js";
+import { ErrorSchema, validationHook } from "../../../schemas/common.js";
 import {
   ForgotPasswordSchema,
   ForgotPasswordResponseSchema,
@@ -28,8 +28,8 @@ import {
 } from "../schemas/password-reset.js";
 import { PasswordResetService } from "../services/password-reset-service.js";
 import { EmailService } from "../services/email-service.js";
-import { SwitchOrgSchema, InvitationTokenSchema } from "../schemas/org.js";
-import { OrgService, OrgError } from "../services/org.js";
+import { SwitchOrgSchema, InvitationTokenSchema } from "../../../schemas/org.js";
+import { OrgService, OrgError } from "../../../services/org.js";
 
 export const authRoute = new OpenAPIHono<{ Bindings: Env }>({
   defaultHook: validationHook as any,

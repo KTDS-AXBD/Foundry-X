@@ -2,7 +2,7 @@ import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { verify } from "hono/jwt";
 import { SsoService } from "../services/sso.js";
-import type { JwtPayload } from "../middleware/auth.js";
+import type { JwtPayload } from "../../../middleware/auth.js";
 import {
   HubTokenRequestSchema,
   HubTokenResponseSchema,
@@ -11,8 +11,8 @@ import {
   OrgServiceSchema,
   OrgServiceUpdateSchema,
 } from "../schemas/sso.js";
-import { ErrorSchema, validationHook } from "../schemas/common.js";
-import type { Env } from "../env.js";
+import { ErrorSchema, validationHook } from "../../../schemas/common.js";
+import type { Env } from "../../../env.js";
 
 export const ssoRoute = new OpenAPIHono<{ Bindings: Env }>({
   defaultHook: validationHook as any,

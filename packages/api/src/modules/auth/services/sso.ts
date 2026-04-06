@@ -1,5 +1,5 @@
 import { verify } from "hono/jwt";
-import { createHubToken, type ServiceAccess } from "../middleware/auth.js";
+import { createHubToken, type ServiceAccess } from "../../../middleware/auth.js";
 
 export class SsoService {
   async createHubToken(

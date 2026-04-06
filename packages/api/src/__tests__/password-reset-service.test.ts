@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { PasswordResetService } from "../services/password-reset-service.js";
+import { PasswordResetService } from "../modules/auth/services/password-reset-service.js";
 
 describe("PasswordResetService", () => {
   let db: ReturnType<typeof createMockD1>;

@@ -3,7 +3,7 @@
  * 토큰 1시간 만료, 1회 사용, 비밀번호 변경 시 refresh tokens 전체 폐기
  */
 
-import { hashPassword } from "../utils/crypto.js";
+import { hashPassword } from "../../../utils/crypto.js";
 
 export interface TokenValidation {
   valid: boolean;

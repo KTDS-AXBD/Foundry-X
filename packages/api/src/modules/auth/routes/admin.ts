@@ -1,9 +1,9 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
-import { roleGuard } from "../middleware/role-guard.js";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import { roleGuard } from "../../../middleware/role-guard.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { BulkSignupSchema, BulkSignupResultSchema } from "../schemas/admin.js";
-import { ErrorSchema, validationHook } from "../schemas/common.js";
+import { ErrorSchema, validationHook } from "../../../schemas/common.js";
 import { AdminService } from "../services/admin-service.js";
 
 export const adminRoute = new OpenAPIHono<{ Bindings: Env; Variables: TenantVariables }>({

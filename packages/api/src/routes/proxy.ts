@@ -1,5 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { SsoService } from "../services/sso.js";
+import { SsoService } from "../modules/auth/services/sso.js";
 import { ServiceProxy } from "../services/service-proxy.js";
 import type { Env } from "../env.js";
 

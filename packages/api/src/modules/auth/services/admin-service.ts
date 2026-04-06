@@ -1,4 +1,4 @@
-import { hashPassword } from "../utils/crypto.js";
+import { hashPassword } from "../../../utils/crypto.js";
 
 interface BulkAccountInput {
   email: string;

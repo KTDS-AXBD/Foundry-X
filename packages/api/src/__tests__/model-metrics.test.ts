@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { ModelMetricsService } from "../services/model-metrics.js";
 import { createTestEnv } from "./helpers/test-app.js";
-import { tokenRoute } from "../routes/token.js";
+import { tokenRoute } from "../modules/auth/routes/token.js";
 
 const TABLE_DDL = `
   CREATE TABLE IF NOT EXISTS model_execution_metrics (

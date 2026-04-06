@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { PasswordResetService } from "../services/password-reset-service.js";
-import { EmailService } from "../services/email-service.js";
+import { PasswordResetService } from "../modules/auth/services/password-reset-service.js";
+import { EmailService } from "../modules/auth/services/email-service.js";
 
 /**
  * Sprint 67: F210 — Password Reset 통합 테스트
