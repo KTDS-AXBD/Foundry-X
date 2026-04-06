@@ -99,10 +99,13 @@ const MOCK_REPORT = {
 
 function setupMocks(page: import("@playwright/test").Page) {
   return Promise.all([
-    // Skip tours
+    // Skip tours + guide modals
     page.evaluate(() => {
       localStorage.setItem("fx-discovery-tour-completed", "true");
       localStorage.setItem("fx-tour-completed", "true");
+      localStorage.setItem("fx-guide-dismissed", "true");
+      localStorage.setItem("fx-onboarding-completed", "true");
+      localStorage.setItem("fx-process-guide-dismissed", "true");
     }),
     // Hide feedback widget
     page.addInitScript(() => {
@@ -110,8 +113,16 @@ function setupMocks(page: import("@playwright/test").Page) {
       style.textContent = "[aria-label='피드백 보내기'] { display: none !important; }";
       document.addEventListener("DOMContentLoaded", () => document.head.appendChild(style));
     }),
+    // Summary API (must be before report wildcard)
+    page.route("**/api/ax-bd/discovery-report/*/summary", (route) =>
+      route.fulfill({ json: null }),
+    ),
+    // Team review API
+    page.route("**/api/ax-bd/team-reviews/**", (route) =>
+      route.fulfill({ json: { data: [] } }),
+    ),
     // Report API
-    page.route("**/api/ax-bd/discovery-report/**", (route) =>
+    page.route("**/api/ax-bd/discovery-report/*", (route) =>
       route.fulfill({ json: MOCK_REPORT }),
     ),
     // prevent real calls
@@ -182,16 +193,13 @@ test.describe("Discovery Report (F346+F347)", () => {
     await setupMocks(page);
     await page.goto("/discovery/items/biz-1/report?tab=2-2");
 
-    // 탭 클릭으로 이동
-    await page.getByRole("tab", { name: "시장 검증" }).click();
-
-    // StepHeader
+    // StepHeader — URL query param으로 탭 이미 선택됨
     await expect(page.getByText("시장 검증").first()).toBeVisible({ timeout: 10000 });
 
     // MetricCard — TAM/SAM/SOM
-    await expect(page.getByText("TAM")).toBeVisible();
-    await expect(page.getByText("SAM")).toBeVisible();
-    await expect(page.getByText("SOM")).toBeVisible();
+    await expect(page.getByText("TAM").first()).toBeVisible();
+    await expect(page.getByText("SAM").first()).toBeVisible();
+    await expect(page.getByText("SOM").first()).toBeVisible();
 
     // Pain Point 맵
     await expect(page.getByText("Pain Point 맵")).toBeVisible();
@@ -213,9 +221,7 @@ test.describe("Discovery Report (F346+F347)", () => {
     await setupMocks(page);
     await page.goto("/discovery/items/biz-1/report?tab=2-3");
 
-    await page.getByRole("tab", { name: "경쟁 구도" }).click();
-
-    // StepHeader
+    // StepHeader — URL query param으로 탭 이미 선택됨
     await expect(page.getByText("경쟁 구도").first()).toBeVisible({ timeout: 10000 });
 
     // SWOT 4분면
@@ -227,13 +233,13 @@ test.describe("Discovery Report (F346+F347)", () => {
     await expect(page.getByText("Threats")).toBeVisible();
 
     // Porter 5 Forces
-    await expect(page.getByText("Porter 5 Forces")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Porter 5 Forces" }).first()).toBeVisible();
 
-    // 포지셔닝 맵
-    await expect(page.getByText("포지셔닝 맵")).toBeVisible();
+    // 포지셔닝 맵 (Suspense lazy-load 대기)
+    await expect(page.getByText("포지셔닝 맵").first()).toBeVisible({ timeout: 10000 });
 
     // InsightBox
-    await expect(page.getByText("경쟁 분석 요약")).toBeVisible();
+    await expect(page.getByText("경쟁 분석 요약")).toBeVisible({ timeout: 10000 });
   });
 
   test("탭 2-4: 기회 도출 — HMW + BMC + Phase 타임라인", async ({
@@ -242,9 +248,7 @@ test.describe("Discovery Report (F346+F347)", () => {
     await setupMocks(page);
     await page.goto("/discovery/items/biz-1/report?tab=2-4");
 
-    await page.getByRole("tab", { name: "기회 도출" }).click();
-
-    // StepHeader
+    // StepHeader — URL query param으로 탭 이미 선택됨
     await expect(page.getByText("기회 도출").first()).toBeVisible({ timeout: 10000 });
 
     // HMW 카드
@@ -275,13 +279,13 @@ test.describe("Discovery Report (F346+F347)", () => {
 
     await expect(page.getByText("AI 문서 자동화 — 발굴 리포트")).toBeVisible({ timeout: 10000 });
 
-    // 2-5 기회 선정 탭 클릭
+    // 2-5 기회 선정 탭 클릭 — mock에 없는 탭은 빈 데이터 표시
     await page.getByRole("tab", { name: "기회 선정" }).click();
-    await expect(page.getByText("Sprint 157에서 구현 예정이에요")).toBeVisible();
+    await expect(page.getByText("기회 선정 데이터가 아직 없어요")).toBeVisible();
 
     // 2-8 패키징 탭 클릭
     await page.getByRole("tab", { name: "패키징" }).click();
-    await expect(page.getByText("Sprint 157에서 구현 예정이에요")).toBeVisible();
+    await expect(page.getByText("패키징 데이터가 아직 없어요")).toBeVisible();
   });
 
   test("탭 전환 시 URL query param 변경", async ({
