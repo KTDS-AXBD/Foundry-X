@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { EvaluationReportService } from "../services/evaluation-report-service.js";
+import { EvaluationReportService } from "../modules/gate/services/evaluation-report-service.js";
 
 const DDL = `
   CREATE TABLE IF NOT EXISTS organizations (

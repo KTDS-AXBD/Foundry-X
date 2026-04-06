@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { EvaluationReportService } from "../services/evaluation-report-service.js";
 import {
   GenerateReportSchema,

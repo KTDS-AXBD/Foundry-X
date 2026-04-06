@@ -2,8 +2,8 @@
  * Sprint 121: GTM Customer Routes — 고객 프로필 관리 (F299)
  */
 import { Hono } from "hono";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { GtmCustomerService } from "../services/gtm-customer-service.js";
 import {
   CreateGtmCustomerSchema,

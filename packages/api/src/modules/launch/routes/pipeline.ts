@@ -2,8 +2,8 @@
  * Sprint 79: Pipeline Routes — 파이프라인 대시보드 (F232)
  */
 import { Hono } from "hono";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { PipelineService } from "../services/pipeline-service.js";
 import { AdvanceStageSchema, PipelineFilterSchema } from "../schemas/pipeline.schema.js";
 

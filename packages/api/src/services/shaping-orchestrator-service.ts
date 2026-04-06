@@ -4,7 +4,7 @@
  * 발굴 완료 → 산출물 수집 → shaping_runs 생성 → Phase A~F 순차 실행
  */
 import { ShapingService } from "./shaping-service.js";
-import { PipelineStateMachine } from "./pipeline-state-machine.js";
+import { PipelineStateMachine } from "../modules/launch/services/pipeline-state-machine.js";
 import type { TriggerShapingInput } from "../schemas/discovery-pipeline.js";
 
 const SHAPING_PHASES = ["A", "B", "C", "D", "E", "F"] as const;

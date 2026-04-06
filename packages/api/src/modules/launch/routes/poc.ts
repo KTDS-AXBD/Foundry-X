@@ -2,8 +2,8 @@
  * Sprint 120: PoC Management Routes — PoC 프로젝트 관리 + KPI (F298)
  */
 import { Hono } from "hono";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { PocService } from "../services/poc-service.js";
 import {
   CreatePocSchema,

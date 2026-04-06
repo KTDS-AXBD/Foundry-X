@@ -11,5 +11,18 @@ export {
   projectOverviewRoute, partySessionRoute, reconciliationRoute,
 } from "./portal/index.js";
 
-// Sprint 183: gate + launch 모듈 (예정)
+// Sprint 183: gate 모듈 (검증 → Gate-X)
+export {
+  axBdEvaluationsRoute, decisionsRoute, evaluationReportRoute,
+  gatePackageRoute, teamReviewsRoute, validationMeetingsRoute,
+  validationTierRoute,
+} from "./gate/index.js";
+
+// Sprint 183: launch 모듈 (제품화/GTM → Launch-X)
+export {
+  gtmCustomersRoute, gtmOutreachRoute, mvpTrackingRoute,
+  offeringPacksRoute, pipelineRoute, pipelineMonitoringRoute,
+  pocRoute, shareLinksRoute,
+} from "./launch/index.js";
+
 // Sprint 184: infra 모듈 (예정)

@@ -2,8 +2,8 @@
  * Sprint 116: Validation 2-tier Routes — 본부/전사 검증 워크플로 (F294)
  */
 import { Hono } from "hono";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { ValidationService, ValidationTierError } from "../services/validation-service.js";
 import { SubmitValidationSchema, ValidationFilterSchema } from "../schemas/validation.schema.js";
 

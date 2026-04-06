@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { gtmCustomersRoute } from "../routes/gtm-customers.js";
+import { gtmCustomersRoute } from "../modules/launch/routes/gtm-customers.js";
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { gtmOutreachRoute } from "../routes/gtm-outreach.js";
+import { gtmOutreachRoute } from "../modules/launch/routes/gtm-outreach.js";
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 

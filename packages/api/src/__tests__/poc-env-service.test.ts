@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { PocEnvService } from "../services/poc-env-service.js";
+import { PocEnvService } from "../modules/launch/services/poc-env-service.js";
 
 describe("PocEnvService", () => {
   let db: ReturnType<typeof createMockD1>;

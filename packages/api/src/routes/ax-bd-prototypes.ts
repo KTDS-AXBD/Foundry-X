@@ -6,7 +6,7 @@ import { Hono } from "hono";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 import { PrototypeService } from "../services/prototype-service.js";
-import { PocEnvService } from "../services/poc-env-service.js";
+import { PocEnvService } from "../modules/launch/services/poc-env-service.js";
 import { TechReviewService } from "../services/tech-review-service.js";
 import { PocEnvProvisionSchema } from "../schemas/prototype-ext.js";
 import { PrototypeReviewService } from "../services/prototype-review-service.js";

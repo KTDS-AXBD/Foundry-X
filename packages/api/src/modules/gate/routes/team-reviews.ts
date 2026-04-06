@@ -3,8 +3,8 @@
  * Sprint 154+: F349 팀장 최종결정 (POST /ax-bd/team-reviews/:itemId/decide)
  */
 import { Hono } from "hono";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { SubmitTeamReviewSchema, TeamDecideSchema } from "../schemas/team-review-schema.js";
 
 export const teamReviewsRoute = new Hono<{

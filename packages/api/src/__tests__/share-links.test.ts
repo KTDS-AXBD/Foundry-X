@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { shareLinksRoute } from "../routes/share-links.js";
+import { shareLinksRoute } from "../modules/launch/routes/share-links.js";
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 

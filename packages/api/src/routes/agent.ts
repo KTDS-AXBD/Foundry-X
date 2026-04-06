@@ -1087,10 +1087,10 @@ agentRoute.openapi(architectReviewDesign, async (c) => {
 // ─── Sprint 36: Evaluator-Optimizer (F137) ───
 
 import { EvaluatorOptimizer } from "../services/evaluator-optimizer.js";
-import { CodeReviewCriteria, TestCoverageCriteria, SpecComplianceCriteria } from "../services/evaluation-criteria.js";
+import { CodeReviewCriteria, TestCoverageCriteria, SpecComplianceCriteria } from "../modules/gate/services/evaluation-criteria.js";
 import { createRoutedRunner } from "../services/agent-runner.js";
 
-const CRITERIA_MAP: Record<string, () => import("../services/evaluation-criteria.js").EvaluationCriteria> = {
+const CRITERIA_MAP: Record<string, () => import("../modules/gate/services/evaluation-criteria.js").EvaluationCriteria> = {
   "code-review": () => new CodeReviewCriteria(),
   "test-coverage": () => new TestCoverageCriteria(),
   "spec-compliance": () => new SpecComplianceCriteria(),
@@ -1116,7 +1116,7 @@ agentRoute.openapi(evaluateOptimize, async (c) => {
 
   const criteria = config.criteria
     .map((name) => CRITERIA_MAP[name]?.())
-    .filter(Boolean) as import("../services/evaluation-criteria.js").EvaluationCriteria[];
+    .filter(Boolean) as import("../modules/gate/services/evaluation-criteria.js").EvaluationCriteria[];
 
   if (criteria.length === 0) {
     return c.json({ error: "No valid criteria specified" }, 400);

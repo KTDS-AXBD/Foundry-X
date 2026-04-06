@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { GtmOutreachService } from "../services/gtm-outreach-service.js";
+import { GtmOutreachService } from "../modules/launch/services/gtm-outreach-service.js";
 
 const DDL = `
   CREATE TABLE IF NOT EXISTS gtm_customers (

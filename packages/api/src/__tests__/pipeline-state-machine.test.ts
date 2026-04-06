@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { PipelineStateMachine } from "../services/pipeline-state-machine.js";
+import { PipelineStateMachine } from "../modules/launch/services/pipeline-state-machine.js";
 
 describe("PipelineStateMachine (F313)", () => {
   let db: ReturnType<typeof createMockD1>;

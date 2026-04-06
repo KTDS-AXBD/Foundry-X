@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { gatePackageRoute } from "../routes/gate-package.js";
-import { GatePackageService, MissingArtifactsError } from "../services/gate-package-service.js";
+import { gatePackageRoute } from "../modules/gate/routes/gate-package.js";
+import { GatePackageService, MissingArtifactsError } from "../modules/gate/services/gate-package-service.js";
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { PipelineCheckpointService } from "../services/pipeline-checkpoint-service.js";
+import { PipelineCheckpointService } from "../modules/launch/services/pipeline-checkpoint-service.js";
 import { DiscoveryPipelineService } from "../services/discovery-pipeline-service.js";
 
 describe("PipelineCheckpointService (F314)", () => {

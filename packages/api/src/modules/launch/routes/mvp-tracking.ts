@@ -2,8 +2,8 @@
  * Sprint 81: MVP Tracking Routes — MVP 상태 추적 + 자동화 (F238)
  */
 import { Hono } from "hono";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { MvpTrackingService } from "../services/mvp-tracking-service.js";
 import {
   CreateMvpSchema,

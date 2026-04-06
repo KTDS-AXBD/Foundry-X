@@ -2,8 +2,8 @@
  * Sprint 79: Decisions Routes — 의사결정 워크플로 (F239)
  */
 import { Hono } from "hono";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { DecisionService } from "../services/decision-service.js";
 import { CreateDecisionSchema, DecisionFilterSchema } from "../schemas/decision.schema.js";
 

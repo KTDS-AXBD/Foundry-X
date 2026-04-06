@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { offeringPacksRoute } from "../routes/offering-packs.js";
+import { offeringPacksRoute } from "../modules/launch/routes/offering-packs.js";
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 
