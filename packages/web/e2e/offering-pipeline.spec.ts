@@ -27,65 +27,81 @@ function setupOfferingMocks(page: import("@playwright/test").Page) {
       localStorage.setItem("fx-onboarding-completed", "true");
       localStorage.setItem("fx-process-guide-dismissed", "true");
     }),
-    // Offering detail (더 구체적인 경로 먼저 등록)
-    page.route("**/api/offerings/offering-1", (route) => {
-      const url = route.request().url();
-      // /offerings/offering-1 정확히 매칭 (sub-paths 제외)
-      if (url.endsWith("/offering-1") || url.includes("/offering-1?")) {
-        return route.fulfill({ json: { ...OFFERING, sections: SECTIONS } });
-      }
-      return route.continue();
-    }),
-    // Offerings list (less specific — must come after detail)
+    // Offerings list (exact path — no sub-path)
     page.route("**/api/offerings", (route) => {
       if (route.request().method() === "GET") {
-        return route.fulfill({
-          json: { items: [OFFERING], total: 1 },
-        });
+        return route.fulfill({ json: { items: [OFFERING], total: 1 } });
       }
       return route.fulfill({ json: OFFERING, status: 201 });
     }),
-    // Sections
-    page.route("**/api/offerings/offering-1/sections*", (route) =>
-      route.fulfill({ json: { sections: SECTIONS } }),
-    ),
-    // Design tokens
-    page.route("**/api/offerings/offering-1/tokens*", (route) =>
-      route.fulfill({
-        json: {
-          tokens: [
-            { tokenKey: "--color-primary", tokenValue: "#2563eb", tokenCategory: "color" },
-            { tokenKey: "--font-size-base", tokenValue: "16px", tokenCategory: "typography" },
-          ],
-        },
-      }),
-    ),
-    // Export (HTML preview — returns raw HTML text)
-    page.route("**/api/offerings/offering-1/export*", (route) =>
-      route.fulfill({ body: "<html><body><h1>AI 헬스케어 사업기획서</h1><p>Preview Content</p></body></html>", contentType: "text/html" }),
-    ),
-    // Validate
-    page.route("**/api/offerings/offering-1/validate*", (route) => {
-      if (route.request().method() === "POST") {
-        return route.fulfill({ json: makeOfferingValidation(), status: 201 });
+    // All /api/offerings/* sub-paths
+    page.route("**/api/offerings/**", (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^.*\/api\/offerings/, "");
+      const method = route.request().method();
+
+      // GET /offerings/metrics
+      if (path.startsWith("/metrics")) {
+        return route.fulfill({ json: makeOfferingMetrics() });
       }
-      return route.fulfill({ json: { validations: [makeOfferingValidation()] } });
+
+      // /offerings/offering-1/...
+      if (path.startsWith("/offering-1")) {
+        const subpath = path.replace("/offering-1", "");
+
+        // /offerings/offering-1 (detail)
+        if (subpath === "" || subpath === "/") {
+          return route.fulfill({ json: { ...OFFERING, sections: SECTIONS } });
+        }
+        // /offerings/offering-1/sections
+        if (subpath.startsWith("/sections")) {
+          return route.fulfill({ json: { sections: SECTIONS } });
+        }
+        // /offerings/offering-1/tokens
+        if (subpath.startsWith("/tokens")) {
+          return route.fulfill({
+            json: {
+              tokens: [
+                { tokenKey: "--color-primary", tokenValue: "#2563eb", tokenCategory: "color" },
+                { tokenKey: "--font-size-base", tokenValue: "16px", tokenCategory: "typography" },
+              ],
+            },
+          });
+        }
+        // /offerings/offering-1/export
+        if (subpath.startsWith("/export")) {
+          return route.fulfill({
+            body: "<html><body><h1>AI 헬스케어 사업기획서</h1><p>Preview</p></body></html>",
+            contentType: "text/html",
+          });
+        }
+        // /offerings/offering-1/validations (GET list) or /offerings/offering-1/validate (POST)
+        if (subpath.startsWith("/validations")) {
+          return route.fulfill({ json: { validations: [makeOfferingValidation()], total: 1 } });
+        }
+        if (subpath.startsWith("/validate")) {
+          return route.fulfill({ json: makeOfferingValidation(), status: 201 });
+        }
+        // /offerings/offering-1/prototypes (list)
+        if (subpath.startsWith("/prototypes")) {
+          return route.fulfill({ json: { items: [] } });
+        }
+        // /offerings/offering-1/prototype (create)
+        if (subpath === "/prototype") {
+          return route.fulfill({ json: { jobId: "job-1", status: "queued" }, status: 201 });
+        }
+        // /offerings/offering-1/html
+        if (subpath.startsWith("/html")) {
+          return route.fulfill({
+            body: "<html><body><h1>Preview</h1></body></html>",
+            contentType: "text/html",
+          });
+        }
+      }
+
+      // Fallback: 404
+      return route.fulfill({ status: 404, json: { error: "Not found" } });
     }),
-    // Prototype: GET /prototypes (list) + POST /prototype (create)
-    page.route("**/api/offerings/offering-1/prototypes**", (route) =>
-      route.fulfill({ json: { items: [] } }),
-    ),
-    page.route("**/api/offerings/offering-1/prototype", (route) =>
-      route.fulfill({ json: { jobId: "job-1", status: "queued" }, status: 201 }),
-    ),
-    // HTML preview (별도 엔드포인트가 있으면)
-    page.route("**/api/offerings/offering-1/html*", (route) =>
-      route.fulfill({ body: "<html><body><h1>Preview</h1></body></html>", contentType: "text/html" }),
-    ),
-    // Metrics
-    page.route("**/api/offerings/metrics*", (route) =>
-      route.fulfill({ json: makeOfferingMetrics() }),
-    ),
     // BizItem for wizard
     page.route("**/api/biz-items*", (route) =>
       route.fulfill({ json: { items: [makeBizItem()] } }),
@@ -150,7 +166,7 @@ test.describe("Offering Pipeline E2E", () => {
     ).toBeVisible();
   });
 
-  test.fixme("offering-validate — 검증 대시보드", /* TODO: mock route 매칭 개선 필요 — /shaping/offering/:id/validate 경로에서 detail fetch 누락 */ async ({
+  test("offering-validate — 검증 대시보드", async ({
     authenticatedPage: page,
   }) => {
     await setupOfferingMocks(page);
@@ -182,7 +198,7 @@ test.describe("Offering Pipeline E2E", () => {
     await expect(page.getByText(/섹션/).first()).toBeVisible();
   });
 
-  test.fixme("offering-editor — Prototype 패널 존재", /* TODO: offering detail mock route 매칭 불안정 — retry 시 간헐적 성공 */ async ({
+  test("offering-editor — Prototype 패널 존재", async ({
     authenticatedPage: page,
   }) => {
     await setupOfferingMocks(page);
@@ -193,7 +209,7 @@ test.describe("Offering Pipeline E2E", () => {
     // Prototype panel or button
     await expect(
       page.getByText(/프로토타입|prototype/i)
-        .or(page.getByRole("button", { name: /프로토타입|prototype/i })),
+        .or(page.getByRole("button", { name: /프로토타입|prototype/i })).first(),
     ).toBeVisible();
   });
 });
