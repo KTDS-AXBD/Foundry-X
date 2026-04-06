@@ -62,3 +62,11 @@ export interface GenerateRulesResult {
   proposalsCreated: number;
   proposals: GuardRailProposal[];
 }
+
+/** F359: Rule 배치 결과 */
+export interface DeployResult {
+  filename: string;
+  content: string;
+  proposalId: string;
+  patternId: string;
+}

@@ -9,8 +9,8 @@ import type { Env } from "../env.js";
 
 export const builderRoute = new Hono<{ Bindings: Env }>();
 
-// Webhook Secret 검증 미들웨어
-builderRoute.use("/*", async (c, next) => {
+// Webhook Secret 검증 미들웨어 — /builder/* 경로에만 적용
+builderRoute.use("/builder/*", async (c, next) => {
   const token = c.req.header("Authorization")?.replace("Bearer ", "");
   const secret = c.env?.WEBHOOK_SECRET;
   if (!secret || token !== secret) {
