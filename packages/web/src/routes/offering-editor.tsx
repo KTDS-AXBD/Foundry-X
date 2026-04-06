@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, FileText, Shield } from "lucide-react";
+import { ArrowLeft, FileText, Shield, Palette, Boxes } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,6 +21,7 @@ import {
 import { SectionList } from "@/components/feature/offering-editor/section-list";
 import { SectionEditor } from "@/components/feature/offering-editor/section-editor";
 import { HtmlPreview } from "@/components/feature/offering-editor/html-preview";
+import { OfferingPrototypePanel } from "@/components/feature/OfferingPrototypePanel";
 
 const PURPOSE_LABELS: Record<string, string> = {
   report: "보고용",
@@ -151,6 +152,11 @@ export function Component() {
               <FileText className="size-4 mr-1" /> 에디터
             </Button>
           </Link>
+          <Link to={`/shaping/offering/${id}/tokens`}>
+            <Button size="sm" variant="outline">
+              <Palette className="size-4 mr-1" /> 토큰
+            </Button>
+          </Link>
           <Link to={`/shaping/offering/${id}/validate`}>
             <Button size="sm" variant="outline">
               <Shield className="size-4 mr-1" /> 검증
@@ -184,8 +190,9 @@ export function Component() {
         </div>
 
         {/* Right Panel: HTML Preview */}
-        <div className="flex-1 overflow-hidden p-4">
+        <div className="flex-1 overflow-hidden p-4 flex flex-col gap-4">
           <HtmlPreview html={htmlPreview} loading={previewLoading} />
+          {id && <OfferingPrototypePanel offeringId={id} />}
         </div>
       </div>
     </div>
