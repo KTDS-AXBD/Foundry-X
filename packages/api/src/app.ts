@@ -2,15 +2,14 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 import { cors } from "hono/cors";
 import { Toucan } from "toucan-js";
-import { profileRoute } from "./routes/profile.js";
+// Sprint 181: Auth module (F396 — modules/auth/)
+import { authRoute, ssoRoute, tokenRoute, profileRoute, adminRoute } from "./modules/auth/index.js";
 import { integrityRoute } from "./routes/integrity.js";
 import { healthRoute } from "./routes/health.js";
 import { freshnessRoute } from "./routes/freshness.js";
 import { wikiRoute } from "./routes/wiki.js";
 import { requirementsRoute } from "./routes/requirements.js";
 import { agentRoute } from "./routes/agent.js";
-import { tokenRoute } from "./routes/token.js";
-import { authRoute } from "./routes/auth.js";
 import { specRoute } from "./routes/spec.js";
 import { webhookRoute } from "./routes/webhook.js";
 import { githubRoute } from "./routes/github.js";
@@ -22,7 +21,7 @@ import { projectOverviewRoute } from "./routes/project-overview.js";
 import { webhookRegistryRoute, webhookInboundRoute } from "./routes/webhook-registry.js";
 import { jiraRoute } from "./routes/jira.js";
 import { workflowRoute } from "./routes/workflow.js";
-import { ssoRoute } from "./routes/sso.js";
+// ssoRoute — moved to modules/auth (F396)
 import { proxyRoute } from "./routes/proxy.js";
 import { entitiesRoute } from "./routes/entities.js";
 import { kpiRoute } from "./routes/kpi.js";
@@ -68,8 +67,7 @@ import { gatePackageRoute } from "./routes/gate-package.js";
 import { offeringPacksRoute } from "./routes/offering-packs.js";
 import { mvpTrackingRoute } from "./routes/mvp-tracking.js";
 import { irProposalsRoute } from "./routes/ir-proposals.js";
-// Sprint 87: Admin bulk operations (F251)
-import { adminRoute } from "./routes/admin.js";
+// Sprint 87: Admin bulk operations (F251) — moved to modules/auth (F396)
 // Sprint 88: Org shared data + NPS (F253, F254)
 import { orgSharedRoute } from "./routes/org-shared.js";
 import { npsRoute } from "./routes/nps.js";

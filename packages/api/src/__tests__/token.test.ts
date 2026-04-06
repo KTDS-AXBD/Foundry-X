@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { tokenRoute } from "../routes/token.js";
+import { tokenRoute } from "../modules/auth/routes/token.js";
 
 describe("token routes", () => {
   // ─── Summary ───

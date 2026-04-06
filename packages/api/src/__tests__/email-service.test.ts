@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { EmailService } from "../services/email-service.js";
+import { EmailService } from "../modules/auth/services/email-service.js";
 
 describe("EmailService", () => {
   beforeEach(() => {
