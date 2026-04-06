@@ -107,6 +107,7 @@ foundry-x/
 | `docs/specs/dev-transparency-spec.md` | 개발 투명성 스펙 |
 | `docs/specs/fx-offering-pipeline/prd-final.md` | Offering Pipeline PRD (Phase 18, F363~F383) |
 | `docs/specs/fx-builder-evolution/prd-final.md` | Builder Evolution PRD (Phase 19, F384~F391) |
+| `docs/specs/ax-bd-msa/prd-final.md` | AX BD MSA 재조정 PRD (Phase 20, F392~F401) |
 | `docs/02-design/features/tech-stack-review.design.md` | 기술 스택 결정 근거 |
 | `docs/02-design/features/mcp-protocol.design.md` | MCP 프로토콜 설계 |
 
@@ -171,8 +172,9 @@ pnpm e2e                          # Playwright E2E
 - **Phase 15:** ✅ 완료 (Sprint 154~157) — Discovery UI/UX 고도화 v2 F342~F350. PRD: `docs/specs/fx-discovery-ui-v2/prd-final.md`
 - **Phase 16:** ✅ 완료 (Sprint 158~160) — Prototype Auto-Gen F351~F356. PRD: `docs/specs/prototype-auto-gen/prd-final.md`
 - **Phase 17:** ✅ 완료 (Sprint 161~164) — Self-Evolving Harness v2 F357~F362. Guard Rail 자동 제안 + O-G-D 4도메인 범용화 + 운영 지표 대시보드. PRD: `docs/specs/fx-harness-evolution/prd-final.md`. 전략: `docs/specs/self-evolving-harness-strategy.md`
-- **Phase 18:** 📋 계획 (Sprint 165~174) — Offering Pipeline F363~F383. PRD: `docs/specs/fx-offering-pipeline/prd-final.md`
+- **Phase 18:** ✅ 완료 (Sprint 165~174) — Offering Pipeline F363~F383 (21/21, Match 93%). 형상화 자동화: HTML/PPTX Skill + Offering Agent + Full UI + 콘텐츠 어댑터 + 파이프라인. PRD: `docs/specs/fx-offering-pipeline/prd-final.md`
 - **Phase 19:** ✅ 완료 (Sprint 175~178) — Builder Evolution F384~F391. 5차원 품질 스코어링 + CLI 듀얼모드 + Enhanced O-G-D + Quality Dashboard. PRD: `docs/specs/fx-builder-evolution/prd-final.md`
+- **Phase 20:** 📋 계획 (Sprint 179~188) — AX BD MSA 재조정 F392~F401. 모놀리스 모듈화(20-A) + harness-kit + 이벤트/프록시(20-B). 2단계 접근법: 모듈화→실제분리. PRD: `docs/specs/ax-bd-msa/prd-final.md`
 - **수치 확인:** `/ax:daily-check` 실행 또는 SPEC.md §2 "실시간 수치" 블록 참조 (하드코딩 금지 — drift 방지)
 - **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 
