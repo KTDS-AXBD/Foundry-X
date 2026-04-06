@@ -267,4 +267,54 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     await page.goto("/product/offering-pack/pack-1");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
   });
+
+  // ─── P2 미커버 5건 추가 (E2E 감사 권장사항) ───
+
+  test("nps-dashboard 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/orgs/*/nps/summary", (route) =>
+      route.fulfill({
+        json: {
+          averageNps: 42,
+          totalResponses: 15,
+          responseRate: 0.75,
+          weeklyTrend: [],
+          recentFeedback: [],
+        },
+      }),
+    );
+    await page.goto("/nps-dashboard");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "NPS 대시보드" })).toBeVisible();
+    await expect(page.getByText("42")).toBeVisible();
+  });
+
+  test("settings 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.goto("/settings");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "Jira Integration" })).toBeVisible();
+  });
+
+  test("validation/share 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/orgs/*/shared/bmcs*", (route) =>
+      route.fulfill({ json: { items: [], total: 0, page: 1, limit: 20 } }),
+    );
+    await page.route("**/api/orgs/*/shared/activity*", (route) =>
+      route.fulfill({ json: { items: [] } }),
+    );
+    await page.goto("/validation/share");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "팀 공유" })).toBeVisible();
+  });
+
+  test("product/offering-pack/givc-pitch 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.goto("/product/offering-pack/givc-pitch");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("GIVC Ontology")).toBeVisible();
+  });
+
+  test("shaping/offering/givc-pitch 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.goto("/shaping/offering/givc-pitch");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("GIVC Ontology")).toBeVisible();
+  });
 });
