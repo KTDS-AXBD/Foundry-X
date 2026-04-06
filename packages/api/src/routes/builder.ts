@@ -9,8 +9,8 @@ import type { Env } from "../env.js";
 
 export const builderRoute = new Hono<{ Bindings: Env }>();
 
-// Builder Token 검증 미들웨어 (BUILDER_SECRET 또는 WEBHOOK_SECRET)
-builderRoute.use("/*", async (c, next) => {
+// Webhook Secret 검증 미들웨어 — /builder/* 경로에만 적용 (Sprint 162 버그 수정)
+builderRoute.use("/builder/*", async (c, next) => {
   const token = c.req.header("Authorization")?.replace("Bearer ", "");
   const builderSecret = (c.env as unknown as Record<string, string>)?.BUILDER_SECRET;
   const webhookSecret = c.env?.WEBHOOK_SECRET;
