@@ -189,6 +189,7 @@ const DEFAULT_ADMIN_GROUP: NavGroup = {
     { href: "/methodologies", label: "방법론", icon: Library },
     { href: "/projects", label: "프로젝트", icon: FolderKanban },
     { href: "/nps-dashboard", label: "NPS 대시보드", icon: BarChart3 },
+    { href: "/dashboard/metrics", label: "운영 지표", icon: TrendingUp },
   ],
 };
 
