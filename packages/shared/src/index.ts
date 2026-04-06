@@ -291,6 +291,7 @@ export type {
   DiscriminatorEventPayload,
   SyncEventPayload,
   ManualEventPayload,
+  PipelineEventPayload,
 } from './task-event.js';
 
 // F335: Orchestration Loop types (Sprint 150, Phase 14)
