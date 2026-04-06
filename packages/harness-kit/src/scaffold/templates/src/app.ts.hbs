@@ -1,0 +1,22 @@
+import { OpenAPIHono } from "@hono/zod-openapi";
+import {
+  createAuthMiddleware,
+  createCorsMiddleware,
+  errorHandler,
+} from "@foundry-x/harness-kit";
+import type { HarnessEnv } from "@foundry-x/harness-kit";
+
+const config = {
+  serviceName: "{{name}}",
+  serviceId: "{{serviceId}}" as const,
+  corsOrigins: ["http://localhost:3000"],
+  publicPaths: ["/api/health"],
+};
+
+export const app = new OpenAPIHono<{ Bindings: HarnessEnv }>();
+
+app.use("*", createCorsMiddleware(config));
+app.use("*", createAuthMiddleware(config));
+app.onError(errorHandler);
+
+app.get("/api/health", (c) => c.json({ status: "ok", service: "{{name}}" }));

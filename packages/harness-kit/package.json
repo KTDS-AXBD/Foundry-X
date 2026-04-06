@@ -1,0 +1,36 @@
+{
+  "name": "@foundry-x/harness-kit",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "harness": "dist/cli/index.js"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./eslint": "./dist/eslint/index.js",
+    "./events": "./dist/events/index.js",
+    "./d1": "./dist/d1/index.js",
+    "./scaffold": "./dist/scaffold/generator.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "handlebars": "^4.7.8",
+    "hono": "^4.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.0.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "peerDependencies": {
+    "hono": "^4.0.0"
+  }
+}
