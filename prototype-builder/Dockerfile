@@ -9,8 +9,8 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /build
 
-# pnpm workspace 설정 복사
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+# pnpm workspace + tsconfig 설정 복사
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml tsconfig.json ./
 
 # shared + prototype-builder 패키지만 복사
 COPY packages/shared/ ./packages/shared/
