@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #210 (2026-04-06)
+
+**Phase 17 Self-Evolving Harness v2 완료 — Guard Rail 자동 제안 + O-G-D 범용화 + 운영 지표**:
+- ✅ req-interview: 전략문서(FX-STRT-015 v3.0) → PRD(82점, Ambiguity 0.155) → prd-final
+- ✅ SPEC F357~F362 등록 (FX-REQ-349~354, Phase 17, Sprint 161~164)
+- ✅ Sprint 161 (PR #298): 데이터 진단 + 패턴 감지 + Rule 생성 (Match 100%, 18 tests, 22분)
+- ✅ Sprint 162 (PR #299): 승인 플로우 + builder 미들웨어 버그 수정 (Match 97%, 10 tests, 20분)
+- ✅ Sprint 163 (PR #301): O-G-D 4도메인 범용 인터페이스 + 어댑터 레지스트리 (20분)
+- ✅ Sprint 164 (PR #300): Rule 효과 측정 + 운영 지표 대시보드 (20분)
+- ✅ Sprint 163+164 병렬 실행, builder.ts + app.ts merge conflict 즉시 해소
+- ✅ Archive 17 파일 → docs/archive/2026-04/fx-harness-evolution/
+- **수치**: ~107 routes, ~237 services, ~122 schemas, D1 0109
+
+**검증 결과**: 4 Sprint autopilot 전체 완료, ~82분 총 소요
+
+---
+
 ### 세션 #208 (2026-04-06)
 
 **Phase 16 Prototype Auto-Gen 완료 — PRD→Prototype 자동 생성 파이프라인**:
