@@ -87,10 +87,12 @@ export const test = base.extend<{ authenticatedPage: Page }>({
     await page.goto("/");
 
     // Store JWT + user in localStorage for hydrate() to find
+    // Also suppress onboarding guide modal (shows on every clean localStorage)
     await page.evaluate(
       ({ t, u }) => {
         localStorage.setItem("token", t);
         localStorage.setItem("user", JSON.stringify(u));
+        localStorage.setItem("onboarding_progress", "100");
       },
       { t: token, u: TEST_USER },
     );

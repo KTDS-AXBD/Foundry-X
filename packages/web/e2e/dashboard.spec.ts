@@ -1,9 +1,8 @@
-import { test, expect, dismissGuideModal } from "./fixtures/auth";
+import { test, expect } from "./fixtures/auth";
 
 test.describe("Dashboard", () => {
   test("sidebar navigation is visible", async ({ authenticatedPage: page }) => {
     await page.goto("/dashboard");
-    await dismissGuideModal(page);
 
     // 상단 고정 링크
     await expect(page.getByRole("link", { name: "대시보드" })).toBeVisible();
@@ -17,7 +16,6 @@ test.describe("Dashboard", () => {
 
   test("sidebar 프로세스 6단계 그룹 항목 확인", async ({ authenticatedPage: page }) => {
     await page.goto("/dashboard");
-    await dismissGuideModal(page);
 
     // sidebar 영역 내에서만 검색
     const sidebar = page.locator("aside").or(page.locator("[class*='Sheet']"));

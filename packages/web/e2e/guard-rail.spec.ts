@@ -8,7 +8,7 @@
  * 참고: Guard Rail의 핵심 기능은 API + CLI(session-start) 기반이라
  * E2E는 대시보드 내 Guard Rail 관련 표시/링크 검증에 집중
  */
-import { test, expect, dismissGuideModal } from "./fixtures/auth";
+import { test, expect } from "./fixtures/auth";
 
 const MOCK_PROPOSALS = [
   {
@@ -116,7 +116,6 @@ test.describe("Guard Rail (F357~F359)", () => {
     );
 
     await page.goto("/dashboard/metrics");
-    await dismissGuideModal(page);
     // Rule 효과 점수가 metrics 대시보드에 표시됨
     await expect(page.getByText("auto-guard-002.md")).toBeVisible();
   });

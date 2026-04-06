@@ -1,4 +1,4 @@
-import { test, expect, dismissGuideModal } from "./fixtures/auth";
+import { test, expect } from "./fixtures/auth";
 
 test.describe("Onboarding Flow (F252)", () => {
   test.beforeEach(async ({ authenticatedPage: page }) => {
@@ -202,7 +202,6 @@ test.describe("Onboarding Flow (F252)", () => {
     authenticatedPage: page,
   }) => {
     await page.goto("/getting-started");
-    await dismissGuideModal(page);
 
     await expect(page.getByRole("heading", { name: "더 알아보기" })).toBeVisible();
     // 4개 feature cards: BD 스킬 가이드, Cowork / Claude Code, 데모 시나리오, 도구 가이드

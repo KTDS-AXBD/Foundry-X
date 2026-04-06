@@ -8,7 +8,7 @@
  * - Section 4개 (RuleEffectChart, AgentUsageChart, SkillReuseChart, UnusedHighlight)
  * - 빈 데이터 + 데이터 있는 경우 모두 검증
  */
-import { test, expect, dismissGuideModal } from "./fixtures/auth";
+import { test, expect } from "./fixtures/auth";
 
 // ─── Mock Data ───
 
@@ -96,7 +96,6 @@ test.describe("Dashboard Metrics (F362)", () => {
   test("페이지 로드 — 제목 + SummaryCard 3개 렌더링", async ({ authenticatedPage: page }) => {
     await setupMetricsMocks(page);
     await page.goto("/dashboard/metrics");
-    await dismissGuideModal(page);
 
     // 제목
     await expect(page.getByRole("heading", { name: "운영 지표 대시보드" })).toBeVisible();
@@ -118,7 +117,6 @@ test.describe("Dashboard Metrics (F362)", () => {
   test("Section 렌더링 — Guard Rail 효과 점수", async ({ authenticatedPage: page }) => {
     await setupMetricsMocks(page);
     await page.goto("/dashboard/metrics");
-    await dismissGuideModal(page);
 
     await expect(page.getByRole("heading", { name: "Guard Rail 효과 점수" })).toBeVisible();
     // Rule 파일명 표시
@@ -129,7 +127,6 @@ test.describe("Dashboard Metrics (F362)", () => {
   test("Section 렌더링 — 에이전트/스킬 활용률", async ({ authenticatedPage: page }) => {
     await setupMetricsMocks(page);
     await page.goto("/dashboard/metrics");
-    await dismissGuideModal(page);
 
     await expect(page.getByRole("heading", { name: "에이전트/스킬 활용률" })).toBeVisible();
     // source 이름 표시
@@ -140,7 +137,6 @@ test.describe("Dashboard Metrics (F362)", () => {
   test("Section 렌더링 — Skill 재사용률", async ({ authenticatedPage: page }) => {
     await setupMetricsMocks(page);
     await page.goto("/dashboard/metrics");
-    await dismissGuideModal(page);
 
     await expect(page.getByRole("heading", { name: "Skill 재사용률" })).toBeVisible();
     // 도넛 차트에 overallRate가 렌더링됨 (SVG text)
@@ -152,7 +148,6 @@ test.describe("Dashboard Metrics (F362)", () => {
   test("UnusedHighlight — 미사용 항목 경고 표시", async ({ authenticatedPage: page }) => {
     await setupMetricsMocks(page);
     await page.goto("/dashboard/metrics");
-    await dismissGuideModal(page);
 
     // 미사용 source가 UnusedHighlight 컴포넌트에 표시
     const unusedSection = page.locator("[data-testid='unused-highlight']").or(page.locator("text=미사용"));
@@ -182,7 +177,6 @@ test.describe("Dashboard Metrics (F362)", () => {
     );
 
     await page.goto("/dashboard/metrics");
-    await dismissGuideModal(page);
     await expect(page.getByRole("heading", { name: "운영 지표 대시보드" })).toBeVisible();
     // 빈 데이터 — SummaryCard에 0% 또는 0/0 표시
     await expect(page.getByText("0%").first()).toBeVisible();
@@ -203,7 +197,6 @@ test.describe("Dashboard Metrics (F362)", () => {
     );
 
     await page.goto("/dashboard/metrics");
-    await dismissGuideModal(page);
     // fetchApi가 throw하면 error state로 → 에러 메시지 표시
     const errorText = page.locator("text=Failed to load").or(page.locator("text=error"));
     await expect(errorText.first()).toBeVisible({ timeout: 10000 });
