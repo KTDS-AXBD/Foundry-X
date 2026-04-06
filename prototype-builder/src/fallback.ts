@@ -67,7 +67,66 @@ export async function writeGeneratedFiles(
     console.log(`[Builder] Wrote: ${block.filePath} (${block.content.length} bytes)`);
   }
 
+  // 빌드 실패 방지: 파일에서 import된 로컬 모듈 중 없는 파일에 stub 생성
+  await createMissingStubs(workDir);
+
   return written;
+}
+
+/**
+ * 작성된 .tsx/.ts 파일의 import를 스캔하여 누락된 로컬 파일에 빈 stub 생성
+ */
+async function createMissingStubs(workDir: string): Promise<void> {
+  const srcDir = path.join(workDir, 'src');
+  try {
+    await fs.access(srcDir);
+  } catch {
+    return;
+  }
+
+  const files = await collectFiles(srcDir);
+  const existing = new Set(files.map(f => path.relative(workDir, f)));
+
+  for (const file of files) {
+    if (!file.endsWith('.tsx') && !file.endsWith('.ts')) continue;
+    const content = await fs.readFile(file, 'utf-8');
+
+    // from './path' 또는 from "../path" 패턴 매칭
+    const importRegex = /from\s+['"](\.[^'"]+)['"]/g;
+    let m;
+    while ((m = importRegex.exec(content)) !== null) {
+      const importPath = m[1]!;
+      const dir = path.dirname(file);
+      const resolved = path.resolve(dir, importPath);
+      const rel = path.relative(workDir, resolved);
+
+      // .tsx, .ts 확장자 시도
+      const candidates = [rel + '.tsx', rel + '.ts', rel + '/index.tsx', rel + '/index.ts'];
+      const found = candidates.some(c => existing.has(c));
+
+      if (!found) {
+        const stubPath = path.join(workDir, rel + '.tsx');
+        await fs.mkdir(path.dirname(stubPath), { recursive: true });
+        await fs.writeFile(stubPath, `export default function Stub() { return <div>Component placeholder</div>; }\n`, 'utf-8');
+        existing.add(rel + '.tsx');
+        console.log(`[Builder] Stub created: ${rel}.tsx`);
+      }
+    }
+  }
+}
+
+async function collectFiles(dir: string): Promise<string[]> {
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  const result: string[] = [];
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      result.push(...await collectFiles(full));
+    } else {
+      result.push(full);
+    }
+  }
+  return result;
 }
 
 /**
