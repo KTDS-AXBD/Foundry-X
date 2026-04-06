@@ -333,6 +333,22 @@ export type {
   DiscoveryTypeV2,
 } from './discovery-v2.js';
 
+// F351: Prototype Auto-Gen types (Sprint 158, Phase 16)
+export {
+  PROTOTYPE_TRANSITIONS,
+  PROTOTYPE_TIMEOUTS,
+  isValidPrototypeTransition,
+  getAvailablePrototypeTransitions,
+} from './prototype.js';
+
+export type {
+  PrototypeStatus,
+  Prototype,
+  PrototypeCreateRequest,
+  PrototypeUpdateRequest,
+  PrototypeFeedbackRequest,
+} from './prototype.js';
+
 // F346+F347+F348+F349: Discovery Report types (Sprint 156~157, Phase 15)
 export type {
   ReferenceAnalysisData,
