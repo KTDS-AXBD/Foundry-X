@@ -29,7 +29,9 @@ function execDb(sql: string) {
 
 beforeEach(async () => {
   env = createTestEnv();
-  authHeaders = await createAuthHeaders();
+  // F340: feedback-queue는 Webhook Secret 인증 (JWT가 아닌 X-Webhook-Secret 헤더)
+  (env as any).WEBHOOK_SECRET = "test-webhook-secret";
+  authHeaders = { "X-Webhook-Secret": "test-webhook-secret" };
   // Ensure agent_tasks has github_issue_number column (same as webhook-extended.test.ts)
   execDb("ALTER TABLE agent_tasks ADD COLUMN github_issue_number INTEGER DEFAULT NULL");
   execDb("CREATE INDEX IF NOT EXISTS idx_tasks_github ON agent_tasks(github_issue_number)");
