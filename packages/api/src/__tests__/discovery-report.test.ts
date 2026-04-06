@@ -112,7 +112,7 @@ describe("GET /api/ax-bd/discovery-report/:itemId", () => {
     await app.request("/api/ax-bd/discovery-report/item-1");
 
     const cached = db.prepare(
-      "SELECT * FROM ax_discovery_reports WHERE biz_item_id = ?",
+      "SELECT * FROM ax_discovery_reports WHERE item_id = ?",
     ).bind("item-1").first();
     expect(cached).not.toBeNull();
 

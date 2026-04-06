@@ -680,17 +680,69 @@ export class MockD1Database {
 
       CREATE TABLE IF NOT EXISTS ax_discovery_reports (
         id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
-        biz_item_id TEXT NOT NULL REFERENCES biz_items(id) ON DELETE CASCADE,
         org_id TEXT NOT NULL,
+        item_id TEXT NOT NULL REFERENCES biz_items(id) ON DELETE CASCADE,
         report_json TEXT NOT NULL DEFAULT '{}',
-        overall_verdict TEXT CHECK (overall_verdict IN ('go','conditional','hold','drop')),
-        team_decision TEXT CHECK (team_decision IN ('go','hold','drop')),
+        overall_verdict TEXT DEFAULT NULL
+          CHECK(overall_verdict IN ('Go', 'Conditional', 'NoGo')),
+        team_decision TEXT DEFAULT NULL
+          CHECK(team_decision IN ('Go', 'Hold', 'Drop')),
+        shared_token TEXT,
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
         updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-        UNIQUE(biz_item_id)
+        UNIQUE(item_id)
       );
-      CREATE INDEX IF NOT EXISTS idx_adr_biz_item ON ax_discovery_reports(biz_item_id);
+      CREATE INDEX IF NOT EXISTS idx_adr_item ON ax_discovery_reports(item_id);
       CREATE INDEX IF NOT EXISTS idx_adr_org ON ax_discovery_reports(org_id);
+      CREATE INDEX IF NOT EXISTS idx_adr_shared ON ax_discovery_reports(shared_token);
+
+      CREATE TABLE IF NOT EXISTS ax_persona_configs (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        item_id TEXT NOT NULL,
+        org_id TEXT NOT NULL,
+        persona_id TEXT NOT NULL,
+        persona_name TEXT NOT NULL DEFAULT '',
+        persona_role TEXT NOT NULL DEFAULT '',
+        weights TEXT NOT NULL DEFAULT '{}',
+        context_json TEXT NOT NULL DEFAULT '{}',
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(item_id, persona_id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_persona_configs_item ON ax_persona_configs(item_id);
+
+      CREATE TABLE IF NOT EXISTS ax_persona_evals (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        item_id TEXT NOT NULL,
+        org_id TEXT NOT NULL,
+        persona_id TEXT NOT NULL,
+        scores TEXT NOT NULL DEFAULT '{}',
+        verdict TEXT NOT NULL DEFAULT 'pending',
+        summary TEXT,
+        concern TEXT,
+        condition TEXT,
+        eval_model TEXT,
+        eval_duration_ms INTEGER,
+        eval_cost_usd REAL,
+        eval_metadata TEXT DEFAULT '{}',
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(item_id, persona_id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_persona_evals_item ON ax_persona_evals(item_id);
+
+      CREATE TABLE IF NOT EXISTS ax_team_reviews (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        org_id TEXT NOT NULL,
+        item_id TEXT NOT NULL REFERENCES biz_items(id) ON DELETE CASCADE,
+        reviewer_id TEXT NOT NULL,
+        reviewer_name TEXT NOT NULL DEFAULT '',
+        decision TEXT NOT NULL CHECK(decision IN ('Go', 'Hold', 'Drop')),
+        comment TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(item_id, reviewer_id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_atr_item ON ax_team_reviews(item_id);
+      CREATE INDEX IF NOT EXISTS idx_atr_org ON ax_team_reviews(org_id);
     `);
     this.db.prepare("INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)").run("org_test", "Test Org", "test");
   }
@@ -700,7 +752,12 @@ export class MockD1Database {
   }
 
   async batch(statements: MockD1PreparedStatement[]) {
-    return Promise.all(statements.map((s) => s.all()));
+    return Promise.all(statements.map((s) => {
+      const q = (s as any).query as string;
+      const upper = q.trimStart().toUpperCase();
+      if (upper.startsWith("SELECT")) return s.all();
+      return s.run();
+    }));
   }
 
   async exec(query: string) {

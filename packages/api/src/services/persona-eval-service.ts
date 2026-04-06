@@ -5,6 +5,12 @@ import { BIZ_PERSONAS } from "./biz-persona-prompts.js";
 import { DEMO_EVAL_DATA, getDemoFinalResult } from "./persona-eval-demo.js";
 import type { PersonaConfigInput } from "../schemas/persona-config.js";
 
+function generateId(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 export interface PersonaEvalRow {
   id: string;
   item_id: string;
@@ -38,6 +44,101 @@ export class PersonaEvalService {
     return result.results;
   }
 
+  /** 아이템 ID로 전체 평가 조회 (orgId 불필요) */
+  async getByItem(itemId: string): Promise<PersonaEvalRow[]> {
+    const result = await this.db
+      .prepare("SELECT * FROM ax_persona_evals WHERE item_id = ? ORDER BY persona_id")
+      .bind(itemId)
+      .all<PersonaEvalRow>();
+    return result.results;
+  }
+
+  /** 단일 평가 결과 저장 (upsert) */
+  async save(
+    itemId: string,
+    orgId: string,
+    data: {
+      personaId: string;
+      scores: Record<string, number>;
+      verdict: string;
+      summary: string;
+      concern?: string | null;
+      condition?: string | null;
+      evalModel?: string;
+      evalDurationMs?: number;
+      evalCostUsd?: number;
+    },
+  ): Promise<PersonaEvalRow> {
+    const id = generateId();
+    await this.db
+      .prepare(
+        `INSERT INTO ax_persona_evals (id, item_id, org_id, persona_id, scores, verdict, summary, concern, condition, eval_model, eval_duration_ms, eval_cost_usd)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ON CONFLICT(item_id, persona_id) DO UPDATE SET
+           scores = excluded.scores,
+           verdict = excluded.verdict,
+           summary = excluded.summary,
+           concern = excluded.concern,
+           condition = excluded.condition,
+           eval_model = excluded.eval_model,
+           eval_duration_ms = excluded.eval_duration_ms,
+           eval_cost_usd = excluded.eval_cost_usd`,
+      )
+      .bind(
+        id, itemId, orgId, data.personaId,
+        JSON.stringify(data.scores), data.verdict, data.summary,
+        data.concern ?? null, data.condition ?? null,
+        data.evalModel ?? null, data.evalDurationMs ?? null, data.evalCostUsd ?? null,
+      )
+      .run();
+
+    return (await this.db
+      .prepare("SELECT * FROM ax_persona_evals WHERE item_id = ? AND persona_id = ?")
+      .bind(itemId, data.personaId)
+      .first<PersonaEvalRow>())!;
+  }
+
+  /** 종합 판정 — 다수결 기반 */
+  async getOverallVerdict(itemId: string): Promise<{
+    verdict: string;
+    go: number;
+    conditional: number;
+    noGo: number;
+    avgScore: number;
+    totalEvals: number;
+  }> {
+    const evals = await this.getByItem(itemId);
+
+    if (evals.length === 0) {
+      return { verdict: "Conditional", go: 0, conditional: 0, noGo: 0, avgScore: 0, totalEvals: 0 };
+    }
+
+    const counts = { Go: 0, Conditional: 0, NoGo: 0 };
+    let scoreSum = 0;
+    let scoreCount = 0;
+
+    for (const e of evals) {
+      if (e.verdict in counts) counts[e.verdict as keyof typeof counts]++;
+      const scores = JSON.parse(e.scores) as Record<string, number>;
+      const vals = Object.values(scores);
+      scoreSum += vals.reduce((a, b) => a + b, 0);
+      scoreCount += vals.length;
+    }
+
+    let verdict = "Conditional";
+    if (counts.Go > counts.NoGo && counts.Go > counts.Conditional) verdict = "Go";
+    else if (counts.NoGo >= counts.Go && counts.NoGo > 0) verdict = "NoGo";
+
+    return {
+      verdict,
+      go: counts.Go,
+      conditional: counts.Conditional,
+      noGo: counts.NoGo,
+      avgScore: scoreCount > 0 ? Math.round((scoreSum / scoreCount) * 10) / 10 : 0,
+      totalEvals: evals.length,
+    };
+  }
+
   createEvalStream(
     itemId: string,
     orgId: string,
@@ -59,7 +160,7 @@ export class PersonaEvalService {
           const results: Array<{ personaId: string; scores: Record<string, number>; verdict: string; summary: string | null; concerns: string[]; index: number }> = [];
 
           for (let i = 0; i < configs.length; i++) {
-            const config = configs[i];
+            const config = configs[i]!;
             const persona = BIZ_PERSONAS.find((p) => p.id === config.personaId);
             const personaName = persona?.name ?? config.personaId;
 

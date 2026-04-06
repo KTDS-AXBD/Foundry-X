@@ -1,7 +1,8 @@
 /**
- * Sprint 156+157: F346+F349 — 발굴 완료 리포트 집계 + Executive Summary
+ * Sprint 154+156+157: F342+F346+F349 — 발굴 완료 리포트 CRUD + 집계 + Executive Summary
  */
 import type { DiscoveryReportResponse, ExecutiveSummaryData } from "@foundry-x/shared";
+import type { UpsertDiscoveryReportInput } from "../schemas/discovery-report-schema.js";
 
 interface StageRow {
   stage: string;
@@ -21,6 +22,14 @@ interface BizItemRow {
 
 interface ReportRow {
   id: string;
+  item_id: string;
+  org_id: string;
+  report_json: string;
+  overall_verdict: string | null;
+  team_decision: string | null;
+  shared_token: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 function generateId(): string {
@@ -45,6 +54,72 @@ const TOTAL_STAGES = 9; // 2-1 ~ 2-9
 export class DiscoveryReportService {
   constructor(private db: D1Database) {}
 
+  /** CRUD: 아이템 ID로 리포트 조회 */
+  async getByItem(itemId: string): Promise<ReportRow | null> {
+    return this.db
+      .prepare("SELECT * FROM ax_discovery_reports WHERE item_id = ?")
+      .bind(itemId)
+      .first<ReportRow>();
+  }
+
+  /** CRUD: 리포트 생성 또는 갱신 */
+  async upsert(itemId: string, orgId: string, data: UpsertDiscoveryReportInput): Promise<ReportRow> {
+    const existing = await this.getByItem(itemId);
+
+    if (existing) {
+      await this.db
+        .prepare(
+          `UPDATE ax_discovery_reports
+           SET report_json = ?, overall_verdict = ?, team_decision = ?, updated_at = datetime('now')
+           WHERE item_id = ?`,
+        )
+        .bind(JSON.stringify(data.reportJson), data.overallVerdict, data.teamDecision, itemId)
+        .run();
+    } else {
+      const id = generateId();
+      await this.db
+        .prepare(
+          `INSERT INTO ax_discovery_reports (id, item_id, org_id, report_json, overall_verdict, team_decision)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+        )
+        .bind(id, itemId, orgId, JSON.stringify(data.reportJson), data.overallVerdict, data.teamDecision)
+        .run();
+    }
+
+    return (await this.getByItem(itemId))!;
+  }
+
+  /** CRUD: 팀 결정 갱신 */
+  async setTeamDecision(itemId: string, decision: string): Promise<void> {
+    await this.db
+      .prepare("UPDATE ax_discovery_reports SET team_decision = ?, updated_at = datetime('now') WHERE item_id = ?")
+      .bind(decision, itemId)
+      .run();
+  }
+
+  /** CRUD: 공유 토큰 생성 */
+  async generateShareToken(itemId: string): Promise<string> {
+    const bytes = new Uint8Array(32);
+    crypto.getRandomValues(bytes);
+    const token = Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+
+    await this.db
+      .prepare("UPDATE ax_discovery_reports SET shared_token = ?, updated_at = datetime('now') WHERE item_id = ?")
+      .bind(token, itemId)
+      .run();
+
+    return token;
+  }
+
+  /** CRUD: 공유 토큰으로 리포트 조회 */
+  async getByShareToken(token: string): Promise<ReportRow | null> {
+    return this.db
+      .prepare("SELECT * FROM ax_discovery_reports WHERE shared_token = ?")
+      .bind(token)
+      .first<ReportRow>();
+  }
+
+  /** 집계: 스테이지/아티팩트 기반 리포트 생성 */
   async getReport(
     bizItemId: string,
     orgId: string,
@@ -113,7 +188,7 @@ export class DiscoveryReportService {
 
     // 4. 리포트 캐시 upsert
     const existing = await this.db
-      .prepare("SELECT id FROM ax_discovery_reports WHERE biz_item_id = ?")
+      .prepare("SELECT id FROM ax_discovery_reports WHERE item_id = ?")
       .bind(bizItemId)
       .first<ReportRow>();
 
@@ -124,14 +199,14 @@ export class DiscoveryReportService {
         .prepare(
           `UPDATE ax_discovery_reports
            SET report_json = ?, updated_at = datetime('now')
-           WHERE biz_item_id = ?`,
+           WHERE item_id = ?`,
         )
         .bind(JSON.stringify(tabs), bizItemId)
         .run();
     } else {
       await this.db
         .prepare(
-          `INSERT INTO ax_discovery_reports (id, biz_item_id, org_id, report_json)
+          `INSERT INTO ax_discovery_reports (id, item_id, org_id, report_json)
            VALUES (?, ?, ?, ?)`,
         )
         .bind(reportId, bizItemId, orgId, JSON.stringify(tabs))
