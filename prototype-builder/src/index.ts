@@ -137,8 +137,9 @@ async function main(): Promise<void> {
     res.end();
   });
 
-  server.listen(3001, () => {
-    console.log('[Builder] Health check on :3001/health');
+  const port = Number(process.env['PORT'] ?? 3001);
+  server.listen(port, () => {
+    console.log(`[Builder] Health check on :${port}/health`);
   });
 
   // 폴링 루프 시작
