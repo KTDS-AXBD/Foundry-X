@@ -121,11 +121,11 @@ test.describe("Discovery Detail Advanced (F316)", () => {
     await expect(page.getByText("AI 문서 자동화").first()).toBeVisible({ timeout: 10000 });
 
     // 산출물 섹션 헤딩
-    await expect(page.getByText("산출물")).toBeVisible();
+    await expect(page.getByText("산출물").first()).toBeVisible();
 
     // 산출물이 3건 렌더링됨 — stageId나 skillId 기반 텍스트 확인
     // ArtifactList 컴포넌트가 어떻게 렌더링하는지에 따라 검증
-    const artifactSection = page.locator("text=산출물").locator("..");
+    const artifactSection = page.getByText("산출물").first().locator("..");
     await expect(artifactSection).toBeVisible();
   });
 

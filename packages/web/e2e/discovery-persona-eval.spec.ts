@@ -57,10 +57,13 @@ const MOCK_SSE_EVENTS = [
 
 function setupMocks(page: import("@playwright/test").Page) {
   return Promise.all([
-    // Skip tours
+    // Skip tours + guide modals
     page.evaluate(() => {
       localStorage.setItem("fx-discovery-tour-completed", "true");
       localStorage.setItem("fx-tour-completed", "true");
+      localStorage.setItem("fx-guide-dismissed", "true");
+      localStorage.setItem("fx-onboarding-completed", "true");
+      localStorage.setItem("fx-process-guide-dismissed", "true");
     }),
     // Hide feedback widget
     page.addInitScript(() => {
@@ -99,15 +102,16 @@ test.describe("Persona Eval (F344+F345)", () => {
     // 페이지 제목
     await expect(page.getByText("AI 멀티 페르소나 평가")).toBeVisible({ timeout: 10000 });
 
-    // 8개 카드 렌더링 (grid-cols-4 → 8 buttons)
-    const cards = page.locator("button").filter({ hasText: /팀장|부장|본부장/ });
+    // 8개 카드 렌더링 (grid-cols-4 → 8 buttons) — 상세 패널 버튼 제외
+    const cardGrid = page.locator("[class*='grid-cols']").first();
+    const cards = cardGrid.locator("button").filter({ hasText: /팀장|부장|본부장/ });
     await expect(cards).toHaveCount(8, { timeout: 10000 });
 
-    // 특정 페르소나 이름 확인
-    await expect(page.getByText("전략기획팀장")).toBeVisible();
-    await expect(page.getByText("영업총괄부장")).toBeVisible();
-    await expect(page.getByText("AI기술본부장")).toBeVisible();
-    await expect(page.getByText("혁신추진팀장")).toBeVisible();
+    // 특정 페르소나 이름 확인 (.first() — 카드+상세 패널 중복 방지)
+    await expect(page.getByText("전략기획팀장").first()).toBeVisible();
+    await expect(page.getByText("영업총괄부장").first()).toBeVisible();
+    await expect(page.getByText("AI기술본부장").first()).toBeVisible();
+    await expect(page.getByText("혁신추진팀장").first()).toBeVisible();
   });
 
   test("WeightSliderPanel — 7축 슬라이더 렌더링", async ({
@@ -157,10 +161,10 @@ test.describe("Persona Eval (F344+F345)", () => {
 
     await expect(page.getByText("AI 멀티 페르소나 평가")).toBeVisible({ timeout: 10000 });
 
-    // 4개 탭 버튼 확인
+    // 4개 탭 버튼 확인 (exact: true — "다음: 브리핑 →" 등 CTA 중복 방지)
     const tabs = ["설정", "브리핑", "평가", "결과"];
     for (const tab of tabs) {
-      await expect(page.getByRole("button", { name: tab })).toBeVisible();
+      await expect(page.getByRole("button", { name: tab, exact: true })).toBeVisible();
     }
 
     // 설정 탭 → 브리핑 탭 전환
@@ -208,8 +212,8 @@ test.describe("Persona Eval (F344+F345)", () => {
 
     await expect(page.getByText("AI 멀티 페르소나 평가")).toBeVisible({ timeout: 10000 });
 
-    // 영업총괄부장 카드 클릭
-    const salesCard = page.locator("button").filter({ hasText: "영업총괄부장" });
+    // 영업총괄부장 카드 클릭 (strict mode 방지 — .first())
+    const salesCard = page.locator("button").filter({ hasText: "영업총괄부장" }).first();
     await salesCard.click();
 
     // 선택된 카드에 ring 스타일이 적용되는지 확인 (border-[#8b5cf6])
