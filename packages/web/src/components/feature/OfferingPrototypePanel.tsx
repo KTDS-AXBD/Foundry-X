@@ -55,7 +55,7 @@ export function OfferingPrototypePanel({ offeringId }: OfferingPrototypePanelPro
       const data = await fetchApi<PrototypeListResponse>(
         `/offerings/${offeringId}/prototypes`,
       );
-      setPrototypes(data.items);
+      setPrototypes(data.items ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "프로토타입 목록을 불러오지 못했어요");
     } finally {
