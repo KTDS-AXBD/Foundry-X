@@ -1,0 +1,503 @@
+{
+  "generated": "2026-04-06T21:38:11.513Z",
+  "totalItems": 82,
+  "byType": {
+    "flaw": 26,
+    "gap": 8,
+    "risk": 45
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**문제 정의 → 해결책 → 성공기준**의 플로우가 전반적으로 논리적이며, 문제(모놀리스의 복잡성, 서비스 경계 불명확, 확장 불가 등)를 잘 진단했고, 단계적 MSA 전환(모듈화→분리→이관) 및 harness-kit 기반 표준화로 해법을 제시하고 있습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**이관과 분리의 정의, 단계별 전략, 롤백/운영 계획** 등도 논리적으로 잘 이어지며, 이행 단계에서의 위험 관리까지 언급되어 있습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**서비스 경계와 실제 종속성 해소의 구체적 방법**이 다소 추상적입니다. 예: “분리 후에도 종속성이 남아있음”을 해소하기 위한 기술적/조직적 방법(예: 코드 오너십, 레거시 호출 차단 방법, 공통 컴포넌트 분리 정책, 실제 통신 인터페이스 설계 등)이 좀 더 구체적으로 명시되면 좋겠습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**데이터베이스 분리 전략**이 “논리적 분리”로만 서술되어 있는데, eventual consistency 시 발생할 수 있는 실무 이슈(정합성, 딜레이, 장애 발생 시 복구 등)에 대한 시나리오가 좀 더 구체적으로 필요합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**범위**는 모놀리스의 단계적 분리(모듈화 → harness-kit → 이관), 업무별 분리, DB 논리적 분리 등으로 적절히 잘게 쪼개져 있습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**일정/인력**: 1인 개발 + AI Agent 기반, 8~10 Sprint(2~2.5개월) 내 완료 목표.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**병렬 개발/리뷰/테스트** 리소스 부족(특히 MSA로 전환할수록 리스크가 기하급수적으로 증가)",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**운영 이슈 발생 시 장애 복구 리소스** 부족",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**harness-kit의 품질/호환성/문서화**에 충분한 검증·피드백 시간이 부족",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**실제 모듈 분리 후, 신규 서비스로의 “이관” 작업**(DB 마이그레이션, 신규 서비스 운영, 트래픽 전환 등)은 본 PRD 범위 외로 빠졌으나, 실질적으로 MSA 성공의 핵심 관건임",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**인력/리소스 증원 또는 외부 지원/컨설팅 pool 준비**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**harness-kit의 핵심 범위/품질/문서화에 대해 상세한 Definition of Done(DOD) 및 코드 리뷰/피드백 구조 마련**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**테스트/운영/배포/롤백 체계에 대한 상세한 체크리스트 및 자동화 스크립트 구비**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**서비스 경계/데이터 경계/계약서(REST/이벤트) 명세, 실서비스 마이그레이션 dry-run 계획 준비**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**운영/지원/교육/문서화 계획 구체화**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**조건부(Conditional) 착수**로, 위의 5가지 조건(인력/품질/운영/데이터/교육) 충족을 선결 과제로 강력히 권고합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**전사 테스트 전략과 품질 게이트**: E2E/단위 테스트 자동화, 커버리지 기준(90% 이상)을 명시하였으나, “테스트 실패 시 장애 대응 체계”, “테스트 데이터/시나리오 관리”, “성능/부하 테스트”, “테스트 환경 자동화” 등 실무적으로 필수인 품질 관리 정책이 부족합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영/관제 체계**: Sentry 등 언급은 있지만, 실제 장애 발생 시 대응 매뉴얼, 운영 대시보드, 알림 체계(슬랙/이메일/온콜), 운영팀/개발팀간 장애 escalation flow 등 운영 체계의 컨크리트한 정의가 미흡합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**서비스간 API/이벤트 인터페이스 표준/버전 관리**: harness-kit 내 이벤트/REST 계약이 언급됐으나, 실제 “계약서 관리/변경 관리/하위 호환성/배포 순서 관리” 등 MSA 환경에서 실무적으로 반드시 필요한 계약 관리 체계가 빠져있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**보안/컴플라이언스 추가 이슈**: JWT/RBAC 언급 외, 서비스 분리 시 각 서비스별 secrets 관리, 외부 연동 인증정보 분리, 권한 분리, 보안 감사 로그, 취약점 진단/대응 등 추가적인 보안 이슈 체크리스트가 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실제 “이관 이후” 운영계획**: 분리 → 이관 → 실제 독립 서비스로의 전환 이후의 운영/지원 계획(운영 조직, 서비스 책임자, 배포/장애 지원 체계 등)이 없습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**문제 정의 → 해결책 → 성공기준**의 플로우가 전반적으로 논리적이며, 문제(모놀리스의 복잡성, 서비스 경계 불명확, 확장 불가 등)를 잘 진단했고, 단계적 MSA 전환(모듈화→분리→이관) 및 harness-kit 기반 표준화로 해법을 제시하고 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**이관과 분리의 정의, 단계별 전략, 롤백/운영 계획** 등도 논리적으로 잘 이어지며, 이행 단계에서의 위험 관리까지 언급되어 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**서비스 경계와 실제 종속성 해소의 구체적 방법**이 다소 추상적입니다. 예: “분리 후에도 종속성이 남아있음”을 해소하기 위한 기술적/조직적 방법(예: 코드 오너십, 레거시 호출 차단 방법, 공통 컴포넌트 분리 정책, 실제 통신 인터페이스 설계 등)이 좀 더 구체적으로 명시되면 좋겠습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**데이터베이스 분리 전략**이 “논리적 분리”로만 서술되어 있는데, eventual consistency 시 발생할 수 있는 실무 이슈(정합성, 딜레이, 장애 발생 시 복구 등)에 대한 시나리오가 좀 더 구체적으로 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**범위**는 모놀리스의 단계적 분리(모듈화 → harness-kit → 이관), 업무별 분리, DB 논리적 분리 등으로 적절히 잘게 쪼개져 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**일정/인력**: 1인 개발 + AI Agent 기반, 8~10 Sprint(2~2.5개월) 내 완료 목표.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**병렬 개발/리뷰/테스트** 리소스 부족(특히 MSA로 전환할수록 리스크가 기하급수적으로 증가)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영 이슈 발생 시 장애 복구 리소스** 부족",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**harness-kit의 품질/호환성/문서화**에 충분한 검증·피드백 시간이 부족",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 모듈 분리 후, 신규 서비스로의 “이관” 작업**(DB 마이그레이션, 신규 서비스 운영, 트래픽 전환 등)은 본 PRD 범위 외로 빠졌으나, 실질적으로 MSA 성공의 핵심 관건임",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**전사 테스트 전략과 품질 게이트**: E2E/단위 테스트 자동화, 커버리지 기준(90% 이상)을 명시하였으나, “테스트 실패 시 장애 대응 체계”, “테스트 데이터/시나리오 관리”, “성능/부하 테스트”, “테스트 환경 자동화” 등 실무적으로 필수인 품질 관리 정책이 부족합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/관제 체계**: Sentry 등 언급은 있지만, 실제 장애 발생 시 대응 매뉴얼, 운영 대시보드, 알림 체계(슬랙/이메일/온콜), 운영팀/개발팀간 장애 escalation flow 등 운영 체계의 컨크리트한 정의가 미흡합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**서비스간 API/이벤트 인터페이스 표준/버전 관리**: harness-kit 내 이벤트/REST 계약이 언급됐으나, 실제 “계약서 관리/변경 관리/하위 호환성/배포 순서 관리” 등 MSA 환경에서 실무적으로 반드시 필요한 계약 관리 체계가 빠져있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**보안/컴플라이언스 추가 이슈**: JWT/RBAC 언급 외, 서비스 분리 시 각 서비스별 secrets 관리, 외부 연동 인증정보 분리, 권한 분리, 보안 감사 로그, 취약점 진단/대응 등 추가적인 보안 이슈 체크리스트가 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 “이관 이후” 운영계획**: 분리 → 이관 → 실제 독립 서비스로의 전환 이후의 운영/지원 계획(운영 조직, 서비스 책임자, 배포/장애 지원 체계 등)이 없습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 인력/일정 한계로 인한 품질 저하**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**서비스 경계/DB 경계 미흡으로 인한 분리 실패**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트/품질 게이트 미비로 인한 장애**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/배포/롤백 체계의 불완전성**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**문서화/커뮤니케이션 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**인력/리소스 증원 또는 외부 지원/컨설팅 pool 준비**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**harness-kit의 핵심 범위/품질/문서화에 대해 상세한 Definition of Done(DOD) 및 코드 리뷰/피드백 구조 마련**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트/운영/배포/롤백 체계에 대한 상세한 체크리스트 및 자동화 스크립트 구비**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**서비스 경계/데이터 경계/계약서(REST/이벤트) 명세, 실서비스 마이그레이션 dry-run 계획 준비**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/지원/교육/문서화 계획 구체화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**조건부(Conditional) 착수**로, 위의 5가지 조건(인력/품질/운영/데이터/교육) 충족을 선결 과제로 강력히 권고합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "flaw",
+      "source": "Gemini",
+      "text": "**인력 및 역량 재평가:**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "Gemini",
+      "text": "**현실적인 일정 재조정:**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "Gemini",
+      "text": "**D1 비용 모델 및 생산 환경 고려:**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "Gemini",
+      "text": "**포괄적인 Observability 및 보안 전략 강화:**",
+      "severity": "high"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "사실 확인\n\nPRD에는 몇 가지 중요한 가정과 수치가 포함되어 있으며, 특히 \"AI Agent 기반 1인 개발\" 모델과 관련된 부분은 검증이 필요합니다.\n\n*   **\"AI Agent 기반 1인 개발\"로 8~10 Sprint 내 완성 목표:**\n    *   **검증 필요:** MSA 전환은 아키텍처 설계, 기존 코드베이스 분석, 리팩토링, 데이터 마이그레",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**인력 및 역량 재평가:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**현실적인 일정 재조정:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**D1 비용 모델 및 생산 환경 고려:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**포괄적인 Observability 및 보안 전략 강화:**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**Cloudflare Workers의 분산 시스템 한계**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**데이터 분리 전략의 미흡함**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**이벤트 시스템 설계 부재**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**데이터 일관성 위험 (위험도: 매우 높음)**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**분산 트랜잭션 관리 실패 (위험도: 높음)**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**운영 복잡도 폭발 (위험도: 높음)**",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**데이터 일관성 위험 (위험도: 매우 높음)**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**분산 트랜잭션 관리 실패 (위험도: 높음)**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**운영 복잡도 폭발 (위험도: 높음)**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**서비스 경계 모호성**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**의존성 관리 리스크**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**모니터링/운영 아키텍처 부재**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Bounded Context 재정의 필요**: DDD 관점에서 서비스 경계 재검토",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**이벤트 기반 아키텍처 명확화**: CQRS/Event Sourcing 패턴 고려",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**공유 라이브러리 최소화**: harness-kit을 인프라 레이어만 담당하도록 축소",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**데이터 일관성 위험 (위험도: 매우 높음)**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**분산 트랜잭션 관리 실패 (위험도: 높음)**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**운영 복잡도 폭발 (위험도: 높음)**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**데이터 분리 전략 재설계**: Shared DB 접근법 폐기, 실제 DB 분리 로드맵 수립",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**이벤트 시스템 상세 설계**: Cloudflare Queue 기반 이벤트 버스 상세 스펙 확정",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**운영 체계 선구축**: 분산 추적, 중앙 집중식 로깅, 모니터링 대시보드 구축",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**팀 역량 강화**: 최소 1명의 분산 시스템 경험자 추가 또는 컨설팅 도입",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**단계적 접근 재정의**: 8-10 Sprint는 비현실적, 최소 6개월 이상의 로드맵 수립",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}
