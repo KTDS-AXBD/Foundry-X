@@ -1,0 +1,29 @@
+<!-- Component: scenario-card
+     Usage: §03-2 시나리오/Use Case — 시나리오 카드
+     Variables: {{num}}, {{title}}, {{badge_text}}, {{badge_class}}, {{question}}, {{content}}, {{primary?}}
+-->
+<style>
+  .scenario-card {
+    background: var(--white); border: 1px solid var(--gray-200); border-radius: 20px;
+    padding: 48px; margin-bottom: 32px; transition: box-shadow 0.3s;
+  }
+  .scenario-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.06); }
+  .scenario-card.primary { border-color: var(--black); border-width: 2px; }
+  .scenario-num {
+    font-size: 12px; font-weight: 700; color: var(--gray-400);
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .scenario-title { font-size: 22px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.02em; }
+  .scenario-q {
+    font-size: 17px; color: var(--gray-700); margin-bottom: 32px; padding: 20px 24px;
+    background: var(--gray-50); border-radius: var(--card-radius-sm);
+    border-left: 3px solid var(--black); line-height: 1.7;
+  }
+</style>
+
+<div class="scenario-card {{#primary}}primary{{/primary}} fade-in">
+  <div class="scenario-num">{{num}} <span class="badge {{badge_class}}">{{badge_text}}</span></div>
+  <h3 class="scenario-title">{{title}}</h3>
+  <div class="scenario-q">{{question}}</div>
+  {{content}}
+</div>

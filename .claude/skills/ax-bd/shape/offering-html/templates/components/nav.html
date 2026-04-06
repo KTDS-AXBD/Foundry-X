@@ -1,0 +1,32 @@
+<!-- Component: nav
+     Usage: 전체 페이지 상단 고정 네비게이션
+     Variables: {{brand}}, {{brand_sub}}, {{nav_items[]}}
+-->
+<style>
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 40px;
+    height: var(--nav-height);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  nav .brand { font-weight: 700; font-size: 15px; letter-spacing: -0.02em; color: var(--black); }
+  nav .brand span { color: var(--gray-400); font-weight: 400; margin-left: 8px; font-size: 13px; }
+  nav ul { list-style: none; display: flex; gap: 28px; }
+  nav ul li a {
+    text-decoration: none; color: var(--gray-600); font-size: 13px; font-weight: 500;
+    transition: color 0.2s;
+  }
+  nav ul li a:hover { color: var(--black); }
+</style>
+
+<nav>
+  <div class="brand">{{brand}}<span>{{brand_sub}}</span></div>
+  <ul>
+    <!-- {{#nav_items}} -->
+    <li><a href="#{{anchor}}">{{label}}</a></li>
+    <!-- {{/nav_items}} -->
+  </ul>
+</nav>

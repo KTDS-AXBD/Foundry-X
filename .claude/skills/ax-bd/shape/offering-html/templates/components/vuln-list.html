@@ -1,0 +1,64 @@
+<!-- Component: vuln-list
+     Usage: §04-5 사업성 교차검증 — 리스크/취약점 목록 (추진론/반대론/판정)
+     Variables: {{questions[]}}: {number, question, type, pro, con, verdict, verdict_class}
+-->
+<style>
+  .vuln-card {
+    border: 1px solid var(--gray-200); border-radius: 20px; padding: 48px;
+    margin-bottom: 32px; background: var(--white);
+  }
+  .vuln-header {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 24px;
+  }
+  .vuln-num {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--black); color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; flex-shrink: 0;
+  }
+  .vuln-title { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+  .vuln-type {
+    font-size: 11px; font-weight: 600; color: var(--gray-400);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .vuln-body { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+  .vuln-col { padding: 24px; border-radius: var(--card-radius-sm); }
+  .vuln-col.pro { background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .vuln-col.con { background: #fef2f2; border: 1px solid #fecaca; }
+  .vuln-col.verdict { background: var(--gray-50); border: 1px solid var(--gray-200); }
+  .vuln-col h4 {
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .vuln-col.pro h4 { color: var(--green); }
+  .vuln-col.con h4 { color: var(--red); }
+  .vuln-col.verdict h4 { color: var(--black); }
+  .vuln-col p { font-size: 14px; line-height: 1.7; color: var(--gray-700); }
+
+  @media (max-width: 900px) {
+    .vuln-body { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="vuln-card fade-in">
+  <div class="vuln-header">
+    <div class="vuln-num">{{number}}</div>
+    <div>
+      <div class="vuln-type">{{type}}</div>
+      <div class="vuln-title">{{question}}</div>
+    </div>
+  </div>
+  <div class="vuln-body">
+    <div class="vuln-col pro">
+      <h4>추진론</h4>
+      <p>{{pro}}</p>
+    </div>
+    <div class="vuln-col con">
+      <h4>반대론</h4>
+      <p>{{con}}</p>
+    </div>
+    <div class="vuln-col verdict">
+      <h4>판정</h4>
+      <p><span class="badge {{verdict_class}}">{{verdict}}</span></p>
+    </div>
+  </div>
+</div>

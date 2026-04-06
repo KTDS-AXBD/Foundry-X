@@ -1,0 +1,17 @@
+<!-- Component: silo-grid
+     Usage: §03-1 Before 상태 — 사일로 박스 (현재 분산 상태)
+     Variables: {{silos[]}}: {label}
+-->
+<style>
+  .silo-boxes { display: flex; flex-wrap: wrap; gap: 10px; }
+  .silo-box {
+    padding: 10px 16px; background: var(--gray-100); border-radius: 8px; font-size: 13px;
+    font-weight: 600; color: var(--gray-600); border: 1px solid var(--gray-200);
+  }
+</style>
+
+<div class="silo-boxes">
+  <!-- {{#silos}} -->
+  <div class="silo-box">{{label}}</div>
+  <!-- {{/silos}} -->
+</div>

@@ -1,0 +1,27 @@
+<!-- Component: flow-diagram
+     Usage: §03-2 시나리오 데이터 흐름 — 노드-화살표 다이어그램
+     Variables: {{flows[]}}: {nodes[]: {label, class}}
+-->
+<style>
+  .flow-diagram { margin: 32px 0; overflow-x: auto; }
+  .flow-row { display: flex; align-items: center; gap: 0; margin-bottom: 12px; flex-wrap: nowrap; }
+  .flow-node {
+    padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .flow-node.source { background: var(--black); color: var(--white); }
+  .flow-node.mid { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200); }
+  .flow-node.end { background: var(--white); color: var(--black); border: 2px solid var(--black); }
+  .flow-arrow { width: 32px; text-align: center; color: var(--gray-400); font-size: 14px; flex-shrink: 0; }
+</style>
+
+<div class="flow-diagram fade-in">
+  <!-- {{#flows}} -->
+  <div class="flow-row">
+    <!-- {{#nodes}} -->
+    <div class="flow-node {{class}}">{{label}}</div>
+    <!-- {{^last}} --><div class="flow-arrow">→</div><!-- {{/last}} -->
+    <!-- {{/nodes}} -->
+  </div>
+  <!-- {{/flows}} -->
+</div>

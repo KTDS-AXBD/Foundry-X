@@ -1,0 +1,27 @@
+<!-- Component: cta
+     Usage: §01 추진목적, §04-6 기대효과 — 블랙 박스 CTA
+     Variables: {{headline}}, {{keywords[]}}: {label}
+-->
+<style>
+  .cta-box {
+    margin-top: 48px; padding: 48px; background: var(--black); border-radius: var(--card-radius);
+    color: var(--white); text-align: center;
+  }
+  .cta-box .cta-headline {
+    font-size: 20px; font-weight: 700; line-height: 1.5; margin-bottom: 24px;
+  }
+  .cta-keywords { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+  .cta-keyword {
+    padding: 10px 24px; border: 1px solid rgba(255,255,255,0.3); border-radius: 100px;
+    font-size: 14px; font-weight: 600; color: var(--white);
+  }
+</style>
+
+<div class="cta-box fade-in">
+  <div class="cta-headline">{{headline}}</div>
+  <div class="cta-keywords">
+    <!-- {{#keywords}} -->
+    <span class="cta-keyword">{{label}}</span>
+    <!-- {{/keywords}} -->
+  </div>
+</div>

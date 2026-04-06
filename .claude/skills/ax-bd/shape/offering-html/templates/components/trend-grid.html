@@ -1,0 +1,31 @@
+<!-- Component: trend-grid
+     Usage: §02-6 글로벌·국내 동향 — 트렌드/역량 카드 (3~4열)
+     Variables: {{columns}}, {{cards[]}}: {title, description, badge?, badge_class?}
+-->
+<style>
+  .trend-grid {
+    display: grid; grid-template-columns: repeat(var(--cols, 3), 1fr); gap: 20px; margin-top: 48px;
+  }
+  .trend-card {
+    padding: 28px; border-radius: var(--card-radius); border: 1px solid var(--gray-200);
+    background: var(--white);
+  }
+  .trend-card h4 {
+    font-size: 15px; font-weight: 700; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .trend-card p { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+
+  @media (max-width: 900px) {
+    .trend-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="trend-grid fade-in" style="--cols: {{columns}}">
+  <!-- {{#cards}} -->
+  <div class="trend-card">
+    <h4>{{title}}<!-- {{#badge}} --> <span class="badge {{badge_class}}">{{badge}}</span><!-- {{/badge}} --></h4>
+    <p>{{description}}</p>
+  </div>
+  <!-- {{/cards}} -->
+</div>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{title}} | KT DS</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+<style>
+  /* ===== RESET & ROOT ===== */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    /* Color: Text */
+    --black: #111;
+    --gray-900: #222;
+    --gray-700: #444;
+    --gray-600: #666;
+    --gray-400: #999;
+    --gray-300: #ccc;
+    --gray-200: #e5e5e5;
+    --gray-100: #f0f0f0;
+    --gray-50: #f8f9fa;
+    --white: #fff;
+
+    /* Color: Data Visualization Only */
+    --red: #dc2626;
+    --orange: #ea580c;
+    --green: #16a34a;
+    --amber: #d97706;
+
+    /* Layout */
+    --max-width: 1200px;
+    --nav-height: 56px;
+    --card-radius: 16px;
+    --card-radius-sm: 12px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    color: var(--black);
+    background: var(--white);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== TYPOGRAPHY ===== */
+  .section-label {
+    font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--gray-400); margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: 36px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.3;
+    margin-bottom: 20px; color: var(--black);
+  }
+  .section-sub {
+    font-size: 17px; color: var(--gray-600); line-height: 1.7; max-width: 680px;
+  }
+
+  /* ===== LAYOUT ===== */
+  section {
+    padding: 120px 40px 80px;
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+  section.full-width {
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* ===== FADE-IN ANIMATION ===== */
+  .fade-in {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ===== COMMON CARD ===== */
+  .card {
+    padding: 28px 24px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--card-radius);
+    background: var(--white);
+  }
+  .card.highlight {
+    border-color: var(--black);
+    border-width: 2px;
+  }
+
+  /* ===== TABLE ===== */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+  }
+  .compare-table th, .compare-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-200);
+    font-size: 14px;
+  }
+  .compare-table th {
+    font-weight: 600;
+    color: var(--gray-600);
+    background: var(--gray-50);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ===== BADGE ===== */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 6px;
+  }
+  .badge.green { background: #f0fdf4; color: var(--green); }
+  .badge.red { background: #fef2f2; color: var(--red); }
+  .badge.orange { background: #fff7ed; color: var(--orange); }
+  .badge.amber { background: #fffbeb; color: var(--amber); }
+  .badge.black { background: var(--black); color: var(--white); }
+  .badge.gray { background: var(--gray-100); color: var(--gray-600); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    section { padding: 80px 20px 60px; }
+    .section-title { font-size: 28px; }
+    nav ul { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COMPONENT: nav -->
+<!-- COMPONENT: hero -->
+<!-- COMPONENT: sections (조합) -->
+<!-- COMPONENT: footer (선택) -->
+
+<script>
+// IntersectionObserver — 스크롤 시 fade-in 애니메이션
+document.addEventListener('DOMContentLoaded', () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+});
+</script>
+</body>
+</html>

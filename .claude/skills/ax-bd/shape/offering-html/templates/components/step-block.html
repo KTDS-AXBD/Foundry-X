@@ -1,0 +1,41 @@
+<!-- Component: step-block
+     Usage: §04-1 데이터 확보, 처리 과정 — 가로 흐름 단계
+     Variables: {{steps[]}}: {number, title, description}
+-->
+<style>
+  .step-blocks {
+    display: flex; gap: 16px; margin-top: 48px; overflow-x: auto;
+  }
+  .step-block {
+    flex: 1; min-width: 180px; padding: 24px; border-radius: var(--card-radius);
+    border: 1px solid var(--gray-200); background: var(--white);
+    position: relative;
+  }
+  .step-block .step-num {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--black); color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; margin-bottom: 12px;
+  }
+  .step-block h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+  .step-block p { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+  .step-block::after {
+    content: '→'; position: absolute; right: -14px; top: 50%;
+    transform: translateY(-50%); color: var(--gray-300); font-size: 16px;
+  }
+  .step-block:last-child::after { content: none; }
+
+  @media (max-width: 900px) {
+    .step-blocks { flex-direction: column; }
+    .step-block::after { content: '↓'; right: auto; bottom: -14px; top: auto; left: 50%; transform: translateX(-50%); }
+  }
+</style>
+
+<div class="step-blocks fade-in">
+  <!-- {{#steps}} -->
+  <div class="step-block">
+    <div class="step-num">{{number}}</div>
+    <h4>{{title}}</h4>
+    <p>{{description}}</p>
+  </div>
+  <!-- {{/steps}} -->
+</div>
