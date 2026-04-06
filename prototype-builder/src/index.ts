@@ -40,11 +40,13 @@ async function processJob(
     const t = transition('queued', 'building');
     if (!t.success) return;
     await updatePrototypeStatus(proto.id, { status: 'building' }, config);
+    console.log(`[Builder] Step 1: Status → building`);
 
     // 2. 템플릿 복사
     await copyTemplate(TEMPLATE_DIR, workDir);
+    console.log(`[Builder] Step 2: Template copied to ${workDir}`);
 
-    // 3. O-G-D 루프 실행
+    // 3. O-G-D 루프 실행 (빌드 검증 포함)
     const job: PrototypeJob = {
       id: proto.id,
       projectId: proto.projectId,
@@ -60,24 +62,36 @@ async function processJob(
       qualityThreshold: config.qualityThreshold,
       costTracker,
     });
+    console.log(`[Builder] Step 3: O-G-D done — score=${result.score}, rounds=${result.rounds}`);
 
-    // 4. 빌드
-    const buildResult = await runBuild(workDir);
-    if (!buildResult.success || !(await verifyBuildOutput(workDir))) {
-      await updatePrototypeStatus(proto.id, {
-        status: 'failed',
-        errorMessage: `Build failed: ${buildResult.output.slice(0, 500)}`,
-        buildLog: buildResult.output,
-      }, config);
-      return;
+    // 4. 최종 빌드 확인 (O-G-D에서 이미 빌드 성공했을 수 있음)
+    const hasOutput = await verifyBuildOutput(workDir);
+    let buildLog = '';
+
+    if (!hasOutput) {
+      // O-G-D에서 빌드 미통과 — 한번 더 시도
+      const buildResult = await runBuild(workDir);
+      buildLog = buildResult.output;
+      if (!buildResult.success || !(await verifyBuildOutput(workDir))) {
+        console.log(`[Builder] Step 4: Build FAILED`);
+        await updatePrototypeStatus(proto.id, {
+          status: 'failed',
+          errorMessage: `Build failed: ${buildResult.output.slice(0, 500)}`,
+          buildLog: buildResult.output,
+        }, config);
+        return;
+      }
     }
+    console.log(`[Builder] Step 4: Build verified`);
 
     // 5. deploying 상태 전환
     await updatePrototypeStatus(proto.id, { status: 'deploying' }, config);
+    console.log(`[Builder] Step 5: Status → deploying`);
 
     // 6. Pages 배포
     const projectName = toProjectName(proto.name);
     const deploy = await deployToPages(workDir, projectName, config);
+    console.log(`[Builder] Step 6: Deployed to ${deploy.url}`);
 
     // 7. live 상태 전환 + 결과 기록
     await updatePrototypeStatus(proto.id, {
@@ -85,8 +99,9 @@ async function processJob(
       pagesProject: deploy.projectName,
       pagesUrl: deploy.url,
       costUsd: result.totalCost,
-      buildLog: buildResult.output,
+      buildLog,
     }, config);
+    console.log(`[Builder] Step 7: Status → live ✅`);
 
     // 8. Slack 알림
     const message = buildCompletionMessage({
@@ -100,6 +115,7 @@ async function processJob(
     await sendSlackNotification(message, config);
 
   } catch (err) {
+    console.error(`[Builder] Job failed:`, err);
     await updatePrototypeStatus(proto.id, {
       status: 'failed',
       errorMessage: String(err),

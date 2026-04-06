@@ -111,6 +111,7 @@ export async function runOgdLoop(
 
   for (let round = 0; round < maxRounds; round++) {
     const updatedJob: PrototypeJob = { ...job, round };
+    console.log(`[OGD] Round ${round + 1}/${maxRounds} — ${job.name}`);
 
     // 1. Generator: PRD + 이전 feedback → 코드 생성
     const generated = await executeWithFallback(
@@ -120,11 +121,35 @@ export async function runOgdLoop(
     );
 
     if (!generated.success) {
+      console.log(`[OGD] Generator failed: ${generated.error}`);
       continue; // 생성 실패 → 다음 Round 시도
     }
 
-    // 2. Discriminator: 생성물 평가 (현재는 스캐폴딩 — 실제 구현은 Sprint 160)
-    const evaluation = parseEvaluation(''); // placeholder — Sprint 160 F355에서 구현
+    console.log(`[OGD] Generator succeeded (level: ${generated.level})`);
+
+    // 2. Discriminator: 빌드 성공 여부 + 파일 수로 판정 (간이 평가)
+    const buildCheck = await runBuild(job.workDir);
+    let evaluation: OgdEvaluation;
+
+    if (buildCheck.success) {
+      // 빌드 성공 → 0.9점 (qualityThreshold 이상)
+      evaluation = {
+        qualityScore: 0.9,
+        feedback: 'Build succeeded',
+        tokensUsed: { input: 0, output: 0 },
+        pass: true,
+      };
+      console.log(`[OGD] Build check: PASS (0.9)`);
+    } else {
+      // 빌드 실패 → 0.4점, 에러를 피드백으로 전달
+      evaluation = {
+        qualityScore: 0.4,
+        feedback: `Build failed:\n${buildCheck.output.slice(0, 1000)}`,
+        tokensUsed: { input: 0, output: 0 },
+        pass: false,
+      };
+      console.log(`[OGD] Build check: FAIL (0.4)`);
+    }
 
     // 3. 비용 추적
     if (costTracker) {

@@ -65,7 +65,7 @@ export async function runCliGenerator(
   options: { cliPath?: string; timeoutMs?: number } = {},
 ): Promise<{ stdout: string; stderr: string; exitCode: number }> {
   const cliPath = options.cliPath ?? 'claude';
-  const timeoutMs = options.timeoutMs ?? 10 * 60 * 1000; // 10분
+  const timeoutMs = options.timeoutMs ?? 30 * 1000; // 30초 (Docker에서 CLI hang 방지)
 
   const args = buildCliArgs(job, round);
 
