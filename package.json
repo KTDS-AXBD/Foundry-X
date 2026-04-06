@@ -4,6 +4,8 @@
   "packageManager": "pnpm@9.15.0",
   "scripts": {
     "build": "turbo build",
+    "build:builder": "pnpm --filter @foundry-x/shared build && pnpm --filter @foundry-x/prototype-builder build",
+    "start": "node prototype-builder/dist/index.js",
     "test": "turbo test",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck"
