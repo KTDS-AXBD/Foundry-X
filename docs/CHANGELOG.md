@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #212 (2026-04-06)
+
+**Daily Check + 콘텐츠 동기화 (Phase 13→17 drift 해소)**:
+- ✅ daily-check full: 전 항목 OK (node 22, pnpm 9.15, typecheck 0 errors)
+- ✅ SPEC.md services 수치 보정 (237→238)
+- ✅ README/hero.md/landing.tsx/footer.tsx Phase 13→17, Sprint 147→164 동기화
+- ✅ CLAUDE.md routes/services/schemas 수치 갱신 (90→107, 208→238, 105→122)
+
+**검증 결과**: typecheck 6/6 pass, git clean
+
+---
+
 ### 세션 #210b (2026-04-06)
 
 **Sprint 161~164 검증 + E2E 대규모 안정화 (26 fail → 2 flaky)**:
