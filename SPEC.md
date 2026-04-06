@@ -6,7 +6,7 @@ status: Active
 category: SPEC
 system-version: Sprint 148
 created: 2026-03-16
-updated: 2026-04-06
+updated: 2026-04-07
 author: Sinclair Seo
 ---
 
@@ -220,7 +220,7 @@ Foundry-X CLI — 사람과 AI 에이전트가 동등한 팀원으로 협업하�
 > ls packages/api/src/db/migrations/*.sql | sort | tail -1  # D1 latest
 > turbo test --output-logs=errors-only    # 테스트 수 (전체 실행)
 > ```
-> **마지막 실측** (Sprint 164, 2026-04-06): ~107 routes, ~237 services, ~122 schemas, D1 0109, tests ~3155 (9 fail feedback-queue 기존)
+> **마지막 실측** (Sprint 178, 2026-04-07): ~115 routes, ~249 services, ~131 schemas, D1 0112, tests ~3155 (E2E 263)
 
 ## §3 마일스톤
 
