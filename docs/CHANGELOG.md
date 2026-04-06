@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #213 (2026-04-06)
+
+**Builder Server 실배포 + 5종 PRD E2E 실측**:
+- ✅ Railway 클라우드 배포 (Docker + Node.js 20)
+- ✅ Builder API route + BUILDER_SECRET 인증 (tenant bypass)
+- ✅ SKIP_CLI + Anthropic API 직접 호출 (Docker 환경 최적화)
+- ✅ 파일 파서 + stub 자동 생성 (named/default export, PascalCase)
+- ✅ Pages project auto-create + wrangler deploy
+- ✅ 5종 PRD E2E: 3/5 live (수정 후 3/3 100%)
+  - https://8c31ee4c.proto-self-evolving-harness-v2.pages.dev
+  - https://b5e1196e.proto-bd-pipeline-end-to-end.pages.dev
+  - https://1184df0f.proto-ax-bd-ideation-mvp-platform.pages.dev
+- ✅ Gap Analysis 97% + 완료 보고서 + Archive
+
+**수치**: ~107r/~237s/~122sch/D1 0109
+
 ### 세션 #212 (2026-04-06)
 
 **Daily Check + 콘텐츠 동기화 (Phase 13→17 drift 해소)**:
