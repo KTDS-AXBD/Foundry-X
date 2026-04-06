@@ -134,6 +134,9 @@ import { prototypeJobsRoute } from "./routes/prototype-jobs.js";
 import { prototypeUsageRoute } from "./routes/prototype-usage.js";
 // Builder Server 전용 API (Webhook Secret 인증)
 import { builderRoute } from "./routes/builder.js";
+// Sprint 167: Offerings Data Layer (F369, F370, F371, Phase 18)
+import { offeringsRoute } from "./routes/offerings.js";
+import { offeringSectionsRoute } from "./routes/offering-sections.js";
 // Sprint 160: O-G-D Quality + Feedback (F355, F356, Phase 16)
 import { ogdQualityRoute } from "./routes/ogd-quality.js";
 import { prototypeFeedbackRoute } from "./routes/prototype-feedback.js";
@@ -449,6 +452,10 @@ app.route("/api", ogdGenericRoute);
 
 // Sprint 164: 운영 지표 라우트 (F362, Phase 17)
 app.route("/api", metricsRoute);
+
+// Sprint 167: Offerings Data Layer (F369, F370, F371, Phase 18)
+app.route("/api", offeringsRoute);
+app.route("/api", offeringSectionsRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
