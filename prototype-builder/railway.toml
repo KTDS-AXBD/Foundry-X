@@ -1,9 +1,0 @@
-[build]
-# Dockerfile은 모노리포 루트 컨텍스트에서 빌드
-dockerfilePath = "prototype-builder/Dockerfile"
-
-[deploy]
-healthcheckPath = "/health"
-healthcheckTimeout = 10
-restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 5
