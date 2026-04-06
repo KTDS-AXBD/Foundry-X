@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #207 (2026-04-06)
+
+**shared exports 복원 + typecheck 0 errors 달성**:
+- ✅ `AgentMetadata` shared export 복원 (Phase 14 rebase 시 손실)
+- ✅ 3서비스 CRUD 메서드 추가: DiscoveryReport(5), PersonaConfig(4), PersonaEval(3)
+- ✅ mock-d1 스키마 갱신 (0100 기준 + persona/eval/team_reviews 테이블)
+- ✅ mock-d1 `batch()` INSERT 지원 개선
+- ✅ typecheck 50 errors → 0, test +6 pass (2947 passed)
+
+**검증 결과**:
+- ✅ typecheck 6/6 패키지 0 errors
+- ✅ lint 0 errors
+- ✅ test 2947 pass / 9 fail (feedback-queue 기존 401)
+
+---
+
 ### 세션 #205 (2026-04-05~06)
 
 **Phase 15 Discovery UI/UX 고도화 v2 — 전체 완료 (F342~F350, Match 92%)**
