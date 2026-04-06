@@ -47,12 +47,12 @@
 | P1 | POST /team-reviews/:itemId/decide | 팀장 최종결정 API | ~2h |
 | P1 | Rate Limiting | persona-eval API 비용 방지 | ~1h |
 | P2 | GET /shared-report/:token | Public 공유 링크 조회 | ~3h |
-| P2 | SkipStepOption 컴포넌트 | 간소 단계 스킵 UI | ~2h |
+| ~~P2~~ | ~~SkipStepOption 컴포넌트~~ | ~~간소 단계 스킵 UI~~ | ✅ 해소 (iterate R2) |
 | P3 | DecisionRecord 컴포넌트 | 최종 결정 별도 컴포넌트 | ~1h |
 | P3 | version 컬럼 (3 테이블) | Optimistic locking | ~4h |
 | P3 | weighted_score 컬럼 | 가중 합산 점수 DB 저장 | ~1h |
 | P3 | raw_response 컬럼 | Claude 원문 감사 저장 | ~1h |
-| P3 | data-step CSS 선택자 | 단계별 색상 매핑 | ~1h |
+| ~~P3~~ | ~~data-step CSS 선택자~~ | ~~단계별 색상 매핑~~ | ✅ 해소 (iterate R2) |
 
 ### C. 추가 구현 (Design에 없지만 유용) — 7개
 
@@ -70,11 +70,10 @@
 
 | Action | Expected |
 |--------|:--------:|
-| 현재 (as-is) | 62% |
-| Design 역갱신만 | 82% |
-| Design 역갱신 + P1 구현 | 88% |
-| Design 역갱신 + P1+P2 구현 | **93%** ✅ |
-| 전체 완료 | 97% |
+| 초기 (as-is) | 62% |
+| R1: Design 역갱신 + P1 구현 | 88% |
+| **R2: + SkipStepOption + data-step CSS** | **92%** ✅ |
+| 전체 완료 (P2+P3 잔여) | 97% |
 
 ---
 

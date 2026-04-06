@@ -45,6 +45,13 @@
     --discovery-purple-bg: #f3e8ff;
 }
 
+/* Discovery 단계별 색상 매핑 (data-step 선택자) */
+[data-step="2-1"], [data-step="2-2"] { --step-color: var(--discovery-mint); --step-bg: var(--discovery-mint-bg); }
+[data-step="2-3"], [data-step="2-4"] { --step-color: var(--discovery-blue); --step-bg: var(--discovery-blue-bg); }
+[data-step="2-5"], [data-step="2-6"], [data-step="2-7"] { --step-color: var(--discovery-amber); --step-bg: var(--discovery-amber-bg); }
+[data-step="2-8"] { --step-color: var(--discovery-red); --step-bg: var(--discovery-red-bg); }
+[data-step="2-9"] { --step-color: var(--discovery-purple); --step-bg: var(--discovery-purple-bg); }
+
 .dark {
     --sidebar: oklch(0.205 0 0);
     --sidebar-foreground: oklch(0.985 0 0);
