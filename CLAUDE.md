@@ -105,6 +105,8 @@ foundry-x/
 | `docs/specs/axbd/` | AX BD 프로세스 v8.2 참고자료 (ai-biz 플러그인 포함) |
 | `docs/specs/FX-PLAN-012/` | Phase 6 Ecosystem Integration PRD |
 | `docs/specs/dev-transparency-spec.md` | 개발 투명성 스펙 |
+| `docs/specs/fx-offering-pipeline/prd-final.md` | Offering Pipeline PRD (Phase 18, F363~F383) |
+| `docs/specs/fx-builder-evolution/prd-final.md` | Builder Evolution PRD (Phase 19, F384~F391) |
 | `docs/02-design/features/tech-stack-review.design.md` | 기술 스택 결정 근거 |
 | `docs/02-design/features/mcp-protocol.design.md` | MCP 프로토콜 설계 |
 
@@ -169,6 +171,8 @@ pnpm e2e                          # Playwright E2E
 - **Phase 15:** ✅ 완료 (Sprint 154~157) — Discovery UI/UX 고도화 v2 F342~F350. PRD: `docs/specs/fx-discovery-ui-v2/prd-final.md`
 - **Phase 16:** ✅ 완료 (Sprint 158~160) — Prototype Auto-Gen F351~F356. PRD: `docs/specs/prototype-auto-gen/prd-final.md`
 - **Phase 17:** ✅ 완료 (Sprint 161~164) — Self-Evolving Harness v2 F357~F362. Guard Rail 자동 제안 + O-G-D 4도메인 범용화 + 운영 지표 대시보드. PRD: `docs/specs/fx-harness-evolution/prd-final.md`. 전략: `docs/specs/self-evolving-harness-strategy.md`
+- **Phase 18:** 📋 계획 (Sprint 165~174) — Offering Pipeline F363~F383. PRD: `docs/specs/fx-offering-pipeline/prd-final.md`
+- **Phase 19:** 📋 계획 (Sprint 175~178) — Builder Evolution F384~F391. Prototype 품질 자동화 + CLI 구독 비용 최적화. PRD: `docs/specs/fx-builder-evolution/prd-final.md`
 - **수치 확인:** `/ax:daily-check` 실행 또는 SPEC.md §2 "실시간 수치" 블록 참조 (하드코딩 금지 — drift 방지)
 - **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 
