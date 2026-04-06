@@ -11,7 +11,14 @@ export interface TenantVariables {
  * tenantGuard — Extracts orgId from JWT and verifies membership via D1.
  * If DB is unavailable (e.g., unit tests without mock env), trusts JWT claims.
  */
+// Paths that skip tenant guard (service-to-service endpoints)
+const TENANT_BYPASS_PATHS = ["/api/builder/"];
+
 export async function tenantGuard(c: Context<{ Bindings: Env; Variables: TenantVariables }>, next: Next) {
+  if (TENANT_BYPASS_PATHS.some((p) => c.req.path.startsWith(p))) {
+    return next();
+  }
+
   const payload = c.get("jwtPayload") as { sub?: string; orgId?: string; orgRole?: string } | undefined;
 
   if (!payload?.orgId) {

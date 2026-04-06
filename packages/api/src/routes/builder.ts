@@ -9,14 +9,28 @@ import type { Env } from "../env.js";
 
 export const builderRoute = new Hono<{ Bindings: Env }>();
 
-// Webhook Secret 검증 미들웨어
+// Builder Token 검증 미들웨어 (BUILDER_SECRET 또는 WEBHOOK_SECRET)
 builderRoute.use("/*", async (c, next) => {
   const token = c.req.header("Authorization")?.replace("Bearer ", "");
-  const secret = c.env?.WEBHOOK_SECRET;
+  const builderSecret = (c.env as unknown as Record<string, string>)?.BUILDER_SECRET;
+  const webhookSecret = c.env?.WEBHOOK_SECRET;
+  const secret = builderSecret || webhookSecret;
   if (!secret || token !== secret) {
     return c.json({ error: "Invalid builder token" }, 401);
   }
   return next();
+});
+
+// POST /builder/jobs — Job 등록 (E2E 테스트용)
+builderRoute.post("/builder/jobs", async (c) => {
+  const raw = await c.req.json() as { prdContent: string; prdTitle: string; orgId?: string };
+  if (!raw.prdContent || raw.prdContent.length < 10) {
+    return c.json({ error: "prdContent required (min 10 chars)" }, 400);
+  }
+  const orgId = raw.orgId || "org_builder_test";
+  const svc = new PrototypeJobService(c.env.DB);
+  const job = await svc.create(orgId, raw.prdContent, raw.prdTitle || "Untitled");
+  return c.json(job, 201);
 });
 
 // GET /builder/jobs?status=queued — 대기 Job 목록 (모든 org)
