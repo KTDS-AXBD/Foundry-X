@@ -396,3 +396,15 @@ export type {
   GenerateRulesResult,
   DeployResult,
 } from './guard-rail.js';
+
+// F360: O-G-D Generic Interface (Sprint 163, Phase 17)
+export { OGD_DEFAULT_MAX_ROUNDS, OGD_DEFAULT_MIN_SCORE } from './ogd-generic.js';
+
+export type {
+  OGDRequest,
+  OGDResult,
+  OGDRunRound,
+  DomainAdapterConfig,
+  DomainAdapterInterface,
+  OGDRunStatus,
+} from './ogd-generic.js';
