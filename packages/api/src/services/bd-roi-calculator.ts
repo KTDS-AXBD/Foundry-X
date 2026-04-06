@@ -8,6 +8,7 @@ import type { BdRoiSummary } from "@foundry-x/shared";
 import type { RoiSummaryQuery } from "../schemas/roi-benchmark.js";
 import { RoiBenchmarkService } from "./roi-benchmark.js";
 import { SignalValuationService } from "./signal-valuation.js";
+import { OfferingMetricsService } from "./offering-metrics-service.js";
 
 export class BdRoiCalculatorService {
   constructor(
@@ -40,6 +41,12 @@ export class BdRoiCalculatorService {
       totalSavings += perExecSaving * b.warmExecutions;
       totalWarmExecutions += b.warmExecutions;
     }
+    totalSavings = Math.round(totalSavings * 10000) / 10000;
+
+    // 2b. Offering savings (F383: 수동 제안서 대비 자동화 절감)
+    const offeringMetricsSvc = new OfferingMetricsService(this.db);
+    const offeringSavings = await offeringMetricsSvc.calculateOfferingSavings(tenantId, fromStr);
+    totalSavings += offeringSavings;
     totalSavings = Math.round(totalSavings * 10000) / 10000;
 
     // 3. Signal Value
@@ -129,6 +136,7 @@ export class BdRoiCalculatorService {
         },
       },
       topSkillsBySavings: topSkills,
+      offeringSavingsUsd: offeringSavings,
     };
   }
 }

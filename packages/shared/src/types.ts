@@ -765,6 +765,7 @@ export interface BdRoiSummary {
     };
   };
   topSkillsBySavings: Array<{ skillId: string; savingsPct: number }>;
+  offeringSavingsUsd?: number;
 }
 
 // ─── Sprint 121: GTM Outreach (F299) ───

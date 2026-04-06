@@ -158,6 +158,8 @@ import { discoveryShapePipelineRoute } from "./routes/discovery-shape-pipeline.j
 // Sprint 173: Design Token Editor + Offering→Prototype (F381, F382, Phase 18)
 import { designTokensRoute } from "./routes/design-tokens.js";
 import { offeringPrototypeRoute } from "./routes/offering-prototype.js";
+// Sprint 174: Offering Metrics + BD ROI 연동 (F383, Phase 18)
+import { offeringMetricsRoute } from "./routes/offering-metrics.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -478,6 +480,8 @@ app.route("/api", contentAdapterRoute);
 app.route("/api", discoveryShapePipelineRoute);
 app.route("/api", designTokensRoute);
 app.route("/api", offeringPrototypeRoute);
+// Sprint 174: Offering Metrics (F383, Phase 18)
+app.route("/api", offeringMetricsRoute);
 
 // Sprint 178: Builder Quality Dashboard + User Evaluations (F390, F391, Phase 19)
 app.route("/api", qualityDashboardRoute);
