@@ -97,6 +97,8 @@ export const router = createBrowserRouter([
       // ── Sprint 160: Prototype Dashboard (F356) ──
       { path: "prototype-dashboard", lazy: () => import("@/routes/prototype-dashboard") },
       { path: "prototype-dashboard/:id", lazy: () => import("@/routes/prototype-detail") },
+      // ── Sprint 178: Builder Quality Dashboard (F390, F391) ──
+      { path: "builder-quality", lazy: () => import("@/routes/builder-quality") },
 
       // ── 지식/관리/설정 (변경 없음) ──
       { path: "wiki", lazy: () => import("@/routes/wiki") },

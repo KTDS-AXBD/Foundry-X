@@ -2309,3 +2309,105 @@ export async function fetchPrototypeFeedback(
 ): Promise<{ items: FeedbackItem[] }> {
   return fetchApi(`/prototype-jobs/${jobId}/feedback`);
 }
+
+// ─── F390: Quality Dashboard (Sprint 178) ───
+
+export interface QualityDashboardSummaryResponse {
+  totalPrototypes: number;
+  averageScore: number;
+  above80Count: number;
+  above80Pct: number;
+  totalCostSaved: number;
+  generationModes: Record<string, number>;
+}
+
+export interface DimensionAverageResponse {
+  build: number;
+  ui: number;
+  functional: number;
+  prd: number;
+  code: number;
+}
+
+export interface TrendPoint {
+  date: string;
+  avgScore: number;
+  count: number;
+}
+
+export interface QualityTrendResponse {
+  points: TrendPoint[];
+  period: string;
+}
+
+export async function fetchQualityDashboardSummary(): Promise<QualityDashboardSummaryResponse> {
+  const res = await fetchApi<{ summary: QualityDashboardSummaryResponse }>("/quality-dashboard/summary");
+  return res.summary;
+}
+
+export async function fetchQualityDimensions(): Promise<DimensionAverageResponse> {
+  const res = await fetchApi<{ dimensions: DimensionAverageResponse }>("/quality-dashboard/dimensions");
+  return res.dimensions;
+}
+
+export async function fetchQualityTrend(days?: number): Promise<QualityTrendResponse> {
+  const q = days ? `?days=${days}` : "";
+  const res = await fetchApi<{ trend: QualityTrendResponse }>(`/quality-dashboard/trend${q}`);
+  return res.trend;
+}
+
+// ─── F391: User Evaluations (Sprint 178) ───
+
+export interface UserEvaluationItem {
+  id: string;
+  jobId: string;
+  evaluatorRole: string;
+  buildScore: number;
+  uiScore: number;
+  functionalScore: number;
+  prdScore: number;
+  codeScore: number;
+  overallScore: number;
+  comment: string | null;
+  createdAt: string;
+}
+
+export interface CorrelationResult {
+  dimension: string;
+  pearson: number;
+  sampleSize: number;
+  autoMean: number;
+  manualMean: number;
+}
+
+export interface CorrelationSummaryResponse {
+  correlations: CorrelationResult[];
+  overallPearson: number;
+  totalEvaluations: number;
+  calibrationStatus: "good" | "needs_attention" | "insufficient_data";
+}
+
+export async function submitUserEvaluation(data: {
+  jobId: string;
+  evaluatorRole: string;
+  buildScore: number;
+  uiScore: number;
+  functionalScore: number;
+  prdScore: number;
+  codeScore: number;
+  overallScore: number;
+  comment?: string;
+}): Promise<{ evaluation: UserEvaluationItem }> {
+  return postApi("/user-evaluations", data);
+}
+
+export async function fetchUserEvaluations(
+  jobId: string,
+): Promise<{ items: UserEvaluationItem[] }> {
+  return fetchApi(`/user-evaluations/${jobId}`);
+}
+
+export async function fetchCorrelation(): Promise<CorrelationSummaryResponse> {
+  const res = await fetchApi<{ correlation: CorrelationSummaryResponse }>("/user-evaluations/correlation");
+  return res.correlation;
+}

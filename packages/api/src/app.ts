@@ -149,6 +149,9 @@ import { guardRailRoute } from "./routes/guard-rail.js";
 import { ogdGenericRoute } from "./routes/ogd-generic.js";
 // Sprint 164: 운영 지표 — 활용률 + 재사용률 + Rule 효과 (F361, F362, Phase 17)
 import { metricsRoute } from "./routes/metrics.js";
+// Sprint 178: Builder Quality Dashboard + User Evaluations (F390, F391, Phase 19)
+import { qualityDashboardRoute } from "./routes/quality-dashboard.js";
+import { userEvaluationsRoute } from "./routes/user-evaluations.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -463,6 +466,10 @@ app.route("/api", offeringSectionsRoute);
 // Sprint 168: Offering Export + Validate (F372, F373, Phase 18)
 app.route("/api", offeringExportRoute);
 app.route("/api", offeringValidateRoute);
+
+// Sprint 178: Builder Quality Dashboard + User Evaluations (F390, F391, Phase 19)
+app.route("/api", qualityDashboardRoute);
+app.route("/api", userEvaluationsRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
