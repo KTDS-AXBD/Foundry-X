@@ -129,6 +129,9 @@ import { teamReviewsRoute } from "./routes/team-reviews.js";
 import { axBdPersonaEvalRoute } from "./routes/ax-bd-persona-eval.js";
 // Sprint 156: Discovery Report (F346, Phase 15)
 import { discoveryReportRoute } from "./routes/discovery-report.js";
+// Sprint 159: Prototype Auto-Gen (F353, F354, Phase 16)
+import { prototypeJobsRoute } from "./routes/prototype-jobs.js";
+import { prototypeUsageRoute } from "./routes/prototype-usage.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -420,6 +423,9 @@ app.route("/api", teamReviewsRoute);
 app.route("/api", axBdPersonaEvalRoute);
 // Sprint 156: Discovery Report (F346, Phase 15)
 app.route("/api", discoveryReportRoute);
+// Sprint 159: Prototype Auto-Gen (F353, F354, Phase 16)
+app.route("/api", prototypeJobsRoute);
+app.route("/api", prototypeUsageRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
