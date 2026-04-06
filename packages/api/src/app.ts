@@ -139,6 +139,8 @@ import { ogdQualityRoute } from "./routes/ogd-quality.js";
 import { prototypeFeedbackRoute } from "./routes/prototype-feedback.js";
 // Sprint 161: Guard Rail — 데이터 진단 + 패턴 감지 + Rule 생성 (F357, F358, Phase 17)
 import { guardRailRoute } from "./routes/guard-rail.js";
+// Sprint 163: O-G-D Generic Interface (F360, Phase 17)
+import { ogdGenericRoute } from "./routes/ogd-generic.js";
 // Sprint 164: 운영 지표 — 활용률 + 재사용률 + Rule 효과 (F361, F362, Phase 17)
 import { metricsRoute } from "./routes/metrics.js";
 import { handleScheduled } from "./scheduled.js";
@@ -442,6 +444,8 @@ app.route("/api", ogdQualityRoute);
 app.route("/api", prototypeFeedbackRoute);
 // Sprint 161: Guard Rail (F357, F358, Phase 17)
 app.route("/api", guardRailRoute);
+// Sprint 163: O-G-D Generic Interface (F360, Phase 17)
+app.route("/api", ogdGenericRoute);
 
 // Sprint 164: 운영 지표 라우트 (F362, Phase 17)
 app.route("/api", metricsRoute);
