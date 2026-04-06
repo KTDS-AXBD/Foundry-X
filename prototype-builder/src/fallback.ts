@@ -107,8 +107,9 @@ async function createMissingStubs(workDir: string): Promise<void> {
       if (!found) {
         const stubPath = path.join(workDir, rel + '.tsx');
         await fs.mkdir(path.dirname(stubPath), { recursive: true });
-        // 파일명에서 컴포넌트명 추출 (e.g. RuleGeneratorView.tsx → RuleGeneratorView)
-        const compName = path.basename(rel).replace(/\.\w+$/, '');
+        // 파일명에서 컴포넌트명 추출 + PascalCase 변환 (use-toast → UseToast)
+        const rawName = path.basename(rel).replace(/\.\w+$/, '');
+        const compName = rawName.replace(/(^|[-_])([a-z])/g, (_, __, c: string) => c.toUpperCase());
         // default + named export 모두 제공 — import 방식 무관하게 동작
         const stub = [
           `export function ${compName}() { return <div>${compName} placeholder</div>; }`,
