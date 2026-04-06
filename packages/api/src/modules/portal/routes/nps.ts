@@ -5,12 +5,12 @@ import {
   NpsDismissRequestSchema,
   NpsOrgSummaryResponseSchema,
 } from "../schemas/nps.js";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
-import type { JwtPayload } from "../middleware/auth.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
+import type { JwtPayload } from "../../../middleware/auth.js";
 import { NpsService } from "../services/nps-service.js";
-import { roleGuard } from "../middleware/role-guard.js";
-import { ErrorSchema } from "../schemas/common.js";
+import { roleGuard } from "../../../middleware/role-guard.js";
+import { ErrorSchema } from "../../../schemas/common.js";
 
 export const npsRoute = new OpenAPIHono<{ Bindings: Env; Variables: TenantVariables }>();
 

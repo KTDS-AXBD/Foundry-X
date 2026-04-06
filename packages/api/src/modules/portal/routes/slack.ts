@@ -2,8 +2,8 @@ import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { verifySlackSignature } from "../services/slack.js";
 import { SlackCommandSchema, SlackInteractionSchema } from "../schemas/slack.js";
-import { ErrorSchema } from "../schemas/common.js";
-import type { Env } from "../env.js";
+import { ErrorSchema } from "../../../schemas/common.js";
+import type { Env } from "../../../env.js";
 
 export const slackRoute = new OpenAPIHono<{ Bindings: Env }>();
 

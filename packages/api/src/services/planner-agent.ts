@@ -5,7 +5,7 @@ import type {
 } from "@foundry-x/shared";
 import type { AgentTaskType, AgentExecutionRequest } from "./execution-types.js";
 import type { SSEManager } from "./sse-manager.js";
-import type { GitHubService } from "./github.js";
+import type { GitHubService } from "../modules/portal/services/github.js";
 import { FileContextCollector, estimateTokens } from "./file-context-collector.js";
 import type { CollectorResult } from "./file-context-collector.js";
 import { getPlannerPrompt } from "./planner-prompts.js";

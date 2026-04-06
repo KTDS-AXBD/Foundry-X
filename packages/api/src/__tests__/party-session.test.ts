@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { PartySessionService } from "../services/party-session.js";
+import { PartySessionService } from "../modules/portal/services/party-session.js";
 
 const DDL = `
   CREATE TABLE IF NOT EXISTS party_sessions (

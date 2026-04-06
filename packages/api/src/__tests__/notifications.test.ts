@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { notificationsRoute } from "../routes/notifications.js";
+import { notificationsRoute } from "../modules/portal/routes/notifications.js";
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 

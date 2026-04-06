@@ -1,9 +1,9 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { ProjectOverviewService } from "../services/project-overview.js";
-import { ErrorSchema, validationHook } from "../schemas/common.js";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import { ErrorSchema, validationHook } from "../../../schemas/common.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 
 export const projectOverviewRoute = new OpenAPIHono<{ Bindings: Env; Variables: TenantVariables }>({
   defaultHook: validationHook as any,

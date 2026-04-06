@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { GitHubSyncService } from "../services/github-sync.js";
+import { GitHubSyncService } from "../modules/portal/services/github-sync.js";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import type { GitHubIssueEvent, GitHubPrEvent } from "../schemas/webhook.js";
+import type { GitHubIssueEvent, GitHubPrEvent } from "../modules/portal/schemas/webhook.js";
 
 // ─── Mock GitHubService ───
 
@@ -238,7 +238,7 @@ describe("GitHubSyncService", () => {
 
   describe("schema validation", () => {
     it("githubIssueEventSchema validates correct payload", async () => {
-      const { githubIssueEventSchema } = await import("../schemas/webhook.js");
+      const { githubIssueEventSchema } = await import("../modules/portal/schemas/webhook.js");
       const result = githubIssueEventSchema.safeParse({
         action: "opened",
         issue: { number: 1, title: "Test", state: "open", body: "desc", labels: [{ name: "bug" }] },
@@ -248,7 +248,7 @@ describe("GitHubSyncService", () => {
     });
 
     it("githubPrEventSchema validates correct payload", async () => {
-      const { githubPrEventSchema } = await import("../schemas/webhook.js");
+      const { githubPrEventSchema } = await import("../modules/portal/schemas/webhook.js");
       const result = githubPrEventSchema.safeParse({
         action: "closed",
         pull_request: { number: 5, title: "PR", state: "closed", merged: true, merged_at: "2026-01-01" },
@@ -258,7 +258,7 @@ describe("GitHubSyncService", () => {
     });
 
     it("rejects invalid issue event action", async () => {
-      const { githubIssueEventSchema } = await import("../schemas/webhook.js");
+      const { githubIssueEventSchema } = await import("../modules/portal/schemas/webhook.js");
       const result = githubIssueEventSchema.safeParse({
         action: "invalid_action",
         issue: { number: 1, title: "T", state: "open", body: null, labels: [] },

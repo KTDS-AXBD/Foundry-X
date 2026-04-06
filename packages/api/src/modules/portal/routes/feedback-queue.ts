@@ -2,8 +2,8 @@ import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { feedbackQueueItemSchema, feedbackQueueListSchema, feedbackQueueUpdateSchema } from "../schemas/feedback-queue.js";
 import { FeedbackQueueService } from "../services/feedback-queue-service.js";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 
 export const feedbackQueueRoute = new OpenAPIHono<{ Bindings: Env; Variables: TenantVariables }>();
 

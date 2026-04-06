@@ -28,8 +28,8 @@ import {
 } from "../schemas/password-reset.js";
 import { PasswordResetService } from "../services/password-reset-service.js";
 import { EmailService } from "../services/email-service.js";
-import { SwitchOrgSchema, InvitationTokenSchema } from "../../../schemas/org.js";
-import { OrgService, OrgError } from "../../../services/org.js";
+import { SwitchOrgSchema, InvitationTokenSchema } from "../../portal/schemas/org.js";
+import { OrgService, OrgError } from "../../portal/services/org.js";
 
 export const authRoute = new OpenAPIHono<{ Bindings: Env }>({
   defaultHook: validationHook as any,

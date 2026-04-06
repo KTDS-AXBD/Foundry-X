@@ -5,7 +5,7 @@ import { Hono } from "hono";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 import { ShareLinkService } from "../services/share-link-service.js";
-import { NotificationService } from "../services/notification-service.js";
+import { NotificationService } from "../modules/portal/services/notification-service.js";
 import { CreateShareLinkSchema, ReviewRequestSchema } from "../schemas/share-link.schema.js";
 
 export const shareLinksRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();

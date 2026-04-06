@@ -29,7 +29,7 @@ import { getDb } from "../db/index.js";
 import { agentSessions } from "../db/schema.js";
 import { SSEManager } from "../services/sse-manager.js";
 import { AgentOrchestrator } from "../services/agent-orchestrator.js";
-import { GitHubService } from "../services/github.js";
+import { GitHubService } from "../modules/portal/services/github.js";
 import { ReviewerAgent } from "../services/reviewer-agent.js";
 import { PrPipelineService } from "../services/pr-pipeline.js";
 import { MergeQueueService } from "../services/merge-queue.js";

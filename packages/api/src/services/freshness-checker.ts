@@ -1,5 +1,5 @@
 import type { FreshnessReport } from "@foundry-x/shared";
-import type { GitHubService } from "./github.js";
+import type { GitHubService } from "../modules/portal/services/github.js";
 import type { KVCacheService } from "./kv-cache.js";
 
 const HARNESS_DOCS = ["CLAUDE.md", "SPEC.md", "docs/specs/prd-v4.md"];

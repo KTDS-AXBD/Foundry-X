@@ -4,10 +4,10 @@ import {
   FeedbackSubmitResponseSchema,
   FeedbackSummaryResponseSchema,
 } from "../schemas/feedback.js";
-import type { Env } from "../env.js";
+import type { Env } from "../../../env.js";
 import { FeedbackService } from "../services/feedback.js";
 import { NpsService } from "../services/nps-service.js";
-import type { JwtPayload } from "../middleware/auth.js";
+import type { JwtPayload } from "../../../middleware/auth.js";
 
 export const feedbackRoute = new OpenAPIHono<{ Bindings: Env }>();
 

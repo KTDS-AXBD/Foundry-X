@@ -7,8 +7,8 @@ import {
   PartyMessageResponseSchema,
   PartyConcludeSchema,
 } from "../schemas/party-session.js";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { PartySessionService } from "../services/party-session.js";
 
 export const partySessionRoute = new OpenAPIHono<{ Bindings: Env; Variables: TenantVariables }>();

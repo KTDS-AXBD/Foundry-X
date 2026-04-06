@@ -4,7 +4,7 @@
 import type { DecisionType } from "../schemas/decision.schema.js";
 import type { PipelineStage } from "../schemas/pipeline.schema.js";
 import { PipelineService } from "./pipeline-service.js";
-import { NotificationService } from "./notification-service.js";
+import { NotificationService } from "../modules/portal/services/notification-service.js";
 
 export interface Decision {
   id: string;

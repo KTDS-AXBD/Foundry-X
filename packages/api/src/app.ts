@@ -4,30 +4,24 @@ import { cors } from "hono/cors";
 import { Toucan } from "toucan-js";
 // Sprint 181: Auth module (F396 — modules/auth/)
 import { authRoute, ssoRoute, tokenRoute, profileRoute, adminRoute } from "./modules/auth/index.js";
+// Sprint 182: Portal module (F396 — modules/portal/)
+import {
+  orgRoute, orgSharedRoute, kpiRoute, metricsRoute, wikiRoute,
+  onboardingRoute, inboxRoute, notificationsRoute, npsRoute,
+  feedbackRoute, feedbackQueueRoute, slackRoute, githubRoute,
+  jiraRoute, webhookRoute, webhookRegistryRoute, webhookInboundRoute,
+  projectOverviewRoute, partySessionRoute, reconciliationRoute,
+} from "./modules/portal/index.js";
 import { integrityRoute } from "./routes/integrity.js";
 import { healthRoute } from "./routes/health.js";
 import { freshnessRoute } from "./routes/freshness.js";
-import { wikiRoute } from "./routes/wiki.js";
 import { requirementsRoute } from "./routes/requirements.js";
 import { agentRoute } from "./routes/agent.js";
 import { specRoute } from "./routes/spec.js";
-import { webhookRoute } from "./routes/webhook.js";
-import { githubRoute } from "./routes/github.js";
 import mcpRoute from "./routes/mcp.js";
-import { inboxRoute } from "./routes/inbox.js";
-import { slackRoute } from "./routes/slack.js";
-import { orgRoute } from "./routes/org.js";
-import { projectOverviewRoute } from "./routes/project-overview.js";
-import { webhookRegistryRoute, webhookInboundRoute } from "./routes/webhook-registry.js";
-import { jiraRoute } from "./routes/jira.js";
 import { workflowRoute } from "./routes/workflow.js";
-// ssoRoute — moved to modules/auth (F396)
 import { proxyRoute } from "./routes/proxy.js";
 import { entitiesRoute } from "./routes/entities.js";
-import { kpiRoute } from "./routes/kpi.js";
-import { reconciliationRoute } from "./routes/reconciliation.js";
-import { feedbackRoute } from "./routes/feedback.js";
-import { onboardingRoute } from "./routes/onboarding.js";
 import { automationQualityRoute } from "./routes/automation-quality.js";
 import { srRoute } from "./routes/sr.js";
 import { auditRoute } from "./routes/audit.js";
@@ -52,13 +46,13 @@ import { agentDefinitionRoute } from "./routes/agent-definition.js";
 import { shardDocRoute } from "./routes/shard-doc.js";
 import { contextPassthroughRoute } from "./routes/context-passthrough.js";
 import { commandRegistryRoute } from "./routes/command-registry.js";
-import { partySessionRoute } from "./routes/party-session.js";
+// partySessionRoute — moved to modules/portal (F396)
 import { specLibraryRoute } from "./routes/spec-library.js";
 import { expansionPackRoute } from "./routes/expansion-pack.js";
 // Sprint 79: BD Pipeline E2E (F232, F233, F239)
 import { pipelineRoute } from "./routes/pipeline.js";
 import { shareLinksRoute } from "./routes/share-links.js";
-import { notificationsRoute } from "./routes/notifications.js";
+// notificationsRoute — moved to modules/portal (F396)
 import { decisionsRoute } from "./routes/decisions.js";
 // Sprint 80: BDP + Gate Package (F234, F235, F237)
 import { bdpRoute } from "./routes/bdp.js";
@@ -68,9 +62,7 @@ import { offeringPacksRoute } from "./routes/offering-packs.js";
 import { mvpTrackingRoute } from "./routes/mvp-tracking.js";
 import { irProposalsRoute } from "./routes/ir-proposals.js";
 // Sprint 87: Admin bulk operations (F251) — moved to modules/auth (F396)
-// Sprint 88: Org shared data + NPS (F253, F254)
-import { orgSharedRoute } from "./routes/org-shared.js";
-import { npsRoute } from "./routes/nps.js";
+// Sprint 88: Org shared data + NPS (F253, F254) — moved to modules/portal (F396)
 // Sprint 90: BD 스킬 실행 + 산출물 (F260, F261)
 import { axBdSkillsRoute } from "./routes/ax-bd-skills.js";
 import { axBdArtifactsRoute } from "./routes/ax-bd-artifacts.js";
@@ -108,8 +100,7 @@ import { discoveryPipelineRoute } from "./routes/discovery-pipeline.js";
 import { pipelineMonitoringRoute } from "./routes/pipeline-monitoring.js";
 // Sprint 136: Backup/Restore (F317)
 import { backupRestoreRoute } from "./routes/backup-restore.js";
-// Sprint 137: Marker.io Feedback Queue (F319, F320)
-import { feedbackQueueRoute } from "./routes/feedback-queue.js";
+// Sprint 137: Marker.io Feedback Queue (F319, F320) — moved to modules/portal (F396)
 // Sprint 148: TaskState Machine (F333, Phase 14)
 import { taskStateRoute } from "./routes/task-state.js";
 // Sprint 149: Execution Events (F334, Phase 14)
@@ -145,8 +136,7 @@ import { prototypeFeedbackRoute } from "./routes/prototype-feedback.js";
 import { guardRailRoute } from "./routes/guard-rail.js";
 // Sprint 163: O-G-D Generic Interface (F360, Phase 17)
 import { ogdGenericRoute } from "./routes/ogd-generic.js";
-// Sprint 164: 운영 지표 — 활용률 + 재사용률 + Rule 효과 (F361, F362, Phase 17)
-import { metricsRoute } from "./routes/metrics.js";
+// Sprint 164: 운영 지표 — metricsRoute moved to modules/portal (F396)
 // Sprint 178: Builder Quality Dashboard + User Evaluations (F390, F391, Phase 19)
 import { qualityDashboardRoute } from "./routes/quality-dashboard.js";
 import { userEvaluationsRoute } from "./routes/user-evaluations.js";

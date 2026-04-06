@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { OrgSharedService } from "../services/org-shared-service.js";
+import { OrgSharedService } from "../modules/portal/services/org-shared-service.js";
 
 describe("OrgSharedService", () => {
   let db: ReturnType<typeof createMockD1>;

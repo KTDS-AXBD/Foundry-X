@@ -1,4 +1,4 @@
-import type { GitHubService } from "./github.js";
+import type { GitHubService } from "../modules/portal/services/github.js";
 import type { ReviewerAgent } from "./reviewer-agent.js";
 import type { SSEManager } from "./sse-manager.js";
 import type {

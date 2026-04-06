@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { SlackService, verifySlackSignature, eventToCategory } from "../services/slack.js";
-import type { SlackEvent } from "../services/slack.js";
-import { slackRoute } from "../routes/slack.js";
+import { SlackService, verifySlackSignature, eventToCategory } from "../modules/portal/services/slack.js";
+import type { SlackEvent } from "../modules/portal/services/slack.js";
+import { slackRoute } from "../modules/portal/routes/slack.js";
 import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
 

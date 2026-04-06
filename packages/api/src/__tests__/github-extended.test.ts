@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { GitHubService } from "../services/github.js";
+import { GitHubService } from "../modules/portal/services/github.js";
 
 const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);

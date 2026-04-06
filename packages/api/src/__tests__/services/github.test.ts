@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { GitHubService, GitHubApiError } from "../../services/github.js";
+import { GitHubService, GitHubApiError } from "../../modules/portal/services/github.js";
 
 const originalFetch = globalThis.fetch;
 

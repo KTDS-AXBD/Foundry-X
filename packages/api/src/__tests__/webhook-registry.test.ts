@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { app } from "../app.js";
 import { createTestEnv, createAuthHeaders } from "./helpers/test-app.js";
-import { WebhookRegistryService } from "../services/webhook-registry.js";
+import { WebhookRegistryService } from "../modules/portal/services/webhook-registry.js";
 
 let env: ReturnType<typeof createTestEnv>;
 

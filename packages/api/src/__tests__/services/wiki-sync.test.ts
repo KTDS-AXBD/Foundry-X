@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { WikiSyncService } from "../../services/wiki-sync.js";
+import { WikiSyncService } from "../../modules/portal/services/wiki-sync.js";
 import { createMockD1 } from "../helpers/mock-d1.js";
 
 function createMockGitHub() {

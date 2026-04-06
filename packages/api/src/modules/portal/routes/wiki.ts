@@ -1,10 +1,10 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { eq } from "drizzle-orm";
-import { getDb } from "../db/index.js";
-import { wikiPages } from "../db/schema.js";
-import type { Env } from "../env.js";
-import { rbac } from "../middleware/rbac.js";
+import { getDb } from "../../../db/index.js";
+import { wikiPages } from "../../../db/schema.js";
+import type { Env } from "../../../env.js";
+import { rbac } from "../../../middleware/rbac.js";
 import {
   WikiPageSchema,
   WikiCreateSchema,
@@ -12,7 +12,7 @@ import {
   WikiSlugParamSchema,
   WikiActionResponseSchema,
 } from "../schemas/wiki.js";
-import { ErrorSchema, validationHook } from "../schemas/common.js";
+import { ErrorSchema, validationHook } from "../../../schemas/common.js";
 import { WikiSyncService } from "../services/wiki-sync.js";
 import { GitHubService } from "../services/github.js";
 

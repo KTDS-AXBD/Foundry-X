@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 import { EvaluationService } from "../services/evaluation-service.js";
-import { KpiService } from "../services/kpi-service.js";
+import { KpiService } from "../modules/portal/services/kpi-service.js";
 import {
   CreateEvaluationSchema,
   UpdateEvalStatusSchema,

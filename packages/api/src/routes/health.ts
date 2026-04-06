@@ -3,7 +3,7 @@ import { HealthResponseSchema, DetailedHealthSchema } from "../schemas/health.js
 import type { HealthScore } from "@foundry-x/shared";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
-import { GitHubService } from "../services/github.js";
+import { GitHubService } from "../modules/portal/services/github.js";
 import { KVCacheService } from "../services/kv-cache.js";
 import { HealthCalculator } from "../services/health-calc.js";
 import { MonitoringService } from "../services/monitoring.js";

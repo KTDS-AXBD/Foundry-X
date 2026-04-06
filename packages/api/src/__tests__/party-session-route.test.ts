@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { partySessionRoute } from "../routes/party-session.js";
+import { partySessionRoute } from "../modules/portal/routes/party-session.js";
 import type { Env } from "../env.js";
 
 const DDL = `

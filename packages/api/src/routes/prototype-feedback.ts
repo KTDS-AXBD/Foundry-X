@@ -3,7 +3,7 @@
 import { Hono } from "hono";
 import { CreateFeedbackSchema } from "../schemas/prototype-feedback-schema.js";
 import { PrototypeFeedbackService } from "../services/prototype-feedback-service.js";
-import { SlackNotificationService } from "../services/slack-notification-service.js";
+import { SlackNotificationService } from "../modules/portal/services/slack-notification-service.js";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 
