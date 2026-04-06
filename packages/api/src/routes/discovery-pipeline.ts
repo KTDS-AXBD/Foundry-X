@@ -18,9 +18,9 @@ import {
   checkpointDecisionSchema,
 } from "../schemas/discovery-pipeline.js";
 import { SkillPipelineRunner } from "../services/skill-pipeline-runner.js";
-import { PipelineCheckpointService } from "../services/pipeline-checkpoint-service.js";
-import { PipelineNotificationService } from "../services/pipeline-notification-service.js";
-import { PipelinePermissionService } from "../services/pipeline-permission-service.js";
+import { PipelineCheckpointService } from "../modules/launch/services/pipeline-checkpoint-service.js";
+import { PipelineNotificationService } from "../modules/launch/services/pipeline-notification-service.js";
+import { PipelinePermissionService } from "../modules/launch/services/pipeline-permission-service.js";
 
 export const discoveryPipelineRoute = new Hono<{
   Bindings: Env;

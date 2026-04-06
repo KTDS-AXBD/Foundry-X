@@ -1,8 +1,8 @@
 /**
  * F312: DiscoveryPipelineService — 발굴→형상화 통합 파이프라인 CRUD + 오케스트레이션
  */
-import { PipelineStateMachine } from "./pipeline-state-machine.js";
-import { PipelineErrorHandler } from "./pipeline-error-handler.js";
+import { PipelineStateMachine } from "../modules/launch/services/pipeline-state-machine.js";
+import { PipelineErrorHandler } from "../modules/launch/services/pipeline-error-handler.js";
 import type {
   CreatePipelineRunInput,
   StepAction,

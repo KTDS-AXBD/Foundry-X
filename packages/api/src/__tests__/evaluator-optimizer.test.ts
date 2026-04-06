@@ -8,7 +8,7 @@ import {
   CodeReviewCriteria,
   TestCoverageCriteria,
   SpecComplianceCriteria,
-} from "../services/evaluation-criteria.js";
+} from "../modules/gate/services/evaluation-criteria.js";
 import { EvaluatorOptimizer } from "../services/evaluator-optimizer.js";
 
 // ── Mock Runner ─────────────────────────────────────────────

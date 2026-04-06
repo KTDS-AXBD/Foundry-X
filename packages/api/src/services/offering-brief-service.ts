@@ -2,7 +2,7 @@
  * OfferingBriefService — Offering Brief 생성/조회 (F293)
  */
 import type { MeetingType } from "../schemas/offering-brief.schema.js";
-import type { OfferingPackDetail, OfferingPackItem } from "./offering-pack-service.js";
+import type { OfferingPackDetail, OfferingPackItem } from "../modules/launch/services/offering-pack-service.js";
 
 export interface OfferingBrief {
   id: string;

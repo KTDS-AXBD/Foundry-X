@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { pocRoute } from "../routes/poc.js";
+import { pocRoute } from "../modules/launch/routes/poc.js";
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 

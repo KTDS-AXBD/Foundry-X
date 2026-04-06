@@ -2,7 +2,7 @@
  * MvpTrackingService — MVP 상태 추적 + 이력 관리 (F238)
  */
 import type { MvpStatus } from "../schemas/mvp-tracking.schema.js";
-import { NotificationService } from "../modules/portal/services/notification-service.js";
+import { NotificationService } from "../../portal/services/notification-service.js";
 
 export interface MvpTracking {
   id: string;

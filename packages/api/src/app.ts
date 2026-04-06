@@ -2,16 +2,25 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 import { cors } from "hono/cors";
 import { Toucan } from "toucan-js";
-// Sprint 181: Auth module (F396 — modules/auth/)
-import { authRoute, ssoRoute, tokenRoute, profileRoute, adminRoute } from "./modules/auth/index.js";
-// Sprint 182: Portal module (F396 — modules/portal/)
+// Modules: auth (S181), portal (S182), gate+launch (S183) — Phase 20-A
 import {
+  // auth (Sprint 181)
+  authRoute, ssoRoute, tokenRoute, profileRoute, adminRoute,
+  // portal (Sprint 182)
   orgRoute, orgSharedRoute, kpiRoute, metricsRoute, wikiRoute,
   onboardingRoute, inboxRoute, notificationsRoute, npsRoute,
   feedbackRoute, feedbackQueueRoute, slackRoute, githubRoute,
   jiraRoute, webhookRoute, webhookRegistryRoute, webhookInboundRoute,
   projectOverviewRoute, partySessionRoute, reconciliationRoute,
-} from "./modules/portal/index.js";
+  // gate (Sprint 183)
+  axBdEvaluationsRoute, decisionsRoute, evaluationReportRoute,
+  gatePackageRoute, teamReviewsRoute, validationMeetingsRoute,
+  validationTierRoute,
+  // launch (Sprint 183)
+  gtmCustomersRoute, gtmOutreachRoute, mvpTrackingRoute,
+  offeringPacksRoute, pipelineRoute, pipelineMonitoringRoute,
+  pocRoute, shareLinksRoute,
+} from "./modules/index.js";
 import { integrityRoute } from "./routes/integrity.js";
 import { healthRoute } from "./routes/health.js";
 import { freshnessRoute } from "./routes/freshness.js";
@@ -39,7 +48,6 @@ import { axBdLinksRoute } from "./routes/ax-bd-links.js";
 import { axBdCommentsRoute } from "./routes/ax-bd-comments.js";
 import { axBdDiscoveryRoute } from "./routes/ax-bd-discovery.js";
 import { axBdInsightsRoute } from "./routes/ax-bd-insights.js";
-import { axBdEvaluationsRoute } from "./routes/ax-bd-evaluations.js";
 import { axBdPrototypesRoute } from "./routes/ax-bd-prototypes.js";
 import { axBdViabilityRoute } from "./routes/ax-bd-viability.js";
 import { agentDefinitionRoute } from "./routes/agent-definition.js";
@@ -49,17 +57,9 @@ import { commandRegistryRoute } from "./routes/command-registry.js";
 // partySessionRoute — moved to modules/portal (F396)
 import { specLibraryRoute } from "./routes/spec-library.js";
 import { expansionPackRoute } from "./routes/expansion-pack.js";
-// Sprint 79: BD Pipeline E2E (F232, F233, F239)
-import { pipelineRoute } from "./routes/pipeline.js";
-import { shareLinksRoute } from "./routes/share-links.js";
-// notificationsRoute — moved to modules/portal (F396)
-import { decisionsRoute } from "./routes/decisions.js";
-// Sprint 80: BDP + Gate Package (F234, F235, F237)
+// Sprint 79~81: pipelineRoute, shareLinksRoute, decisionsRoute, gatePackageRoute,
+// offeringPacksRoute, mvpTrackingRoute — moved to modules/gate/ + modules/launch/ (F397)
 import { bdpRoute } from "./routes/bdp.js";
-import { gatePackageRoute } from "./routes/gate-package.js";
-// Sprint 81: Offering Pack + MVP Tracking + IR Bottom-up (F236, F238, F240)
-import { offeringPacksRoute } from "./routes/offering-packs.js";
-import { mvpTrackingRoute } from "./routes/mvp-tracking.js";
 import { irProposalsRoute } from "./routes/ir-proposals.js";
 // Sprint 87: Admin bulk operations (F251) — moved to modules/auth (F396)
 // Sprint 88: Org shared data + NPS (F253, F254) — moved to modules/portal (F396)
@@ -85,19 +85,11 @@ import { capturedEngineRoute } from "./routes/captured-engine.js";
 import { roiBenchmarkRoute } from "./routes/roi-benchmark.js";
 // Sprint 112: BD 형상화 Phase F (F286, F287)
 import { shapingRoute } from "./routes/shaping.js";
-// Sprint 116: 2-tier 검증 + 미팅 관리 (F294, F295)
-import { validationTierRoute } from "./routes/validation-tier.js";
-import { validationMeetingsRoute } from "./routes/validation-meetings.js";
-// Sprint 117: 통합 평가 결과서 (F296)
-import { evaluationReportRoute } from "./routes/evaluation-report.js";
-// Sprint 120: PoC 관리 분리 (F298)
-import { pocRoute } from "./routes/poc.js";
-import { gtmCustomersRoute } from "./routes/gtm-customers.js";
-import { gtmOutreachRoute } from "./routes/gtm-outreach.js";
+// Sprint 116~120: validationTierRoute, validationMeetingsRoute, evaluationReportRoute,
+// pocRoute, gtmCustomersRoute, gtmOutreachRoute — moved to modules/gate/ + modules/launch/ (F397)
 // Sprint 132: Discovery Pipeline 오케스트레이션 (F312, F313)
 import { discoveryPipelineRoute } from "./routes/discovery-pipeline.js";
-// Sprint 134: Pipeline Monitoring + Permissions (F315)
-import { pipelineMonitoringRoute } from "./routes/pipeline-monitoring.js";
+// Sprint 134: pipelineMonitoringRoute — moved to modules/launch/ (F397)
 // Sprint 136: Backup/Restore (F317)
 import { backupRestoreRoute } from "./routes/backup-restore.js";
 // Sprint 137: Marker.io Feedback Queue (F319, F320) — moved to modules/portal (F396)
@@ -113,7 +105,7 @@ import { agentAdaptersRoute } from "./routes/agent-adapters.js";
 import { personaConfigsRoute } from "./routes/persona-configs.js";
 import { personaEvalsRoute } from "./routes/persona-evals.js";
 import { discoveryReportsRoute } from "./routes/discovery-reports.js";
-import { teamReviewsRoute } from "./routes/team-reviews.js";
+// teamReviewsRoute — moved to modules/gate/ (F397)
 // Sprint 155: 멀티 페르소나 평가 (F344, F345, Phase 15)
 import { axBdPersonaEvalRoute } from "./routes/ax-bd-persona-eval.js";
 // Sprint 156: Discovery Report (F346, Phase 15)

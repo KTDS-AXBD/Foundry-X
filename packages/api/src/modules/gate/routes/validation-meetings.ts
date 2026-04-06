@@ -2,8 +2,8 @@
  * Sprint 116: Validation Meetings Routes — 인터뷰/미팅 관리 CRUD (F295)
  */
 import { Hono } from "hono";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { MeetingService } from "../services/meeting-service.js";
 import { CreateMeetingSchema, UpdateMeetingSchema, MeetingFilterSchema } from "../schemas/validation.schema.js";
 

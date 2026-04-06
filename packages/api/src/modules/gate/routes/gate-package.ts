@@ -2,8 +2,8 @@
  * Sprint 80: Gate Package Routes — ORB/PRB 게이트 문서 패키징 (F235)
  */
 import { Hono } from "hono";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { GatePackageService, MissingArtifactsError } from "../services/gate-package-service.js";
 import { CreateGatePackageSchema, UpdateGateStatusSchema } from "../schemas/gate-package.schema.js";
 

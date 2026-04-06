@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { pipelineRoute } from "../routes/pipeline.js";
+import { pipelineRoute } from "../modules/launch/routes/pipeline.js";
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 

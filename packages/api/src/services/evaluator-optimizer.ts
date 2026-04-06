@@ -3,7 +3,7 @@ import type {
   AgentExecutionResult,
 } from "./execution-types.js";
 import type { AgentRunner } from "./agent-runner.js";
-import type { EvaluationCriteria, EvaluationScore } from "./evaluation-criteria.js";
+import type { EvaluationCriteria, EvaluationScore } from "../modules/gate/services/evaluation-criteria.js";
 
 // ── Types ───────────────────────────────────────────────────
 

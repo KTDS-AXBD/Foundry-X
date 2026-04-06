@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { MvpTrackingService } from "../services/mvp-tracking-service.js";
+import { MvpTrackingService } from "../modules/launch/services/mvp-tracking-service.js";
 
 const DDL = `
   CREATE TABLE IF NOT EXISTS biz_items (

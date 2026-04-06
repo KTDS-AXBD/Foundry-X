@@ -2,8 +2,8 @@
  * Sprint 121: GTM Outreach Routes — 아웃리치 파이프라인 (F299)
  */
 import { Hono } from "hono";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { GtmOutreachService } from "../services/gtm-outreach-service.js";
 import { OutreachProposalService } from "../services/outreach-proposal-service.js";
 import {

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { decisionsRoute } from "../routes/decisions.js";
+import { decisionsRoute } from "../modules/gate/routes/decisions.js";
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 

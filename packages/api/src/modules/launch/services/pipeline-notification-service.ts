@@ -1,7 +1,7 @@
 /**
  * F315: PipelineNotificationService — 파이프라인 이벤트→인앱 알림 자동 발행
  */
-import { NotificationService } from "../modules/portal/services/notification-service.js";
+import { NotificationService } from "../../portal/services/notification-service.js";
 import type { PipelineNotificationType } from "../schemas/pipeline-monitoring.schema.js";
 
 const DEDUP_WINDOW_MS = 5 * 60 * 1000; // 5분

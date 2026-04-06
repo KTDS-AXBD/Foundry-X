@@ -5,7 +5,7 @@
  * Workers 30초 제한을 고려하여, 한 호출에 1단계만 실행한다.
  */
 import { DiscoveryPipelineService } from "./discovery-pipeline-service.js";
-import { PipelineCheckpointService } from "./pipeline-checkpoint-service.js";
+import { PipelineCheckpointService } from "../modules/launch/services/pipeline-checkpoint-service.js";
 import { BdSkillExecutor } from "./bd-skill-executor.js";
 import { DiscoveryStageService } from "./discovery-stage-service.js";
 

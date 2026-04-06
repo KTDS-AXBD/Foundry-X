@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { EvaluationService } from "../services/evaluation-service.js";
+import { EvaluationService } from "../modules/gate/services/evaluation-service.js";
 import { KpiService, calculateAchievement } from "../modules/portal/services/kpi-service.js";
 
 describe("EvaluationService", () => {

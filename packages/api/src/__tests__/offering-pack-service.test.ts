@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { OfferingPackService } from "../services/offering-pack-service.js";
+import { OfferingPackService } from "../modules/launch/services/offering-pack-service.js";
 
 const DDL = `
   CREATE TABLE IF NOT EXISTS biz_items (
