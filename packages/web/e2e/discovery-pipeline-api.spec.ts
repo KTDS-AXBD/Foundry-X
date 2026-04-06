@@ -178,8 +178,8 @@ test.describe("Discovery Pipeline API + Dashboard (F316)", () => {
 
     // 산출물 탭 전환
     await page.getByRole("tab", { name: "산출물" }).click();
-    // ArtifactList 렌더링 대기 (mock 데이터의 산출물) — 탭 콘텐츠 로드 확인
-    await expect(page.locator("[role='tabpanel']")).toBeVisible({ timeout: 5000 });
+    // ArtifactList 렌더링 대기 — mock 데이터의 산출물 제목 확인
+    await expect(page.getByText("idea-classifier").first()).toBeVisible({ timeout: 5000 });
   });
 
   test("발굴 대시보드 — 신호등 필터 배지 표시 + 클릭", async ({

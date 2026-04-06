@@ -129,10 +129,14 @@ test.describe("BD 데모 워크쓰루", () => {
       route.fulfill({
         json: {
           items: [],
-          summary: { total: 0, green: 0, yellow: 0, red: 0, byStage: {} },
-          page: 1,
-          limit: 20,
-          totalPages: 0,
+          summary: {
+            totalItems: 0,
+            bySignal: { green: 0, yellow: 0, red: 0 },
+            byPipelineStage: {},
+            avgCompletionRate: 0,
+            bottleneck: null,
+          },
+          total: 0,
         },
       }),
     );
