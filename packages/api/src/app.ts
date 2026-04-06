@@ -137,6 +137,8 @@ import { builderRoute } from "./routes/builder.js";
 // Sprint 160: O-G-D Quality + Feedback (F355, F356, Phase 16)
 import { ogdQualityRoute } from "./routes/ogd-quality.js";
 import { prototypeFeedbackRoute } from "./routes/prototype-feedback.js";
+// Sprint 161: Guard Rail — 데이터 진단 + 패턴 감지 + Rule 생성 (F357, F358, Phase 17)
+import { guardRailRoute } from "./routes/guard-rail.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -436,6 +438,8 @@ app.route("/api", builderRoute);
 // Sprint 160: O-G-D Quality + Feedback (F355, F356, Phase 16)
 app.route("/api", ogdQualityRoute);
 app.route("/api", prototypeFeedbackRoute);
+// Sprint 161: Guard Rail (F357, F358, Phase 17)
+app.route("/api", guardRailRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

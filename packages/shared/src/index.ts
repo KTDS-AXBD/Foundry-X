@@ -385,3 +385,13 @@ export type {
   FeedbackStatus,
   PrototypeFeedback,
 } from './prototype-feedback.js';
+
+// F357+F358: Guard Rail types (Sprint 161, Phase 17)
+export type {
+  DiagnosticResult,
+  FailurePattern,
+  GuardRailProposal,
+  DetectPatternsRequest,
+  DetectPatternsResult,
+  GenerateRulesResult,
+} from './guard-rail.js';
