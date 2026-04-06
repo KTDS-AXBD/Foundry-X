@@ -23,27 +23,34 @@ export async function writeGeneratedFiles(
 ): Promise<number> {
   // 패턴 1: ```언어\n// filepath: path\n코드```
   // 패턴 2: ```언어\n// src/path\n코드```
-  // 패턴 3: **src/path** 헤더 후 코드블록
   const fileBlocks: Array<{ filePath: string; content: string }> = [];
-
-  // 패턴: ```(tsx|ts|css|json|html)\n 이후 첫 줄에 경로 힌트
-  const codeBlockRegex = /```(?:tsx?|jsx?|css|json|html)\s*\n(?:\/\/\s*(?:filepath:\s*)?)?(\S+\.(?:tsx?|jsx?|css|json|html))\s*\n([\s\S]*?)```/g;
+  const seen = new Set<string>();
   let match;
-  while ((match = codeBlockRegex.exec(text)) !== null) {
-    const filePath = match[1]!.replace(/^\/+/, '');
-    const content = match[2]!;
-    fileBlocks.push({ filePath, content });
+
+  // 패턴 1: ```lang\n// filepath 또는 // src/path\n코드```
+  const p1 = /```(?:tsx?|jsx?|css|json|html)\s*\n(?:\/\/\s*(?:filepath:\s*)?)?(\S+\.(?:tsx?|jsx?|css|json|html))\s*\n([\s\S]*?)```/g;
+  while ((match = p1.exec(text)) !== null) {
+    const fp = match[1]!.replace(/^\/+/, '');
+    if (!seen.has(fp)) { seen.add(fp); fileBlocks.push({ filePath: fp, content: match[2]! }); }
   }
 
-  // 패턴 2: **`src/path`** 또는 **src/path** 후 코드블록
-  if (fileBlocks.length === 0) {
-    const headerRegex = /\*\*`?(src\/[^`*\n]+)`?\*\*\s*\n+```(?:tsx?|jsx?|css|json|html)?\s*\n([\s\S]*?)```/g;
-    while ((match = headerRegex.exec(text)) !== null) {
-      fileBlocks.push({ filePath: match[1]!, content: match[2]! });
-    }
+  // 패턴 2: **`src/path`** 또는 **src/path** 또는 ### `src/path` 후 코드블록
+  const p2 = /(?:\*\*`?|###\s*`?)(src\/[^`*\n#]+\.(?:tsx?|jsx?|css))`?\*?\*?\s*\n+```(?:tsx?|jsx?|css|json|html)?\s*\n([\s\S]*?)```/g;
+  while ((match = p2.exec(text)) !== null) {
+    const fp = match[1]!;
+    if (!seen.has(fp)) { seen.add(fp); fileBlocks.push({ filePath: fp, content: match[2]! }); }
   }
 
-  // 파일이 하나도 없으면 전체를 App.tsx로 저장 (best effort)
+  // 패턴 3: #### filename.tsx 또는 **filename.tsx**: 후 코드블록 (경로 없으면 src/ 추가)
+  const p3 = /(?:####?\s+|^\*\*)([A-Z][A-Za-z]+\.tsx?)\*?\*?\s*:?\s*\n+```(?:tsx?|jsx?)?\s*\n([\s\S]*?)```/gm;
+  while ((match = p3.exec(text)) !== null) {
+    const name = match[1]!;
+    const fp = name === 'App.tsx' ? `src/${name}` : `src/components/${name}`;
+    if (!seen.has(fp)) { seen.add(fp); fileBlocks.push({ filePath: fp, content: match[2]! }); }
+  }
+
+  // 패턴 4: 코드블록 내부 첫 줄이 import/export로 시작하면 파일명 추론 불가 → skip
+  // 최후 fallback: 단일 블록이면 App.tsx로
   if (fileBlocks.length === 0) {
     const singleBlock = text.match(/```(?:tsx?|jsx?)\s*\n([\s\S]*?)```/);
     if (singleBlock) {
