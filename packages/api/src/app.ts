@@ -141,6 +141,8 @@ import { prototypeFeedbackRoute } from "./routes/prototype-feedback.js";
 import { guardRailRoute } from "./routes/guard-rail.js";
 // Sprint 163: O-G-D Generic Interface (F360, Phase 17)
 import { ogdGenericRoute } from "./routes/ogd-generic.js";
+// Sprint 164: 운영 지표 — 활용률 + 재사용률 + Rule 효과 (F361, F362, Phase 17)
+import { metricsRoute } from "./routes/metrics.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -444,6 +446,9 @@ app.route("/api", prototypeFeedbackRoute);
 app.route("/api", guardRailRoute);
 // Sprint 163: O-G-D Generic Interface (F360, Phase 17)
 app.route("/api", ogdGenericRoute);
+
+// Sprint 164: 운영 지표 라우트 (F362, Phase 17)
+app.route("/api", metricsRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

@@ -16,6 +16,8 @@ import { DataDiagnosticService } from "../services/data-diagnostic-service.js";
 import { PatternDetectorService } from "../services/pattern-detector-service.js";
 import { RuleGeneratorService } from "../services/rule-generator-service.js";
 import { GuardRailDeployService, DeployError } from "../services/guard-rail-deploy-service.js";
+import { RuleEffectivenessService } from "../services/rule-effectiveness-service.js";
+import { RuleEffectivenessResponseSchema } from "../schemas/metrics-schema.js";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 
@@ -296,4 +298,49 @@ guardRailRoute.openapi(proposalDeployRoute, async (c) => {
     }
     throw err;
   }
+});
+
+// ── GET /guard-rail/effectiveness — F361: Rule 효과 측정 (Sprint 164) ──
+
+const effectivenessRoute = createRoute({
+  method: "get",
+  path: "/guard-rail/effectiveness",
+  tags: ["GuardRail"],
+  request: {
+    query: z.object({
+      windowDays: z.coerce.number().min(1).max(90).optional().default(14),
+    }),
+  },
+  responses: {
+    200: {
+      description: "Rule effectiveness scores",
+      content: { "application/json": { schema: RuleEffectivenessResponseSchema } },
+    },
+  },
+});
+
+guardRailRoute.openapi(effectivenessRoute, async (c) => {
+  const tenantId = c.get("orgId");
+  const { windowDays } = c.req.valid("query");
+  const svc = new RuleEffectivenessService(c.env.DB);
+  const items = await svc.measureAll(tenantId, windowDays);
+
+  const measured = items.filter((i) => i.status === "measured");
+  const averageScore =
+    measured.length > 0
+      ? Math.round(
+          measured.reduce((sum, i) => sum + i.effectivenessScore, 0) /
+            measured.length,
+        )
+      : 0;
+
+  return c.json(
+    {
+      items,
+      averageScore,
+      totalRules: items.length,
+      measuredRules: measured.length,
+    },
+    200,
+  );
 });

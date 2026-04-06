@@ -386,6 +386,17 @@ export type {
   PrototypeFeedback,
 } from './prototype-feedback.js';
 
+// F361+F362: Operational Metrics types (Sprint 164, Phase 17)
+export type {
+  RuleEffectiveness,
+  RuleEffectivenessResponse,
+  SkillReuseData,
+  SkillReuseResponse,
+  AgentUsageData,
+  AgentUsageResponse,
+  MetricsOverview,
+} from './metrics.js';
+
 // F357+F358: Guard Rail types (Sprint 161, Phase 17)
 export type {
   DiagnosticResult,
