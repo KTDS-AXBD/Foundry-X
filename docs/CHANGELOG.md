@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - https://b5e1196e.proto-bd-pipeline-end-to-end.pages.dev
   - https://1184df0f.proto-ax-bd-ideation-mvp-platform.pages.dev
 - ✅ Gap Analysis 97% + 완료 보고서 + Archive
+- ✅ Phase 17 fx-harness-evolution Archive 완료 (4 Sprint × plan/design/analysis/report)
+- ✅ Phase 18 Offering Pipeline SPEC 등록 — F363~F383 (21 F-items, Sprint 165~174)
+- ✅ CLAUDE.md/SPEC.md services 수치 보정 (238→237)
 
 **수치**: ~107r/~237s/~122sch/D1 0109
 
