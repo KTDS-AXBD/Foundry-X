@@ -47,13 +47,28 @@ export function buildCliArgs(job: PrototypeJob, round: number): string[] {
 }
 
 /**
- * 템플릿을 작업 디렉토리에 복사
+ * 템플릿을 작업 디렉토리에 복사 + 의존성 설치
  */
 export async function copyTemplate(
   templateDir: string,
   workDir: string,
 ): Promise<void> {
   await fs.cp(templateDir, workDir, { recursive: true });
+
+  // 의존성 설치
+  console.log(`[Builder] Installing dependencies in ${workDir}`);
+  try {
+    const { stdout, stderr } = await execFileAsync(
+      'npm',
+      ['install', '--no-audit', '--no-fund'],
+      { cwd: workDir, timeout: 2 * 60 * 1000 },
+    );
+    console.log(`[Builder] npm install done (${stdout.split('\n').length} lines)`);
+    if (stderr) console.log(`[Builder] npm install stderr: ${stderr.slice(0, 200)}`);
+  } catch (err) {
+    console.error(`[Builder] npm install failed:`, err);
+    throw new Error(`Dependency install failed: ${String(err)}`);
+  }
 }
 
 /**
