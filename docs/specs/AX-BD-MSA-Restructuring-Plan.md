@@ -1,11 +1,12 @@
 # AX BD 서비스 그룹 MSA 재조정 설계서
 
-> **문서 ID**: FX-DSGN-MSA-001 v3 (실측 데이터 반영)
-> **작성일**: 2026-04-06 → 2026-04-07 (v3 업데이트)
-> **현행**: Phase 18 (Sprint 172 진행 중, ~174까지 계획) — 모놀리스 유지
-> **F# 분석 기준**: SPEC.md F1~F267 (Sprint 98 시점), 이후 Sprint 99~174는 모놀리스 내 확장
-> **MSA 시작**: **Phase 19 — Sprint 175~**
+> **문서 ID**: FX-DSGN-MSA-001 v4 (F1~F391 전체 커버)
+> **작성일**: 2026-04-06 → 2026-04-07 (v4: Sprint 179 전수 태깅 반영)
+> **현행**: Phase 19 ✅ 완료 (Sprint 178) — Builder Evolution | **Phase 20 진행 중** — MSA 재조정
+> **F# 분석 기준**: SPEC.md F1~F391 (Sprint 179 시점, 전수 태깅 완료)
+> **MSA 시작**: **Phase 20 — Sprint 179~188** (2단계 접근: 모듈화→실제분리)
 > **목적**: AX BD 사업개발 체계를 MSA로 재구조화 — 실측 F# 기반 마이그레이션 계획
+> **실측 수치**: 118 routes / 252 services / 133 schemas / 174 D1 테이블 / 123 migrations
 
 ---
 
@@ -362,9 +363,11 @@ AI Foundry (플랫폼)
 
 ## 5. 기능 마이그레이션 맵 (실측 기반)
 
-> **기준**: SPEC.md F1~F267, Sprint 98 완료 시점
-> **현행 수치**: 73 routes, ~420 EP, 169 services, 87 schemas, D1 0001~0078
-> **테스트**: API 2,250 + CLI 149 + Web 265 + E2E 35 specs
+> **기준**: SPEC.md F1~F391, Sprint 179 시점 (v4 ��수 태깅)
+> **현행 수치**: 118 routes, 252 services, 133 schemas, D1 0001~0113 (174 테이블)
+> **테스트**: 전체 263 E2E tests + API/CLI/Web 단위 테스트
+> **상세 매핑**: `docs/specs/ax-bd-msa/service-mapping.md` (전수 태깅)
+> **D1 소유권**: `docs/specs/ax-bd-msa/d1-ownership.md` (FK 그래프 포함)
 
 ### 5.1 서비스별 기능(F#) 배정표
 
@@ -557,22 +560,92 @@ AI Foundry (플랫폼)
 | F249-F250 | E2E Auth Fixture, Login E2E | 테스트 |
 | **소계** | **~35건** | 서비스별 분산 |
 
-### 5.2 서비스별 EP 규모 (실측 기반 업데이트)
+### 5.1b F268~F391 증분 배정표 (v4 신규, 124건)
+
+> Sprint 99~178에서 추가된 F-items. PRD `docs/specs/ax-bd-msa/prd-final.md` §7과 정합.
+
+#### S0. AI Foundry 포털 — 증분
+
+| Phase | F# | 기능명 | 서비스 |
+|-------|-----|--------|--------|
+| Ph11 | F288 | Sidebar Restructure — Process 6+1 Step | S0 |
+| Ph11 | F289 | Sidebar Tab-Based Navigation | S0 |
+| Ph11 | F293 | Dashboard Todo Widget + Activity Feed | S0 |
+| Ph13 | F322 | Member Menu 25→12 Merge | S0 |
+| Ph13 | F323 | Discovery Tab Integration | S0 |
+| Ph13 | F328 | Dashboard Todo Personal+Team | S0 |
+| Ph14 | F333 | Agent Status Dashboard | S0 |
+| **소계** | **7건** | | |
+
+#### S3. Foundry-X — 증분 (잔류)
+
+| Phase | F# | 기능명 | 서비스 |
+|-------|-----|--------|--------|
+| Ph9 | F268 | BD Skill Plugin 전환 | S3 |
+| Ph9 | F269 | Discovery IA 정리 | S3 |
+| Ph10 | F270~F273 | O-G-D Agent Loop 4건 | S3 |
+| Ph10 | F274~F278 | Skill Evolution 5-Track | S3 |
+| Ph10 | F279~F281 | BD Demo 3건 | S3 |
+| Ph10 | F282~F287 | BD 형상화 A~F 6건 | S3 |
+| Ph11 | F290~F292 | IA 대개편 구조확장 3건 | S3 |
+| Ph11 | F294~F296 | IA 기능확장 3건 | S3 |
+| Ph11 | F297~F299 | IA 고도화+GTM 3건 | S3 |
+| Ph12 | F303~F308 | Skill Unification 6건 | S3 |
+| Ph13 | F324~F327 | IA 재설계 탭통합 4건 | S3 |
+| Ph14 | F334~F337 | Agent Orchestration 4건 | S3/SX |
+| Ph15 | F342~F350 | Discovery UI/UX v2 9건 | S3 |
+| Ph16 | F351~F356 | Prototype Auto-Gen 6건 | S3 |
+| Ph17 | F357~F362 | Self-Evolving Harness v2 6건 | SX |
+| Ph18 | F363~F383 | Offering Pipeline 21건 | S3 |
+| Ph19 | F384~F391 | Builder Evolution 8건 | S3 |
+| **소계** | **~100건** | | |
+
+#### S4. Gate-X — 증분
+
+| Phase | F# | 기능명 | 서비스 |
+|-------|-----|--------|--------|
+| Ph15 | F346~F347 | Discovery Report 일부 (검증 탭) | S4 |
+| **소계** | **~2건** | | |
+
+#### S5. Launch-X — 증분
+
+| Phase | F# | 기능명 | 서비스 |
+|-------|-----|--------|--------|
+| Ph11 | F299 | GTM 선제안 아웃리치 | S5 |
+| Ph18 | F372~F375 | Offering Pack + 메트릭 | S5 |
+| **소계** | **~5건** | | |
+
+#### SX. Infra — 증분
+
+| Phase | F# | 기능명 | 서비스 |
+|-------|-----|--------|--------|
+| Ph9 | F263~F267 | 발굴 UX 인프라 5건 | SX |
+| Ph14 | F334~F337 | Agent Orchestration 4건 (SX 부분) | SX |
+| Ph17 | F357~F362 | Self-Evolving Harness v2 6건 | SX |
+| **소계** | **~10건** | | |
+
+> 합계: ~124건 (S0:7 + S3:~100 + S4:~2 + S5:~5 + SX:~10)
+> 상세 파일별 매핑: `docs/specs/ax-bd-msa/service-mapping.md`
+
+### 5.2 서비스별 EP 규모 (v4 갱신, 실측 기반)
 
 | 서비스 | 이관 F-items | 이관 EP | 신규 EP | 합계 | 비율 |
 |--------|-------------|--------|---------|------|------|
-| AI Foundry (포털) | 42건 | ~215 | ~30 | **~245** | 37% |
-| Discovery-X | 6건 | ~30 | ~40 | **~70** | 11% |
-| Recon-X | 4건 | ~39 | ~15 | **~54** | 8% |
-| **Foundry-X** (잔류) | 43건 | ~195 | ~10 | **~205** | 31% |
-| Gate-X | 4건 | ~20 | ~30 | **~50** | 8% |
-| Launch-X | 6건 | ~29 | ~15 | **~44** | 7% |
-| Eval-X | 2건+2신규 | ~12 | ~20 | **~32** | 5% |
-| **합계** | **107건 핵심** | **~540** | **~160** | **~700** | |
+| 서비스 | F1~F267 | F268~F391 (증분) | Routes | Services | Schemas |
+|--------|---------|-----------------|--------|----------|---------|
+| AI Foundry (포털) | 42건 | +7건 | **20** | **27** | **21** |
+| Discovery-X | 6건 | — | **4** | **5** | **5** |
+| Recon-X | 4건 | — | — | — | — |
+| **Foundry-X** (잔류) | 43건 | **+~100건** | **44** | **97** | **55** |
+| Gate-X | 4건 | +~2건 | **7** | **6** | **6** |
+| Launch-X | 6건 | +~5건 | **8** | **12** | **8** |
+| Eval-X | 2건+2신규 | — | **2** | **4** | **2** |
+| Infra (SX) | — | +~10건 | **33** | **101** | **36** |
+| **합계** | **107건** | **+~124건** | **118** | **252** | **133** |
 
-> **참고**: Agent Evolution 28건(~96 EP)은 1차에서 Foundry-X 잔류, 2차에서 AI Foundry로 이관 검토.
-> CLI 21건은 CLI 패키지 독립 유지. 인프라/기타 ~35건은 서비스별 분산.
-> 총 F-items: 267건 = 핵심 107 + Agent 28 + CLI 21 + 인프라 35 + Ecosystem Ref 76
+> **v4 갱신**: F268~F391 증분은 대부분 S3(Foundry-X) + SX(Infra)에 집중. 이관 대상(S0/S4/S5)에도 소수 추가.
+> CLI 21건은 CLI 패키지 독립 유지. Agent Evolution은 SX(Infra)로 분류.
+> 총 F-items: F1~F391 = 핵심 ~231건 + CLI 21 + 인프라 ~45 + Ecosystem Ref 76 + 기타
 
 ### 5.3 D1 마이그레이션 분할 계획
 
@@ -713,3 +786,5 @@ MSA 이관 시작 전 반드시:
 ---
 
 *v2: 포털 네이밍 AI Foundry 확정, 기존 AI Foundry(RE) → Recon-X 리네임, BD 프로세스 기반 `*-X` 패밀리 네이밍 적용*
+*v3: 실측 데이터 반영 (F1~F267, 73 routes, 169 services)*
+*v4 (Sprint 179): F268~F391 증분 124건 전수 태깅 + 실측 수치 갱신 (118 routes, 252 services, 133 schemas, 174 D1 테이블). Phase 20 2단계 접근법 반영. 상세 매핑: service-mapping.md + d1-ownership.md + ADR-001*
