@@ -547,6 +547,19 @@ PRD 인터뷰에서 확정. 직접 Anthropic API 호출 대신 OpenRouter를 거
 3. **HITL 승인 흐름**: 스킬 실행 → 결과 패널 → 승인 → 다음 단계 자동 이동
 4. **온보딩 투어**: 첫 방문 → 5스텝 완료 → 재방문 시 미표시
 
+### 8.4 E2E Skip 사유 추적 (Phase 17 E2E 감사, 2026-04-06)
+
+| Spec | 테스트 | Skip 사유 | 분류 | 해소 조건 |
+|------|--------|----------|------|----------|
+| `hitl-review.spec.ts:130` | 산출물 클릭 → 패널 열기 | Wizard step detail에 "산출물/리뷰" 링크 미노출 — HITL 패널 트리거 불가 | 기능 미연결 | Wizard에 산출물 액션 링크 추가 시 |
+| `hitl-review.spec.ts:152` | 승인 동작 | 상동 — HITL 패널 진입 불가 | 기능 미연결 | 상동 |
+| `hitl-review.spec.ts:191` | 수정 동작 | 상동 — HITL 패널 진입 불가 | 기능 미연결 | 상동 |
+| `hitl-review.spec.ts:236` | 리뷰 이력 토글 | 상동 — HITL 패널 진입 불가 | 기능 미연결 | 상동 |
+| `help-agent.spec.ts:181` | 새 대화 리셋 | Sheet 패널 내 버튼이 viewport 밖 — click 불가 (flaky) | UI 레이아웃 | Sheet 높이/스크롤 수정 시 |
+| `integration-path.spec.ts:122` | harness rules API | API 서버 미실행 시 proxy 연결 불가 — 환경 의존 skip 정상 | 환경 의존 | 정상 — skip 유지 |
+
+> **참고**: HITL 4건은 F266 구현 시 Wizard와 HitlReviewPanel 사이 연결이 완성되면 자동 해소될 것으로 예상. 현재 HitlReviewPanel 컴포넌트 자체는 구현 완료(Sprint 118), Wizard 내 호출 경로만 미연결 상태.
+
 ---
 
 ## 9. 리스크 대응
