@@ -1,0 +1,23 @@
+services:
+  generator:
+    build:
+      context: .
+      dockerfile: Dockerfile.generator
+    volumes:
+      - ../work:/workspace
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+    # 리소스 제한 (Job당)
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "2.0"
+    # 네트워크 격리
+    networks:
+      - generator-net
+
+networks:
+  generator-net:
+    driver: bridge
