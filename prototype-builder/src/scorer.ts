@@ -13,6 +13,7 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import Anthropic from '@anthropic-ai/sdk';
 import type {
   PrototypeJob,
   QualityScore,
@@ -287,21 +288,81 @@ function prdScoreKeyword(
 }
 
 /**
- * PRD LLM 비교 (M1 본구현용 placeholder)
+ * PRD → 생성코드 LLM 비교 응답 타입
+ */
+interface PrdLlmResponse {
+  implemented: number;
+  total: number;
+  missing: string[];
+}
+
+/**
+ * PRD LLM 비교 (M1 본구현)
+ * Claude Sonnet API, temperature 0, 구조화 JSON 응답
  */
 async function prdScoreWithLlm(
-  _job: PrototypeJob,
-  _code: string,
+  job: PrototypeJob,
+  code: string,
   weight: number,
 ): Promise<DimensionScore> {
-  // M1에서 구현: Claude Sonnet API, temperature 0, JSON 응답
-  return {
-    dimension: 'prd',
-    score: 0,
-    weight,
-    weighted: 0,
-    details: 'LLM scoring not yet implemented (M1)',
-  };
+  const apiKey = process.env['ANTHROPIC_API_KEY'];
+  if (!apiKey) {
+    // API 키 없으면 키워드 모드로 fallback
+    return prdScoreKeyword(job.prdContent.toLowerCase(), code, weight);
+  }
+
+  const client = new Anthropic({ apiKey });
+
+  const prompt = [
+    'PRD 문서의 Must Have 기능 목록과 생성된 코드를 비교하세요.',
+    '',
+    '## PRD',
+    job.prdContent.slice(0, 8000),
+    '',
+    '## 생성된 코드',
+    code.slice(0, 12000),
+    '',
+    '## 지시사항',
+    '1. PRD에서 Must Have / 핵심 기능 항목을 추출하세요.',
+    '2. 생성된 코드에서 각 기능이 구현되었는지 확인하세요.',
+    '3. 아래 JSON 형식으로만 응답하세요 (마크다운 블록 없이 순수 JSON만):',
+    '{"implemented": 5, "total": 8, "missing": ["기능A", "기능B", "기능C"]}',
+  ].join('\n');
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 512,
+      temperature: 0,
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    const text = response.content
+      .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+      .map(block => block.text)
+      .join('\n')
+      .trim();
+
+    // JSON 파싱 (```json 블록 또는 순수 JSON)
+    const jsonStr = text.replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
+    const parsed = JSON.parse(jsonStr) as PrdLlmResponse;
+
+    const total = parsed.total || 1;
+    const score = Math.min(parsed.implemented / total, 1.0);
+    const missingPreview = parsed.missing.slice(0, 5).join(', ');
+
+    return {
+      dimension: 'prd',
+      score: Math.round(score * 100) / 100,
+      weight,
+      weighted: Math.round(score * weight * 100) / 100,
+      details: `LLM: ${parsed.implemented}/${total} implemented. Missing: ${missingPreview || 'none'}`,
+    };
+  } catch (err) {
+    // LLM 호출 실패 시 키워드 모드로 fallback
+    console.log(`[Scorer] prdScore LLM failed, falling back to keyword: ${String(err).slice(0, 100)}`);
+    return prdScoreKeyword(job.prdContent.toLowerCase(), code, weight);
+  }
 }
 
 /**
