@@ -1,4 +1,4 @@
-import { test, expect } from "./fixtures/auth";
+import { test, expect, dismissGuideModal } from "./fixtures/auth";
 
 test.describe("Onboarding Flow (F252)", () => {
   test.beforeEach(async ({ authenticatedPage: page }) => {
@@ -202,10 +202,13 @@ test.describe("Onboarding Flow (F252)", () => {
     authenticatedPage: page,
   }) => {
     await page.goto("/getting-started");
+    await dismissGuideModal(page);
 
     await expect(page.getByRole("heading", { name: "더 알아보기" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "에이전트", exact: true })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "아키텍처", exact: true })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "지식베이스", exact: true })).toBeVisible();
+    // 4개 feature cards: BD 스킬 가이드, Cowork / Claude Code, 데모 시나리오, 도구 가이드
+    await expect(page.getByText("BD 스킬 가이드")).toBeVisible();
+    await expect(page.getByText("Cowork / Claude Code")).toBeVisible();
+    await expect(page.getByText("데모 시나리오")).toBeVisible();
+    await expect(page.getByText("도구 가이드")).toBeVisible();
   });
 });

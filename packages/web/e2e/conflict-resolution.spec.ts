@@ -1,4 +1,4 @@
-import { test, expect } from "./fixtures/auth";
+import { test, expect, dismissGuideModal } from "./fixtures/auth";
 
 const MOCK_SPEC_RESULT = {
   spec: {
@@ -40,9 +40,10 @@ test.describe("Conflict Resolution Flow", () => {
     );
 
     await page.goto("/shaping/prd");
+    await dismissGuideModal(page);
 
     await expect(
-      page.getByRole("heading", { name: /NL → Spec Generator/i }),
+      page.getByRole("heading", { name: /PRD/i }),
     ).toBeVisible();
 
     // Fill in requirements text (min 10 chars)
@@ -71,6 +72,7 @@ test.describe("Conflict Resolution Flow", () => {
     );
 
     await page.goto("/shaping/prd");
+    await dismissGuideModal(page);
 
     const textarea = page.getByRole("textbox").first();
     await textarea.fill("사용자가 에이전트별 토큰 사용량을 일별 차트로 확인할 수 있어야 합니다");
@@ -110,6 +112,7 @@ test.describe("Conflict Resolution Flow", () => {
 
     await page.goto("/shaping/prd");
 
+    await dismissGuideModal(page);
     const textarea = page.getByRole("textbox").first();
     await textarea.fill("사용자가 에이전트별 토큰 사용량을 일별 차트로 확인할 수 있어야 합니다");
 
