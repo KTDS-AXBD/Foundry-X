@@ -38,6 +38,7 @@ import {
   Send,
   Activity,
   FlaskConical,
+  FileOutput,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { loadSidebarConfig, getIcon } from "@/lib/navigation-loader";
@@ -135,7 +136,8 @@ const DEFAULT_PROCESS_GROUPS: NavGroup[] = [
     stageColor: "bg-axis-warm",
     items: [
       { href: "/shaping/business-plan", label: "사업기획서", icon: FileSignature },
-      { href: "/shaping/offering", label: "Offering", icon: Package },
+      { href: "/shaping/offerings", label: "Offerings", icon: FileOutput },
+      { href: "/shaping/offering", label: "Offering Pack", icon: Package },
       { href: "/shaping/prd", label: "PRD", icon: FileText },
       { href: "/shaping/prototype", label: "Prototype", icon: Code },
     ],
