@@ -1,0 +1,17 @@
+FROM node:20-slim
+
+# Claude Code CLI + 빌드 도구
+RUN npm install -g @anthropic-ai/claude-code wrangler
+
+# 작업 디렉토리
+WORKDIR /workspace
+
+# 호스트에서 템플릿 + PRD를 마운트
+# -v $(pwd)/work:/workspace
+
+# 환경변수 (런타임 주입)
+# ANTHROPIC_API_KEY — Claude CLI 인증
+# CLOUDFLARE_API_TOKEN — Pages 배포
+
+# 기본 명령: 없음 (executor가 docker exec으로 실행)
+CMD ["sleep", "infinity"]
