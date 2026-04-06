@@ -2,7 +2,7 @@
 
 export type EventSeverity = 'info' | 'warning' | 'error' | 'critical';
 
-export type TaskEventSource = 'hook' | 'ci' | 'review' | 'discriminator' | 'sync' | 'manual';
+export type TaskEventSource = 'hook' | 'ci' | 'review' | 'discriminator' | 'sync' | 'manual' | 'pipeline';
 
 /** 통합 이벤트 shape — 모든 이벤트 소스가 이 형식을 따름 */
 export interface TaskEvent {
@@ -22,7 +22,8 @@ export type TaskEventPayload =
   | ReviewEventPayload
   | DiscriminatorEventPayload
   | SyncEventPayload
-  | ManualEventPayload;
+  | ManualEventPayload
+  | PipelineEventPayload;
 
 export interface HookEventPayload {
   type: 'hook';
@@ -66,6 +67,15 @@ export interface ManualEventPayload {
   type: 'manual';
   action: string;
   reason?: string;
+}
+
+// ─── F379: Pipeline Event (Sprint 171) ───
+export interface PipelineEventPayload {
+  type: 'pipeline';
+  action: 'discovery.completed' | 'offering.created' | 'offering.prefilled';
+  itemId: string;
+  offeringId?: string;
+  details?: string;
 }
 
 /** TaskEvent 생성 헬퍼 */

@@ -152,6 +152,9 @@ import { metricsRoute } from "./routes/metrics.js";
 // Sprint 178: Builder Quality Dashboard + User Evaluations (F390, F391, Phase 19)
 import { qualityDashboardRoute } from "./routes/quality-dashboard.js";
 import { userEvaluationsRoute } from "./routes/user-evaluations.js";
+// Sprint 171: Content Adapter + Discovery→Shape Pipeline (F378, F379, Phase 18)
+import { contentAdapterRoute } from "./routes/content-adapter.js";
+import { discoveryShapePipelineRoute } from "./routes/discovery-shape-pipeline.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -466,6 +469,10 @@ app.route("/api", offeringSectionsRoute);
 // Sprint 168: Offering Export + Validate (F372, F373, Phase 18)
 app.route("/api", offeringExportRoute);
 app.route("/api", offeringValidateRoute);
+
+// Sprint 171: Content Adapter + Discovery→Shape Pipeline (F378, F379, Phase 18)
+app.route("/api", contentAdapterRoute);
+app.route("/api", discoveryShapePipelineRoute);
 
 // Sprint 178: Builder Quality Dashboard + User Evaluations (F390, F391, Phase 19)
 app.route("/api", qualityDashboardRoute);

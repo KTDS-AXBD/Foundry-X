@@ -2450,6 +2450,72 @@ export async function triggerOfferingValidation(
 export async function fetchOfferingValidations(offeringId: string): Promise<OfferingValidationItem[]> {
   const res = await fetchApi<{ validations: OfferingValidationItem[]; total: number }>(`/offerings/${offeringId}/validations`);
   return res.validations;
+}
+
+// ─── F378: Content Adapter (Sprint 171) ───
+
+export type AdaptTone = "executive" | "technical" | "critical";
+
+export interface AdaptedSection {
+  sectionKey: string;
+  title: string;
+  content: string;
+}
+
+export interface AdaptResponse {
+  adaptedSections: AdaptedSection[];
+  tone: AdaptTone;
+  offeringId: string;
+  sectionCount: number;
+}
+
+export async function adaptOfferingTone(
+  offeringId: string,
+  tone: AdaptTone,
+  sectionKeys?: string[],
+): Promise<AdaptResponse> {
+  return postApi(`/offerings/${offeringId}/adapt`, { tone, sectionKeys });
+}
+
+export async function previewOfferingTone(
+  offeringId: string,
+  tone: AdaptTone,
+): Promise<AdaptResponse> {
+  return fetchApi(`/offerings/${offeringId}/adapt/preview?tone=${tone}`);
+}
+
+// ─── F379: Discovery→Shape Pipeline (Sprint 171) ───
+
+export interface ShapePipelineResult {
+  offeringId: string;
+  prefilledSections: number;
+  totalSections: number;
+  tone: string;
+  status: "success" | "partial" | "failed";
+  error?: string;
+}
+
+export interface ShapePipelineStatusResponse {
+  status: "idle" | "processing" | "completed" | "failed";
+  offering?: {
+    id: string;
+    title: string;
+    prefilledCount: number;
+  };
+}
+
+export async function triggerShapePipeline(
+  itemId: string,
+  tone: AdaptTone = "executive",
+): Promise<ShapePipelineResult> {
+  return postApi("/pipeline/shape/trigger", { itemId, tone });
+}
+
+export async function fetchShapePipelineStatus(
+  itemId: string,
+): Promise<ShapePipelineStatusResponse> {
+  return fetchApi(`/pipeline/shape/status?itemId=${itemId}`);
+}
 
 // ─── F390: Quality Dashboard (Sprint 178) ───
 
