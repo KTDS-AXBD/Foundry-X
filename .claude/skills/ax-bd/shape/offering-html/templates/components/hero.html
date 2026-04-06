@@ -1,0 +1,36 @@
+<!-- Component: hero
+     Usage: §0 Hero — 사업의 한줄 요약
+     Variables: {{title}}, {{subtitle}}, {{tags[]}}
+-->
+<style>
+  #hero {
+    min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+    padding-top: var(--nav-height);
+  }
+  #hero h1 {
+    font-size: 48px; font-weight: 900; letter-spacing: -0.04em; line-height: 1.35;
+    white-space: pre-line; margin-bottom: 28px;
+  }
+  #hero .hero-sub {
+    font-size: 18px; color: var(--gray-600); margin-bottom: 48px; font-weight: 400;
+  }
+  .hero-tags { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hero-tag {
+    display: inline-block; font-size: 13px; font-weight: 600;
+    border: 1px solid var(--gray-200); border-radius: 100px; padding: 6px 16px;
+    color: var(--gray-600);
+  }
+  .hero-tag.highlight { border-color: var(--black); color: var(--black); background: var(--gray-50); }
+</style>
+
+<section id="hero">
+  <div class="fade-in">
+    <h1>{{title}}</h1>
+    <p class="hero-sub">{{subtitle}}</p>
+    <div class="hero-tags">
+      <!-- {{#tags}} -->
+      <span class="hero-tag {{#highlight}}highlight{{/highlight}}">{{label}}</span>
+      <!-- {{/tags}} -->
+    </div>
+  </div>
+</section>

@@ -1,0 +1,32 @@
+<!-- Component: ba-grid
+     Usage: §03-1 솔루션 개요 — Before/After 비교
+     Variables: {{before_label}}, {{before_content}}, {{after_label}}, {{after_content}}
+-->
+<style>
+  .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 48px; }
+  .ba-card {
+    border: 1px solid var(--gray-200); border-radius: var(--card-radius); padding: 36px;
+    background: var(--white);
+  }
+  .ba-card .ba-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 24px; color: var(--gray-400);
+  }
+  .ba-card.after { border-color: var(--black); border-width: 2px; }
+  .ba-card.after .ba-label { color: var(--black); }
+
+  @media (max-width: 900px) {
+    .ba-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="ba-grid fade-in">
+  <div class="ba-card before">
+    <div class="ba-label">{{before_label}}</div>
+    {{before_content}}
+  </div>
+  <div class="ba-card after">
+    <div class="ba-label">{{after_label}}</div>
+    {{after_content}}
+  </div>
+</div>

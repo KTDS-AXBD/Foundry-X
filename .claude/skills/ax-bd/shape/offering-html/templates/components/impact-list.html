@@ -1,0 +1,43 @@
+<!-- Component: impact-list
+     Usage: §04-6 기대효과 — 영향도 바 차트 랭킹
+     Variables: {{impacts[]}}: {label, value, percentage, color}
+-->
+<style>
+  .impact-list { margin-top: 48px; }
+  .impact-item {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 16px;
+  }
+  .impact-label {
+    width: 160px; flex-shrink: 0; font-size: 14px; font-weight: 600;
+    color: var(--gray-700);
+  }
+  .impact-bar-bg {
+    flex: 1; height: 28px; background: var(--gray-100); border-radius: 6px;
+    overflow: hidden; position: relative;
+  }
+  .impact-bar {
+    height: 100%; border-radius: 6px; display: flex; align-items: center;
+    padding-left: 12px; font-size: 12px; font-weight: 700; color: var(--white);
+    transition: width 0.8s ease;
+  }
+  .impact-bar.green { background: var(--green); }
+  .impact-bar.red { background: var(--red); }
+  .impact-bar.orange { background: var(--orange); }
+  .impact-bar.black { background: var(--black); }
+  .impact-value {
+    flex-shrink: 0; width: 80px; text-align: right; font-size: 14px;
+    font-weight: 700; color: var(--black);
+  }
+</style>
+
+<div class="impact-list fade-in">
+  <!-- {{#impacts}} -->
+  <div class="impact-item">
+    <div class="impact-label">{{label}}</div>
+    <div class="impact-bar-bg">
+      <div class="impact-bar {{color}}" style="width: {{percentage}}%">{{percentage}}%</div>
+    </div>
+    <div class="impact-value">{{value}}</div>
+  </div>
+  <!-- {{/impacts}} -->
+</div>

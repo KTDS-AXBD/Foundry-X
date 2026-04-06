@@ -1,0 +1,53 @@
+<!-- Component: roadmap-track
+     Usage: §03-3 사업화 로드맵 — 타임라인 시각화 (단기→중기→장기)
+     Variables: {{phases[]}}: {label, period, items[], highlight?}
+-->
+<style>
+  .roadmap-track { margin-top: 48px; position: relative; }
+  .roadmap-line {
+    position: absolute; left: 24px; top: 0; bottom: 0;
+    width: 2px; background: var(--gray-200);
+  }
+  .roadmap-phase {
+    position: relative; padding-left: 60px; margin-bottom: 48px;
+  }
+  .roadmap-dot {
+    position: absolute; left: 16px; top: 4px;
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 3px solid var(--gray-200); background: var(--white);
+  }
+  .roadmap-phase.active .roadmap-dot {
+    border-color: var(--black); background: var(--black);
+  }
+  .roadmap-label {
+    font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--gray-400); margin-bottom: 4px;
+  }
+  .roadmap-phase.active .roadmap-label { color: var(--black); }
+  .roadmap-period {
+    font-size: 16px; font-weight: 700; color: var(--black); margin-bottom: 12px;
+  }
+  .roadmap-items { list-style: none; padding: 0; }
+  .roadmap-items li {
+    font-size: 14px; color: var(--gray-600); line-height: 1.8;
+    padding-left: 16px; position: relative;
+  }
+  .roadmap-items li::before {
+    content: ''; position: absolute; left: 0; top: 10px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--gray-300);
+  }
+</style>
+
+<div class="roadmap-track fade-in">
+  <div class="roadmap-line"></div>
+  <!-- {{#phases}} -->
+  <div class="roadmap-phase {{#highlight}}active{{/highlight}}">
+    <div class="roadmap-dot"></div>
+    <div class="roadmap-label">{{label}}</div>
+    <div class="roadmap-period">{{period}}</div>
+    <ul class="roadmap-items">
+      <!-- {{#items}} --><li>{{.}}</li><!-- {{/items}} -->
+    </ul>
+  </div>
+  <!-- {{/phases}} -->
+</div>

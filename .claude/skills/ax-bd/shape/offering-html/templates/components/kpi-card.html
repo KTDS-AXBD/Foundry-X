@@ -1,0 +1,30 @@
+<!-- Component: kpi-card
+     Usage: §0.5 Executive Summary, §04-2 시장 분석 — KPI 수치 카드 (4열 그리드)
+     Variables: {{kpis[]}}: {value, label, sub?}
+-->
+<style>
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 48px;
+  }
+  .kpi-card {
+    padding: 28px 24px; border: 1px solid var(--gray-200); border-radius: var(--card-radius);
+    background: var(--white); text-align: center;
+  }
+  .kpi-card .val { font-size: 32px; font-weight: 900; color: var(--black); letter-spacing: -0.03em; }
+  .kpi-card .label { font-size: 13px; color: var(--gray-600); margin-top: 4px; line-height: 1.5; }
+  .kpi-card .sub { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+
+  @media (max-width: 900px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+
+<div class="kpi-grid fade-in">
+  <!-- {{#kpis}} -->
+  <div class="kpi-card">
+    <div class="val">{{value}}</div>
+    <div class="label">{{label}}</div>
+    <!-- {{#sub}} --><div class="sub">{{sub}}</div><!-- {{/sub}} -->
+  </div>
+  <!-- {{/kpis}} -->
+</div>

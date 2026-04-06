@@ -1,0 +1,51 @@
+<!-- Component: compare-grid
+     Usage: §02-5 Gap 분석, §04-5 교차검증 — 2열 비교 (현황/목표, 추진론/반대론)
+     Variables: {{left_title}}, {{left_class}}, {{left_items[]}}, {{right_title}}, {{right_class}}, {{right_items[]}}
+-->
+<style>
+  .compare-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 48px;
+  }
+  .compare-col {
+    background: var(--white); border-radius: var(--card-radius); padding: 36px;
+    border: 1px solid var(--gray-200);
+  }
+  .compare-col.highlight { border-color: var(--black); border-width: 2px; }
+  .compare-col h3 { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
+  .compare-item {
+    display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px;
+    font-size: 15px; line-height: 1.6;
+  }
+  .compare-item .icon {
+    flex-shrink: 0; width: 22px; height: 22px; display: flex; align-items: center;
+    justify-content: center; font-size: 14px; font-weight: 700; border-radius: 50%;
+  }
+  .compare-item .icon.check { background: var(--gray-100); color: var(--gray-600); }
+  .compare-item .icon.cross { background: var(--black); color: var(--white); }
+  .compare-item .evidence { display: block; font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+
+  @media (max-width: 900px) {
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="compare-grid fade-in">
+  <div class="compare-col {{left_class}}">
+    <h3>{{left_title}}</h3>
+    <!-- {{#left_items}} -->
+    <div class="compare-item">
+      <span class="icon {{icon_class}}">{{icon}}</span>
+      <div>{{text}}<!-- {{#evidence}} --><span class="evidence">{{evidence}}</span><!-- {{/evidence}} --></div>
+    </div>
+    <!-- {{/left_items}} -->
+  </div>
+  <div class="compare-col {{right_class}}">
+    <h3>{{right_title}}</h3>
+    <!-- {{#right_items}} -->
+    <div class="compare-item">
+      <span class="icon {{icon_class}}">{{icon}}</span>
+      <div>{{text}}<!-- {{#evidence}} --><span class="evidence">{{evidence}}</span><!-- {{/evidence}} --></div>
+    </div>
+    <!-- {{/right_items}} -->
+  </div>
+</div>

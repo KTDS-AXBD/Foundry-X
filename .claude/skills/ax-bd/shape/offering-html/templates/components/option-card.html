@@ -1,0 +1,46 @@
+<!-- Component: option-card
+     Usage: §03-2 대응 옵션 비교 — 3열 카드
+     Variables: {{options[]}}: {title, description, pros[], cons[], recommended?}
+-->
+<style>
+  .option-cards {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px;
+  }
+  .option-card {
+    padding: 28px; border-radius: var(--card-radius); border: 1px solid var(--gray-200);
+    background: var(--white);
+  }
+  .option-card.recommended { border-color: var(--black); border-width: 2px; }
+  .option-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+  .option-card p { font-size: 14px; color: var(--gray-600); line-height: 1.6; margin-bottom: 16px; }
+  .option-card .pros, .option-card .cons { font-size: 13px; line-height: 1.7; }
+  .option-card .pros li { color: var(--green); }
+  .option-card .cons li { color: var(--red); }
+  .option-card ul { list-style: none; padding: 0; }
+  .option-card li { padding-left: 16px; position: relative; margin-bottom: 4px; color: var(--gray-700); }
+  .option-card li::before {
+    content: ''; position: absolute; left: 0; top: 8px;
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+  .option-card .pros li::before { background: var(--green); }
+  .option-card .cons li::before { background: var(--red); }
+
+  @media (max-width: 900px) {
+    .option-cards { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="option-cards fade-in">
+  <!-- {{#options}} -->
+  <div class="option-card {{#recommended}}recommended{{/recommended}}">
+    <h4>{{title}} {{#recommended}}<span class="badge black">권장</span>{{/recommended}}</h4>
+    <p>{{description}}</p>
+    <ul class="pros">
+      <!-- {{#pros}} --><li>{{.}}</li><!-- {{/pros}} -->
+    </ul>
+    <ul class="cons">
+      <!-- {{#cons}} --><li>{{.}}</li><!-- {{/cons}} -->
+    </ul>
+  </div>
+  <!-- {{/options}} -->
+</div>
