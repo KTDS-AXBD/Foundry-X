@@ -9,7 +9,7 @@ import {
   ReqIdParamSchema,
 } from "../schemas/requirements.js";
 import { ErrorSchema, validationHook } from "../schemas/common.js";
-import { GitHubService } from "../services/github.js";
+import { GitHubService } from "../modules/portal/services/github.js";
 import { KVCacheService } from "../services/kv-cache.js";
 import {
   parseSpecRequirements as parseSpecFItems,

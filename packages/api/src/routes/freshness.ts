@@ -2,7 +2,7 @@ import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { FreshnessSchema } from "../schemas/freshness.js";
 import type { FreshnessReport } from "@foundry-x/shared";
 import type { Env } from "../env.js";
-import { GitHubService } from "../services/github.js";
+import { GitHubService } from "../modules/portal/services/github.js";
 import { KVCacheService } from "../services/kv-cache.js";
 import { FreshnessChecker } from "../services/freshness-checker.js";
 

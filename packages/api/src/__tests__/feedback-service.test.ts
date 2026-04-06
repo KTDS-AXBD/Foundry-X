@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { FeedbackService } from "../services/feedback.js";
+import { FeedbackService } from "../modules/portal/services/feedback.js";
 import { createMockD1 } from "./helpers/mock-d1.js";
 
 describe("FeedbackService", () => {

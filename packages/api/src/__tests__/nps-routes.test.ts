@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { NpsService } from "../services/nps-service.js";
+import { NpsService } from "../modules/portal/services/nps-service.js";
 
 describe("NpsService", () => {
   let db: ReturnType<typeof createMockD1>;

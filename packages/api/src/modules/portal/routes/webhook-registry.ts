@@ -2,9 +2,9 @@ import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { WebhookRegistryService, WebhookError } from "../services/webhook-registry.js";
 import { webhookCreateSchema, webhookResponseSchema } from "../schemas/webhook.js";
-import { ErrorSchema, validationHook } from "../schemas/common.js";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import { ErrorSchema, validationHook } from "../../../schemas/common.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 
 export const webhookRegistryRoute = new OpenAPIHono<{ Bindings: Env; Variables: TenantVariables }>({
   defaultHook: validationHook as any,

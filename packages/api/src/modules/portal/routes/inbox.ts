@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { AgentInbox } from "../services/agent-inbox.js";
+import { AgentInbox } from "../../../services/agent-inbox.js";
 import { sendMessageSchema, listMessagesSchema, threadParamsSchema, threadQuerySchema, ackThreadParamsSchema } from "../schemas/inbox.js";
-import type { Env } from "../env.js";
+import type { Env } from "../../../env.js";
 
 export const inboxRoute = new Hono<{ Bindings: Env }>();
 

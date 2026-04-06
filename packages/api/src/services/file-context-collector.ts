@@ -1,4 +1,4 @@
-import type { GitHubService } from "./github.js";
+import type { GitHubService } from "../modules/portal/services/github.js";
 
 export interface FileContext {
   path: string;

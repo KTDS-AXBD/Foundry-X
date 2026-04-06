@@ -5,7 +5,7 @@ import {
   parseFoundryCommand,
   formatStatusComment,
   HELP_COMMENT,
-} from "../services/github-review.js";
+} from "../modules/portal/services/github-review.js";
 import { createMockD1 } from "./helpers/mock-d1.js";
 
 // ─── Mock GitHubService ───

@@ -2,7 +2,7 @@ import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { IntegritySchema } from "../schemas/integrity.js";
 import type { HarnessIntegrity } from "@foundry-x/shared";
 import type { Env } from "../env.js";
-import { GitHubService } from "../services/github.js";
+import { GitHubService } from "../modules/portal/services/github.js";
 import { KVCacheService } from "../services/kv-cache.js";
 import { IntegrityChecker } from "../services/integrity-checker.js";
 

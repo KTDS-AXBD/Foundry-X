@@ -3,7 +3,7 @@ import { createMockD1 } from "./helpers/mock-d1.js";
 
 // ─── Mock external services ───
 
-vi.mock("../services/github-review.js", () => {
+vi.mock("../modules/portal/services/github-review.js", () => {
   const ReviewCooldownError = class ReviewCooldownError extends Error {
     prNumber: number;
     constructor(prNumber: number) {
@@ -52,19 +52,19 @@ vi.mock("../services/reviewer-agent.js", () => ({
   ReviewerAgent: vi.fn().mockImplementation(() => ({})),
 }));
 
-vi.mock("../services/wiki-sync.js", () => ({
+vi.mock("../modules/portal/services/wiki-sync.js", () => ({
   WikiSyncService: vi.fn().mockImplementation(() => ({
     pullFromGit: vi.fn().mockResolvedValue({ synced: 0 }),
   })),
 }));
 
-vi.mock("../services/github.js", () => ({
+vi.mock("../modules/portal/services/github.js", () => ({
   GitHubService: vi.fn().mockImplementation(() => ({
     addIssueComment: vi.fn().mockResolvedValue({ id: 1 }),
   })),
 }));
 
-vi.mock("../services/github-sync.js", () => ({
+vi.mock("../modules/portal/services/github-sync.js", () => ({
   GitHubSyncService: vi.fn().mockImplementation(() => ({
     syncIssueToTask: vi.fn().mockResolvedValue({ taskId: null, action: "no_matching_task" }),
     syncPrStatus: vi.fn().mockResolvedValue({ prRecordId: null, action: "no_matching_pr" }),
@@ -73,9 +73,9 @@ vi.mock("../services/github-sync.js", () => ({
 
 // ─── Import after mocks ───
 
-import { webhookRoute } from "../routes/webhook.js";
+import { webhookRoute } from "../modules/portal/routes/webhook.js";
 import { Hono } from "hono";
-import { GitHubReviewService, ReviewCooldownError } from "../services/github-review.js";
+import { GitHubReviewService, ReviewCooldownError } from "../modules/portal/services/github-review.js";
 
 function createTestApp(envOverrides: Record<string, unknown> = {}) {
   const app = new Hono();
@@ -323,7 +323,7 @@ describe("POST /webhook/git (issue_comment)", () => {
 
   // ─── 10. Review cooldown → 429 ───
   it("should handle review cooldown error (429 response)", async () => {
-    const { GitHubReviewService: MockGitHubReviewService } = await import("../services/github-review.js");
+    const { GitHubReviewService: MockGitHubReviewService } = await import("../modules/portal/services/github-review.js");
     const mockInstance = {
       reviewPr: vi.fn().mockRejectedValue(new ReviewCooldownError(42)),
       getReviewResult: vi.fn(),

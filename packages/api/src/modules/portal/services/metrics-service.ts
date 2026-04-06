@@ -7,7 +7,7 @@ import type {
   AgentUsageResponse,
   MetricsOverview,
 } from "@foundry-x/shared";
-import { RuleEffectivenessService } from "./rule-effectiveness-service.js";
+import { RuleEffectivenessService } from "../../../services/rule-effectiveness-service.js";
 
 export class MetricsService {
   constructor(private db: D1Database) {}

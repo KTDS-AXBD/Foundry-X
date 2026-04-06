@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { FreshnessChecker } from "../../services/freshness-checker.js";
-import type { GitHubService } from "../../services/github.js";
+import type { GitHubService } from "../../modules/portal/services/github.js";
 import type { KVCacheService } from "../../services/kv-cache.js";
 
 function createMockGitHub(

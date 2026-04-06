@@ -4,10 +4,10 @@ import {
   OrgSharedBmcsResponseSchema,
   OrgActivityFeedResponseSchema,
 } from "../schemas/org-shared.js";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { OrgSharedService } from "../services/org-shared-service.js";
-import { ErrorSchema } from "../schemas/common.js";
+import { ErrorSchema } from "../../../schemas/common.js";
 
 export const orgSharedRoute = new OpenAPIHono<{ Bindings: Env; Variables: TenantVariables }>();
 

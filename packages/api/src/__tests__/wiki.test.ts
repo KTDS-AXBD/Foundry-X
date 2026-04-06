@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, beforeAll } from "vitest";
 import { app } from "../app.js";
 import { createTestEnv, createAuthHeaders } from "./helpers/test-app.js";
-import { wikiRoute } from "../routes/wiki.js";
+import { wikiRoute } from "../modules/portal/routes/wiki.js";
 
 describe("wiki route instance", () => {
   it("wikiRoute is an OpenAPIHono instance", () => {

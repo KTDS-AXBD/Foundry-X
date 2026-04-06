@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { OnboardingProgressService, ONBOARDING_STEPS } from "../services/onboarding-progress.js";
+import { OnboardingProgressService, ONBOARDING_STEPS } from "../modules/portal/services/onboarding-progress.js";
 import { createMockD1 } from "./helpers/mock-d1.js";
 
 describe("OnboardingProgressService", () => {

@@ -1,4 +1,4 @@
-import type { GitHubService } from "./github.js";
+import type { GitHubService } from "../modules/portal/services/github.js";
 import type { SSEManager } from "./sse-manager.js";
 import type { AutoRebaseService } from "./auto-rebase.js";
 import type {

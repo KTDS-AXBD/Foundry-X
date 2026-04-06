@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { JiraAdapter, JiraApiError } from "../services/jira-adapter.js";
-import { JiraSyncService } from "../services/jira-sync.js";
+import { JiraAdapter, JiraApiError } from "../modules/portal/services/jira-adapter.js";
+import { JiraSyncService } from "../modules/portal/services/jira-sync.js";
 import { createTestEnv } from "./helpers/test-app.js";
 
 let env: ReturnType<typeof createTestEnv>;

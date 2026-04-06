@@ -2,8 +2,8 @@
  * Sprint 79: Notifications Routes — 인앱 알림 (F233)
  */
 import { Hono } from "hono";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { NotificationService } from "../services/notification-service.js";
 import { NotificationFilterSchema } from "../schemas/notification.schema.js";
 

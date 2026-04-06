@@ -8,8 +8,8 @@ import {
   AgentUsageResponseSchema,
 } from "../schemas/metrics-schema.js";
 import { MetricsService } from "../services/metrics-service.js";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 
 export const metricsRoute = new OpenAPIHono<{
   Bindings: Env;

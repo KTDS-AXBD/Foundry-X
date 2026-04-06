@@ -13,7 +13,7 @@ import {
   createTaskEvent,
 } from "@foundry-x/shared";
 import { TaskStateService } from "./task-state-service.js";
-import { FeedbackLoopContextManager } from "./feedback-loop-context.js";
+import { FeedbackLoopContextManager } from "../modules/portal/services/feedback-loop-context.js";
 import { EventBus } from "./event-bus.js";
 import { TransitionGuard } from "./transition-guard.js";
 

@@ -3,9 +3,9 @@ import { z } from "@hono/zod-openapi";
 import { JiraAdapter, JiraApiError } from "../services/jira-adapter.js";
 import { JiraSyncService } from "../services/jira-sync.js";
 import { jiraConfigSchema, jiraProjectSchema } from "../schemas/jira.js";
-import { ErrorSchema, validationHook } from "../schemas/common.js";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import { ErrorSchema, validationHook } from "../../../schemas/common.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 
 export const jiraRoute = new OpenAPIHono<{ Bindings: Env; Variables: TenantVariables }>({
   defaultHook: validationHook as any,

@@ -11,7 +11,7 @@ import {
 import { LLMService, NL_TO_SPEC_SYSTEM_PROMPT, buildUserPrompt } from "../services/llm.js";
 import { ConflictDetector } from "../services/conflict-detector.js";
 import { validationHook, SuccessSchema, ErrorSchema } from "../schemas/common.js";
-import { GitHubService } from "../services/github.js";
+import { GitHubService } from "../modules/portal/services/github.js";
 import { KVCacheService } from "../services/kv-cache.js";
 import {
   parseSpecRequirements as parseSpecFItems,

@@ -5,11 +5,11 @@ import {
   ReconciliationStatusResponseSchema,
   ReconciliationHistoryResponseSchema,
 } from "../schemas/reconciliation.js";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { GitHubService } from "../services/github.js";
 import { ReconciliationService } from "../services/reconciliation.js";
-import { parseSpecRequirements } from "../services/spec-parser.js";
+import { parseSpecRequirements } from "../../../services/spec-parser.js";
 
 // ─── F99: Reconciliation Routes ───
 

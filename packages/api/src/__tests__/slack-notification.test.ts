@@ -1,7 +1,7 @@
 // F356: Slack Notification Service 테스트 (Sprint 160)
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { SlackNotificationService } from "../services/slack-notification-service.js";
+import { SlackNotificationService } from "../modules/portal/services/slack-notification-service.js";
 
 describe("SlackNotificationService", () => {
   const event = {

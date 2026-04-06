@@ -17,7 +17,7 @@ import { PatternDetectorService } from "../services/pattern-detector-service.js"
 import { RuleGeneratorService } from "../services/rule-generator-service.js";
 import { GuardRailDeployService, DeployError } from "../services/guard-rail-deploy-service.js";
 import { RuleEffectivenessService } from "../services/rule-effectiveness-service.js";
-import { RuleEffectivenessResponseSchema } from "../schemas/metrics-schema.js";
+import { RuleEffectivenessResponseSchema } from "../modules/portal/schemas/metrics-schema.js";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 

@@ -7,10 +7,10 @@ import {
   KpiTrendsResponseSchema,
   KpiEventsResponseSchema,
 } from "../schemas/kpi.js";
-import { ErrorSchema } from "../schemas/common.js";
-import type { Env } from "../env.js";
+import { ErrorSchema } from "../../../schemas/common.js";
+import type { Env } from "../../../env.js";
 import { KpiLogger } from "../services/kpi-logger.js";
-import type { JwtPayload } from "../middleware/auth.js";
+import type { JwtPayload } from "../../../middleware/auth.js";
 
 export const kpiRoute = new OpenAPIHono<{ Bindings: Env }>();
 

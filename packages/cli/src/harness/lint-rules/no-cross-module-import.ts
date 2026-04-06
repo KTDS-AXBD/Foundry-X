@@ -4,8 +4,8 @@
 const MODULE_BOUNDARIES: Record<string, string[]> = {
   "core/discovery": ["core/shaping", "shared"],
   "core/shaping": ["core/discovery", "shared"],
-  "modules/auth": ["shared"],
-  "modules/portal": ["shared"],
+  "modules/auth": ["shared", "modules/portal"],
+  "modules/portal": ["shared", "modules/auth"],
   "modules/gate": ["shared"],
   "modules/launch": ["shared"],
   "modules/infra": ["shared"],
