@@ -1,7 +1,4 @@
 # Railway 배포용 — 모노리포 루트에서 빌드
-# Railway Root Directory: / (프로젝트 루트)
-# Docker Context: . (모노리포 전체)
-
 FROM node:20-slim AS builder
 
 RUN apt-get update -qq && apt-get install -y -qq git && rm -rf /var/lib/apt/lists/*
@@ -31,11 +28,13 @@ RUN npm install -g @anthropic-ai/claude-code wrangler
 
 WORKDIR /app
 
-# 빌드 산출물 + 런타임 의존성만 복사
+# 빌드 산출물 복사
 COPY --from=builder /build/prototype-builder/dist/ ./dist/
-COPY --from=builder /build/prototype-builder/node_modules/ ./node_modules/
 COPY --from=builder /build/prototype-builder/templates/ ./templates/
 COPY --from=builder /build/prototype-builder/package.json ./
+
+# node_modules: 루트 + prototype-builder 둘 다 (pnpm hoisting 대응)
+COPY --from=builder /build/node_modules/ ./node_modules/
 COPY --from=builder /build/packages/shared/dist/ ./node_modules/@foundry-x/shared/dist/
 COPY --from=builder /build/packages/shared/package.json ./node_modules/@foundry-x/shared/
 
