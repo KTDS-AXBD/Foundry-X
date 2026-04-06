@@ -59,6 +59,46 @@ export interface DeployResult {
   projectName: string;
 }
 
+/** 5차원 품질 차원 */
+export type ScoreDimension = 'build' | 'ui' | 'functional' | 'prd' | 'code';
+
+/** 차원별 가중치 */
+export const DIMENSION_WEIGHTS: Record<ScoreDimension, number> = {
+  build: 0.20,
+  ui: 0.25,
+  functional: 0.20,
+  prd: 0.25,
+  code: 0.10,
+};
+
+/** 차원별 점수 상세 */
+export interface DimensionScore {
+  dimension: ScoreDimension;
+  score: number;       // 0.0 ~ 1.0
+  weight: number;
+  weighted: number;    // score * weight
+  details: string;
+}
+
+/** 전체 품질 스코어 */
+export interface QualityScore {
+  total: number;           // 0 ~ 100 (가중 평균 * 100)
+  dimensions: DimensionScore[];
+  evaluatedAt: string;
+  round: number;
+  jobId: string;
+}
+
+/** 타겟 피드백 */
+export interface TargetFeedback {
+  weakestDimension: ScoreDimension;
+  score: number;
+  prompt: string;
+}
+
+/** 생성 모드 */
+export type GenerationMode = 'max-cli' | 'cli' | 'api' | 'fallback';
+
 export type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 export interface BuilderLogger {
