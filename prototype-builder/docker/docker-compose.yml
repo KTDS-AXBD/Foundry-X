@@ -1,23 +1,24 @@
 services:
-  generator:
+  builder:
     build:
-      context: .
-      dockerfile: Dockerfile.generator
+      context: ..
+      dockerfile: docker/Dockerfile.builder
+    ports:
+      - "3001:3001"
+    env_file:
+      - ../.env
     volumes:
-      - ../work:/workspace
-    environment:
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
-    # 리소스 제한 (Job당)
+      # 로컬 빌드 산출물 + node_modules + templates 마운트
+      - ..:/app
+    restart: unless-stopped
+    networks:
+      - builder-net
     deploy:
       resources:
         limits:
-          memory: 2G
-          cpus: "2.0"
-    # 네트워크 격리
-    networks:
-      - generator-net
+          memory: 4G
+          cpus: "4.0"
 
 networks:
-  generator-net:
+  builder-net:
     driver: bridge

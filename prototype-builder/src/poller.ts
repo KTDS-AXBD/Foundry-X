@@ -1,13 +1,59 @@
-import type { Prototype, BuilderConfig } from './types.js';
+import type { BuilderConfig } from './types.js';
+
+/** API list 엔드포인트가 반환하는 요약 레코드 */
+interface JobSummary {
+  id: string;
+  orgId: string;
+  prdTitle: string;
+  status: string;
+}
+
+/** API 상세 엔드포인트가 반환하는 전체 레코드 (prdContent 포함) */
+interface JobDetail extends JobSummary {
+  prdContent: string;
+  buildLog: string;
+  errorMessage: string | null;
+}
+
+/** Builder Server가 processJob에 전달하는 통합 인터페이스 */
+export interface PolledJob {
+  id: string;
+  projectId: string;  // API의 orgId
+  name: string;       // API의 prdTitle
+  prdContent: string;
+  feedbackContent: string | null;
+}
+
+/**
+ * 단일 Job의 상세 정보를 가져옴 (prdContent 포함)
+ */
+async function fetchJobDetail(
+  id: string,
+  config: Pick<BuilderConfig, 'apiBaseUrl' | 'apiToken'>,
+): Promise<JobDetail | null> {
+  const response = await fetch(
+    `${config.apiBaseUrl}/api/builder/jobs/${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${config.apiToken}`,
+        'Content-Type': 'application/json',
+      },
+    },
+  );
+
+  if (!response.ok) return null;
+  return await response.json() as JobDetail;
+}
 
 /**
  * Foundry-X API에서 대기 중인 Prototype Job을 폴링
+ * list → 개별 상세 조회로 prdContent 확보
  */
 export async function pollForJobs(
   config: Pick<BuilderConfig, 'apiBaseUrl' | 'apiToken'>,
-): Promise<Prototype[]> {
+): Promise<PolledJob[]> {
   const response = await fetch(
-    `${config.apiBaseUrl}/api/prototypes?status=queued`,
+    `${config.apiBaseUrl}/api/builder/jobs?status=queued`,
     {
       headers: {
         Authorization: `Bearer ${config.apiToken}`,
@@ -20,8 +66,23 @@ export async function pollForJobs(
     throw new Error(`API polling failed: ${response.status} ${response.statusText}`);
   }
 
-  const data = await response.json() as { items: Prototype[] };
-  return data.items;
+  const data = await response.json() as { items: JobSummary[] };
+  const jobs: PolledJob[] = [];
+
+  for (const summary of data.items) {
+    const detail = await fetchJobDetail(summary.id, config);
+    if (detail) {
+      jobs.push({
+        id: detail.id,
+        projectId: detail.orgId,
+        name: detail.prdTitle,
+        prdContent: detail.prdContent,
+        feedbackContent: null,
+      });
+    }
+  }
+
+  return jobs;
 }
 
 /**
@@ -29,9 +90,9 @@ export async function pollForJobs(
  */
 export async function pollForFeedbackJobs(
   config: Pick<BuilderConfig, 'apiBaseUrl' | 'apiToken'>,
-): Promise<Prototype[]> {
+): Promise<PolledJob[]> {
   const response = await fetch(
-    `${config.apiBaseUrl}/api/prototypes?status=feedback_pending`,
+    `${config.apiBaseUrl}/api/builder/jobs?status=feedback_pending`,
     {
       headers: {
         Authorization: `Bearer ${config.apiToken}`,
@@ -44,8 +105,23 @@ export async function pollForFeedbackJobs(
     throw new Error(`Feedback polling failed: ${response.status} ${response.statusText}`);
   }
 
-  const data = await response.json() as { items: Prototype[] };
-  return data.items;
+  const data = await response.json() as { items: JobSummary[] };
+  const jobs: PolledJob[] = [];
+
+  for (const summary of data.items) {
+    const detail = await fetchJobDetail(summary.id, config);
+    if (detail) {
+      jobs.push({
+        id: detail.id,
+        projectId: detail.orgId,
+        name: detail.prdTitle,
+        prdContent: detail.prdContent,
+        feedbackContent: null, // 피드백은 별도 API에서 가져와야 함
+      });
+    }
+  }
+
+  return jobs;
 }
 
 /**
@@ -57,7 +133,7 @@ export async function updatePrototypeStatus(
   config: Pick<BuilderConfig, 'apiBaseUrl' | 'apiToken'>,
 ): Promise<void> {
   const response = await fetch(
-    `${config.apiBaseUrl}/api/prototypes/${id}`,
+    `${config.apiBaseUrl}/api/builder/jobs/${id}`,
     {
       method: 'PATCH',
       headers: {

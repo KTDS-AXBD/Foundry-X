@@ -132,6 +132,8 @@ import { discoveryReportRoute } from "./routes/discovery-report.js";
 // Sprint 159: Prototype Auto-Gen (F353, F354, Phase 16)
 import { prototypeJobsRoute } from "./routes/prototype-jobs.js";
 import { prototypeUsageRoute } from "./routes/prototype-usage.js";
+// Builder Server 전용 API (Webhook Secret 인증)
+import { builderRoute } from "./routes/builder.js";
 // Sprint 160: O-G-D Quality + Feedback (F355, F356, Phase 16)
 import { ogdQualityRoute } from "./routes/ogd-quality.js";
 import { prototypeFeedbackRoute } from "./routes/prototype-feedback.js";
@@ -429,6 +431,8 @@ app.route("/api", discoveryReportRoute);
 // Sprint 159: Prototype Auto-Gen (F353, F354, Phase 16)
 app.route("/api", prototypeJobsRoute);
 app.route("/api", prototypeUsageRoute);
+// Builder Server 전용 API (Webhook Secret 인증, auth bypass)
+app.route("/api", builderRoute);
 // Sprint 160: O-G-D Quality + Feedback (F355, F356, Phase 16)
 app.route("/api", ogdQualityRoute);
 app.route("/api", prototypeFeedbackRoute);
