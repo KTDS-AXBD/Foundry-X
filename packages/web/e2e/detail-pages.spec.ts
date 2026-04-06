@@ -184,4 +184,108 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
     await expect(page.getByText("feasibility-study")).toBeVisible();
     await expect(page.getByText("입력")).toBeVisible();
   });
+
+  // ─── 세션 #215: 미커버 동적 라우트 4건 추가 ───
+
+  test("product/offering-pack/:id/brief — 오퍼링 브리프 (product 경로)", async ({
+    authenticatedPage: page,
+  }) => {
+    await page.evaluate(() => localStorage.setItem("fx-tour-completed", "true"));
+    await page.route("**/api/offering-packs/pack-1", (route) =>
+      route.fulfill({
+        json: {
+          id: "pack-1", title: "테스트 Offering", status: "draft",
+          itemCount: 2, createdAt: "2026-04-07T00:00:00Z",
+        },
+      }),
+    );
+    await page.route("**/api/offering-packs/pack-1/briefs*", (route) =>
+      route.fulfill({ json: { items: [] } }),
+    );
+
+    await page.goto("/product/offering-pack/pack-1/brief");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("미팅 브리프")).toBeVisible({ timeout: 5000 });
+  });
+
+  test("prototype-dashboard/:id — 프로토타입 상세", async ({
+    authenticatedPage: page,
+  }) => {
+    await page.evaluate(() => localStorage.setItem("fx-tour-completed", "true"));
+    await page.route("**/api/prototype-jobs/job-1", (route) =>
+      route.fulfill({
+        json: {
+          id: "job-1", orgId: "org-1", prdTitle: "AI 문서 자동화",
+          status: "completed", builderType: "nextjs", pagesUrl: null,
+          costUsd: 0.05, modelUsed: "claude-sonnet-4-20250514", fallbackUsed: false,
+          retryCount: 0, qualityScore: 85, ogdRounds: 2,
+          createdAt: Date.now(), updatedAt: Date.now(),
+          startedAt: Date.now(), prdContent: "# PRD", buildLog: "",
+          errorMessage: null, feedbackContent: null,
+        },
+      }),
+    );
+    await page.route("**/api/prototype-jobs/job-1/ogd-summary", (route) =>
+      route.fulfill({ json: { summary: null } }),
+    );
+    await page.route("**/api/prototype-jobs/job-1/feedback*", (route) =>
+      route.fulfill({ json: { items: [] } }),
+    );
+    await page.route("**/api/prototype-jobs/job-1/evaluations*", (route) =>
+      route.fulfill({ json: { items: [] } }),
+    );
+
+    await page.goto("/prototype-dashboard/job-1");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("AI 문서 자동화")).toBeVisible();
+  });
+
+  test("shaping/offering/:id/edit — 오퍼링 편집기", async ({
+    authenticatedPage: page,
+  }) => {
+    await page.evaluate(() => localStorage.setItem("fx-tour-completed", "true"));
+    await page.route("**/api/offerings/off-1", (route) =>
+      route.fulfill({
+        json: {
+          id: "off-1", orgId: "org-1", bizItemId: "biz-1", title: "편집 테스트 Offering",
+          purpose: "proposal", format: "html", status: "draft",
+          currentVersion: 1, createdBy: "user-1",
+          createdAt: "2026-04-07T00:00:00Z", updatedAt: "2026-04-07T00:00:00Z",
+        },
+      }),
+    );
+    await page.route("**/api/offerings/off-1/sections*", (route) =>
+      route.fulfill({ json: { sections: [] } }),
+    );
+    await page.route("**/api/offerings/off-1/export*", (route) =>
+      route.fulfill({ body: "<p>미리보기</p>", contentType: "text/html" }),
+    );
+
+    await page.goto("/shaping/offering/off-1/edit");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("편집 테스트 Offering")).toBeVisible({ timeout: 5000 });
+  });
+
+  test("shaping/offering/:id/validate — 오퍼링 검증", async ({
+    authenticatedPage: page,
+  }) => {
+    await page.evaluate(() => localStorage.setItem("fx-tour-completed", "true"));
+    await page.route("**/api/offerings/off-1", (route) =>
+      route.fulfill({
+        json: {
+          id: "off-1", orgId: "org-1", bizItemId: "biz-1", title: "검증 대상 Offering",
+          purpose: "proposal", format: "html", status: "review",
+          currentVersion: 1, createdBy: "user-1",
+          createdAt: "2026-04-07T00:00:00Z", updatedAt: "2026-04-07T00:00:00Z",
+        },
+      }),
+    );
+    await page.route("**/api/offerings/off-1/validations*", (route) =>
+      route.fulfill({ json: { validations: [], total: 0 } }),
+    );
+
+    await page.goto("/shaping/offering/off-1/validate");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("검증 대상 Offering")).toBeVisible({ timeout: 5000 });
+  });
 });

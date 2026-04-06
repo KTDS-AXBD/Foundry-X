@@ -317,4 +317,93 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("GIVC Ontology")).toBeVisible();
   });
+
+  // ─── 세션 #215: 미커버 14건 보강 (E2E 커버리지 매트릭스 기반) ───
+
+  test("ax-bd/bmc/new 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/ax-bd/biz-items*", (route) =>
+      route.fulfill({ json: { items: [], total: 0 } }),
+    );
+    await page.goto("/ax-bd/bmc/new");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "새 BMC 캔버스" })).toBeVisible();
+  });
+
+  test("backup 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/backup*", (route) =>
+      route.fulfill({ json: [] }),
+    );
+    await page.goto("/backup");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "백업 관리" })).toBeVisible();
+  });
+
+  test("builder-quality 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/builder/quality/**", (route) =>
+      route.fulfill({ json: null }),
+    );
+    await page.route("**/api/builder/quality/summary*", (route) =>
+      route.fulfill({ json: null }),
+    );
+    await page.goto("/builder-quality");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "Builder Quality Dashboard" })).toBeVisible();
+  });
+
+  test("tools-guide 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.goto("/tools-guide");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "도구 가이드" })).toBeVisible();
+  });
+
+  test("validation 인덱스 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/validation/**", (route) =>
+      route.fulfill({ json: { items: [], total: 0 } }),
+    );
+    await page.goto("/validation");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "검증" })).toBeVisible();
+  });
+
+  test("product 인덱스 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/mvp-tracking/**", (route) =>
+      route.fulfill({ json: {} }),
+    );
+    await page.route("**/api/poc*", (route) =>
+      route.fulfill({ json: [] }),
+    );
+    await page.goto("/product");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "제품화" })).toBeVisible();
+  });
+
+  test("shaping/offerings 목록 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/ax-bd/offerings*", (route) =>
+      route.fulfill({ json: { items: [], total: 0 } }),
+    );
+    await page.goto("/shaping/offerings");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "Offerings" })).toBeVisible();
+  });
+
+  test("shaping/offerings/new 위자드 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/ax-bd/biz-items*", (route) =>
+      route.fulfill({ json: { items: [], total: 0 } }),
+    );
+    await page.goto("/shaping/offerings/new");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "새 사업기획서 만들기" })).toBeVisible();
+  });
+
+  test("external/discovery-x 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.goto("/external/discovery-x");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("Discovery-X", { exact: false }).first()).toBeVisible();
+  });
+
+  test("external/foundry 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.goto("/external/foundry");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("AI Foundry", { exact: false }).first()).toBeVisible();
+  });
 });
