@@ -137,6 +137,9 @@ import { builderRoute } from "./routes/builder.js";
 // Sprint 167: Offerings Data Layer (F369, F370, F371, Phase 18)
 import { offeringsRoute } from "./routes/offerings.js";
 import { offeringSectionsRoute } from "./routes/offering-sections.js";
+// Sprint 168: Offering Export + Validate (F372, F373, Phase 18)
+import { offeringExportRoute } from "./routes/offering-export.js";
+import { offeringValidateRoute } from "./routes/offering-validate.js";
 // Sprint 160: O-G-D Quality + Feedback (F355, F356, Phase 16)
 import { ogdQualityRoute } from "./routes/ogd-quality.js";
 import { prototypeFeedbackRoute } from "./routes/prototype-feedback.js";
@@ -456,6 +459,10 @@ app.route("/api", metricsRoute);
 // Sprint 167: Offerings Data Layer (F369, F370, F371, Phase 18)
 app.route("/api", offeringsRoute);
 app.route("/api", offeringSectionsRoute);
+
+// Sprint 168: Offering Export + Validate (F372, F373, Phase 18)
+app.route("/api", offeringExportRoute);
+app.route("/api", offeringValidateRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
