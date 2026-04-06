@@ -134,7 +134,7 @@ test.describe("Discovery Pipeline API + Dashboard (F316)", () => {
     expect(cp.checkpointType).toBe("commit_gate");
     expect(cp.questions).toHaveLength(4);
     expect(cp.status).toBe("pending");
-    expect(cp.deadline).toBeTruthy();
+    expect(typeof cp.deadline).toBe("string");
 
     // override 동작 검증
     const customRun = makePipelineRun({ status: "completed", currentStep: "2-10" });
@@ -178,8 +178,8 @@ test.describe("Discovery Pipeline API + Dashboard (F316)", () => {
 
     // 산출물 탭 전환
     await page.getByRole("tab", { name: "산출물" }).click();
-    // ArtifactList 렌더링 대기 (mock 데이터의 산출물)
-    await page.waitForTimeout(1000); // 탭 전환 + 데이터 로드
+    // ArtifactList 렌더링 대기 (mock 데이터의 산출물) — 탭 콘텐츠 로드 확인
+    await expect(page.locator("[role='tabpanel']")).toBeVisible({ timeout: 5000 });
   });
 
   test("발굴 대시보드 — 신호등 필터 배지 표시 + 클릭", async ({
@@ -206,7 +206,7 @@ test.describe("Discovery Pipeline API + Dashboard (F316)", () => {
     if (await greenBadge.isVisible().catch(() => false)) {
       await greenBadge.click();
       // API 재호출 후 결과가 렌더링됨 (mock이므로 동일 데이터)
-      await page.waitForTimeout(500);
+      await expect(page.getByText("AI 문서 자동화").first()).toBeVisible({ timeout: 5000 });
     }
   });
 });

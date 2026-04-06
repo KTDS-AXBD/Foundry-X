@@ -4,13 +4,13 @@ test.describe("Landing Page", () => {
   test("renders hero with Foundry-X branding", async ({ page }) => {
     await page.goto("/");
 
-    // Hero headline — PRD v8 정체성 반영
+    // Hero headline — 사업개발 자동화 직설형 메시지
     await expect(
-      page.getByRole("heading", { name: /AI 에이전트가/i }),
+      page.getByRole("heading", { name: /사업기회 발굴부터/i }),
     ).toBeVisible();
 
-    // 그래디언트 텍스트
-    await expect(page.getByText("일하는 방식을 설계하다")).toBeVisible();
+    // Hero 하단 텍스트
+    await expect(page.getByText("AI가 자동화해요")).toBeVisible();
   });
 
   test("navigation links are visible", async ({ page }) => {

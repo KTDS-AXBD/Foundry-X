@@ -27,10 +27,10 @@ test.describe("Production Smoke", () => {
     // Hero headline — 사업개발 자동화 직설형 메시지
     await expect(
       page.getByRole("heading", { name: /사업기회 발굴부터/i }),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
-    // Hero 브랜딩 텍스트 (Blueprint: br 태그로 분할됨)
-    await expect(page.getByText("자동화해요")).toBeVisible();
+    // Hero 하단 텍스트 (br 태그로 분할됨)
+    await expect(page.getByText("AI가 자동화해요")).toBeVisible();
   });
 
   /**

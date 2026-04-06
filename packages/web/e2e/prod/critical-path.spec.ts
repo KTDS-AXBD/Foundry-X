@@ -53,11 +53,9 @@ test.describe("Production Critical Path", () => {
 
     // 대안: 페이지 하단으로 스크롤하여 Roadmap 섹션 확인
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(500);
 
-    // Roadmap 관련 텍스트가 페이지에 존재하는지 확인
-    const pageContent = await page.textContent("body");
-    expect(pageContent).toBeTruthy();
+    // Roadmap 섹션이 페이지에 존재하는지 확인
+    await expect(page.getByRole("heading", { name: /로드맵/i })).toBeAttached();
   });
 
   /**
@@ -69,10 +67,8 @@ test.describe("Production Critical Path", () => {
     await page.waitForLoadState("networkidle");
 
     // 파이프라인 페이지가 렌더링됨 (인증 없이도 기본 UI)
-    const hasContent = await page.locator("body").textContent();
-    expect(hasContent).toBeTruthy();
-    const bodyChildCount = await page.locator("body > *").count();
-    expect(bodyChildCount).toBeGreaterThan(0);
+    await expect(page.locator("body")).not.toBeEmpty();
+    await expect(page.locator("main, [id='root']").first()).toBeVisible();
   });
 
   /**
@@ -87,13 +83,9 @@ test.describe("Production Critical Path", () => {
     // 두 가지 시나리오 모두 허용:
     // 1) 로그인 페이지로 리다이렉트 → URL에 login/auth 포함
     // 2) 공개 대시보드 표시 → 페이지가 렌더링됨
-    const hasContent = await page.locator("body").textContent();
-
     // 페이지가 비어있지 않아야 함 (500 에러 페이지가 아님)
-    expect(hasContent).toBeTruthy();
-
-    // 빈 흰색 화면이 아닌, 어떤 형태든 UI가 렌더링되어야 함
-    const bodyChildCount = await page.locator("body > *").count();
-    expect(bodyChildCount).toBeGreaterThan(0);
+    await expect(page.locator("body")).not.toBeEmpty();
+    // 로그인 페이지 또는 대시보드가 렌더링되어야 함
+    await expect(page.locator("main, form, [id='root']").first()).toBeVisible();
   });
 });

@@ -127,7 +127,7 @@ function ExecutiveSummarySection({ summary }: { summary: ExecutiveSummaryData | 
         <div><span className="text-muted-foreground">비즈니스 모델:</span> {summary.businessModel}</div>
         <div><span className="text-muted-foreground">추천:</span> {summary.recommendation}</div>
       </div>
-      {summary.openQuestions.length > 0 && (
+      {(summary.openQuestions?.length ?? 0) > 0 && (
         <div>
           <div className="text-xs font-medium text-amber-700">Open Questions</div>
           <ul className="text-xs space-y-0.5">

@@ -272,3 +272,37 @@ export function makeCheckpoint(overrides?: Record<string, unknown>) {
     ...overrides,
   };
 }
+
+// ── 공유 Discovery Fixture (3+ spec에서 중복 사용) ──
+
+export const SHARED_TRAFFIC_LIGHT = {
+  overallSignal: "green" as const,
+  summary: { go: 4, pivot: 2, drop: 1 },
+  dimensions: { market: "green", tech: "yellow", team: "green" },
+};
+
+export function makeBizItems(overrides?: Record<string, unknown>[]) {
+  const defaults = [
+    { id: "biz-1", title: "AI 문서 자동화", type: "I", stage: "2-3", orgId: "test-org-e2e", createdAt: "2026-03-01T00:00:00Z" },
+    { id: "biz-2", title: "스마트 팩토리", type: "T", stage: "2-1", orgId: "test-org-e2e", createdAt: "2026-03-15T00:00:00Z" },
+  ];
+  return overrides ? defaults.map((d, i) => ({ ...d, ...overrides[i] })) : defaults;
+}
+
+export const SHARED_STAGES = {
+  stages: [
+    { stage: "2-0", status: "completed", updatedAt: "2026-03-30T00:00:00Z" },
+    { stage: "2-1", status: "completed", updatedAt: "2026-03-30T00:00:00Z" },
+    { stage: "2-2", status: "completed", updatedAt: "2026-03-30T00:00:00Z" },
+    { stage: "2-3", status: "in_progress", updatedAt: "2026-03-30T00:00:00Z" },
+  ],
+};
+
+export function makeArtifacts(overrides?: Record<string, unknown>[]) {
+  const defaults = [
+    { id: "art-1", stageId: "2-1", skillId: "market-analysis", title: "시장 분석", content: "## 분석 결과\n내용", createdAt: "2026-03-30T10:00:00Z" },
+    { id: "art-2", stageId: "2-2", skillId: "competitor-map", title: "경쟁사 분석", content: "## 경쟁사\n내용", createdAt: "2026-03-30T11:00:00Z" },
+    { id: "art-3", stageId: "2-3", skillId: "bmc-draft", title: "BMC 초안", content: "## BMC\n내용", createdAt: "2026-03-30T12:00:00Z" },
+  ];
+  return overrides ? defaults.map((d, i) => ({ ...d, ...overrides[i] })) : defaults;
+}

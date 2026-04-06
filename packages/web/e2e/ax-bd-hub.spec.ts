@@ -5,17 +5,13 @@
 import { test, expect } from "./fixtures/auth";
 
 test.describe("AX BD Hub", () => {
-  test("ax-bd 허브 → ideas 리다이렉트", async ({ authenticatedPage: page }) => {
-    // ideas 페이지의 API 호출 mock
-    await page.route("**/api/ax-bd/ideas*", (route) =>
-      route.fulfill({ json: { items: [], total: 0, page: 1, limit: 20 } }),
-    );
-
+  test("ax-bd 허브 — 사업기획서 인덱스 렌더링", async ({ authenticatedPage: page }) => {
     await page.goto("/shaping/proposal");
 
-    // /ax-bd/ideas로 리다이렉트되어야 함
-    await page.waitForURL("**/ax-bd/ideas", { timeout: 10000 });
-    await expect(page.locator("main")).toBeVisible();
+    // /shaping/proposal은 사업기획서 인덱스 페이지를 렌더링
+    await expect(page.getByRole("heading", { name: "사업기획서" })).toBeVisible({ timeout: 10000 });
+    // 아이디어 목록 링크 존재
+    await expect(page.getByText("아이디어 목록")).toBeVisible();
   });
 
   test("아이디어 목록 페이지 렌더링", async ({ authenticatedPage: page }) => {

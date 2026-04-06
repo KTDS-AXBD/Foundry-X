@@ -196,7 +196,7 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     );
     await page.goto("/shaping/prototype");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByRole("heading", { name: "Prototype HITL" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Prototype" })).toBeVisible();
   });
 
   test("validation/company 페이지 렌더링", async ({ authenticatedPage: page }) => {
@@ -224,5 +224,47 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     await page.goto("/validation/meetings");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByRole("heading", { name: "미팅 관리" })).toBeVisible();
+  });
+
+  // ─── P1 미커버 라우트 보강 (Phase 17 E2E 감사) ───
+
+  test("shaping/business-plan 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.goto("/shaping/business-plan");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "사업기획서" })).toBeVisible();
+  });
+
+  test("product/offering-pack 목록 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/ax-bd/offering-packs*", (route) =>
+      route.fulfill({ json: { items: [], total: 0 } }),
+    );
+    await page.goto("/product/offering-pack");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "Offering" })).toBeVisible();
+  });
+
+  test("prototype-dashboard 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/prototype/jobs*", (route) =>
+      route.fulfill({ json: { items: [], total: 0 } }),
+    );
+    await page.goto("/prototype-dashboard");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "Prototype Dashboard" })).toBeVisible();
+  });
+
+  test("product/offering-pack/:id 상세 페이지 렌더링", async ({ authenticatedPage: page }) => {
+    await page.route("**/api/ax-bd/offering-packs/pack-1", (route) =>
+      route.fulfill({
+        json: {
+          id: "pack-1", title: "테스트 Offering Pack", status: "draft",
+          itemCount: 0, createdAt: "2026-04-06T00:00:00Z",
+        },
+      }),
+    );
+    await page.route("**/api/ax-bd/offering-packs/pack-1/items*", (route) =>
+      route.fulfill({ json: [] }),
+    );
+    await page.goto("/product/offering-pack/pack-1");
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
   });
 });

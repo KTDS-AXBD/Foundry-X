@@ -125,8 +125,8 @@ test.describe("HITL Review Panel (F266)", () => {
       // HITL 패널 (fixed right panel) 렌더링 확인
       await expect(page.getByText("산출물 리뷰")).toBeVisible({ timeout: 5000 });
     } else {
-      // 산출물이 없는 단계인 경우 — 패널 직접 주입 테스트 (fallback)
-      // evaluate로 HITL 패널 상태를 강제 설정
+      // Skip 사유: Wizard step detail에 산출물/리뷰 링크 미노출 — HITL 패널 트리거 불가
+      // 해소 조건: Wizard에 산출물 액션 링크 추가 시 (Design §8.4 참조)
       test.skip();
     }
   });

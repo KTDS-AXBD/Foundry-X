@@ -15,8 +15,7 @@ test.describe("Phase 4 Integration Path", () => {
     if ((await iframe.count()) > 0) {
       // Verify iframe has src attribute
       const src = await iframe.getAttribute("src");
-      expect(typeof src).toBe("string");
-      expect(src!.length).toBeGreaterThan(0);
+      expect(src).toMatch(/^https?:\/\//);
 
       // Verify loading skeleton disappears after load
       await expect(

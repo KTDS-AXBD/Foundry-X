@@ -212,8 +212,8 @@ test.describe("Discovery Wizard Advanced (F316)", () => {
     // 컴포넌트에서 summary를 어떻게 표시하는지에 따라 검증
     const wizardContainer = page.locator("[data-tour='discovery-wizard']");
     const wizardText = await wizardContainer.textContent();
-    // 트래픽 라이트 데이터가 페이지에 반영되었는지 확인
-    expect(wizardText).toBeTruthy();
+    // 트래픽 라이트 데이터가 페이지에 반영되었는지 확인 (빈 문자열 아님)
+    expect(wizardText!.length).toBeGreaterThan(10);
   });
 
   test("빈 아이템 리스트 상태 표시", async ({
@@ -245,9 +245,8 @@ test.describe("Discovery Wizard Advanced (F316)", () => {
     const isStepperVisible = await stepper.isVisible().catch(() => false);
     // 아이템이 없으면 스텝퍼가 안 보이거나, 빈 상태 텍스트가 표시됨
     if (!isStepperVisible) {
-      // 빈 상태 메시지 또는 생성 유도 확인
-      const pageContent = await page.locator("[data-tour='discovery-wizard']").textContent();
-      expect(pageContent).toBeTruthy();
+      // 빈 상태 메시지 또는 생성 유도 확인 (빈 UI가 아닌 안내 텍스트)
+      await expect(page.locator("[data-tour='discovery-wizard']")).not.toBeEmpty();
     }
   });
 });
