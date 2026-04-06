@@ -155,6 +155,9 @@ import { userEvaluationsRoute } from "./routes/user-evaluations.js";
 // Sprint 171: Content Adapter + Discovery→Shape Pipeline (F378, F379, Phase 18)
 import { contentAdapterRoute } from "./routes/content-adapter.js";
 import { discoveryShapePipelineRoute } from "./routes/discovery-shape-pipeline.js";
+// Sprint 173: Design Token Editor + Offering→Prototype (F381, F382, Phase 18)
+import { designTokensRoute } from "./routes/design-tokens.js";
+import { offeringPrototypeRoute } from "./routes/offering-prototype.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -473,6 +476,8 @@ app.route("/api", offeringValidateRoute);
 // Sprint 171: Content Adapter + Discovery→Shape Pipeline (F378, F379, Phase 18)
 app.route("/api", contentAdapterRoute);
 app.route("/api", discoveryShapePipelineRoute);
+app.route("/api", designTokensRoute);
+app.route("/api", offeringPrototypeRoute);
 
 // Sprint 178: Builder Quality Dashboard + User Evaluations (F390, F391, Phase 19)
 app.route("/api", qualityDashboardRoute);

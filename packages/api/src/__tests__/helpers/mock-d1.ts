@@ -825,6 +825,33 @@ export class MockD1Database {
       );
       CREATE INDEX IF NOT EXISTS idx_offering_validations_offering
         ON offering_validations(offering_id, created_at DESC);
+
+      -- 0043: Prototypes (F181)
+      CREATE TABLE IF NOT EXISTS prototypes (
+        id TEXT PRIMARY KEY,
+        biz_item_id TEXT NOT NULL REFERENCES biz_items(id),
+        version INTEGER NOT NULL DEFAULT 1,
+        format TEXT NOT NULL DEFAULT 'html',
+        content TEXT NOT NULL,
+        template_used TEXT,
+        model_used TEXT,
+        tokens_used INTEGER DEFAULT 0,
+        generated_at TEXT NOT NULL,
+        UNIQUE(biz_item_id, version)
+      );
+      CREATE INDEX IF NOT EXISTS idx_prototypes_biz_item ON prototypes(biz_item_id);
+
+      -- 0113: Offering → Prototype 연동 (F382)
+      CREATE TABLE IF NOT EXISTS offering_prototypes (
+        id TEXT PRIMARY KEY,
+        offering_id TEXT NOT NULL,
+        prototype_id TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(offering_id, prototype_id),
+        FOREIGN KEY (offering_id) REFERENCES offerings(id) ON DELETE CASCADE,
+        FOREIGN KEY (prototype_id) REFERENCES prototypes(id) ON DELETE CASCADE
+      );
+      CREATE INDEX IF NOT EXISTS idx_offering_prototypes_offering ON offering_prototypes(offering_id);
     `);
     this.db.prepare("INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)").run("org_test", "Test Org", "test");
   }

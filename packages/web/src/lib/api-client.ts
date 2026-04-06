@@ -2452,6 +2452,33 @@ export async function fetchOfferingValidations(offeringId: string): Promise<Offe
   return res.validations;
 }
 
+// ─── F381: Design Tokens (Sprint 173) ───
+
+export interface DesignTokenItem {
+  id?: string;
+  tokenKey: string;
+  tokenValue: string;
+  tokenCategory: "color" | "typography" | "layout" | "spacing";
+}
+
+export async function fetchOfferingDesignTokens(offeringId: string): Promise<DesignTokenItem[]> {
+  const res = await fetchApi<{ tokens: DesignTokenItem[] }>(`/offerings/${offeringId}/tokens`);
+  return res.tokens;
+}
+
+export async function updateOfferingDesignTokens(
+  offeringId: string,
+  tokens: DesignTokenItem[],
+): Promise<DesignTokenItem[]> {
+  const res = await putApi<{ tokens: DesignTokenItem[] }>(`/offerings/${offeringId}/tokens`, { tokens });
+  return res.tokens;
+}
+
+export async function resetOfferingDesignTokens(offeringId: string): Promise<DesignTokenItem[]> {
+  const res = await postApi<{ tokens: DesignTokenItem[] }>(`/offerings/${offeringId}/tokens/reset`);
+  return res.tokens;
+}
+
 // ─── F378: Content Adapter (Sprint 171) ───
 
 export type AdaptTone = "executive" | "technical" | "critical";
