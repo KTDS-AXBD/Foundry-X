@@ -4,7 +4,9 @@
 
 import { Hono } from "hono";
 import { PrototypeJobService } from "../services/prototype-job-service.js";
+import { PrototypeQualityService } from "../services/prototype-quality-service.js";
 import { UpdatePrototypeJobSchema } from "../schemas/prototype-job.js";
+import { InsertQualitySchema } from "../schemas/prototype-quality-schema.js";
 import type { Env } from "../env.js";
 
 export const builderRoute = new Hono<{ Bindings: Env }>();
@@ -118,4 +120,32 @@ builderRoute.patch("/builder/jobs/:id", async (c) => {
     if (msg.includes("not found")) return c.json({ error: msg }, 404);
     return c.json({ error: msg }, 409);
   }
+});
+
+// ─── Quality Score Endpoints (Sprint 176: F387) ───
+
+// POST /builder/quality — 품질 점수 저장 (Builder Server → API)
+builderRoute.post("/builder/quality", async (c) => {
+  const raw = await c.req.json();
+  const parsed = InsertQualitySchema.safeParse(raw);
+  if (!parsed.success) return c.json({ error: parsed.error.flatten() }, 400);
+
+  const svc = new PrototypeQualityService(c.env.DB);
+  const record = await svc.insert(parsed.data);
+  return c.json(record, 201);
+});
+
+// GET /builder/:jobId/quality — Job의 라운드별 품질 점수 조회
+builderRoute.get("/builder/:jobId/quality", async (c) => {
+  const jobId = c.req.param("jobId");
+  const svc = new PrototypeQualityService(c.env.DB);
+  const scores = await svc.listByJob(jobId);
+  return c.json({ scores });
+});
+
+// GET /builder/quality/stats — 전체 품질 통계
+builderRoute.get("/builder/quality/stats", async (c) => {
+  const svc = new PrototypeQualityService(c.env.DB);
+  const stats = await svc.getStats();
+  return c.json(stats);
 });

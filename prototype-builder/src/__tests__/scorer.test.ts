@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { PrototypeJob, QualityScore } from '../types.js';
 import { DIMENSION_WEIGHTS } from '../types.js';
 
-// Mock child_process and fs before imports
+// Mock child_process, fs, and Anthropic SDK before imports
 vi.mock('node:child_process', () => ({
   execFile: vi.fn(),
 }));
@@ -14,9 +14,17 @@ vi.mock('node:fs/promises', () => ({
     stat: vi.fn(),
   },
 }));
+vi.mock('@anthropic-ai/sdk', () => ({
+  default: vi.fn().mockImplementation(() => ({
+    messages: {
+      create: vi.fn(),
+    },
+  })),
+}));
 
 import { execFile } from 'node:child_process';
 import fs from 'node:fs/promises';
+import Anthropic from '@anthropic-ai/sdk';
 import {
   evaluateQuality,
   generateTargetFeedback,
@@ -124,6 +132,72 @@ describe('scorer', () => {
       expect(result.dimension).toBe('functional');
       expect(result.score).toBeGreaterThanOrEqual(0.7);
       expect(result.details).toContain('Handlers:');
+    });
+  });
+
+  describe('prdScore (LLM mode)', () => {
+    it('LLM 응답에서 implemented/total을 파싱해 점수를 산출해요', async () => {
+      const job = makeJob({
+        prdContent: '## Must Have\n- 대시보드\n- 차트\n- 로그인',
+      });
+
+      // Mock Anthropic API
+      const mockCreate = vi.fn().mockResolvedValue({
+        content: [{
+          type: 'text',
+          text: '{"implemented": 2, "total": 3, "missing": ["로그인"]}',
+        }],
+      });
+      vi.mocked(Anthropic).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }) as unknown as Anthropic);
+
+      // Set API key
+      process.env['ANTHROPIC_API_KEY'] = 'test-key';
+
+      mockFs.access.mockResolvedValue(undefined);
+      mockFs.readdir.mockResolvedValue([] as never);
+
+      const result = await prdScore(job, '/tmp/test', { useLlm: true });
+      expect(result.dimension).toBe('prd');
+      expect(result.score).toBeCloseTo(0.67, 1);
+      expect(result.details).toContain('LLM');
+      expect(result.details).toContain('2/3');
+
+      delete process.env['ANTHROPIC_API_KEY'];
+    });
+
+    it('API 키가 없으면 키워드 모드로 fallback해요', async () => {
+      const job = makeJob({
+        prdContent: '대시보드를 구현해야 한다.',
+      });
+
+      delete process.env['ANTHROPIC_API_KEY'];
+      mockFs.readdir.mockResolvedValue([] as never);
+
+      const result = await prdScore(job, '/tmp/test', { useLlm: true });
+      expect(result.dimension).toBe('prd');
+      // keyword mode → default 0.5 or keyword match
+    });
+
+    it('LLM 호출 실패 시 키워드 모드로 fallback해요', async () => {
+      const job = makeJob({
+        prdContent: '대시보드를 구현해야 한다.',
+      });
+
+      const mockCreate = vi.fn().mockRejectedValue(new Error('API Error'));
+      vi.mocked(Anthropic).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }) as unknown as Anthropic);
+
+      process.env['ANTHROPIC_API_KEY'] = 'test-key';
+      mockFs.readdir.mockResolvedValue([] as never);
+
+      const result = await prdScore(job, '/tmp/test', { useLlm: true });
+      expect(result.dimension).toBe('prd');
+      // Should not throw, falls back to keyword mode
+
+      delete process.env['ANTHROPIC_API_KEY'];
     });
   });
 
