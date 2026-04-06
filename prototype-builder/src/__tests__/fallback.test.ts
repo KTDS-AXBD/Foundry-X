@@ -53,15 +53,6 @@ describe('fallback', () => {
     delete process.env['ANTHROPIC_API_KEY'];
   });
 
-  describe('FallbackLevel type', () => {
-    it('max-cli 레벨이 포함돼요', async () => {
-      const { type } = await import('../fallback.js');
-      // FallbackLevel은 타입이므로 런타임 체크 대신 FallbackResult를 확인
-      // executeWithFallback의 반환 타입에 'max-cli'가 포함되는지 간접 검증
-      expect(type).toBeUndefined(); // 모듈에 type export 없음 — 타입 검증은 tsc가 담당
-    });
-  });
-
   describe('executeWithFallback', () => {
     it('SKIP_CLI=true이면 CLI를 건너뛰고 API로 가요', async () => {
       process.env['SKIP_CLI'] = 'true';
