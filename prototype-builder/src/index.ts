@@ -1,6 +1,6 @@
 import http from 'node:http';
 import type { BuilderConfig, PrototypeJob } from './types.js';
-import { pollForJobs, pollForFeedbackJobs, updatePrototypeStatus, startPollingLoop } from './poller.js';
+import { pollForJobs, pollForFeedbackJobs, updatePrototypeStatus, startPollingLoop, type PolledJob } from './poller.js';
 import { copyTemplate, runBuild, verifyBuildOutput } from './executor.js';
 import { runOgdLoop } from './orchestrator.js';
 import { transition, checkTimeout, canDeadLetter } from './state-machine.js';
@@ -29,7 +29,7 @@ function loadConfig(): BuilderConfig {
 const TEMPLATE_DIR = path.resolve(import.meta.dirname, '../templates/react-spa');
 
 async function processJob(
-  proto: { id: string; projectId: string; name: string; prdContent: string; feedbackContent: string | null },
+  proto: PolledJob,
   config: BuilderConfig,
   costTracker: CostTracker,
 ): Promise<void> {
@@ -82,10 +82,9 @@ async function processJob(
     // 7. live 상태 전환 + 결과 기록
     await updatePrototypeStatus(proto.id, {
       status: 'live',
-      deployUrl: deploy.url,
-      qualityScore: result.score,
-      ogdRounds: result.rounds,
-      apiCost: result.totalCost,
+      pagesProject: deploy.projectName,
+      pagesUrl: deploy.url,
+      costUsd: result.totalCost,
       buildLog: buildResult.output,
     }, config);
 

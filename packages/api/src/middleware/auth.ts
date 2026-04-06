@@ -29,6 +29,7 @@ const PUBLIC_PATHS = [
   "/api/docs",
   "/api/dx/",
   "/api/aif/",
+  "/api/builder/",
 ];
 
 export const authMiddleware: MiddlewareHandler = async (c, next) => {
