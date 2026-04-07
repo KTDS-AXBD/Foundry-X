@@ -59,6 +59,19 @@ crons = ["0 */6 * * *"]
 ## binding = "AIF_WORKER"
 ## service = "ai-foundry-svc-gateway"
 
+# F441: R2 File Storage (Sprint 213)
+[[r2_buckets]]
+binding = "FILES_BUCKET"
+bucket_name = "foundry-x-files"
+
+[[env.dev.r2_buckets]]
+binding = "FILES_BUCKET"
+bucket_name = "foundry-x-files-dev"
+
+[[env.staging.r2_buckets]]
+binding = "FILES_BUCKET"
+bucket_name = "foundry-x-files-staging"
+
 # Sprint 8: KV Cache
 [[kv_namespaces]]
 binding = "CACHE"
