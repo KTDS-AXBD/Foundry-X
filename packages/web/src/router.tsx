@@ -8,17 +8,27 @@ function RedirectDiscoveryDetail() {
   return <Navigate to={`/discovery/items/${id}`} replace />;
 }
 
+function Spinner() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+    </div>
+  );
+}
+
 export const router = createBrowserRouter([
   {
     element: <LandingLayout />,
+    hydrateFallbackElement: <Spinner />,
     children: [
       { index: true, lazy: () => import("@/routes/landing") },
     ],
   },
-  { path: "login", lazy: () => import("@/routes/login") },
-  { path: "invite", lazy: () => import("@/routes/invite") },
+  { path: "login", lazy: () => import("@/routes/login"), hydrateFallbackElement: <Spinner /> },
+  { path: "invite", lazy: () => import("@/routes/invite"), hydrateFallbackElement: <Spinner /> },
   {
     element: <ProtectedRoute />,
+    hydrateFallbackElement: <Spinner />,
     children: [{
     element: <AppLayout />,
     children: [
