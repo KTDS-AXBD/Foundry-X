@@ -61,7 +61,16 @@ function scheduleTokenRefresh() {
 }
 
 /** refreshToken으로 새 토큰 쌍을 발급받아 저장 */
+let pendingRefresh: Promise<boolean> | null = null;
+
 async function refreshAccessToken(): Promise<boolean> {
+  // 동시 다발 refresh 방지 — 이미 진행 중이면 같은 Promise 공유
+  if (pendingRefresh) return pendingRefresh;
+  pendingRefresh = doRefresh().finally(() => { pendingRefresh = null; });
+  return pendingRefresh;
+}
+
+async function doRefresh(): Promise<boolean> {
   const rt = localStorage.getItem("refreshToken");
   if (!rt) return false;
 
