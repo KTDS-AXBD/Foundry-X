@@ -38,6 +38,7 @@ describe("constraintGuard middleware", () => {
       GITHUB_REPO: "",
       CACHE: {} as KVNamespace,
       AI: {} as Ai,
+      FILES_BUCKET: {} as R2Bucket,
     }) satisfies Env;
 
   it("passes through when no agent headers", async () => {
