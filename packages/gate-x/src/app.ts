@@ -17,8 +17,10 @@ import {
   gatePackageRoute,
   ogdPocRoute,
   teamReviewsRoute,
+  tenantsRoute,
   validationMeetingsRoute,
   validationTierRoute,
+  webhooksRoute,
 } from "./routes/index.js";
 
 const config: HarnessConfig = {
@@ -55,5 +57,7 @@ app.route("/api/gate", teamReviewsRoute);
 app.route("/api/gate", validationMeetingsRoute);
 app.route("/api/gate", validationTierRoute);
 app.route("/api/gate", customRulesRoute);
+app.route("/api/gate", webhooksRoute);
+app.route("/api/tenants", tenantsRoute);
 
 export default app;
