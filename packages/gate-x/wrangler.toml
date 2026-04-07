@@ -1,0 +1,23 @@
+name = "gate-x-api"
+account_id = "b6c06059b413892a92f150e5ca496236"
+main = "src/index.ts"
+compatibility_date = "2026-03-17"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "gate-x-db"
+database_id = "TBD"
+migrations_dir = "src/db/migrations"
+
+[vars]
+ENVIRONMENT = "production"
+
+[env.dev]
+name = "gate-x-api-dev"
+
+[[env.dev.d1_databases]]
+binding = "DB"
+database_name = "gate-x-db-dev"
+database_id = "TBD"
+migrations_dir = "src/db/migrations"
