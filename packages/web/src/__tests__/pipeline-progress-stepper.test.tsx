@@ -2,7 +2,7 @@
  * F447 — PipelineProgressStepper 단위 테스트
  */
 import { describe, it, expect } from "vitest";
-import { render } from "ink-testing-library";
+import { render } from "@testing-library/react";
 import React from "react";
 
 // jsdom 환경에서 React 컴포넌트 테스트

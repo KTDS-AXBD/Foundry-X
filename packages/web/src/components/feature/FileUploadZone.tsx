@@ -65,10 +65,10 @@ export function FileUploadZone({ apiBaseUrl = "", bizItemId, onUploadComplete }:
       if (!presignRes.ok) {
         throw new Error("Presigned URL 발급에 실패했어요");
       }
-      const { presigned_url, file_id } = await presignRes.json<{
+      const { presigned_url, file_id } = (await presignRes.json()) as {
         presigned_url: string;
         file_id: string;
-      }>();
+      };
 
       // Step 2: R2에 직접 PUT (XMLHttpRequest로 진행바 지원)
       await new Promise<void>((resolve, reject) => {
