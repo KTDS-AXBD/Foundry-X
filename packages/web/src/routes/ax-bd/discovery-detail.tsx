@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, FileBarChart, Loader2, Pencil, History } from "lucide-react";
+import LoadingSkeleton from "@/components/feature/discovery/LoadingSkeleton";
 import {
   fetchBizItemDetail,
   fetchBdpLatest,
@@ -88,6 +89,18 @@ export function Component() {
 
   useEffect(() => { void loadData(); }, [loadData]);
 
+  // F450: Escape 키로 패널 닫기
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        if (showVersionPanel) setShowVersionPanel(false);
+        if (showTemplateSelector) setShowTemplateSelector(false);
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [showVersionPanel, showTemplateSelector]);
+
   async function handleGenerateBusinessPlan(templateParams?: TemplateParams) {
     if (!id) return;
     setGeneratingPlan(true);
@@ -122,14 +135,14 @@ export function Component() {
     setEditMode(false);
   }
 
-  if (loading) return <div className="flex items-center justify-center p-8 text-muted-foreground"><Loader2 className="size-5 animate-spin mr-2" />로딩 중...</div>;
+  if (loading) return <div className="p-6"><LoadingSkeleton variant="analysis-result" /></div>;
   if (error) return <div className="p-8 text-destructive">{error}</div>;
   if (!item) return null;
 
   const statusLabel = STATUS_LABELS[item.status] ?? item.status;
 
   return (
-    <div className="space-y-6 pb-12">
+    <div data-discovery-page className="space-y-6 pb-12">
       {/* 헤더 */}
       <div className="flex items-start gap-3">
         <Link to="/discovery" className="text-muted-foreground hover:text-foreground mt-1">
@@ -166,7 +179,7 @@ export function Component() {
 
       {/* 3탭 허브 */}
       <Tabs defaultValue="info">
-        <TabsList>
+        <TabsList aria-label="아이템 상세 탭">
           <TabsTrigger value="info">기본정보</TabsTrigger>
           <TabsTrigger value="analysis">발굴분석</TabsTrigger>
           <TabsTrigger value="shaping">형상화</TabsTrigger>
@@ -300,6 +313,7 @@ export function Component() {
                         size="sm"
                         onClick={() => setShowTemplateSelector(true)}
                         disabled={generatingPlan}
+                        aria-label="사업기획서 재생성"
                       >
                         재생성
                       </Button>

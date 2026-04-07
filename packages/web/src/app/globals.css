@@ -335,3 +335,35 @@
   pointer-events: none;
   z-index: 1;
 }
+
+/* Sprint 218: F450 반응형 Discovery */
+:root {
+  --discovery-content-padding: 1.5rem;
+  --discovery-grid-cols: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --discovery-content-padding: 1rem;
+    --discovery-grid-cols: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --discovery-content-padding: 0.75rem;
+    --discovery-grid-cols: 1fr;
+  }
+
+  /* Discovery 탭 스크롤 */
+  [data-discovery-tabs] [role="tablist"] {
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+
+  /* Discovery 패딩 축소 */
+  [data-discovery-page] {
+    padding: var(--discovery-content-padding) !important;
+  }
+}
