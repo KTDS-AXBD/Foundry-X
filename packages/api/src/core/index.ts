@@ -3,17 +3,16 @@
 
 // Discovery (S1-S2 발굴) — 12 routes
 export {
-  axBdDiscoveryRoute, axBdIdeasRoute, axBdArtifactsRoute,
-  bizItemsRoute, collectionRoute, ideaPortalWebhookRoute,
+  axBdDiscoveryRoute, axBdArtifactsRoute,
+  bizItemsRoute,
   discoveryRoute, discoveryPipelineRoute, discoveryReportRoute,
   discoveryReportsRoute, discoveryStagesRoute, discoveryShapePipelineRoute,
-  irProposalsRoute,
 } from "./discovery/index.js";
 
 // Shaping (S3 형상화) — 14 routes
 export {
   shapingRoute, axBdBmcRoute, axBdAgentRoute, axBdCommentsRoute,
-  axBdHistoryRoute, axBdInsightsRoute, axBdLinksRoute, axBdViabilityRoute,
+  axBdHistoryRoute, axBdLinksRoute, axBdViabilityRoute,
   axBdPrototypesRoute, axBdSkillsRoute, axBdPersonaEvalRoute,
   axBdProgressRoute, personaConfigsRoute, personaEvalsRoute,
 } from "./shaping/index.js";
@@ -44,3 +43,12 @@ export {
   userEvaluationsRoute, builderRoute, mcpRoute, expansionPackRoute,
   axBdKgRoute,
 } from "./harness/index.js";
+
+// collection (5 routes) — F401, Sprint 188
+export {
+  axBdIdeasRoute,
+  collectionRoute,
+  ideaPortalWebhookRoute,
+  irProposalsRoute,
+  axBdInsightsRoute,
+} from "./collection/index.js";

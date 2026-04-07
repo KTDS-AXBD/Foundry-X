@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
-import { DiscoveryXIngestService } from "../services/discovery-x-ingest-service.js";
-import { discoveryIngestPayloadSchema } from "../schemas/discovery-x.schema.js";
+import { DiscoveryXIngestService } from "../../collection/services/discovery-x-ingest-service.js";
+import { discoveryIngestPayloadSchema } from "../../collection/schemas/discovery-x.schema.js";
 
 export const axBdDiscoveryRoute = new Hono<{
   Bindings: Env;

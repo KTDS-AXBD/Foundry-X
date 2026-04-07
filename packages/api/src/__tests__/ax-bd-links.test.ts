@@ -5,7 +5,7 @@ import {
   NotFoundError,
   ConflictError,
 } from "../core/shaping/services/idea-bmc-link-service.js";
-import { IdeaService } from "../core/discovery/services/idea-service.js";
+import { IdeaService } from "../core/collection/services/idea-service.js";
 import { BmcService } from "../core/shaping/services/bmc-service.js";
 
 describe("IdeaBmcLinkService", () => {

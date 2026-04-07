@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #218 (2026-04-07)
+**Sprint 197 — Foundry-X 수집 코드 격리 (F413, Phase 21-E)**:
+- ✅ `packages/api/src/core/collection/` 신설 — Discovery-X 이관 대상 14개 파일 격리 (4 routes + 5 services + 5 schemas)
+- ✅ `git mv` 14건 (R 100% 보존), Cross-module import 6 파일 + 테스트 8 파일 패치
+- ✅ `core/index.ts` barrel + `app.ts` 5 mount 라인 정합성 유지
+- ✅ typecheck 0 errors, 테스트 3167 passed / 1 skipped
+- 📄 SPEC.md F413 등록 (Phase 21-E 신설), Sprint 197 plan/design/report 3종 작성
+- 🎯 Strangler Fig 사전 정리 — Phase 21+ 본 추출을 위한 도메인 경계 명확화
+
 ### 세션 #217 (2026-04-07)
 **Phase 20 AX BD MSA 재조정 완결 — F392~F401 (10/10, Sprint 179~188, Match 94%)**:
 - ✅ Sprint 185~188 Full Auto (Sonnet WT) — 4 Sprint 완료, PR #322~#325

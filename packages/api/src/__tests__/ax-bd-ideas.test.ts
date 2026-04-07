@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { IdeaService } from "../core/discovery/services/idea-service.js";
+import { IdeaService } from "../core/collection/services/idea-service.js";
 
 describe("IdeaService", () => {
   let db: ReturnType<typeof createMockD1>;

@@ -7,7 +7,7 @@ import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
 import { AgentCollectSchema, IdeaPortalWebhookSchema, ScreeningRejectSchema, AgentScheduleCreateSchema, AgentRunsQuerySchema, AgentTriggerSchema } from "../schemas/collection.js";
 import { CollectionPipelineService } from "../services/collection-pipeline.js";
-import { AgentCollector, CollectorError } from "../services/agent-collector.js";
+import { AgentCollector, CollectorError } from "../../discovery/services/agent-collector.js";
 import { createAgentRunner } from "../../agent/services/agent-runner.js";
 import { AgentCollectionService } from "../../agent/services/agent-collection.js";
 
