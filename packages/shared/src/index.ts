@@ -445,3 +445,5 @@ export type {
   AnyDomainEvent,
 } from './events/index.js';
 export { D1EventBus } from './events/index.js';
+// F406: 이벤트 유실 복구 타입 (Sprint 191)
+export type { D1LikeDatabase, EventHandler, EventStatusSummary } from './events/index.js';
