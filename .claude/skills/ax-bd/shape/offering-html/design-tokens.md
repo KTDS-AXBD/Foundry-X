@@ -1,10 +1,12 @@
-# Offering HTML 디자인 토큰 (Phase 1)
+# Offering HTML 디자인 토큰 (v2)
 
-> **Phase 1:** MD 문서 (Sprint 165 F365)
+> **v1:** Sprint 165 F365 — KOAMI v0.5 CSS 기반 추출
+> **v2:** Sprint 198 F415 — 가이드 §5 정합성 검증 + 12종 컴포넌트 참조 추가
 > **Phase 2:** JSON 정규 포맷 + API (Sprint 173 F381)
 > **Phase 3:** Web 실시간 에디터 + CSS 커스터마이징 (Sprint 173 F381)
 
-KOAMI v0.5 CSS에서 추출한 디자인 토큰. 모든 사업기획서 HTML에 일관된 시각 언어를 적용한다.
+가이드 §5 기준 디자인 시스템. 모든 사업기획서 HTML에 일관된 시각 언어를 적용한다.
+v2 검증 결과: base.html의 CSS variable은 가이드 §5와 완전 일치 확인 (Sprint 198).
 
 ---
 
@@ -108,7 +110,26 @@ Fallback: `-apple-system, BlinkMacSystemFont, system-ui, sans-serif`
 
 ---
 
-## 6. 승격 경로
+## 6. 컴포넌트 참조 (가이드 §5 기준 12종)
+
+| # | 컴포넌트 | 파일 | 핵심 토큰 | 상태 |
+|---|---------|------|----------|------|
+| 1 | Hero | hero.html | typography.hero, layout.sectionPadding | 기존 |
+| 2 | Executive Summary | exec-summary.html | color.bg.alt, color.border.default | **신규 v2** |
+| 3 | 3축 카드 그리드 | three-axis.html | color.bg.default + black CTA box | **신규 v2** |
+| 4 | TAM/SAM/SOM | tam-card.html | color.border.strong, typography.kpi | **신규 v2** |
+| 5 | Before/After | ba-grid.html | spacing.grid.gapLarge | 기존 |
+| 6 | 비교 그리드 | compare-grid.html | spacing.grid.gap | 기존 |
+| 7 | 비교 테이블 | compare-table.html | compare-table class | **신규 v2** |
+| 8 | 트렌드 그리드 | trend-grid.html | layout.cardRadius | 기존 |
+| 9 | 플로우 다이어그램 | flow-diagram.html | color.border.default | 기존 |
+| 10 | 로드맵 | roadmap-track.html | color.text.muted | 기존 |
+| 11 | 임팩트 리스트 | impact-list.html | color.data.* | 기존 |
+| 12 | GAN 판정 카드 | gan-verdict.html | color.data.positive/negative/warning | **신규 v2** |
+
+---
+
+## 7. 승격 경로
 
 ```
 Phase 1 (현재):  design-tokens.md
@@ -125,7 +146,7 @@ Phase 3 (F381):  Web Token Editor
     └── export: CSS custom properties snippet
 ```
 
-## 7. 커스터마이징 가이드
+## 8. 커스터마이징 가이드
 
 고객별 브랜드에 맞게 토큰을 오버라이드할 때:
 

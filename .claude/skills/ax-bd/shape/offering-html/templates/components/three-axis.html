@@ -1,0 +1,122 @@
+<!-- Component: three-axis
+     Usage: §01-1 추진 배경 및 목적 — 수익성/KT적합성/실행력 3축 카드 + 추진목적 CTA
+     Variables:
+       {{axis[]}}
+         {{axis[].label}}    — 축 이름 (예: "수익성", "KT 적합성", "실행력")
+         {{axis[].question}} — 핵심 질문 (예: "이 사업이 매출·수익에 어떻게 기여하는가?")
+         {{axis[].content}}  — 본문 (경영 언어, 구체 수치 또는 근거 포함)
+       {{purpose}}           — 추진목적 1문장 (CTA 박스)
+       {{keywords[]}}        — 키워드 카드 3개 (예: "데이터 확보", "KT 시너지", "수주 가능성")
+     Spec: 가이드 §01-1 — "항상 3축 구조", KT 연계 없으면 경고
+     Sprint: 198 F415
+-->
+<style>
+  #three-axis { background: var(--white); }
+
+  .three-axis-grid {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 900px) { .three-axis-grid { grid-template-columns: 1fr; } }
+
+  .axis-card {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--card-radius);
+    padding: 28px 24px;
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .axis-card-number {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gray-400);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .axis-card-label {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--black);
+    letter-spacing: -0.02em;
+  }
+  .axis-card-question {
+    font-size: 13px;
+    color: var(--gray-600);
+    line-height: 1.5;
+    border-left: 3px solid var(--gray-200);
+    padding-left: 10px;
+  }
+  .axis-card-content {
+    font-size: 15px;
+    color: var(--black);
+    line-height: 1.7;
+  }
+
+  /* 추진목적 CTA 블랙 박스 */
+  .purpose-box {
+    margin-top: 32px;
+    background: var(--black);
+    color: var(--white);
+    border-radius: var(--card-radius);
+    padding: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .purpose-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gray-400);
+  }
+  .purpose-text {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--white);
+  }
+  .purpose-keywords {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .purpose-keyword {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 100px;
+    padding: 6px 16px;
+  }
+</style>
+
+<section id="three-axis" class="fade-in">
+  <p class="section-label">01-1 추진 배경 및 목적</p>
+  <h2 class="section-title">왜 이 사업을 해야 하는가</h2>
+
+  <div class="three-axis-grid">
+    <!-- {{#axis}} -->
+    <div class="axis-card">
+      <span class="axis-card-number">축 {{@index}}</span>
+      <p class="axis-card-label">{{label}}</p>
+      <p class="axis-card-question">{{question}}</p>
+      <p class="axis-card-content">{{content}}</p>
+    </div>
+    <!-- {{/axis}} -->
+  </div>
+
+  <div class="purpose-box">
+    <span class="purpose-label">추진 목적</span>
+    <p class="purpose-text">{{purpose}}</p>
+    <div class="purpose-keywords">
+      <!-- {{#keywords}} -->
+      <span class="purpose-keyword">{{.}}</span>
+      <!-- {{/keywords}} -->
+    </div>
+  </div>
+</section>

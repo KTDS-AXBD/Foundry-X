@@ -1,0 +1,67 @@
+<!-- Component: exec-summary
+     Usage: §0.5 Executive Summary — 경영진 3분 Go/No-Go 판단용
+     Variables:
+       {{bullets[]}} — 표준 불릿 풀 5~6개 선택 조합
+         {{bullets[].role}}   — "What" | "Why Now" | "How much" | "Why KT" | "Why Us" | "Scale"
+         {{bullets[].icon}}   — 역할별 이모지 또는 SVG (옵션)
+         {{bullets[].text}}   — 불릿 본문 (경영 언어)
+         {{bullets[].bold[]}} — 강조 키워드 목록 (1불릿당 2~3개)
+     Spec: 가이드 §0.5 — "경영진이 3분 안에 Go/No-Go 판단 가능해야 함"
+     Sprint: 198 F415
+-->
+<style>
+  #exec-summary { background: var(--gray-50); }
+  .exec-summary-grid {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 900px) { .exec-summary-grid { grid-template-columns: 1fr; } }
+
+  .exec-bullet {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--card-radius);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .exec-bullet-role {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gray-400);
+  }
+  .exec-bullet-text {
+    font-size: 15px;
+    color: var(--black);
+    line-height: 1.6;
+  }
+  .exec-bullet-text strong {
+    font-weight: 700;
+    color: var(--black);
+  }
+  /* 마지막 불릿이 홀수일 때 풀폭 처리 */
+  .exec-summary-grid.five-bullets .exec-bullet:last-child,
+  .exec-summary-grid.four-bullets .exec-bullet:last-child {
+    grid-column: 1 / -1;
+  }
+</style>
+
+<section id="exec-summary" class="fade-in">
+  <p class="section-label">Executive Summary</p>
+  <h2 class="section-title">핵심 요약</h2>
+  <p class="section-sub">경영진이 3분 안에 Go/No-Go를 판단할 수 있는 핵심 내용입니다.</p>
+
+  <div class="exec-summary-grid">
+    <!-- {{#bullets}} -->
+    <div class="exec-bullet">
+      <span class="exec-bullet-role">{{role}}</span>
+      <p class="exec-bullet-text">{{text}}</p>
+    </div>
+    <!-- {{/bullets}} -->
+  </div>
+</section>

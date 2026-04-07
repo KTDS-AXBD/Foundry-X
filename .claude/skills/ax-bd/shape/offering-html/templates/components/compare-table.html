@@ -1,0 +1,76 @@
+<!-- Component: compare-table
+     Usage: §01-4 왜 이 고객/도메인인가, §05-3 투자 계획 등 데이터 비교/판단 기준 표
+     Variables:
+       {{table_id}}         — 섹션 앵커 ID
+       {{label}}            — 섹션 레이블 (예: "01-4 왜 이 고객/도메인인가")
+       {{title}}            — 섹션 제목
+       {{description}}      — 섹션 설명 (옵션)
+       {{headers[]}}        — 테이블 헤더 배열 (예: ["기준", "내용", "평가"])
+       {{rows[]}}           — 데이터 행 배열
+         {{rows[].cells[]}} — 각 행의 셀 배열
+         {{rows[].badge}}   — 배지 타입 (옵션): "green" | "orange" | "red" | "black" | "gray"
+         {{rows[].badge_text}} — 배지 텍스트 (옵션, badge와 함께 사용)
+       {{note}}             — 하단 보충 메모 (옵션)
+     Spec: 가이드 §5 — ".compare-table 클래스 사용" / §01-4 고객 판단 기준 테이블
+     Sprint: 198 F415
+-->
+<style>
+  /* compare-table 기본 스타일은 base.html에 정의됨 */
+  /* 여기서는 컴포넌트 전용 추가 스타일만 정의 */
+
+  .compare-table-note {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--gray-600);
+    line-height: 1.5;
+    padding-left: 14px;
+    border-left: 3px solid var(--gray-200);
+  }
+
+  .compare-table td .badge {
+    font-size: 11px;
+  }
+
+  /* 첫 컬럼 강조 */
+  .compare-table td:first-child {
+    font-weight: 600;
+    color: var(--black);
+  }
+
+  /* 배지 포함 셀 */
+  .compare-table td.cell-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+</style>
+
+<section id="{{table_id}}" class="fade-in">
+  <p class="section-label">{{label}}</p>
+  <h2 class="section-title">{{title}}</h2>
+  <!-- {{#description}}<p class="section-sub">{{description}}</p>{{/description}} -->
+
+  <table class="compare-table" style="margin-top: 40px;">
+    <thead>
+      <tr>
+        <!-- {{#headers}} -->
+        <th>{{.}}</th>
+        <!-- {{/headers}} -->
+      </tr>
+    </thead>
+    <tbody>
+      <!-- {{#rows}} -->
+      <tr>
+        <!-- {{#cells}} -->
+        <td>{{.}}</td>
+        <!-- {{/cells}} -->
+        <!-- {{#badge}}<td><span class="badge {{badge}}">{{badge_text}}</span></td>{{/badge}} -->
+      </tr>
+      <!-- {{/rows}} -->
+    </tbody>
+  </table>
+
+  <!-- {{#note}} -->
+  <p class="compare-table-note">{{note}}</p>
+  <!-- {{/note}} -->
+</section>
