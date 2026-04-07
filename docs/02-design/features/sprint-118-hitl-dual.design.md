@@ -279,6 +279,18 @@ GET  /api/ax-bd/prototypes/:id/review-summary               ← 상태 요약
 
 ---
 
+## E2E Skip 추적
+
+> 감사 시점: 2026-04-07, E2E Audit Phase 22
+
+| Spec | Skip 건수 | 사유 | 해소 조건 |
+|------|----------|------|----------|
+| `hitl-review.spec.ts` | 4건 | WizardStepDetail에 산출물/리뷰 링크 미노출 → HITL 패널 트리거 불가 | Wizard에 산출물 액션 링크 추가 시 (§8.4 참조) |
+
+**해소 시점**: HITL 패널이 Wizard 내에서 직접 트리거 가능해지면 `test.skip()` 제거 + functional assertion 추가
+
+---
+
 ## Version History
 
 | Version | Date | Changes | Author |

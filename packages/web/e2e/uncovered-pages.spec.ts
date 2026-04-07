@@ -144,7 +144,7 @@ test.describe("미커버 페이지 렌더링 검증", () => {
   test("settings/jira 페이지 렌더링", async ({ authenticatedPage: page }) => {
     await page.route("**/api/**", (route) => route.fulfill({ json: {} }));
     await page.goto("/settings/jira");
-    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "Jira Integration" })).toBeVisible({ timeout: 10000 });
   });
 
   // ── 세션 #189 추가: 감사 기반 미커버 라우트 보강 (8건) ──
