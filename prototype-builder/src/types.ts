@@ -128,3 +128,68 @@ export type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 export interface BuilderLogger {
   log(level: LogLevel, message: string, meta?: Record<string, unknown>): void;
 }
+
+// ─────────────────────────────────────────────────────────────────
+// F429: BuildQueue 타입
+// ─────────────────────────────────────────────────────────────────
+
+export interface BuildQueueStatus {
+  /** 대기 중인 항목 수 (현재 실행 중인 작업 미포함) */
+  queueSize: number;
+  /** 현재 실행 중 여부 */
+  isRunning: boolean;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// F430: DesignPipeline 타입
+// ─────────────────────────────────────────────────────────────────
+
+export type ImpeccableDomain =
+  | 'typography'
+  | 'colorContrast'
+  | 'spatialDesign'
+  | 'motionDesign'
+  | 'componentDesign'
+  | 'darkMode'
+  | 'accessibility';
+
+export type ViolationSeverity = 'critical' | 'major' | 'minor';
+
+export interface ImpeccableViolation {
+  domain: ImpeccableDomain;
+  severity: ViolationSeverity;
+  /** impeccable 규칙 설명 */
+  rule: string;
+  /** 코드에서 발견된 증거 */
+  evidence: string;
+  /** 구체적 수정 지시 */
+  fix: string;
+}
+
+export interface AuditReport {
+  jobId: string;
+  violations: ImpeccableViolation[];
+  criticalCount: number;
+  majorCount: number;
+  minorCount: number;
+  auditedAt: string;
+  /** LLM 원문 응답 */
+  rawAnalysis: string;
+}
+
+export interface PipelineStepResult {
+  step: 'audit' | 'normalize' | 'polish';
+  success: boolean;
+  durationMs: number;
+  error?: string;
+}
+
+export interface PipelineResult {
+  jobId: string;
+  auditReport: AuditReport;
+  /** polish 후 최종 품질 점수 (0~100) */
+  score: number;
+  totalCost: number;
+  steps: PipelineStepResult[];
+  converged: boolean;
+}
