@@ -2,8 +2,8 @@
 name: offering-html
 domain: ax-bd
 stage: shape
-version: "2.3"
-description: "AX BD팀 사업기획서(HTML) 생성 스킬 v2.3 — 20섹션 목차 + 발굴 산출물 매핑 + 경영 언어 원칙 + KT 3축 강제 검증 + GAN 교차검증 자동화 + 피드백 반영 자동화"
+version: "2.4"
+description: "AX BD팀 사업기획서(HTML) 생성 스킬 v2.4 — 20섹션 목차 + 발굴 산출물 매핑 + 경영 언어 원칙 + KT 3축 강제 검증 + GAN 교차검증 자동화 + 피드백 반영 자동화"
 input_schema: DiscoveryPackage + OfferingConfig
 output_schema: OfferingHTML
 upstream: [ax-bd/discover/packaging]
@@ -164,6 +164,16 @@ KT 연계 AX 사업개발 체계의 **3. 형상화** 단계를 자동화한다.
 [8] 최종 확정 (v1.0)
     └── 보고 대상·일정 확인 후 최종본
     └── 파일명: 사업기획서_{사업명}_v1.0_{YYMMDD}.html
+        ↓
+[9] PPTX 변환 (선택 — offering-pptx 체이닝)
+    └── AskUserQuestion: "PPTX로도 변환할까요?"
+    └── 승인 시: offering-pptx 스킬 호출 (HTML 파일 경로 전달)
+    └── 거부 시: 건너뜀
+        ↓
+[10] 버전 이력 기록 (자동)
+    └── review-history.md에 버전 항목 자동 append
+    └── 형식: | v{N} | {날짜} | {변경 요약} | {변경 섹션 목록} |
+    └── 매 버전 생성(v0.1, v0.2, ..., v1.0) 시 자동 기록
 ```
 
 ## 표준 목차 — 20섹션 (가이드 §3 기준, Why→What→How→Proof→Next)
