@@ -2,14 +2,18 @@
  * F380: PPTX Renderer (Sprint 172)
  * pptxgenjs 기반 사업기획서 PPTX 생성 엔진
  */
-import { createRequire } from "node:module";
 import { SECTION_SLIDE_MAP, type SlideType } from "./pptx-slide-types.js";
 
-// pptxgenjs v4: namespace+default+class 혼합 export → NodeNext에서 `new` 불가
-// createRequire fallback으로 CJS 모듈을 직접 로드
-const require = createRequire(import.meta.url);
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const PptxGenJS = require("pptxgenjs") as new () => PptxPres;
+// pptxgenjs v4: namespace+default+class 혼합 export
+// Workers에서 createRequire 불가 → dynamic import + lazy init
+let _PptxGenJS: (new () => PptxPres) | null = null;
+async function getPptxGenJS(): Promise<new () => PptxPres> {
+  if (!_PptxGenJS) {
+    const mod = await import("pptxgenjs");
+    _PptxGenJS = (mod.default ?? mod) as unknown as new () => PptxPres;
+  }
+  return _PptxGenJS;
+}
 
 interface PptxPres {
   layout: string;
@@ -123,6 +127,7 @@ export async function renderPptx(input: PptxRenderInput): Promise<Uint8Array> {
   const design = buildDesignConfig(tokens);
   const sectionMap = new Map(sections.map((s) => [s.section_key, s]));
 
+  const PptxGenJS = await getPptxGenJS();
   const pres = new PptxGenJS();
   pres.layout = "LAYOUT_WIDE";
   pres.author = "Foundry-X";
