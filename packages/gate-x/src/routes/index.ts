@@ -7,3 +7,4 @@ export { ogdPocRoute } from "./ogd-poc.js";
 export { teamReviewsRoute } from "./team-reviews.js";
 export { validationMeetingsRoute } from "./validation-meetings.js";
 export { validationTierRoute } from "./validation-tier.js";
+export { customRulesRoute } from "./custom-rules.js";
