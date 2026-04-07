@@ -4,6 +4,7 @@ import { ReconciliationService } from "./modules/portal/services/reconciliation.
 import { KpiLogger } from "./modules/portal/services/kpi-logger.js";
 import { parseSpecRequirements } from "./services/spec-parser.js";
 import { BackupRestoreService } from "./core/harness/services/backup-restore-service.js";
+import { processDomainEvents } from './core/events/event-cron.js';
 
 // ─── Cloudflare Workers Cron Trigger Handler ───
 
@@ -28,6 +29,7 @@ export async function handleScheduled(
   });
 
   ctx.waitUntil(Promise.allSettled(tasks));
+  ctx.waitUntil(processDomainEvents(env));
 
   // F317: 자동 백업 — UTC 18시 (KST 03시)에만 실행
   const now = new Date();

@@ -420,3 +420,28 @@ export type {
   DomainAdapterInterface,
   OGDRunStatus,
 } from './ogd-generic.js';
+
+// F398: 이벤트 카탈로그 8종 + D1EventBus (Sprint 185, Phase 20-B)
+export type {
+  EventServiceId,
+  DomainEventType,
+  DomainEventEnvelope,
+  BizItemCreatedPayload,
+  BizItemCreatedEvent,
+  BizItemUpdatedPayload,
+  BizItemUpdatedEvent,
+  BizItemStageChangedPayload,
+  BizItemStageChangedEvent,
+  ValidationCompletedPayload,
+  ValidationCompletedEvent,
+  ValidationRejectedPayload,
+  ValidationRejectedEvent,
+  OfferingGeneratedPayload,
+  OfferingGeneratedEvent,
+  PrototypeCreatedPayload,
+  PrototypeCreatedEvent,
+  PipelineStepCompletedPayload,
+  PipelineStepCompletedEvent,
+  AnyDomainEvent,
+} from './events/index.js';
+export { D1EventBus } from './events/index.js';
