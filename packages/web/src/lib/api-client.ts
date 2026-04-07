@@ -2645,3 +2645,35 @@ export async function fetchCorrelation(): Promise<CorrelationSummaryResponse> {
   const res = await fetchApi<{ correlation: CorrelationSummaryResponse }>("/user-evaluations/correlation");
   return res.correlation;
 }
+
+// ─── Sprint 210: Discovery Criteria + Analysis Context (F437) ───
+
+export interface DiscoveryCriterionItem {
+  id: string;
+  bizItemId: string;
+  criterionId: number;
+  name: string;
+  condition: string;
+  status: "pending" | "in_progress" | "completed" | "needs_revision";
+  evidence: string | null;
+  completedAt: string | null;
+  updatedAt: string;
+}
+
+export interface CriteriaProgress {
+  total: 9;
+  completed: number;
+  inProgress: number;
+  needsRevision: number;
+  pending: number;
+  criteria: DiscoveryCriterionItem[];
+  gateStatus: "blocked" | "warning" | "ready";
+}
+
+export async function getDiscoveryCriteria(bizItemId: string): Promise<CriteriaProgress> {
+  return fetchApi(`/biz-items/${bizItemId}/discovery-criteria`);
+}
+
+export async function getNextGuide(bizItemId: string): Promise<{ step: string; description: string; actions: string[] }> {
+  return fetchApi(`/biz-items/${bizItemId}/next-guide`);
+}

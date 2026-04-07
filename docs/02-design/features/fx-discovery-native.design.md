@@ -279,49 +279,68 @@ src/routes/getting-started.tsx (재구축)
 ### 5.1 discovery-unified.tsx 재구축
 
 **As-Is:** 3탭 (대시보드/프로세스/BMC)
-**To-Be:** 아이템 카드 목록
+**To-Be:** 아이템 카드 목록 + 검색 + 상태 필터
 
 ```
 ┌─────────────────────────────────────────────────┐
 │ 내 아이템                              [+ 새 아이템] │
 │                                                 │
-│ 필터: [전체] [분석 중] [형상화 중] [완료]          │
+│ [🔍 아이템 검색...]                              │
+│ 필터: [전체] [대기] [분석 중] [분석 완료] [완료]   │
 ├─────────────────────────────────────────────────┤
 │                                                 │
 │ ┌──────────────┐  ┌──────────────┐              │
 │ │ AI 비서 도입   │  │ 클라우드 전환  │              │
-│ │ 🟢 분석 완료   │  │ 🔵 분석 중    │              │
-│ │ ████████ 100% │  │ ████░░░ 45%  │              │
-│ │ 3일 전 갱신   │  │ 방금 전       │              │
+│ │ [분석 중] 뱃지  │  │ [대기] 뱃지    │              │
+│ │ I — 아이디어형  │  │ T — 기술형    │              │
+│ │ 4월 1일 등록   │  │ 4월 2일 등록  │              │
 │ └──────────────┘  └──────────────┘              │
 │                                                 │
-│ ┌──────────────┐                                │
-│ │ 데이터 분석    │  아이템이 없어요.                │
-│ │ ⬜ 대기       │  [+ 새 아이템 등록]              │
-│ │ ░░░░░░░ 0%   │                                │
-│ │ 5분 전 등록   │                                │
-│ └──────────────┘                                │
+│ ─── 빈 상태 ───                                 │
+│  💡 아직 등록된 아이템이 없어요.                   │
+│  [+ 첫 아이템 등록하기]                           │
 └─────────────────────────────────────────────────┘
 ```
+
+> **진행률 표시 결정**: 목록 API(`GET /biz-items`)에 progress 미포함 — N+1 방지 목적.
+> 9기준 진행률은 아이템 상세 페이지(DiscoveryCriteriaPanel)에서만 표시.
 
 ### 5.2 아이템 카드 컴포넌트
 
 ```typescript
 // 새 컴포넌트: src/components/feature/discovery/BizItemCard.tsx
 interface BizItemCardProps {
-  item: BizItemSummary;
-  progress: number;       // 0~100 (9기준 중 완료 수 / 9 * 100)
-  stage: 'pending' | 'analyzing' | 'shaping' | 'completed';
+  item: BizItemSummary;  // id, title, description, status, discoveryType, createdAt
 }
+// 상태(뱃지): item.status 기반 (draft→대기, analyzing→분석 중, analyzed→분석 완료, ...)
+// 유형: item.discoveryType (I/M/P/T/S) — 한국어 레이블 매핑
 ```
 
-### 5.3 API 활용
+### 5.3 F437 발굴 9기준 체크리스트 패널 (DiscoveryCriteriaPanel)
+
+```typescript
+// 새 컴포넌트: src/components/feature/discovery/DiscoveryCriteriaPanel.tsx
+// 아이템 상세(discovery-detail.tsx)에 임베드
+interface DiscoveryCriteriaPanelProps {
+  bizItemId: string;
+}
+// API: GET /biz-items/:id/discovery-criteria → CriteriaProgress
+// API: GET /biz-items/:id/next-guide → 다음 단계 가이드
+```
+
+**표시 요소:**
+- 완료 수 / 전체 수 + 프로그레스바
+- gateStatus 뱃지 (ready/warning/blocked)
+- 9기준 체크리스트: 각 기준명 + 조건 + 완료 여부 아이콘
+- 다음 단계 가이드 패널 (nextGuide API)
+
+### 5.4 API 활용
 
 | 용도 | API | 비고 |
 |------|-----|------|
 | 아이템 목록 | `GET /biz-items` | org 필터, status 쿼리 |
-| 아이템 요약 | `GET /biz-items/summary` | 카운트, 상태별 집계 |
-| 진행률 | `GET /discovery/progress` | 9기준 체크포인트 기반 |
+| 9기준 체크리스트 | `GET /biz-items/:id/discovery-criteria` | 아이템 상세에서 호출 |
+| 다음 단계 가이드 | `GET /biz-items/:id/next-guide` | 아이템 상세에서 호출 |
 
 ---
 

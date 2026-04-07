@@ -7,6 +7,7 @@ import { fetchBizItemDetail, getDiscoveryProgress, type BizItemDetail, type Disc
 import { Badge } from "@/components/ui/badge";
 import ArtifactList from "@/components/feature/ax-bd/ArtifactList";
 import { STAGE_LABELS, STAGE_COLORS } from "@/components/feature/pipeline/item-card";
+import DiscoveryCriteriaPanel from "@/components/feature/discovery/DiscoveryCriteriaPanel";
 
 const TYPE_LABELS: Record<string, string> = { I: "아이디어형", M: "시장·타겟형", P: "고객문제형", T: "기술형", S: "서비스형" };
 
@@ -82,6 +83,14 @@ export function Component() {
           <p className="text-xs text-muted-foreground">
             {progress.completedCount}/{progress.totalCount} 단계 완료
           </p>
+        </div>
+      )}
+
+      {/* F437: 발굴 9기준 체크리스트 */}
+      {id && (
+        <div className="space-y-2">
+          <h2 className="text-sm font-semibold text-muted-foreground">발굴 분석 기준</h2>
+          <DiscoveryCriteriaPanel bizItemId={id} />
         </div>
       )}
 
