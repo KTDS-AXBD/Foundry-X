@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #227 (2026-04-08)
+**Google OAuth 디버깅 + Marker.io 자동화 + Issue 정리**:
+- ✅ COOP `same-origin-allow-popups` 헤더 추가 → GIS SDK 팝업 postMessage 차단 해소 (PR #361)
+- ✅ `hydrateFallbackElement` 추가 → React Router 7 lazy route hydration 경고 해소 (PR #361)
+- ✅ `refreshAccessToken` dedup → token rotation race condition 방지 (PR #361)
+- ✅ GIS 이중 초기화 방지 + 로그인 페이지 레이아웃 h-screen 변경 (PR #365)
+- ✅ feedback-consumer: JWT → WEBHOOK_SECRET 인증 전환 + systemd service 자동화 (PR #367)
+- ✅ tina-lock.json navigation 컬렉션 복원 (PR #369)
+- ✅ GitHub Issues 9건 → 0건 정리 (8건 닫기)
+- ✅ E2E 검증: prod smoke 7/7, auth-flow 10/10
+
+**검증 결과**: ✅ typecheck / lint / build / Playwright E2E 17/17
+
 ### 세션 #225 (2026-04-07)
 **대시보드 콘솔 에러 전수 해소 + API 배포 차단 해소**:
 - ✅ dashboard.metrics: fetchApi에 BASE_URL 중복 전달 제거 (4개 API 200 OK)
