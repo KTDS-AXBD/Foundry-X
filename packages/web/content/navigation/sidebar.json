@@ -13,11 +13,11 @@
       "sortOrder": 0,
       "visible": true,
       "collapsed": true,
-      "badge": "TBD",
+      "badge": "이관 예정",
       "items": [
-        { "href": "/collection/field", "label": "Field 수집", "iconKey": "Radio", "visible": false, "sortOrder": 0 },
-        { "href": "/collection/ideas", "label": "IDEA Portal", "iconKey": "ArrowUpFromLine", "visible": false, "sortOrder": 1 },
-        { "href": "/collection/screening", "label": "스크리닝", "iconKey": "ClipboardList", "visible": false, "sortOrder": 2 }
+        { "href": "/collection/field", "label": "Field 수집", "iconKey": "Radio", "visible": true, "sortOrder": 0 },
+        { "href": "/collection/ideas", "label": "IDEA Portal", "iconKey": "ArrowUpFromLine", "visible": true, "sortOrder": 1 },
+        { "href": "/collection/screening", "label": "스크리닝", "iconKey": "ClipboardList", "visible": true, "sortOrder": 2 }
       ]
     },
     {
@@ -41,9 +41,10 @@
       "visible": true,
       "items": [
         { "href": "/shaping/business-plan", "label": "사업기획서", "iconKey": "FileSignature", "visible": true, "sortOrder": 0 },
-        { "href": "/shaping/offering", "label": "Offering", "iconKey": "Package", "visible": true, "sortOrder": 1 },
-        { "href": "/shaping/prd", "label": "PRD", "iconKey": "FileText", "visible": true, "sortOrder": 2 },
-        { "href": "/shaping/prototype", "label": "Prototype", "iconKey": "Code", "visible": true, "sortOrder": 3 }
+        { "href": "/shaping/offerings", "label": "Offerings", "iconKey": "FileOutput", "visible": true, "sortOrder": 1 },
+        { "href": "/shaping/offering", "label": "Offering Pack", "iconKey": "Package", "visible": true, "sortOrder": 2 },
+        { "href": "/shaping/prd", "label": "PRD", "iconKey": "FileText", "visible": true, "sortOrder": 3 },
+        { "href": "/shaping/prototype", "label": "Prototype", "iconKey": "Code", "visible": true, "sortOrder": 4 }
       ]
     },
     {
@@ -78,10 +79,10 @@
       "sortOrder": 5,
       "visible": true,
       "collapsed": true,
-      "badge": "TBD",
+      "badge": "이관 예정",
       "items": [
-        { "href": "/gtm/outreach", "label": "대고객 선제안", "iconKey": "Send", "visible": false, "sortOrder": 0 },
-        { "href": "/gtm/pipeline", "label": "파이프라인", "iconKey": "GitBranch", "visible": false, "sortOrder": 1 }
+        { "href": "/gtm/outreach", "label": "대고객 선제안", "iconKey": "Send", "visible": true, "sortOrder": 0 },
+        { "href": "/gtm/pipeline", "label": "파이프라인", "iconKey": "GitBranch", "visible": true, "sortOrder": 1 }
       ]
     }
   ],
@@ -91,19 +92,64 @@
   ],
   "adminGroups": [
     {
-      "key": "admin-manage",
-      "label": "관리",
-      "iconKey": "Settings",
+      "key": "admin-auth",
+      "label": "Auth 서비스",
+      "iconKey": "Users",
       "sortOrder": 0,
       "visible": true,
+      "badge": "modules/auth",
       "items": [
         { "href": "/tokens", "label": "토큰/모델", "iconKey": "Coins", "visible": true, "sortOrder": 0 },
-        { "href": "/workspace", "label": "워크스페이스", "iconKey": "FolderKanban", "visible": true, "sortOrder": 1 },
-        { "href": "/agents", "label": "에이전트", "iconKey": "Bot", "visible": true, "sortOrder": 2 },
-        { "href": "/architecture", "label": "아키텍처", "iconKey": "Blocks", "visible": true, "sortOrder": 3 },
-        { "href": "/methodologies", "label": "방법론", "iconKey": "Library", "visible": true, "sortOrder": 4 },
-        { "href": "/projects", "label": "프로젝트", "iconKey": "FolderKanban", "visible": true, "sortOrder": 5 },
-        { "href": "/nps-dashboard", "label": "NPS 대시보드", "iconKey": "BarChart3", "visible": true, "sortOrder": 6 }
+        { "href": "/workspace", "label": "워크스페이스", "iconKey": "FolderKanban", "visible": true, "sortOrder": 1 }
+      ]
+    },
+    {
+      "key": "admin-portal",
+      "label": "Portal 서비스",
+      "iconKey": "LayoutDashboard",
+      "sortOrder": 1,
+      "visible": true,
+      "badge": "modules/portal",
+      "items": [
+        { "href": "/nps-dashboard", "label": "NPS 대시보드", "iconKey": "BarChart3", "visible": true, "sortOrder": 0 },
+        { "href": "/dashboard/metrics", "label": "운영 지표", "iconKey": "TrendingUp", "visible": true, "sortOrder": 1 },
+        { "href": "/projects", "label": "프로젝트", "iconKey": "FolderKanban", "visible": true, "sortOrder": 2 }
+      ]
+    },
+    {
+      "key": "admin-gate",
+      "label": "Gate 서비스",
+      "iconKey": "CheckCircle",
+      "sortOrder": 2,
+      "visible": true,
+      "badge": "modules/gate",
+      "items": [
+        { "href": "/orchestration", "label": "오케스트레이션", "iconKey": "Network", "visible": true, "sortOrder": 0 }
+      ]
+    },
+    {
+      "key": "admin-launch",
+      "label": "Launch 서비스",
+      "iconKey": "Rocket",
+      "sortOrder": 3,
+      "visible": true,
+      "badge": "modules/launch",
+      "items": [
+        { "href": "/prototype-dashboard", "label": "Prototype", "iconKey": "FlaskConical", "visible": true, "sortOrder": 0 },
+        { "href": "/builder-quality", "label": "Quality", "iconKey": "BarChart3", "visible": true, "sortOrder": 1 }
+      ]
+    },
+    {
+      "key": "admin-core",
+      "label": "Core (Foundry-X)",
+      "iconKey": "GitBranch",
+      "sortOrder": 4,
+      "visible": true,
+      "badge": "core",
+      "items": [
+        { "href": "/agents", "label": "에이전트", "iconKey": "Bot", "visible": true, "sortOrder": 0 },
+        { "href": "/architecture", "label": "아키텍처", "iconKey": "Blocks", "visible": true, "sortOrder": 1 },
+        { "href": "/methodologies", "label": "방법론", "iconKey": "Library", "visible": true, "sortOrder": 2 }
       ]
     }
   ]
