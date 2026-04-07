@@ -1,8 +1,8 @@
 // ─── F398: D1EventBus 단위 테스트 (Sprint 185) ───
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { D1EventBus } from "@foundry-x/harness-kit/events";
-import type { DomainEventEnvelope } from "@foundry-x/harness-kit/events";
+import { D1EventBus } from "@foundry-x/shared";
+import type { DomainEventEnvelope } from "@foundry-x/shared";
 
 /* ------------------------------------------------------------------ */
 /*  In-memory D1 stub                                                  */
