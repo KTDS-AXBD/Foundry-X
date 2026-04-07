@@ -176,7 +176,8 @@ pnpm e2e                          # Playwright E2E
 - **Phase 18:** ✅ 완료 (Sprint 165~174) — Offering Pipeline F363~F383 (21/21, Match 93%). 형상화 자동화: HTML/PPTX Skill + Offering Agent + Full UI + 콘텐츠 어댑터 + 파이프라인. PRD: `docs/specs/fx-offering-pipeline/prd-final.md`
 - **Phase 19:** ✅ 완료 (Sprint 175~178) — Builder Evolution F384~F391. 5차원 품질 스코어링 + CLI 듀얼모드 + Enhanced O-G-D + Quality Dashboard. PRD: `docs/specs/fx-builder-evolution/prd-final.md`
 - **Phase 20:** ✅ 완료 (Sprint 179~188) — AX BD MSA 재조정 F392~F401. 모놀리스 모듈화(20-A) + harness-kit + 이벤트/프록시(20-B). 2단계 접근법: 모듈화→실제분리. PRD: `docs/specs/ax-bd-msa/prd-final.md`
-- **Phase 21:** 🔧 진행 중 — Gate-X 독립 서비스 F402~F412 (Sprint 189~196). harness-kit 기반 독립 Workers. Conditional 착수 (Workers CPU time PoC 검증). PRD: `docs/specs/gate-x/prd-final.md`
+- **Phase 21:** 🔧 진행 중 — Gate-X 독립 서비스 F402~F413 (Sprint 189~197). harness-kit 기반 독립 Workers. PRD: `docs/specs/gate-x/prd-final.md`
+- **Phase 22:** 📋 계획 — Offering Skill v2 F414~F422 (Sprint 198~202). 사업기획서 표준화 + GAN 교차검증 + PPTX/이력/피드백 자동화. PRD: `docs/specs/axbd-offering/prd-final.md`
 - **수치 확인:** `/ax:daily-check` 실행 또는 SPEC.md §2 "실시간 수치" 블록 참조 (하드코딩 금지 — drift 방지)
 - **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 

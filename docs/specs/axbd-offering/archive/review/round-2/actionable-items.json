@@ -1,0 +1,329 @@
+{
+  "generated": "2026-04-07T06:25:16.311Z",
+  "totalItems": 53,
+  "byType": {
+    "flaw": 7,
+    "gap": 19,
+    "risk": 24
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**흐름 자체는 대체로 논리적이나, 다음과 같은 결함이 보입니다.**",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**흐름 자체는 대체로 논리적이나, 다음과 같은 결함이 보입니다.**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**아래와 같은 실전 관점의 누락이 있습니다.**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Input Validity/Completeness 실시간 체크**: 입력 산출물(2-0~2-8) 누락이나 품질 편차가 많을 때, 자동화 스킬이 “무엇을, 어떻게” 안내/조치하는지(예: 입력 단계에서 필수 항목 미비 경고→자동 중단/수동 보정 유도 등) 실제 UX 플로우/오류 메시지/담당자 안내 프로세스가 구체적이지 않습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Human-in-the-loop/예외 승인 프로세스**: 자동화 실패(예: AI가 생성 불가/불완전 생성/품질 미달)시, 어떤 승인·보정 절차를 거쳐서 결과물을 제출할지(담당자 권한, 임원 승인 등) 명확한 워크플로우 정의가 없습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**AI Output 품질평가/QA 체계**: 자동 생성 결과가 “임원/BD팀 합의”에 적합한지 주관적 판단에 의존할 수밖에 없으므로, 구체적 QA 시트/Check-list/Automated Test Case 등 정량적 품질 보증 방법론이 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영/장애/변경관리 담당자 실명 및 Escalation Rule**: 장애/이슈 발생시 누구에게 알리고, 어떻게 대응/보고/롤백할지(담당자 이름/팀, 연락망, Escalation 단계 등)가 실제 운영계획에 빠져 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**교육/Onboarding/FAQ**: AI 기반 자동화 툴 초심자(Claude Code CLI 초보자 등)가 쉽게 적응할 수 있도록, 사용자 가이드/FAQ/시나리오별 사용법이 누락되어 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**입력 산출물 품질/포맷 표준화, 실시간 유효성 체크 및 입력 UX 시나리오 구체화**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**AI 자동화 결과의 QA/검증 프로세스 현실화**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영·장애·변경관리 담당자 명시 및 Escalation/복구 플로우 도입**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**현업(임원/BD팀) 대상 Close Beta/파일럿 운영 계획·일정 명시**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**사용자 교육/Onboarding 계획 명시**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**흐름 자체는 대체로 논리적이나, 다음과 같은 결함이 보입니다.**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**범위 및 일정/인력 산정이 다소 낙관적으로 보입니다.**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**아래와 같은 실전 관점의 누락이 있습니다.**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Input Validity/Completeness 실시간 체크**: 입력 산출물(2-0~2-8) 누락이나 품질 편차가 많을 때, 자동화 스킬이 “무엇을, 어떻게” 안내/조치하는지(예: 입력 단계에서 필수 항목 미비 경고→자동 중단/수동 보정 유도 등) 실제 UX 플로우/오류 메시지/담당자 안내 프로세스가 구체적이지 않습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Human-in-the-loop/예외 승인 프로세스**: 자동화 실패(예: AI가 생성 불가/불완전 생성/품질 미달)시, 어떤 승인·보정 절차를 거쳐서 결과물을 제출할지(담당자 권한, 임원 승인 등) 명확한 워크플로우 정의가 없습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**AI Output 품질평가/QA 체계**: 자동 생성 결과가 “임원/BD팀 합의”에 적합한지 주관적 판단에 의존할 수밖에 없으므로, 구체적 QA 시트/Check-list/Automated Test Case 등 정량적 품질 보증 방법론이 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/장애/변경관리 담당자 실명 및 Escalation Rule**: 장애/이슈 발생시 누구에게 알리고, 어떻게 대응/보고/롤백할지(담당자 이름/팀, 연락망, Escalation 단계 등)가 실제 운영계획에 빠져 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**교육/Onboarding/FAQ**: AI 기반 자동화 툴 초심자(Claude Code CLI 초보자 등)가 쉽게 적응할 수 있도록, 사용자 가이드/FAQ/시나리오별 사용법이 누락되어 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**가장 큰 실패 요인 및 우려사항은 다음과 같습니다.**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**입력 품질 미달**: 산출물(2-0~2-8)이 불완전/불균일할 경우, 자동화 툴의 품질이 통제 불가하게 떨어질 수 있음. “누가 실행해도 동일 품질” 목표가 달성 불가.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**AI 결과 신뢰성/설명력 부족**: GAN 교차검증 등 AI 자동화 결과가 임원/현업 눈높이에 미달할 때, 반복적 수동 보정/재작성이 불가피. 이때 책임소재/결정권한이 불명확할 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**기술/운영 장애**: 네트워크/CLI/API 장애, 에이전트 오류 등 발생 시, 신속 복구 체계와 담당 리소스 미비로 업무 차질 발생 가능.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**일정 지연/기능 축소**: “즉시 필요”에 비해 실제 개발/테스트/합의 소요기간이 과소평가되어, 파일럿/실전 적용 시 기능 미달/품질 저하/일정 지연이 크게 우려됨.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**현업 수용성/UX 미흡**: 자동화 결과에 대한 현업(임원/BD팀) 신뢰 및 사용성 확보 실패 시, 수동 작성 회귀 및 프로젝트 목적 상실 위험.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "flaw",
+      "source": "Gemini",
+      "text": "**\"GAN 교차검증\" 기술적 정의 및 신뢰성:** 'GAN'이라는 용어의 기술적 정확성 검토와 함께, 이 기능이 실제로 'No-Go' 판정까지 내릴 수 있는 비판적 사고 능력을 어떻게 구현할 것인지에 대한 **명확한 기술적 설명과 PoC를 통한 신뢰성 확보**가 필수적입니다. 이 기능은 솔루션의 핵심 차별점이자 가장 큰 리스크 요인이 될 수 있습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "Gemini",
+      "text": "**민감한 사업 기밀 정보의 외부 LLM 활용에 대한 보안 강화:** 비록 데이터 최소화 및 마스킹을 언급했으나, 기업의 핵심 IP인 사업기획서 내용을 외부 LLM에 전달하는 것은 **잠재적 보안 리스크**가 매우 높습니다. 이에 대한 더욱 구체적이고 강력한 완화 방안(예: 온프레미스 LLM 검토, 민감 정보의 철저한 내부 처리 후 일반 정보만 외부 LLM",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "Gemini",
+      "text": "**\"Claude Code 초보\" 사용자를 위한 초기 도입/온보딩 지원 강화:** \"WSL + Claude Code CLI\" 환경은 비개발자에게 여전히 높은 진입 장벽입니다. '단일 명령' 외에, **초기 환경 설정, 문제 해결, 그리고 지속적인 기술 지원**에 대한 구체적인 온보딩/운영 계획이 더 명확하게 제시되어야 합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**\"GAN 교차검증\" 기술적 정의 및 신뢰성:** 'GAN'이라는 용어의 기술적 정확성 검토와 함께, 이 기능이 실제로 'No-Go' 판정까지 내릴 수 있는 비판적 사고 능력을 어떻게 구현할 것인지에 대한 **명확한 기술적 설명과 PoC를 통한 신뢰성 확보**가 필수적입니다. 이 기능은 솔루션의 핵심 차별점이자 가장 큰 리스크 요인이 될 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**민감한 사업 기밀 정보의 외부 LLM 활용에 대한 보안 강화:** 비록 데이터 최소화 및 마스킹을 언급했으나, 기업의 핵심 IP인 사업기획서 내용을 외부 LLM에 전달하는 것은 **잠재적 보안 리스크**가 매우 높습니다. 이에 대한 더욱 구체적이고 강력한 완화 방안(예: 온프레미스 LLM 검토, 민감 정보의 철저한 내부 처리 후 일반 정보만 외부 LLM",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**\"Claude Code 초보\" 사용자를 위한 초기 도입/온보딩 지원 강화:** \"WSL + Claude Code CLI\" 환경은 비개발자에게 여전히 높은 진입 장벽입니다. '단일 명령' 외에, **초기 환경 설정, 문제 해결, 그리고 지속적인 기술 지원**에 대한 구체적인 온보딩/운영 계획이 더 명확하게 제시되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**\"GAN 교차검증\" 기술적 정의 및 신뢰성:** 'GAN'이라는 용어의 기술적 정확성 검토와 함께, 이 기능이 실제로 'No-Go' 판정까지 내릴 수 있는 비판적 사고 능력을 어떻게 구현할 것인지에 대한 **명확한 기술적 설명과 PoC를 통한 신뢰성 확보**가 필수적입니다. 이 기능은 솔루션의 핵심 차별점이자 가장 큰 리스크 요인이 될 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**민감한 사업 기밀 정보의 외부 LLM 활용에 대한 보안 강화:** 비록 데이터 최소화 및 마스킹을 언급했으나, 기업의 핵심 IP인 사업기획서 내용을 외부 LLM에 전달하는 것은 **잠재적 보안 리스크**가 매우 높습니다. 이에 대한 더욱 구체적이고 강력한 완화 방안(예: 온프레미스 LLM 검토, 민감 정보의 철저한 내부 처리 후 일반 정보만 외부 LLM",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**\"Claude Code 초보\" 사용자를 위한 초기 도입/온보딩 지원 강화:** \"WSL + Claude Code CLI\" 환경은 비개발자에게 여전히 높은 진입 장벽입니다. '단일 명령' 외에, **초기 환경 설정, 문제 해결, 그리고 지속적인 기술 지원**에 대한 구체적인 온보딩/운영 계획이 더 명확하게 제시되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**입력 데이터 품질 Garbage-In, Garbage-Out**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**AI 기반 교차검증의 신뢰성 위기**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**PPTX 변환의 기술적 부채**",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**Edge Cases**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**동시성**: 다수 사용자가 동일 스킬 실행 시, 임시 파일/캐시 충돌 가능성.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**데이터 일관성**: 발굴 산출물 간 상호 참조(예: 2-3의 수익성과 2-5의 실행력 불일치) 검증 로직 복잡.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**디자인 시스템 렌더링**: CSS variable 적용은 쉬우나, 브라우저/PPT 렌더링 차이로 인한 품질 변동성.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**GAN 교차검증의 AI 신뢰성**: LLM 기반 \"냉철한 판정\"은 확률적 출력 특성상 일관성 보장 어려움. No-Go 판정 생성은 비즈니스 리스크가 큼.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**입력 데이터 품질 의존성**: 2-0~2-8 산출물의 구조화/표준화 수준이 낮을 경우, 자동 매핑 실패율이 높아질 것.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**디자인 시스템 100% 준수**: CSS variable 구현은 가능하나, 레이아웃/컴포넌트의 WYSIWYG 검증은 추가 도구 없이 어려움.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**PPTX 변환**: HTML→PPTX 변환은 레이아웃 깨짐이 빈번한 기술적 난제. offering-pptx 스킬과의 체이닝 실패 가능성 높음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**입력 데이터 품질 Garbage-In, Garbage-Out**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**AI 기반 교차검증의 신뢰성 위기**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**PPTX 변환의 기술적 부채**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}
