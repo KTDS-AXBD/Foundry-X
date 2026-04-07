@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { fetchApi, BASE_URL } from "@/lib/api-client";
+import { fetchApi } from "@/lib/api-client";
 import { AgentUsageChart } from "@/components/feature/AgentUsageChart";
 import { SkillReuseChart } from "@/components/feature/SkillReuseChart";
 import { RuleEffectChart } from "@/components/feature/RuleEffectChart";
@@ -26,10 +26,10 @@ export function Component() {
     async function load() {
       try {
         const [ov, eff, usage, reuse] = await Promise.all([
-          fetchApi<MetricsOverview>(`${BASE_URL}/metrics/overview`),
-          fetchApi<RuleEffectivenessResponse>(`${BASE_URL}/guard-rail/effectiveness`),
-          fetchApi<AgentUsageResponse>(`${BASE_URL}/metrics/agent-usage`),
-          fetchApi<SkillReuseResponse>(`${BASE_URL}/metrics/skill-reuse`),
+          fetchApi<MetricsOverview>("/metrics/overview"),
+          fetchApi<RuleEffectivenessResponse>("/guard-rail/effectiveness"),
+          fetchApi<AgentUsageResponse>("/metrics/agent-usage"),
+          fetchApi<SkillReuseResponse>("/metrics/skill-reuse"),
         ]);
         setOverview(ov);
         setEffectiveness(eff);
