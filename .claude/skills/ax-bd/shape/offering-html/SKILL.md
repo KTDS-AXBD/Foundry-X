@@ -2,8 +2,8 @@
 name: offering-html
 domain: ax-bd
 stage: shape
-version: "2.0"
-description: "AX BD팀 사업기획서(HTML) 생성 스킬 v2 — 가이드 §3 기준 20섹션 표준 목차 + 작성 원칙 내장 + GAN 교차검증 자동화"
+version: "2.1"
+description: "AX BD팀 사업기획서(HTML) 생성 스킬 v2.1 — 20섹션 목차 + 발굴 산출물 자동 매핑 + 경영 언어 원칙 내장 + GAN 교차검증 자동화"
 input_schema: DiscoveryPackage + OfferingConfig
 output_schema: OfferingHTML
 upstream: [ax-bd/discover/packaging]
@@ -19,6 +19,16 @@ evolution:
   track: DERIVED
   registry_id: null
 changelog:
+  - version: "2.1"
+    date: "2026-04-07"
+    sprint: 199
+    changes:
+      - "F416: section-mapping.md 생성 — 발굴 산출물(2-0~2-8)→20섹션 매핑 테이블 + 역매핑 + 자동 탐색 절차"
+      - "F417: writing-rules.md 생성 — 경영 언어 10항목 체크리스트 + KT 연계 3축 + 고객 유형별 톤 3종 + 최종 점검 자동화"
+      - "F416: SKILL.md Step 1에 산출물 자동 탐색 키워드 패턴 추가"
+      - "F416: SKILL.md Step 3에 정방향/역방향 매핑 + 부족 정보 처리 로직 추가"
+      - "F417: SKILL.md Step 4에 경영 언어 10항목 + 고객 톤 자동 적용 로직 추가"
+      - "F417: SKILL.md Step 7에 10항목 전수 검토 자동 검색 패턴 추가"
   - version: "2.0"
     date: "2026-04-07"
     sprint: 198
@@ -52,36 +62,57 @@ KT 연계 AX 사업개발 체계의 **3. 형상화** 단계를 자동화한다.
 ## How (8단계 생성 프로세스)
 
 ```
-[1] 아이템 확인
-    └── 발굴 단계(2-0~2-8) 산출물 확인 (section-mapping.md 참조)
-    └── 어떤 단계까지 완료되었는지 파악
+[1] 아이템 확인 — section-mapping.md §2 "자동 매핑 절차" 참조
+    ├── 발굴 단계(2-0~2-8) 산출물 파일 자동 탐색
+    │   └── 탐색 키워드: *2-0*, *아이템*구체화*, *레퍼런스*, *TAM* 등
+    │   └── section-mapping.md §2 "Step 1: 산출물 탐색" 패턴 사용
+    ├── 어떤 단계까지 완료되었는지 파악 → 누락 단계 식별
+    └── KT 연계 여부 선제 확인 (writing-rules.md §2.1 대전제)
         ↓
 [2] 목차 확정
-    └── 20섹션 표준 목차에서 선택 섹션(01-5, 01-6) 포함 여부 결정
-    └── 고객 유형 확인 → 시나리오 톤 결정 (writing-rules.md 참조)
-    └── AskUserQuestion: "고객 유형이 기존 고객인가요, 신규 고객인가요?"
+    ├── 20섹션 표준 목차에서 선택 섹션(01-5, 01-6) 포함 여부 결정
+    ├── 고객 유형 확인 → 시나리오 톤 결정
+    │   └── writing-rules.md §3 "고객 유형별 톤 자동 조정" 참조
+    │   └── AskUserQuestion: "고객 유형이 기존/신규/B2C 중 어디인가요?"
+    └── 선택 섹션 대체 가이드 적용 (아래 테이블 참조)
         ↓
-[3] 핵심 정보 수집
-    └── section-mapping.md 기반 발굴 산출물 → 섹션 자동 매핑
-    └── 부족한 정보는 AskUserQuestion으로 보충
+[3] 핵심 정보 수집 — section-mapping.md §2 "Step 3: 섹션별 데이터 매핑" 참조
+    ├── 발굴 산출물 → 섹션 자동 매핑 (정방향 매핑)
+    │   └── 2-0→Hero/Exec/01-4, 2-1→01-8, 2-2→01-2/01-3/01-7, ...
+    ├── 부족 정보 처리 (section-mapping.md §3):
+    │   └── 산출물 없음 → AskUserQuestion으로 핵심만 보충
+    │   └── 산출물 부족 → 있는 내용 + AskUserQuestion 보충
+    └── 우선순위: 산출물 자동 매핑 > AskUserQuestion > 스킬 추론
         ↓
-[4] 초안 생성 (v0.1)
-    └── base.html + 12종 컴포넌트 조합
-    └── design-tokens.md 기반 CSS variable 적용
-    └── writing-rules.md 경영 언어 원칙 자동 적용
-    └── KT 연계 3축 체크: 01-1에 수익성/KT적합성/실행력 3축 모두 포함 확인
+[4] 초안 생성 (v0.1) — writing-rules.md §1 체크리스트 자동 적용
+    ├── base.html + 12종 컴포넌트 조합
+    ├── design-tokens.md 기반 CSS variable 적용
+    ├── writing-rules.md §1 경영 언어 10항목 자동 적용:
+    │   └── 가능형 금지, 최초 금지, 금액 약 표기, 과대 표현 금지, 볼드 제한
+    │   └── 기술 용어 최소화, KT 상태 솔직, TAM/수익 근거, URL 첨부
+    ├── writing-rules.md §3 고객 유형별 톤 반영 (Step 2에서 결정된 톤)
+    ├── KT 연계 3축 체크 (writing-rules.md §2.2):
+    │   └── 01-1에 수익성/KT적합성/실행력 3축 모두 포함 확인
+    │   └── 미충족 시 경고 메시지 + 보충 요청
+    └── AX BD팀 표현 표준화 (writing-rules.md §4)
         ↓
-[5] 피드백 반영
-    └── 섹션별 수정 요청 반영 → 버전 업 (v0.2~v0.4)
-    └── 수정된 부분에 <!-- CHANGED: {사유} --> 마커 삽입 (v0.2~)
+[5] 피드백 반영 — writing-rules.md §7 참조
+    ├── 피드백 → 섹션 자동 식별 → 수정
+    ├── 고객 유형별 톤 유지하면서 수정
+    ├── 수정된 부분에 <!-- CHANGED: {사유} --> 마커 삽입
+    └── 수정 후 경영 언어 10항목 재검증
         ↓
 [6] 교차검증 (자동)
-    └── cross-validation.md 참조 — 표준 질문 풀 7개 적용
-    └── 05-4 섹션에 추진론/반대론/판정 배지 자동 생성
+    ├── cross-validation.md 참조 — 표준 질문 풀 7개 적용
+    ├── 05-4 섹션에 추진론/반대론/판정 배지 자동 생성
     └── ogd-orchestrator 호출 (냉철한 톤 — "경영진 안심"이 아니라 "정확한 판단")
         ↓
-[7] 최종 점검 (v0.5+)
-    └── writing-rules.md 경영 언어 체크리스트 10항목 검토
+[7] 최종 점검 (v0.5+) — writing-rules.md §6 "최종 점검 체크리스트" 실행
+    ├── 경영 언어 10항목 전수 검토 (자동 검색 패턴):
+    │   └── [1] "~할 수 있다" 검색 → [2] "최초" 검색 → [3] 금액 약 확인
+    │   └── [4] 과대 표현 → [5] 볼드 과다 → [6] 기술 용어 → [7] KT 상태
+    │   └── [8] TAM 근거 → [9] 수익 근거 → [10] 출처 URL
+    ├── 위반 항목 표시 + 수정 제안
     └── 본부장/대표 보고 수준 확인
         ↓
 [8] 최종 확정 (v1.0)
@@ -248,10 +279,10 @@ KT 연계 AX 사업개발 체계의 **3. 형상화** 단계를 자동화한다.
 
 - 구현 예시: [examples/KOAMI_v0.5.html](examples/KOAMI_v0.5.html)
 
-> **참조 문서** (Sprint 199~200에서 생성):
-> - [section-mapping.md](section-mapping.md) — 발굴 산출물(2-0~2-8) → 섹션 매핑
-> - [writing-rules.md](writing-rules.md) — 경영 언어 + KT 연계 + 고객 톤 규칙 상세
-> - [cross-validation.md](cross-validation.md) — GAN 교차검증 질문 풀 + 판정 로직
+> **참조 문서**:
+> - [section-mapping.md](section-mapping.md) — 발굴 산출물(2-0~2-8) → 섹션 매핑 (Sprint 199 F416 ✅)
+> - [writing-rules.md](writing-rules.md) — 경영 언어 + KT 연계 + 고객 톤 규칙 상세 (Sprint 199 F417 ✅)
+> - [cross-validation.md](cross-validation.md) — GAN 교차검증 질문 풀 + 판정 로직 (Sprint 200 F419 예정)
 
 ## 교차검증 체크리스트 (Step 7 — 최종 점검)
 
