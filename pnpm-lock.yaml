@@ -125,6 +125,34 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/debug@4.1.13)(@types/node@22.19.15)(jiti@2.6.1)(jsdom@29.0.0(@noble/hashes@1.8.0))(lightningcss@1.32.0)(msw@2.12.12(@types/node@22.19.15)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.2)
 
+  packages/gate-x:
+    dependencies:
+      '@foundry-x/harness-kit':
+        specifier: workspace:*
+        version: link:../harness-kit
+      '@hono/zod-openapi':
+        specifier: ^0.18.4
+        version: 0.18.4(hono@4.12.8)(zod@3.25.76)
+      hono:
+        specifier: ^4.0.0
+        version: 4.12.8
+      zod:
+        specifier: ^3.22.0
+        version: 3.25.76
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20241218.0
+        version: 4.20260316.1
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.37
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/debug@4.1.13)(@types/node@20.19.37)(jiti@2.6.1)(jsdom@29.0.0(@noble/hashes@1.8.0))(lightningcss@1.32.0)(msw@2.12.12(@types/node@20.19.37)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.2)
+
   packages/harness-kit:
     dependencies:
       commander:
@@ -348,6 +376,11 @@ packages:
 
   '@asteasolutions/zod-to-openapi@5.5.0':
     resolution: {integrity: sha512-d5HwrvM6dOKr3XdeF+DmashGvfEc+1oiEfbscugsiwSTrFtuMa7ETpW9sTNnVgn+hJaz+PRxPQUYD7q9/5dUig==}
+    peerDependencies:
+      zod: ^3.20.2
+
+  '@asteasolutions/zod-to-openapi@7.3.4':
+    resolution: {integrity: sha512-/2rThQ5zPi9OzVwes6U7lK1+Yvug0iXu25olp7S0XsYmOqnyMfxH7gdSQjn/+DSOHRg7wnotwGJSyL+fBKdnEA==}
     peerDependencies:
       zod: ^3.20.2
 
@@ -1665,6 +1698,13 @@ packages:
     peerDependencies:
       hono: '*'
 
+  '@hono/zod-openapi@0.18.4':
+    resolution: {integrity: sha512-6NHMHU96Hh32B1yDhb94Z4Z5/POsmEu2AXpWLWcBq9arskRnOMt2752yEoXoADV8WUAc7H1IkNaQHGj1ytXbYw==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      hono: '>=4.3.6'
+      zod: 3.*
+
   '@hono/zod-openapi@0.9.10':
     resolution: {integrity: sha512-v/b/z0qPxDo952gjRyhJ0n9ifbPoIluR2KmXDL20np0hj99+XvakoIHK5/T/3+hUmXlTj1Kn3TiGsSV6hwZesg==}
     engines: {node: '>=16.0.0'}
@@ -1674,6 +1714,12 @@ packages:
 
   '@hono/zod-validator@0.2.1':
     resolution: {integrity: sha512-HFoxln7Q6JsE64qz2WBS28SD33UB2alp3aRKmcWnNLDzEL1BLsWfbdX6e1HIiUprHYTIXf5y7ax8eYidKUwyaA==}
+    peerDependencies:
+      hono: '>=3.9.0'
+      zod: ^3.19.1
+
+  '@hono/zod-validator@0.4.3':
+    resolution: {integrity: sha512-xIgMYXDyJ4Hj6ekm9T9Y27s080Nl9NXHcJkOvkXPhubOLj8hZkOL8pDnnXfvCf5xEE8Q4oMFenQUZZREUY2gqQ==}
     peerDependencies:
       hono: '>=3.9.0'
       zod: ^3.19.1
@@ -8712,6 +8758,11 @@ snapshots:
       openapi3-ts: 4.5.0
       zod: 3.25.76
 
+  '@asteasolutions/zod-to-openapi@7.3.4(zod@3.25.76)':
+    dependencies:
+      openapi3-ts: 4.5.0
+      zod: 3.25.76
+
   '@axis-ds/theme@1.1.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.2.1)':
     dependencies:
       '@axis-ds/tokens': 1.1.1(tailwindcss@4.2.1)
@@ -9798,6 +9849,13 @@ snapshots:
     dependencies:
       hono: 4.12.8
 
+  '@hono/zod-openapi@0.18.4(hono@4.12.8)(zod@3.25.76)':
+    dependencies:
+      '@asteasolutions/zod-to-openapi': 7.3.4(zod@3.25.76)
+      '@hono/zod-validator': 0.4.3(hono@4.12.8)(zod@3.25.76)
+      hono: 4.12.8
+      zod: 3.25.76
+
   '@hono/zod-openapi@0.9.10(hono@4.12.8)(zod@3.25.76)':
     dependencies:
       '@asteasolutions/zod-to-openapi': 5.5.0(zod@3.25.76)
@@ -9806,6 +9864,11 @@ snapshots:
       zod: 3.25.76
 
   '@hono/zod-validator@0.2.1(hono@4.12.8)(zod@3.25.76)':
+    dependencies:
+      hono: 4.12.8
+      zod: 3.25.76
+
+  '@hono/zod-validator@0.4.3(hono@4.12.8)(zod@3.25.76)':
     dependencies:
       hono: 4.12.8
       zod: 3.25.76
