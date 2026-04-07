@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Phase 21 🔧 진행 중 — Gate-X 독립 서비스 F402~F412 (Sprint 189~196)
+**현재 상태:** Phase 22 ✅ 완료 — Offering Skill v2 + Builder v2 F414~F431 (Sprint 198~207)
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -176,8 +176,8 @@ pnpm e2e                          # Playwright E2E
 - **Phase 18:** ✅ 완료 (Sprint 165~174) — Offering Pipeline F363~F383 (21/21, Match 93%). 형상화 자동화: HTML/PPTX Skill + Offering Agent + Full UI + 콘텐츠 어댑터 + 파이프라인. PRD: `docs/specs/fx-offering-pipeline/prd-final.md`
 - **Phase 19:** ✅ 완료 (Sprint 175~178) — Builder Evolution F384~F391. 5차원 품질 스코어링 + CLI 듀얼모드 + Enhanced O-G-D + Quality Dashboard. PRD: `docs/specs/fx-builder-evolution/prd-final.md`
 - **Phase 20:** ✅ 완료 (Sprint 179~188) — AX BD MSA 재조정 F392~F401. 모놀리스 모듈화(20-A) + harness-kit + 이벤트/프록시(20-B). 2단계 접근법: 모듈화→실제분리. PRD: `docs/specs/ax-bd-msa/prd-final.md`
-- **Phase 21:** 🔧 진행 중 — Gate-X 독립 서비스 F402~F413 (Sprint 189~197). harness-kit 기반 독립 Workers. PRD: `docs/specs/gate-x/prd-final.md`
-- **Phase 22:** 📋 계획 — Offering Skill v2 + Builder v2 F414~F431 (Sprint 198~207). 22-A~C: 사업기획서 표준화 + GAN 교차검증 + PPTX/이력/피드백. 22-D: Builder 디자인 품질(impeccable) + LLM 판별 고도화 + max-cli 통합. PRD: `docs/specs/axbd-offering/prd-final.md`, `docs/specs/fx-builder-v2/prd-final.md`
+- **Phase 21:** ✅ 완료 (Sprint 189~197) — Gate-X 독립 서비스 F402~F413. harness-kit 기반 독립 Workers. PRD: `docs/specs/gate-x/prd-final.md`
+- **Phase 22:** ✅ 완료 (Sprint 198~207) — Offering Skill v2 + Builder v2 F414~F431 (18/18). 22-A~C: 사업기획서 표준화 + GAN 교차검증 + PPTX/이력/피드백 (Match 100%). 22-D: impeccable 디자인 + LLM 판별 + max-cli + Vision API (Match 100%). PRD: `docs/specs/axbd-offering/prd-final.md`, `docs/specs/fx-builder-v2/prd-final.md`
 - **수치 확인:** `/ax:daily-check` 실행 또는 SPEC.md §2 "실시간 수치" 블록 참조 (하드코딩 금지 — drift 방지)
 - **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 
