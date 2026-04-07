@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, CheckCircle2, Play, BookOpen, Wrench, FileText, HelpCircle, SkipForward } from "lucide-react";
+import { ArrowRight, CheckCircle2, Play, BookOpen, Wrench, FileText, HelpCircle, SkipForward, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -247,12 +247,22 @@ export default function WizardStepDetail({
       {/* Outputs */}
       <div className="flex gap-2">
         <FileText className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap items-center gap-1">
           {content.outputs.map((output) => (
             <Badge key={output} variant="outline" className="text-xs">
               {output}
             </Badge>
           ))}
+          {onArtifactReview && (status === "in_progress" || status === "completed") && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => onArtifactReview(`${bizItemId}-${stage}`, content.outputs.join("\n"))}
+              className="ml-1 h-6 gap-1 px-2 text-xs text-blue-600 hover:text-blue-700"
+            >
+              <Eye className="h-3 w-3" /> 산출물 리뷰
+            </Button>
+          )}
         </div>
       </div>
 

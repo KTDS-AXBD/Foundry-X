@@ -127,7 +127,7 @@ test.describe("HITL Review Panel (F266)", () => {
     if (hasArtifact) {
       await artifactLink.first().click();
       // HITL 패널 (fixed right panel) 렌더링 확인
-      await expect(page.getByText("산출물 리뷰")).toBeVisible({ timeout: 5000 });
+      await expect(page.getByRole("heading", { name: "산출물 리뷰" })).toBeVisible({ timeout: 5000 });
     } else {
       // Skip 사유: Wizard step detail에 산출물/리뷰 링크 미노출 — HITL 패널 트리거 불가
       // 해소 조건: Wizard에 산출물 액션 링크 추가 시 (Design §8.4 참조)
@@ -158,7 +158,7 @@ test.describe("HITL Review Panel (F266)", () => {
     }
 
     await artifactLink.first().click();
-    await expect(page.getByText("산출물 리뷰")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("heading", { name: "산출물 리뷰" })).toBeVisible({ timeout: 5000 });
 
     // 승인 버튼 클릭
     const approveBtn = page.getByRole("button", { name: /승인/ });
@@ -173,7 +173,7 @@ test.describe("HITL Review Panel (F266)", () => {
     expect(body.action).toBe("approved");
 
     // 패널 닫힘
-    await expect(page.getByText("산출물 리뷰")).not.toBeVisible({
+    await expect(page.getByRole("heading", { name: "산출물 리뷰" })).not.toBeVisible({
       timeout: 5000,
     });
   });
@@ -197,7 +197,7 @@ test.describe("HITL Review Panel (F266)", () => {
     }
 
     await artifactLink.first().click();
-    await expect(page.getByText("산출물 리뷰")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("heading", { name: "산출물 리뷰" })).toBeVisible({ timeout: 5000 });
 
     // 수정 버튼 클릭 → 에디터 모드
     const editBtn = page.getByRole("button", { name: /수정/ }).first();
@@ -242,7 +242,7 @@ test.describe("HITL Review Panel (F266)", () => {
     }
 
     await artifactLink.first().click();
-    await expect(page.getByText("산출물 리뷰")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("heading", { name: "산출물 리뷰" })).toBeVisible({ timeout: 5000 });
 
     // 리뷰 이력 토글
     await page.getByText("리뷰 이력").click();
