@@ -1,0 +1,413 @@
+{
+  "generated": "2026-04-07T07:13:37.238Z",
+  "totalItems": 67,
+  "byType": {
+    "flaw": 11,
+    "gap": 14,
+    "risk": 39
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**문제-해결책-성공기준**의 기본적 연결은 잘 잡혀 있습니다. As-Is와 To-Be의 대조, 구체적 한계 → 기능 → 성공 기준의 흐름도 논리적입니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**문제 정의**에서 ‘실제 체감 품질’의 중요성을 인지하고 있으나, ‘정성적 평가’의 구체적 방법론(예: 고객 피드백의 정량화 방식, 내부 검증 기준) 설명이 다소 모호합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**기능 범위 → 성공 기준**에서 자동화 점수와 수동 검증을 모두 언급하지만, 실제로 두 지표가 불일치할 경우(예: 자동 기준은 통과했으나 BD팀/고객이 불만족) 어떤 우선순위로 판단할지 명확하지 않습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**오픈 이슈**와 **리스크**가 따로 정리되어 있으나, 일부 핵심 전제(비용, rate limit 등)가 미확정 상태임에도 마일스톤·일정·범위가 사실상 확정적으로 서술된 점은 논리상 불안정 요소입니다.",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트/QA 프로세스**: 자동화 테스트, 회귀 테스트, QA 담당자/프로세스 명확화가 없습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**배포/릴리즈 관리**: 실제 프로토타입의 배포, 롤백, Hotfix 등 배포 전략이 없습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**사용자 피드백 루프의 자동화/시스템화**: 피드백 수집 → 분석 → 반영의 구체적 방법 및 도구가 빠져 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**정량적 SLA**: Vision API/CLI, 빌드 파이프라인 등 각 서비스의 허용 대기시간, 실패 허용율 등 명확치 않습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영 담당자 지정**: 장애 대응, 모니터링, 보안, 데이터 관리 등 실질적 운영 담당자/역할분담이 없습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**교육/온보딩**: BD팀, 신규 운영자 등을 위한 매뉴얼, 교육 자료 언급이 없습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**사용자/고객 Data Privacy**: PRD 등 민감 데이터가 외부로 나갈 때의 명확한 보안 대책(예: 암호화, 접근통제)과 법적 검토가 약합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**문제-해결책-성공기준**의 기본적 연결은 잘 잡혀 있습니다. As-Is와 To-Be의 대조, 구체적 한계 → 기능 → 성공 기준의 흐름도 논리적입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**문제 정의**에서 ‘실제 체감 품질’의 중요성을 인지하고 있으나, ‘정성적 평가’의 구체적 방법론(예: 고객 피드백의 정량화 방식, 내부 검증 기준) 설명이 다소 모호합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**기능 범위 → 성공 기준**에서 자동화 점수와 수동 검증을 모두 언급하지만, 실제로 두 지표가 불일치할 경우(예: 자동 기준은 통과했으나 BD팀/고객이 불만족) 어떤 우선순위로 판단할지 명확하지 않습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**오픈 이슈**와 **리스크**가 따로 정리되어 있으나, 일부 핵심 전제(비용, rate limit 등)가 미확정 상태임에도 마일스톤·일정·범위가 사실상 확정적으로 서술된 점은 논리상 불안정 요소입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트/QA 프로세스**: 자동화 테스트, 회귀 테스트, QA 담당자/프로세스 명확화가 없습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**배포/릴리즈 관리**: 실제 프로토타입의 배포, 롤백, Hotfix 등 배포 전략이 없습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**사용자 피드백 루프의 자동화/시스템화**: 피드백 수집 → 분석 → 반영의 구체적 방법 및 도구가 빠져 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**정량적 SLA**: Vision API/CLI, 빌드 파이프라인 등 각 서비스의 허용 대기시간, 실패 허용율 등 명확치 않습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영 담당자 지정**: 장애 대응, 모니터링, 보안, 데이터 관리 등 실질적 운영 담당자/역할분담이 없습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**교육/온보딩**: BD팀, 신규 운영자 등을 위한 매뉴얼, 교육 자료 언급이 없습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**사용자/고객 Data Privacy**: PRD 등 민감 데이터가 외부로 나갈 때의 명확한 보안 대책(예: 암호화, 접근통제)과 법적 검토가 약합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**외부 서비스 불확실성**: Vision API/CLI의 비용, rate limit, 품질, 장애 시 대안이 실제로 명확하지 않음. 이 부분이 풀리지 않으면 프로젝트 전체가 지연·중단될 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**인력 과소배치**: 1명+AI로 실질적 운영/품질/보안 확보는 불가능. 검증/운영/QA 리소스 미확보는 중대한 리스크.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**품질 측정 불일치**: 자동 평가와 실제 사용자/BD팀 평가가 지속적으로 괴리될 경우, 자동화 루프가 무력화되고 반복적인 수동 개입(=비용 증가, 일정 지연)으로 이어질 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/보안 체계 미흡**: 실제로 장애·보안 이슈 발생 시 즉각적 대응이 불가할 가능성. 이력 관리, 감사 로그, 키 관리 등 실운영에 필수적인 부분이 설계만 있고, 담당자/프로세스가 없다면 실질적 운영 리스크 큼.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**WSL CLI 환경 한계**: 개발/테스트 단계에서는 문제없지만, 실서비스/여러 명 동시 사용 시 확장성·안정성 문제 발생 가능.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "사실 확인: PRD에 포함된 가정이나 수치 중 검증이 필요한 것들은?\nv2 PRD는 많은 가정을 오픈 이슈와 리스크 관리 섹션에 명시하여 투명성을 높였지만, 여전히 핵심적인 검증이 필요합니다.\n\n*   **1) Claude Max CLI (max-cli)의 비용 및 성능 가정 (가장 중요):**\n    *   **가정:** \"빌드 비용 $0/회 (구독 내)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**Claude Max CLI (max-cli)의 실제 구독 비용, rate limit, WSL 환경에서의 안정성 및 성능에 대한 PoC 완료 및 결과 공유.**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**Claude Vision API의 스크린샷 1장당 실제 비용, 그리고 'impeccable' 디자인 가이드라인에 따른 시각적 품질 평가의 유효성 및 구체적인 피드백 제공 가능성에 대한 PoC 완료 및 결과 공유.**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**위 두 가지 PoC 결과가 PRD의 목표값(비용, 성능, 정확도)을 충족하거나, 목표 미달 시 스코프 및 예산 조정 계획 수립.**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**단일 지점 장애(SPOF)**: WSL 로컬 CLI는 명백한 SPOF입니다. 해당 머신의 하드웨어 장애, 네트워크 문제, OS 업데이트 시 전체 서비스 중단이 불가피합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**이벤트 기반 비동기 처리 미흡**: \"큐 관리(F420)\"가 설명되었지만, Cloudflare Workers/D1 기반의 분산 큐, 작업 상태 추적, 재시도 메커니즘에 대한 명확한 설계가 부족합니다. 빌드 요청이 누락되거나 중복 실행될 위험이 있습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**데이터 파이프라인 일관성 보장 어려움**: O-G-D 루프 내에서 LLM 평가, Vision API 호출, CLI 생성 등 여러 외부 단계를 거칩니다. 중간 단계 실패 시 데이터 불일치가 발생하고, 전체 트랜잭션을 롤백하거나 보상 작업을 구현하기가 매우 복잡합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**모니터링 및 관측성 부재**: 외부 서비스 호출 지연, 토큰 사용량, CLI 프로세스 상태 등을 실시간으로 모니터링할 수 있는 체계가 PRD에 구체적으로 명시되지 않았습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**로컬 CLI의 제한적 사용**: 초기 MVP에서는 로컬 CLI를 사용하되, 장기적으로는 **원격 실행 에이전트(소규모 VM/컨테이너) 풀**을 도입하는 아키텍처로의 진화 경로를 명시해야 합니다. 이를 통해 확장성과 내결함성을 확보할 수 있습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**이벤트 드리븐 워크플로우 엔진 도입**: 빌드 작업을 상태 머신으로 모델링하고, 각 단계를 이벤트로 트리거하는 방식을 고려해야 합니다. (예: Cloudflare Queues + D1 for state persistence). 이는 복잡한 O-G-D 루프와 재시도 로직을 관리하는 데 훨씬 유리합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**평가 결과 캐싱 계층**: 동일한 스크린샷/프로토타입에 대한 Vision API 평가 결과를 캐시하여 비용과 지연 시간을 줄여야 합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**단일 지점 장애(SPOF)**: WSL 로컬 CLI는 명백한 SPOF입니다. 해당 머신의 하드웨어 장애, 네트워크 문제, OS 업데이트 시 전체 서비스 중단이 불가피합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**이벤트 기반 비동기 처리 미흡**: \"큐 관리(F420)\"가 설명되었지만, Cloudflare Workers/D1 기반의 분산 큐, 작업 상태 추적, 재시도 메커니즘에 대한 명확한 설계가 부족합니다. 빌드 요청이 누락되거나 중복 실행될 위험이 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**데이터 파이프라인 일관성 보장 어려움**: O-G-D 루프 내에서 LLM 평가, Vision API 호출, CLI 생성 등 여러 외부 단계를 거칩니다. 중간 단계 실패 시 데이터 불일치가 발생하고, 전체 트랜잭션을 롤백하거나 보상 작업을 구현하기가 매우 복잡합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**모니터링 및 관측성 부재**: 외부 서비스 호출 지연, 토큰 사용량, CLI 프로세스 상태 등을 실시간으로 모니터링할 수 있는 체계가 PRD에 구체적으로 명시되지 않았습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**로컬 CLI의 제한적 사용**: 초기 MVP에서는 로컬 CLI를 사용하되, 장기적으로는 **원격 실행 에이전트(소규모 VM/컨테이너) 풀**을 도입하는 아키텍처로의 진화 경로를 명시해야 합니다. 이를 통해 확장성과 내결함성을 확보할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**이벤트 드리븐 워크플로우 엔진 도입**: 빌드 작업을 상태 머신으로 모델링하고, 각 단계를 이벤트로 트리거하는 방식을 고려해야 합니다. (예: Cloudflare Queues + D1 for state persistence). 이는 복잡한 O-G-D 루프와 재시도 로직을 관리하는 데 훨씬 유리합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**평가 결과 캐싱 계층**: 동일한 스크린샷/프로토타입에 대한 Vision API 평가 결과를 캐시하여 비용과 지연 시간을 줄여야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**단일 지점 장애(SPOF)**: WSL 로컬 CLI는 명백한 SPOF입니다. 해당 머신의 하드웨어 장애, 네트워크 문제, OS 업데이트 시 전체 서비스 중단이 불가피합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**이벤트 기반 비동기 처리 미흡**: \"큐 관리(F420)\"가 설명되었지만, Cloudflare Workers/D1 기반의 분산 큐, 작업 상태 추적, 재시도 메커니즘에 대한 명확한 설계가 부족합니다. 빌드 요청이 누락되거나 중복 실행될 위험이 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**데이터 파이프라인 일관성 보장 어려움**: O-G-D 루프 내에서 LLM 평가, Vision API 호출, CLI 생성 등 여러 외부 단계를 거칩니다. 중간 단계 실패 시 데이터 불일치가 발생하고, 전체 트랜잭션을 롤백하거나 보상 작업을 구현하기가 매우 복잡합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**모니터링 및 관측성 부재**: 외부 서비스 호출 지연, 토큰 사용량, CLI 프로세스 상태 등을 실시간으로 모니터링할 수 있는 체계가 PRD에 구체적으로 명시되지 않았습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**로컬 CLI의 제한적 사용**: 초기 MVP에서는 로컬 CLI를 사용하되, 장기적으로는 **원격 실행 에이전트(소규모 VM/컨테이너) 풀**을 도입하는 아키텍처로의 진화 경로를 명시해야 합니다. 이를 통해 확장성과 내결함성을 확보할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**이벤트 드리븐 워크플로우 엔진 도입**: 빌드 작업을 상태 머신으로 모델링하고, 각 단계를 이벤트로 트리거하는 방식을 고려해야 합니다. (예: Cloudflare Queues + D1 for state persistence). 이는 복잡한 O-G-D 루프와 재시도 로직을 관리하는 데 훨씬 유리합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**평가 결과 캐싱 계층**: 동일한 스크린샷/프로토타입에 대한 Vision API 평가 결과를 캐시하여 비용과 지연 시간을 줄여야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**LLM 평가의 재현성 확보(F417)**: \"±20점 범위 내 재현성\"은 매우 도전적인 목표입니다. 프롬프트 엔지니어링, 온도(Temperature) 설정, 평가 기준의 객관화에 상당한 실험과 반복이 필요하며, 한 명의 담당자로는 부족할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**운영 장애 대응(F423)**: max-cli 장애 시 API로의 \"자동 전환\"은 단순히 엔드포인트를 바꾸는 것이 아닙니다. 두 방식은 요청 형식, 응답 구조, 비용 구조가 완전히 다릅니다. 상태를 유지하면서 전환하는 로직은 상당히 복잡합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**데이터 일관성(F425)**: 빌드 → 평가 → 피드백의 전 과정에서 발생하는 모든 메타데이터(로그, 점수, 중간 산출물)를 원자적으로 저장하고, 실패 시 정리하는 것은 분산 트랜잭션 문제에 가깝습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**보안 관리(F426)**: WSL 로컬 환경에 API 키를 안전하게 저장하고, CLI 프로세스가 해당 키에 접근하도록 하는 것은 생각보다 까다롭습니다. 하드코딩이나 평문 저장을 피하기 위해 로컬 키 관리 도구 도입이 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**로컬 CLI 운영 리스크**: 단일 머신 의존성으로 인한 확장 불가, 장애 복구 시간 과다, 팀 멤버 간 개발/운영 환경 불일치가 발생할 가능성이 매우 높습니다. 이는 서비스 신뢰도의 근본적 위협입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**비용/성능 실증 실패**: Sprint 0에서의 실증 실험 결과, Vision API 비용이 예상보다 높거나, max-cli rate limit이 매우 낮게 확인될 경우, 전체 프로젝트의 가치 제안이 붕괴됩니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**품질 평가의 유효성 위기**: LLM과 Vision API가 매기는 \"고점수\"가 BD팀이나 실제 고객이 느끼는 \"데모 가능 품질\"과 상관관계가 낮을 수 있습니다. 이 경우 모든 기술적 고도화 노력이 무의미해집니다. F424(수동 검증)을 강제하는 것은 좋지만, 이조차 주관적일 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**인력 리소스 부족**: 5~7 Sprint에 해당하는 복잡한 다중 트랙 작업을 1명의 담당자와 AI 에이전트만으로 수행하는 것은 현실적으로 불가능에 가깝습니다. 품질 저하와 일정 지연이 불가피하며, 이는 기술 부채로 직결됩니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Sprint 0 실증 완료**: 오픈 이슈 #1, #2에 명시된 **Vision API 비용**과 **max-cli rate limit**에 대한 정량적 실측 데이터가 확보되고, 그 결과가 프로젝트의 경제성/실용성 목표(빌드당 $0 근접, 하루 N회 이상 실행 가능)를 충족할 때.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**아키텍처 설계 보완**: 현재의 **WSL SPOF 아키텍처**에 대한 구체적인 위험 완화 계획(예: 빠른 장애 복구 절차, 모니터링 방법, 단기 대체안)과 **중장기 이전 로드맵**이 수립되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**핵심 리소스 확보**: 최소 **1명의 추가 풀타임 개발자 또는 경험 있는 파트타임 개발자**가 프로젝트에 투입될 수 있어야 합니다. 특히 LLM 평가 재현성, 이벤트 기반 워크플로우 구현, 운영 인프라 구축에 전문성이 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**품질 검증 프로토타입 완성**: impeccable 통합 전, **1~2개의 샘플 PRD**로 현재 시스템과 향후 시스템(수동 프롬프트 개선)의 출력 품질을 BD팀과 잠재 고객이 평가하는 **블라인드 테스트**를 수행하여, 기술적 개선의 효과에 대한 신뢰를 확보해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}

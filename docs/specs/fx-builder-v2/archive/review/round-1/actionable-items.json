@@ -1,0 +1,353 @@
+{
+  "generated": "2026-04-07T07:10:56.231Z",
+  "totalItems": 57,
+  "byType": {
+    "flaw": 6,
+    "gap": 11,
+    "risk": 37
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**문제 정의와 성공 기준의 연결:** PRD에서 ‘고객 데모 가능 수준’의 기준이 다소 모호합니다. Vision API 점수, 5D 품질점수, PRD 반영률 등 세부 KPI는 있으나, 실제 고객이 ‘데모 가능’하다고 느끼는 기준과의 간극이 남아 있음(예: BD팀 실사용 평가, 고객 피드백 등 실질적 품질 검증 프로세스가 누락됨).",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**기능별 우선순위와 KPI 간 연결성 부족:** 예를 들어, impeccable 디자인 스킬을 프롬프트에 넣는 것이 실제 5D 품질 점수 향상으로 바로 연결되는지 실증적 근거가 부족. LLM/Vision API 평가가 실제로 ‘고객 만족’과 상관관계가 높은지 명확하지 않음.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**비용 구조 문제의 근본적 해결책 미흡:** Vision API 등 외부 비용이 늘어나는 구조에 대한 근본적인 비용 한도/대안이 모호함(비용 측정은 오픈이슈로만 남아 있음).",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**문제 정의와 성공 기준의 연결:** PRD에서 ‘고객 데모 가능 수준’의 기준이 다소 모호합니다. Vision API 점수, 5D 품질점수, PRD 반영률 등 세부 KPI는 있으나, 실제 고객이 ‘데모 가능’하다고 느끼는 기준과의 간극이 남아 있음(예: BD팀 실사용 평가, 고객 피드백 등 실질적 품질 검증 프로세스가 누락됨).",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**기능별 우선순위와 KPI 간 연결성 부족:** 예를 들어, impeccable 디자인 스킬을 프롬프트에 넣는 것이 실제 5D 품질 점수 향상으로 바로 연결되는지 실증적 근거가 부족. LLM/Vision API 평가가 실제로 ‘고객 만족’과 상관관계가 높은지 명확하지 않음.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**비용 구조 문제의 근본적 해결책 미흡:** Vision API 등 외부 비용이 늘어나는 구조에 대한 근본적인 비용 한도/대안이 모호함(비용 측정은 오픈이슈로만 남아 있음).",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실사용/실고객 피드백 루프:** “고객이 바로 데모 가능”이라는 목표에 비해, 실제 사용자(내부 BD팀, 외부 고객) 피드백 수집 및 품질 검증 루프가 전혀 언급되지 않음. 최소한 파일럿 사용자 선정, 데모 후 피드백 반영 프로세스 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영/장애 대응 시나리오:** max-cli, Vision API 장애/지연/실패 시 fallback·모니터링·알림 체계 필요. CLI rate limit, Vision API 장애 등 발생시 실시간 대응 방안이 부재.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**품질 검증 수동 절차:** LLM/Vision API 자동화 점수만으로는 부족. BD팀 직접 검수, 체크리스트, 품질 확인 절차 등 사람이 보는 검증/보완 프로세스가 반드시 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**보안/개인정보 이슈:** PRD 정보가 외부 API로 전송된다는 점 외에, API key 관리, 데이터 유출 방지 등 실질적 보안 절차가 미흡.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**성능/대기시간:** max-cli, Vision API 연동 시 실제 빌드 대기시간, 동시 요청시 응답지연 등 성능 요구사항이 명확치 않음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**인력 투입의 비현실성:** 실질적으로 “AI 에이전트 + BD팀 1명(=Sinclair)”만 투입인데, 실제로 impeccable 도메인별 프롬프트 튜닝, LLM 판별기 구축 및 Vision API 연동, max-cli 파이프라인 통합, 장애 대응까지 혼자서 5~7스프린트 내에 소화하기는 어렵습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**max-cli 및 Vision API 의존**: CLI 기반 처리와 Vision API 비용/성능 검증이 실측 전제조건임에도, 이를 Sprint 착수 후로 미룬 것은 리스크가 큽니다(실제로 불가/초과시 전체 일정 연쇄적 지연).",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**병렬 트랙의 리스크:** 3트랙 병렬(M1~M3) 추진 시, 한정된 리소스(1명)가 동시 병렬로 처리하기 어렵고, 의존성(예: F414/415 완성 전 F418 정상 측정 불가) 고려가 부족합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실사용/실고객 피드백 루프:** “고객이 바로 데모 가능”이라는 목표에 비해, 실제 사용자(내부 BD팀, 외부 고객) 피드백 수집 및 품질 검증 루프가 전혀 언급되지 않음. 최소한 파일럿 사용자 선정, 데모 후 피드백 반영 프로세스 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/장애 대응 시나리오:** max-cli, Vision API 장애/지연/실패 시 fallback·모니터링·알림 체계 필요. CLI rate limit, Vision API 장애 등 발생시 실시간 대응 방안이 부재.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**품질 검증 수동 절차:** LLM/Vision API 자동화 점수만으로는 부족. BD팀 직접 검수, 체크리스트, 품질 확인 절차 등 사람이 보는 검증/보완 프로세스가 반드시 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**보안/개인정보 이슈:** PRD 정보가 외부 API로 전송된다는 점 외에, API key 관리, 데이터 유출 방지 등 실질적 보안 절차가 미흡.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**성능/대기시간:** max-cli, Vision API 연동 시 실제 빌드 대기시간, 동시 요청시 응답지연 등 성능 요구사항이 명확치 않음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**외부 서비스 비용·제한 리스크:** Vision API와 max-cli의 실제 과금, rate limit 등은 확인 전 착수 불가. 예산 초과, 기능 미작동 가능성 높음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**인력 과소배치:** 핵심 개발·운영·품질 검증을 1명(혹은 AI에이전트)에 과도하게 의존. 병목·지연·품질 저하 우려.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**품질 측정의 현실 미달:** LLM/Vision API 평가 기준과 실제 고객 체감 품질이 괴리될 가능성. “80점” 기준이 형식적 수치에 그칠 위험.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**스펙 크리프(scope creep):** impeccable, Vision 등 외부 트렌드·레퍼런스 변화에 따라 요구사항이 계속 늘어날 우려.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**의존성 미해소:** max-cli, Vision API, impeccable 참조문서 등 핵심 기능이 미확정/미실측 상태에서 병렬 개발을 시작하는 것 자체가 불확실성 큼.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Vision API, max-cli의 실제 과금/성능/제한**을 사전 실측(프로토타입 몇 건 실험)하여 “예산·성능·제한”이 수용 가능한 범위임을 확인할 것",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**최소 1명 이상의 개발 인력**(혹은 외부 리소스) 실투입 가능성 확보",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실사용자(내부 BD팀) 품질 검증 및 피드백 루프**를 Milestone에 명시(예: 내부 QA, 파일럿 데모, 피드백 반영 과정)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**비상시 장애 대응 및 fallback 체계** 설계(예: Vision API/CLI 장애시 대체 로직, 알림 등)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 데모 가능 기준 정의**(정량/정성 혼합, BD팀 자체 평가 기준 등) 및 품질 검증 절차 포함",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**Vision API 비용 및 `max-cli` rate limit 검증:** Sprint 착수 전, Vision API의 실제 비용과 `max-cli`의 구독 계정별 일일 한도를 정확히 파악하고, 이것이 프로젝트의 \"빌드 비용 $0/회\" 및 \"무제한 반복 가능\" 목표 달성에 지장을 주지 않는다는 확신이 필요합니다. 실패 조건(Vision API 비용 $",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**LLM 판별 재현성 확보 방안 구체화:** \"LLM 판별 재현성 ±20점 이상 불안정\"이라는 실패 조건을 극복하기 위한 구체적인 방법론(프롬프트 엔지니어링 전략, 평가 지표 정교화, LLM 모델 선택 등)이 F417/F418 설계 단계에서 명확히 제시되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**`impeccable` 참조문서 크기 문제 해결:** F414 설계 시, 참조문서 크기로 인한 토큰 한도 초과 문제를 해결하기 위한 구체적인 전략(예: 핵심 도메인 우선순위, 동적 참조 주입, 요약 등)이 마련되어야 합니다. 이는 디자인 품질 목표 달성에 직결됩니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**Vision API 비용 및 `max-cli` rate limit 검증:** Sprint 착수 전, Vision API의 실제 비용과 `max-cli`의 구독 계정별 일일 한도를 정확히 파악하고, 이것이 프로젝트의 \"빌드 비용 $0/회\" 및 \"무제한 반복 가능\" 목표 달성에 지장을 주지 않는다는 확신이 필요합니다. 실패 조건(Vision API 비용 $",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**LLM 판별 재현성 확보 방안 구체화:** \"LLM 판별 재현성 ±20점 이상 불안정\"이라는 실패 조건을 극복하기 위한 구체적인 방법론(프롬프트 엔지니어링 전략, 평가 지표 정교화, LLM 모델 선택 등)이 F417/F418 설계 단계에서 명확히 제시되어야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**`impeccable` 참조문서 크기 문제 해결:** F414 설계 시, 참조문서 크기로 인한 토큰 한도 초과 문제를 해결하기 위한 구체적인 전략(예: 핵심 도메인 우선순위, 동적 참조 주입, 요약 등)이 마련되어야 합니다. 이는 디자인 품질 목표 달성에 직결됩니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**모놀리식 평가 파이프라인**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**로컬 CLI 의존성의 아키텍처적 위험**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**데이터 일관성 보장 부재**",
+      "severity": "high"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Vision API 비용 및 성능 병목**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**max-cli 운영 환경의 불안정성**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**토큰 한도 초과 위험**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**모놀리식 평가 파이프라인**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**로컬 CLI 의존성의 아키텍처적 위험**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**데이터 일관성 보장 부재**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**LLM 평가의 재현성 보장**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Vision API의 정량화 난이도**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**에지 케이스 처리**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**성능 최적화 필요**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**수렴 실패 리스크 (위험도: 높음)**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**운영 신뢰성 리스크 (위험도: 높음)**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**비용 예측 불가능성 (위험도: 중간)**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**반드시 선행되어야 할 실증 실험:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**아키텍처 재설계 필요:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**MVP 범위 축소 권고:**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}
