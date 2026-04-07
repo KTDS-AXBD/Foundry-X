@@ -3,9 +3,9 @@
 # Usage: ./scripts/feedback-consumer.sh [--once] [--interval 60]
 #
 # Environment variables:
-#   API_BASE   — Workers API URL (default: https://foundry-x-api.ktds-axbd.workers.dev)
-#   API_TOKEN  — JWT 인증 토큰
-#   REPO_DIR   — Foundry-X 리포 경로 (default: pwd)
+#   API_BASE       — Workers API URL (default: https://foundry-x-api.ktds-axbd.workers.dev)
+#   WEBHOOK_SECRET — X-Webhook-Secret 헤더 인증 (JWT 불필요)
+#   REPO_DIR       — Foundry-X 리포 경로 (default: pwd)
 #
 # Prerequisites:
 #   - jq, curl, gh (GitHub CLI), claude (Claude Code CLI)
@@ -24,8 +24,13 @@ for arg in "$@"; do
   esac
 done
 
-if [ -z "${API_TOKEN:-}" ]; then
-  echo "ERROR: API_TOKEN environment variable required"
+# 인증: X-Webhook-Secret 우선, fallback으로 JWT (레거시 호환)
+if [ -n "${WEBHOOK_SECRET:-}" ]; then
+  AUTH_HEADER="X-Webhook-Secret: $WEBHOOK_SECRET"
+elif [ -n "${API_TOKEN:-}" ]; then
+  AUTH_HEADER="Authorization: Bearer $API_TOKEN"
+else
+  echo "ERROR: WEBHOOK_SECRET or API_TOKEN environment variable required"
   exit 1
 fi
 
@@ -35,7 +40,7 @@ consume_one() {
   # 1. 큐에서 다음 아이템 consume
   local ITEM
   ITEM=$(curl -sf -X POST "$API_BASE/api/feedback-queue/consume" \
-    -H "Authorization: Bearer $API_TOKEN" \
+    -H "$AUTH_HEADER" \
     -H "Content-Type: application/json" 2>/dev/null || echo "{}")
 
   local ITEM_ID
@@ -88,7 +93,7 @@ $BODY
   if [ -n "$PR_URL" ]; then
     log "SUCCESS: PR created — $PR_URL"
     curl -sf -X PATCH "$API_BASE/api/feedback-queue/$ITEM_ID" \
-      -H "Authorization: Bearer $API_TOKEN" \
+      -H "$AUTH_HEADER" \
       -H "Content-Type: application/json" \
       -d "{\"status\":\"done\",\"agentPrUrl\":\"$PR_URL\"}" >/dev/null
   else
@@ -96,7 +101,7 @@ $BODY
     local ERR_MSG
     ERR_MSG=$(echo "$RESULT" | tail -5 | jq -Rs '.' | sed 's/^"//;s/"$//')
     curl -sf -X PATCH "$API_BASE/api/feedback-queue/$ITEM_ID" \
-      -H "Authorization: Bearer $API_TOKEN" \
+      -H "$AUTH_HEADER" \
       -H "Content-Type: application/json" \
       -d "{\"status\":\"failed\",\"errorMessage\":\"No PR created: $ERR_MSG\"}" >/dev/null
   fi
