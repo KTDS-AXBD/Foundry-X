@@ -1,12 +1,20 @@
 /**
  * F441+F442: 파일 업로드 + 문서 파싱 라우트 (Sprint 213)
+ * F443: 문서 기반 아이템 추출 + GET /files JOIN 개선 (Sprint 214)
  */
 import { Hono } from "hono";
+import { z } from "zod";
 import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
 import { PresignFileSchema, ConfirmFileSchema } from "../schemas/file.js";
 import { fileService } from "../services/file-service.js";
 import { documentParserService } from "../services/document-parser-service.js";
+import { documentExtractService } from "../services/document-extract-service.js";
+
+const ExtractItemSchema = z.object({
+  file_ids: z.array(z.string()).min(1).max(10),
+  biz_item_id: z.string().optional(),
+});
 
 export const filesRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
@@ -48,12 +56,53 @@ filesRoute.post("/files/confirm", async (c) => {
   }
 });
 
-// ─── F441: GET /files — 파일 목록 ───
+// ─── F441: GET /files — 파일 목록 (F443: parsed_at/page_count JOIN 추가) ───
 filesRoute.get("/files", async (c) => {
   const orgId = c.get("orgId");
   const bizItemId = c.req.query("biz_item_id");
-  const files = await fileService.list(c.env, orgId, bizItemId);
-  return c.json({ files });
+
+  // parsed_documents와 JOIN하여 파싱 상태 포함 반환
+  let query: string;
+  let bindings: (string | undefined)[];
+  if (bizItemId) {
+    query = `SELECT f.*, pd.parsed_at, pd.page_count
+             FROM uploaded_files f
+             LEFT JOIN parsed_documents pd ON pd.file_id = f.id
+             WHERE f.tenant_id = ? AND f.biz_item_id = ?
+             ORDER BY f.created_at DESC`;
+    bindings = [orgId, bizItemId];
+  } else {
+    query = `SELECT f.*, pd.parsed_at, pd.page_count
+             FROM uploaded_files f
+             LEFT JOIN parsed_documents pd ON pd.file_id = f.id
+             WHERE f.tenant_id = ?
+             ORDER BY f.created_at DESC
+             LIMIT 50`;
+    bindings = [orgId];
+  }
+
+  const { results } = await c.env.DB.prepare(query).bind(...bindings).all();
+  return c.json({ files: results });
+});
+
+// ─── F443: PATCH /files/:id — 파일 메타 업데이트 (biz_item_id 연결) ───
+filesRoute.patch("/files/:id", async (c) => {
+  const orgId = c.get("orgId");
+  const fileId = c.req.param("id");
+  const body = await c.req.json<{ biz_item_id?: string }>().catch(() => ({}));
+
+  const file = await fileService.getById(c.env, orgId, fileId);
+  if (!file) return c.json({ error: "파일을 찾을 수 없어요" }, 404);
+
+  if (body.biz_item_id !== undefined) {
+    await c.env.DB.prepare(
+      `UPDATE uploaded_files SET biz_item_id = ? WHERE id = ? AND tenant_id = ?`,
+    )
+      .bind(body.biz_item_id, fileId, orgId)
+      .run();
+  }
+
+  return c.json({ ok: true });
 });
 
 // ─── F441: DELETE /files/:id — 파일 삭제 ───
@@ -171,4 +220,34 @@ filesRoute.get("/files/:id/parsed", async (c) => {
     ...parsed,
     content_structured: JSON.parse(parsed.content_structured ?? "{}"),
   });
+});
+
+// ─── F443: POST /files/extract-item — 파싱 결과에서 아이템 정보 AI 추출 ───
+filesRoute.post("/files/extract-item", async (c) => {
+  const orgId = c.get("orgId");
+  const body = await c.req.json();
+  const validation = ExtractItemSchema.safeParse(body);
+
+  if (!validation.success) {
+    return c.json({ error: "file_ids 배열이 필요해요", details: validation.error.flatten() }, 400);
+  }
+
+  const { file_ids } = validation.data;
+
+  try {
+    const parsedTexts = await documentExtractService.fetchParsedTexts(c.env.DB, {
+      fileIds: file_ids,
+      tenantId: orgId,
+    });
+
+    if (parsedTexts.length === 0) {
+      return c.json({ error: "파싱된 문서가 없어요. 먼저 /parse를 호출하세요" }, 404);
+    }
+
+    const extracted = await documentExtractService.extractItemInfo(c.env.AI, parsedTexts);
+    return c.json(extracted);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "추출에 실패했어요";
+    return c.json({ error: msg }, 500);
+  }
 });

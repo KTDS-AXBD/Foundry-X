@@ -6,7 +6,8 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { postApi } from "@/lib/api-client";
+import { postApi, extractItemFromDocuments, associateFilesToItem } from "@/lib/api-client";
+import { FileUploadZone } from "@/components/feature/FileUploadZone";
 
 // ─── Types ───
 
@@ -24,7 +25,8 @@ interface ClassifyResult {
 
 // ─── Step Indicator ───
 
-const STEPS = ["아이디어 입력", "AI 분석", "확인 & 등록"] as const;
+// F443: 자료 업로드 스텝 추가 (Step 0)
+const STEPS = ["자료 업로드", "아이디어 입력", "AI 분석", "확인 & 등록"] as const;
 
 function StepIndicator({ current }: { current: number }) {
   return (
@@ -63,6 +65,60 @@ function StepIndicator({ current }: { current: number }) {
           )}
         </div>
       ))}
+    </div>
+  );
+}
+
+// ─── Step 1: 아이디어 입력 ───
+
+// ─── Step 0: 자료 업로드 (F443, optional) ───
+
+function Step0({
+  uploadedFileIds,
+  onUpload,
+  onExtracted,
+  onSkip,
+  extracting,
+}: {
+  uploadedFileIds: string[];
+  onUpload: (fileId: string) => void;
+  onExtracted: (title: string, description: string) => void;
+  onSkip: () => void;
+  extracting: boolean;
+}) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="mb-1 text-lg font-semibold">자료를 업로드해 주세요 (선택)</h2>
+        <p className="text-sm text-muted-foreground">
+          PDF, PPTX, DOCX 파일을 업로드하면 AI가 아이디어 제목과 설명을 자동으로 채워드려요.
+        </p>
+      </div>
+
+      <FileUploadZone onUploadComplete={onUpload} />
+
+      {uploadedFileIds.length > 0 && (
+        <p className="text-sm text-muted-foreground">
+          ✅ {uploadedFileIds.length}개 파일 업로드 완료
+        </p>
+      )}
+
+      <div className="flex gap-3">
+        <Button
+          className="flex-1"
+          onClick={() => void onExtracted("", "")}
+          disabled={uploadedFileIds.length === 0 || extracting}
+        >
+          {extracting ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" />AI 분석 중...</>
+          ) : (
+            <><ArrowRight className="mr-2 h-4 w-4" />다음 (AI 자동 입력)</>
+          )}
+        </Button>
+        <Button variant="ghost" onClick={onSkip}>
+          건너뛰기
+        </Button>
+      </div>
     </div>
   );
 }
@@ -294,6 +350,31 @@ export function Component() {
   const [createdItem, setCreatedItem] = useState<CreatedItem | null>(null);
   const [classifyResult, setClassifyResult] = useState<ClassifyResult | null>(null);
   const [classifyLoading, setClassifyLoading] = useState(false);
+  // F443: 자료 업로드 상태
+  const [uploadedFileIds, setUploadedFileIds] = useState<string[]>([]);
+  const [extracting, setExtracting] = useState(false);
+
+  const handleFileUploaded = (fileId: string) => {
+    setUploadedFileIds((prev) => [...prev, fileId]);
+  };
+
+  const handleExtract = async () => {
+    if (uploadedFileIds.length === 0) {
+      setStep(1);
+      return;
+    }
+    setExtracting(true);
+    try {
+      const result = await extractItemFromDocuments(uploadedFileIds);
+      if (result.title) setTitle(result.title);
+      if (result.description) setDescription(result.description);
+    } catch {
+      // 추출 실패 시 빈 필드로 진행
+    } finally {
+      setExtracting(false);
+      setStep(1);
+    }
+  };
 
   const handleStep1Next = async () => {
     setError(null);
@@ -305,7 +386,13 @@ export function Component() {
         source: "wizard",
       });
       setCreatedItem(item);
-      setStep(1);
+
+      // F443: 업로드된 파일을 생성된 아이템에 연결
+      if (uploadedFileIds.length > 0) {
+        associateFilesToItem(uploadedFileIds, item.id).catch(() => {/* non-fatal */});
+      }
+
+      setStep(2); // Step 2 = AI 분석 (STEPS[2])
 
       // Kick off classification in background
       setClassifyLoading(true);
@@ -344,7 +431,17 @@ export function Component() {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {/* F443: Step 0 — 자료 업로드 (optional) */}
           {step === 0 && (
+            <Step0
+              uploadedFileIds={uploadedFileIds}
+              onUpload={handleFileUploaded}
+              onExtracted={() => void handleExtract()}
+              onSkip={() => setStep(1)}
+              extracting={extracting}
+            />
+          )}
+          {step === 1 && (
             <Step1
               title={title}
               description={description}
@@ -355,22 +452,22 @@ export function Component() {
               error={error}
             />
           )}
-          {step === 1 && createdItem && (
+          {step === 2 && createdItem && (
             <Step2
               item={createdItem}
               classifyResult={classifyResult}
               classifyLoading={classifyLoading}
-              onBack={() => setStep(0)}
-              onNext={() => setStep(2)}
+              onBack={() => setStep(1)}
+              onNext={() => setStep(3)}
             />
           )}
-          {step === 2 && createdItem && (
+          {step === 3 && createdItem && (
             <Step3
               item={{
                 ...createdItem,
                 discoveryType: classifyResult?.type ?? classifyResult?.category ?? createdItem.discoveryType,
               }}
-              onBack={() => setStep(1)}
+              onBack={() => setStep(2)}
               onFinish={handleFinish}
             />
           )}

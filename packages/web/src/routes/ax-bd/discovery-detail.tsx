@@ -3,10 +3,11 @@
 /**
  * F439 — 아이템 상세 허브 (3탭: 기본정보/발굴분석/형상화)
  * F440 — 사업기획서 생성 + 열람
- * F447 — 파이프라인 상태 추적 스테퍼
- * F448 — 단계 간 자동 전환 CTA
+ * F443 — 첨부 자료 탭 추가 (Sprint 214)
  * F444 — 사업기획서 편집기 + 버전 이력
  * F445 — 기획서 템플릿 선택
+ * F447 — 파이프라인 상태 추적 스테퍼
+ * F448 — 단계 간 자동 전환 CTA
  */
 import { useCallback, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
@@ -35,6 +36,7 @@ import PipelineTransitionCTA from "@/components/feature/discovery/PipelineTransi
 import BusinessPlanEditor from "@/components/feature/discovery/BusinessPlanEditor";
 import VersionHistoryPanel from "@/components/feature/discovery/VersionHistoryPanel";
 import TemplateSelector, { type TemplateParams } from "@/components/feature/discovery/TemplateSelector";
+import AttachedFilesPanel from "@/components/feature/discovery/AttachedFilesPanel";
 
 const TYPE_LABELS: Record<string, string> = {
   I: "아이디어형", M: "시장·타겟형", P: "고객문제형", T: "기술형", S: "서비스형",
@@ -164,12 +166,13 @@ export function Component() {
       {/* F447: 파이프라인 진행률 스테퍼 */}
       {pipelineDetail && <PipelineProgressStepper detail={pipelineDetail} />}
 
-      {/* 3탭 허브 */}
+      {/* 4탭 허브 (F443: "첨부 자료" 탭 추가) */}
       <Tabs defaultValue="info">
         <TabsList>
           <TabsTrigger value="info">기본정보</TabsTrigger>
           <TabsTrigger value="analysis">발굴분석</TabsTrigger>
           <TabsTrigger value="shaping">형상화</TabsTrigger>
+          <TabsTrigger value="files">첨부 자료</TabsTrigger>
         </TabsList>
 
         {/* ── 탭 1: 기본정보 ── */}
@@ -335,6 +338,13 @@ export function Component() {
               onCancel={() => setShowTemplateSelector(false)}
             />
           )}
+        </TabsContent>
+
+        {/* ── 탭 4: 첨부 자료 (F443) ── */}
+        <TabsContent value="files" className="mt-4">
+          <div className="rounded-lg border bg-card p-5">
+            <AttachedFilesPanel bizItemId={id!} />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

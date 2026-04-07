@@ -830,6 +830,20 @@ bizItemsRoute.post("/biz-items/:id/generate-business-plan", async (c) => {
   const prdService = new PrdGeneratorService(c.env.DB, null as never);
   const prd = await prdService.getLatest(id);
 
+  // F443: 첨부 문서 파싱 결과 컨텍스트 조회
+  const { results: docRows } = await c.env.DB.prepare(
+    `SELECT f.filename, pd.content_text
+     FROM parsed_documents pd
+     JOIN uploaded_files f ON f.id = pd.file_id
+     WHERE f.biz_item_id = ? AND f.tenant_id = ?
+     ORDER BY pd.parsed_at DESC LIMIT 3`,
+  )
+    .bind(id, orgId)
+    .all<{ filename: string; content_text: string }>();
+  const documentContext = docRows.map(
+    (d) => `[${d.filename}]\n${d.content_text.slice(0, 2000)}`,
+  );
+
   const runner = createAgentRunner(c.env);
   const bpService = new BusinessPlanGeneratorService(c.env.DB, runner);
 
@@ -851,6 +865,7 @@ bizItemsRoute.post("/biz-items/:id/generate-business-plan", async (c) => {
     templateType,
     tone,
     length,
+    documentContext,
   });
 
   return c.json(bp, 201);

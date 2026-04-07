@@ -2880,3 +2880,41 @@ export async function advancePipelineStage(
 ): Promise<{ success: boolean }> {
   return patchApi(`/pipeline/items/${bizItemId}/stage`, { stage, notes });
 }
+
+// ─── F443: 파일 업로드 + 문서 추출 ──────────────────────────────────────
+
+export interface UploadedFileMeta {
+  id: string;
+  filename: string;
+  mime_type: string;
+  status: string;
+  size_bytes: number;
+  created_at: number;
+  parsed_at?: number | null;
+  page_count?: number | null;
+}
+
+export async function fetchFiles(bizItemId?: string): Promise<UploadedFileMeta[]> {
+  const params = bizItemId ? `?biz_item_id=${encodeURIComponent(bizItemId)}` : "";
+  const data = await fetchApi<{ files: UploadedFileMeta[] }>(`/files${params}`);
+  return data.files ?? [];
+}
+
+export async function deleteFile(fileId: string): Promise<void> {
+  await deleteApi(`/files/${fileId}`);
+}
+
+export async function extractItemFromDocuments(
+  fileIds: string[],
+): Promise<{ title: string; description: string; confidence: number }> {
+  return postApi("/files/extract-item", { file_ids: fileIds });
+}
+
+export async function associateFilesToItem(
+  fileIds: string[],
+  bizItemId: string,
+): Promise<void> {
+  await Promise.all(
+    fileIds.map((id) => patchApi(`/files/${id}`, { biz_item_id: bizItemId })),
+  );
+}

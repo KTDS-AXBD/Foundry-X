@@ -50,6 +50,8 @@ export interface BpDataBundle {
     trends: unknown;
   } | null;
   prdContent: string | null;
+  // F443: 업로드 문서 파싱 결과 컨텍스트
+  documentContext?: string[];
 }
 
 // ─── 매핑 함수 ───
