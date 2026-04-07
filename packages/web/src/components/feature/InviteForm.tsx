@@ -28,10 +28,7 @@ function useGoogleIdentity(onCredential: (credential: string) => void) {
   callbackRef.current = onCredential;
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.onload = () => {
+    const initGis = () => {
       window.google?.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: (res: { credential: string }) =>
@@ -48,6 +45,16 @@ function useGoogleIdentity(onCredential: (credential: string) => void) {
         });
       }
     };
+
+    if (window.google?.accounts.id) {
+      initGis();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.onload = initGis;
     document.head.appendChild(script);
     return () => { script.remove(); };
   }, []);
