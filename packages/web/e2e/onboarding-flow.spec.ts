@@ -1,216 +1,176 @@
 import { test, expect } from "./fixtures/auth";
 
 // @service: portal
-// @sprint: 187
-// @tagged-by: F400
+// @sprint: 209
+// @tagged-by: F435
 
-test.describe("Onboarding Flow (F252)", () => {
+// ─── F435: 아이템 등록 위저드 테스트 ───
+
+test.describe("Item Registration Wizard (F435)", () => {
   test.beforeEach(async ({ authenticatedPage: page }) => {
-    // Mock onboarding progress API (GET + PATCH)
-    await page.route("**/api/onboarding/progress", (route) => {
-      if (route.request().method() === "GET") {
+    // Mock POST /biz-items
+    await page.route("**/api/biz-items", (route) => {
+      if (route.request().method() === "POST") {
         return route.fulfill({
-          status: 200,
+          status: 201,
           contentType: "application/json",
           body: JSON.stringify({
-            totalSteps: 5,
-            completedSteps: ["step-1", "step-2"],
-            progressPercent: 40,
-            steps: [
-              { id: "step-1", label: "프로젝트 연결하기", completed: true, completedAt: "2026-03-01T00:00:00Z" },
-              { id: "step-2", label: "첫 Spec 생성", completed: true, completedAt: "2026-03-02T00:00:00Z" },
-              { id: "step-3", label: "에이전트 실행", completed: false, completedAt: null },
-              { id: "step-4", label: "팀원 초대", completed: false, completedAt: null },
-              { id: "step-5", label: "대시보드 확인", completed: false, completedAt: null },
-            ],
+            id: "item-wizard-1",
+            title: "AI 기반 사내 지식 관리",
+            description: "사내 업무 효율화를 위한 AI 지식 관리 시스템",
+            status: "active",
+            discoveryType: null,
+            createdAt: "2026-04-07T00:00:00Z",
           }),
-        });
-      }
-      if (route.request().method() === "PATCH") {
-        return route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({ success: true, stepId: "step-3", progressPercent: 60, allComplete: false }),
         });
       }
       return route.continue();
     });
 
-    // Mock skill guide API
-    await page.route("**/api/onboarding/skill-guide", (route) =>
+    // Mock POST /biz-items/:id/classify
+    await page.route("**/api/biz-items/item-wizard-1/classify", (route) =>
       route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify({ categories: [], skills: [] }),
-      }),
-    );
-
-    // Mock process flow API
-    await page.route("**/api/onboarding/process-flow", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ stages: [], connections: [] }),
-      }),
-    );
-
-    // Mock team FAQ API
-    await page.route("**/api/onboarding/team-faq", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ categories: [], items: [] }),
+        body: JSON.stringify({ type: "I", category: "Intelligence" }),
       }),
     );
   });
 
-  // ─── 기존 테스트 (assertive 강화) ───
+  test("위저드 3단계 UI가 렌더링된다", async ({ authenticatedPage: page }) => {
+    await page.goto("/getting-started");
 
+    // 페이지 제목
+    await expect(page.getByRole("heading", { name: "새 사업 아이템 등록" })).toBeVisible();
+
+    // Step 1 활성 상태
+    await expect(page.getByText("아이디어 입력")).toBeVisible();
+    await expect(page.getByText("아이디어를 입력하면 AI가 분석하고")).toBeVisible();
+
+    // Step 1 입력 폼
+    await expect(page.getByLabel("아이템 제목")).toBeVisible();
+    await expect(page.getByLabel("아이디어 설명")).toBeVisible();
+  });
+
+  test("Step 1 → Step 2: 아이템 등록 후 AI 분석 결과 표시", async ({ authenticatedPage: page }) => {
+    await page.goto("/getting-started");
+
+    // Step 1 입력
+    await page.getByLabel("아이템 제목").fill("AI 기반 사내 지식 관리");
+    await page.getByLabel("아이디어 설명").fill("사내 업무 효율화를 위한 AI 지식 관리 시스템");
+
+    // 다음 클릭
+    await page.getByRole("button", { name: "다음" }).click();
+
+    // Step 2: AI 분석 결과
+    await expect(page.getByText("AI 분석 결과")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("AI 기반 사내 지식 관리")).toBeVisible();
+    await expect(page.getByText("사내 업무 효율화를 위한 AI 지식 관리 시스템")).toBeVisible();
+  });
+
+  test("Step 2 → Step 3: 확인 및 등록 완료 화면", async ({ authenticatedPage: page }) => {
+    await page.goto("/getting-started");
+
+    // Step 1
+    await page.getByLabel("아이템 제목").fill("AI 기반 사내 지식 관리");
+    await page.getByLabel("아이디어 설명").fill("사내 업무 효율화를 위한 AI 지식 관리 시스템");
+    await page.getByRole("button", { name: "다음" }).click();
+
+    // Step 2 → 다음
+    await expect(page.getByText("AI 분석 결과")).toBeVisible({ timeout: 10000 });
+    await page.getByRole("button", { name: "다음" }).click();
+
+    // Step 3: 등록 완료
+    await expect(page.getByText("등록 완료!")).toBeVisible();
+    await expect(page.getByRole("button", { name: "발굴 분석 시작" })).toBeVisible();
+  });
+
+  test("Step 3 완료 후 아이템 상세로 이동", async ({ authenticatedPage: page }) => {
+    await page.goto("/getting-started");
+
+    // 전체 흐름
+    await page.getByLabel("아이템 제목").fill("AI 기반 사내 지식 관리");
+    await page.getByLabel("아이디어 설명").fill("사내 업무 효율화를 위한 AI 지식 관리 시스템");
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByText("AI 분석 결과")).toBeVisible({ timeout: 10000 });
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByText("등록 완료!")).toBeVisible();
+
+    // 발굴 분석 시작 → /discovery/items/:id
+    await page.getByRole("button", { name: "발굴 분석 시작" }).click();
+    await page.waitForURL("**/discovery/items/item-wizard-1", { timeout: 5000 });
+    expect(page.url()).toContain("/discovery/items/item-wizard-1");
+  });
+
+  test("이전 버튼으로 Step 2 → Step 1 돌아가기", async ({ authenticatedPage: page }) => {
+    await page.goto("/getting-started");
+
+    // Step 1 → 2
+    await page.getByLabel("아이템 제목").fill("테스트 아이디어");
+    await page.getByLabel("아이디어 설명").fill("테스트 설명입니다.");
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByText("AI 분석 결과")).toBeVisible({ timeout: 10000 });
+
+    // 이전 클릭
+    await page.getByRole("button", { name: "이전" }).click();
+
+    // Step 1로 돌아옴
+    await expect(page.getByLabel("아이템 제목")).toBeVisible();
+  });
+});
+
+// ─── F252 Onboarding Flow (구 5탭 UI) — F435 재구축으로 의도적 skip ───
+
+test.describe.skip("Onboarding Flow (F252) — F435 위저드 재구축으로 skip", () => {
   test("getting-started 페이지가 워크플로우 카드와 FAQ를 렌더링한다", async ({
     authenticatedPage: page,
   }) => {
     await page.goto("/getting-started");
-
-    // Welcome banner with progress bar
     await expect(page.getByText("Foundry-X 시작하기")).toBeVisible();
-    await expect(page.locator("[style*='width: 40%']")).toBeVisible();
-
-    // 4 workflow quickstart cards
-    await expect(page.getByText("📥 SR 처리하기")).toBeVisible();
-    await expect(page.getByText("📝 아이디어 → 명세")).toBeVisible();
-    await expect(page.getByText("📈 현황 확인하기")).toBeVisible();
-    await expect(page.getByText("🔍 Discovery 프로세스")).toBeVisible();
-
-    // FAQ section
-    await expect(page.getByText("자주 묻는 질문")).toBeVisible();
-    await expect(page.getByText("Foundry-X는 무엇인가요?")).toBeVisible();
   });
 
   test("NPS 피드백 폼이 점수 선택과 제출이 가능하다", async ({
     authenticatedPage: page,
   }) => {
-    // Mock feedback submission
-    await page.route("**/api/feedback", (route) => {
-      if (route.request().method() === "POST") {
-        return route.fulfill({
-          status: 201,
-          contentType: "application/json",
-          body: JSON.stringify({ id: "fb-1", npsScore: 8 }),
-        });
-      }
-      return route.continue();
-    });
-
     await page.goto("/getting-started");
-
-    // NPS form heading
-    await expect(
-      page.getByText("Foundry-X를 추천할 의향이 있으신가요?"),
-    ).toBeVisible();
-
-    // 10 score buttons (1~10)
-    const scoreButtons = page.locator(
-      "button:has-text('8'):near(button:has-text('7'))",
-    );
-    // Use a more specific selector for score button "8"
-    const scoreBtns = page.locator("section:has-text('피드백') button");
-    const btn8 = scoreBtns.filter({ hasText: /^8$/ });
-    await btn8.click();
-
-    // Submit button should be enabled after selecting a score
-    const submitBtn = page.getByRole("button", { name: "피드백 제출" });
-    await expect(submitBtn).toBeEnabled();
-    await submitBtn.click();
-
-    // Success message
-    await expect(page.getByText("감사합니다! 피드백이 제출되었습니다.")).toBeVisible();
+    await expect(page.getByText("Foundry-X를 추천할 의향이 있으신가요?")).toBeVisible();
   });
 
   test("온보딩 체크리스트가 진행 상태를 표시하고 토글 가능하다", async ({
     authenticatedPage: page,
   }) => {
     await page.goto("/getting-started");
-
-    // Checklist section
     await expect(page.getByText("온보딩 체크리스트")).toBeVisible();
-    await expect(page.getByText("2/5 완료")).toBeVisible();
-
-    // Checklist section
-    const checklistSection = page.locator("section:has(h2:text('온보딩 체크리스트'))");
-
-    // Completed steps should exist
-    await expect(checklistSection.getByRole("button", { name: "프로젝트 연결하기" })).toBeVisible();
-
-    // Incomplete step should be clickable
-    const incompleteStep = checklistSection.getByRole("button", { name: "팀원 초대" });
-    await expect(incompleteStep).toBeVisible();
-    await incompleteStep.click();
-
-    // After clicking, should update (optimistic UI)
-    await expect(checklistSection.getByText("3/5 완료")).toBeVisible();
   });
-
-  // ─── F252 신규 테스트: 탭 네비게이션 ───
 
   test("탭 네비게이션이 5개 탭 사이를 전환한다", async ({
     authenticatedPage: page,
   }) => {
     await page.goto("/getting-started");
-
-    // 5 tabs should be visible
     const tabLabels = ["시작하기", "환경 설정", "스킬 레퍼런스", "프로세스 가이드", "FAQ"];
     for (const label of tabLabels) {
       await expect(page.getByRole("tab", { name: label })).toBeVisible();
     }
-
-    // Default tab is "시작하기"
-    await expect(page.getByRole("tab", { name: "시작하기" })).toHaveAttribute(
-      "data-state",
-      "active",
-    );
-
-    // Switch tabs using force:true to bypass tour overlay (z-[10000] intercepts clicks)
-    await page.getByRole("tab", { name: "환경 설정" }).click({ force: true });
-    await expect(page).toHaveURL(/tab=setup/);
-
-    await page.getByRole("tab", { name: "스킬 레퍼런스" }).click({ force: true });
-    await expect(page).toHaveURL(/tab=skills/);
   });
 
   test("URL ?tab= 파라미터로 직접 탭을 열 수 있다", async ({
     authenticatedPage: page,
   }) => {
     await page.goto("/getting-started?tab=skills");
-
-    await expect(
-      page.getByRole("tab", { name: "스킬 레퍼런스" }),
-    ).toHaveAttribute("data-state", "active");
+    await expect(page.getByRole("tab", { name: "스킬 레퍼런스" })).toHaveAttribute("data-state", "active");
   });
-
-  // ─── F252 신규 테스트: 투어 다시 보기 ───
 
   test("투어 다시 보기 버튼이 존재한다", async ({
     authenticatedPage: page,
   }) => {
     await page.goto("/getting-started");
-
-    await expect(
-      page.getByRole("button", { name: /투어 다시 보기/ }),
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /투어 다시 보기/ })).toBeVisible();
   });
-
-  // ─── F252 신규 테스트: 보조 기능 카드 ───
 
   test("더 알아보기 섹션에 3개 기능 카드가 있다", async ({
     authenticatedPage: page,
   }) => {
     await page.goto("/getting-started");
-
     await expect(page.getByRole("heading", { name: "더 알아보기" })).toBeVisible();
-    // 4개 feature cards: BD 스킬 가이드, Cowork / Claude Code, 데모 시나리오, 도구 가이드
-    await expect(page.getByText("BD 스킬 가이드")).toBeVisible();
-    await expect(page.getByText("Cowork / Claude Code")).toBeVisible();
-    await expect(page.getByText("데모 시나리오")).toBeVisible();
-    await expect(page.getByText("도구 가이드")).toBeVisible();
   });
 });

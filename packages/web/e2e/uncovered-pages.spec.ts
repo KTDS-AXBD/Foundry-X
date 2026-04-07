@@ -44,26 +44,14 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     await expect(page.getByText("등록된 분석 방법론을 관리하고")).toBeVisible();
   });
 
-  test("projects 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/projects/**", (route) =>
-      route.fulfill({ json: { projects: [], totalProjects: 0 } }),
-    );
-    await page.route("**/api/monitoring/**", (route) =>
-      route.fulfill({ json: {} }),
-    );
-
+  // F434: 1/4/5/6단계 라우트 제거로 인한 의도적 skip
+  test.skip("projects 페이지 렌더링 — F434: gtm/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/gtm/projects");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
   });
 
-  test("sr 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/sr/stats*", (route) =>
-      route.fulfill({ json: { total: 0, byType: {}, byStatus: {} } }),
-    );
-    await page.route("**/api/sr*", (route) =>
-      route.fulfill({ json: { items: [], total: 0 } }),
-    );
-
+  // F434: 1/4/5/6단계 라우트 제거로 인한 의도적 skip
+  test.skip("sr 페이지 렌더링 — F434: collection/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/collection/sr");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
   });
@@ -102,22 +90,20 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     await expect(page.locator("main, body")).toBeVisible({ timeout: 10000 });
   });
 
-  test("collection/field 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/**", (route) => route.fulfill({ json: [] }));
+  // F434: 1/4/5/6단계 라우트 제거로 인한 의도적 skip
+  test.skip("collection/field 페이지 렌더링 — F434: collection/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/collection/field");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
   });
 
-  test("collection/ideas 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/**", (route) => route.fulfill({ json: [] }));
+  // F434: 1/4/5/6단계 라우트 제거로 인한 의도적 skip
+  test.skip("collection/ideas 페이지 렌더링 — F434: collection/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/collection/ideas");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
   });
 
-  test("product/mvp 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/mvp-tracking/**", (route) =>
-      route.fulfill({ json: {} }),
-    );
+  // F434: 1/4/5/6단계 라우트 제거로 인한 의도적 skip
+  test.skip("product/mvp 페이지 렌더링 — F434: product/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/product/mvp");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
   });
@@ -155,13 +141,8 @@ test.describe("미커버 페이지 렌더링 검증", () => {
 
   // ── 세션 #189 추가: 감사 기반 미커버 라우트 보강 (8건) ──
 
-  test("collection/agent 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/collection/agent-runs*", (route) =>
-      route.fulfill({ json: { runs: [], total: 0 } }),
-    );
-    await page.route("**/api/collection/agent-schedule*", (route) =>
-      route.fulfill({ json: null }),
-    );
+  // F434: 1/4/5/6단계 라우트 제거로 인한 의도적 skip
+  test.skip("collection/agent 페이지 렌더링 — F434: collection/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/collection/agent");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByRole("heading", { name: "Agent 수집" })).toBeVisible();
@@ -176,25 +157,15 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     await expect(page.getByRole("heading", { name: "평가 결과서" })).toBeVisible();
   });
 
-  test("gtm/outreach 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/gtm/outreach*", (route) =>
-      route.fulfill({ json: { items: [], total: 0 } }),
-    );
-    await page.route("**/api/gtm/outreach/stats*", (route) =>
-      route.fulfill({ json: { total: 0, byStatus: {} } }),
-    );
-    await page.route("**/api/gtm/customers*", (route) =>
-      route.fulfill({ json: { items: [] } }),
-    );
+  // F434: 1/4/5/6단계 라우트 제거로 인한 의도적 skip
+  test.skip("gtm/outreach 페이지 렌더링 — F434: gtm/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/gtm/outreach");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByRole("heading", { name: "선제안 아웃리치" })).toBeVisible();
   });
 
-  test("product/poc 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/poc*", (route) =>
-      route.fulfill({ json: [] }),
-    );
+  // F434: 1/4/5/6단계 라우트 제거로 인한 의도적 skip
+  test.skip("product/poc 페이지 렌더링 — F434: product/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/product/poc");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByRole("heading", { name: "PoC 관리" })).toBeVisible();
@@ -209,28 +180,22 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     await expect(page.getByRole("heading", { name: "Prototype" })).toBeVisible();
   });
 
-  test("validation/company 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/validation/company/items*", (route) =>
-      route.fulfill({ json: { items: [], total: 0 } }),
-    );
+  // F434: 1/4/5/6단계 라우트 제거로 인한 의도적 skip
+  test.skip("validation/company 페이지 렌더링 — F434: validation/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/validation/company");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByRole("heading", { name: "전사 검증" })).toBeVisible();
   });
 
-  test("validation/division 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/validation/division/items*", (route) =>
-      route.fulfill({ json: { items: [], total: 0 } }),
-    );
+  // F434: 1/4/5/6단계 라우트 제거로 인한 의도적 skip
+  test.skip("validation/division 페이지 렌더링 — F434: validation/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/validation/division");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByRole("heading", { name: "본부 검증" })).toBeVisible();
   });
 
-  test("validation/meetings 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/validation/meetings*", (route) =>
-      route.fulfill({ json: { items: [], total: 0 } }),
-    );
+  // F434: 1/4/5/6단계 라우트 제거로 인한 의도적 skip
+  test.skip("validation/meetings 페이지 렌더링 — F434: validation/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/validation/meetings");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByRole("heading", { name: "미팅 관리" })).toBeVisible();
@@ -244,10 +209,8 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     await expect(page.getByRole("heading", { name: "사업기획서" })).toBeVisible();
   });
 
-  test("product/offering-pack 목록 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/ax-bd/offering-packs*", (route) =>
-      route.fulfill({ json: { items: [], total: 0 } }),
-    );
+  // F434: product/* 제거로 인한 의도적 skip — /shaping/offering 사용
+  test.skip("product/offering-pack 목록 페이지 렌더링 — F434: product/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/product/offering-pack");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByRole("heading", { name: "Offering" })).toBeVisible();
@@ -262,18 +225,8 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     await expect(page.getByRole("heading", { name: "Prototype Dashboard" })).toBeVisible();
   });
 
-  test("product/offering-pack/:id 상세 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/ax-bd/offering-packs/pack-1", (route) =>
-      route.fulfill({
-        json: {
-          id: "pack-1", title: "테스트 Offering Pack", status: "draft",
-          itemCount: 0, createdAt: "2026-04-06T00:00:00Z",
-        },
-      }),
-    );
-    await page.route("**/api/ax-bd/offering-packs/pack-1/items*", (route) =>
-      route.fulfill({ json: [] }),
-    );
+  // F434: product/* 제거로 인한 의도적 skip — /shaping/offering/:id 사용
+  test.skip("product/offering-pack/:id 상세 페이지 렌더링 — F434: product/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/product/offering-pack/pack-1");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
   });
@@ -304,19 +257,15 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     await expect(page.getByRole("heading", { name: "Jira Integration" })).toBeVisible();
   });
 
-  test("validation/share 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/orgs/*/shared/bmcs*", (route) =>
-      route.fulfill({ json: { items: [], total: 0, page: 1, limit: 20 } }),
-    );
-    await page.route("**/api/orgs/*/shared/activity*", (route) =>
-      route.fulfill({ json: { items: [] } }),
-    );
+  // F434: validation/* 제거로 인한 의도적 skip
+  test.skip("validation/share 페이지 렌더링 — F434: validation/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/validation/share");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByRole("heading", { name: "팀 공유" })).toBeVisible();
   });
 
-  test("product/offering-pack/givc-pitch 페이지 렌더링", async ({ authenticatedPage: page }) => {
+  // F434: product/* 제거로 인한 의도적 skip
+  test.skip("product/offering-pack/givc-pitch 페이지 렌더링 — F434: product/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/product/offering-pack/givc-pitch");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("GIVC Ontology")).toBeVisible();
@@ -366,22 +315,15 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     await expect(page.getByRole("heading", { name: "도구 가이드" })).toBeVisible();
   });
 
-  test("validation 인덱스 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/validation/**", (route) =>
-      route.fulfill({ json: { items: [], total: 0 } }),
-    );
+  // F434: validation/* 제거로 인한 의도적 skip
+  test.skip("validation 인덱스 페이지 렌더링 — F434: validation/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/validation");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByRole("heading", { name: "검증" })).toBeVisible();
   });
 
-  test("product 인덱스 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/mvp-tracking/**", (route) =>
-      route.fulfill({ json: {} }),
-    );
-    await page.route("**/api/poc*", (route) =>
-      route.fulfill({ json: [] }),
-    );
+  // F434: product/* 제거로 인한 의도적 skip
+  test.skip("product 인덱스 페이지 렌더링 — F434: product/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/product");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByRole("heading", { name: "제품화" })).toBeVisible();
@@ -405,13 +347,15 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     await expect(page.getByRole("heading", { name: "새 사업기획서 만들기" })).toBeVisible();
   });
 
-  test("external/discovery-x 페이지 렌더링", async ({ authenticatedPage: page }) => {
+  // F434: 외부 서비스 라우트 제거로 인한 의도적 skip
+  test.skip("external/discovery-x 페이지 렌더링 — F434: external/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/external/discovery-x");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("Discovery-X", { exact: false }).first()).toBeVisible();
   });
 
-  test("external/foundry 페이지 렌더링", async ({ authenticatedPage: page }) => {
+  // F434: 외부 서비스 라우트 제거로 인한 의도적 skip
+  test.skip("external/foundry 페이지 렌더링 — F434: external/* 제거됨", async ({ authenticatedPage: page }) => {
     await page.goto("/external/foundry");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("AI Foundry", { exact: false }).first()).toBeVisible();

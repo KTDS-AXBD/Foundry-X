@@ -30,23 +30,15 @@ export const router = createBrowserRouter([
 
       // ── Phase 13 v1.3 신규 경로 ──
       { path: "discovery", lazy: () => import("@/routes/discovery-unified") },
-      { path: "validation", lazy: () => import("@/routes/validation-unified") },
-      { path: "product", lazy: () => import("@/routes/product-unified") },
       { path: "shaping/business-plan", lazy: () => import("@/routes/ax-bd/index") },
-      { path: "validation/share", lazy: () => import("@/routes/team-shared") },
-      { path: "product/offering-pack", lazy: () => import("@/routes/offering-packs") },
-      { path: "product/offering-pack/givc-pitch", lazy: () => import("@/routes/offering-pack-givc-pitch") },
-      { path: "product/offering-pack/:id", lazy: () => import("@/routes/offering-pack-detail") },
-      { path: "product/offering-pack/:id/brief", lazy: () => import("@/routes/offering-brief") },
       { path: "nps-dashboard", lazy: () => import("@/routes/nps-dashboard") },
       { path: "settings", lazy: () => import("@/routes/settings-jira") },
 
-      // ── 1단계 수집 (collection) ──
-      { path: "collection/sr", lazy: () => import("@/routes/sr") },
-      { path: "collection/sr/:id", lazy: () => import("@/routes/sr-detail") },
-      { path: "collection/field", lazy: () => import("@/routes/discovery-collection") },
-      { path: "collection/ideas", lazy: () => import("@/routes/ir-proposals") },
-      { path: "collection/agent", lazy: () => import("@/routes/collection-agent") },
+      // ── F434: 1/4/5/6단계 catch-all → /discovery 리다이렉트 ──
+      { path: "collection/*", element: <Navigate to="/discovery" replace /> },
+      { path: "validation/*", element: <Navigate to="/discovery" replace /> },
+      { path: "product/*", element: <Navigate to="/discovery" replace /> },
+      { path: "gtm/*", element: <Navigate to="/discovery" replace /> },
 
       // ── 2단계 발굴 (discovery) ──
       { path: "discovery/items", lazy: () => import("@/routes/ax-bd/discovery") },
@@ -74,20 +66,6 @@ export const router = createBrowserRouter([
       { path: "shaping/offering/:id/validate", lazy: () => import("@/routes/offering-validate") },
       { path: "shaping/offering/:id/tokens", lazy: () => import("@/routes/offering-tokens") },
 
-      // ── 4단계 검증/공유 (validation) ──
-      { path: "validation/pipeline", lazy: () => import("@/routes/pipeline") },
-      { path: "validation/division", lazy: () => import("@/routes/validation-division") },
-      { path: "validation/company", lazy: () => import("@/routes/validation-company") },
-      { path: "validation/meetings", lazy: () => import("@/routes/validation-meetings") },
-
-      // ── 5단계 제품화 (product) ──
-      { path: "product/mvp", lazy: () => import("@/routes/mvp-tracking") },
-      { path: "product/poc", lazy: () => import("@/routes/product-poc") },
-
-      // ── 6단계 GTM ──
-      { path: "gtm/projects", lazy: () => import("@/routes/projects") },
-      { path: "gtm/outreach", lazy: () => import("@/routes/gtm-outreach") },
-      { path: "gtm/outreach/:id", lazy: () => import("@/routes/gtm-outreach-detail") },
 
       // ── ax-bd 하위 (현행 유지) ──
       { path: "ax-bd/ideas", lazy: () => import("@/routes/ax-bd/ideas") },
@@ -127,14 +105,7 @@ export const router = createBrowserRouter([
       { path: "settings/nps", lazy: () => import("@/routes/nps-dashboard") },
       { path: "backup", lazy: () => import("@/routes/backup") },
 
-      // ── 외부 서비스 (이전) ──
-      { path: "external/discovery-x", lazy: () => import("@/routes/discovery") },
-      { path: "external/foundry", lazy: () => import("@/routes/foundry") },
-
-      // ── Redirects (기존 15건, Phase 13 dead code 13건 제거 후) ──
-      { path: "sr", element: <Navigate to="/collection/sr" replace /> },
-      { path: "discovery/collection", element: <Navigate to="/collection/field" replace /> },
-      { path: "ir-proposals", element: <Navigate to="/collection/ideas" replace /> },
+      // ── Redirects ──
       { path: "ax-bd/discovery", element: <Navigate to="/discovery/items" replace /> },
       { path: "ax-bd/discovery/:id", element: <RedirectDiscoveryDetail /> },
       { path: "ax-bd/ideas-bmc", element: <Navigate to="/discovery/ideas-bmc" replace /> },
@@ -144,17 +115,11 @@ export const router = createBrowserRouter([
       { path: "ax-bd", element: <Navigate to="/shaping/proposal" replace /> },
       { path: "ax-bd/shaping", element: <Navigate to="/shaping/review" replace /> },
       { path: "offering-packs", element: <Navigate to="/shaping/offering" replace /> },
-      { path: "pipeline", element: <Navigate to="/validation/pipeline" replace /> },
-      { path: "mvp-tracking", element: <Navigate to="/product/mvp" replace /> },
-      { path: "projects", element: <Navigate to="/gtm/projects" replace /> },
-      // discovery redirect 제거 — /discovery는 Phase 13에서 실제 라우트로 전환
-      { path: "foundry", element: <Navigate to="/external/foundry" replace /> },
-
-      // Phase 13 Redirects 13건 삭제 (2026-04-06 E2E 감사)
-      // 각 path에 lazy route가 선행하여 Navigate가 도달 불가 (dead code)
-      // 삭제 대상: team-shared, ax-bd/demo, discovery/items, discovery/ideas-bmc,
-      // discovery/dashboard, shaping/proposal, shaping/review, validation/pipeline,
-      // product/mvp, product/poc, tools-guide, analytics, settings/jira
+      // F434: 구 1/4/5/6단계 단축 경로 → /discovery
+      { path: "sr", element: <Navigate to="/discovery" replace /> },
+      { path: "pipeline", element: <Navigate to="/discovery" replace /> },
+      { path: "mvp-tracking", element: <Navigate to="/discovery" replace /> },
+      { path: "projects", element: <Navigate to="/discovery" replace /> },
     ],
   }],
   },
