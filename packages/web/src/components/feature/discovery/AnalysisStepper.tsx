@@ -20,6 +20,7 @@ interface AnalysisStepperProps {
   bizItemId: string;
   discoveryType?: string | null;
   onAnalysisComplete?: () => void;
+  onSupplement?: (stage: string, text: string) => void;
 }
 
 type StepResult = StartingPointResult | ClassifyResult | EvaluateResult;
@@ -50,6 +51,7 @@ export default function AnalysisStepper({
   bizItemId,
   discoveryType,
   onAnalysisComplete,
+  onSupplement,
 }: AnalysisStepperProps) {
   const [stages, setStages] = useState<StageProgress[]>([]);
   const [activeStage, setActiveStage] = useState("2-0");
@@ -205,6 +207,7 @@ export default function AnalysisStepper({
               stage={step.stage}
               stageName={step.stageName}
               result={results[step.stage] as unknown as Record<string, unknown>}
+              onSupplement={onSupplement}
             />
           ))}
         </div>
