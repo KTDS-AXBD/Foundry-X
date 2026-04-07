@@ -1,0 +1,175 @@
+<!-- Component: tam-card
+     Usage: §01-7 시장 분석 — TAM/SAM/SOM 3개 카드 + 경쟁 비대칭 가설
+     Variables:
+       {{tam.value}}     — TAM 수치 (예: "약 1.2조원")
+       {{tam.basis}}     — 산출 근거 (예: "국내 물류 AI 시장 ×12%")
+       {{sam.value}}     — SAM 수치
+       {{sam.basis}}     — 산출 근거
+       {{som.value}}     — SOM 수치
+       {{som.basis}}     — 산출 근거
+       {{advantages[]}}  — 경쟁 비대칭 가설 3가지
+         {{advantages[].title}}  — 우위 제목
+         {{advantages[].reason}} — 구체 근거
+     Spec: 가이드 §01-7 — "과대 추정 금지", "약 표기", "산출 근거 명시"
+     Sprint: 198 F415
+-->
+<style>
+  #tam-card { background: var(--white); }
+
+  .tam-grid {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 900px) { .tam-grid { grid-template-columns: 1fr; } }
+
+  .tam-item {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--card-radius);
+    padding: 28px 24px;
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .tam-item.total  { border-color: var(--gray-400); }
+  .tam-item.target { border-color: var(--black); border-width: 2px; }
+  .tam-item.obtain { background: var(--black); color: var(--white); }
+
+  .tam-acronym {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .tam-item.obtain .tam-acronym { color: var(--gray-400); }
+
+  .tam-label {
+    font-size: 13px;
+    color: var(--gray-600);
+  }
+  .tam-item.obtain .tam-label { color: var(--gray-400); }
+
+  .tam-value {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    color: var(--black);
+  }
+  .tam-item.obtain .tam-value { color: var(--white); }
+
+  .tam-basis {
+    font-size: 12px;
+    color: var(--gray-400);
+    line-height: 1.5;
+  }
+  .tam-basis a { color: inherit; text-decoration: underline; }
+
+  /* 경쟁 비대칭 가설 */
+  .asymmetry-block {
+    margin-top: 32px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--card-radius);
+    overflow: hidden;
+  }
+  .asymmetry-header {
+    padding: 16px 24px;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .asymmetry-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--black);
+  }
+  .asymmetry-sub {
+    font-size: 12px;
+    color: var(--gray-600);
+    margin-top: 4px;
+  }
+  .asymmetry-list {
+    list-style: none;
+    padding: 0;
+  }
+  .asymmetry-list li {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--gray-200);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px 16px;
+    align-items: start;
+  }
+  .asymmetry-list li:last-child { border-bottom: none; }
+  .asymmetry-index {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--black);
+    color: var(--white);
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .asymmetry-content {}
+  .asymmetry-adv-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 4px;
+  }
+  .asymmetry-adv-reason {
+    font-size: 13px;
+    color: var(--gray-600);
+    line-height: 1.5;
+  }
+</style>
+
+<section id="tam-card" class="fade-in">
+  <p class="section-label">01-7 시장 분석</p>
+  <h2 class="section-title">시장 규모 및 경쟁 비대칭</h2>
+  <p class="section-sub">TAM/SAM/SOM 추정치와 KT DS의 구조적 우위 가설입니다. 모든 수치에 "약" 표기 및 산출 근거를 명시합니다.</p>
+
+  <div class="tam-grid">
+    <div class="tam-item total">
+      <span class="tam-acronym">TAM</span>
+      <span class="tam-label">Total Addressable Market</span>
+      <p class="tam-value">{{tam.value}}</p>
+      <p class="tam-basis">{{tam.basis}}</p>
+    </div>
+    <div class="tam-item target">
+      <span class="tam-acronym">SAM</span>
+      <span class="tam-label">Serviceable Addressable Market</span>
+      <p class="tam-value">{{sam.value}}</p>
+      <p class="tam-basis">{{sam.basis}}</p>
+    </div>
+    <div class="tam-item obtain">
+      <span class="tam-acronym">SOM</span>
+      <span class="tam-label">Serviceable Obtainable Market</span>
+      <p class="tam-value">{{som.value}}</p>
+      <p class="tam-basis">{{som.basis}}</p>
+    </div>
+  </div>
+
+  <div class="asymmetry-block">
+    <div class="asymmetry-header">
+      <p class="asymmetry-title">경쟁 비대칭 가설</p>
+      <p class="asymmetry-sub">KT DS가 이 사업에서 가진 구조적 우위 — "왜 지금?", "왜 kt ds?"</p>
+    </div>
+    <ul class="asymmetry-list">
+      <!-- {{#advantages}} -->
+      <li>
+        <span class="asymmetry-index">{{@index}}</span>
+        <div class="asymmetry-content">
+          <p class="asymmetry-adv-title">{{title}}</p>
+          <p class="asymmetry-adv-reason">{{reason}}</p>
+        </div>
+      </li>
+      <!-- {{/advantages}} -->
+    </ul>
+  </div>
+</section>

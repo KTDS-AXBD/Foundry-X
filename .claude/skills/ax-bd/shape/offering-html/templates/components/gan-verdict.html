@@ -1,0 +1,192 @@
+<!-- Component: gan-verdict
+     Usage: §05-4 사업성 교차검증 — GAN 추진론/반대론/판정 배지
+     Variables:
+       {{questions[]}}
+         {{questions[].number}}    — 질문 번호 (1~7)
+         {{questions[].question}}  — 표준 질문 (예: "올해 매출·수익에 어떻게 기여하는가?")
+         {{questions[].type}}      — 유형 (수익성/시장성/실행력/KT 적합성/긴급성/리스크)
+         {{questions[].pro}}       — 추진론 (이 사업을 해야 하는 이유 — 냉철하게)
+         {{questions[].con}}       — 반대론 (이 사업을 하면 안 되는 이유 — 냉철하게)
+         {{questions[].verdict}}   — 판정: "유효" | "조건부" | "주의"
+         {{questions[].reason}}    — 판정 근거 1문장
+     Spec: 가이드 §05-4 — "냉철한 톤", "경영진 안심이 아닌 정확한 판단"
+     Sprint: 198 F415
+-->
+<style>
+  #gan-verdict { background: var(--gray-50); }
+
+  .gan-intro {
+    margin-top: 16px;
+    padding: 20px 24px;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--card-radius-sm);
+    font-size: 14px;
+    color: var(--gray-600);
+    line-height: 1.6;
+  }
+  .gan-intro strong { color: var(--black); }
+
+  .gan-questions {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .gan-item {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--card-radius);
+    overflow: hidden;
+  }
+  .gan-item-header {
+    padding: 20px 24px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .gan-item-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .gan-item-type {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gray-400);
+  }
+  .gan-item-question {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--black);
+    line-height: 1.4;
+  }
+
+  /* 판정 배지 */
+  .verdict-badge {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+  .verdict-badge.valid   { background: #f0fdf4; color: var(--green); }
+  .verdict-badge.partial { background: #fff7ed; color: var(--orange); }
+  .verdict-badge.risk    { background: #fef2f2; color: var(--red); }
+
+  .gan-item-body {
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 900px) { .gan-item-body { grid-template-columns: 1fr; } }
+
+  .gan-side {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .gan-side-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .gan-side-label.pro { color: var(--green); }
+  .gan-side-label.con { color: var(--red); }
+
+  .gan-side-text {
+    font-size: 14px;
+    color: var(--gray-700);
+    line-height: 1.6;
+    padding: 12px 14px;
+    border-radius: var(--card-radius-sm);
+  }
+  .gan-side-text.pro { background: #f0fdf4; }
+  .gan-side-text.con { background: #fef2f2; }
+
+  .gan-item-footer {
+    padding: 12px 24px;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    font-size: 13px;
+    color: var(--gray-600);
+    line-height: 1.5;
+  }
+  .gan-item-footer strong { color: var(--black); }
+
+  /* 요약 배지 행 */
+  .gan-summary {
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .gan-summary-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-600);
+    margin-right: 4px;
+  }
+</style>
+
+<section id="gan-verdict" class="fade-in">
+  <p class="section-label">05-4 사업성 교차검증</p>
+  <h2 class="section-title">GAN 추진론 / 반대론</h2>
+  <p class="section-sub">핵심 질문별 추진론·반대론을 냉철하게 검증합니다.</p>
+
+  <div class="gan-intro">
+    <strong>검증 원칙:</strong>
+    "경영진이 안심하도록"이 아니라 "정확히 판단하도록" — No-Go 판정도 가능한 수준으로 작성합니다.
+    판정 배지: <span class="verdict-badge valid" style="display:inline-flex">✅ 유효</span>
+    <span class="verdict-badge partial" style="display:inline-flex;margin:0 4px">⚠️ 조건부</span>
+    <span class="verdict-badge risk" style="display:inline-flex">❌ 주의</span>
+  </div>
+
+  <div class="gan-questions">
+    <!-- {{#questions}} -->
+    <div class="gan-item">
+      <div class="gan-item-header">
+        <div class="gan-item-meta">
+          <span class="gan-item-type">Q{{number}} · {{type}}</span>
+          <p class="gan-item-question">{{question}}</p>
+        </div>
+        <!-- {{#verdict_valid}}<span class="verdict-badge valid">✅ 유효</span>{{/verdict_valid}} -->
+        <!-- {{#verdict_partial}}<span class="verdict-badge partial">⚠️ 조건부</span>{{/verdict_partial}} -->
+        <!-- {{#verdict_risk}}<span class="verdict-badge risk">❌ 주의</span>{{/verdict_risk}} -->
+      </div>
+      <div class="gan-item-body">
+        <div class="gan-side">
+          <span class="gan-side-label pro">▲ 추진론</span>
+          <p class="gan-side-text pro">{{pro}}</p>
+        </div>
+        <div class="gan-side">
+          <span class="gan-side-label con">▼ 반대론</span>
+          <p class="gan-side-text con">{{con}}</p>
+        </div>
+      </div>
+      <div class="gan-item-footer">
+        <strong>판정 근거:</strong> {{reason}}
+      </div>
+    </div>
+    <!-- {{/questions}} -->
+  </div>
+
+  <div class="gan-summary">
+    <span class="gan-summary-label">종합 판정:</span>
+    <!-- {{#summary_badges}} -->
+    <!-- verdict별 badge 반복 -->
+    <!-- {{/summary_badges}} -->
+  </div>
+</section>
