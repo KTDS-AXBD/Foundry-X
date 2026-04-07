@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { BuildQueue, BuildQueueTimeoutError } from '../build-queue.js';
+import { BuildQueue, BuildQueueTimeoutError, type BuildQueueStatus } from '../build-queue.js';
 
 // Singleton 초기화를 위해 각 테스트 전 clear
 let queue: BuildQueue;
@@ -60,7 +60,7 @@ describe('BuildQueue', () => {
     });
 
     it('첫 번째 실행 중 두 번째는 queueSize=1 상태여야 해요', async () => {
-      let statusDuringRun: ReturnType<typeof queue.getStatus> | null = null;
+      let statusDuringRun: BuildQueueStatus | null = null;
 
       const p1 = queue.enqueue(async () => {
         await new Promise(r => setTimeout(r, 20));
@@ -75,8 +75,8 @@ describe('BuildQueue', () => {
       await p1;
       await p2;
 
-      expect(statusDuringRun?.isRunning).toBe(true);
-      expect(statusDuringRun?.queueSize).toBe(1);
+      expect(statusDuringRun!.isRunning).toBe(true);
+      expect(statusDuringRun!.queueSize).toBe(1);
     });
   });
 
@@ -125,7 +125,7 @@ describe('BuildQueue', () => {
     });
 
     it('실행 중일 때 isRunning=true여야 해요', async () => {
-      let runningStatus: ReturnType<typeof queue.getStatus> | null = null;
+      let runningStatus: BuildQueueStatus | null = null;
 
       const p = queue.enqueue(async () => {
         await new Promise(r => setTimeout(r, 10));
@@ -133,7 +133,7 @@ describe('BuildQueue', () => {
       });
 
       await p;
-      expect(runningStatus?.isRunning).toBe(true);
+      expect(runningStatus!.isRunning).toBe(true);
     });
 
     it('완료 후 queueSize=0, isRunning=false여야 해요', async () => {
