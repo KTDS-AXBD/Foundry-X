@@ -53,7 +53,7 @@ export class GatePackageService {
   }
 
   private mapRow(r: Record<string, unknown>): GatePackage {
-    let items: GatePackageItem[] = [];
+    let items: GatePackageItem[];
     try { items = JSON.parse(r["items"] as string) as GatePackageItem[]; } catch { items = []; }
     return { id: r["id"] as string, orgId: r["org_id"] as string, bizItemId: r["biz_item_id"] as string, gateType: r["gate_type"] as GateType, items, status: r["status"] as GateStatus, downloadUrl: (r["download_url"] as string) || null, createdBy: r["created_by"] as string, createdAt: r["created_at"] as string };
   }

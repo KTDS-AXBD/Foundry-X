@@ -57,7 +57,7 @@ export class MeetingService {
   }
 
   private mapRow(r: Record<string, unknown>): Meeting {
-    let attendees: string[] = [];
+    let attendees: string[];
     try { attendees = JSON.parse(r["attendees"] as string) as string[]; } catch { attendees = []; }
     return { id: r["id"] as string, orgId: r["org_id"] as string, bizItemId: r["biz_item_id"] as string, type: r["type"] as MeetingType, title: r["title"] as string, scheduledAt: r["scheduled_at"] as string, attendees, location: (r["location"] as string) || null, notes: (r["notes"] as string) || null, status: r["status"] as MeetingStatus, createdBy: r["created_by"] as string, createdAt: r["created_at"] as string, updatedAt: r["updated_at"] as string };
   }
