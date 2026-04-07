@@ -1427,6 +1427,66 @@ export async function updateDiscoveryStage(
   return postApi(`/biz-items/${bizItemId}/discovery-stage`, { stage, status });
 }
 
+// ─── Sprint 211: F438 발굴 분석 실행 API ───
+
+export interface StartingPointResult {
+  startingPoint: string;
+  confidence: number;
+  reasoning: string;
+  needsConfirmation: boolean;
+  analysisPath?: unknown;
+}
+
+export interface ClassifyResult {
+  itemType: string;
+  confidence: number;
+  reasoning: string;
+  turnAnswers: { turn1: string; turn2: string; turn3: string };
+  analysisWeights: Record<string, number>;
+}
+
+export interface EvaluationScore {
+  personaId: string;
+  businessViability: number;
+  strategicFit: number;
+  customerValue: number;
+  techMarket: number;
+  execution: number;
+  financialFeasibility: number;
+  competitiveDiff: number;
+  scalability: number;
+  summary: string;
+  concerns: string[];
+}
+
+export interface EvaluateResult {
+  id: string;
+  bizItemId: string;
+  verdict: string;
+  avgScore: number;
+  totalConcerns: number;
+  scores: EvaluationScore[];
+  warnings: string[];
+}
+
+export async function runStartingPoint(
+  bizItemId: string,
+  context?: string,
+): Promise<StartingPointResult> {
+  return postApi(`/biz-items/${bizItemId}/starting-point`, context ? { context } : {});
+}
+
+export async function runClassify(
+  bizItemId: string,
+  context?: string,
+): Promise<ClassifyResult> {
+  return postApi(`/biz-items/${bizItemId}/classify`, context ? { context } : {});
+}
+
+export async function runEvaluate(bizItemId: string): Promise<EvaluateResult> {
+  return postApi(`/biz-items/${bizItemId}/evaluate`, {});
+}
+
 // ─── Sprint 71: Skill Guide API (F215) ───
 
 export interface SkillGuideResponse {
