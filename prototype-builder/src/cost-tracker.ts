@@ -1,4 +1,4 @@
-import type { CostRecord, BuilderConfig } from './types.js';
+import type { CostRecord, BuilderConfig, GenerationMode } from './types.js';
 
 // Anthropic 가격표 (2026-04 기준, USD per 1M tokens)
 const MODEL_PRICING: Record<string, { input: number; output: number }> = {
@@ -54,8 +54,13 @@ export class CostTracker {
 
   /**
    * CLI 구독 모드 비용 기록 ($0)
+   * F428: generation_mode 파라미터 추가
    */
-  recordCli(jobId: string, round: number): CostRecord {
+  recordCli(
+    jobId: string,
+    round: number,
+    mode: GenerationMode = 'max-cli',
+  ): CostRecord {
     const entry: CostRecord = {
       jobId,
       round,
@@ -64,9 +69,31 @@ export class CostTracker {
       outputTokens: 0,
       cost: 0,
       timestamp: Date.now(),
+      generation_mode: mode,
     };
     this.records.push(entry);
     return entry;
+  }
+
+  /**
+   * API 비용 기록 (generation_mode 포함)
+   * F428: generation_mode 파라미터 추가
+   */
+  recordWithMode(
+    jobId: string,
+    round: number,
+    model: string,
+    inputTokens: number,
+    outputTokens: number,
+    mode: GenerationMode,
+  ): CostRecord {
+    const entry = this.record(jobId, round, model, inputTokens, outputTokens);
+    // record()가 반환한 entry에 generation_mode 추가
+    const last = this.records[this.records.length - 1];
+    if (last && last.jobId === jobId && last.round === round) {
+      (last as CostRecord).generation_mode = mode;
+    }
+    return { ...entry, generation_mode: mode };
   }
 
   /**

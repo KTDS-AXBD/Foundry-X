@@ -41,6 +41,8 @@ export interface CostRecord {
   outputTokens: number;
   cost: number;
   timestamp: number;
+  /** F428: 실제 생성 모드 (max-cli / api / fallback 등) */
+  generation_mode?: GenerationMode;
 }
 
 export interface BuilderConfig {
