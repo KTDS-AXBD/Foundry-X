@@ -1,4 +1,5 @@
 // ─── F355: O-G-D Discriminator Service (Sprint 160) ───
+// F431: failedItems 반환 추가 (Sprint 207)
 // HTML 프로토타입 품질 평가 + Pass/Fail 판정
 
 import { OGD_THRESHOLD } from "@foundry-x/shared";
@@ -6,6 +7,8 @@ import { OGD_THRESHOLD } from "@foundry-x/shared";
 interface EvaluateResult {
   qualityScore: number;
   feedback: string;
+  /** F431: FAIL된 체크리스트 항목 목록 (FeedbackConverter에 전달) */
+  failedItems: string[];
   inputTokens: number;
   outputTokens: number;
   passed: boolean;
@@ -45,18 +48,32 @@ export class OgdDiscriminatorService {
     // Parse response — try JSON first, fallback to heuristic
     let qualityScore = 0;
     let feedback = "";
+    let failedItems: string[] = [];
     try {
       const jsonMatch = raw.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
+        const parsed = JSON.parse(jsonMatch[0]) as {
+          qualityScore?: number;
+          feedback?: string;
+          items?: Array<{ item?: string; pass?: boolean; reason?: string }>;
+        };
         qualityScore = Math.max(0, Math.min(1, Number(parsed.qualityScore) || 0));
         feedback = parsed.feedback || "";
+        // F431: FAIL 항목 추출
+        if (Array.isArray(parsed.items)) {
+          failedItems = parsed.items
+            .filter((it) => it.pass === false)
+            .map((it) => it.item ?? "")
+            .filter(Boolean);
+        }
       }
     } catch {
       // Heuristic: count PASS keywords
       const passCount = (raw.match(/PASS/gi) || []).length;
       qualityScore = checklist.length > 0 ? passCount / checklist.length : 0;
       feedback = raw.slice(0, 500);
+      // Heuristic fallback: assume all items failed if score is low
+      failedItems = qualityScore < 0.5 ? [...checklist] : [];
     }
 
     const inputTokens = Math.ceil((systemPrompt.length + userPrompt.length) / 4);
@@ -65,6 +82,7 @@ export class OgdDiscriminatorService {
     return {
       qualityScore,
       feedback,
+      failedItems,
       inputTokens,
       outputTokens,
       passed: qualityScore >= OGD_THRESHOLD,

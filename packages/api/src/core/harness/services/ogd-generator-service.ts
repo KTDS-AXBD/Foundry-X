@@ -1,7 +1,9 @@
 // ─── F355: O-G-D Generator Service (Sprint 160) ───
 // PRD → HTML 프로토타입 생성 (Haiku 모델 기반)
 // F423: impeccable 디자인 스킬 통합 (Sprint 203)
+// F431: structured instructions 주입 포맷 개선 (Sprint 207)
 
+import type { StructuredInstruction } from "@foundry-x/shared";
 import { getImpeccableReference } from "../../../data/impeccable-reference.js";
 
 interface GenerateResult {
@@ -20,6 +22,7 @@ export class OgdGeneratorService {
   async generate(
     prdContent: string,
     previousFeedback?: string,
+    previousInstructions?: StructuredInstruction[],
   ): Promise<GenerateResult> {
     const designReference = getImpeccableReference();
 
@@ -37,7 +40,28 @@ export class OgdGeneratorService {
     ].join("\n");
 
     let userPrompt = `PRD:\n${prdContent}`;
-    if (previousFeedback) {
+
+    // F431: structured instructions 우선 주입 (구체적 지시가 있으면 일반 피드백보다 우선)
+    if (previousInstructions && previousInstructions.length > 0) {
+      const instructionLines = previousInstructions.map((inst, i) => {
+        const lines = [
+          `${i + 1}. [${inst.issue}]`,
+          `   수정 지시: ${inst.action}`,
+        ];
+        if (inst.example) {
+          lines.push(`   예시: \`${inst.example}\``);
+        }
+        return lines.join("\n");
+      });
+      userPrompt += [
+        "",
+        "",
+        "## 이전 라운드 수정 지시 (반드시 모두 적용할 것)",
+        "",
+        ...instructionLines,
+      ].join("\n");
+    } else if (previousFeedback) {
+      // 하위 호환: structured instructions 없을 때 기존 방식 사용
       userPrompt += `\n\nPrevious round feedback (improve these areas):\n${previousFeedback}`;
     }
 
