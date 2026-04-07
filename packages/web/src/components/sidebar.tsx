@@ -4,45 +4,13 @@ import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import {
-  LayoutDashboard,
-  BookOpen,
-  Blocks,
-  ClipboardList,
-  Bot,
-  Coins,
-  BarChart3,
   Menu,
-  Search,
   LogIn,
   LogOut,
-  Rocket,
-  FileText,
-  FolderKanban,
   ChevronRight,
-  Inbox,
-  TrendingUp,
-  Settings,
-  Map,
-  Radio,
-  ArrowUpFromLine,
-  PenTool,
-  FileSignature,
-  Package,
-  CheckCircle,
-  GitBranch,
-  Target,
-  Library,
-  Users,
-  ClipboardCheck,
-  Code,
-  Send,
-  Activity,
-  FlaskConical,
-  FileOutput,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { loadSidebarConfig, getIcon } from "@/lib/navigation-loader";
-import type { SidebarConfig } from "@/lib/navigation-loader";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import {
@@ -98,205 +66,45 @@ export function isVisible(
   return true;
 }
 
-const DEFAULT_TOP_ITEMS: NavItem[] = [
-  { href: "/dashboard", label: "대시보드", icon: LayoutDashboard },
-  { href: "/getting-started", label: "시작하기", icon: Rocket },
-];
-
-/* ── 프로세스 6단계: 수집→발굴→형상화→검증/공유→제품화→GTM ── */
-
-const DEFAULT_PROCESS_GROUPS: NavGroup[] = [
-  {
-    key: "collect",
-    label: "1. 수집",
-    icon: Inbox,
-    stageColor: "bg-axis-blue",
-    collapsed: true,
-    badge: "이관 예정",
-    items: [
-      { href: "/collection/field", label: "Field 수집", icon: Radio },
-      { href: "/collection/ideas", label: "IDEA Portal", icon: ArrowUpFromLine },
-      { href: "/collection/screening", label: "스크리닝", icon: ClipboardList },
-    ],
-  },
-  {
-    key: "discover",
-    label: "2. 발굴",
-    icon: Search,
-    stageColor: "bg-axis-violet",
-    items: [
-      { href: "/discovery", label: "발굴", icon: Map },
-      { href: "/discovery/report", label: "평가 결과서", icon: ClipboardCheck },
-    ],
-  },
-  {
-    key: "shape",
-    label: "3. 형상화",
-    icon: PenTool,
-    stageColor: "bg-axis-warm",
-    items: [
-      { href: "/shaping/business-plan", label: "사업기획서", icon: FileSignature },
-      { href: "/shaping/offerings", label: "Offerings", icon: FileOutput },
-      { href: "/shaping/offering", label: "Offering Pack", icon: Package },
-      { href: "/shaping/prd", label: "PRD", icon: FileText },
-      { href: "/shaping/prototype", label: "Prototype", icon: Code },
-    ],
-  },
-  {
-    key: "validate",
-    label: "4. 검증",
-    icon: CheckCircle,
-    stageColor: "bg-axis-green",
-    items: [
-      { href: "/validation", label: "검증", icon: CheckCircle },
-      { href: "/validation/share", label: "산출물 공유", icon: Users },
-    ],
-  },
-  {
-    key: "productize",
-    label: "5. 제품화",
-    icon: Rocket,
-    stageColor: "bg-axis-indigo",
-    items: [
-      { href: "/product", label: "제품화", icon: Target },
-      { href: "/product/offering-pack", label: "Offering Pack", icon: Package },
-    ],
-  },
-  {
-    key: "gtm",
-    label: "6. GTM",
-    icon: TrendingUp,
-    stageColor: "bg-axis-rose",
-    collapsed: true,
-    badge: "이관 예정",
-    items: [
-      { href: "/gtm/outreach", label: "대고객 선제안", icon: Send },
-      { href: "/gtm/pipeline", label: "파이프라인", icon: GitBranch },
-    ],
-  },
-];
-
-const DEFAULT_ADMIN_GROUPS: NavGroup[] = [
-  {
-    key: "admin-auth",
-    label: "Auth 서비스",
-    icon: Users,
-    visibility: "admin",
-    badge: "modules/auth",
-    items: [
-      { href: "/tokens", label: "토큰/모델", icon: Coins },
-      { href: "/workspace", label: "워크스페이스", icon: FolderKanban },
-    ],
-  },
-  {
-    key: "admin-portal",
-    label: "Portal 서비스",
-    icon: LayoutDashboard,
-    visibility: "admin",
-    badge: "modules/portal",
-    items: [
-      { href: "/nps-dashboard", label: "NPS 대시보드", icon: BarChart3 },
-      { href: "/dashboard/metrics", label: "운영 지표", icon: TrendingUp },
-      { href: "/projects", label: "프로젝트", icon: FolderKanban },
-    ],
-  },
-  {
-    key: "admin-gate",
-    label: "Gate 서비스",
-    icon: CheckCircle,
-    visibility: "admin",
-    badge: "modules/gate",
-    items: [
-      { href: "/orchestration", label: "오케스트레이션", icon: Activity },
-    ],
-  },
-  {
-    key: "admin-launch",
-    label: "Launch 서비스",
-    icon: Rocket,
-    visibility: "admin",
-    badge: "modules/launch",
-    items: [
-      { href: "/prototype-dashboard", label: "Prototype", icon: FlaskConical },
-      { href: "/builder-quality", label: "Quality", icon: BarChart3 },
-    ],
-  },
-  {
-    key: "admin-core",
-    label: "Core (Foundry-X)",
-    icon: GitBranch,
-    visibility: "admin",
-    badge: "core",
-    items: [
-      { href: "/agents", label: "에이전트", icon: Bot },
-      { href: "/architecture", label: "아키텍처", icon: Blocks },
-      { href: "/methodologies", label: "방법론", icon: Library },
-    ],
-  },
-];
-
-const DEFAULT_MEMBER_BOTTOM_ITEMS: NavItem[] = [
-  { href: "/wiki", label: "위키", icon: BookOpen },
-  { href: "/settings", label: "설정", icon: Settings },
-];
-
 /* ------------------------------------------------------------------ */
-/*  CMS-driven Navigation (TinaCMS content → NavItem/NavGroup)         */
+/*  CMS-driven Navigation (SSOT: content/navigation/sidebar.json)      */
+/*  sidebar.json이 없으면 빌드 에러 → drift 즉시 감지                    */
 /* ------------------------------------------------------------------ */
 
-const cmsNav: SidebarConfig | null = loadSidebarConfig();
+const cmsNav = loadSidebarConfig()!;
 
 function cmsItemToNav(item: { href: string; label: string; iconKey: string }): NavItem {
   return { href: item.href, label: item.label, icon: getIcon(item.iconKey) };
 }
 
-const topItems: NavItem[] = cmsNav
-  ? cmsNav.topItems
-      .filter((i) => i.visible !== false)
-      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
-      .map(cmsItemToNav)
-  : DEFAULT_TOP_ITEMS;
+function sortAndFilter<T extends { visible?: boolean; sortOrder?: number }>(items: T[]): T[] {
+  return items
+    .filter((i) => i.visible !== false)
+    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+}
 
-const processGroups: NavGroup[] = cmsNav
-  ? cmsNav.processGroups
-      .filter((g) => g.visible !== false)
-      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
-      .map((g) => ({
-        key: g.key,
-        label: g.label,
-        icon: getIcon(g.iconKey ?? g.items[0]?.iconKey ?? "HelpCircle"),
-        stageColor: g.stageColor,
-        collapsed: g.collapsed,
-        badge: g.badge,
-        items: g.items
-          .filter((i) => i.visible !== false)
-          .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
-          .map(cmsItemToNav),
-      }))
-  : DEFAULT_PROCESS_GROUPS;
+const topItems: NavItem[] = sortAndFilter(cmsNav.topItems).map(cmsItemToNav);
 
-const memberBottomItems: NavItem[] = cmsNav
-  ? cmsNav.bottomItems
-      .filter((i) => i.visible !== false)
-      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
-      .map(cmsItemToNav)
-  : DEFAULT_MEMBER_BOTTOM_ITEMS;
+const processGroups: NavGroup[] = sortAndFilter(cmsNav.processGroups).map((g) => ({
+  key: g.key,
+  label: g.label,
+  icon: getIcon(g.iconKey ?? g.items[0]?.iconKey ?? "HelpCircle"),
+  stageColor: g.stageColor,
+  collapsed: g.collapsed,
+  badge: g.badge,
+  items: sortAndFilter(g.items).map(cmsItemToNav),
+}));
 
-const adminGroups: NavGroup[] = cmsNav?.adminGroups
-  ? cmsNav.adminGroups
-      .filter((g) => g.visible !== false)
-      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
-      .map((g) => ({
-        key: g.key,
-        label: g.label,
-        icon: getIcon(g.iconKey ?? "Settings"),
-        visibility: "admin" as Visibility,
-        items: g.items
-          .filter((i) => i.visible !== false)
-          .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
-          .map(cmsItemToNav),
-      }))
-  : DEFAULT_ADMIN_GROUPS;
+const memberBottomItems: NavItem[] = sortAndFilter(cmsNav.bottomItems).map(cmsItemToNav);
+
+const adminGroups: NavGroup[] = sortAndFilter(cmsNav.adminGroups ?? []).map((g) => ({
+  key: g.key,
+  label: g.label,
+  icon: getIcon(g.iconKey ?? "Settings"),
+  visibility: "admin" as Visibility,
+  badge: g.badge,
+  items: sortAndFilter(g.items).map(cmsItemToNav),
+}));
 
 /* ------------------------------------------------------------------ */
 /*  Collapsible Group State (localStorage 영속)                        */

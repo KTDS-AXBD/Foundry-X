@@ -112,11 +112,12 @@ describe("Sidebar role-based visibility", () => {
     expect(screen.queryByText("아키텍처")).not.toBeInTheDocument();
   });
 
-  it("T-06: Admin 로그인 시 관리 그룹 헤더 노출", () => {
+  it("T-06: Admin 로그인 시 MSA 서비스 그룹 헤더 노출", () => {
     mockedUseUserRole.mockReturnValue({ role: "admin", isAdmin: true });
     renderSidebar();
-    // F322: 외부 서비스 그룹 제거, 관리 그룹만 검증
-    expect(screen.getAllByText("관리").length).toBeGreaterThan(0);
+    // Phase 20: MSA 5개 서비스 그룹 (Auth/Portal/Gate/Launch/Core)
+    expect(screen.getAllByText("Auth 서비스").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Core (Foundry-X)").length).toBeGreaterThan(0);
   });
 
   it("T-07: F322 — 수집 그룹은 collapsed+TBD (items visible:false)", () => {
@@ -145,8 +146,9 @@ describe("Sidebar role-based visibility", () => {
     // F322: 지식/외부 서비스 그룹 제거
     expect(screen.queryByText("지식")).not.toBeInTheDocument();
     expect(screen.queryByText("외부 서비스")).not.toBeInTheDocument();
-    // Admin 전용 그룹은 미노출
-    expect(screen.queryByText("관리")).not.toBeInTheDocument();
+    // Admin 전용 MSA 그룹은 미노출
+    expect(screen.queryByText("Auth 서비스")).not.toBeInTheDocument();
+    expect(screen.queryByText("Core (Foundry-X)")).not.toBeInTheDocument();
   });
 
   it("Member: 하단에 위키+설정 표시", () => {

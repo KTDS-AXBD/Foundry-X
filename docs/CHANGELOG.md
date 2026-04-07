@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #224 (2026-04-07)
+**사이드바 IA 점검 + CMS SSOT 확정**:
+- ✅ sidebar.json(TinaCMS) ↔ 코드 Default 불일치 발견: Offerings 누락, Admin 단일그룹 vs MSA 5그룹
+- ✅ sidebar.json 동기화: Offerings 항목 추가, Admin→MSA 5서비스 그룹, badge "이관 예정"
+- ✅ CMS SSOT 리팩토링: DEFAULT_* 상수 ~140줄 삭제, sortAndFilter 헬퍼 도입, nullable 제거
+- ✅ navigation-loader.ts: try/catch fallback → 정적 import 전환 (빌드 타임 에러 감지)
+- ✅ 테스트 갱신: 소스 문자열 검사→JSON 구조 검사 전환 (22/22 pass)
+
+**검증 결과**: ✅ typecheck / test (22 pass)
+
+### 세션 #223 (2026-04-07)
+**대시보드 콘솔 에러 3건 수정**:
+- ✅ BASE_URL 중복 슬래시 해소 (biz-items.ts)
+- ✅ biz-items/summary 404 해소
+- ✅ _headers 파서 간섭 해소
+
+**검증 결과**: ✅ typecheck
+
 ### 세션 #222 (2026-04-07)
 **E2E flaky 해소 + 레거시 라우트 리다이렉트 수정**:
 - ✅ E2E 4건 flaky 해소 (onboarding-flow, org-members, sse-lifecycle, uncovered-pages)

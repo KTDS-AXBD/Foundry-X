@@ -18,6 +18,7 @@ import {
   ClipboardList,
   Code,
   Coins,
+  FileOutput,
   FileSignature,
   FileText,
   FlaskConical,
@@ -91,6 +92,7 @@ const iconMap: Record<string, LucideIcon> = {
   ClipboardList,
   Code,
   Coins,
+  FileOutput,
   FileSignature,
   FileText,
   FlaskConical,
@@ -123,18 +125,10 @@ export function getIcon(key: string): LucideIcon {
   return iconMap[key] ?? HelpCircle;
 }
 
-/* ── Loader ── */
+/* ── Loader (SSOT: content/navigation/sidebar.json) ── */
+// sidebar.json이 없으면 빌드 에러 — fallback 없이 즉시 감지
+import sidebarData from "../../content/navigation/sidebar.json";
 
-let sidebarData: SidebarConfig | null = null;
-try {
-  // Vite resolves this at build time — if the file doesn't exist, the build still succeeds
-  // because we catch the error and fall back to null.
-  const mod = await import("../../content/navigation/sidebar.json");
-  sidebarData = mod.default as SidebarConfig;
-} catch {
-  sidebarData = null;
-}
-
-export function loadSidebarConfig(): SidebarConfig | null {
-  return sidebarData;
+export function loadSidebarConfig(): SidebarConfig {
+  return sidebarData as SidebarConfig;
 }
