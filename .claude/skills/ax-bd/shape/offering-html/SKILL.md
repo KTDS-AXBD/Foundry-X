@@ -2,8 +2,8 @@
 name: offering-html
 domain: ax-bd
 stage: shape
-version: "2.2"
-description: "AX BD팀 사업기획서(HTML) 생성 스킬 v2.2 — 20섹션 목차 + 발굴 산출물 매핑 + 경영 언어 원칙 + KT 3축 강제 검증 + GAN 교차검증 자동화"
+version: "2.3"
+description: "AX BD팀 사업기획서(HTML) 생성 스킬 v2.3 — 20섹션 목차 + 발굴 산출물 매핑 + 경영 언어 원칙 + KT 3축 강제 검증 + GAN 교차검증 자동화 + 피드백 반영 자동화"
 input_schema: DiscoveryPackage + OfferingConfig
 output_schema: OfferingHTML
 upstream: [ax-bd/discover/packaging]
@@ -19,6 +19,15 @@ evolution:
   track: DERIVED
   registry_id: null
 changelog:
+  - version: "2.3"
+    date: "2026-04-07"
+    sprint: 202
+    changes:
+      - "F422: writing-rules.md §7 대폭 확장 — 섹션 키워드 맵(22섹션) + 4유형 분류(TypeA/B/C/D) + 처리 절차 상세화"
+      - "F422: CHANGED 마커 포맷 표준화 — Type|섹션ID|사유 3필드 구조"
+      - "F422: 고객 유형별 톤 전환 트리거 3종 + 전환 범위 자동화"
+      - "F422: 버전 자동 증가 규칙 표준화 (v0.1씩 증가, 교차검증 완료=0.5+, 최종=1.0)"
+      - "F422: SKILL.md Step 5 전면 재작성 — 4유형 피드백 분류 + 6단계 처리 흐름"
   - version: "2.2"
     date: "2026-04-07"
     sprint: 200
@@ -106,11 +115,28 @@ KT 연계 AX 사업개발 체계의 **3. 형상화** 단계를 자동화한다.
     │   └── 부재 축은 보충 인터뷰 필수 → 확보 후 초안 생성 진행
     └── AX BD팀 표현 표준화 (writing-rules.md §4)
         ↓
-[5] 피드백 반영 — writing-rules.md §7 참조
-    ├── 피드백 → 섹션 자동 식별 → 수정
-    ├── 고객 유형별 톤 유지하면서 수정
-    ├── 수정된 부분에 <!-- CHANGED: {사유} --> 마커 삽입
-    └── 수정 후 경영 언어 10항목 재검증
+[5] 피드백 반영 자동화 (F422) — writing-rules.md §7 전체 참조
+    ├── [5-1] 피드백 분류 (4유형 — writing-rules.md §7.2):
+    │   ├── Type A: 내용 수정 (수치·사실·근거 변경)
+    │   ├── Type B: 톤 조정 (고객 유형 맞춤 표현)
+    │   ├── Type C: KT 연계 보강 (3축 추가·구체화)
+    │   └── Type D: 구조 변경 (섹션 추가·삭제·순서)
+    ├── [5-2] 섹션 자동 식별 (writing-rules.md §7.1 키워드 맵):
+    │   ├── 피드백 텍스트 → 22섹션 키워드 패턴 매칭
+    │   ├── 탐지 성공: 해당 섹션 ID + 컴포넌트 특정
+    │   └── 탐지 실패: AskUserQuestion "어떤 섹션을 수정할까요?"
+    ├── [5-3] 유형별 수정 실행:
+    │   ├── Type A: 해당 섹션 데이터 교체 + 경영 언어 §1 재적용
+    │   ├── Type B: 고객 유형 전환 여부 확인 → 전환이면 AskUserQuestion 후 일괄 재작성
+    │   │         → 부분 수정이면 해당 섹션만 §3.2 톤 규칙 적용
+    │   ├── Type C: KT 3축 재검증(SKILL.md §KT) → 미흡 축 보강 → 04-2 연동 확인
+    │   └── Type D: 선택 섹션만 추가/삭제 (필수 섹션 삭제 불가) → nav.html 목차 갱신
+    ├── [5-4] CHANGED 마커 삽입 (writing-rules.md §7.3):
+    │   └── <!-- CHANGED: {Type}|{섹션ID}|{사유 한줄} --> 수정 블록 직전 삽입
+    ├── [5-5] 경영 언어 재검증 (writing-rules.md §1 10항목):
+    │   └── 수정 섹션 대상으로 10항목 재적용 → 위반 시 수정 제안
+    └── [5-6] 버전 자동 증가 (writing-rules.md §7.5):
+        └── 수정 유형별 0.1 증가 → HTML meta + Hero 버전 배지 갱신
         ↓
 [6] 교차검증 (자동) — cross-validation.md 전체 프로세스 참조
     ├── [6-1] 사업기획서 전문 읽기 → 질문별 검증 섹션 매핑
