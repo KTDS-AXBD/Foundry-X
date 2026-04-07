@@ -378,6 +378,7 @@ export type {
   OgdStatus,
   OgdRound,
   OgdSummary,
+  StructuredInstruction,
 } from './ogd.js';
 
 // F356: Prototype Feedback types (Sprint 160, Phase 16)

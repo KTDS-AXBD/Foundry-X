@@ -1,10 +1,12 @@
 // ─── F355: O-G-D Orchestrator Service (Sprint 160) ───
+// F431: FeedbackConverter 주입 + structured instructions 전달 (Sprint 207)
 // Generator → Discriminator → Feedback 루프 관리
 
 import { OGD_MAX_ROUNDS } from "@foundry-x/shared";
-import type { OgdRound, OgdSummary } from "@foundry-x/shared";
+import type { OgdRound, OgdSummary, StructuredInstruction } from "@foundry-x/shared";
 import { OgdGeneratorService } from "./ogd-generator-service.js";
 import { OgdDiscriminatorService } from "./ogd-discriminator-service.js";
+import { OgdFeedbackConverterService } from "./ogd-feedback-converter.js";
 
 interface OgdRoundRow {
   id: string;
@@ -50,6 +52,7 @@ export class OgdOrchestratorService {
     private db: D1Database,
     private generator: OgdGeneratorService,
     private discriminator: OgdDiscriminatorService,
+    private feedbackConverter?: OgdFeedbackConverterService,
   ) {}
 
   async runLoop(
@@ -64,17 +67,32 @@ export class OgdOrchestratorService {
     let passed = false;
     let totalCostUsd = 0;
     let previousFeedback: string | undefined;
+    let previousInstructions: StructuredInstruction[] | undefined;
 
     for (let round = 1; round <= OGD_MAX_ROUNDS; round++) {
-      // Generator: PRD + 이전 피드백 → HTML
-      const genResult = await this.generator.generate(prdContent, previousFeedback);
+      // Generator: PRD + 이전 피드백(or structured instructions) → HTML
+      const genResult = await this.generator.generate(prdContent, previousFeedback, previousInstructions);
 
-      // Discriminator: HTML + 체크리스트 → 스코어
+      // Discriminator: HTML + 체크리스트 → 스코어 + failedItems
       const evalResult = await this.discriminator.evaluate(genResult.html, checklist);
+
+      // F431: Feedback → Structured Instructions 변환
+      let convertCost = 0;
+      let structuredInstructions: StructuredInstruction[] | undefined;
+      if (!evalResult.passed && this.feedbackConverter) {
+        const convertResult = await this.feedbackConverter.convert(
+          evalResult.feedback,
+          evalResult.failedItems,
+        );
+        structuredInstructions = convertResult.instructions.length > 0
+          ? convertResult.instructions
+          : undefined;
+        convertCost = estimateCost(convertResult.inputTokens, convertResult.outputTokens);
+      }
 
       const totalInput = genResult.inputTokens + evalResult.inputTokens;
       const totalOutput = genResult.outputTokens + evalResult.outputTokens;
-      const roundCost = estimateCost(totalInput, totalOutput);
+      const roundCost = estimateCost(totalInput, totalOutput) + convertCost;
       totalCostUsd += roundCost;
 
       // DB에 라운드 기록
@@ -105,6 +123,7 @@ export class OgdOrchestratorService {
         modelUsed: genResult.modelUsed,
         passed: evalResult.passed,
         createdAt: now,
+        structuredInstructions,  // F431
       };
       rounds.push(ogdRound);
 
@@ -119,8 +138,9 @@ export class OgdOrchestratorService {
         break;
       }
 
-      // 다음 라운드에 피드백 전달
-      previousFeedback = evalResult.feedback;
+      // F431: 다음 라운드에 structured instructions 우선 전달, 없으면 raw feedback
+      previousInstructions = structuredInstructions;
+      previousFeedback = structuredInstructions ? undefined : evalResult.feedback;
     }
 
     // prototype_jobs 갱신
