@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #222 (2026-04-07)
+**E2E flaky 해소 + 레거시 라우트 리다이렉트 수정**:
+- ✅ E2E 4건 flaky 해소 (onboarding-flow, org-members, sse-lifecycle, uncovered-pages)
+- ✅ `/ax-bd/discovery/:id` → `/discovery/items/:id` 리다이렉트 추가 (콘솔 "No routes matched" 에러 해소)
+- ✅ loader+redirect → useParams+Navigate 컴포넌트 방식으로 전환 ("no element" 경고 해소)
+
+**검증 결과**: ✅ typecheck / build / 프로덕션 배포 검증 (CI/CD success)
+
 ### 세션 #221 (2026-04-07)
 **E2E Audit — Sprint 203~207 (Builder v2) Flaky 4건 해소**:
 - ✅ E2E 전체 실행: 270 tests (268 passed / 0 failed / 2 skipped / 0 flaky)
