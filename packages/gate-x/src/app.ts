@@ -11,6 +11,7 @@ import { createGateAuthMiddleware } from "./middleware/auth.js";
 import {
   apiKeysRoute,
   axBdEvaluationsRoute,
+  customRulesRoute,
   decisionsRoute,
   evaluationReportRoute,
   gatePackageRoute,
@@ -53,5 +54,6 @@ app.route("/api/gate", gatePackageRoute);
 app.route("/api/gate", teamReviewsRoute);
 app.route("/api/gate", validationMeetingsRoute);
 app.route("/api/gate", validationTierRoute);
+app.route("/api/gate", customRulesRoute);
 
 export default app;

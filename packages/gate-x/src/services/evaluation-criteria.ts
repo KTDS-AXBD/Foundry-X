@@ -1,4 +1,5 @@
 import type { AgentExecutionRequest, AgentExecutionResult } from "../types/agent-execution.js";
+import type { CustomValidationRule, RuleConditionInput } from "../schemas/custom-rule.schema.js";
 
 export interface EvaluationScore {
   criteriaName: string;
@@ -54,5 +55,58 @@ export class SpecComplianceCriteria implements EvaluationCriteria {
     const unmet = criteria.filter((c) => !outputJson.includes(c.toLowerCase()));
     const score = Math.round((met.length / criteria.length) * 100);
     return { criteriaName: this.name, score, passed: score >= 60, feedback: unmet.map((c) => `Acceptance criteria not addressed: ${c}`), details: { totalCriteria: criteria.length, metCriteria: met.length, unmetCriteria: unmet } };
+  }
+}
+
+function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
+  return path.split(".").reduce<unknown>((cur, key) => (cur != null && typeof cur === "object" ? (cur as Record<string, unknown>)[key] : undefined), obj);
+}
+
+function evaluateCondition(actual: unknown, operator: RuleConditionInput["operator"], expected: unknown): boolean {
+  switch (operator) {
+    case "gte": return typeof actual === "number" && actual >= (expected as number);
+    case "lte": return typeof actual === "number" && actual <= (expected as number);
+    case "eq":  return actual === expected;
+    case "neq": return actual !== expected;
+    case "contains": return typeof actual === "string" && actual.includes(String(expected));
+    case "regex": return typeof actual === "string" && new RegExp(String(expected)).test(actual);
+    default: return false;
+  }
+}
+
+export class DynamicRuleCriteria implements EvaluationCriteria {
+  readonly name: string;
+  readonly weight: number;
+
+  constructor(private rule: CustomValidationRule) {
+    this.name = `custom:${rule.id}`;
+    this.weight = rule.weight;
+  }
+
+  evaluate(result: AgentExecutionResult, _request: AgentExecutionRequest): EvaluationScore {
+    const conditions = (typeof this.rule.conditions === "string"
+      ? (JSON.parse(this.rule.conditions) as RuleConditionInput[])
+      : this.rule.conditions);
+
+    let scoreAccum = 0;
+    const feedback: string[] = [];
+
+    for (const cond of conditions) {
+      const actual = getNestedValue(result.output, cond.field);
+      if (evaluateCondition(actual, cond.operator, cond.value)) {
+        scoreAccum += cond.score_weight;
+      } else {
+        feedback.push(`[${cond.field}] ${String(actual)} not ${cond.operator} ${String(cond.value)}`);
+      }
+    }
+
+    const score = Math.round(scoreAccum * 100);
+    return {
+      criteriaName: this.name,
+      score,
+      passed: score >= this.rule.threshold,
+      feedback,
+      details: { ruleId: this.rule.id, ruleName: this.rule.name },
+    };
   }
 }
