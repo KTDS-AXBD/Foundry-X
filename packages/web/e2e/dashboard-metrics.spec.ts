@@ -10,6 +10,10 @@
  */
 import { test, expect } from "./fixtures/auth";
 
+// @service: portal
+// @sprint: 187
+// @tagged-by: F400
+
 // ─── Mock Data ───
 
 const MOCK_OVERVIEW = {

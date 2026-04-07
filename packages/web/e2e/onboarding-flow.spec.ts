@@ -1,5 +1,9 @@
 import { test, expect } from "./fixtures/auth";
 
+// @service: portal
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("Onboarding Flow (F252)", () => {
   test.beforeEach(async ({ authenticatedPage: page }) => {
     // Mock onboarding progress API (GET + PATCH)

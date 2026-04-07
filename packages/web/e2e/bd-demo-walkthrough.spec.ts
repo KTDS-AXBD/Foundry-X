@@ -4,6 +4,10 @@
  */
 import { test, expect } from "./fixtures/auth";
 
+// @service: bd-demo
+// @sprint: 187
+// @tagged-by: F400
+
 const SEED_IDEAS = [
   {
     id: "biz-health",

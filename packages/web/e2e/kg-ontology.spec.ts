@@ -4,6 +4,10 @@
  */
 import { test, expect } from "./fixtures/auth";
 
+// @service: portal
+// @sprint: 187
+// @tagged-by: F400
+
 const MOCK_STATS = {
   totalNodes: 12,
   totalEdges: 18,

@@ -1,5 +1,9 @@
 import { test, expect } from "./fixtures/org";
 
+// @service: infra/shared
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("Team Shared (F253)", () => {
   test.beforeEach(async ({ orgPage: { page } }) => {
     // Mock shared BMCs API

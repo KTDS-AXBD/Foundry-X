@@ -4,6 +4,10 @@
  */
 import { test, expect } from "./fixtures/auth";
 
+// @service: foundry-x
+// @sprint: 187
+// @tagged-by: F400
+
 // SSE 이벤트를 순차적으로 생성하는 헬퍼
 function buildSseBody(events: Array<{ event: string; data: unknown }>): string {
   return events.map((e) => `event: ${e.event}\ndata: ${JSON.stringify(e.data)}\n\n`).join("");

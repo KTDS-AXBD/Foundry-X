@@ -3,6 +3,10 @@
  * 발굴→형상화→검증 전체 흐름 자동 검증
  */
 import { test, expect, dismissGuideModal } from "./fixtures/auth";
+
+// @service: foundry-x
+// @sprint: 187
+// @tagged-by: F400
 import {
   makeOffering,
   makeOfferingSection,

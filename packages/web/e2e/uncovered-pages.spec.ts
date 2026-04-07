@@ -4,6 +4,10 @@
  */
 import { test, expect } from "./fixtures/auth";
 
+// @service: infra/shared
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("미커버 페이지 렌더링 검증", () => {
   test("analytics 페이지 렌더링", async ({ authenticatedPage: page }) => {
     // KPI API mock

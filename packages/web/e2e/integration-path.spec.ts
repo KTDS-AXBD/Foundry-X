@@ -1,5 +1,9 @@
 import { test, expect } from "./fixtures/auth";
 
+// @service: infra/shared
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("Phase 4 Integration Path", () => {
   test("iframe SSO token delivery via postMessage", async ({
     authenticatedPage: page,

@@ -4,6 +4,10 @@
  */
 import { test, expect } from "./fixtures/auth";
 
+// @service: foundry-x
+// @sprint: 187
+// @tagged-by: F400
+
 // Use a tall viewport so tour tooltips stay in view
 test.use({ viewport: { width: 1280, height: 900 } });
 

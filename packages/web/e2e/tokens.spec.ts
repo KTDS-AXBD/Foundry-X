@@ -1,5 +1,9 @@
 import { test, expect } from "./fixtures/auth";
 
+// @service: portal
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("Tokens Page", () => {
   test("토큰 페이지 렌더링", async ({ authenticatedPage: page }) => {
     await page.goto("/tokens");

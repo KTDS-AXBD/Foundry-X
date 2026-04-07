@@ -1,5 +1,9 @@
 import { test, expect } from "@playwright/test";
 
+// @service: portal
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("Authentication Flow", () => {
   test.beforeEach(async ({ page }) => {
     // 매 테스트 전 localStorage 초기화

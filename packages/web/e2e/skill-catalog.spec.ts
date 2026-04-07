@@ -4,6 +4,10 @@
  */
 import { test, expect } from "./fixtures/auth";
 
+// @service: gate-x
+// @sprint: 187
+// @tagged-by: F400
+
 const mockSkillList = {
   skills: [
     {

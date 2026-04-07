@@ -2,6 +2,10 @@
 
 import { test, expect } from "./fixtures/auth";
 
+// @service: gate-x
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("Orchestration Dashboard", () => {
   test("page renders with title and 3 tabs", async ({
     authenticatedPage: page,

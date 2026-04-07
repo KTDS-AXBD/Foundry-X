@@ -1,5 +1,9 @@
 import { test, expect } from "./fixtures/auth";
 
+// @service: gate-x
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("Agents Page", () => {
   test("Agent Transparency heading is visible", async ({
     authenticatedPage: page,

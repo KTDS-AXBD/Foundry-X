@@ -3,6 +3,10 @@
  * F314 파이프라인 API mock + 발굴 대시보드 탭 전환 + factory 데이터 검증
  */
 import { test, expect } from "./fixtures/auth";
+
+// @service: foundry-x
+// @sprint: 187
+// @tagged-by: F400
 import { makePipelineRun, makeCheckpoint, makeArtifact } from "./fixtures/mock-factory";
 
 const MOCK_PORTFOLIO_PROGRESS = {

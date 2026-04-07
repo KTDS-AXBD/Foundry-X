@@ -10,6 +10,10 @@
  */
 import { test, expect } from "./fixtures/auth";
 
+// @service: foundry-x
+// @sprint: 187
+// @tagged-by: F400
+
 const MOCK_PROPOSALS = [
   {
     id: "prop-1",

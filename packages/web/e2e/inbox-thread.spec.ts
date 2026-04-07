@@ -1,5 +1,9 @@
 import { test, expect } from "./fixtures/auth";
 
+// @service: portal
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("Agent Inbox Thread Reply", () => {
   test("에이전트 페이지에서 Inbox 렌더링", async ({
     authenticatedPage: page,

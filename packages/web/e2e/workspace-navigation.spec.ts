@@ -1,5 +1,9 @@
 import { test, expect } from "./fixtures/auth";
 
+// @service: portal
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("Workspace Navigation", () => {
   test("workspace 페이지 접근", async ({ authenticatedPage: page }) => {
     await page.goto("/workspace");
