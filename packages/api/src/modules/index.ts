@@ -25,4 +25,7 @@ export {
   pocRoute, shareLinksRoute,
 } from "./launch/index.js";
 
+// Sprint 195: billing 모듈 (F411 과금 체계)
+export { billingRoute } from "./billing/index.js";
+
 // Sprint 184: infra 모듈 (예정)
