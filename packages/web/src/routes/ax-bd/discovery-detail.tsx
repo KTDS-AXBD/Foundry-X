@@ -323,7 +323,7 @@ export function Component() {
                   onCancel={() => setEditMode(false)}
                 />
               ) : (
-                <BusinessPlanViewer plan={plan} />
+                <BusinessPlanViewer plan={plan} bizItemId={item.id} />
               )}
             </div>
           )}

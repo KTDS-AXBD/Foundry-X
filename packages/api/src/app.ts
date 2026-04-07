@@ -38,11 +38,11 @@ import {
   axBdHistoryRoute, axBdLinksRoute, axBdViabilityRoute,
   axBdPrototypesRoute, axBdSkillsRoute, axBdPersonaEvalRoute,
   axBdProgressRoute, personaConfigsRoute, personaEvalsRoute,
-  // offering (11 routes — Sprint 215: businessPlanRoute 추가)
+  // offering (12 routes — Sprint 216: businessPlanExportRoute 추가)
   offeringsRoute, offeringSectionsRoute, offeringExportRoute,
   offeringValidateRoute, offeringMetricsRoute, offeringPrototypeRoute,
   designTokensRoute, contentAdapterRoute, bdpRoute, methodologyRoute,
-  businessPlanRoute,
+  businessPlanRoute, businessPlanExportRoute,
   // agent (13 routes)
   agentRoute, agentAdaptersRoute, agentDefinitionRoute,
   orchestrationRoute, executionEventsRoute, taskStateRoute,
@@ -296,6 +296,8 @@ app.route("/api", decisionsRoute);
 app.route("/api", bdpRoute);
 // Sprint 215: 사업기획서 편집기 (F444)
 app.route("/api", businessPlanRoute);
+// Sprint 216: 사업기획서 내보내기 (F446)
+app.route("/api", businessPlanExportRoute);
 app.route("/api", gatePackageRoute);
 // Sprint 81: Offering Pack + MVP Tracking + IR Bottom-up (F236, F238, F240)
 app.route("/api", offeringPacksRoute);
