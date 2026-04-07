@@ -1,5 +1,9 @@
 import { test, expect } from "./fixtures/auth";
 
+// @service: portal
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("Setup Guide — F267 설치 가이드 UI", () => {
   test.beforeEach(async ({ authenticatedPage: page }) => {
     // Mock onboarding progress API

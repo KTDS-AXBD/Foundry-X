@@ -4,6 +4,10 @@
  */
 import { test, expect } from "./fixtures/auth";
 
+// @service: infra/shared
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("Share Links (F233)", () => {
   test("공유 링크 생성 + 목록 조회", async ({ authenticatedPage: page }) => {
     await page.route("**/api/share-links*", (route) => {

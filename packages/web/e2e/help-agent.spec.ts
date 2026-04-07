@@ -4,6 +4,10 @@
  */
 import { test, expect } from "./fixtures/auth";
 
+// @service: foundry-x
+// @sprint: 187
+// @tagged-by: F400
+
 function setupBaseMocks(page: import("@playwright/test").Page) {
   return Promise.all([
     page.evaluate(() => {

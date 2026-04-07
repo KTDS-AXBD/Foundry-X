@@ -1,5 +1,9 @@
 import { test, expect } from "./fixtures/org";
 
+// @service: portal
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("NPS Dashboard (F254)", () => {
   const mockSummary = {
     averageNps: 7.8,

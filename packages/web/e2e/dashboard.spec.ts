@@ -1,5 +1,9 @@
 import { test, expect } from "./fixtures/auth";
 
+// @service: portal
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("Dashboard", () => {
   test("sidebar navigation is visible", async ({ authenticatedPage: page }) => {
     await page.goto("/dashboard");

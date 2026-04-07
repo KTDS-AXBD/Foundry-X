@@ -1,5 +1,9 @@
 import { test, expect } from "./fixtures/auth";
 
+// @service: gate-x
+// @sprint: 187
+// @tagged-by: F400
+
 const MOCK_SPEC_RESULT = {
   spec: {
     title: "에이전트 토큰 사용량 차트",

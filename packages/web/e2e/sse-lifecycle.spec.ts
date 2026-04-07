@@ -1,5 +1,9 @@
 import { test, expect } from "./fixtures/auth";
 
+// @service: infra/shared
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("SSE Lifecycle — Agents Page", () => {
   test("agents 페이지 진입 시 UI 렌더링", async ({ authenticatedPage: page }) => {
     await page.goto("/agents");

@@ -4,6 +4,10 @@
  */
 import { test, expect } from "./fixtures/auth";
 
+// @service: infra/shared
+// @sprint: 187
+// @tagged-by: F400
+
 const REDIRECTS = [
   { from: "/sr", to: "/collection/sr" },
   { from: "/discovery/collection", to: "/collection/field" },

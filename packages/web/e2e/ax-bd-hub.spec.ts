@@ -4,6 +4,10 @@
  */
 import { test, expect } from "./fixtures/auth";
 
+// @service: bd-demo
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("AX BD Hub", () => {
   test("ax-bd 허브 — 사업기획서 인덱스 렌더링", async ({ authenticatedPage: page }) => {
     await page.goto("/shaping/proposal");

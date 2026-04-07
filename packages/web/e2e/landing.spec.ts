@@ -1,5 +1,9 @@
 import { test, expect } from "@playwright/test";
 
+// @service: infra/shared
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("Landing Page", () => {
   test("renders hero with Foundry-X branding", async ({ page }) => {
     await page.goto("/");

@@ -4,6 +4,10 @@
  */
 import { test, expect } from "./fixtures/auth";
 
+// @service: foundry-x
+// @sprint: 187
+// @tagged-by: F400
+
 // ── 5유형별 biz-item mock ──
 function makeBizItems(type: string) {
   return {

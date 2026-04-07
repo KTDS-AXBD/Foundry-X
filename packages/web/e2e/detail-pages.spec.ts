@@ -3,6 +3,10 @@
  * F302 — 파라미터 기반 상세 페이지 10건의 렌더링 + 데이터 표시 + 네비게이션 검증
  */
 import { test, expect } from "./fixtures/auth";
+
+// @service: bd-demo
+// @sprint: 187
+// @tagged-by: F400
 import {
   makeBizItem,
   makeIdea,

@@ -1,5 +1,9 @@
 import { test, expect } from "./fixtures/auth";
 
+// @service: foundry-x
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("Spec Generator", () => {
   test("spec generator page renders input area", async ({
     authenticatedPage: page,

@@ -1,5 +1,9 @@
 import { test, expect } from "./fixtures/auth";
 
+// @service: portal
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("MCP Server Management (F61/F63)", () => {
   test("workspace MCP 탭에서 서버 등록 폼 표시", async ({ authenticatedPage: page }) => {
     // Mock MCP servers API (empty list)

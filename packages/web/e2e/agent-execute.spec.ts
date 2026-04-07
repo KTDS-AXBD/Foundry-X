@@ -1,5 +1,9 @@
 import { test, expect } from "./fixtures/auth";
 
+// @service: gate-x
+// @sprint: 187
+// @tagged-by: F400
+
 test.describe("Agent Execute Flow", () => {
   test("에이전트 작업 실행 → 결과 표시", async ({ authenticatedPage: page }) => {
     // Mock agents list API

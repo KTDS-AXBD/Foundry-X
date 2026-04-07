@@ -3,6 +3,10 @@
  * 프로세스 진행률, 산출물 목록, 네비게이션
  */
 import { test, expect } from "./fixtures/auth";
+
+// @service: foundry-x
+// @sprint: 187
+// @tagged-by: F400
 import { makeArtifact } from "./fixtures/mock-factory";
 
 const MOCK_BIZ_ITEM_DETAIL = {
