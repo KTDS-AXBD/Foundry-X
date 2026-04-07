@@ -33,3 +33,14 @@ export async function tenantGuard(
 
   return next();
 }
+
+type TenantContext = Context<{ Bindings: GateEnv; Variables: TenantVariables }>;
+
+/** requireTenantAdmin — tenant_admin 역할 전용 미들웨어 */
+export async function requireTenantAdmin(c: TenantContext, next: Next) {
+  const role = c.get("orgRole");
+  if (role !== "tenant_admin") {
+    return c.json({ error: "Tenant admin role required" }, 403);
+  }
+  return next();
+}

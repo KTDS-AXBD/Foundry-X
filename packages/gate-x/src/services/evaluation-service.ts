@@ -137,7 +137,23 @@ export class EvaluationService {
     const historyId = crypto.randomUUID();
     await this.db.prepare(`INSERT INTO ax_evaluation_history (id, eval_id, actor_id, action, from_status, to_status, reason, created_at) VALUES (?, ?, ?, 'status_change', ?, ?, ?, ?)`).bind(historyId, evalId, actorId, current.status, newStatus, reason || null, now).run();
 
-    return { ...current, status: newStatus, decisionReason: reason || null, updatedAt: now };
+    const updated = { ...current, status: newStatus, decisionReason: reason || null, updatedAt: now };
+
+    // 결정(go/kill) 시 웹훅 dispatch — fire-and-forget
+    if (newStatus === "go" || newStatus === "kill") {
+      import("./webhook-service.js")
+        .then(({ dispatch }) =>
+          dispatch(
+            "decision.made",
+            orgId,
+            { evaluationId: evalId, decision: newStatus, reason: reason ?? null },
+            this.db,
+          ),
+        )
+        .catch((e) => console.error("Webhook dispatch error:", e));
+    }
+
+    return updated;
   }
 
   async getHistory(evalId: string, orgId: string): Promise<EvalHistoryEntry[]> {
