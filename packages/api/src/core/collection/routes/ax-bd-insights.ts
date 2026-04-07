@@ -4,11 +4,11 @@
 import { Hono } from "hono";
 import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
-import { GenerateInsightSchema } from "../schemas/bmc-insight.schema.js";
+import { GenerateInsightSchema } from "../../shaping/schemas/bmc-insight.schema.js";
 import { CreateMarketSummarySchema } from "../schemas/insight-job.schema.js";
-import { BmcInsightService } from "../services/bmc-insight-service.js";
+import { BmcInsightService } from "../../shaping/services/bmc-insight-service.js";
 import { InsightAgentService } from "../services/insight-agent-service.js";
-import { BMC_BLOCK_TYPES } from "../services/bmc-service.js";
+import { BMC_BLOCK_TYPES } from "../../shaping/services/bmc-service.js";
 
 export const axBdInsightsRoute = new Hono<{
   Bindings: Env;

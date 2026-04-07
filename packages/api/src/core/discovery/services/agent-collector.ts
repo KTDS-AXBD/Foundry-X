@@ -4,7 +4,7 @@
  */
 import type { AgentRunner } from "../../agent/services/agent-runner.js";
 import type { AgentExecutionResult } from "../../agent/services/execution-types.js";
-import type { CollectionCandidate } from "./collection-pipeline.js";
+import type { CollectionCandidate } from "../../collection/services/collection-pipeline.js";
 import {
   AGENT_COLLECTOR_SYSTEM_PROMPT,
   buildCollectorPrompt,

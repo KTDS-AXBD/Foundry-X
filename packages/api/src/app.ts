@@ -23,15 +23,17 @@ import {
 } from "./modules/index.js";
 // Core: discovery (S184), shaping (S184), offering (S184), agent (S184), harness (S184) — Phase 20-A
 import {
+  // collection (5 routes) — F401, Sprint 188
+  axBdIdeasRoute, collectionRoute, ideaPortalWebhookRoute,
+  irProposalsRoute, axBdInsightsRoute,
   // discovery (12 routes)
-  axBdDiscoveryRoute, axBdIdeasRoute, axBdArtifactsRoute,
-  bizItemsRoute, collectionRoute, ideaPortalWebhookRoute,
+  axBdDiscoveryRoute, axBdArtifactsRoute,
+  bizItemsRoute,
   discoveryRoute, discoveryPipelineRoute, discoveryReportRoute,
   discoveryReportsRoute, discoveryStagesRoute, discoveryShapePipelineRoute,
-  irProposalsRoute,
   // shaping (14 routes)
   shapingRoute, axBdBmcRoute, axBdAgentRoute, axBdCommentsRoute,
-  axBdHistoryRoute, axBdInsightsRoute, axBdLinksRoute, axBdViabilityRoute,
+  axBdHistoryRoute, axBdLinksRoute, axBdViabilityRoute,
   axBdPrototypesRoute, axBdSkillsRoute, axBdPersonaEvalRoute,
   axBdProgressRoute, personaConfigsRoute, personaEvalsRoute,
   // offering (10 routes)

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { collectionRoute } from "../core/discovery/routes/collection.js";
+import { collectionRoute } from "../core/collection/routes/collection.js";
 
 function createTestApp(db: any) {
   const app = new Hono();

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { IrProposalService } from "../core/discovery/services/ir-proposal-service.js";
+import { IrProposalService } from "../core/collection/services/ir-proposal-service.js";
 
 const DDL = `
   CREATE TABLE IF NOT EXISTS biz_items (

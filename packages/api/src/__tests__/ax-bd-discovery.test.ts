@@ -7,8 +7,8 @@ import {
   discoveryIngestPayloadSchema,
   discoveryDataItemSchema,
   collectionSourceSchema,
-} from "../core/discovery/schemas/discovery-x.schema.js";
-import { DiscoveryXIngestService } from "../core/discovery/services/discovery-x-ingest-service.js";
+} from "../core/collection/schemas/discovery-x.schema.js";
+import { DiscoveryXIngestService } from "../core/collection/services/discovery-x-ingest-service.js";
 
 function makeValidPayload(overrides?: Record<string, unknown>) {
   return {

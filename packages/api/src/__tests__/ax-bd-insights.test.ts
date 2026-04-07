@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
 import { BmcInsightService, parseInsights } from "../core/shaping/services/bmc-insight-service.js";
-import { InsightAgentService, parseMarketSummary } from "../core/shaping/services/insight-agent-service.js";
+import { InsightAgentService, parseMarketSummary } from "../core/collection/services/insight-agent-service.js";
 
 // ── Helpers ──
 
