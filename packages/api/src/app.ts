@@ -23,6 +23,8 @@ import {
 } from "./modules/index.js";
 // Core: discovery (S184), shaping (S184), offering (S184), agent (S184), harness (S184) — Phase 20-A
 import {
+  // files (1 route) — F441+F442, Sprint 213
+  filesRoute,
   // collection (5 routes) — F401, Sprint 188
   axBdIdeasRoute, collectionRoute, ideaPortalWebhookRoute,
   irProposalsRoute, axBdInsightsRoute,
@@ -401,6 +403,9 @@ app.route("/api", eventStatusRoute);
 
 // Sprint 195: 과금 체계 (F411)
 app.route("/api", billingRoute);
+
+// Sprint 213: 파일 업로드 + 문서 파싱 (F441, F442)
+app.route("/api", filesRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

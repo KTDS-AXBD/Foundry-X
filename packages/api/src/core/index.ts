@@ -52,3 +52,6 @@ export {
   irProposalsRoute,
   axBdInsightsRoute,
 } from "./collection/index.js";
+
+// Files: 업로드 + 파싱 (2 routes) — F441+F442, Sprint 213
+export { filesRoute } from "./files/index.js";

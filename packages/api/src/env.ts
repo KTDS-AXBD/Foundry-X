@@ -26,4 +26,6 @@ export type Env = {
   AIF_API_URL?: string;  // 폴백: AI Foundry API URL
   // Sprint 67: 이메일 발송 (F210)
   RESEND_API_KEY?: string;
+  // F441: R2 파일 스토리지 (Sprint 213)
+  FILES_BUCKET: R2Bucket;
 };
