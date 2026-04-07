@@ -294,14 +294,14 @@ packages/web/src/routes/
 
 ## 5. Sprint별 IA 변경 일정
 
-| Sprint | IA 작업 | 영향 범위 |
-|--------|--------|----------|
-| **179** | 라우트 분류 문서 확정 (이 문서) | 문서만, 코드 변경 없음 |
-| **181** | (1) `/ax-bd/*` 14개 → 정규 경로 redirect (2) 사이드바에서 ax-bd 참조 제거 | sidebar.tsx + router.tsx |
-| **182** | (1) 사이드바 "이관 예정" 그룹 도입 (2) Admin 3개 서브그룹 분리 | sidebar.tsx |
-| **183** | (1) 수집·검증·제품화·GTM 메뉴에 "(→ 서비스명)" 라벨 추가 (2) route 파일 디렉토리 이동 | sidebar.tsx + routes/ |
-| **184** | (1) 코어(발굴+형상화) 메뉴 정리 — 스킬 카탈로그 흡수 (2) Offering Pack 중복 해소 | sidebar.tsx |
-| **187** | E2E 테스트 태깅 — 서비스별 describe 그룹 | e2e/ |
+| Sprint | IA 작업 | 영향 범위 | 상태 |
+|--------|--------|----------|------|
+| **179** | 라우트 분류 문서 확정 (이 문서) | 문서만, 코드 변경 없음 | ✅ 완료 |
+| ~~**181~184**~~ | ~~Sprint별 점진적 IA 변경~~ | ~~sidebar.tsx + router.tsx~~ | ⏭️ 건너뜀 — API 모듈 분리에 집중 |
+| **185** | (1) `/ax-bd/*` 14개 → 정규 경로 redirect (2) 사이드바 서비스 경계 그룹 재구성 (3) "이관 예정" 라벨 + Admin 서브그룹 (4) 코어 메뉴 정리 + Offering Pack 중복 해소 | sidebar.tsx + router.tsx + routes/ | 📋 F398에 통합 |
+| **187** | E2E 테스트 태깅 — 서비스별 describe 그룹 + IA 변경 E2E 검증 | e2e/ | 📋 F400에 통합 |
+
+> **변경 사유**: Sprint 181~184는 API 모듈 분리(`modules/auth`, `modules/portal`, `modules/gate`, `modules/launch`, `core/`)에 집중하여 Web IA 작업을 수행하지 못했어요. API 모듈 구조가 확정된 후 IA를 한 번에 변경하는 게 더 일관적이므로, Sprint 185(F398)에 전체 IA 작업을 통합했어요.
 
 ---
 

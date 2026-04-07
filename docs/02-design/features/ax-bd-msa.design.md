@@ -545,13 +545,13 @@ app.route('/api', infraRoutes);     // modules/infra
 | 5 | 183 | gate 4 + launch 5 라우트 이동 | ~25 파일 이동 | `git revert` |
 | 6 | 184 | infra 21 라우트 이동 + core 정리 | ~60 파일 이동 | `git revert` |
 
-### Phase 20-B: 분리 준비 (Sprint 185~188)
+### Phase 20-B: 분리 준비 (Sprint 185~188) — 이벤트 + 프록시 + IA 개편
 
 | 순서 | Sprint | 작업 | 파일 변경 예상 |
 |------|--------|------|-------------|
-| 7 | 185 | 이벤트 카탈로그 + EventBus PoC | +20 파일 |
+| 7 | 185 | 이벤트 카탈로그 + EventBus PoC + **Web IA 개편** (sidebar 서비스 경계 그룹, `/ax-bd/*` redirect, "이관 예정" 라벨, 코어 메뉴 정리) | +20 파일 + sidebar.tsx + router.tsx |
 | 8 | 186 | Strangler 프록시 + harness-kit 이벤트 | +10 파일 |
-| 9 | 187 | E2E 태깅 + Gate-X scaffold PoC | ~30 파일 수정 |
+| 9 | 187 | E2E 태깅 + IA E2E 검증 + Gate-X scaffold PoC | ~30 파일 수정 |
 | 10 | 188 | Production 배포 + 문서화 | 문서 |
 
 ---
