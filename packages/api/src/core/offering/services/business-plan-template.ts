@@ -1,5 +1,6 @@
 /**
  * Sprint 58: 사업계획서 템플릿 + 매핑 로직 (F180)
+ * Sprint 215: F445 — 템플릿 3종 (내부보고/제안서/IR피치) 추가
  * Discovery 분석 결과 + 평가 + 트렌드를 사업계획서 10개 섹션에 매핑
  */
 
@@ -135,6 +136,56 @@ export function mapDataToSections(data: BpDataBundle): Map<number, string> {
   }
 
   return sections;
+}
+
+// ─── F445: 템플릿 3종 정의 ───
+
+export type TemplateType = 'internal' | 'proposal' | 'ir-pitch';
+export type ToneType = 'formal' | 'casual';
+export type LengthType = 'short' | 'medium' | 'long';
+
+export interface TemplateConfig {
+  name: string;
+  sections: readonly number[];
+  focus: string;
+  defaultLength: LengthType;
+}
+
+export const TEMPLATE_CONFIGS: Record<TemplateType, TemplateConfig> = {
+  'internal': {
+    name: '내부보고',
+    sections: [1, 2, 3, 4, 5, 7, 9] as const,
+    focus: '핵심 지표 + 실행 가능성',
+    defaultLength: 'short',
+  },
+  'proposal': {
+    name: '제안서',
+    sections: [1, 2, 3, 4, 5, 6, 7, 8] as const,
+    focus: '문제→해결→효과 구조',
+    defaultLength: 'medium',
+  },
+  'ir-pitch': {
+    name: 'IR피치',
+    sections: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const,
+    focus: '시장→제품→비즈모델→팀 스토리',
+    defaultLength: 'long',
+  },
+};
+
+export function getTemplateSections(templateType: TemplateType): typeof BP_SECTIONS[number][] {
+  const config = TEMPLATE_CONFIGS[templateType] ?? TEMPLATE_CONFIGS['internal'];
+  return BP_SECTIONS.filter(s => (config.sections as readonly number[]).includes(s.section));
+}
+
+export function buildGenerationPrompt(
+  templateType: TemplateType,
+  tone: ToneType,
+  length: LengthType,
+): string {
+  const config = TEMPLATE_CONFIGS[templateType];
+  const toneStr = tone === 'formal' ? '공식적이고 전문적인 어투' : '친근하고 명확한 어투';
+  const lengthStr = length === 'short' ? '간결하게 (섹션당 2~3문장)' : length === 'long' ? '풍부하게 (섹션당 5~7문장)' : '적당하게 (섹션당 3~5문장)';
+  return `템플릿: ${config.name} | 포커스: ${config.focus} | 어투: ${toneStr} | 분량: ${lengthStr}`;
 }
 
 // ─── Markdown 렌더링 ───

@@ -1,5 +1,6 @@
 /**
  * Sprint 58: 사업계획서 초안 자동 생성 서비스 (F180)
+ * Sprint 215: F445 — 템플릿 파라미터 지원 추가
  */
 
 import type { AgentRunner } from "../../agent/services/agent-runner.js";
@@ -7,7 +8,10 @@ import type { DiscoveryCriterion } from "../../discovery/services/discovery-crit
 import type { AnalysisContext } from "../../discovery/services/analysis-context.js";
 import type { BizItem, EvaluationWithScores } from "../../discovery/services/biz-item-service.js";
 import type { StartingPointType } from "../../discovery/services/analysis-paths.js";
-import { mapDataToSections, renderBpMarkdown, type BpDataBundle } from "./business-plan-template.js";
+import {
+  mapDataToSections, renderBpMarkdown, getTemplateSections, buildGenerationPrompt,
+  type BpDataBundle, type TemplateType, type ToneType, type LengthType,
+} from "./business-plan-template.js";
 
 export interface BpGenerationInput {
   bizItemId: string;
@@ -19,6 +23,10 @@ export interface BpGenerationInput {
   trendReport: BpDataBundle["trendReport"];
   prdContent: string | null;
   skipLlmRefine?: boolean;
+  // F445: 템플릿 파라미터
+  templateType?: TemplateType;
+  tone?: ToneType;
+  length?: LengthType;
 }
 
 export interface BusinessPlanDraft {
@@ -111,6 +119,10 @@ export class BusinessPlanGeneratorService {
   }
 
   buildTemplate(input: BpGenerationInput): string {
+    const templateType = input.templateType ?? 'internal';
+    const tone = input.tone ?? 'formal';
+    const length = input.length ?? 'medium';
+
     const bundle: BpDataBundle = {
       bizItem: input.bizItem,
       classification: input.bizItem.classification,
@@ -121,10 +133,22 @@ export class BusinessPlanGeneratorService {
       trendReport: input.trendReport,
       prdContent: input.prdContent,
     };
-    const sectionContents = mapDataToSections(bundle);
+    const allSectionContents = mapDataToSections(bundle);
+
+    // 템플릿별 섹션 필터링
+    const templateSections = getTemplateSections(templateType);
+    const filteredContents = new Map<number, string>();
+    for (const sec of templateSections) {
+      filteredContents.set(sec.section, allSectionContents.get(sec.section) ?? `*${sec.description}*`);
+    }
+
+    // 템플릿 파라미터를 제목에 포함 (LLM 리파인 시 참고용)
+    const templateNote = buildGenerationPrompt(templateType, tone, length);
+    const titleWithTemplate = `${input.bizItem.title} [${templateNote}]`;
+
     return renderBpMarkdown(
-      { title: input.bizItem.title, description: input.bizItem.description },
-      sectionContents,
+      { title: titleWithTemplate, description: input.bizItem.description },
+      filteredContents,
     );
   }
 
