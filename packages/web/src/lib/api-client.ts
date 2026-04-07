@@ -1704,6 +1704,62 @@ export async function fetchBdpLatest(bizItemId: string): Promise<BdpVersion> {
   return fetchApi(`/bdp/${bizItemId}`);
 }
 
+// ─── Sprint 212: F440 기획서 생성 + F438 분석 실행 APIs ───
+
+export interface BusinessPlanResult {
+  id: string;
+  bizItemId: string;
+  versionNum: number;
+  content: string;
+  createdAt: string;
+}
+
+export async function generateBusinessPlan(bizItemId: string): Promise<BusinessPlanResult> {
+  return postApi(`/biz-items/${bizItemId}/generate-business-plan`, {});
+}
+
+export interface StartingPointResult {
+  startingPointType: string;
+  reason: string;
+  confidence: number;
+}
+
+export async function analyzeStartingPoint(bizItemId: string): Promise<StartingPointResult> {
+  return postApi(`/biz-items/${bizItemId}/starting-point`, {});
+}
+
+export interface ClassifyResult {
+  discoveryType: string;
+  industry: string | null;
+  targetScale: string | null;
+  reason: string;
+}
+
+export async function classifyBizItem(bizItemId: string): Promise<ClassifyResult> {
+  return postApi(`/biz-items/${bizItemId}/classify`, {});
+}
+
+export interface EvaluateResult {
+  personas: Array<{ name: string; score: number; feedback: string }>;
+  overallScore: number;
+  summary: string;
+}
+
+export async function evaluateBizItem(bizItemId: string): Promise<EvaluateResult> {
+  return postApi(`/biz-items/${bizItemId}/evaluate`, {});
+}
+
+export interface ShapingArtifacts {
+  businessPlan: { versionNum: number; createdAt: string } | null;
+  offering: { id: string; status: string } | null;
+  prd: { versionNum: number } | null;
+  prototype: { id: string } | null;
+}
+
+export async function getShapingArtifacts(bizItemId: string): Promise<ShapingArtifacts> {
+  return fetchApi(`/biz-items/${bizItemId}/shaping-artifacts`);
+}
+
 // ─── Sprint 88: Org Shared Data (F253) ───
 
 export interface OrgSharedBmcItem {

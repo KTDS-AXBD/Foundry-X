@@ -1,56 +1,81 @@
 /**
- * E2E: Discovery Detail Advanced (F316) — 상세 페이지 심화 시나리오
- * 프로세스 진행률, 산출물 목록, 네비게이션
+ * E2E: Discovery Detail Advanced — F439 아이템 허브 3탭 + F440 기획서 생성
+ * F439: 기본정보/발굴분석/형상화 탭 전환
+ * F440: 기획서 생성 CTA → 로딩 → 결과 열람
+ *
+ * Note: F316(F400) 기존 상세 테스트는 3탭 허브로 재구축됨 (Sprint 212)
  */
 import { test, expect } from "./fixtures/auth";
 
 // @service: foundry-x
-// @sprint: 187
-// @tagged-by: F400
-import { makeArtifact } from "./fixtures/mock-factory";
+// @sprint: 212
+// @tagged-by: F439 F440
 
 const MOCK_BIZ_ITEM_DETAIL = {
   id: "biz-1",
   title: "AI 문서 자동화",
   description: "문서 자동 분류 및 요약 서비스",
   discoveryType: "I",
-  status: "discovery",
-  source: "internal",
+  status: "analyzed",
+  source: "wizard",
   orgId: "test-org-e2e",
   authorId: "test-user-id",
+  classification: null,
+  createdBy: "test-user-id",
   createdAt: "2026-03-20T00:00:00Z",
   updatedAt: "2026-03-30T00:00:00Z",
 };
 
-const MOCK_PROGRESS = {
-  stages: [
-    { stage: "2-0", stageName: "아이디어 분류", status: "completed", updatedAt: "2026-03-25T00:00:00Z" },
-    { stage: "2-1", stageName: "사업 적합성", status: "completed", updatedAt: "2026-03-26T00:00:00Z" },
-    { stage: "2-2", stageName: "시장 트렌드", status: "completed", updatedAt: "2026-03-27T00:00:00Z" },
-    { stage: "2-3", stageName: "경쟁 분석", status: "in_progress", updatedAt: "2026-03-28T00:00:00Z" },
-    { stage: "2-4", stageName: "고객 니즈", status: "pending", updatedAt: null },
-    { stage: "2-5", stageName: "Commit Gate", status: "pending", updatedAt: null },
-    { stage: "2-6", stageName: "기술 타당성", status: "pending", updatedAt: null },
-    { stage: "2-7", stageName: "파일럿 설계", status: "pending", updatedAt: null },
-    { stage: "2-8", stageName: "패키징", status: "pending", updatedAt: null },
-    { stage: "2-9", stageName: "AI 평가", status: "pending", updatedAt: null },
-    { stage: "2-10", stageName: "최종 보고서", status: "pending", updatedAt: null },
-  ],
-  currentStage: "2-3",
-  completedCount: 3,
-  totalCount: 11,
+const MOCK_SHAPING_ARTIFACTS_EMPTY = {
+  businessPlan: null,
+  offering: null,
+  prd: null,
+  prototype: null,
 };
 
-const MOCK_ARTIFACTS = {
-  items: [
-    makeArtifact({ id: "art-1", stageId: "2-0", skillId: "idea-classifier", outputText: "## 아이디어 분류\nI: 아이디어형" }),
-    makeArtifact({ id: "art-2", stageId: "2-1", skillId: "feasibility-study", outputText: "## 타당성\n시장 규모 1조원" }),
-    makeArtifact({ id: "art-3", stageId: "2-2", skillId: "market-trend", outputText: "## 트렌드\nAI 문서 자동화 성장세" }),
-  ],
-  total: 3,
+const MOCK_SHAPING_ARTIFACTS_WITH_PLAN = {
+  businessPlan: { versionNum: 1, createdAt: "2026-04-07T00:00:00Z" },
+  offering: null,
+  prd: null,
+  prototype: null,
 };
 
-function setupDetailMocks(page: import("@playwright/test").Page) {
+const MOCK_CRITERIA_PROGRESS = {
+  total: 9,
+  completed: 3,
+  gateStatus: "warning",
+  criteria: [
+    { id: "c1", name: "고객 문제 정의", condition: "고객 페인포인트를 명확히 정의했나요?", status: "completed" },
+    { id: "c2", name: "시장 규모 추정", condition: "TAM/SAM/SOM을 추정했나요?", status: "completed" },
+    { id: "c3", name: "핵심 가정 도출", condition: "핵심 가정을 도출했나요?", status: "in_progress" },
+    { id: "c4", name: "경쟁사 분석", condition: "경쟁사를 분석했나요?", status: "pending" },
+  ],
+};
+
+const MOCK_NEXT_GUIDE = {
+  step: "2-3",
+  description: "경쟁사 분석을 진행해 주세요.",
+};
+
+const MOCK_BDP = {
+  id: "bdp-1",
+  bizItemId: "biz-1",
+  versionNum: 1,
+  content: "# AI 문서 자동화 사업기획서\n\n## 개요\n본 사업은 문서 자동 분류 및 요약 서비스입니다.",
+  isFinal: false,
+  createdBy: "test-user-id",
+  createdAt: "2026-04-07T00:00:00Z",
+};
+
+const MOCK_GENERATE_RESULT = {
+  id: "bdp-1",
+  bizItemId: "biz-1",
+  versionNum: 1,
+  content: "# AI 문서 자동화 사업기획서\n\n## 개요\n본 사업은 문서 자동 분류 및 요약 서비스입니다.",
+  createdAt: "2026-04-07T00:00:00Z",
+};
+
+function setupDetailMocks(page: import("@playwright/test").Page, withPlan = false) {
   return Promise.all([
     page.evaluate(() => {
       localStorage.setItem("fx-discovery-tour-completed", "true");
@@ -69,25 +94,24 @@ function setupDetailMocks(page: import("@playwright/test").Page) {
     }),
     page.route("**/api/biz-items", (route) => {
       if (route.request().method() === "GET") {
-        return route.fulfill({
-          json: {
-            items: [MOCK_BIZ_ITEM_DETAIL],
-            total: 1,
-            page: 1,
-            limit: 20,
-          },
-        });
+        return route.fulfill({ json: { items: [MOCK_BIZ_ITEM_DETAIL], total: 1, page: 1, limit: 20 } });
       }
       return route.continue();
     }),
+    page.route("**/api/biz-items/biz-1/shaping-artifacts", (route) =>
+      route.fulfill({ json: withPlan ? MOCK_SHAPING_ARTIFACTS_WITH_PLAN : MOCK_SHAPING_ARTIFACTS_EMPTY }),
+    ),
+    page.route("**/api/biz-items/biz-1/discovery-criteria", (route) =>
+      route.fulfill({ json: MOCK_CRITERIA_PROGRESS }),
+    ),
+    page.route("**/api/biz-items/biz-1/next-guide", (route) =>
+      route.fulfill({ json: MOCK_NEXT_GUIDE }),
+    ),
     page.route("**/api/biz-items/biz-1/discovery-progress", (route) =>
-      route.fulfill({ json: MOCK_PROGRESS }),
+      route.fulfill({ json: { stages: [], currentStage: null, completedCount: 0, totalCount: 0 } }),
     ),
-    page.route("**/api/ax-bd/artifacts*", (route) =>
-      route.fulfill({ json: MOCK_ARTIFACTS }),
-    ),
-    page.route("**/api/ax-bd/biz-items/*/artifacts*", (route) =>
-      route.fulfill({ json: MOCK_ARTIFACTS }),
+    page.route("**/api/bdp/biz-1", (route) =>
+      route.fulfill({ json: withPlan ? MOCK_BDP : { error: "not found" }, status: withPlan ? 200 : 404 }),
     ),
     page.route("**/api/help-agent/**", (route) =>
       route.fulfill({ json: { content: "mock" } }),
@@ -95,78 +119,147 @@ function setupDetailMocks(page: import("@playwright/test").Page) {
   ]);
 }
 
-test.describe("Discovery Detail Advanced (F316)", () => {
-  test("프로세스 진행률 바 + 완료 카운트 표시", async ({
-    authenticatedPage: page,
-  }) => {
+test.describe("F439 — 아이템 상세 허브 3탭", () => {
+  test("헤더에 제목, 유형 뱃지, 상태 뱃지 표시", async ({ authenticatedPage: page }) => {
     await setupDetailMocks(page);
     await page.goto("/discovery/items/biz-1");
 
-    // 제목 확인
     await expect(page.getByText("AI 문서 자동화").first()).toBeVisible({ timeout: 10000 });
-
-    // Type 배지 확인
-    await expect(page.getByText("Type I")).toBeVisible();
-
-    // 프로세스 진행률 영역 확인
-    await expect(page.getByText("프로세스 진행률")).toBeVisible();
-
-    // 완료 카운트 "3/11 단계 완료"
-    await expect(page.getByText("3/11 단계 완료")).toBeVisible();
+    // 유형 뱃지 — "I — 아이디어형"
+    await expect(page.getByText(/아이디어형/).first()).toBeVisible();
+    // 상태 뱃지 — "분석 완료"
+    await expect(page.getByText("분석 완료").first()).toBeVisible();
   });
 
-  test("산출물 목록 표시", async ({
-    authenticatedPage: page,
-  }) => {
+  test("기본정보 탭 — 제목/설명/출처/등록일 표시", async ({ authenticatedPage: page }) => {
     await setupDetailMocks(page);
     await page.goto("/discovery/items/biz-1");
 
-    // 제목 로딩 대기
     await expect(page.getByText("AI 문서 자동화").first()).toBeVisible({ timeout: 10000 });
 
-    // 산출물 섹션 헤딩
-    await expect(page.getByText("산출물").first()).toBeVisible();
+    // 기본정보 탭이 기본 활성
+    const infoTab = page.getByRole("tab", { name: "기본정보" });
+    await expect(infoTab).toBeVisible();
 
-    // 산출물이 3건 렌더링됨 — stageId나 skillId 기반 텍스트 확인
-    // ArtifactList 컴포넌트가 어떻게 렌더링하는지에 따라 검증
-    const artifactSection = page.getByText("산출물").first().locator("..");
-    await expect(artifactSection).toBeVisible();
+    // 설명 텍스트
+    await expect(page.getByText("문서 자동 분류 및 요약 서비스")).toBeVisible();
+    // 출처
+    await expect(page.getByText("wizard")).toBeVisible();
   });
 
-  test("뒤로가기 링크 → /discovery/items 이동", async ({
-    authenticatedPage: page,
-  }) => {
+  test("발굴분석 탭 클릭 → 분석 스텝퍼 + 9기준 체크리스트 표시", async ({ authenticatedPage: page }) => {
     await setupDetailMocks(page);
+    await page.goto("/discovery/items/biz-1");
 
-    // /discovery/items에 대한 mock도 설정 (이동 후 페이지 로딩용)
-    await page.route("**/api/biz-items", (route) => {
-      if (route.request().method() === "GET") {
-        return route.fulfill({
-          json: {
-            items: [MOCK_BIZ_ITEM_DETAIL],
-            total: 1,
-            page: 1,
-            limit: 20,
-          },
-        });
-      }
-      return route.continue();
-    });
+    await expect(page.getByText("AI 문서 자동화").first()).toBeVisible({ timeout: 10000 });
+
+    // 발굴분석 탭 클릭
+    await page.getByRole("tab", { name: "발굴분석" }).click();
+
+    // 분석 스텝퍼 헤딩
+    await expect(page.getByText("발굴 분석 실행")).toBeVisible();
+    // 분석 시작 버튼
+    await expect(page.getByRole("button", { name: "분석 시작" })).toBeVisible();
+    // 9기준 체크리스트 헤딩
+    await expect(page.getByText("발굴 9기준 체크리스트")).toBeVisible();
+    // 완료 수 표시 — "3 / 9 기준 완료"
+    await expect(page.getByText(/3\s*\/\s*9\s*기준\s*완료/)).toBeVisible();
+  });
+
+  test("형상화 탭 클릭 → 파이프라인 표시 (기획서 미생성 상태)", async ({ authenticatedPage: page }) => {
+    await setupDetailMocks(page, false);
+    await page.goto("/discovery/items/biz-1");
+
+    await expect(page.getByText("AI 문서 자동화").first()).toBeVisible({ timeout: 10000 });
+
+    // 형상화 탭 클릭
+    await page.getByRole("tab", { name: "형상화" }).click();
+
+    // 파이프라인 헤딩
+    await expect(page.getByText("형상화 파이프라인")).toBeVisible();
+    // 사업기획서 단계
+    await expect(page.getByText("사업기획서").first()).toBeVisible();
+    // 생성하기 버튼 (기획서 미생성)
+    await expect(page.getByRole("button", { name: "생성하기" }).first()).toBeVisible();
+    // Offering은 잠김
+    await expect(page.getByText("Offering").first()).toBeVisible();
+  });
+
+  test("뒤로가기 링크 → /discovery 이동", async ({ authenticatedPage: page }) => {
+    await setupDetailMocks(page);
+    await page.route("**/api/biz-items", (route) =>
+      route.fulfill({ json: { items: [MOCK_BIZ_ITEM_DETAIL], total: 1, page: 1, limit: 20 } }),
+    );
     await page.route("**/api/ax-bd/viability/traffic-light/**", (route) =>
-      route.fulfill({
-        json: { overallSignal: "green", summary: { go: 3, pivot: 1, drop: 0 } },
-      }),
+      route.fulfill({ json: { overallSignal: "green", summary: { go: 3, pivot: 1, drop: 0 } } }),
     );
 
     await page.goto("/discovery/items/biz-1");
     await expect(page.getByText("AI 문서 자동화").first()).toBeVisible({ timeout: 10000 });
 
-    // ArrowLeft 뒤로가기 링크 — 사이드바에도 같은 href가 있으므로 .last() 사용
-    const backLink = page.locator("a[href='/discovery/items']").last();
+    // 돌아가기 링크
+    const backLink = page.locator("a[href='/discovery']").first();
     if (await backLink.isVisible()) {
       await backLink.click();
-      // /discovery/items 로 이동 확인
-      await expect(page).toHaveURL(/\/discovery\/items/);
+      await expect(page).toHaveURL(/\/discovery/);
     }
+  });
+});
+
+test.describe("F440 — 사업기획서 생성 + 열람", () => {
+  test("형상화 탭에서 생성하기 클릭 → 기획서 생성 후 BusinessPlanViewer 표시", async ({ authenticatedPage: page }) => {
+    await setupDetailMocks(page, false);
+
+    // 기획서 생성 API mock
+    await page.route("**/api/biz-items/biz-1/generate-business-plan", (route) => {
+      if (route.request().method() === "POST") {
+        return route.fulfill({ json: MOCK_GENERATE_RESULT });
+      }
+      return route.continue();
+    });
+
+    // 생성 후 shaping-artifacts 재조회 → 기획서 있음
+    let artifactCallCount = 0;
+    await page.route("**/api/biz-items/biz-1/shaping-artifacts", (route) => {
+      artifactCallCount++;
+      return route.fulfill({
+        json: artifactCallCount > 1 ? MOCK_SHAPING_ARTIFACTS_WITH_PLAN : MOCK_SHAPING_ARTIFACTS_EMPTY,
+      });
+    });
+
+    // BDP 조회 (생성 후)
+    await page.route("**/api/bdp/biz-1", (route) =>
+      route.fulfill({ json: MOCK_BDP }),
+    );
+
+    await page.goto("/discovery/items/biz-1");
+    await expect(page.getByText("AI 문서 자동화").first()).toBeVisible({ timeout: 10000 });
+
+    // 형상화 탭 클릭
+    await page.getByRole("tab", { name: "형상화" }).click();
+    await expect(page.getByText("형상화 파이프라인")).toBeVisible();
+
+    // 생성하기 버튼 클릭
+    const generateBtn = page.getByRole("button", { name: "생성하기" }).first();
+    await expect(generateBtn).toBeVisible();
+    await generateBtn.click();
+
+    // 기획서 콘텐츠 표시
+    await expect(page.getByText(/AI 문서 자동화 사업기획서/).first()).toBeVisible({ timeout: 15000 });
+  });
+
+  test("기획서 있는 경우 형상화 탭에 BusinessPlanViewer 바로 표시", async ({ authenticatedPage: page }) => {
+    await setupDetailMocks(page, true);
+
+    await page.goto("/discovery/items/biz-1");
+    await expect(page.getByText("AI 문서 자동화").first()).toBeVisible({ timeout: 10000 });
+
+    // 형상화 탭
+    await page.getByRole("tab", { name: "형상화" }).click();
+
+    // 기획서 뷰어 — v1 뱃지
+    await expect(page.getByText("v1")).toBeVisible({ timeout: 10000 });
+    // 재생성 버튼
+    await expect(page.getByRole("button", { name: "재생성" })).toBeVisible();
   });
 });
