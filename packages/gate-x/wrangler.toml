@@ -13,6 +13,26 @@ migrations_dir = "src/db/migrations"
 [vars]
 ENVIRONMENT = "production"
 
+# Durable Objects — O-G-D 파이프라인 job 상태 관리 (F404 PoC)
+[[durable_objects.bindings]]
+name = "OGD_COORDINATOR"
+class_name = "OgdCoordinator"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["OgdCoordinator"]
+
+# Queues producer — O-G-D 비동기 phase 메시지 발행 (F404 PoC)
+[[queues.producers]]
+binding = "OGD_QUEUE"
+queue = "gate-x-ogd-queue"
+
+# Queues consumer — O-G-D phase 처리 (F404 PoC)
+[[queues.consumers]]
+queue = "gate-x-ogd-queue"
+max_batch_size = 5
+max_batch_timeout = 30
+
 [env.dev]
 name = "gate-x-api-dev"
 
