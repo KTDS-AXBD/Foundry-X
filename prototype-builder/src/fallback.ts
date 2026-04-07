@@ -5,6 +5,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { PrototypeJob } from './types.js';
 import { buildGeneratorPrompt } from './executor.js';
+import { BuildQueue } from './build-queue.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -309,23 +310,28 @@ export async function runMaxCli(
     '--output-format', 'json',
   ];
 
+  const MAX_CLI_TIMEOUT = 5 * 60 * 1000; // 5분
   let retryCount = 0;
 
   try {
-    const stdout = await retryWithBackoff(
-      async () => {
-        const result = await execFileAsync(cliPath, args, {
-          cwd: job.workDir,
-          timeout: 5 * 60 * 1000,  // 5분
-          env: { ...process.env },  // ANTHROPIC_API_KEY 불필요 (구독 인증)
-        });
-        return result.stdout;
-      },
-      {
-        maxRetries: options.maxRetries ?? 3,
-        initialDelayMs: options.retryDelayMs ?? 1000,
-        onRetry: (attempt) => { retryCount = attempt; },
-      },
+    // F429: BuildQueue로 래핑 — 단일 머신에서 max-cli 동시 실행 방지
+    const stdout = await BuildQueue.getInstance().enqueue(
+      () => retryWithBackoff(
+        async () => {
+          const result = await execFileAsync(cliPath, args, {
+            cwd: job.workDir,
+            timeout: MAX_CLI_TIMEOUT,
+            env: { ...process.env },  // ANTHROPIC_API_KEY 불필요 (구독 인증)
+          });
+          return result.stdout;
+        },
+        {
+          maxRetries: options.maxRetries ?? 3,
+          initialDelayMs: options.retryDelayMs ?? 1000,
+          onRetry: (attempt) => { retryCount = attempt; },
+        },
+      ),
+      { label: `${job.id}-round${round}`, timeoutMs: MAX_CLI_TIMEOUT + 10_000 },
     );
 
     const filesWritten = await writeGeneratedFiles(stdout, job.workDir);
