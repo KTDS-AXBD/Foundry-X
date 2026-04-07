@@ -1771,6 +1771,21 @@ export async function fetchBusinessPlanVersions(bizItemId: string): Promise<Arra
   return data.versions;
 }
 
+// F446: 사업기획서 내보내기 (Sprint 216)
+export async function exportBusinessPlanPptx(bizItemId: string): Promise<Blob> {
+  const url = `${BASE_URL}/biz-items/${bizItemId}/business-plan/export?format=pptx`;
+  const res = await requestWithRetry(url, { headers: getAuthHeaders() }, false);
+  if (!res.ok) throw new ApiError(res.status, "PPTX 내보내기 실패");
+  return res.blob();
+}
+
+export async function exportBusinessPlanHtml(bizItemId: string): Promise<string> {
+  const url = `${BASE_URL}/biz-items/${bizItemId}/business-plan/export?format=html`;
+  const res = await requestWithRetry(url, { headers: getAuthHeaders() }, false);
+  if (!res.ok) throw new ApiError(res.status, "HTML 내보내기 실패");
+  return res.text();
+}
+
 export interface StartingPointResult {
   startingPointType: string;
   reason: string;

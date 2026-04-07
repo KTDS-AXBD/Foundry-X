@@ -17,12 +17,12 @@ export {
   axBdProgressRoute, personaConfigsRoute, personaEvalsRoute,
 } from "./shaping/index.js";
 
-// Offering Pipeline — 11 routes (Sprint 215: businessPlanRoute 추가)
+// Offering Pipeline — 12 routes (Sprint 216: businessPlanExportRoute 추가)
 export {
   offeringsRoute, offeringSectionsRoute, offeringExportRoute,
   offeringValidateRoute, offeringMetricsRoute, offeringPrototypeRoute,
   designTokensRoute, contentAdapterRoute, bdpRoute, methodologyRoute,
-  businessPlanRoute,
+  businessPlanRoute, businessPlanExportRoute,
 } from "./offering/index.js";
 
 // Agent/Orchestration — 13 routes
