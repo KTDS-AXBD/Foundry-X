@@ -1,5 +1,8 @@
 // ─── F355: O-G-D Generator Service (Sprint 160) ───
 // PRD → HTML 프로토타입 생성 (Haiku 모델 기반)
+// F423: impeccable 디자인 스킬 통합 (Sprint 203)
+
+import { getImpeccableReference } from "../../../data/impeccable-reference.js";
 
 interface GenerateResult {
   html: string;
@@ -18,12 +21,20 @@ export class OgdGeneratorService {
     prdContent: string,
     previousFeedback?: string,
   ): Promise<GenerateResult> {
+    const designReference = getImpeccableReference();
+
     const systemPrompt = [
       "You are a prototype HTML generator.",
       "Generate a complete, self-contained single-page HTML prototype based on the PRD below.",
-      "Include inline CSS and minimal JS. Use modern, clean design.",
+      "Include inline CSS and minimal JS.",
       "Output ONLY the HTML — no markdown fences, no explanations.",
-    ].join(" ");
+      "",
+      "=== DESIGN QUALITY GUIDELINES ===",
+      "Apply the following professional design principles when generating HTML:",
+      "",
+      designReference,
+      "=== END DESIGN GUIDELINES ===",
+    ].join("\n");
 
     let userPrompt = `PRD:\n${prdContent}`;
     if (previousFeedback) {

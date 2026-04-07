@@ -82,6 +82,16 @@ export class OgdDiscriminatorService {
     items.push("반응형 레이아웃이 적용되어 있다");
     items.push("시각적 계층 구조가 명확하다");
 
+    // F424: 디자인 안티패턴 차단 — 항상 적용 (PRD 내용과 무관)
+    items.push("과용 폰트(Arial, Inter, system-ui) 대신 전문 폰트 또는 Google Fonts를 사용한다");
+    items.push("순수 흑색(#000000)을 피하고 약간의 채도가 있는 tinted neutral을 사용한다");
+    items.push("순수 회색(#808080, #999999)을 피하고 채도 있는 색상 팔레트를 사용한다");
+    items.push("텍스트와 배경의 명도 대비가 충분하여 가독성이 높다");
+    items.push("카드 안에 카드를 중첩하는 패턴을 사용하지 않는다");
+    items.push("h1, h2 또는 크기가 다른 텍스트로 타이포그래피 계층 구조가 명확하다");
+    items.push("모바일 화면을 위한 미디어 쿼리(@media)가 적용되어 있다");
+    items.push("섹션과 요소 사이에 충분한 여백(padding/margin)으로 호흡감이 있다");
+
     // PRD 키워드 기반 추가 체크
     if (prdContent.includes("대시보드") || prdContent.includes("dashboard")) {
       items.push("데이터 시각화 요소(차트/테이블)가 존재한다");
