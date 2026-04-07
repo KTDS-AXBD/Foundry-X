@@ -1,4 +1,5 @@
 import type { GateEnv } from "../env.js";
+import { callLLM } from "../services/llm/index.js";
 
 export interface OgdQueueMessage {
   jobId: string;
@@ -25,8 +26,16 @@ export const ogdQueueWorker = {
         // 2. DO 상태 → RUNNING
         await stub.fetch(new Request("http://do/start", { method: "POST" }));
 
-        // 3. LLM 호출 stub (실제 호출 대신 단순 결과 생성)
-        const phaseResult = `Phase ${phase + 1} result for evaluation ${evaluationId} (org: ${orgId})`;
+        // 3. LLM 호출 (O-G-D 파이프라인 phase 실행)
+        const llmResp = await callLLM(
+          {
+            system: 'You are an AX BD evaluation assistant.',
+            prompt: `Evaluate phase ${phase + 1} of O-G-D pipeline for evaluation ID: ${evaluationId} (org: ${orgId}). Provide a concise assessment.`,
+            maxTokens: 500,
+          },
+          env,
+        );
+        const phaseResult = llmResp.text;
 
         const isLastPhase = phase + 1 >= maxPhases;
 

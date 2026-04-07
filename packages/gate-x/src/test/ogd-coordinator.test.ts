@@ -95,7 +95,7 @@ describe("OgdCoordinator", () => {
     const c = makeCoordinator();
     await req(c, "POST", "/init", { id: "j", evaluationId: "e", orgId: "o", maxPhases: 3 });
     const { body } = await req(c, "GET", "/job");
-    expect((body as OgdJob).id).toBe("j");
-    expect((body as OgdJob).status).toBe("PENDING");
+    expect((body as unknown as OgdJob).id).toBe("j");
+    expect((body as unknown as OgdJob).status).toBe("PENDING");
   });
 });

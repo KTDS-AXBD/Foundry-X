@@ -7,6 +7,9 @@ export interface GateEnv extends HarnessEnv {
   JWT_SECRET: string;
   CACHE?: KVNamespace;
   ANTHROPIC_API_KEY?: string;
+  OPENAI_API_KEY?: string;
+  GOOGLE_AI_API_KEY?: string;
+  LLM_PROVIDER_ORDER?: string;
   ENVIRONMENT?: string;
   /** Cloudflare Queue — O-G-D 파이프라인 비동기 처리 (F404 PoC) */
   OGD_QUEUE: Queue<OgdQueueMessage>;
