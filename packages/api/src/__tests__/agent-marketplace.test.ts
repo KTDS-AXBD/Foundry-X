@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { AgentMarketplace } from "../services/agent-marketplace.js";
+import { AgentMarketplace } from "../core/agent/services/agent-marketplace.js";
 
 const CUSTOM_ROLES_DDL = `
   CREATE TABLE IF NOT EXISTS custom_agent_roles (

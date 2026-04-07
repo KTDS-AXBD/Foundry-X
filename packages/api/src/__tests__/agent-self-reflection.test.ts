@@ -2,12 +2,12 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   AgentSelfReflection,
   type ReflectionMetadata,
-} from "../services/agent-self-reflection.js";
+} from "../core/agent/services/agent-self-reflection.js";
 import type {
   AgentExecutionRequest,
   AgentExecutionResult,
-} from "../services/execution-types.js";
-import type { AgentRunner } from "../services/agent-runner.js";
+} from "../core/agent/services/execution-types.js";
+import type { AgentRunner } from "../core/agent/services/agent-runner.js";
 
 function makeRequest(overrides?: Partial<AgentExecutionRequest>): AgentExecutionRequest {
   return {

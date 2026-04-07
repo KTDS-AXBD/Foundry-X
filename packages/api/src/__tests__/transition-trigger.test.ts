@@ -1,10 +1,10 @@
 // ─── F334: TransitionTrigger 테스트 (Sprint 149) ───
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { TransitionTrigger } from "../services/transition-trigger.js";
+import { TransitionTrigger } from "../core/harness/services/transition-trigger.js";
 import { EventBus } from "../services/event-bus.js";
 import { TaskState, createTaskEvent } from "@foundry-x/shared";
-import type { TaskStateService } from "../services/task-state-service.js";
+import type { TaskStateService } from "../core/agent/services/task-state-service.js";
 import type { TaskStateRecord, HookEventPayload, CIEventPayload, ManualEventPayload } from "@foundry-x/shared";
 
 function makeTaskStateService(currentState: TaskState | null) {

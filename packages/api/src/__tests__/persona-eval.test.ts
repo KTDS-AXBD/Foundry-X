@@ -2,11 +2,11 @@
  * Sprint 155 F344+F345: 멀티 페르소나 평가 API 테스트
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { PersonaConfigService } from "../services/persona-config-service.js";
-import { PersonaEvalService } from "../services/persona-eval-service.js";
-import { DEMO_EVAL_DATA, getDemoFinalResult } from "../services/persona-eval-demo.js";
-import { StartEvalSchema, ScoresSchema, VerdictEnum } from "../schemas/persona-eval.js";
-import { WeightsSchema, PersonaConfigSchema, UpsertPersonaConfigsSchema } from "../schemas/persona-config.js";
+import { PersonaConfigService } from "../core/shaping/services/persona-config-service.js";
+import { PersonaEvalService } from "../core/shaping/services/persona-eval-service.js";
+import { DEMO_EVAL_DATA, getDemoFinalResult } from "../core/shaping/services/persona-eval-demo.js";
+import { StartEvalSchema, ScoresSchema, VerdictEnum } from "../core/shaping/schemas/persona-eval.js";
+import { WeightsSchema, PersonaConfigSchema, UpsertPersonaConfigsSchema } from "../core/shaping/schemas/persona-config.js";
 
 // ─── Mock DB ───
 

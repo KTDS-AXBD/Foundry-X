@@ -5,9 +5,9 @@ import {
   DEFAULT_MODEL_MAP,
   toRoutingRule,
   type RoutingRule,
-} from "../services/model-router.js";
-import { createRoutedRunner, createAgentRunner } from "../services/agent-runner.js";
-import type { AgentTaskType } from "../services/execution-types.js";
+} from "../core/agent/services/model-router.js";
+import { createRoutedRunner, createAgentRunner } from "../core/agent/services/agent-runner.js";
+import type { AgentTaskType } from "../core/agent/services/execution-types.js";
 
 let env: ReturnType<typeof createTestEnv>;
 

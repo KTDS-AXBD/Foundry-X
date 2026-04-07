@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { axBdPrototypesRoute } from "../routes/ax-bd-prototypes.js";
+import { axBdPrototypesRoute } from "../core/shaping/routes/ax-bd-prototypes.js";
 
 const DDL = `
   CREATE TABLE IF NOT EXISTS biz_items (

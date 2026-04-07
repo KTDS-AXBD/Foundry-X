@@ -2,7 +2,7 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { OgdDomainRegistry } from "../services/ogd-domain-registry.js";
+import { OgdDomainRegistry } from "../core/harness/services/ogd-domain-registry.js";
 import type { DomainAdapterInterface } from "@foundry-x/shared";
 
 const SCHEMA = `

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { OpenRouterService } from "../services/openrouter-service.js";
+import { OpenRouterService } from "../core/agent/services/openrouter-service.js";
 
 describe("OpenRouterService", () => {
   afterEach(() => {

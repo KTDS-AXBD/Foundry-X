@@ -1,7 +1,7 @@
 // ─── F359: GuardRailDeployService 단위 테스트 (Sprint 162) ───
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { GuardRailDeployService, DeployError } from "../services/guard-rail-deploy-service.js";
+import { GuardRailDeployService, DeployError } from "../core/harness/services/guard-rail-deploy-service.js";
 import { createMockD1 } from "./helpers/mock-d1.js";
 
 const DDL = `

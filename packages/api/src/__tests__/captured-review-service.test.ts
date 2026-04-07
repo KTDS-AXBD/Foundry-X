@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { CapturedReviewService } from "../services/captured-review.js";
+import { CapturedReviewService } from "../core/agent/services/captured-review.js";
 
 const CAPTURED_TABLES = `
 CREATE TABLE IF NOT EXISTS captured_workflow_patterns (

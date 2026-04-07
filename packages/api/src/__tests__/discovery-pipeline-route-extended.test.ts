@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { discoveryPipelineRoute } from "../routes/discovery-pipeline.js";
+import { discoveryPipelineRoute } from "../core/discovery/routes/discovery-pipeline.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createTestApp(db: any) {

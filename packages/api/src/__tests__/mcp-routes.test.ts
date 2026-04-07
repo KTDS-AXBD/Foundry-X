@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
-import mcpApp from "../routes/mcp.js";
+import mcpApp from "../core/harness/routes/mcp.js";
 import { createTestEnv } from "./helpers/test-app.js";
 
 // Mock mcp-transport and mcp-runner (Worker 1 creates these)
-vi.mock("../services/mcp-transport.js", () => ({
+vi.mock("../core/agent/services/mcp-transport.js", () => ({
   createTransport: vi.fn(() => ({
     type: "sse",
     connect: vi.fn(),
@@ -12,7 +12,7 @@ vi.mock("../services/mcp-transport.js", () => ({
   })),
 }));
 
-vi.mock("../services/mcp-runner.js", () => ({
+vi.mock("../core/agent/services/mcp-runner.js", () => ({
   McpRunner: vi.fn().mockImplementation(() => ({
     listTools: vi.fn().mockResolvedValue([
       { name: "foundry_code_review", description: "Review code" },

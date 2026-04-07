@@ -7,7 +7,7 @@ import {
   clearRegistry,
   type MethodologyModule,
   type MethodologyRegistryEntry,
-} from "../services/methodology-types.js";
+} from "../core/offering/services/methodology-types.js";
 
 function createMockModule(id: string, name: string, baseScore: number): MethodologyModule {
   return {

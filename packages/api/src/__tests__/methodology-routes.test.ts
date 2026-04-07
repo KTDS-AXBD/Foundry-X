@@ -4,11 +4,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { app } from "../app.js";
 import { createTestEnv, createAuthHeaders } from "./helpers/test-app.js";
-import { MethodologyRegistry } from "../services/methodology-registry.js";
-import type { MethodologyModule } from "../services/methodology-module.js";
+import { MethodologyRegistry } from "../core/offering/services/methodology-registry.js";
+import type { MethodologyModule } from "../core/offering/services/methodology-module.js";
 
 // Mock agent-runner (avoid LLM calls)
-vi.mock("../services/agent-runner.js", () => ({
+vi.mock("../core/agent/services/agent-runner.js", () => ({
   createAgentRunner: () => ({
     type: "mock",
     execute: vi.fn().mockResolvedValue({ status: "success", output: {}, tokensUsed: 0, model: "mock", duration: 0 }),

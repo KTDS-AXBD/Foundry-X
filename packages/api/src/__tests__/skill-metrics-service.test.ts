@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { SkillMetricsService } from "../services/skill-metrics.js";
+import { SkillMetricsService } from "../core/agent/services/skill-metrics.js";
 
 const TABLES = `
 CREATE TABLE IF NOT EXISTS skill_executions (

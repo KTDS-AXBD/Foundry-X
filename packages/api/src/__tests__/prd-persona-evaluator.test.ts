@@ -5,11 +5,11 @@ import {
   EvaluationError,
   savePrdPersonaEvaluations,
   getPrdPersonaEvaluations,
-} from "../services/biz-persona-evaluator.js";
-import { buildPrdEvaluationPrompt, BIZ_PERSONAS } from "../services/biz-persona-prompts.js";
-import type { AgentRunner } from "../services/agent-runner.js";
-import type { AgentExecutionResult } from "../services/execution-types.js";
-import type { BizItem } from "../services/biz-persona-prompts.js";
+} from "../core/shaping/services/biz-persona-evaluator.js";
+import { buildPrdEvaluationPrompt, BIZ_PERSONAS } from "../core/shaping/services/biz-persona-prompts.js";
+import type { AgentRunner } from "../core/agent/services/agent-runner.js";
+import type { AgentExecutionResult } from "../core/agent/services/execution-types.js";
+import type { BizItem } from "../core/shaping/services/biz-persona-prompts.js";
 
 const TABLES_SQL = `
   CREATE TABLE IF NOT EXISTS biz_items (

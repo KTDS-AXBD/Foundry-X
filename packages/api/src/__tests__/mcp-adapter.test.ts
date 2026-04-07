@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { TASK_TYPE_TO_MCP_TOOL } from "../services/mcp-adapter.js";
-import type { McpMessage, McpResponse } from "../services/mcp-adapter.js";
+import { TASK_TYPE_TO_MCP_TOOL } from "../core/agent/services/mcp-adapter.js";
+import type { McpMessage, McpResponse } from "../core/agent/services/mcp-adapter.js";
 
 describe("MCP Adapter", () => {
   it("TASK_TYPE_TO_MCP_TOOL maps all 7 task types", () => {

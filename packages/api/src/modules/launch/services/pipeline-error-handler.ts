@@ -2,7 +2,7 @@
  * F313: PipelineErrorHandler — 에러 복구 로직 (재시도/건너뛰기/중단)
  */
 import { PipelineStateMachine } from "./pipeline-state-machine.js";
-import type { StepAction } from "../../../schemas/discovery-pipeline.js";
+import type { StepAction } from "../../../core/discovery/schemas/discovery-pipeline.js";
 
 export interface FailureResult {
   retryable: boolean;

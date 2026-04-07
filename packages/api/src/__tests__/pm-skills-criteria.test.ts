@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { PmSkillsCriteriaService, PM_SKILLS_CRITERIA } from "../services/pm-skills-criteria.js";
+import { PmSkillsCriteriaService, PM_SKILLS_CRITERIA } from "../core/discovery/services/pm-skills-criteria.js";
 
 const TABLES_SQL = `
   CREATE TABLE IF NOT EXISTS biz_items (

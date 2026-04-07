@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { SignalValuationService, DEFAULT_SIGNAL_VALUATIONS } from "../services/signal-valuation.js";
+import { SignalValuationService, DEFAULT_SIGNAL_VALUATIONS } from "../core/discovery/services/signal-valuation.js";
 
 const TABLES = `
 CREATE TABLE IF NOT EXISTS roi_signal_valuations (

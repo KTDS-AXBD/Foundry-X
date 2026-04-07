@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
 import { pipelineMonitoringRoute } from "../modules/launch/routes/pipeline-monitoring.js";
-import { discoveryPipelineRoute } from "../routes/discovery-pipeline.js";
+import { discoveryPipelineRoute } from "../core/discovery/routes/discovery-pipeline.js";
 import { PipelinePermissionService } from "../modules/launch/services/pipeline-permission-service.js";
 import { PipelineNotificationService } from "../modules/launch/services/pipeline-notification-service.js";
 

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { HelpAgentService } from "../services/help-agent-service.js";
-import { OpenRouterService } from "../services/openrouter-service.js";
+import { HelpAgentService } from "../core/agent/services/help-agent-service.js";
+import { OpenRouterService } from "../core/agent/services/openrouter-service.js";
 
 /**
  * Help Agent Route 검증 — 라우트 핸들러의 핵심 로직인

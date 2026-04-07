@@ -4,8 +4,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
 import { EventBus } from "../services/event-bus.js";
-import { DiscoveryShapePipelineService } from "../services/discovery-shape-pipeline-service.js";
-import { discoveryShapePipelineRoute } from "../routes/discovery-shape-pipeline.js";
+import { DiscoveryShapePipelineService } from "../core/discovery/services/discovery-shape-pipeline-service.js";
+import { discoveryShapePipelineRoute } from "../core/discovery/routes/discovery-shape-pipeline.js";
 import { createTaskEvent } from "@foundry-x/shared";
 import { Hono } from "hono";
 import type { Env } from "../env.js";

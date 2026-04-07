@@ -4,8 +4,8 @@ import {
   parseSimpleYaml,
   parseAgentDefinition,
   exportToYaml,
-} from "../services/agent-definition-loader.js";
-import { CustomRoleManager } from "../services/custom-role-manager.js";
+} from "../core/agent/services/agent-definition-loader.js";
+import { CustomRoleManager } from "../core/harness/services/custom-role-manager.js";
 
 const CUSTOM_ROLES_DDL = `
   CREATE TABLE IF NOT EXISTS custom_agent_roles (

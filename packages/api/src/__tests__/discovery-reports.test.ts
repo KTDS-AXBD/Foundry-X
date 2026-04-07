@@ -3,7 +3,7 @@
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { DiscoveryReportService } from "../services/discovery-report-service.js";
+import { DiscoveryReportService } from "../core/discovery/services/discovery-report-service.js";
 
 describe("DiscoveryReportService", () => {
   let db: ReturnType<typeof createMockD1>;

@@ -10,7 +10,7 @@ import {
   STAGE_NAMES,
   type DiscoveryType,
   type Stage,
-} from "../services/analysis-path-v82.js";
+} from "../core/discovery/services/analysis-path-v82.js";
 
 describe("analysis-path-v82", () => {
   describe("ANALYSIS_PATH_MAP", () => {

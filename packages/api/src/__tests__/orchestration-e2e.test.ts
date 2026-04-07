@@ -2,8 +2,8 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { taskStateRoute } from "../routes/task-state.js";
-import { orchestrationRoute } from "../routes/orchestration.js";
+import { taskStateRoute } from "../core/agent/routes/task-state.js";
+import { orchestrationRoute } from "../core/agent/routes/orchestration.js";
 import { TaskState } from "@foundry-x/shared";
 import { Hono } from "hono";
 import type { Env } from "../env.js";

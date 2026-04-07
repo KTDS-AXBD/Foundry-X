@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { SkillPipelineRunner } from "../services/skill-pipeline-runner.js";
-import { DiscoveryPipelineService } from "../services/discovery-pipeline-service.js";
+import { SkillPipelineRunner } from "../core/agent/services/skill-pipeline-runner.js";
+import { DiscoveryPipelineService } from "../core/discovery/services/discovery-pipeline-service.js";
 
 describe("SkillPipelineRunner (F314)", () => {
   let db: ReturnType<typeof createMockD1>;

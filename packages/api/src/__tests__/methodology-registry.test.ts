@@ -2,8 +2,8 @@
  * Sprint 59 F191: MethodologyRegistry unit tests
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { MethodologyRegistry } from "../services/methodology-registry.js";
-import type { MethodologyModule, BizItemContext } from "../services/methodology-module.js";
+import { MethodologyRegistry } from "../core/offering/services/methodology-registry.js";
+import type { MethodologyModule, BizItemContext } from "../core/offering/services/methodology-module.js";
 
 function createMockModule(overrides: Partial<MethodologyModule> & { id: string }): MethodologyModule {
   return {

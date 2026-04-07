@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { ogdQualityRoute } from "../routes/ogd-quality.js";
+import { ogdQualityRoute } from "../core/harness/routes/ogd-quality.js";
 
 const SCHEMA = `
   CREATE TABLE IF NOT EXISTS prototype_jobs (

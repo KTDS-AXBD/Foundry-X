@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { BmcService } from "../services/bmc-service.js";
+import { BmcService } from "../core/shaping/services/bmc-service.js";
 import {
   BmcCommentService,
   NotFoundError,
   ForbiddenError,
   ValidationError,
-} from "../services/bmc-comment-service.js";
+} from "../core/shaping/services/bmc-comment-service.js";
 
 describe("BmcCommentService", () => {
   let db: ReturnType<typeof createMockD1>;
@@ -232,7 +232,7 @@ describe("BmcCommentService", () => {
 
 // ─── Route 테스트 (Hono app.request 방식) ───
 import { Hono } from "hono";
-import { axBdCommentsRoute } from "../routes/ax-bd-comments.js";
+import { axBdCommentsRoute } from "../core/shaping/routes/ax-bd-comments.js";
 
 describe("ax-bd-comments route", () => {
   let db: ReturnType<typeof createMockD1>;

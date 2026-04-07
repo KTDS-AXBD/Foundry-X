@@ -3,16 +3,16 @@
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { offeringExportRoute } from "../routes/offering-export.js";
+import { offeringExportRoute } from "../core/offering/routes/offering-export.js";
 import { Hono } from "hono";
 import type { Env } from "../env.js";
-import { buildDesignConfig } from "../services/pptx-renderer.js";
+import { buildDesignConfig } from "../core/offering/services/pptx-renderer.js";
 import {
   SECTION_SLIDE_MAP,
   calculateTotalSlides,
   getSlideMapping,
-} from "../services/pptx-slide-types.js";
-import { STANDARD_SECTIONS } from "../schemas/offering-section.schema.js";
+} from "../core/offering/services/pptx-slide-types.js";
+import { STANDARD_SECTIONS } from "../core/offering/schemas/offering-section.schema.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Any = any;

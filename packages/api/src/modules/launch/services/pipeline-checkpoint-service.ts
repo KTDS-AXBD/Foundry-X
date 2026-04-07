@@ -2,8 +2,8 @@
  * F314: PipelineCheckpointService — HITL 체크포인트 CRUD + 승인/거부
  */
 import { PipelineStateMachine } from "./pipeline-state-machine.js";
-import type { CheckpointDecision } from "../../../schemas/discovery-pipeline.js";
-import { CHECKPOINT_STEPS, COMMIT_GATE_STEP } from "../../../schemas/discovery-pipeline.js";
+import type { CheckpointDecision } from "../../../core/discovery/schemas/discovery-pipeline.js";
+import { CHECKPOINT_STEPS, COMMIT_GATE_STEP } from "../../../core/discovery/schemas/discovery-pipeline.js";
 
 interface CheckpointRow {
   id: string;

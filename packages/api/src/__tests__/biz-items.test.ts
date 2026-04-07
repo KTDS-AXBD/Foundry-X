@@ -3,7 +3,7 @@ import { app } from "../app.js";
 import { createTestEnv, createAuthHeaders } from "./helpers/test-app.js";
 
 // Mock agent-runner to avoid real LLM calls
-vi.mock("../services/agent-runner.js", () => ({
+vi.mock("../core/agent/services/agent-runner.js", () => ({
   createAgentRunner: () => ({
     type: "mock",
     execute: vi.fn().mockResolvedValue({
@@ -35,8 +35,8 @@ vi.mock("../services/agent-runner.js", () => ({
 }));
 
 // Mock evaluator persona responses — return high scores for all personas
-vi.mock("../services/biz-persona-evaluator.js", async () => {
-  const actual = await vi.importActual<typeof import("../services/biz-persona-evaluator.js")>("../services/biz-persona-evaluator.js");
+vi.mock("../core/shaping/services/biz-persona-evaluator.js", async () => {
+  const actual = await vi.importActual<typeof import("../core/shaping/services/biz-persona-evaluator.js")>("../core/shaping/services/biz-persona-evaluator.js");
   return {
     ...actual,
     BizPersonaEvaluator: class {

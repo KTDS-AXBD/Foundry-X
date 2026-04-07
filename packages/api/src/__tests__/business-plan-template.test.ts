@@ -6,10 +6,10 @@ import {
   formatItemType,
   formatVerdict,
   type BpDataBundle,
-} from "../services/business-plan-template.js";
-import type { BizItem, EvaluationWithScores } from "../services/biz-item-service.js";
-import type { DiscoveryCriterion } from "../services/discovery-criteria.js";
-import type { AnalysisContext } from "../services/analysis-context.js";
+} from "../core/offering/services/business-plan-template.js";
+import type { BizItem, EvaluationWithScores } from "../core/discovery/services/biz-item-service.js";
+import type { DiscoveryCriterion } from "../core/discovery/services/discovery-criteria.js";
+import type { AnalysisContext } from "../core/discovery/services/analysis-context.js";
 
 function makeBizItem(overrides?: Partial<BizItem>): BizItem {
   return {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { SafetyChecker } from "../services/safety-checker.js";
+import { SafetyChecker } from "../core/harness/services/safety-checker.js";
 
 describe("SafetyChecker (F275)", () => {
   it("returns grade A for clean prompt", () => {

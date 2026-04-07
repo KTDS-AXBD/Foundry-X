@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { AgentFeedbackLoopService } from "../services/agent-feedback-loop.js";
-import type { AgentExecutionResult } from "../services/execution-types.js";
+import { AgentFeedbackLoopService } from "../core/agent/services/agent-feedback-loop.js";
+import type { AgentExecutionResult } from "../core/agent/services/execution-types.js";
 
 function createMockDb() {
   return {

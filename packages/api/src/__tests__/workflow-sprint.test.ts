@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { WorkflowEngine, WORKFLOW_TEMPLATES } from "../services/workflow-engine.js";
+import { WorkflowEngine, WORKFLOW_TEMPLATES } from "../core/agent/services/workflow-engine.js";
 
 /**
  * F142 Sprint Workflow Templates — 구조 + 조건 평가기 + 라우트 테스트

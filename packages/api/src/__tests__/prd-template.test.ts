@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { PRD_SECTIONS, mapCriteriaToSections, renderPrdMarkdown } from "../services/prd-template.js";
-import type { DiscoveryCriterion } from "../services/discovery-criteria.js";
-import type { AnalysisContext } from "../services/analysis-context.js";
+import { PRD_SECTIONS, mapCriteriaToSections, renderPrdMarkdown } from "../core/offering/services/prd-template.js";
+import type { DiscoveryCriterion } from "../core/discovery/services/discovery-criteria.js";
+import type { AnalysisContext } from "../core/discovery/services/analysis-context.js";
 
 function makeCriterion(id: number, status: "completed" | "pending", evidence: string | null = null): DiscoveryCriterion {
   return {

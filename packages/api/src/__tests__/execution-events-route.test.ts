@@ -2,8 +2,8 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { executionEventsRoute } from "../routes/execution-events.js";
-import { ExecutionEventService } from "../services/execution-event-service.js";
+import { executionEventsRoute } from "../core/agent/routes/execution-events.js";
+import { ExecutionEventService } from "../core/agent/services/execution-event-service.js";
 import { createTaskEvent } from "@foundry-x/shared";
 import type { HookEventPayload } from "@foundry-x/shared";
 import { Hono } from "hono";

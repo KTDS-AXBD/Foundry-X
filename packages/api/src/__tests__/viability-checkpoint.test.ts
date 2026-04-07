@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { ViabilityCheckpointService } from "../services/viability-checkpoint-service.js";
+import { ViabilityCheckpointService } from "../core/shaping/services/viability-checkpoint-service.js";
 
 describe("ViabilityCheckpointService", () => {
   let db: ReturnType<typeof createMockD1>;

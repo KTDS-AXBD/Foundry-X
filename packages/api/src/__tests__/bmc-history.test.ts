@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { BmcHistoryService } from "../services/bmc-history.js";
-import { axBdHistoryRoute } from "../routes/ax-bd-history.js";
+import { BmcHistoryService } from "../core/shaping/services/bmc-history.js";
+import { axBdHistoryRoute } from "../core/shaping/routes/ax-bd-history.js";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 

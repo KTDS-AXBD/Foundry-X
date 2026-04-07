@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Hono } from "hono";
-import { AutomationQualityReporter } from "../services/automation-quality-reporter.js";
-import { automationQualityRoute } from "../routes/automation-quality.js";
+import { AutomationQualityReporter } from "../core/harness/services/automation-quality-reporter.js";
+import { automationQualityRoute } from "../core/harness/routes/automation-quality.js";
 import { createTestEnv } from "./helpers/test-app.js";
 
 // ── DDL ──────────────────────────────────

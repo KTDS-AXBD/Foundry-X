@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { KgScenarioService } from "../services/kg-scenario.js";
-import { KgSeedService } from "../services/kg-seed.js";
+import { KgScenarioService } from "../core/harness/services/kg-scenario.js";
+import { KgSeedService } from "../core/harness/services/kg-seed.js";
 
 const KG_SCHEMA = `
   CREATE TABLE IF NOT EXISTS kg_nodes (

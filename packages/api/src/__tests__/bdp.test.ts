@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { bdpRoute } from "../routes/bdp.js";
-import { BdpService, BdpFinalizedError } from "../services/bdp-service.js";
-import { ProposalGenerator, NoBdpError } from "../services/proposal-generator.js";
+import { bdpRoute } from "../core/offering/routes/bdp.js";
+import { BdpService, BdpFinalizedError } from "../core/offering/services/bdp-service.js";
+import { ProposalGenerator, NoBdpError } from "../core/agent/services/proposal-generator.js";
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 

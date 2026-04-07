@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { DiscoveryCriteriaService, DISCOVERY_CRITERIA } from "../services/discovery-criteria.js";
+import { DiscoveryCriteriaService, DISCOVERY_CRITERIA } from "../core/discovery/services/discovery-criteria.js";
 
 const TABLES_SQL = `
   CREATE TABLE IF NOT EXISTS biz_items (

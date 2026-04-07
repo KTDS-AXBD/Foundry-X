@@ -2,7 +2,7 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { DataDiagnosticService } from "../services/data-diagnostic-service.js";
+import { DataDiagnosticService } from "../core/harness/services/data-diagnostic-service.js";
 
 const DDL = `
   CREATE TABLE IF NOT EXISTS execution_events (

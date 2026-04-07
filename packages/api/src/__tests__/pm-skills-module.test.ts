@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
 import { PmSkillsModule, registerPmSkillsModule } from "../services/pm-skills-module.js";
-import { clearRegistry, getAllMethodologies } from "../services/methodology-types.js";
+import { clearRegistry, getAllMethodologies } from "../core/offering/services/methodology-types.js";
 
 const TABLES_SQL = `
   CREATE TABLE IF NOT EXISTS biz_items (

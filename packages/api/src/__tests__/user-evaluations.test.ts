@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { UserEvaluationService } from "../services/user-evaluation-service.js";
+import { UserEvaluationService } from "../core/harness/services/user-evaluation-service.js";
 
 const JOBS_SCHEMA = `
   CREATE TABLE IF NOT EXISTS prototype_jobs (

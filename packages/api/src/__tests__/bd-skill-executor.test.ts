@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { BdSkillExecutor } from "../services/bd-skill-executor.js";
+import { BdSkillExecutor } from "../core/shaping/services/bd-skill-executor.js";
 
 const TABLES = `
   CREATE TABLE IF NOT EXISTS organizations (id TEXT PRIMARY KEY, name TEXT NOT NULL, slug TEXT NOT NULL UNIQUE, plan TEXT NOT NULL DEFAULT 'free', settings TEXT NOT NULL DEFAULT '{}');

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   parseImports, resolveImportPath, estimateTokens, truncateToTokens, FileContextCollector,
-} from "../services/file-context-collector.js";
+} from "../core/harness/services/file-context-collector.js";
 
 describe("parseImports", () => {
   it("ESM import", () => {

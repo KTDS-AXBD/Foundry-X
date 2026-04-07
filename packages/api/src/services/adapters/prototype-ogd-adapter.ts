@@ -2,8 +2,8 @@
 // 기존 OgdGeneratorService + OgdDiscriminatorService를 DomainAdapter로 래핑
 
 import type { DomainAdapterInterface } from "@foundry-x/shared";
-import { OgdGeneratorService } from "../ogd-generator-service.js";
-import { OgdDiscriminatorService } from "../ogd-discriminator-service.js";
+import { OgdGeneratorService } from "../../core/harness/services/ogd-generator-service.js";
+import { OgdDiscriminatorService } from "../../core/harness/services/ogd-discriminator-service.js";
 
 /**
  * Prototype 어댑터 — PRD → HTML 프로토타입 생성 → 체크리스트 기반 평가

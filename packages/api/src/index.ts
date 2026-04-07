@@ -1,6 +1,6 @@
 import { app, handleScheduled } from "./app.js";
-import { harnessRoute } from "./routes/harness.js";
-import { methodologyRoute } from "./routes/methodology.js";
+import { harnessRoute } from "./core/harness/routes/harness.js";
+import { methodologyRoute } from "./core/offering/routes/methodology.js";
 import { z } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 

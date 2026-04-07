@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
 
 // Mock agent-runner
-vi.mock("../services/agent-runner.js", () => ({
+vi.mock("../core/agent/services/agent-runner.js", () => ({
   createAgentRunner: () => ({
     type: "mock",
     execute: vi.fn().mockResolvedValue({
@@ -23,7 +23,7 @@ vi.mock("../services/agent-runner.js", () => ({
   }),
 }));
 
-import { SixHatsDebateService, SixHatsDebateError } from "../services/sixhats-debate.js";
+import { SixHatsDebateService, SixHatsDebateError } from "../core/shaping/services/sixhats-debate.js";
 
 const SIXHATS_TABLES_SQL = `
   CREATE TABLE IF NOT EXISTS biz_items (

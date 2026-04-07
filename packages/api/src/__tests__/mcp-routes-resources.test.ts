@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import mcpApp from "../routes/mcp.js";
+import mcpApp from "../core/harness/routes/mcp.js";
 import { createTestEnv } from "./helpers/test-app.js";
 
 // Mock transport + runner for resource operations
@@ -9,7 +9,7 @@ const mockReadResource = vi.fn().mockResolvedValue([]);
 const mockSubscribeResource = vi.fn().mockResolvedValue(undefined);
 const mockOnNotification = vi.fn();
 
-vi.mock("../services/mcp-transport.js", () => ({
+vi.mock("../core/agent/services/mcp-transport.js", () => ({
   createTransport: vi.fn(() => ({
     type: "http",
     connect: vi.fn(),
@@ -20,7 +20,7 @@ vi.mock("../services/mcp-transport.js", () => ({
   })),
 }));
 
-vi.mock("../services/mcp-runner.js", () => ({
+vi.mock("../core/agent/services/mcp-runner.js", () => ({
   McpRunner: vi.fn().mockImplementation(() => ({
     listTools: vi.fn().mockResolvedValue([]),
     listResources: mockListResources,

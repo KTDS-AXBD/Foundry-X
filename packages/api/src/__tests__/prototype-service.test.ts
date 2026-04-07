@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { PrototypeService } from "../services/prototype-service.js";
+import { PrototypeService } from "../core/harness/services/prototype-service.js";
 
 describe("PrototypeService", () => {
   let db: ReturnType<typeof createMockD1>;

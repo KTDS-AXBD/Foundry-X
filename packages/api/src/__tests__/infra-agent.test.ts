@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
-import { InfraAgent } from "../services/infra-agent.js";
-import type { AgentExecutionRequest, AgentExecutionResult } from "../services/execution-types.js";
+import { InfraAgent } from "../core/agent/services/infra-agent.js";
+import type { AgentExecutionRequest, AgentExecutionResult } from "../core/agent/services/execution-types.js";
 import { app } from "../app.js";
 import { createTestEnv, createAuthHeaders } from "./helpers/test-app.js";
 
@@ -15,7 +15,7 @@ const { mockRunner } = vi.hoisted(() => {
   return { mockRunner };
 });
 
-vi.mock("../services/agent-runner.js", () => ({
+vi.mock("../core/agent/services/agent-runner.js", () => ({
   createRoutedRunner: vi.fn().mockResolvedValue(mockRunner),
   createAgentRunner: vi.fn().mockReturnValue(mockRunner),
 }));

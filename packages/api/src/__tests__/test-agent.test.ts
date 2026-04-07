@@ -1,18 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { AgentRunner } from "../services/agent-runner.js";
+import type { AgentRunner } from "../core/agent/services/agent-runner.js";
 import type {
   AgentExecutionRequest,
   AgentExecutionResult,
-} from "../services/execution-types.js";
-import { TestAgent } from "../services/test-agent.js";
+} from "../core/agent/services/execution-types.js";
+import { TestAgent } from "../core/agent/services/test-agent.js";
 import {
   buildTestGenerationPrompt,
   buildCoveragePrompt,
-} from "../services/test-agent-prompts.js";
+} from "../core/agent/services/test-agent-prompts.js";
 import {
   testGenerateSchema,
   coverageGapsSchema,
-} from "../schemas/agent.js";
+} from "../core/agent/schemas/agent.js";
 
 // ── Mock Runner ─────────────────────────────────────────
 
@@ -77,7 +77,7 @@ function makeRequest(overrides?: Partial<AgentExecutionRequest>): AgentExecution
 
 let currentMockRunner: AgentRunner;
 
-vi.mock("../services/agent-runner.js", () => ({
+vi.mock("../core/agent/services/agent-runner.js", () => ({
   createRoutedRunner: vi.fn().mockImplementation(() => Promise.resolve(currentMockRunner)),
   createAgentRunner: vi.fn(),
 }));

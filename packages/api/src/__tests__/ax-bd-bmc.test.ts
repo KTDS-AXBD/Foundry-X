@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { BmcService, BMC_BLOCK_TYPES } from "../services/bmc-service.js";
+import { BmcService, BMC_BLOCK_TYPES } from "../core/shaping/services/bmc-service.js";
 
 describe("BmcService", () => {
   let db: ReturnType<typeof createMockD1>;

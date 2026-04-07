@@ -3,7 +3,7 @@ import {
   TURN_SEQUENCE, HAT_CONFIGS, MAX_PRD_SUMMARY_LENGTH,
   summarizePrd, buildTurnPrompt,
   type HatColor,
-} from "../services/sixhats-prompts.js";
+} from "../core/shaping/services/sixhats-prompts.js";
 
 describe("SixHatsPrompts (F188)", () => {
   it("TURN_SEQUENCE has exactly 20 turns", () => {

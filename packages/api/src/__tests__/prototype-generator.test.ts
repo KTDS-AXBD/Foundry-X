@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
 import { PrototypeGeneratorService } from "../services/prototype-generator.js";
-import type { AgentRunner } from "../services/agent-runner.js";
-import type { BizItem, EvaluationWithScores } from "../services/biz-item-service.js";
-import type { DiscoveryCriterion } from "../services/discovery-criteria.js";
-import type { StartingPointType } from "../services/analysis-paths.js";
+import type { AgentRunner } from "../core/agent/services/agent-runner.js";
+import type { BizItem, EvaluationWithScores } from "../core/discovery/services/biz-item-service.js";
+import type { DiscoveryCriterion } from "../core/discovery/services/discovery-criteria.js";
+import type { StartingPointType } from "../core/discovery/services/analysis-paths.js";
 
 const TABLES_SQL = `
   CREATE TABLE IF NOT EXISTS prototypes (

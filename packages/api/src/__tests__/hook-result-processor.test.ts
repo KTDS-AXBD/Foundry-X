@@ -1,7 +1,7 @@
 // ─── F334: HookResultProcessor 테스트 (Sprint 149) ───
 
 import { describe, it, expect } from "vitest";
-import { HookResultProcessor } from "../services/hook-result-processor.js";
+import { HookResultProcessor } from "../core/harness/services/hook-result-processor.js";
 
 describe("HookResultProcessor", () => {
   const processor = new HookResultProcessor();

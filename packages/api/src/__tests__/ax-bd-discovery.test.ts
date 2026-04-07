@@ -2,13 +2,13 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
 import type { Env } from "../env.js";
-import { axBdDiscoveryRoute } from "../routes/ax-bd-discovery.js";
+import { axBdDiscoveryRoute } from "../core/discovery/routes/ax-bd-discovery.js";
 import {
   discoveryIngestPayloadSchema,
   discoveryDataItemSchema,
   collectionSourceSchema,
-} from "../schemas/discovery-x.schema.js";
-import { DiscoveryXIngestService } from "../services/discovery-x-ingest-service.js";
+} from "../core/discovery/schemas/discovery-x.schema.js";
+import { DiscoveryXIngestService } from "../core/discovery/services/discovery-x-ingest-service.js";
 
 function makeValidPayload(overrides?: Record<string, unknown>) {
   return {

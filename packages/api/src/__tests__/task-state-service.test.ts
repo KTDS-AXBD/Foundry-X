@@ -2,9 +2,9 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { TaskStateService } from "../services/task-state-service.js";
-import { createDefaultGuard } from "../services/transition-guard.js";
-import { taskStateRoute } from "../routes/task-state.js";
+import { TaskStateService } from "../core/agent/services/task-state-service.js";
+import { createDefaultGuard } from "../core/harness/services/transition-guard.js";
+import { taskStateRoute } from "../core/agent/routes/task-state.js";
 import { TaskState } from "@foundry-x/shared";
 import { Hono } from "hono";
 import type { Env } from "../env.js";

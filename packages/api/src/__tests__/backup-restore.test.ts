@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { backupRestoreRoute } from "../routes/backup-restore.js";
-import { BackupRestoreService } from "../services/backup-restore-service.js";
+import { backupRestoreRoute } from "../core/harness/routes/backup-restore.js";
+import { BackupRestoreService } from "../core/harness/services/backup-restore-service.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createTestApp(db: any, role = "admin") {

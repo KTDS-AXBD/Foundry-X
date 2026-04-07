@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { axBdArtifactsRoute } from "../routes/ax-bd-artifacts.js";
+import { axBdArtifactsRoute } from "../core/discovery/routes/ax-bd-artifacts.js";
 
 const TABLES = `
   CREATE TABLE IF NOT EXISTS organizations (id TEXT PRIMARY KEY, name TEXT NOT NULL, slug TEXT NOT NULL UNIQUE, plan TEXT NOT NULL DEFAULT 'free', settings TEXT NOT NULL DEFAULT '{}');
