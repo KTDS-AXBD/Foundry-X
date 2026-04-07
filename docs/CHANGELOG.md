@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #217 (2026-04-07)
+**Phase 20 AX BD MSA 재조정 완결 — F392~F401 (10/10, Sprint 179~188, Match 94%)**:
+- ✅ Sprint 185~188 Full Auto (Sonnet WT) — 4 Sprint 완료, PR #322~#325
+- ✅ Phase 20-A (모듈화): 118 routes → core/(5) + modules/(4) + flat(8)
+- ✅ Phase 20-B (분리 준비): 이벤트 8종 + EventBus + Strangler proxy + Web IA 개편 + E2E 태깅 + Gate-X PoC
+- ✅ harness-kit README + developer-guide + migration-guide
+- ✅ Phase 20 종합 Gap Analysis (94%) + 완료 보고서 + PDCA 아카이브 (21건)
+- ✅ Sprint skill WT→Sonnet 모델 변경 (ax-plugin push)
+- ✅ sync-claude-md.sh — SPEC→CLAUDE.md 헤더 자동 동기화 스크립트
+- ✅ daily-check 수치 보정 (모듈화 후 find 방식 + README/landing 갱신)
+- ✅ IA 개편 Sprint 185 통합 (Plan/Design/IA설계서 갱신)
+
+**검증 결과**: typecheck ✅ / tests 3,488 ✅ / E2E 263 ✅
+
 ### 세션 #216 (2026-04-07)
 **Phase 18 Offering Pipeline 완료 — F363~F383 (21/21, Sprint 165~174)**:
 - ✅ req-interview → PRD → Plan → Design → 10 Sprint autopilot (PR #302~#315)
