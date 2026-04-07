@@ -3,8 +3,8 @@ title: Foundry-X
 section: hero
 sort_order: 0
 tagline: "사업기회 발굴부터 데모까지, AI가 자동화하는 BD 플랫폼"
-phase: "Phase 19 완료"
-phaseTitle: "Builder Evolution"
+phase: "Phase 20 진행 중"
+phaseTitle: "AX BD MSA 재조정"
 stats:
   - value: "6"
     label: "BD 파이프라인"
@@ -12,7 +12,7 @@ stats:
     label: "AI 에이전트"
   - value: "22"
     label: "자동화 스킬"
-  - value: "178"
+  - value: "186"
     label: "Sprints"
 ---
 
