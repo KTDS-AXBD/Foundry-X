@@ -39,8 +39,19 @@ function makeD1Stub() {
               }
               if (query.startsWith("UPDATE")) {
                 const a = args as string[];
-                const id = a[2];
-                if (id && rows[id]) rows[id]!.status = a[0]!;
+                if (query.includes("SET status = ?,")) {
+                  // _ack: bind(status, processed_at, id)
+                  const id = a[2];
+                  if (id && rows[id]) rows[id]!.status = a[0]!;
+                } else if (query.includes("status = 'failed'")) {
+                  // _markFailed: bind(retryCount, error, next_retry_at, id)
+                  const id = a[3];
+                  if (id && rows[id]) rows[id]!.status = "failed";
+                } else if (query.includes("status = 'dead_letter'")) {
+                  // _moveToDLQ: bind(error, processed_at, id)
+                  const id = a[2];
+                  if (id && rows[id]) rows[id]!.status = "dead_letter";
+                }
               }
               return { success: true };
             },
