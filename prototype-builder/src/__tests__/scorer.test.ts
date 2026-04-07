@@ -27,6 +27,7 @@ import fs from 'node:fs/promises';
 import Anthropic from '@anthropic-ai/sdk';
 import {
   evaluateQuality,
+  evaluateQualityWithLlm,
   generateTargetFeedback,
   functionalScore,
   prdScore,
@@ -136,16 +137,23 @@ describe('scorer', () => {
   });
 
   describe('prdScore (LLM mode)', () => {
-    it('LLM 응답에서 implemented/total을 파싱해 점수를 산출해요', async () => {
+    it('LLM 응답에서 requirements/summary를 파싱해 점수를 산출해요 (F425 신규 포맷)', async () => {
       const job = makeJob({
         prdContent: '## Must Have\n- 대시보드\n- 차트\n- 로그인',
       });
 
-      // Mock Anthropic API
+      // Mock Anthropic API — F425 신규 포맷 (requirements + summary)
       const mockCreate = vi.fn().mockResolvedValue({
         content: [{
           type: 'text',
-          text: '{"implemented": 2, "total": 3, "missing": ["로그인"]}',
+          text: JSON.stringify({
+            requirements: [
+              { id: 1, text: '대시보드', implemented: true, evidence: 'Dashboard.tsx', fix: null },
+              { id: 2, text: '차트', implemented: true, evidence: 'Chart 존재', fix: null },
+              { id: 3, text: '로그인', implemented: false, evidence: null, fix: 'LoginForm 추가' },
+            ],
+            summary: { implemented: 2, total: 3, score: 0.667 },
+          }),
         }],
       });
       vi.mocked(Anthropic).mockImplementation(() => ({
@@ -332,6 +340,171 @@ describe('scorer', () => {
       const feedback = generateTargetFeedback(score);
       expect(feedback.weakestDimension).toBe('prd');
       expect(feedback.prompt).toContain('Must Have');
+    });
+  });
+
+  // ─────────────────────────────────────────────
+  // F425: PRD 정합성 LLM 판별 개선
+  // ─────────────────────────────────────────────
+  describe('F425: prdScore LLM 의미론적 비교', () => {
+    it('requirements 배열이 포함된 LLM 응답을 파싱해 점수를 산출해요', async () => {
+      const job = makeJob({
+        prdContent: '## Must Have\n- 사용자 인증 로그인\n- 대시보드 차트\n- 데이터 필터',
+      });
+
+      const mockCreate = vi.fn().mockResolvedValue({
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            requirements: [
+              { id: 1, text: '사용자 인증 로그인', implemented: true, evidence: 'LoginForm 존재', fix: null },
+              { id: 2, text: '대시보드 차트', implemented: true, evidence: 'ChartComponent 존재', fix: null },
+              { id: 3, text: '데이터 필터', implemented: false, evidence: null, fix: 'FilterPanel 추가 필요' },
+            ],
+            summary: { implemented: 2, total: 3, score: 0.667 },
+          }),
+        }],
+      });
+      vi.mocked(Anthropic).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }) as unknown as Anthropic);
+
+      process.env['ANTHROPIC_API_KEY'] = 'test-key';
+      mockFs.readdir.mockResolvedValue([] as never);
+
+      const result = await prdScore(job, '/tmp/test', { useLlm: true });
+
+      expect(result.dimension).toBe('prd');
+      expect(result.score).toBeCloseTo(0.67, 1);
+      expect(result.details).toContain('LLM');
+      expect(result.details).toContain('2/3');
+      expect(result.details).toContain('데이터 필터');
+
+      delete process.env['ANTHROPIC_API_KEY'];
+    });
+
+    it('LLM 응답 파싱 실패 시 keyword fallback으로 에러 없이 동작해요', async () => {
+      const job = makeJob({ prdContent: '대시보드 구현' });
+
+      const mockCreate = vi.fn().mockResolvedValue({
+        content: [{ type: 'text', text: 'invalid json {{{{' }],
+      });
+      vi.mocked(Anthropic).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }) as unknown as Anthropic);
+
+      process.env['ANTHROPIC_API_KEY'] = 'test-key';
+      mockFs.readdir.mockResolvedValue([] as never);
+
+      const result = await prdScore(job, '/tmp/test', { useLlm: true });
+      expect(result.dimension).toBe('prd');
+      // fallback: 에러 throw 없이 반환
+
+      delete process.env['ANTHROPIC_API_KEY'];
+    });
+  });
+
+  // ─────────────────────────────────────────────
+  // F426: 5차원 LLM 통합 판별
+  // ─────────────────────────────────────────────
+  describe('F426: evaluateQualityWithLlm 5차원 통합 판별', () => {
+    it('LLM이 5차원을 평가하고 llmEvaluation + staticAnalysis를 포함해요', async () => {
+      const job = makeJob();
+
+      const llmResponse = {
+        build: { score: 90, rationale: '빌드 성공', fix: null },
+        ui: { score: 72, rationale: '시맨틱 미흡', fix: 'header 추가' },
+        functional: { score: 68, rationale: '핸들러 부족', fix: 'onClick 추가' },
+        prd: { score: 80, rationale: '8/10 구현', fix: '차트 미구현' },
+        code: { score: 85, rationale: 'TS 에러 1건', fix: null },
+      };
+
+      const mockCreate = vi.fn().mockResolvedValue({
+        content: [{ type: 'text', text: JSON.stringify(llmResponse) }],
+      });
+      vi.mocked(Anthropic).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }) as unknown as Anthropic);
+
+      process.env['ANTHROPIC_API_KEY'] = 'test-key';
+      mockFs.readdir.mockResolvedValue([] as never);
+      mockExecSuccess();
+
+      const result = await evaluateQualityWithLlm(job, '/tmp/test');
+
+      expect(result.dimensions).toHaveLength(5);
+      expect(result.llmEvaluation).toBeDefined();
+      expect(result.staticAnalysis).toBeDefined();
+      expect(result.llmEvaluation?.ui.score).toBe(72);
+      expect(result.llmEvaluation?.ui.fix).toBe('header 추가');
+      expect(result.total).toBeGreaterThan(0);
+      expect(result.total).toBeLessThanOrEqual(100);
+
+      // LLM 점수가 dimensions에 반영되는지 확인
+      const uiDim = result.dimensions.find(d => d.dimension === 'ui');
+      expect(uiDim?.details).toContain('LLM');
+      expect(uiDim?.details).toContain('72');
+
+      delete process.env['ANTHROPIC_API_KEY'];
+    });
+
+    it('API 키 없으면 정적 분석으로 fallback하고 staticAnalysis 필드를 포함해요', async () => {
+      delete process.env['ANTHROPIC_API_KEY'];
+      mockFs.readdir.mockResolvedValue([] as never);
+      mockExecSuccess();
+
+      const result = await evaluateQualityWithLlm(makeJob(), '/tmp/test');
+
+      expect(result.dimensions).toHaveLength(5);
+      expect(result.staticAnalysis).toBeDefined();
+      expect(result.llmEvaluation).toBeUndefined();
+    });
+
+    it('LLM 호출 실패 시 정적 분석 fallback, 에러 throw 없어요', async () => {
+      const mockCreate = vi.fn().mockRejectedValue(new Error('API timeout'));
+      vi.mocked(Anthropic).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }) as unknown as Anthropic);
+
+      process.env['ANTHROPIC_API_KEY'] = 'test-key';
+      mockFs.readdir.mockResolvedValue([] as never);
+      mockExecSuccess();
+
+      const result = await evaluateQualityWithLlm(makeJob(), '/tmp/test');
+
+      expect(result.dimensions).toHaveLength(5);
+      expect(result.staticAnalysis).toBeDefined();
+
+      delete process.env['ANTHROPIC_API_KEY'];
+    });
+
+    it('evaluateQuality(useLlmIntegrated: true)이 evaluateQualityWithLlm을 호출해요', async () => {
+      const mockCreate = vi.fn().mockResolvedValue({
+        content: [{ type: 'text', text: JSON.stringify({
+          build: { score: 85, rationale: 'OK', fix: null },
+          ui: { score: 75, rationale: 'OK', fix: null },
+          functional: { score: 70, rationale: 'OK', fix: null },
+          prd: { score: 80, rationale: 'OK', fix: null },
+          code: { score: 90, rationale: 'OK', fix: null },
+        }) }],
+      });
+      vi.mocked(Anthropic).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }) as unknown as Anthropic);
+
+      process.env['ANTHROPIC_API_KEY'] = 'test-key';
+      mockFs.readdir.mockResolvedValue([] as never);
+      mockExecSuccess();
+
+      const result = await evaluateQuality(makeJob(), '/tmp/test', {
+        useLlmIntegrated: true,
+        skipBuild: false,
+      });
+
+      expect(result.llmEvaluation).toBeDefined();
+      expect(mockCreate).toHaveBeenCalled();
+
+      delete process.env['ANTHROPIC_API_KEY'];
     });
   });
 });

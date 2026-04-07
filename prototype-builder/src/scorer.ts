@@ -20,6 +20,8 @@ import type {
   DimensionScore,
   ScoreDimension,
   TargetFeedback,
+  LlmDimensionResult,
+  LlmIntegratedEvaluation,
 } from './types.js';
 import { DIMENSION_WEIGHTS } from './types.js';
 
@@ -288,17 +290,26 @@ function prdScoreKeyword(
 }
 
 /**
- * PRD → 생성코드 LLM 비교 응답 타입
+ * PRD → 생성코드 LLM 비교 응답 타입 (F425 개선)
  */
+interface PrdRequirement {
+  id: number;
+  text: string;
+  implemented: boolean;
+  evidence: string | null;
+  fix?: string;
+}
+
 interface PrdLlmResponse {
-  implemented: number;
-  total: number;
-  missing: string[];
+  requirements: PrdRequirement[];
+  summary: { implemented: number; total: number; score: number };
 }
 
 /**
- * PRD LLM 비교 (M1 본구현)
- * Claude Sonnet API, temperature 0, 구조화 JSON 응답
+ * PRD LLM 의미론적 비교 (F425 본구현)
+ * - PRD에서 Must Have 요구사항을 구조화된 목록으로 추출
+ * - 각 요구사항의 코드 내 구현 여부를 의미적으로 판단
+ * - 미구현 항목에 구체적 수정 지시 포함
  */
 async function prdScoreWithLlm(
   job: PrototypeJob,
@@ -307,32 +318,40 @@ async function prdScoreWithLlm(
 ): Promise<DimensionScore> {
   const apiKey = process.env['ANTHROPIC_API_KEY'];
   if (!apiKey) {
-    // API 키 없으면 키워드 모드로 fallback
     return prdScoreKeyword(job.prdContent.toLowerCase(), code, weight);
   }
 
   const client = new Anthropic({ apiKey });
 
   const prompt = [
-    'PRD 문서의 Must Have 기능 목록과 생성된 코드를 비교하세요.',
+    '당신은 PRD 요구사항과 생성된 프로토타입 코드를 비교하는 전문가입니다.',
     '',
-    '## PRD',
-    job.prdContent.slice(0, 8000),
+    '## PRD 문서',
+    job.prdContent.slice(0, 6000),
     '',
     '## 생성된 코드',
-    code.slice(0, 12000),
+    code.slice(0, 10000),
     '',
     '## 지시사항',
-    '1. PRD에서 Must Have / 핵심 기능 항목을 추출하세요.',
-    '2. 생성된 코드에서 각 기능이 구현되었는지 확인하세요.',
-    '3. 아래 JSON 형식으로만 응답하세요 (마크다운 블록 없이 순수 JSON만):',
-    '{"implemented": 5, "total": 8, "missing": ["기능A", "기능B", "기능C"]}',
+    '1. PRD에서 Must Have / 핵심 기능 항목을 추출하세요 (최대 15개)',
+    '2. 각 요구사항이 코드에 의미적으로 구현되었는지 판단하세요',
+    '   - 단순 키워드 존재가 아니라 실제 기능 구현 여부를 확인하세요',
+    '3. 미구현 항목에는 구체적인 수정 지시를 작성하세요',
+    '4. 아래 JSON 형식으로만 응답하세요 (마크다운 블록 없이 순수 JSON):',
+    '',
+    JSON.stringify({
+      requirements: [
+        { id: 1, text: '사용자 로그인 기능', implemented: true, evidence: 'LoginForm 컴포넌트 존재', fix: null },
+        { id: 2, text: '대시보드 차트 표시', implemented: false, evidence: null, fix: 'Chart.tsx 컴포넌트 추가 필요' },
+      ],
+      summary: { implemented: 1, total: 2, score: 0.5 },
+    }),
   ].join('\n');
 
   try {
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 512,
+      max_tokens: 1024,
       temperature: 0,
       messages: [{ role: 'user', content: prompt }],
     });
@@ -343,25 +362,190 @@ async function prdScoreWithLlm(
       .join('\n')
       .trim();
 
-    // JSON 파싱 (```json 블록 또는 순수 JSON)
-    const jsonStr = text.replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
+    const jsonStr = text.replace(/^```json\s*/m, '').replace(/```\s*$/m, '').trim();
     const parsed = JSON.parse(jsonStr) as PrdLlmResponse;
 
-    const total = parsed.total || 1;
-    const score = Math.min(parsed.implemented / total, 1.0);
-    const missingPreview = parsed.missing.slice(0, 5).join(', ');
+    const { implemented, total } = parsed.summary;
+    const score = Math.min(implemented / Math.max(total, 1), 1.0);
+
+    const missing = parsed.requirements
+      .filter(r => !r.implemented)
+      .slice(0, 5)
+      .map(r => r.text);
 
     return {
       dimension: 'prd',
       score: Math.round(score * 100) / 100,
       weight,
       weighted: Math.round(score * weight * 100) / 100,
-      details: `LLM: ${parsed.implemented}/${total} implemented. Missing: ${missingPreview || 'none'}`,
+      details: `LLM: ${implemented}/${total} implemented. Missing: ${missing.join(', ') || 'none'}`,
     };
   } catch (err) {
-    // LLM 호출 실패 시 키워드 모드로 fallback
     console.log(`[Scorer] prdScore LLM failed, falling back to keyword: ${String(err).slice(0, 100)}`);
     return prdScoreKeyword(job.prdContent.toLowerCase(), code, weight);
+  }
+}
+
+// ─────────────────────────────────────────────
+// F426: 5차원 LLM 통합 판별
+// ─────────────────────────────────────────────
+
+/**
+ * LLM 통합 판별 응답 타입 (F426)
+ */
+interface LlmIntegratedResponse {
+  build: { score: number; rationale: string; fix: string | null };
+  ui: { score: number; rationale: string; fix: string | null };
+  functional: { score: number; rationale: string; fix: string | null };
+  prd: { score: number; rationale: string; fix: string | null };
+  code: { score: number; rationale: string; fix: string | null };
+}
+
+/**
+ * 5차원 LLM 통합 판별 (F426)
+ * - 정적 분석 결과를 컨텍스트로 단일 LLM 호출
+ * - LLM이 5차원 전체를 재평가하고 구체적 개선 지시 반환
+ * - 최종 점수 = LLM 판정 (정적 분석은 보조 데이터)
+ */
+export async function evaluateQualityWithLlm(
+  job: PrototypeJob,
+  workDir: string,
+): Promise<QualityScore> {
+  // Step 1: 정적 분석 실행 (보조 데이터)
+  const [buildResult, uiResult, funcResult, codeResult] = await Promise.all([
+    buildScore(workDir),
+    uiScore(workDir),
+    functionalScore(workDir),
+    codeScore(workDir),
+  ]);
+  const staticDimensions = [buildResult, uiResult, funcResult, codeResult];
+
+  const apiKey = process.env['ANTHROPIC_API_KEY'];
+  if (!apiKey) {
+    // API 키 없으면 prdScore 포함해 정적 분석 전체로 fallback
+    const prdResult = await prdScore(job, workDir, { useLlm: false });
+    const allDimensions = [...staticDimensions, prdResult];
+    const total = Math.round(allDimensions.reduce((s, d) => s + d.weighted, 0) * 100);
+    return {
+      total,
+      dimensions: allDimensions,
+      evaluatedAt: new Date().toISOString(),
+      round: job.round,
+      jobId: job.id,
+      staticAnalysis: allDimensions,
+    };
+  }
+
+  // Step 2: 소스 코드 요약 수집
+  const srcFiles = await collectSourceFiles(workDir);
+  const codeSummary = srcFiles.join('\n').slice(0, 8000);
+
+  // Step 3: 정적 분석 요약 문자열
+  const staticSummary = staticDimensions
+    .map(d => `${d.dimension}: ${Math.round(d.score * 100)} (${d.details})`)
+    .join('\n');
+
+  const client = new Anthropic({ apiKey });
+
+  const prompt = [
+    '당신은 React/TypeScript 프로토타입의 품질을 평가하는 시니어 엔지니어입니다.',
+    '',
+    '## 정적 분석 결과 (참고용)',
+    staticSummary,
+    '',
+    '## 소스 코드',
+    codeSummary || '(소스 파일 없음)',
+    '',
+    '## PRD 요구사항',
+    job.prdContent.slice(0, 3000),
+    '',
+    '## 평가 지시사항',
+    '정적 분석 결과를 참고하되, 코드를 직접 읽고 5개 차원을 0~100점으로 재평가하세요.',
+    '각 차원에 점수 근거와 (필요 시) 구체적 개선 지시를 작성하세요.',
+    '',
+    '차원 정의:',
+    '- build (20%): 빌드 안정성, 경고/에러 수',
+    '- ui (25%): 레이아웃 품질, 시맨틱 구조, 접근성, 디자인 완성도',
+    '- functional (20%): 인터랙티브 기능, 핸들러, 상태 관리',
+    '- prd (25%): PRD Must Have 요구사항 구현 완성도',
+    '- code (10%): 코드 품질, ESLint/TypeScript 준수',
+    '',
+    '순수 JSON으로만 응답하세요:',
+    JSON.stringify({
+      build: { score: 90, rationale: '빌드 성공, 경고 2건', fix: null },
+      ui: { score: 70, rationale: '시맨틱 구조 미흡', fix: 'header/main/footer 추가' },
+      functional: { score: 65, rationale: '핸들러 부족', fix: 'onClick 핸들러 추가' },
+      prd: { score: 80, rationale: '8/10 요구사항 구현', fix: '차트 컴포넌트 미구현' },
+      code: { score: 85, rationale: 'TS 에러 1건', fix: 'any 타입 제거' },
+    }),
+  ].join('\n');
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1024,
+      temperature: 0,
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    const text = response.content
+      .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+      .map(block => block.text)
+      .join('\n')
+      .trim();
+
+    const jsonStr = text.replace(/^```json\s*/m, '').replace(/```\s*$/m, '').trim();
+    const llmResult = JSON.parse(jsonStr) as LlmIntegratedResponse;
+
+    // LLM 점수를 DimensionScore 배열로 변환
+    const dimensions: DimensionScore[] = (
+      ['build', 'ui', 'functional', 'prd', 'code'] as const
+    ).map(dim => {
+      const llm = llmResult[dim];
+      const score = Math.min(Math.max(llm.score / 100, 0), 1.0);
+      const weight = DIMENSION_WEIGHTS[dim];
+      return {
+        dimension: dim,
+        score: Math.round(score * 100) / 100,
+        weight,
+        weighted: Math.round(score * weight * 100) / 100,
+        details: `LLM: ${llm.score}/100 — ${llm.rationale}${llm.fix ? ` | Fix: ${llm.fix}` : ''}`,
+      };
+    });
+
+    const total = Math.round(dimensions.reduce((s, d) => s + d.weighted, 0) * 100);
+
+    const llmEvaluation: LlmIntegratedEvaluation = {
+      build: { score: llmResult.build.score, rationale: llmResult.build.rationale, fix: llmResult.build.fix },
+      ui: { score: llmResult.ui.score, rationale: llmResult.ui.rationale, fix: llmResult.ui.fix },
+      functional: { score: llmResult.functional.score, rationale: llmResult.functional.rationale, fix: llmResult.functional.fix },
+      prd: { score: llmResult.prd.score, rationale: llmResult.prd.rationale, fix: llmResult.prd.fix },
+      code: { score: llmResult.code.score, rationale: llmResult.code.rationale, fix: llmResult.code.fix },
+    };
+
+    return {
+      total,
+      dimensions,
+      evaluatedAt: new Date().toISOString(),
+      round: job.round,
+      jobId: job.id,
+      llmEvaluation,
+      staticAnalysis: staticDimensions,
+    };
+  } catch (err) {
+    console.log(`[Scorer] evaluateQualityWithLlm failed, falling back to static: ${String(err).slice(0, 100)}`);
+    // fallback: 정적 분석 전체
+    const prdResult = await prdScore(job, workDir, { useLlm: false });
+    const allDimensions = [...staticDimensions, prdResult];
+    const total = Math.round(allDimensions.reduce((s, d) => s + d.weighted, 0) * 100);
+    return {
+      total,
+      dimensions: allDimensions,
+      evaluatedAt: new Date().toISOString(),
+      round: job.round,
+      jobId: job.id,
+      staticAnalysis: allDimensions,
+    };
   }
 }
 
@@ -433,12 +617,17 @@ export async function codeScore(workDir: string): Promise<DimensionScore> {
 
 /**
  * 5차원 품질 평가 — 전체 통합
+ * useLlmIntegrated: F426 5차원 LLM 통합 판별 활성화 (evaluateQualityWithLlm 호출)
  */
 export async function evaluateQuality(
   job: PrototypeJob,
   workDir: string,
-  options: { useLlm?: boolean; skipBuild?: boolean } = {},
+  options: { useLlm?: boolean; skipBuild?: boolean; useLlmIntegrated?: boolean } = {},
 ): Promise<QualityScore> {
+  if (options.useLlmIntegrated) {
+    return evaluateQualityWithLlm(job, workDir);
+  }
+
   const dimensions: DimensionScore[] = [];
 
   // 병렬로 독립적인 평가 실행
