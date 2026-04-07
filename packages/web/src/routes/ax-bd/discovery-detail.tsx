@@ -3,6 +3,8 @@
 /**
  * F439 — 아이템 상세 허브 (3탭: 기본정보/발굴분석/형상화)
  * F440 — 사업기획서 생성 + 열람
+ * F447 — 파이프라인 상태 추적 스테퍼
+ * F448 — 단계 간 자동 전환 CTA
  */
 import { useCallback, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
@@ -12,9 +14,11 @@ import {
   fetchBdpLatest,
   generateBusinessPlan,
   getShapingArtifacts,
+  getPipelineItemDetail,
   type BizItemDetail,
   type BdpVersion,
   type ShapingArtifacts,
+  type PipelineItemDetail,
 } from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +27,8 @@ import DiscoveryCriteriaPanel from "@/components/feature/discovery/DiscoveryCrit
 import AnalysisStepper from "@/components/feature/discovery/AnalysisStepper";
 import ShapingPipeline from "@/components/feature/discovery/ShapingPipeline";
 import BusinessPlanViewer from "@/components/feature/discovery/BusinessPlanViewer";
+import PipelineProgressStepper from "@/components/feature/discovery/PipelineProgressStepper";
+import PipelineTransitionCTA from "@/components/feature/discovery/PipelineTransitionCTA";
 
 const TYPE_LABELS: Record<string, string> = {
   I: "아이디어형", M: "시장·타겟형", P: "고객문제형", T: "기술형", S: "서비스형",
@@ -38,6 +44,7 @@ export function Component() {
   const [item, setItem] = useState<BizItemDetail | null>(null);
   const [plan, setPlan] = useState<BdpVersion | null>(null);
   const [artifacts, setArtifacts] = useState<ShapingArtifacts | null>(null);
+  const [pipelineDetail, setPipelineDetail] = useState<PipelineItemDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [generatingPlan, setGeneratingPlan] = useState(false);
@@ -47,14 +54,16 @@ export function Component() {
     if (!id) return;
     setLoading(true);
     try {
-      const [itemData, artifactsData] = await Promise.all([
+      const [itemData, artifactsData, pipelineData] = await Promise.all([
         fetchBizItemDetail(id),
         getShapingArtifacts(id).catch(() => ({
           businessPlan: null, offering: null, prd: null, prototype: null,
         } as ShapingArtifacts)),
+        getPipelineItemDetail(id).catch(() => null),
       ]);
       setItem(itemData);
       setArtifacts(artifactsData);
+      setPipelineDetail(pipelineData);
       // 기획서가 있으면 상세 조회
       if (artifactsData.businessPlan) {
         fetchBdpLatest(id).then(setPlan).catch(() => null);
@@ -127,6 +136,9 @@ export function Component() {
         </div>
       </div>
 
+      {/* F447: 파이프라인 진행률 스테퍼 */}
+      {pipelineDetail && <PipelineProgressStepper detail={pipelineDetail} />}
+
       {/* 3탭 허브 */}
       <Tabs defaultValue="info">
         <TabsList>
@@ -182,6 +194,17 @@ export function Component() {
             <h2 className="text-sm font-semibold mb-3">발굴 9기준 체크리스트</h2>
             <DiscoveryCriteriaPanel bizItemId={item.id} />
           </div>
+
+          {/* F448: 발굴 완료 → 형상화 자동 전환 CTA */}
+          {pipelineDetail && (
+            <PipelineTransitionCTA
+              bizItemId={item.id}
+              bizStatus={item.status}
+              currentStage={pipelineDetail.currentStage}
+              hasBusinessPlan={!!(artifacts?.businessPlan)}
+              onTransitionComplete={loadData}
+            />
+          )}
 
           {/* 리포트 링크 */}
           <Link
