@@ -1,7 +1,12 @@
-import { Navigate, createBrowserRouter, redirect } from "react-router-dom";
+import { Navigate, createBrowserRouter, useParams } from "react-router-dom";
 import { AppLayout } from "@/layouts/AppLayout";
 import { LandingLayout } from "@/layouts/LandingLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+
+function RedirectDiscoveryDetail() {
+  const { id } = useParams<{ id: string }>();
+  return <Navigate to={`/discovery/items/${id}`} replace />;
+}
 
 export const router = createBrowserRouter([
   {
@@ -131,7 +136,7 @@ export const router = createBrowserRouter([
       { path: "discovery/collection", element: <Navigate to="/collection/field" replace /> },
       { path: "ir-proposals", element: <Navigate to="/collection/ideas" replace /> },
       { path: "ax-bd/discovery", element: <Navigate to="/discovery/items" replace /> },
-      { path: "ax-bd/discovery/:id", loader: ({ params }) => redirect(`/discovery/items/${params.id}`) },
+      { path: "ax-bd/discovery/:id", element: <RedirectDiscoveryDetail /> },
       { path: "ax-bd/ideas-bmc", element: <Navigate to="/discovery/ideas-bmc" replace /> },
       { path: "ax-bd/discover-dashboard", element: <Navigate to="/discovery/dashboard" replace /> },
       { path: "discovery-progress", element: <Navigate to="/discovery/progress" replace /> },
