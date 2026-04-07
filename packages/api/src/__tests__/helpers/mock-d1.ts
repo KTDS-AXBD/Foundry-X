@@ -852,6 +852,33 @@ export class MockD1Database {
         FOREIGN KEY (prototype_id) REFERENCES prototypes(id) ON DELETE CASCADE
       );
       CREATE INDEX IF NOT EXISTS idx_offering_prototypes_offering ON offering_prototypes(offering_id);
+
+      -- 0116: Billing — subscription plans + tenant subscriptions + usage records (F411)
+      CREATE TABLE IF NOT EXISTS subscription_plans (
+        id           TEXT    PRIMARY KEY,
+        name         TEXT    NOT NULL,
+        monthly_limit INTEGER NOT NULL,
+        created_at   TEXT    NOT NULL DEFAULT (datetime('now'))
+      );
+      INSERT OR IGNORE INTO subscription_plans (id, name, monthly_limit) VALUES
+        ('free',       'Free',       1000),
+        ('pro',        'Pro',        50000),
+        ('enterprise', 'Enterprise', -1);
+
+      CREATE TABLE IF NOT EXISTS tenant_subscriptions (
+        org_id     TEXT NOT NULL PRIMARY KEY,
+        plan_id    TEXT NOT NULL DEFAULT 'free',
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+
+      CREATE TABLE IF NOT EXISTS usage_records (
+        org_id     TEXT    NOT NULL,
+        month      TEXT    NOT NULL,
+        api_calls  INTEGER NOT NULL DEFAULT 0,
+        updated_at TEXT    NOT NULL DEFAULT (datetime('now')),
+        PRIMARY KEY (org_id, month)
+      );
+      CREATE INDEX IF NOT EXISTS idx_usage_records_org ON usage_records (org_id, month);
     `);
     this.db.prepare("INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)").run("org_test", "Test Org", "test");
   }

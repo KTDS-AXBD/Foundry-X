@@ -69,6 +69,8 @@ import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
 import { tenantGuard, type TenantVariables } from "./middleware/tenant.js";
+import { usageLimiter } from "./middleware/usage-limiter.js";
+import { billingRoute } from "./modules/billing/index.js";
 import type { Env } from "./env.js";
 
 export const app = new OpenAPIHono<{ Bindings: Env; Variables: TenantVariables }>();
@@ -190,6 +192,8 @@ app.route("/api", feedbackQueueRoute);
 // Protected API routes — JWT required + tenant isolation
 app.use("/api/*", authMiddleware);
 app.use("/api/*", tenantGuard);
+// Sprint 195: 사용량 추적 미들웨어 (F411 — tenantGuard 후에 위치)
+app.use("/api/*", usageLimiter);
 app.route("/api", profileRoute);
 app.route("/api", integrityRoute);
 app.route("/api", healthRoute);
@@ -394,6 +398,9 @@ app.route("/api", userEvaluationsRoute);
 
 // Sprint 191: F406 이벤트 상태 폴링 + DLQ 관리 API
 app.route("/api", eventStatusRoute);
+
+// Sprint 195: 과금 체계 (F411)
+app.route("/api", billingRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
