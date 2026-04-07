@@ -2,10 +2,10 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { OrchestrationLoop } from "../services/orchestration-loop.js";
-import { TaskStateService } from "../services/task-state-service.js";
+import { OrchestrationLoop } from "../core/agent/services/orchestration-loop.js";
+import { TaskStateService } from "../core/agent/services/task-state-service.js";
 import { EventBus } from "../services/event-bus.js";
-import { createDefaultGuard } from "../services/transition-guard.js";
+import { createDefaultGuard } from "../core/harness/services/transition-guard.js";
 import { TaskState, type AgentAdapter, type AgentResult, type AgentExecutionContext } from "@foundry-x/shared";
 
 const DDL = `

@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { BusinessPlanGeneratorService } from "../services/business-plan-generator.js";
-import type { AgentRunner } from "../services/agent-runner.js";
-import type { AgentExecutionResult } from "../services/execution-types.js";
-import type { BizItem, EvaluationWithScores } from "../services/biz-item-service.js";
-import type { DiscoveryCriterion } from "../services/discovery-criteria.js";
-import type { AnalysisContext } from "../services/analysis-context.js";
-import type { BpGenerationInput } from "../services/business-plan-generator.js";
+import { BusinessPlanGeneratorService } from "../core/offering/services/business-plan-generator.js";
+import type { AgentRunner } from "../core/agent/services/agent-runner.js";
+import type { AgentExecutionResult } from "../core/agent/services/execution-types.js";
+import type { BizItem, EvaluationWithScores } from "../core/discovery/services/biz-item-service.js";
+import type { DiscoveryCriterion } from "../core/discovery/services/discovery-criteria.js";
+import type { AnalysisContext } from "../core/discovery/services/analysis-context.js";
+import type { BpGenerationInput } from "../core/offering/services/business-plan-generator.js";
 
 const TABLES_SQL = `
   CREATE TABLE IF NOT EXISTS business_plan_drafts (

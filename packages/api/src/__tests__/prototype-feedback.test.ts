@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { prototypeFeedbackRoute } from "../routes/prototype-feedback.js";
+import { prototypeFeedbackRoute } from "../core/harness/routes/prototype-feedback.js";
 
 const SCHEMA = `
   CREATE TABLE IF NOT EXISTS prototype_jobs (

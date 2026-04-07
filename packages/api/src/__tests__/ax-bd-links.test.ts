@@ -4,9 +4,9 @@ import {
   IdeaBmcLinkService,
   NotFoundError,
   ConflictError,
-} from "../services/idea-bmc-link-service.js";
-import { IdeaService } from "../services/idea-service.js";
-import { BmcService } from "../services/bmc-service.js";
+} from "../core/shaping/services/idea-bmc-link-service.js";
+import { IdeaService } from "../core/discovery/services/idea-service.js";
+import { BmcService } from "../core/shaping/services/bmc-service.js";
 
 describe("IdeaBmcLinkService", () => {
   let db: ReturnType<typeof createMockD1>;

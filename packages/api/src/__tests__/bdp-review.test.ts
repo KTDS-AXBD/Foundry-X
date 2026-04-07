@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { bdpRoute } from "../routes/bdp.js";
+import { bdpRoute } from "../core/offering/routes/bdp.js";
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 

@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { AgentOrchestrator } from "../services/agent-orchestrator.js";
-import { McpServerRegistry } from "../services/mcp-registry.js";
-import { McpRunner } from "../services/mcp-runner.js";
+import { AgentOrchestrator } from "../core/agent/services/agent-orchestrator.js";
+import { McpServerRegistry } from "../core/agent/services/mcp-registry.js";
+import { McpRunner } from "../core/agent/services/mcp-runner.js";
 import { SSEManager } from "../services/sse-manager.js";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import type { AgentRunner } from "../services/agent-runner.js";
-import type { McpTransport, McpResponse } from "../services/mcp-adapter.js";
+import type { AgentRunner } from "../core/agent/services/agent-runner.js";
+import type { McpTransport, McpResponse } from "../core/agent/services/mcp-adapter.js";
 
 // ─── Mock Transport ───
 

@@ -21,125 +21,47 @@ import {
   offeringPacksRoute, pipelineRoute, pipelineMonitoringRoute,
   pocRoute, shareLinksRoute,
 } from "./modules/index.js";
-import { integrityRoute } from "./routes/integrity.js";
-import { healthRoute } from "./routes/health.js";
-import { freshnessRoute } from "./routes/freshness.js";
+// Core: discovery (S184), shaping (S184), offering (S184), agent (S184), harness (S184) — Phase 20-A
+import {
+  // discovery (12 routes)
+  axBdDiscoveryRoute, axBdIdeasRoute, axBdArtifactsRoute,
+  bizItemsRoute, collectionRoute, ideaPortalWebhookRoute,
+  discoveryRoute, discoveryPipelineRoute, discoveryReportRoute,
+  discoveryReportsRoute, discoveryStagesRoute, discoveryShapePipelineRoute,
+  irProposalsRoute,
+  // shaping (14 routes)
+  shapingRoute, axBdBmcRoute, axBdAgentRoute, axBdCommentsRoute,
+  axBdHistoryRoute, axBdInsightsRoute, axBdLinksRoute, axBdViabilityRoute,
+  axBdPrototypesRoute, axBdSkillsRoute, axBdPersonaEvalRoute,
+  axBdProgressRoute, personaConfigsRoute, personaEvalsRoute,
+  // offering (10 routes)
+  offeringsRoute, offeringSectionsRoute, offeringExportRoute,
+  offeringValidateRoute, offeringMetricsRoute, offeringPrototypeRoute,
+  designTokensRoute, contentAdapterRoute, bdpRoute, methodologyRoute,
+  // agent (13 routes)
+  agentRoute, agentAdaptersRoute, agentDefinitionRoute,
+  orchestrationRoute, executionEventsRoute, taskStateRoute,
+  commandRegistryRoute, contextPassthroughRoute, workflowRoute,
+  capturedEngineRoute, derivedEngineRoute, skillRegistryRoute,
+  skillMetricsRoute,
+  // harness (22 routes)
+  harnessRoute, governanceRoute, guardRailRoute, auditRoute,
+  backupRestoreRoute, ogdGenericRoute, ogdQualityRoute,
+  automationQualityRoute, qualityDashboardRoute, integrityRoute,
+  freshnessRoute, healthRoute, roiBenchmarkRoute, prototypeFeedbackRoute,
+  prototypeJobsRoute, prototypeUsageRoute, hitlReviewRoute,
+  userEvaluationsRoute, builderRoute, mcpRoute, expansionPackRoute,
+  axBdKgRoute,
+} from "./core/index.js";
+// Flat routes (shared infrastructure — 8 routes)
 import { requirementsRoute } from "./routes/requirements.js";
-import { agentRoute } from "./routes/agent.js";
 import { specRoute } from "./routes/spec.js";
-import mcpRoute from "./routes/mcp.js";
-import { workflowRoute } from "./routes/workflow.js";
 import { proxyRoute } from "./routes/proxy.js";
 import { entitiesRoute } from "./routes/entities.js";
-import { automationQualityRoute } from "./routes/automation-quality.js";
 import { srRoute } from "./routes/sr.js";
-import { auditRoute } from "./routes/audit.js";
-import { governanceRoute } from "./routes/governance.js";
-import { bizItemsRoute } from "./routes/biz-items.js";
-import { discoveryStagesRoute } from "./routes/discovery-stages.js";
-import { collectionRoute, ideaPortalWebhookRoute } from "./routes/collection.js";
-import { discoveryRoute } from "./routes/discovery.js";
-import { methodologyRoute } from "./routes/methodology.js";
-import { axBdBmcRoute } from "./routes/ax-bd-bmc.js";
-import { axBdIdeasRoute } from "./routes/ax-bd-ideas.js";
-import { axBdAgentRoute } from "./routes/ax-bd-agent.js";
-import { axBdHistoryRoute } from "./routes/ax-bd-history.js";
-import { axBdLinksRoute } from "./routes/ax-bd-links.js";
-import { axBdCommentsRoute } from "./routes/ax-bd-comments.js";
-import { axBdDiscoveryRoute } from "./routes/ax-bd-discovery.js";
-import { axBdInsightsRoute } from "./routes/ax-bd-insights.js";
-import { axBdPrototypesRoute } from "./routes/ax-bd-prototypes.js";
-import { axBdViabilityRoute } from "./routes/ax-bd-viability.js";
-import { agentDefinitionRoute } from "./routes/agent-definition.js";
 import { shardDocRoute } from "./routes/shard-doc.js";
-import { contextPassthroughRoute } from "./routes/context-passthrough.js";
-import { commandRegistryRoute } from "./routes/command-registry.js";
-// partySessionRoute — moved to modules/portal (F396)
 import { specLibraryRoute } from "./routes/spec-library.js";
-import { expansionPackRoute } from "./routes/expansion-pack.js";
-// Sprint 79~81: pipelineRoute, shareLinksRoute, decisionsRoute, gatePackageRoute,
-// offeringPacksRoute, mvpTrackingRoute — moved to modules/gate/ + modules/launch/ (F397)
-import { bdpRoute } from "./routes/bdp.js";
-import { irProposalsRoute } from "./routes/ir-proposals.js";
-// Sprint 87: Admin bulk operations (F251) — moved to modules/auth (F396)
-// Sprint 88: Org shared data + NPS (F253, F254) — moved to modules/portal (F396)
-// Sprint 90: BD 스킬 실행 + 산출물 (F260, F261)
-import { axBdSkillsRoute } from "./routes/ax-bd-skills.js";
-import { axBdArtifactsRoute } from "./routes/ax-bd-artifacts.js";
-// Sprint 91: BD 프로세스 진행 추적 (F262)
-import { axBdProgressRoute } from "./routes/ax-bd-progress.js";
-// Sprint 92: KG Ontology (F255)
-import { axBdKgRoute } from "./routes/ax-bd-kg.js";
-// Sprint 95: Help Agent 챗봇 (F264)
 import { helpAgentRoute } from "./routes/help-agent.js";
-// Sprint 96: HITL 인터랙션 패널 (F266)
-import { hitlReviewRoute } from "./routes/hitl-review.js";
-// Sprint 103: 스킬 실행 메트릭 (F274)
-import { skillMetricsRoute } from "./routes/skill-metrics.js";
-import { skillRegistryRoute } from "./routes/skill-registry.js";
-// Sprint 105: DERIVED 엔진 (F276)
-import { derivedEngineRoute } from "./routes/derived-engine.js";
-// Sprint 106: CAPTURED 엔진 (F277)
-import { capturedEngineRoute } from "./routes/captured-engine.js";
-// Sprint 107: BD ROI 벤치마크 (F278)
-import { roiBenchmarkRoute } from "./routes/roi-benchmark.js";
-// Sprint 112: BD 형상화 Phase F (F286, F287)
-import { shapingRoute } from "./routes/shaping.js";
-// Sprint 116~120: validationTierRoute, validationMeetingsRoute, evaluationReportRoute,
-// pocRoute, gtmCustomersRoute, gtmOutreachRoute — moved to modules/gate/ + modules/launch/ (F397)
-// Sprint 132: Discovery Pipeline 오케스트레이션 (F312, F313)
-import { discoveryPipelineRoute } from "./routes/discovery-pipeline.js";
-// Sprint 134: pipelineMonitoringRoute — moved to modules/launch/ (F397)
-// Sprint 136: Backup/Restore (F317)
-import { backupRestoreRoute } from "./routes/backup-restore.js";
-// Sprint 137: Marker.io Feedback Queue (F319, F320) — moved to modules/portal (F396)
-// Sprint 148: TaskState Machine (F333, Phase 14)
-import { taskStateRoute } from "./routes/task-state.js";
-// Sprint 149: Execution Events (F334, Phase 14)
-import { executionEventsRoute } from "./routes/execution-events.js";
-// Sprint 150: Orchestration Loop (F335, Phase 14)
-import { orchestrationRoute } from "./routes/orchestration.js";
-// Sprint 151: Agent Adapter Registry (F336, Phase 14)
-import { agentAdaptersRoute } from "./routes/agent-adapters.js";
-// Sprint 154: Discovery UI/UX v2 — 페르소나 설정/평가 + 리포트 + 팀 검토 (F342)
-import { personaConfigsRoute } from "./routes/persona-configs.js";
-import { personaEvalsRoute } from "./routes/persona-evals.js";
-import { discoveryReportsRoute } from "./routes/discovery-reports.js";
-// teamReviewsRoute — moved to modules/gate/ (F397)
-// Sprint 155: 멀티 페르소나 평가 (F344, F345, Phase 15)
-import { axBdPersonaEvalRoute } from "./routes/ax-bd-persona-eval.js";
-// Sprint 156: Discovery Report (F346, Phase 15)
-import { discoveryReportRoute } from "./routes/discovery-report.js";
-// Sprint 159: Prototype Auto-Gen (F353, F354, Phase 16)
-import { prototypeJobsRoute } from "./routes/prototype-jobs.js";
-import { prototypeUsageRoute } from "./routes/prototype-usage.js";
-// Builder Server 전용 API (Webhook Secret 인증)
-import { builderRoute } from "./routes/builder.js";
-// Sprint 167: Offerings Data Layer (F369, F370, F371, Phase 18)
-import { offeringsRoute } from "./routes/offerings.js";
-import { offeringSectionsRoute } from "./routes/offering-sections.js";
-// Sprint 168: Offering Export + Validate (F372, F373, Phase 18)
-import { offeringExportRoute } from "./routes/offering-export.js";
-import { offeringValidateRoute } from "./routes/offering-validate.js";
-// Sprint 160: O-G-D Quality + Feedback (F355, F356, Phase 16)
-import { ogdQualityRoute } from "./routes/ogd-quality.js";
-import { prototypeFeedbackRoute } from "./routes/prototype-feedback.js";
-// Sprint 161: Guard Rail — 데이터 진단 + 패턴 감지 + Rule 생성 (F357, F358, Phase 17)
-import { guardRailRoute } from "./routes/guard-rail.js";
-// Sprint 163: O-G-D Generic Interface (F360, Phase 17)
-import { ogdGenericRoute } from "./routes/ogd-generic.js";
-// Sprint 164: 운영 지표 — metricsRoute moved to modules/portal (F396)
-// Sprint 178: Builder Quality Dashboard + User Evaluations (F390, F391, Phase 19)
-import { qualityDashboardRoute } from "./routes/quality-dashboard.js";
-import { userEvaluationsRoute } from "./routes/user-evaluations.js";
-// Sprint 171: Content Adapter + Discovery→Shape Pipeline (F378, F379, Phase 18)
-import { contentAdapterRoute } from "./routes/content-adapter.js";
-import { discoveryShapePipelineRoute } from "./routes/discovery-shape-pipeline.js";
-// Sprint 173: Design Token Editor + Offering→Prototype (F381, F382, Phase 18)
-import { designTokensRoute } from "./routes/design-tokens.js";
-import { offeringPrototypeRoute } from "./routes/offering-prototype.js";
-// Sprint 174: Offering Metrics + BD ROI 연동 (F383, Phase 18)
-import { offeringMetricsRoute } from "./routes/offering-metrics.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";

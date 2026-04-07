@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { RoiBenchmarkService } from "../services/roi-benchmark.js";
-import { SignalValuationService } from "../services/signal-valuation.js";
-import { BdRoiCalculatorService } from "../services/bd-roi-calculator.js";
+import { RoiBenchmarkService } from "../core/harness/services/roi-benchmark.js";
+import { SignalValuationService } from "../core/discovery/services/signal-valuation.js";
+import { BdRoiCalculatorService } from "../core/harness/services/bd-roi-calculator.js";
 
 const TABLES = `
 CREATE TABLE IF NOT EXISTS skill_executions (

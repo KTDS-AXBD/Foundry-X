@@ -6,8 +6,8 @@
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { PrdReviewPipeline, PipelineError } from "../services/prd-review-pipeline.js";
-import type { AiReviewProvider, AiReviewResponse } from "../services/external-ai-reviewer.js";
+import { PrdReviewPipeline, PipelineError } from "../core/offering/services/prd-review-pipeline.js";
+import type { AiReviewProvider, AiReviewResponse } from "../core/agent/services/external-ai-reviewer.js";
 
 const BIZ_TABLES_SQL = `
   CREATE TABLE IF NOT EXISTS biz_items (

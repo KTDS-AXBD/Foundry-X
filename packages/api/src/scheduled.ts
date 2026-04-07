@@ -3,7 +3,7 @@ import { GitHubService } from "./modules/portal/services/github.js";
 import { ReconciliationService } from "./modules/portal/services/reconciliation.js";
 import { KpiLogger } from "./modules/portal/services/kpi-logger.js";
 import { parseSpecRequirements } from "./services/spec-parser.js";
-import { BackupRestoreService } from "./services/backup-restore-service.js";
+import { BackupRestoreService } from "./core/harness/services/backup-restore-service.js";
 
 // ─── Cloudflare Workers Cron Trigger Handler ───
 

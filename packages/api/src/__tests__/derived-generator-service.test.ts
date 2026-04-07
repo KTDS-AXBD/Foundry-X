@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { DerivedSkillGeneratorService } from "../services/derived-skill-generator.js";
+import { DerivedSkillGeneratorService } from "../core/agent/services/derived-skill-generator.js";
 
 const DERIVED_TABLES = `
 CREATE TABLE IF NOT EXISTS derived_patterns (

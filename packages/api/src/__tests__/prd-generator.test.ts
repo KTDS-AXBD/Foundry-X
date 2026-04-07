@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { PrdGeneratorService } from "../services/prd-generator.js";
-import type { AgentRunner } from "../services/agent-runner.js";
-import type { AgentExecutionResult } from "../services/execution-types.js";
-import type { DiscoveryCriterion } from "../services/discovery-criteria.js";
-import type { AnalysisContext } from "../services/analysis-context.js";
+import { PrdGeneratorService } from "../core/offering/services/prd-generator.js";
+import type { AgentRunner } from "../core/agent/services/agent-runner.js";
+import type { AgentExecutionResult } from "../core/agent/services/execution-types.js";
+import type { DiscoveryCriterion } from "../core/discovery/services/discovery-criteria.js";
+import type { AnalysisContext } from "../core/discovery/services/analysis-context.js";
 
 const TABLES_SQL = `
   CREATE TABLE IF NOT EXISTS biz_generated_prds (

@@ -7,7 +7,7 @@ import {
   ModelQualityResponseSchema,
   AgentModelMatrixResponseSchema,
 } from "../schemas/token.js";
-import { ModelMetricsService } from "../../../services/model-metrics.js";
+import { ModelMetricsService } from "../../../core/agent/services/model-metrics.js";
 import type { TokenUsage, TokenSummary } from "@foundry-x/shared";
 import { getDb } from "../../../db/index.js";
 import { tokenUsage } from "../../../db/schema.js";

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { prototypeJobsRoute } from "../routes/prototype-jobs.js";
+import { prototypeJobsRoute } from "../core/harness/routes/prototype-jobs.js";
 
 const SCHEMA = `
   CREATE TABLE IF NOT EXISTS prototype_jobs (

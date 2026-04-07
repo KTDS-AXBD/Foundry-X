@@ -2,8 +2,8 @@
 
 import { describe, it, expect } from "vitest";
 import { TaskState } from "@foundry-x/shared";
-import { TransitionGuard, createDefaultGuard } from "../services/transition-guard.js";
-import type { GuardContext } from "../services/transition-guard.js";
+import { TransitionGuard, createDefaultGuard } from "../core/harness/services/transition-guard.js";
+import type { GuardContext } from "../core/harness/services/transition-guard.js";
 
 function makeCtx(from: TaskState, to: TaskState): GuardContext {
   return {

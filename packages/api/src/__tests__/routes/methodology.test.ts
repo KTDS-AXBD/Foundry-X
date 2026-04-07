@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "../helpers/mock-d1.js";
-import { PmSkillsCriteriaService, PM_SKILLS_CRITERIA } from "../../services/pm-skills-criteria.js";
+import { PmSkillsCriteriaService, PM_SKILLS_CRITERIA } from "../../core/discovery/services/pm-skills-criteria.js";
 import { PmSkillsModule, registerPmSkillsModule } from "../../services/pm-skills-module.js";
-import { getAllMethodologies, recommendMethodology, clearRegistry } from "../../services/methodology-types.js";
+import { getAllMethodologies, recommendMethodology, clearRegistry } from "../../core/offering/services/methodology-types.js";
 import { detectEntryPoint, buildAnalysisSteps, getNextExecutableSkills } from "../../services/pm-skills-pipeline.js";
 import { getSkillGuide } from "../../services/pm-skills-guide.js";
 import { UpdatePmSkillsCriterionSchema } from "../../schemas/pm-skills.js";
-import { BizItemService } from "../../services/biz-item-service.js";
+import { BizItemService } from "../../core/discovery/services/biz-item-service.js";
 
 const BIZ_ITEMS_DDL = `
   CREATE TABLE IF NOT EXISTS biz_items (

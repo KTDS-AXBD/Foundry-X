@@ -3,8 +3,8 @@
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { ContentAdapterService } from "../services/content-adapter-service.js";
-import { contentAdapterRoute } from "../routes/content-adapter.js";
+import { ContentAdapterService } from "../core/offering/services/content-adapter-service.js";
+import { contentAdapterRoute } from "../core/offering/routes/content-adapter.js";
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 

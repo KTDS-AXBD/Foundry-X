@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { ShapingOrchestratorService } from "../services/shaping-orchestrator-service.js";
+import { ShapingOrchestratorService } from "../core/shaping/services/shaping-orchestrator-service.js";
 
 describe("ShapingOrchestratorService (F312)", () => {
   let db: ReturnType<typeof createMockD1>;

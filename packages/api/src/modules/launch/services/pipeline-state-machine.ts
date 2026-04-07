@@ -1,7 +1,7 @@
 /**
  * F313: PipelineStateMachine — FSM 기반 파이프라인 상태 전이 엔진
  */
-import type { DiscoveryPipelineStatus, PipelineEventType } from "../../../schemas/discovery-pipeline.js";
+import type { DiscoveryPipelineStatus, PipelineEventType } from "../../../core/discovery/schemas/discovery-pipeline.js";
 
 export interface TransitionResult {
   fromStatus: DiscoveryPipelineStatus;

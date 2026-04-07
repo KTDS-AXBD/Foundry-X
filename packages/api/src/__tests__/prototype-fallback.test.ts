@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { PrototypeFallbackStrategy } from "../services/prototype-fallback.js";
+import { PrototypeFallbackStrategy } from "../core/harness/services/prototype-fallback.js";
 
 describe("PrototypeFallbackStrategy", () => {
   describe("next()", () => {

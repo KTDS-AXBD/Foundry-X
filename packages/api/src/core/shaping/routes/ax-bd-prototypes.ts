@@ -1,0 +1,147 @@
+/**
+ * Sprint 67: F209 — Prototype + PoC 환경 + 기술 검증 라우트
+ * 8 endpoints: list, getById, delete, pocEnv (provision/get/teardown), techReview (analyze/get)
+ */
+import { Hono } from "hono";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
+import { PrototypeService } from "../../harness/services/prototype-service.js";
+import { PocEnvService } from "../../../modules/launch/services/poc-env-service.js";
+import { TechReviewService } from "../../harness/services/tech-review-service.js";
+import { PocEnvProvisionSchema } from "../../harness/schemas/prototype-ext.js";
+import { PrototypeReviewService } from "../../harness/services/prototype-review-service.js";
+import { sectionReviewSchema } from "../schemas/hitl-section.schema.js";
+
+export const axBdPrototypesRoute = new Hono<{
+  Bindings: Env;
+  Variables: TenantVariables;
+}>();
+
+// GET /ax-bd/prototypes — 목록
+axBdPrototypesRoute.get("/ax-bd/prototypes", async (c) => {
+  const svc = new PrototypeService(c.env.DB);
+  const { bizItemId, limit, offset } = c.req.query();
+  const result = await svc.list(c.get("orgId"), {
+    bizItemId: bizItemId || undefined,
+    limit: Number(limit) || 20,
+    offset: Number(offset) || 0,
+  });
+  return c.json(result);
+});
+
+// GET /ax-bd/prototypes/:id — 상세 (PoC + TechReview 포함)
+axBdPrototypesRoute.get("/ax-bd/prototypes/:id", async (c) => {
+  const svc = new PrototypeService(c.env.DB);
+  const proto = await svc.getById(c.req.param("id"), c.get("orgId"));
+  if (!proto) return c.json({ error: "Prototype not found" }, 404);
+  return c.json(proto);
+});
+
+// DELETE /ax-bd/prototypes/:id — 삭제 (CASCADE)
+axBdPrototypesRoute.delete("/ax-bd/prototypes/:id", async (c) => {
+  const svc = new PrototypeService(c.env.DB);
+  const ok = await svc.delete(c.req.param("id"), c.get("orgId"));
+  if (!ok) return c.json({ error: "Prototype not found" }, 404);
+  return c.json({ success: true });
+});
+
+// POST /ax-bd/prototypes/:id/poc-env — PoC 환경 프로비저닝
+axBdPrototypesRoute.post("/ax-bd/prototypes/:id/poc-env", async (c) => {
+  const body = await c.req.json();
+  const parsed = PocEnvProvisionSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+  }
+
+  const svc = new PocEnvService(c.env.DB);
+  try {
+    const env = await svc.provision(c.req.param("id"), c.get("orgId"), parsed.data.config);
+    return c.json(env, 201);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Unknown error";
+    if (msg === "Prototype not found") return c.json({ error: msg }, 404);
+    if (msg === "Active PoC environment already exists") return c.json({ error: msg }, 409);
+    throw e;
+  }
+});
+
+// GET /ax-bd/prototypes/:id/poc-env — PoC 환경 조회
+axBdPrototypesRoute.get("/ax-bd/prototypes/:id/poc-env", async (c) => {
+  const svc = new PocEnvService(c.env.DB);
+  const env = await svc.getByPrototype(c.req.param("id"), c.get("orgId"));
+  if (!env) return c.json({ error: "PoC environment not found" }, 404);
+  return c.json(env);
+});
+
+// DELETE /ax-bd/prototypes/:id/poc-env — PoC 환경 teardown
+axBdPrototypesRoute.delete("/ax-bd/prototypes/:id/poc-env", async (c) => {
+  const svc = new PocEnvService(c.env.DB);
+  try {
+    await svc.teardown(c.req.param("id"), c.get("orgId"));
+    return c.json({ success: true });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Unknown error";
+    if (msg === "PoC environment not found") return c.json({ error: msg }, 404);
+    if (msg === "Environment already terminated") return c.json({ error: msg }, 409);
+    throw e;
+  }
+});
+
+// POST /ax-bd/prototypes/:id/tech-review — 기술 검증 분석 요청
+axBdPrototypesRoute.post("/ax-bd/prototypes/:id/tech-review", async (c) => {
+  const svc = new TechReviewService(c.env.DB);
+  try {
+    const review = await svc.analyze(c.req.param("id"), c.get("orgId"));
+    return c.json(review, 201);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Unknown error";
+    if (msg === "Prototype not found") return c.json({ error: msg }, 404);
+    throw e;
+  }
+});
+
+// GET /ax-bd/prototypes/:id/tech-review — 기술 검증 결과 조회
+axBdPrototypesRoute.get("/ax-bd/prototypes/:id/tech-review", async (c) => {
+  const svc = new TechReviewService(c.env.DB);
+  const review = await svc.getByPrototype(c.req.param("id"), c.get("orgId"));
+  if (!review) return c.json({ error: "Tech review not found" }, 404);
+  return c.json(review);
+});
+
+// POST /ax-bd/prototypes/:id/sections/:sectionId/review — 섹션 리뷰 제출 (F297)
+axBdPrototypesRoute.post("/ax-bd/prototypes/:id/sections/:sectionId/review", async (c) => {
+  const orgId = c.get("orgId");
+  const prototypeId = c.req.param("id");
+  const sectionId = c.req.param("sectionId");
+  const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? (c.get("userId") as string) ?? "";
+
+  const body = await c.req.json();
+  const parsed = sectionReviewSchema.safeParse({ ...body, sectionId });
+  if (!parsed.success) {
+    return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+  }
+
+  const svc = new PrototypeReviewService(c.env.DB);
+  const review = await svc.reviewSection(orgId, prototypeId, parsed.data, userId, body.framework);
+  return c.json(review, 201);
+});
+
+// GET /ax-bd/prototypes/:id/reviews — 리뷰 목록 (F297)
+axBdPrototypesRoute.get("/ax-bd/prototypes/:id/reviews", async (c) => {
+  const orgId = c.get("orgId");
+  const prototypeId = c.req.param("id");
+
+  const svc = new PrototypeReviewService(c.env.DB);
+  const reviews = await svc.listReviews(orgId, prototypeId);
+  return c.json(reviews);
+});
+
+// GET /ax-bd/prototypes/:id/review-summary — 상태 요약 (F297)
+axBdPrototypesRoute.get("/ax-bd/prototypes/:id/review-summary", async (c) => {
+  const orgId = c.get("orgId");
+  const prototypeId = c.req.param("id");
+
+  const svc = new PrototypeReviewService(c.env.DB);
+  const summary = await svc.getSummary(orgId, prototypeId);
+  return c.json(summary);
+});

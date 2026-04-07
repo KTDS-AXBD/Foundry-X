@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { PatternExtractorService, wilsonScoreLowerBound } from "../services/pattern-extractor.js";
+import { PatternExtractorService, wilsonScoreLowerBound } from "../core/harness/services/pattern-extractor.js";
 
 const DERIVED_TABLES = `
 CREATE TABLE IF NOT EXISTS skill_executions (

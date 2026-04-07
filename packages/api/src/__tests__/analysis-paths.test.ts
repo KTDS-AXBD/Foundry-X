@@ -4,7 +4,7 @@ import {
   ANALYSIS_PATHS,
   getAnalysisPath,
   type StartingPointType,
-} from "../services/analysis-paths.js";
+} from "../core/discovery/services/analysis-paths.js";
 
 describe("analysis-paths", () => {
   it("getAnalysisPath(idea) — 8단계", () => {

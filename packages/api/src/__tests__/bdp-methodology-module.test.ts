@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { BdpMethodologyModule } from "../services/bdp-methodology-module.js";
-import type { BizItemContext, ModuleClassificationResult } from "../services/methodology-module.js";
-import type { AgentRunner } from "../services/agent-runner.js";
+import { BdpMethodologyModule } from "../core/offering/services/bdp-methodology-module.js";
+import type { BizItemContext, ModuleClassificationResult } from "../core/offering/services/methodology-module.js";
+import type { AgentRunner } from "../core/agent/services/agent-runner.js";
 
 // ─── Mocks ───
 
-vi.mock("../services/item-classifier.js", () => {
+vi.mock("../core/discovery/services/item-classifier.js", () => {
   const classifyMock = vi.fn().mockResolvedValue({
     itemType: "type_a",
     confidence: 0.85,
@@ -21,8 +21,8 @@ vi.mock("../services/item-classifier.js", () => {
   };
 });
 
-vi.mock("../services/discovery-criteria.js", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../services/discovery-criteria.js")>();
+vi.mock("../core/discovery/services/discovery-criteria.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../core/discovery/services/discovery-criteria.js")>();
   const checkGateMock = vi.fn().mockResolvedValue({
     gateStatus: "warning",
     completedCount: 7,

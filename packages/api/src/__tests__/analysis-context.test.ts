@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { AnalysisContextService } from "../services/analysis-context.js";
-import { ANALYSIS_PATHS } from "../services/analysis-paths.js";
+import { AnalysisContextService } from "../core/discovery/services/analysis-context.js";
+import { ANALYSIS_PATHS } from "../core/discovery/services/analysis-paths.js";
 
 const TABLES_SQL = `
   CREATE TABLE IF NOT EXISTS biz_analysis_contexts (

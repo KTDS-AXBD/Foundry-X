@@ -2,7 +2,7 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { RuleGeneratorService } from "../services/rule-generator-service.js";
+import { RuleGeneratorService } from "../core/harness/services/rule-generator-service.js";
 
 const DDL = `
   CREATE TABLE IF NOT EXISTS failure_patterns (

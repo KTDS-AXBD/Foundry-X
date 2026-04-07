@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { AutoRebaseService, MAX_REBASE_ATTEMPTS, MAX_CONFLICT_FILES } from "../../services/auto-rebase.js";
+import { AutoRebaseService, MAX_REBASE_ATTEMPTS, MAX_CONFLICT_FILES } from "../../core/harness/services/auto-rebase.js";
 import { WorktreeManager } from "../../services/worktree-manager.js";
 import { MergeQueueService } from "../../services/merge-queue.js";
 import { createMockD1 } from "../helpers/mock-d1.js";

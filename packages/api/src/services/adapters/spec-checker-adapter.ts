@@ -1,7 +1,7 @@
 // ─── F336: Spec Checker → AgentAdapter (Sprint 151) ───
 
 import type { AgentAdapter } from "@foundry-x/shared";
-import { AgentAdapterFactory } from "../agent-adapter-factory.js";
+import { AgentAdapterFactory } from "../../core/agent/services/agent-adapter-factory.js";
 
 export function createSpecCheckerAdapter(): AgentAdapter {
   return AgentAdapterFactory.fromYamlDefinition(

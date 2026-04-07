@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { expansionPackRoute } from "../routes/expansion-pack.js";
+import { expansionPackRoute } from "../core/harness/routes/expansion-pack.js";
 import type { Env } from "../env.js";
 
 const DDL = `

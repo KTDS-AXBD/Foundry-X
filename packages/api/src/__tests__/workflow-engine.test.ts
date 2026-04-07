@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { app } from "../app.js";
 import { createTestEnv, createAuthHeaders } from "./helpers/test-app.js";
-import { WorkflowEngine, WORKFLOW_TEMPLATES } from "../services/workflow-engine.js";
+import { WorkflowEngine, WORKFLOW_TEMPLATES } from "../core/agent/services/workflow-engine.js";
 
 let env: ReturnType<typeof createTestEnv>;
 

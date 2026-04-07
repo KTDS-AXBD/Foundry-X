@@ -1,15 +1,15 @@
 import { describe, it, expect } from "vitest";
-import type { AgentRunner } from "../services/agent-runner.js";
+import type { AgentRunner } from "../core/agent/services/agent-runner.js";
 import type {
   AgentExecutionRequest,
   AgentExecutionResult,
-} from "../services/execution-types.js";
+} from "../core/agent/services/execution-types.js";
 import {
   CodeReviewCriteria,
   TestCoverageCriteria,
   SpecComplianceCriteria,
 } from "../modules/gate/services/evaluation-criteria.js";
-import { EvaluatorOptimizer } from "../services/evaluator-optimizer.js";
+import { EvaluatorOptimizer } from "../core/harness/services/evaluator-optimizer.js";
 
 // ── Mock Runner ─────────────────────────────────────────────
 

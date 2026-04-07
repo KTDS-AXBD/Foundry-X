@@ -4,7 +4,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { discoveryReportRoute } from "../routes/discovery-report.js";
+import { discoveryReportRoute } from "../core/discovery/routes/discovery-report.js";
 
 function createTestApp(db: unknown) {
   const app = new Hono();

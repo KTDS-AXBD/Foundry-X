@@ -2,9 +2,9 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { OgdOrchestratorService } from "../services/ogd-orchestrator-service.js";
-import { OgdGeneratorService } from "../services/ogd-generator-service.js";
-import { OgdDiscriminatorService } from "../services/ogd-discriminator-service.js";
+import { OgdOrchestratorService } from "../core/harness/services/ogd-orchestrator-service.js";
+import { OgdGeneratorService } from "../core/harness/services/ogd-generator-service.js";
+import { OgdDiscriminatorService } from "../core/harness/services/ogd-discriminator-service.js";
 
 const SCHEMA = `
   CREATE TABLE IF NOT EXISTS prototype_jobs (

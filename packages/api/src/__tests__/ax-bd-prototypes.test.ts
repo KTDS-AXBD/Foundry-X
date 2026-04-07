@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { axBdPrototypesRoute } from "../routes/ax-bd-prototypes.js";
+import { axBdPrototypesRoute } from "../core/shaping/routes/ax-bd-prototypes.js";
 
 /**
  * Sprint 67: F209 — Prototype + PoC + TechReview 라우트 테스트

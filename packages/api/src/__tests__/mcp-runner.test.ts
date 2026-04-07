@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { McpRunner } from "../services/mcp-runner.js";
-import type { McpTransport, McpResponse } from "../services/mcp-adapter.js";
-import type { AgentExecutionRequest } from "../services/execution-types.js";
+import { McpRunner } from "../core/agent/services/mcp-runner.js";
+import type { McpTransport, McpResponse } from "../core/agent/services/mcp-adapter.js";
+import type { AgentExecutionRequest } from "../core/agent/services/execution-types.js";
 
 // ─── Mock Transport ───
 

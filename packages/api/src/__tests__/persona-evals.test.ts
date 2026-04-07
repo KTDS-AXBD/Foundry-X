@@ -3,7 +3,7 @@
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { PersonaEvalService } from "../services/persona-eval-service.js";
+import { PersonaEvalService } from "../core/shaping/services/persona-eval-service.js";
 
 describe("PersonaEvalService", () => {
   let db: ReturnType<typeof createMockD1>;

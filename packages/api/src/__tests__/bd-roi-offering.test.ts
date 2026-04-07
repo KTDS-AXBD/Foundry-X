@@ -4,7 +4,7 @@
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { OfferingMetricsService } from "../services/offering-metrics-service.js";
+import { OfferingMetricsService } from "../core/offering/services/offering-metrics-service.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Any = any;

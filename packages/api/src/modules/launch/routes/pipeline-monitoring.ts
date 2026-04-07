@@ -6,7 +6,7 @@ import { Hono } from "hono";
 import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
 import { roleGuard } from "../../../middleware/role-guard.js";
-import { DiscoveryPipelineService } from "../../../services/discovery-pipeline-service.js";
+import { DiscoveryPipelineService } from "../../../core/discovery/services/discovery-pipeline-service.js";
 import { PipelinePermissionService } from "../services/pipeline-permission-service.js";
 import { dashboardQuerySchema, setPermissionSchema } from "../schemas/pipeline-monitoring.schema.js";
 

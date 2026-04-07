@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "../helpers/mock-d1.js";
-import { AuditLogService } from "../../services/audit-logger.js";
+import { AuditLogService } from "../../core/harness/services/audit-logger.js";
 
 const AUDIT_DDL = `CREATE TABLE IF NOT EXISTS audit_logs (
   id TEXT PRIMARY KEY,
@@ -58,7 +58,7 @@ describe("Audit Routes (서비스 통합)", () => {
   });
 
   it("POST /api/audit/log — Zod 스키마 검증", async () => {
-    const { AuditEventSchema } = await import("../../schemas/audit.js");
+    const { AuditEventSchema } = await import("../../core/harness/schemas/audit.js");
 
     // 필수 필드 누락
     expect(AuditEventSchema.safeParse({}).success).toBe(false);

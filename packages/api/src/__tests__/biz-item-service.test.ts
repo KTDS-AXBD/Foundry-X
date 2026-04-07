@@ -5,7 +5,7 @@ import {
   type ClassificationInput,
   type EvaluationInput,
   type EvaluationScoreInput,
-} from "../services/biz-item-service.js";
+} from "../core/discovery/services/biz-item-service.js";
 
 describe("BizItemService", () => {
   let db: ReturnType<typeof createMockD1>;

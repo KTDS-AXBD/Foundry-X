@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "../helpers/mock-d1.js";
-import { AgentOrchestrator } from "../../services/agent-orchestrator.js";
-import { PlannerAgent } from "../../services/planner-agent.js";
-import { MockRunner } from "../../services/claude-api-runner.js";
+import { AgentOrchestrator } from "../../core/agent/services/agent-orchestrator.js";
+import { PlannerAgent } from "../../core/agent/services/planner-agent.js";
+import { MockRunner } from "../../core/agent/services/claude-api-runner.js";
 
 describe("AgentOrchestrator", () => {
   let db: ReturnType<typeof createMockD1>;

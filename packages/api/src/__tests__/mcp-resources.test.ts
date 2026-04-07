@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { McpResourcesClient } from "../services/mcp-resources.js";
-import type { McpServerRegistry, McpServerRecord } from "../services/mcp-registry.js";
+import { McpResourcesClient } from "../core/agent/services/mcp-resources.js";
+import type { McpServerRegistry, McpServerRecord } from "../core/agent/services/mcp-registry.js";
 
 // ─── Mock helpers ───
 
@@ -22,7 +22,7 @@ const mockServer: McpServerRecord = {
 // Mock McpRunner responses via transport
 const mockTransportSend = vi.fn();
 
-vi.mock("../services/mcp-transport.js", () => ({
+vi.mock("../core/agent/services/mcp-transport.js", () => ({
   createTransport: () => ({
     type: "http",
     connect: vi.fn().mockResolvedValue(undefined),

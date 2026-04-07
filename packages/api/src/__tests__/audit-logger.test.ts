@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { AuditLogService } from "../services/audit-logger.js";
+import { AuditLogService } from "../core/harness/services/audit-logger.js";
 
 const AUDIT_DDL = `CREATE TABLE IF NOT EXISTS audit_logs (
   id TEXT PRIMARY KEY,

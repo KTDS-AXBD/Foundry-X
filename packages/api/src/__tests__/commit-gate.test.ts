@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { CommitGateService } from "../services/commit-gate-service.js";
+import { CommitGateService } from "../core/shaping/services/commit-gate-service.js";
 
 describe("CommitGateService", () => {
   let db: ReturnType<typeof createMockD1>;

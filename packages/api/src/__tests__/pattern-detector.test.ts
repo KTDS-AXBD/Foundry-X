@@ -2,7 +2,7 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { PatternDetectorService } from "../services/pattern-detector-service.js";
+import { PatternDetectorService } from "../core/harness/services/pattern-detector-service.js";
 
 const DDL = `
   CREATE TABLE IF NOT EXISTS execution_events (

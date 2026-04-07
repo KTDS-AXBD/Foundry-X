@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createTestEnv } from "./helpers/test-app.js";
-import { ModelRouter, DEFAULT_MODEL_MAP } from "../services/model-router.js";
-import { FallbackChainService } from "../services/fallback-chain.js";
-import type { FallbackChainResult } from "../services/fallback-chain.js";
-import type { AgentRunner } from "../services/agent-runner.js";
-import type { RoutingRule } from "../services/model-router.js";
+import { ModelRouter, DEFAULT_MODEL_MAP } from "../core/agent/services/model-router.js";
+import { FallbackChainService } from "../core/agent/services/fallback-chain.js";
+import type { FallbackChainResult } from "../core/agent/services/fallback-chain.js";
+import type { AgentRunner } from "../core/agent/services/agent-runner.js";
+import type { RoutingRule } from "../core/agent/services/model-router.js";
 import type {
   AgentExecutionRequest,
   AgentExecutionResult,
-} from "../services/execution-types.js";
+} from "../core/agent/services/execution-types.js";
 
 let env: ReturnType<typeof createTestEnv>;
 

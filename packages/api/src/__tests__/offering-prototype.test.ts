@@ -3,7 +3,7 @@
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { offeringPrototypeRoute } from "../routes/offering-prototype.js";
+import { offeringPrototypeRoute } from "../core/offering/routes/offering-prototype.js";
 import { Hono } from "hono";
 import type { Env } from "../env.js";
 

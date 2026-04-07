@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { ExpansionPackService } from "../services/expansion-pack.js";
+import { ExpansionPackService } from "../core/harness/services/expansion-pack.js";
 
 const DDL = `
   CREATE TABLE IF NOT EXISTS expansion_packs (

@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { BmcAgentService, parseBlocks } from "../services/bmc-agent.js";
-import { BMC_BLOCK_TYPES } from "../services/bmc-service.js";
-import { axBdAgentRoute } from "../routes/ax-bd-agent.js";
+import { BmcAgentService, parseBlocks } from "../core/shaping/services/bmc-agent.js";
+import { BMC_BLOCK_TYPES } from "../core/shaping/services/bmc-service.js";
+import { axBdAgentRoute } from "../core/shaping/routes/ax-bd-agent.js";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 

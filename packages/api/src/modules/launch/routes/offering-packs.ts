@@ -5,7 +5,7 @@ import { Hono } from "hono";
 import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
 import { OfferingPackService } from "../services/offering-pack-service.js";
-import { OfferingBriefService } from "../../../services/offering-brief-service.js";
+import { OfferingBriefService } from "../../../core/offering/services/offering-brief-service.js";
 import {
   CreateOfferingPackSchema,
   CreatePackItemSchema,
@@ -13,7 +13,7 @@ import {
   CreatePackShareSchema,
   OfferingPackFilterSchema,
 } from "../schemas/offering-pack.schema.js";
-import { CreateOfferingBriefSchema, OfferingBriefFilterSchema } from "../../../schemas/offering-brief.schema.js";
+import { CreateOfferingBriefSchema, OfferingBriefFilterSchema } from "../../../core/offering/schemas/offering-brief.schema.js";
 
 export const offeringPacksRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 

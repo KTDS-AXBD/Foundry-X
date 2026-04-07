@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createAgentRunner } from "../services/agent-runner.js";
+import { createAgentRunner } from "../core/agent/services/agent-runner.js";
 
 describe("createAgentRunner (factory)", () => {
   // 1. OPENROUTER_API_KEY만 → openrouter

@@ -2,8 +2,8 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { OgdDomainRegistry } from "../services/ogd-domain-registry.js";
-import { OgdGenericRunner, OgdDomainNotFoundError } from "../services/ogd-generic-runner.js";
+import { OgdDomainRegistry } from "../core/harness/services/ogd-domain-registry.js";
+import { OgdGenericRunner, OgdDomainNotFoundError } from "../core/harness/services/ogd-generic-runner.js";
 import type { DomainAdapterInterface } from "@foundry-x/shared";
 
 const SCHEMA = `
