@@ -17,6 +17,9 @@ importers:
 
   packages/api:
     dependencies:
+      '@foundry-x/harness-kit':
+        specifier: workspace:*
+        version: link:../harness-kit
       '@foundry-x/shared':
         specifier: workspace:*
         version: link:../shared

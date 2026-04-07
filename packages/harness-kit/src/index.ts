@@ -5,8 +5,9 @@ export {
   rbac,
   errorHandler,
   HarnessError,
+  createStranglerMiddleware,
 } from "./middleware/index.js";
-export type { JwtPayload, Role } from "./middleware/index.js";
+export type { JwtPayload, Role, StranglerRoute, StranglerConfig } from "./middleware/index.js";
 
 // Types
 export type {
@@ -20,13 +21,14 @@ export type {
 export { getDb, runQuery, runExec } from "./d1/index.js";
 
 // Events
-export { NoopEventBus } from "./events/index.js";
+export { NoopEventBus, D1EventBus, createEvent } from "./events/index.js";
 export type {
   EventType,
   DomainEvent,
   EventPublisher,
   EventSubscriber,
   EventBus,
+  D1LikeDatabase,
 } from "./events/index.js";
 
 // ESLint

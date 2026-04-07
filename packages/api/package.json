@@ -17,6 +17,7 @@
     "lint": "echo 'API lint: eslint config pending (Sprint 7)'"
   },
   "dependencies": {
+    "@foundry-x/harness-kit": "workspace:*",
     "@foundry-x/shared": "workspace:*",
     "@hono/swagger-ui": "^0.4.0",
     "@hono/zod-openapi": "^0.9.0",
