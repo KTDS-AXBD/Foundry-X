@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Foundry-X(파운드리엑스)는 AX 사업개발 업무의 전체 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼이에요.
 핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 모든 명세/코드/테스트/결정 이력은 Git에 존재하고, Foundry-X는 이를 읽고 분석하고 동기화를 강제하는 레이어예요.
 
-**현재 상태:** Phase 20 🔧 진행 중 (Sprint 186) — F392~F401
+**현재 상태:** Phase 20 ✅ 완료 (Sprint 188) — F392~F401
 **패키지 버전:** cli 0.5.0 / api 0.1.0 / web 0.1.0 / shared 0.1.0
 
 ## Architecture
@@ -174,7 +174,7 @@ pnpm e2e                          # Playwright E2E
 - **Phase 17:** ✅ 완료 (Sprint 161~164) — Self-Evolving Harness v2 F357~F362. Guard Rail 자동 제안 + O-G-D 4도메인 범용화 + 운영 지표 대시보드. PRD: `docs/specs/fx-harness-evolution/prd-final.md`. 전략: `docs/specs/self-evolving-harness-strategy.md`
 - **Phase 18:** ✅ 완료 (Sprint 165~174) — Offering Pipeline F363~F383 (21/21, Match 93%). 형상화 자동화: HTML/PPTX Skill + Offering Agent + Full UI + 콘텐츠 어댑터 + 파이프라인. PRD: `docs/specs/fx-offering-pipeline/prd-final.md`
 - **Phase 19:** ✅ 완료 (Sprint 175~178) — Builder Evolution F384~F391. 5차원 품질 스코어링 + CLI 듀얼모드 + Enhanced O-G-D + Quality Dashboard. PRD: `docs/specs/fx-builder-evolution/prd-final.md`
-- **Phase 20:** 🔧 진행 중 (Sprint 179~188) — AX BD MSA 재조정 F392~F401. 모놀리스 모듈화(20-A) + harness-kit + 이벤트/프록시(20-B). 2단계 접근법: 모듈화→실제분리. PRD: `docs/specs/ax-bd-msa/prd-final.md`
+- **Phase 20:** ✅ 완료 (Sprint 179~188) — AX BD MSA 재조정 F392~F401. 모놀리스 모듈화(20-A) + harness-kit + 이벤트/프록시(20-B). 2단계 접근법: 모듈화→실제분리. PRD: `docs/specs/ax-bd-msa/prd-final.md`
 - **수치 확인:** `/ax:daily-check` 실행 또는 SPEC.md §2 "실시간 수치" 블록 참조 (하드코딩 금지 — drift 방지)
 - **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 
