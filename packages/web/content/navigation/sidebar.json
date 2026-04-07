@@ -2,33 +2,18 @@
   "navId": "main-sidebar",
   "topItems": [
     { "href": "/dashboard", "label": "대시보드", "iconKey": "LayoutDashboard", "visible": true, "sortOrder": 0 },
-    { "href": "/getting-started", "label": "시작하기", "iconKey": "Rocket", "visible": true, "sortOrder": 1 }
+    { "href": "/getting-started", "label": "새 아이템", "iconKey": "Plus", "visible": true, "sortOrder": 1 }
   ],
   "processGroups": [
-    {
-      "key": "collect",
-      "label": "1. 수집",
-      "iconKey": "Inbox",
-      "stageColor": "bg-axis-blue",
-      "sortOrder": 0,
-      "visible": true,
-      "collapsed": true,
-      "badge": "이관 예정",
-      "items": [
-        { "href": "/collection/field", "label": "Field 수집", "iconKey": "Radio", "visible": true, "sortOrder": 0 },
-        { "href": "/collection/ideas", "label": "IDEA Portal", "iconKey": "ArrowUpFromLine", "visible": true, "sortOrder": 1 },
-        { "href": "/collection/screening", "label": "스크리닝", "iconKey": "ClipboardList", "visible": true, "sortOrder": 2 }
-      ]
-    },
     {
       "key": "discover",
       "label": "2. 발굴",
       "iconKey": "Search",
       "stageColor": "bg-axis-violet",
-      "sortOrder": 1,
+      "sortOrder": 0,
       "visible": true,
       "items": [
-        { "href": "/discovery", "label": "발굴", "iconKey": "Map", "visible": true, "sortOrder": 0 },
+        { "href": "/discovery", "label": "내 아이템", "iconKey": "List", "visible": true, "sortOrder": 0 },
         { "href": "/discovery/report", "label": "평가 결과서", "iconKey": "ClipboardCheck", "visible": true, "sortOrder": 1 }
       ]
     },
@@ -37,52 +22,13 @@
       "label": "3. 형상화",
       "iconKey": "PenTool",
       "stageColor": "bg-axis-warm",
-      "sortOrder": 2,
+      "sortOrder": 1,
       "visible": true,
       "items": [
         { "href": "/shaping/business-plan", "label": "사업기획서", "iconKey": "FileSignature", "visible": true, "sortOrder": 0 },
-        { "href": "/shaping/offerings", "label": "Offerings", "iconKey": "FileOutput", "visible": true, "sortOrder": 1 },
-        { "href": "/shaping/offering", "label": "Offering Pack", "iconKey": "Package", "visible": true, "sortOrder": 2 },
-        { "href": "/shaping/prd", "label": "PRD", "iconKey": "FileText", "visible": true, "sortOrder": 3 },
-        { "href": "/shaping/prototype", "label": "Prototype", "iconKey": "Code", "visible": true, "sortOrder": 4 }
-      ]
-    },
-    {
-      "key": "validate",
-      "label": "4. 검증",
-      "iconKey": "CheckCircle",
-      "stageColor": "bg-axis-green",
-      "sortOrder": 3,
-      "visible": true,
-      "items": [
-        { "href": "/validation", "label": "검증", "iconKey": "CheckCircle", "visible": true, "sortOrder": 0 },
-        { "href": "/validation/share", "label": "산출물 공유", "iconKey": "Users", "visible": true, "sortOrder": 1 }
-      ]
-    },
-    {
-      "key": "productize",
-      "label": "5. 제품화",
-      "iconKey": "Rocket",
-      "stageColor": "bg-axis-indigo",
-      "sortOrder": 4,
-      "visible": true,
-      "items": [
-        { "href": "/product", "label": "제품화", "iconKey": "Target", "visible": true, "sortOrder": 0 },
-        { "href": "/product/offering-pack", "label": "Offering Pack", "iconKey": "Package", "visible": true, "sortOrder": 1 }
-      ]
-    },
-    {
-      "key": "gtm",
-      "label": "6. GTM",
-      "iconKey": "TrendingUp",
-      "stageColor": "bg-axis-rose",
-      "sortOrder": 5,
-      "visible": true,
-      "collapsed": true,
-      "badge": "이관 예정",
-      "items": [
-        { "href": "/gtm/outreach", "label": "대고객 선제안", "iconKey": "Send", "visible": true, "sortOrder": 0 },
-        { "href": "/gtm/pipeline", "label": "파이프라인", "iconKey": "GitBranch", "visible": true, "sortOrder": 1 }
+        { "href": "/shaping/offerings", "label": "Offering", "iconKey": "FileOutput", "visible": true, "sortOrder": 1 },
+        { "href": "/shaping/prd", "label": "PRD", "iconKey": "FileText", "visible": true, "sortOrder": 2 },
+        { "href": "/shaping/prototype", "label": "Prototype", "iconKey": "Code", "visible": true, "sortOrder": 3 }
       ]
     }
   ],
