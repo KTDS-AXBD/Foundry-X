@@ -2793,3 +2793,37 @@ export async function getDiscoveryCriteria(bizItemId: string): Promise<CriteriaP
 export async function getNextGuide(bizItemId: string): Promise<{ step: string; description: string; actions: string[] }> {
   return fetchApi(`/biz-items/${bizItemId}/next-guide`);
 }
+
+// ─── F447: 파이프라인 단계 추적 ───────────────────────────────────────────
+
+export interface PipelineStageHistoryRecord {
+  id: string;
+  bizItemId: string;
+  stage: string;
+  enteredAt: string;
+  exitedAt: string | null;
+  enteredBy: string;
+  notes: string | null;
+}
+
+export interface PipelineItemDetail {
+  id: string;
+  title: string;
+  currentStage: string;
+  stageEnteredAt: string;
+  stageHistory: PipelineStageHistoryRecord[];
+}
+
+export async function getPipelineItemDetail(bizItemId: string): Promise<PipelineItemDetail> {
+  return fetchApi(`/pipeline/items/${bizItemId}`);
+}
+
+// ─── F448: 단계 간 자동 전환 ─────────────────────────────────────────────
+
+export async function advancePipelineStage(
+  bizItemId: string,
+  stage: string,
+  notes?: string,
+): Promise<{ success: boolean }> {
+  return patchApi(`/pipeline/items/${bizItemId}/stage`, { stage, notes });
+}
