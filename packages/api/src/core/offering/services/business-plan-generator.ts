@@ -27,6 +27,8 @@ export interface BpGenerationInput {
   templateType?: TemplateType;
   tone?: ToneType;
   length?: LengthType;
+  // F443: 업로드 문서 파싱 결과 컨텍스트
+  documentContext?: string[];
 }
 
 export interface BusinessPlanDraft {
@@ -167,7 +169,9 @@ export class BusinessPlanGeneratorService {
 기존 evidence를 삭제하지 않고, 보강만 수행하세요.
 사업 아이템: ${input.bizItem.title}
 시작점: ${input.startingPoint ?? "미분류"}
-
+${input.documentContext && input.documentContext.length > 0
+  ? `\n--- 첨부 자료 (참고용) ---\n${input.documentContext.join("\n\n---\n\n")}\n`
+  : ""}
 --- 사업계획서 초안 ---
 ${draft}`,
           systemPromptOverride: "당신은 B2B 사업계획서 전문 편집자입니다. KT DS 사업개발팀 문체에 맞게 구조화된 사업계획서를 다듬어주세요.",
