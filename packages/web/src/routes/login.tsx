@@ -20,10 +20,7 @@ function useGoogleIdentity(onCredential: (credential: string) => void) {
   callbackRef.current = onCredential;
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.onload = () => {
+    const initGis = () => {
       window.google?.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: (res: { credential: string }) =>
@@ -40,6 +37,17 @@ function useGoogleIdentity(onCredential: (credential: string) => void) {
         });
       }
     };
+
+    // GIS SDK가 이미 로드됐으면 재로드 없이 초기화만
+    if (window.google?.accounts.id) {
+      initGis();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.onload = initGis;
     document.head.appendChild(script);
     return () => { script.remove(); };
   }, []);
@@ -117,7 +125,7 @@ export function Component() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden p-4"
+    <div className="relative flex h-screen items-center justify-center overflow-auto p-4"
       style={{ background: "var(--axis-color-gray-950, hsl(var(--background)))" }}
     >
       {/* ── Ambient grid ── */}
