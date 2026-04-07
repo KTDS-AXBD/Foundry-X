@@ -63,3 +63,4 @@ packages/web/playwright-report/
 
 # Windows Zone.Identifier metadata (WSL file copy artifact)
 *:Zone.Identifier
+.sprint-watch-config
