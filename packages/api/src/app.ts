@@ -64,6 +64,7 @@ import { srRoute } from "./routes/sr.js";
 import { shardDocRoute } from "./routes/shard-doc.js";
 import { specLibraryRoute } from "./routes/spec-library.js";
 import { helpAgentRoute } from "./routes/help-agent.js";
+import { eventStatusRoute } from "./routes/event-status.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -390,6 +391,9 @@ app.route("/api", offeringMetricsRoute);
 // Sprint 178: Builder Quality Dashboard + User Evaluations (F390, F391, Phase 19)
 app.route("/api", qualityDashboardRoute);
 app.route("/api", userEvaluationsRoute);
+
+// Sprint 191: F406 이벤트 상태 폴링 + DLQ 관리 API
+app.route("/api", eventStatusRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

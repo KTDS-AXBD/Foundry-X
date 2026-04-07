@@ -24,3 +24,4 @@ export type {
 } from './catalog.js';
 
 export { D1EventBus } from './d1-bus.js';
+export type { D1LikeDatabase, EventHandler, EventStatusSummary } from './d1-bus.js';
