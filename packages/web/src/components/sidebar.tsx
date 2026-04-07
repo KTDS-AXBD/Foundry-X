@@ -112,7 +112,7 @@ const DEFAULT_PROCESS_GROUPS: NavGroup[] = [
     icon: Inbox,
     stageColor: "bg-axis-blue",
     collapsed: true,
-    badge: "TBD",
+    badge: "이관 예정",
     items: [
       { href: "/collection/field", label: "Field 수집", icon: Radio },
       { href: "/collection/ideas", label: "IDEA Portal", icon: ArrowUpFromLine },
@@ -168,7 +168,7 @@ const DEFAULT_PROCESS_GROUPS: NavGroup[] = [
     icon: TrendingUp,
     stageColor: "bg-axis-rose",
     collapsed: true,
-    badge: "TBD",
+    badge: "이관 예정",
     items: [
       { href: "/gtm/outreach", label: "대고객 선제안", icon: Send },
       { href: "/gtm/pipeline", label: "파이프라인", icon: GitBranch },
@@ -176,25 +176,64 @@ const DEFAULT_PROCESS_GROUPS: NavGroup[] = [
   },
 ];
 
-const DEFAULT_ADMIN_GROUP: NavGroup = {
-  key: "admin-manage",
-  label: "관리",
-  icon: Settings,
-  visibility: "admin",
-  items: [
-    { href: "/tokens", label: "토큰/모델", icon: Coins },
-    { href: "/workspace", label: "워크스페이스", icon: FolderKanban },
-    { href: "/agents", label: "에이전트", icon: Bot },
-    { href: "/prototype-dashboard", label: "Prototype", icon: FlaskConical },
-    { href: "/builder-quality", label: "Quality", icon: BarChart3 },
-    { href: "/orchestration", label: "오케스트레이션", icon: Activity },
-    { href: "/architecture", label: "아키텍처", icon: Blocks },
-    { href: "/methodologies", label: "방법론", icon: Library },
-    { href: "/projects", label: "프로젝트", icon: FolderKanban },
-    { href: "/nps-dashboard", label: "NPS 대시보드", icon: BarChart3 },
-    { href: "/dashboard/metrics", label: "운영 지표", icon: TrendingUp },
-  ],
-};
+const DEFAULT_ADMIN_GROUPS: NavGroup[] = [
+  {
+    key: "admin-auth",
+    label: "Auth 서비스",
+    icon: Users,
+    visibility: "admin",
+    badge: "modules/auth",
+    items: [
+      { href: "/tokens", label: "토큰/모델", icon: Coins },
+      { href: "/workspace", label: "워크스페이스", icon: FolderKanban },
+    ],
+  },
+  {
+    key: "admin-portal",
+    label: "Portal 서비스",
+    icon: LayoutDashboard,
+    visibility: "admin",
+    badge: "modules/portal",
+    items: [
+      { href: "/nps-dashboard", label: "NPS 대시보드", icon: BarChart3 },
+      { href: "/dashboard/metrics", label: "운영 지표", icon: TrendingUp },
+      { href: "/projects", label: "프로젝트", icon: FolderKanban },
+    ],
+  },
+  {
+    key: "admin-gate",
+    label: "Gate 서비스",
+    icon: CheckCircle,
+    visibility: "admin",
+    badge: "modules/gate",
+    items: [
+      { href: "/orchestration", label: "오케스트레이션", icon: Activity },
+    ],
+  },
+  {
+    key: "admin-launch",
+    label: "Launch 서비스",
+    icon: Rocket,
+    visibility: "admin",
+    badge: "modules/launch",
+    items: [
+      { href: "/prototype-dashboard", label: "Prototype", icon: FlaskConical },
+      { href: "/builder-quality", label: "Quality", icon: BarChart3 },
+    ],
+  },
+  {
+    key: "admin-core",
+    label: "Core (Foundry-X)",
+    icon: GitBranch,
+    visibility: "admin",
+    badge: "core",
+    items: [
+      { href: "/agents", label: "에이전트", icon: Bot },
+      { href: "/architecture", label: "아키텍처", icon: Blocks },
+      { href: "/methodologies", label: "방법론", icon: Library },
+    ],
+  },
+];
 
 const DEFAULT_MEMBER_BOTTOM_ITEMS: NavItem[] = [
   { href: "/wiki", label: "위키", icon: BookOpen },
@@ -257,7 +296,7 @@ const adminGroups: NavGroup[] = cmsNav?.adminGroups
           .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
           .map(cmsItemToNav),
       }))
-  : [DEFAULT_ADMIN_GROUP];
+  : DEFAULT_ADMIN_GROUPS;
 
 /* ------------------------------------------------------------------ */
 /*  Collapsible Group State (localStorage 영속)                        */
