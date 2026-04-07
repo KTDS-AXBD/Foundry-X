@@ -10,6 +10,69 @@ const execFileAsync = promisify(execFile);
 
 export type FallbackLevel = 'max-cli' | 'api' | 'ensemble';
 
+// ─────────────────────────────────────────────
+// F428: Rate Limit 감지 + 지수 백오프
+// ─────────────────────────────────────────────
+
+/** rate limit / 과부하 에러 메시지 패턴 */
+const RATE_LIMIT_PATTERNS = [
+  /rate.?limit/i,
+  /429/,
+  /too.?many.?requests/i,
+  /overloaded/i,
+  /capacity/i,
+];
+
+/**
+ * 에러 메시지가 rate limit 에러인지 확인
+ */
+export function isRateLimitError(message: string): boolean {
+  return RATE_LIMIT_PATTERNS.some(pattern => pattern.test(message));
+}
+
+/**
+ * 지수 백오프 재시도 유틸
+ * - 초기 지연: initialDelayMs (기본 1000ms)
+ * - 배수: 2x (1s → 2s → 4s)
+ * - 최대 재시도: maxRetries (기본 3)
+ * - rate limit 에러만 재시도, 다른 에러는 즉시 실패
+ */
+export async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  options: {
+    maxRetries?: number;
+    initialDelayMs?: number;
+    onRetry?: (attempt: number, delayMs: number, error: string) => void;
+  } = {},
+): Promise<T> {
+  const maxRetries = options.maxRetries ?? 3;
+  const initialDelayMs = options.initialDelayMs ?? 1000;
+
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const message = String(err);
+      lastError = err instanceof Error ? err : new Error(message);
+
+      if (attempt < maxRetries && isRateLimitError(message)) {
+        const delayMs = initialDelayMs * Math.pow(2, attempt);
+        options.onRetry?.(attempt + 1, delayMs, message.slice(0, 100));
+        console.log(`[Builder] Rate limit detected. Retry ${attempt + 1}/${maxRetries} in ${delayMs}ms`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        continue;
+      }
+
+      // rate limit이 아닌 에러 or 재시도 소진 → 즉시 throw
+      throw lastError;
+    }
+  }
+
+  throw lastError ?? new Error('retryWithBackoff: exhausted');
+}
+
 export interface FallbackResult {
   level: FallbackLevel;
   output: string;
@@ -226,12 +289,17 @@ export async function fallbackToApi(
 
 /**
  * Claude Max CLI --bare 모드로 코드 생성 (구독 $0)
+ *
+ * F428: 지수 백오프 재시도 포함 (rate limit 에러 시 최대 3회)
+ * - 재시도 간격: 1s → 2s → 4s
+ * - rate limit 아닌 에러: 즉시 실패 (fallback → API)
  */
 export async function runMaxCli(
   job: PrototypeJob,
   round: number,
   cliPath: string = 'claude',
-): Promise<{ success: boolean; output: string }> {
+  options: { maxRetries?: number; retryDelayMs?: number } = {},
+): Promise<{ success: boolean; output: string; retryCount: number }> {
   const prompt = buildGeneratorPrompt(job, round);
   const args = [
     '--bare',
@@ -241,17 +309,29 @@ export async function runMaxCli(
     '--output-format', 'json',
   ];
 
+  let retryCount = 0;
+
   try {
-    const { stdout } = await execFileAsync(cliPath, args, {
-      cwd: job.workDir,
-      timeout: 5 * 60 * 1000,  // 5분 (Max 구독은 여유)
-      env: { ...process.env },  // ANTHROPIC_API_KEY 불필요 (구독 인증)
-    });
+    const stdout = await retryWithBackoff(
+      async () => {
+        const result = await execFileAsync(cliPath, args, {
+          cwd: job.workDir,
+          timeout: 5 * 60 * 1000,  // 5분
+          env: { ...process.env },  // ANTHROPIC_API_KEY 불필요 (구독 인증)
+        });
+        return result.stdout;
+      },
+      {
+        maxRetries: options.maxRetries ?? 3,
+        initialDelayMs: options.retryDelayMs ?? 1000,
+        onRetry: (attempt) => { retryCount = attempt; },
+      },
+    );
 
     const filesWritten = await writeGeneratedFiles(stdout, job.workDir);
-    return { success: filesWritten > 0, output: stdout };
+    return { success: filesWritten > 0, output: stdout, retryCount };
   } catch {
-    return { success: false, output: '' };
+    return { success: false, output: '', retryCount };
   }
 }
 
@@ -273,9 +353,12 @@ export async function executeWithFallback(
     console.log(`[Builder] Trying Max CLI generator (${cliPath})...`);
     const maxCliResult = await runMaxCli(job, round, cliPath);
     if (maxCliResult.success) {
+      if (maxCliResult.retryCount > 0) {
+        console.log(`[Builder] Max CLI succeeded after ${maxCliResult.retryCount} retries`);
+      }
       return { level: 'max-cli', output: maxCliResult.output, success: true };
     }
-    console.log(`[Builder] Max CLI failed, falling back to API`);
+    console.log(`[Builder] Max CLI failed (retries: ${maxCliResult.retryCount}), falling back to API`);
   } else {
     console.log(`[Builder] SKIP_CLI=true, using API directly`);
   }

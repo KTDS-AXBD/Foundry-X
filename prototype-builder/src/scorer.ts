@@ -24,6 +24,7 @@ import type {
   LlmIntegratedEvaluation,
 } from './types.js';
 import { DIMENSION_WEIGHTS } from './types.js';
+import { visionEvaluateUi, visionResultToDimensionScore } from './vision-evaluator.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -618,11 +619,18 @@ export async function codeScore(workDir: string): Promise<DimensionScore> {
 /**
  * 5차원 품질 평가 — 전체 통합
  * useLlmIntegrated: F426 5차원 LLM 통합 판별 활성화 (evaluateQualityWithLlm 호출)
+ * useVisionApi: F427 Vision API 시각 평가 활성화 (ui 차원을 Vision 점수로 대체)
  */
 export async function evaluateQuality(
   job: PrototypeJob,
   workDir: string,
-  options: { useLlm?: boolean; skipBuild?: boolean; useLlmIntegrated?: boolean } = {},
+  options: {
+    useLlm?: boolean;
+    skipBuild?: boolean;
+    useLlmIntegrated?: boolean;
+    /** F427: Vision API로 ui 차원 평가 활성화 */
+    useVisionApi?: boolean;
+  } = {},
 ): Promise<QualityScore> {
   if (options.useLlmIntegrated) {
     return evaluateQualityWithLlm(job, workDir);
@@ -630,12 +638,17 @@ export async function evaluateQuality(
 
   const dimensions: DimensionScore[] = [];
 
+  // ui 차원: Vision API 또는 정적 분석 선택
+  const uiEvaluator = options.useVisionApi
+    ? visionEvaluateUi(workDir).then(visionResultToDimensionScore)
+    : uiScore(workDir);
+
   // 병렬로 독립적인 평가 실행
   const [buildResult, uiResult, funcResult, prdResult, codeResult] = await Promise.all([
     options.skipBuild
       ? Promise.resolve<DimensionScore>({ dimension: 'build', score: 1, weight: 0.2, weighted: 0.2, details: 'Skipped (pre-built)' })
       : buildScore(workDir),
-    uiScore(workDir),
+    uiEvaluator,
     functionalScore(workDir),
     prdScore(job, workDir, { useLlm: options.useLlm }),
     codeScore(workDir),
