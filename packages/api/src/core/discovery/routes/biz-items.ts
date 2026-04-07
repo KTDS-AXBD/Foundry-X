@@ -39,6 +39,42 @@ import { getAnalysisPathV82, type DiscoveryType } from "../services/analysis-pat
 
 export const bizItemsRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
+// ─── GET /biz-items/summary — 대시보드 ToDo 요약 (F323) ───
+
+const STAGE_TO_NUMBER: Record<string, number> = {
+  REGISTERED: 1,
+  DISCOVERY: 2,
+  FORMALIZATION: 3,
+  REVIEW: 4,
+  DECISION: 5,
+  OFFERING: 6,
+  MVP: 6,
+};
+
+bizItemsRoute.get("/biz-items/summary", async (c) => {
+  const orgId = c.get("orgId");
+
+  const { results } = await c.env.DB
+    .prepare(
+      `SELECT bi.id AS biz_item_id, bi.title, ps.stage
+       FROM biz_items bi
+       LEFT JOIN pipeline_stages ps
+         ON ps.biz_item_id = bi.id AND ps.exited_at IS NULL
+       WHERE bi.org_id = ?
+       ORDER BY bi.created_at DESC`,
+    )
+    .bind(orgId)
+    .all<{ biz_item_id: string; title: string; stage: string | null }>();
+
+  const items = results.map((r) => ({
+    bizItemId: r.biz_item_id,
+    title: r.title,
+    currentStage: STAGE_TO_NUMBER[r.stage ?? "REGISTERED"] ?? 1,
+  }));
+
+  return c.json({ items });
+});
+
 // ─── POST /biz-items — 사업 아이템 등록 ───
 
 bizItemsRoute.post("/biz-items", async (c) => {
