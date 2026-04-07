@@ -19,7 +19,7 @@ author: Sinclair Seo
 - **F-items**: F414 (표준 목차 엔진), F415 (디자인 시스템 v2)
 - **Duration**: 2026-04-07 (착수), 2026-04-07 (완료)
 - **Owner**: Sinclair Seo
-- **Match Rate**: 100% (7/7 PASS)
+- **Match Rate**: 100% (16/16 PASS)
 
 ---
 
@@ -62,12 +62,12 @@ author: Sinclair Seo
 - **Actual Duration**: 1일 (착수 당일 완료)
 
 ### Check
-- **Analysis Document**: `docs/03-analysis/sprint-198-gap.md`
+- **Analysis Document**: `docs/03-analysis/features/sprint-198.analysis.md`
 - **Gap Analysis Results**:
-  - **Design ↔ Implementation Match**: 100% (7/7 PASS)
-  - **SKILL.md v2.0 완전성**: 20섹션 목차 명시 ✅ | KT 연계 체크 로직 ✅ | 경영 언어 10항목 ✅
-  - **Design Tokens v2**: CSS variable 가이드 §5 정합성 검증 완료 ✅ | 12종 컴포넌트 참조 추가 ✅
-  - **신규 컴포넌트**: exec-summary ✅ | three-axis ✅ | gan-verdict ✅ | tam-card ✅ | compare-table ✅
+  - **Design ↔ Implementation Match**: 100% (16/16 PASS)
+  - **F414 (8/8)**: 20섹션 목차 ✅ | 5그룹 구조 ✅ | Exec Summary 불릿 ✅ | 3축 구조 ✅ | 선택 섹션 분기 ✅ | 8단계 프로세스 ✅ | KT 연계 체크 ✅ | 경영 언어 10항목 ✅
+  - **F415 (8/8)**: design-tokens v2 ✅ | 가이드 §5 검증 ✅ | 12종 컴포넌트 참조 ✅ | exec-summary ✅ | three-axis ✅ | gan-verdict ✅ | tam-card ✅ | compare-table ✅
+  - **초과 구현 4건**: Animation Tokens 5개 추가, gan-verdict 질문별 반복 카드, tam-card 경쟁 비대칭 블록, 교차검증 체크리스트 10항목
 
 ---
 
@@ -118,7 +118,7 @@ author: Sinclair Seo
 | 6 | 8단계 생성 프로세스 | SKILL.md §How 섹션 Step 1~8 상세 | ✅ PASS |
 | 7 | KT 연계 체크 로직 (3축 필수) | SKILL.md §KT 연계 원칙 체크 (Step 4 자동 적용) | ✅ PASS |
 
-**Match Rate: 100% (7/7 PASS)**
+**Match Rate: 100% (16/16 PASS)** — 상세: `docs/03-analysis/features/sprint-198.analysis.md`
 
 ---
 
