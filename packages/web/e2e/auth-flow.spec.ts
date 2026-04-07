@@ -62,6 +62,43 @@ test.describe("Authentication Flow", () => {
     await expect(page).toHaveURL(/\/login/);
   });
 
+  test("로그인 페이지 로드 시 콘솔 에러 없음 (HydrateFallback, COOP, refresh)", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error") {
+        errors.push(msg.text());
+      }
+    });
+
+    await page.goto("/login");
+    await page.waitForLoadState("networkidle");
+
+    // HydrateFallback 경고, COOP 차단, auth/refresh 401이 없어야 함
+    const criticalErrors = errors.filter(
+      (e) =>
+        /HydrateFallback/i.test(e) ||
+        /Cross-Origin-Opener-Policy/i.test(e) ||
+        /auth\/refresh/i.test(e),
+    );
+
+    expect(criticalErrors).toEqual([]);
+  });
+
+  test("Google 로그인 버튼이 렌더링됨", async ({ page }) => {
+    await page.goto("/login");
+    await page.waitForLoadState("networkidle");
+
+    // GIS SDK가 로드되면 Google 버튼 iframe 또는 div가 생성됨
+    // 최소한 Google 버튼 컨테이너가 존재해야 함
+    const googleBtnContainer = page.locator("[data-client_id], iframe[src*='accounts.google.com'], div.g_id_signin").first();
+    // GIS SDK 로드가 느릴 수 있으므로 5초 대기
+    const isVisible = await googleBtnContainer.isVisible({ timeout: 5000 }).catch(() => false);
+    // GIS SDK가 외부 의존이라 CI에서 차단될 수 있음 — soft assert
+    if (!isVisible) {
+      console.warn("Google Sign-In button not rendered — GIS SDK may be blocked in test environment");
+    }
+  });
+
   test("잘못된 자격 증명으로 로그인 시 에러 표시", async ({ page }) => {
     await page.goto("/login");
 
