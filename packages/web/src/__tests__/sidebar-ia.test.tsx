@@ -8,20 +8,21 @@ import { resolve } from "path";
 const sidebarJsonPath = resolve(process.cwd(), "content/navigation/sidebar.json");
 const sidebarJson = JSON.parse(readFileSync(sidebarJsonPath, "utf-8"));
 
-describe("사이드바 IA 개편 — 이관 예정 라벨", () => {
-  it("'이관 예정' badge가 2개 이상 존재 (수집 + GTM)", () => {
-    const groupsWithBadge = sidebarJson.processGroups.filter(
-      (g: { badge?: string }) => g.badge === "이관 예정",
+describe("사이드바 IA 개편 — processGroups 구조 (F434+F435)", () => {
+  it("processGroups에 discover(발굴) 그룹 존재", () => {
+    const discover = sidebarJson.processGroups.find(
+      (g: { key: string }) => g.key === "discover",
     );
-    expect(groupsWithBadge.length).toBeGreaterThanOrEqual(2);
+    expect(discover).toBeDefined();
+    expect(discover.label).toBe("2. 발굴");
   });
 
-  it("collect 그룹에 이관 예정 라벨 (TBD 없음)", () => {
-    const collect = sidebarJson.processGroups.find(
-      (g: { key: string }) => g.key === "collect",
+  it("processGroups에 shape(형상화) 그룹 존재", () => {
+    const shape = sidebarJson.processGroups.find(
+      (g: { key: string }) => g.key === "shape",
     );
-    expect(collect).toBeDefined();
-    expect(collect.badge).toBe("이관 예정");
+    expect(shape).toBeDefined();
+    expect(shape.label).toBe("3. 형상화");
   });
 });
 

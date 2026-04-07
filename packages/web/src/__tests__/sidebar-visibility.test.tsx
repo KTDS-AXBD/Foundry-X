@@ -120,17 +120,16 @@ describe("Sidebar role-based visibility", () => {
     expect(screen.getAllByText("Core (Foundry-X)").length).toBeGreaterThan(0);
   });
 
-  it("T-07: F322 — 수집 그룹은 collapsed+TBD (items visible:false)", () => {
+  it("T-07: F434 — 발굴 그룹 렌더링", () => {
     mockedUseUserRole.mockReturnValue({ role: "admin", isAdmin: true });
     renderSidebar();
-    // 수집 그룹 헤더는 존재하지만, items는 collapsed 상태로 DOM에 없음
-    expect(screen.getAllByText("1. 수집").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("2. 발굴").length).toBeGreaterThan(0);
   });
 
-  it("T-08: F322 — GTM 그룹도 collapsed+TBD", () => {
+  it("T-08: F434 — 형상화 그룹 렌더링", () => {
     mockedUseUserRole.mockReturnValue({ role: "admin", isAdmin: true });
     renderSidebar();
-    expect(screen.getAllByText("6. GTM").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("3. 형상화").length).toBeGreaterThan(0);
   });
 
   it("T-09: 리브랜딩 — 'PRD' 존재 (Spec 생성 대신)", () => {
