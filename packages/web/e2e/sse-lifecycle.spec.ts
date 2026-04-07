@@ -49,11 +49,8 @@ test.describe("SSE Lifecycle — Agents Page", () => {
 
     await page.goto("/agents");
 
-    // Agent name should render
+    // Agent name and status badge should render
     await expect(page.getByText("TestAgent")).toBeVisible({ timeout: 10000 });
-
-    // Badge or status indicator should exist within the card area
-    const cardArea = page.locator("[class*=card]").filter({ hasText: "TestAgent" });
-    await expect(cardArea.first()).toBeVisible();
+    await expect(page.getByText("idle")).toBeVisible();
   });
 });

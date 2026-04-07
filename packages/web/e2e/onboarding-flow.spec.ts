@@ -169,12 +169,11 @@ test.describe("Onboarding Flow (F252)", () => {
       "active",
     );
 
-    // Switch to "환경 설정" tab
-    await page.getByRole("tab", { name: "환경 설정" }).click();
+    // Switch tabs using force:true to bypass tour overlay (z-[10000] intercepts clicks)
+    await page.getByRole("tab", { name: "환경 설정" }).click({ force: true });
     await expect(page).toHaveURL(/tab=setup/);
 
-    // Switch to "스킬 레퍼런스" tab
-    await page.getByRole("tab", { name: "스킬 레퍼런스" }).click();
+    await page.getByRole("tab", { name: "스킬 레퍼런스" }).click({ force: true });
     await expect(page).toHaveURL(/tab=skills/);
   });
 

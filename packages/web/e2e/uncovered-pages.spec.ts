@@ -142,7 +142,13 @@ test.describe("미커버 페이지 렌더링 검증", () => {
   });
 
   test("settings/jira 페이지 렌더링", async ({ authenticatedPage: page }) => {
-    await page.route("**/api/**", (route) => route.fulfill({ json: {} }));
+    await page.route("**/api/**", (route) => {
+      const url = route.request().url();
+      if (url.includes("/api/orgs") && !url.includes("/members") && !url.includes("/invitations")) {
+        return route.fulfill({ json: [{ id: "org-1", name: "Test", slug: "test", plan: "free", createdAt: "2026-01-01" }] });
+      }
+      return route.fulfill({ json: {} });
+    });
     await page.goto("/settings/jira");
     await expect(page.getByRole("heading", { name: "Jira Integration" })).toBeVisible({ timeout: 10000 });
   });

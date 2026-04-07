@@ -9,7 +9,7 @@ test.describe("Organization Members", () => {
     await page.goto("/workspace/org/members");
 
     // Members heading or Loading state
-    const heading = page.getByRole("heading", { name: /Members/i });
+    const heading = page.getByRole("heading", { name: "Members", exact: true });
     const loading = page.getByText("Loading...");
 
     await expect(heading.or(loading)).toBeVisible({ timeout: 10000 });
@@ -63,7 +63,7 @@ test.describe("Organization Members", () => {
 
     await page.goto("/workspace/org/members");
 
-    const heading = page.getByRole("heading", { name: /Members/i });
+    const heading = page.getByRole("heading", { name: "Members", exact: true });
     if (await heading.isVisible({ timeout: 10000 }).catch(() => false)) {
       // Table should show member names and emails
       await expect(page.getByText("Alice")).toBeVisible();
@@ -75,7 +75,7 @@ test.describe("Organization Members", () => {
   test("멤버 초대 폼 UI", async ({ authenticatedPage: page }) => {
     await page.goto("/workspace/org/members");
 
-    const heading = page.getByRole("heading", { name: /Members/i });
+    const heading = page.getByRole("heading", { name: "Members", exact: true });
     if (await heading.isVisible({ timeout: 10000 }).catch(() => false)) {
       // Email input
       const emailInput = page.getByPlaceholder("email@example.com");
@@ -233,7 +233,7 @@ test.describe("Organization Members", () => {
 
     await page.goto("/workspace/org/members");
 
-    const heading = page.getByRole("heading", { name: /Members/i });
+    const heading = page.getByRole("heading", { name: "Members", exact: true });
     if (await heading.isVisible({ timeout: 10000 }).catch(() => false)) {
       // Pending Invitations section
       const pendingSection = page.getByText(/Pending Invitations/i);
