@@ -5,10 +5,12 @@
  * F440 — 사업기획서 생성 + 열람
  * F447 — 파이프라인 상태 추적 스테퍼
  * F448 — 단계 간 자동 전환 CTA
+ * F444 — 사업기획서 편집기 + 버전 이력
+ * F445 — 기획서 템플릿 선택
  */
 import { useCallback, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, FileBarChart, Loader2 } from "lucide-react";
+import { ArrowLeft, FileBarChart, Loader2, Pencil, History } from "lucide-react";
 import {
   fetchBizItemDetail,
   fetchBdpLatest,
@@ -19,6 +21,7 @@ import {
   type BdpVersion,
   type ShapingArtifacts,
   type PipelineItemDetail,
+  type BusinessPlanResult,
 } from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,6 +32,9 @@ import ShapingPipeline from "@/components/feature/discovery/ShapingPipeline";
 import BusinessPlanViewer from "@/components/feature/discovery/BusinessPlanViewer";
 import PipelineProgressStepper from "@/components/feature/discovery/PipelineProgressStepper";
 import PipelineTransitionCTA from "@/components/feature/discovery/PipelineTransitionCTA";
+import BusinessPlanEditor from "@/components/feature/discovery/BusinessPlanEditor";
+import VersionHistoryPanel from "@/components/feature/discovery/VersionHistoryPanel";
+import TemplateSelector, { type TemplateParams } from "@/components/feature/discovery/TemplateSelector";
 
 const TYPE_LABELS: Record<string, string> = {
   I: "아이디어형", M: "시장·타겟형", P: "고객문제형", T: "기술형", S: "서비스형",
@@ -49,6 +55,11 @@ export function Component() {
   const [loading, setLoading] = useState(true);
   const [generatingPlan, setGeneratingPlan] = useState(false);
   const [planError, setPlanError] = useState<string | null>(null);
+  // F444: 편집기 상태
+  const [editMode, setEditMode] = useState(false);
+  const [showVersionPanel, setShowVersionPanel] = useState(false);
+  // F445: 템플릿 선택 상태
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
 
   const loadData = useCallback(async () => {
     if (!id) return;
@@ -77,13 +88,13 @@ export function Component() {
 
   useEffect(() => { void loadData(); }, [loadData]);
 
-  async function handleGenerateBusinessPlan() {
+  async function handleGenerateBusinessPlan(templateParams?: TemplateParams) {
     if (!id) return;
     setGeneratingPlan(true);
     setPlanError(null);
+    setShowTemplateSelector(false);
     try {
-      await generateBusinessPlan(id);
-      // 생성 완료 후 기획서 + 아티팩트 다시 로드
+      await generateBusinessPlan(id, templateParams);
       const [newPlan, newArtifacts] = await Promise.all([
         fetchBdpLatest(id),
         getShapingArtifacts(id),
@@ -95,6 +106,20 @@ export function Component() {
     } finally {
       setGeneratingPlan(false);
     }
+  }
+
+  function handleEditorSaved(newDraft: BusinessPlanResult) {
+    // 저장된 버전을 BdpVersion 형태로 변환하여 뷰어에 반영
+    setPlan({
+      id: newDraft.id,
+      bizItemId: newDraft.bizItemId,
+      versionNum: newDraft.versionNum,
+      content: newDraft.content,
+      isFinal: false,
+      createdBy: "",
+      createdAt: newDraft.createdAt,
+    });
+    setEditMode(false);
   }
 
   if (loading) return <div className="flex items-center justify-center p-8 text-muted-foreground"><Loader2 className="size-5 animate-spin mr-2" />로딩 중...</div>;
@@ -227,7 +252,7 @@ export function Component() {
               <ShapingPipeline
                 bizItemId={item.id}
                 artifacts={artifacts}
-                onGenerateBusinessPlan={() => void handleGenerateBusinessPlan()}
+                onGenerateBusinessPlan={() => setShowTemplateSelector(true)}
                 generatingPlan={generatingPlan}
               />
             )}
@@ -244,17 +269,71 @@ export function Component() {
             </div>
           )}
 
-          {/* 기획서 열람 (F440) */}
+          {/* 기획서 열람/편집 (F440 + F444) */}
           {plan && !generatingPlan && (
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-sm font-semibold">사업기획서</h2>
-                <Button variant="outline" size="sm" onClick={() => void handleGenerateBusinessPlan()} disabled={generatingPlan}>
-                  재생성
-                </Button>
+                <div className="flex gap-2">
+                  {!editMode && (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowVersionPanel(!showVersionPanel)}
+                        aria-label="버전 이력"
+                      >
+                        <History className="size-4 mr-1.5" />
+                        버전 이력
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEditMode(true)}
+                        aria-label="편집"
+                      >
+                        <Pencil className="size-4 mr-1.5" />
+                        편집
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowTemplateSelector(true)}
+                        disabled={generatingPlan}
+                      >
+                        재생성
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
-              <BusinessPlanViewer plan={plan} />
+
+              {/* 버전 이력 패널 */}
+              {showVersionPanel && !editMode && (
+                <div className="mb-4">
+                  <VersionHistoryPanel bizItemId={item.id} currentVersion={plan.versionNum} />
+                </div>
+              )}
+
+              {/* 편집기 (F444) */}
+              {editMode ? (
+                <BusinessPlanEditor
+                  bizItemId={item.id}
+                  onSaved={handleEditorSaved}
+                  onCancel={() => setEditMode(false)}
+                />
+              ) : (
+                <BusinessPlanViewer plan={plan} />
+              )}
             </div>
+          )}
+
+          {/* 템플릿 선택 모달 (F445) */}
+          {showTemplateSelector && (
+            <TemplateSelector
+              onSelect={(params) => void handleGenerateBusinessPlan(params)}
+              onCancel={() => setShowTemplateSelector(false)}
+            />
           )}
         </TabsContent>
       </Tabs>

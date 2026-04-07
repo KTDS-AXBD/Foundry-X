@@ -816,6 +816,9 @@ bizItemsRoute.post("/biz-items/:id/generate-business-plan", async (c) => {
   const body = await c.req.json().catch(() => ({}));
   const parsed = GenerateBusinessPlanSchema.safeParse(body);
   const skipLlm = parsed.success ? parsed.data.skipLlmRefine : false;
+  const templateType = parsed.success ? parsed.data.templateType : 'internal';
+  const tone = parsed.success ? parsed.data.tone : 'formal';
+  const length = parsed.success ? parsed.data.length : 'medium';
 
   const sp = await bizService.getStartingPoint(id);
   const evaluation = await bizService.getEvaluation(id);
@@ -845,6 +848,9 @@ bizItemsRoute.post("/biz-items/:id/generate-business-plan", async (c) => {
     } : null,
     prdContent: prd?.content ?? null,
     skipLlmRefine: skipLlm,
+    templateType,
+    tone,
+    length,
   });
 
   return c.json(bp, 201);

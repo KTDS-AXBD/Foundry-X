@@ -853,6 +853,44 @@ export class MockD1Database {
       );
       CREATE INDEX IF NOT EXISTS idx_offering_prototypes_offering ON offering_prototypes(offering_id);
 
+      -- 0042: Business plan drafts (F180)
+      CREATE TABLE IF NOT EXISTS business_plan_drafts (
+        id               TEXT PRIMARY KEY,
+        biz_item_id      TEXT NOT NULL,
+        version          INTEGER NOT NULL DEFAULT 1,
+        content          TEXT NOT NULL DEFAULT '',
+        sections_snapshot TEXT,
+        model_used       TEXT,
+        tokens_used      INTEGER NOT NULL DEFAULT 0,
+        generated_at     TEXT NOT NULL,
+        UNIQUE(biz_item_id, version)
+      );
+      CREATE INDEX IF NOT EXISTS idx_business_plan_drafts_biz_item ON business_plan_drafts(biz_item_id);
+
+      -- 0117: Business plan editor + templates (F444+F445)
+      CREATE TABLE IF NOT EXISTS business_plan_sections (
+        id          TEXT PRIMARY KEY,
+        draft_id    TEXT NOT NULL,
+        biz_item_id TEXT NOT NULL,
+        section_num INTEGER NOT NULL,
+        content     TEXT NOT NULL DEFAULT '',
+        updated_at  TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_bp_sections_draft ON business_plan_sections(draft_id);
+      CREATE INDEX IF NOT EXISTS idx_bp_sections_item  ON business_plan_sections(biz_item_id);
+
+      CREATE TABLE IF NOT EXISTS plan_templates (
+        id            TEXT PRIMARY KEY,
+        org_id        TEXT NOT NULL,
+        name          TEXT NOT NULL,
+        template_type TEXT NOT NULL,
+        tone          TEXT NOT NULL DEFAULT 'formal',
+        length        TEXT NOT NULL DEFAULT 'medium',
+        sections_json TEXT NOT NULL DEFAULT '[]',
+        created_at    TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_plan_templates_org ON plan_templates(org_id);
+
       -- 0116: Billing — subscription plans + tenant subscriptions + usage records (F411)
       CREATE TABLE IF NOT EXISTS subscription_plans (
         id           TEXT    PRIMARY KEY,

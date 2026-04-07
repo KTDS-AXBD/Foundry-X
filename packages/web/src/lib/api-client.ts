@@ -1714,8 +1714,61 @@ export interface BusinessPlanResult {
   createdAt: string;
 }
 
-export async function generateBusinessPlan(bizItemId: string): Promise<BusinessPlanResult> {
-  return postApi(`/biz-items/${bizItemId}/generate-business-plan`, {});
+// F445: 템플릿 파라미터 지원
+export async function generateBusinessPlan(
+  bizItemId: string,
+  params?: { templateType?: 'internal'|'proposal'|'ir-pitch'; tone?: 'formal'|'casual'; length?: 'short'|'medium'|'long' },
+): Promise<BusinessPlanResult> {
+  return postApi(`/biz-items/${bizItemId}/generate-business-plan`, params ?? {});
+}
+
+// ─── Sprint 215: F444 편집기 + F445 템플릿 APIs ───
+
+export interface BusinessPlanSectionItem {
+  id: string;
+  draftId: string;
+  bizItemId: string;
+  sectionNum: number;
+  title: string;
+  content: string;
+  updatedAt: string | null;
+}
+
+export interface BpDiffResult {
+  v1: { version: number; generatedAt: string };
+  v2: { version: number; generatedAt: string };
+  sections: Array<{
+    num: number;
+    title: string;
+    v1Content: string;
+    v2Content: string;
+    changed: boolean;
+  }>;
+}
+
+export async function fetchBusinessPlanSections(bizItemId: string): Promise<{ sections: BusinessPlanSectionItem[] }> {
+  return fetchApi(`/biz-items/${bizItemId}/business-plan/sections`);
+}
+
+export async function updateBusinessPlanSection(bizItemId: string, sectionNum: number, content: string): Promise<void> {
+  await patchApi(`/biz-items/${bizItemId}/business-plan/sections/${sectionNum}`, { content });
+}
+
+export async function regenerateBusinessPlanSection(bizItemId: string, sectionNum: number, customPrompt?: string): Promise<{ sectionNum: number; content: string }> {
+  return postApi(`/biz-items/${bizItemId}/business-plan/sections/${sectionNum}/regenerate`, { customPrompt });
+}
+
+export async function saveBusinessPlanDraft(bizItemId: string, note?: string): Promise<BusinessPlanResult> {
+  return postApi(`/biz-items/${bizItemId}/business-plan/save`, { note });
+}
+
+export async function fetchBusinessPlanDiff(bizItemId: string, v1: number, v2: number): Promise<BpDiffResult> {
+  return fetchApi(`/biz-items/${bizItemId}/business-plan/diff?v1=${v1}&v2=${v2}`);
+}
+
+export async function fetchBusinessPlanVersions(bizItemId: string): Promise<Array<{ version: number; generatedAt: string }>> {
+  const data = await fetchApi<{ versions: Array<{ version: number; generatedAt: string }> }>(`/biz-items/${bizItemId}/business-plan/versions`);
+  return data.versions;
 }
 
 export interface StartingPointResult {
