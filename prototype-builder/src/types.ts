@@ -82,6 +82,22 @@ export interface DimensionScore {
   details: string;
 }
 
+/** LLM 차원별 판별 결과 (F426) */
+export interface LlmDimensionResult {
+  score: number;      // 0 ~ 100
+  rationale: string;
+  fix: string | null;
+}
+
+/** LLM 통합 판별 전체 결과 (F426) */
+export interface LlmIntegratedEvaluation {
+  build: LlmDimensionResult;
+  ui: LlmDimensionResult;
+  functional: LlmDimensionResult;
+  prd: LlmDimensionResult;
+  code: LlmDimensionResult;
+}
+
 /** 전체 품질 스코어 */
 export interface QualityScore {
   total: number;           // 0 ~ 100 (가중 평균 * 100)
@@ -89,6 +105,10 @@ export interface QualityScore {
   evaluatedAt: string;
   round: number;
   jobId: string;
+  /** F426: LLM 통합 판별 결과 (선택) */
+  llmEvaluation?: LlmIntegratedEvaluation;
+  /** F426: 원본 정적 분석 결과 (LLM 통합 시 보조 데이터) */
+  staticAnalysis?: DimensionScore[];
 }
 
 /** 타겟 피드백 */

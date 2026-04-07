@@ -27,7 +27,10 @@ export interface OgdOptions {
   maxRounds?: number;
   qualityThreshold?: number;
   costTracker?: CostTracker;
+  /** F425: prd 차원 LLM 의미 비교 활성화 (기본값 true) */
   useLlm?: boolean;
+  /** F426: 5차원 LLM 통합 판별 활성화 */
+  useLlmIntegrated?: boolean;
 }
 
 /**
@@ -48,7 +51,8 @@ export async function runOgdLoop(
   const maxRounds = options.maxRounds ?? 5;
   const qualityThreshold = options.qualityThreshold ?? 80;
   const costTracker = options.costTracker;
-  const useLlm = options.useLlm ?? false;
+  const useLlm = options.useLlm ?? true;           // F425: LLM 기본 활성화
+  const useLlmIntegrated = options.useLlmIntegrated ?? false; // F426: 통합 판별
 
   let bestScore = 0;
   let bestOutput = '';
@@ -74,7 +78,7 @@ export async function runOgdLoop(
     console.log(`[OGD] Generator succeeded (level: ${generated.level})`);
 
     // 2. Scorer: 5차원 품질 평가
-    const score = await evaluateQuality(job, job.workDir, { useLlm });
+    const score = await evaluateQuality(job, job.workDir, { useLlm, useLlmIntegrated });
     console.log(`[OGD] Score: ${score.total}/100 (dimensions: ${score.dimensions.map(d => `${d.dimension}=${(d.score * 100).toFixed(0)}`).join(', ')})`);
 
     // 3. 비용 추적
