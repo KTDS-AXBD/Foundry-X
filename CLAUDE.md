@@ -57,9 +57,9 @@ foundry-x/
 │   │       └── index.ts
 │   ├── api/                # Hono API Server (Phase 2)
 │   │   └── src/
-│   │       ├── routes/     # 118개 (flat 8 + core 71 + modules 39)
-│   │       ├── services/   # 262개 (flat 37 + core 177 + modules 48)
-│   │       ├── schemas/    # 133개 Zod 스키마 (flat 13 + core 83 + modules 37)
+│   │       ├── routes/     # 9개 (MSA 재조정 후 — core/modules → gate-x·harness-kit 이전)
+│   │       ├── services/   # 37개 (adapters 10 포함)
+│   │       ├── schemas/    # 13개 Zod 스키마
 │   │       └── index.ts
 │   ├── web/                # Vite 8 + React Router 7 Dashboard + Landing
 │   │   └── src/
