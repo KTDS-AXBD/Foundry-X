@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #221 (2026-04-07)
+**E2E Audit — Sprint 203~207 (Builder v2) Flaky 4건 해소**:
+- ✅ E2E 전체 실행: 270 tests (268 passed / 0 failed / 2 skipped / 0 flaky)
+- ✅ onboarding-flow: Tour overlay(z-10000) 클릭 가로챔 → force:true
+- ✅ org-members: /Members/i strict violation → exact:true
+- ✅ uncovered-pages: settings/jira orgs.find TypeError → 배열 mock 제공
+- ✅ sse-lifecycle: [class*=card] 불안정 → getByText("idle") 직접 검증
+
+**검증 결과**: ✅ typecheck / lint / E2E 270 (268 pass, 2 skip, 0 flaky)
+
 ### 세션 #220 (2026-04-07)
 **E2E 종합 감사 + HITL skip 해소**:
 - ✅ E2E 전체 실행: 270 tests (266 passed / 0 failed / 2 skipped / 2 flaky)
