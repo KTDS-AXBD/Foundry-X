@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import {
-  createAuthMiddleware,
   createCorsMiddleware,
   errorHandler,
 } from "@foundry-x/harness-kit";
@@ -8,11 +7,14 @@ import type { HarnessConfig } from "@foundry-x/harness-kit";
 import type { GateEnv } from "./env.js";
 import type { TenantVariables } from "./middleware/tenant.js";
 import { tenantGuard } from "./middleware/tenant.js";
+import { createGateAuthMiddleware } from "./middleware/auth.js";
 import {
+  apiKeysRoute,
   axBdEvaluationsRoute,
   decisionsRoute,
   evaluationReportRoute,
   gatePackageRoute,
+  ogdPocRoute,
   teamReviewsRoute,
   validationMeetingsRoute,
   validationTierRoute,
@@ -27,10 +29,13 @@ const config: HarnessConfig = {
 
 export const app = new Hono<{ Bindings: GateEnv; Variables: TenantVariables }>();
 
-// Middleware chain: CORS → Auth → TenantGuard → Routes
+// Middleware chain: CORS → Auth (JWT + API Key) → TenantGuard → Routes
 app.use("*", createCorsMiddleware(config));
 app.onError(errorHandler);
-app.use("/api/*", createAuthMiddleware(config));
+app.use(
+  "/api/*",
+  createGateAuthMiddleware(config) as Parameters<typeof app.use>[1],
+);
 app.use("/api/*", tenantGuard as Parameters<typeof app.use>[1]);
 
 // Health check (public)
@@ -39,6 +44,8 @@ app.get("/api/health", (c) => {
 });
 
 // Routes
+app.route("/api/keys", apiKeysRoute);
+app.route("/api/ogd", ogdPocRoute);
 app.route("/api/gate", axBdEvaluationsRoute);
 app.route("/api/gate", decisionsRoute);
 app.route("/api/gate", evaluationReportRoute);

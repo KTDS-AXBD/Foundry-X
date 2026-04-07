@@ -1,0 +1,55 @@
+name: Deploy Gate-X
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'packages/gate-x/**'
+      - 'packages/harness-kit/**'
+      - '.github/workflows/deploy-gate-x.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @foundry-x/gate-x typecheck
+      - run: pnpm --filter @foundry-x/gate-x test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: D1 Migrations
+        working-directory: packages/gate-x
+        run: npx wrangler d1 migrations apply gate-x-db --remote
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+      - name: Deploy Workers
+        working-directory: packages/gate-x
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+      - name: Smoke Test
+        run: |
+          sleep 5
+          curl -sf https://gate-x-api.ktds-axbd.workers.dev/api/health | grep '"status":"ok"'
