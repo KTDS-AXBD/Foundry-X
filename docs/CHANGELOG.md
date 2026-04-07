@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #225 (2026-04-07)
+**대시보드 콘솔 에러 전수 해소 + API 배포 차단 해소**:
+- ✅ dashboard.metrics: fetchApi에 BASE_URL 중복 전달 제거 (4개 API 200 OK)
+- ✅ biz-items/summary: GET /biz-items/summary 라우트 추가 (TodoSection F323 404 해소)
+- ✅ pptx-renderer: createRequire → dynamic import lazy init (Workers 배포 차단 해소)
+- ✅ SPA 404: Pages Function [[path]].ts catch-all 추가 (커스텀 도메인 200 OK)
+- ✅ _headers: Cloudflare Pages 파서 방해 주석 제거
+
+**검증 결과**: ✅ typecheck / biz-items 77 pass / pipeline 9 pass / Playwright 콘솔 에러 0건
+
 ### 세션 #224 (2026-04-07)
 **사이드바 IA 점검 + CMS SSOT 확정**:
 - ✅ sidebar.json(TinaCMS) ↔ 코드 Default 불일치 발견: Offerings 누락, Admin 단일그룹 vs MSA 5그룹
