@@ -1,0 +1,6 @@
+name = "gate-x-web"
+pages_build_output_dir = "dist"
+compatibility_date = "2024-09-23"
+
+[vars]
+VITE_GATE_X_API_URL = "https://gate-x-api.ktds-axbd.workers.dev"
