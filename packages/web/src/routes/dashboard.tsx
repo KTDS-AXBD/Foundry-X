@@ -186,25 +186,26 @@ export function Component() {
   const integrity = useApi<HarnessIntegrity>("/integrity");
   const freshness = useApi<FreshnessReport>("/freshness");
   const pipelineStats = useApi<PipelineStats>("/pipeline/stats");
-  const bizItemSummary = useApi<Array<{ bizItemId: string; title: string; currentStage: number }>>("/biz-items/summary");
+  const bizItemSummaryRaw = useApi<{ items: Array<{ bizItemId: string; title: string; currentStage: number }> }>("/biz-items/summary");
+  const bizItemSummaryData = bizItemSummaryRaw.data?.items ?? null;
 
   // biz-items/summary → byStage (stageNum 기반 집계)
   const bdByStage = useMemo(() => {
-    if (!bizItemSummary.data) return {};
+    if (!bizItemSummaryData) return {};
     const counts: Record<string, number> = {};
-    for (const item of bizItemSummary.data) {
+    for (const item of bizItemSummaryData) {
       const key = BD_STAGE_KEYS[item.currentStage - 1] ?? "REGISTERED";
       counts[key] = (counts[key] ?? 0) + 1;
     }
     return counts;
-  }, [bizItemSummary.data]);
+  }, [bizItemSummaryData]);
 
   // pipeline/stats byStage 키가 DB 스테이지명(DISCOVERY 등)이지만,
   // dashboard STAGES.label은 한국어(수집, 발굴...) — 실제 수치는 bizItemSummary로 보완
   const mergedStats: PipelineStats | null = pipelineStats.data
     ? { ...pipelineStats.data, byStage: bdByStage }
-    : bizItemSummary.data
-      ? { totalItems: bizItemSummary.data.length, byStage: bdByStage, avgDaysInStage: {} }
+    : bizItemSummaryData
+      ? { totalItems: bizItemSummaryData.length, byStage: bdByStage, avgDaysInStage: {} }
       : null;
 
   const reqCounts = reqs.data
