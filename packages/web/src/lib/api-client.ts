@@ -3027,17 +3027,11 @@ export async function getPrd(bizItemId: string, prdId: string): Promise<Generate
 }
 
 export async function confirmPrd(bizItemId: string, prdId: string): Promise<GeneratedPrdEntry> {
-  return fetchApi<GeneratedPrdEntry>(`/biz-items/${bizItemId}/prds/${prdId}/confirm`, {
-    method: "POST",
-  });
+  return postApi<GeneratedPrdEntry>(`/biz-items/${bizItemId}/prds/${prdId}/confirm`);
 }
 
 export async function editPrd(bizItemId: string, prdId: string, content: string): Promise<GeneratedPrdEntry> {
-  return fetchApi<GeneratedPrdEntry>(`/biz-items/${bizItemId}/prds/${prdId}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ content }),
-  });
+  return patchApi<GeneratedPrdEntry>(`/biz-items/${bizItemId}/prds/${prdId}`, { content });
 }
 
 export async function diffPrds(

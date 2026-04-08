@@ -92,7 +92,7 @@ export function PortfolioView(_: PortfolioViewProps) {
     return items.filter((item) => item.stageKey === filter);
   }, [items, filter]);
 
-  if (loading) return <LoadingSkeleton />;
+  if (loading) return <LoadingSkeleton variant="item-list" />;
 
   return (
     <div className="space-y-4">
@@ -155,7 +155,7 @@ export function PortfolioView(_: PortfolioViewProps) {
       {/* 선택된 아이템 상세 포트폴리오 */}
       {selectedId && (
         <div className="mt-4 space-y-3">
-          {portfolioLoading && <LoadingSkeleton />}
+          {portfolioLoading && <LoadingSkeleton variant="item-list" />}
           {portfolio && !portfolioLoading && (
             <>
               {/* 문서 카운트 요약 */}

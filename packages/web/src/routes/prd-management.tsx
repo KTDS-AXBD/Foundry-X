@@ -9,7 +9,7 @@ import { PrdConfirmDialog } from "../components/prd/PrdConfirmDialog";
 
 type Modal = "detail" | "edit" | "diff" | "confirm";
 
-export default function PrdManagement() {
+export function Component() {
   const { bizItemId = "" } = useParams<{ bizItemId: string }>();
   const navigate = useNavigate();
   const [prds, setPrds] = useState<GeneratedPrdEntry[]>([]);
