@@ -1,6 +1,7 @@
 /**
  * Sprint 51~53: BizItems Routes — CRUD + 분류 + 평가 + Discovery 9기준 + 분석 컨텍스트 + PRD 생성
  * Sprint 220: F454 사업기획서 기반 PRD 생성 + F455 PRD 인터뷰
+ * Sprint 221: F456 PRD 확정 + 3단계 버전 관리
  */
 import { Hono } from "hono";
 import type { Env } from "../../../env.js";
@@ -11,6 +12,9 @@ import { ItemClassifier, ClassificationError } from "../services/item-classifier
 import { BizPersonaEvaluator, EvaluationError } from "../../shaping/services/biz-persona-evaluator.js";
 import { createAgentRunner } from "../../agent/services/agent-runner.js";
 import { StartingPointClassifier, StartingPointError } from "../services/starting-point-classifier.js";
+// Sprint 221 imports (F456)
+import { PrdConfirmationService } from "../../offering/services/prd-confirmation-service.js";
+import { prdEditSchema, prdDiffQuerySchema } from "../../offering/schemas/prd-confirmation-schema.js";
 import { getAnalysisPath, type StartingPointType } from "../services/analysis-paths.js";
 import { ClassifyStartingPointSchema, ConfirmStartingPointSchema } from "../../../schemas/starting-point.js";
 // Sprint 55 imports (F186, F187)
@@ -1164,4 +1168,94 @@ bizItemsRoute.get("/biz-items/:id/prd-interview/status", async (c) => {
   const session = await interviewService.getStatus(id);
 
   return c.json({ interview: session });
+});
+
+// ─── GET /biz-items/:bizItemId/prds — PRD 버전 목록 (F456) ───
+bizItemsRoute.get("/biz-items/:bizItemId/prds", async (c) => {
+  const { bizItemId } = c.req.param();
+  const svc = new PrdConfirmationService(c.env.DB);
+  const result = await svc.listPrds(bizItemId);
+  return c.json(result);
+});
+
+// ─── GET /biz-items/:bizItemId/prds/diff — PRD 버전 비교 (F456) ───
+bizItemsRoute.get("/biz-items/:bizItemId/prds/diff", async (c) => {
+  const { bizItemId } = c.req.param();
+  const query = c.req.query();
+  const parsed = prdDiffQuerySchema.safeParse(query);
+  if (!parsed.success) return c.json({ error: "INVALID_QUERY", details: parsed.error.flatten() }, 400);
+
+  const svc = new PrdConfirmationService(c.env.DB);
+  const [prd1, prd2] = await Promise.all([
+    svc.getPrd(bizItemId, parsed.data.v1),
+    svc.getPrd(bizItemId, parsed.data.v2),
+  ]);
+  if (!prd1 || !prd2) return c.json({ error: "PRD_NOT_FOUND" }, 404);
+
+  const hunks = svc.diff(prd1.content, prd2.content);
+  return c.json({
+    v1: { id: prd1.id, version: prd1.version },
+    v2: { id: prd2.id, version: prd2.version },
+    hunks,
+  });
+});
+
+// ─── GET /biz-items/:bizItemId/prds/:prdId — PRD 상세 (F456) ───
+bizItemsRoute.get("/biz-items/:bizItemId/prds/:prdId", async (c) => {
+  const { bizItemId, prdId } = c.req.param();
+  const svc = new PrdConfirmationService(c.env.DB);
+  const prd = await svc.getPrd(bizItemId, prdId);
+  if (!prd) return c.json({ error: "PRD_NOT_FOUND" }, 404);
+  return c.json(prd);
+});
+
+// ─── POST /biz-items/:bizItemId/prds/:prdId/confirm — PRD 확정 (F456) ───
+bizItemsRoute.post("/biz-items/:bizItemId/prds/:prdId/confirm", async (c) => {
+  const { bizItemId, prdId } = c.req.param();
+  const svc = new PrdConfirmationService(c.env.DB);
+
+  try {
+    const { prd, errors } = await svc.confirm(bizItemId, prdId);
+    if (errors.length > 0) {
+      return c.json({ error: "VALIDATION_FAILED", errors }, 400);
+    }
+    const now = new Date(prd.generated_at * 1000).toISOString();
+    return c.json(
+      {
+        id: prd.id,
+        bizItemId: prd.biz_item_id,
+        version: prd.version,
+        status: prd.status,
+        content: prd.content,
+        generatedAt: now,
+      },
+      201
+    );
+  } catch (err) {
+    if (err instanceof Error) {
+      if (err.message === "PRD_NOT_FOUND") return c.json({ error: "PRD_NOT_FOUND" }, 404);
+      if (err.message === "VERSION_NOT_2") return c.json({ error: "VERSION_NOT_2", message: "version 2만 확정 가능해요" }, 400);
+    }
+    throw err;
+  }
+});
+
+// ─── PATCH /biz-items/:bizItemId/prds/:prdId — PRD 편집 (F456) ───
+bizItemsRoute.patch("/biz-items/:bizItemId/prds/:prdId", async (c) => {
+  const { bizItemId, prdId } = c.req.param();
+  const body = await c.req.json().catch(() => null);
+  const parsed = prdEditSchema.safeParse(body);
+  if (!parsed.success) return c.json({ error: "INVALID_BODY", details: parsed.error.flatten() }, 400);
+
+  const svc = new PrdConfirmationService(c.env.DB);
+  try {
+    const prd = await svc.editPrd(bizItemId, prdId, parsed.data.content);
+    return c.json(prd);
+  } catch (err) {
+    if (err instanceof Error) {
+      if (err.message === "PRD_NOT_FOUND") return c.json({ error: "PRD_NOT_FOUND" }, 404);
+      if (err.message === "READ_ONLY") return c.json({ error: "READ_ONLY", message: "1차 PRD는 읽기 전용이에요" }, 403);
+    }
+    throw err;
+  }
 });
