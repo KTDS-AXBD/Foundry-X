@@ -15,6 +15,7 @@ import {
   updateOfferingSection,
   reorderOfferingSections,
   fetchOfferingHtmlPreview,
+  exportBusinessPlanHtml,
   type OfferingDetail,
   type OfferingSectionItem,
 } from "@/lib/api-client";
@@ -61,6 +62,12 @@ export function Component() {
       ]);
       setOffering(off);
       setSections(secs);
+      // P3: 섹션 0개 + bizItemId 있으면 사업기획서 원본 HTML을 프리뷰 fallback으로
+      if (secs.length === 0 && off.bizItemId) {
+        exportBusinessPlanHtml(off.bizItemId)
+          .then((html) => setHtmlPreview(html))
+          .catch(() => null);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
     }

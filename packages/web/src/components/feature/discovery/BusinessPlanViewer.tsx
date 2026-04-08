@@ -9,7 +9,7 @@ import { useState } from "react";
 import { FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BASE_URL, exportBusinessPlanPptx } from "@/lib/api-client";
+import { BASE_URL, exportBusinessPlanPptx, exportBusinessPlanHtml } from "@/lib/api-client";
 import type { BdpVersion } from "@/lib/api-client";
 
 interface BusinessPlanViewerProps {
@@ -32,6 +32,19 @@ function renderMarkdown(text: string): string {
 
 export default function BusinessPlanViewer({ plan, bizItemId }: BusinessPlanViewerProps) {
   const [isExporting, setIsExporting] = useState(false);
+
+  function handleHtmlView() {
+    exportBusinessPlanHtml(bizItemId)
+      .then((html) => {
+        const blob = new Blob([html], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        window.open(url, "_blank");
+      })
+      .catch(() => {
+        // fallback
+        window.open(`${BASE_URL}/biz-items/${bizItemId}/business-plan/export?format=html`, "_blank");
+      });
+  }
 
   function handlePdfExport() {
     const url = `${BASE_URL}/biz-items/${bizItemId}/business-plan/export?format=html`;
@@ -68,6 +81,10 @@ export default function BusinessPlanViewer({ plan, bizItemId }: BusinessPlanView
         </div>
         <Badge variant="outline">v{plan.versionNum}</Badge>
         {plan.isFinal && <Badge className="bg-green-100 text-green-700 border-green-200">최종</Badge>}
+        {/* HTML 보기 (새 창) */}
+        <Button variant="default" size="sm" onClick={handleHtmlView}>
+          HTML 보기
+        </Button>
         {/* F446: 내보내기 버튼 */}
         <Button variant="outline" size="sm" onClick={handlePdfExport}>
           PDF 내보내기
@@ -77,12 +94,27 @@ export default function BusinessPlanViewer({ plan, bizItemId }: BusinessPlanView
         </Button>
       </div>
 
-      {/* 본문 */}
-      <div
-        className="prose prose-sm max-w-none rounded-lg border bg-card p-6 text-sm leading-relaxed"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: renderMarkdown(plan.content) }}
-      />
+      {/* 본문 — HTML 원본이면 iframe sandbox (XSS 안전), 마크다운이면 변환 렌더링 */}
+      {plan.content.trim().startsWith("<") ? (
+        <iframe
+          srcDoc={plan.content}
+          sandbox="allow-same-origin"
+          className="w-full rounded-lg border bg-white"
+          style={{ minHeight: 600 }}
+          onLoad={(e) => {
+            const frame = e.currentTarget;
+            if (frame.contentDocument?.body) {
+              frame.style.height = `${frame.contentDocument.body.scrollHeight + 40}px`;
+            }
+          }}
+          title="사업기획서"
+        />
+      ) : (
+        <div
+          className="prose prose-sm max-w-none rounded-lg border bg-card p-6 text-sm leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: renderMarkdown(plan.content) }}
+        />
+      )}
     </div>
   );
 }
