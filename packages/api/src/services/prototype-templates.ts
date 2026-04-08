@@ -3,7 +3,7 @@
  */
 
 import type { StartingPointType } from "../core/discovery/services/analysis-paths.js";
-import { getBaseCSS, getTheme } from "./prototype-styles.js";
+import { getBaseCSS, getTheme, type DesignTokenOverride } from "./prototype-styles.js";
 
 export interface PrototypeData {
   title: string;
@@ -71,9 +71,10 @@ function renderCta(data: PrototypeData, theme: ReturnType<typeof getTheme>): str
 export function renderPrototypeHtml(
   data: PrototypeData,
   startingPoint: StartingPointType,
+  tokens?: DesignTokenOverride,
 ): string {
   const theme = getTheme(data.verdict);
-  const css = getBaseCSS(theme);
+  const css = getBaseCSS(theme, tokens);
   const order = SECTION_ORDER[startingPoint] ?? SECTION_ORDER.idea;
 
   const renderers: Record<string, () => string> = {

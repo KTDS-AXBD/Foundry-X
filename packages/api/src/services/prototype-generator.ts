@@ -8,6 +8,7 @@ import type { DiscoveryCriterion } from "../core/discovery/services/discovery-cr
 import type { StartingPointType } from "../core/discovery/services/analysis-paths.js";
 import type { GeneratedPrd } from "../core/offering/services/prd-generator.js";
 import { renderPrototypeHtml, type PrototypeData } from "./prototype-templates.js";
+import { flattenTokens, type DesignTokenOverride } from "./prototype-styles.js";
 
 export interface PrototypeGenerationInput {
   bizItemId: string;
@@ -19,6 +20,7 @@ export interface PrototypeGenerationInput {
   prd: GeneratedPrd | null;
   businessPlan: { content: string } | null;
   template?: StartingPointType;
+  offeringId?: string;  // F465: Offering의 DesignToken을 Prototype에 적용
 }
 
 export interface PrototypeResult {
@@ -76,8 +78,29 @@ export class PrototypeGeneratorService {
     const protoData = this.extractPrototypeData(input);
     const templateType = input.template ?? input.startingPoint;
 
-    // 2. HTML 렌더링
-    const content = renderPrototypeHtml(protoData, templateType);
+    // F465: Offering의 DesignToken 조회 → Prototype 스타일에 적용
+    let tokenOverride: DesignTokenOverride | undefined;
+    if (input.offeringId) {
+      try {
+        const { results } = await this.db
+          .prepare("SELECT token_key, token_value, token_category FROM offering_design_tokens WHERE offering_id = ?")
+          .bind(input.offeringId)
+          .all<{ token_key: string; token_value: string; token_category: string }>();
+        if (results.length > 0) {
+          const json: Record<string, Record<string, string>> = {};
+          for (const r of results) {
+            if (!json[r.token_category]) json[r.token_category] = {};
+            json[r.token_category]![r.token_key] = r.token_value;
+          }
+          tokenOverride = flattenTokens(json);
+        }
+      } catch {
+        // 토큰 조회 실패 시 기본 스타일로 폴백
+      }
+    }
+
+    // 2. HTML 렌더링 (토큰이 있으면 적용)
+    const content = renderPrototypeHtml(protoData, templateType, tokenOverride);
 
     // 3. 버전
     const latestRow = await this.db

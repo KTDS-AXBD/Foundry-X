@@ -39,6 +39,20 @@ export interface DesignTokenOverride {
   "spacing.section.margin"?: string;
 }
 
+/**
+ * F465: DesignTokenJson → DesignTokenOverride 변환
+ * DesignTokenService.getAsJson()의 중첩 구조를 플랫 키로 변환
+ */
+export function flattenTokens(json: Record<string, Record<string, string>>): DesignTokenOverride {
+  const result: Record<string, string> = {};
+  for (const [, values] of Object.entries(json)) {
+    for (const [key, value] of Object.entries(values)) {
+      result[key] = value;
+    }
+  }
+  return result as unknown as DesignTokenOverride;
+}
+
 export function getBaseCSS(theme: ThemeColors, tokens?: DesignTokenOverride): string {
   // F465: 토큰이 전달되면 오버라이드, 없으면 기존 하드코딩 유지 (하위호환)
   const textColor = tokens?.["color.text.primary"] ?? "#0f172a";
