@@ -181,3 +181,13 @@ axBdPrototypesRoute.post("/ax-bd/prototypes/:id/link-offering", async (c) => {
 
   return c.json({ id, offeringId: body.offeringId, prototypeId }, 201);
 });
+
+// GET /ax-bd/prototypes/:id/html — HTML 콘텐츠 직접 서빙 (프레젠테이션용)
+axBdPrototypesRoute.get("/ax-bd/prototypes/:id/html", async (c) => {
+  const svc = new PrototypeService(c.env.DB);
+  const proto = await svc.getById(c.req.param("id"), c.get("orgId"));
+  if (!proto) return c.json({ error: "Prototype not found" }, 404);
+  return new Response(proto.content, {
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
+});

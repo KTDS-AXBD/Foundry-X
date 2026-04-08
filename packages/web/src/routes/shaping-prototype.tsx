@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { fetchApi } from "@/lib/api-client";
+import { fetchApi, BASE_URL } from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
 import HitlSectionReview from "@/components/feature/hitl/HitlSectionReview";
 import ReviewStatusBadge from "@/components/feature/hitl/ReviewStatusBadge";
@@ -143,15 +143,8 @@ export function Component() {
               </button>
               <div className="mt-2 flex justify-end">
                 <button
-                  onClick={async () => {
-                    try {
-                      const d = await fetchApi<PrototypeDetail>(`/ax-bd/prototypes/${p.id}`);
-                      if (d.content) {
-                        const blob = new Blob([d.content], { type: "text/html" });
-                        const url = URL.createObjectURL(blob);
-                        window.open(url, "_blank");
-                      }
-                    } catch { /* ignore */ }
+                  onClick={() => {
+                    window.open(`${BASE_URL}/ax-bd/prototypes/${p.id}/html`, "_blank");
                   }}
                   className="text-xs text-primary hover:underline"
                 >
@@ -174,18 +167,14 @@ export function Component() {
             <h2 className="text-xl font-semibold">{selected.bizItemTitle || selected.bizItemId}</h2>
             <Badge variant="outline">v{selected.version}</Badge>
             <Badge variant="secondary">{selected.format}</Badge>
-            {detail?.content && (
-              <button
-                onClick={() => {
-                  const blob = new Blob([detail.content], { type: "text/html" });
-                  const url = URL.createObjectURL(blob);
-                  window.open(url, "_blank");
-                }}
-                className="ml-auto rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-              >
-                새 창에서 보기 (프레젠테이션)
-              </button>
-            )}
+            <button
+              onClick={() => {
+                window.open(`${BASE_URL}/ax-bd/prototypes/${selected.id}/html`, "_blank");
+              }}
+              className="ml-auto rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              새 창에서 보기 (프레젠테이션)
+            </button>
           </div>
 
           {detail && detail.linkedOfferings.length > 0 && (
