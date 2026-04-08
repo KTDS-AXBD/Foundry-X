@@ -1,9 +1,5 @@
-# Archive Index — 2026-04
+# Archive — 2026-04
 
-| Feature | Phase | Match Rate | Archived | Documents |
-|---------|-------|:----------:|----------|-----------|
-| discovery-ui-v2 | Phase 15 | 92% | 2026-04-06 | plan, design, analysis, report |
-| prototype-auto-gen | Phase 16 | 97% | 2026-04-06 | plan, design, analysis, report |
-| fx-builder-evolution | Phase 19 | 96% | 2026-04-07 | plan, design, analysis, report + Sprint 175~178 (16 docs) |
-| ax-bd-msa | Phase 20 | 94% | 2026-04-07 | plan, design, analysis, report + Sprint 184~188 (21 docs) |
-| gate-x | Phase 21 | 92% | 2026-04-07 | plan, design, analysis, report + Sprint 193/194/196 (11 docs) |
+| Feature | Phase | Match Rate | Sprint | Archived |
+|---------|-------|:----------:|--------|----------|
+| [bd-quality-system](bd-quality-system/) | Phase 27 | 88.7% | 225~230 | 2026-04-09 |
