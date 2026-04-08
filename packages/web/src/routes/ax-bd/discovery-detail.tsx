@@ -8,6 +8,8 @@
  * F445 — 기획서 템플릿 선택
  * F447 — 파이프라인 상태 추적 스테퍼
  * F448 — 단계 간 자동 전환 CTA
+ * F454 — 사업기획서 기반 PRD 자동 생성 (Sprint 220)
+ * F455 — PRD 보강 인터뷰 (Sprint 220)
  */
 import { useCallback, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
@@ -38,6 +40,8 @@ import BusinessPlanEditor from "@/components/feature/discovery/BusinessPlanEdito
 import VersionHistoryPanel from "@/components/feature/discovery/VersionHistoryPanel";
 import TemplateSelector, { type TemplateParams } from "@/components/feature/discovery/TemplateSelector";
 import AttachedFilesPanel from "@/components/feature/discovery/AttachedFilesPanel";
+import PrdFromBpPanel from "@/components/feature/discovery/PrdFromBpPanel";
+import PrdInterviewPanel from "@/components/feature/discovery/PrdInterviewPanel";
 
 const TYPE_LABELS: Record<string, string> = {
   I: "아이디어형", M: "시장·타겟형", P: "고객문제형", T: "기술형", S: "서비스형",
@@ -63,6 +67,8 @@ export function Component() {
   const [showVersionPanel, setShowVersionPanel] = useState(false);
   // F445: 템플릿 선택 상태
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  // F454/F455: PRD 인터뷰 상태
+  const [prdInterviewPrdId, setPrdInterviewPrdId] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     if (!id) return;
@@ -350,6 +356,23 @@ export function Component() {
             <TemplateSelector
               onSelect={(params) => void handleGenerateBusinessPlan(params)}
               onCancel={() => setShowTemplateSelector(false)}
+            />
+          )}
+
+          {/* F454: 사업기획서 기반 PRD 자동 생성 */}
+          <PrdFromBpPanel
+            bizItemId={item.id}
+            hasBp={!!plan}
+            onPrdGenerated={(prd) => setPrdInterviewPrdId(prd.id)}
+            onStartInterview={(prdId) => setPrdInterviewPrdId(prdId)}
+          />
+
+          {/* F455: PRD 보강 인터뷰 */}
+          {prdInterviewPrdId && (
+            <PrdInterviewPanel
+              bizItemId={item.id}
+              prdId={prdInterviewPrdId}
+              onComplete={() => setPrdInterviewPrdId(null)}
             />
           )}
         </TabsContent>
