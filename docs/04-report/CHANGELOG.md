@@ -2,6 +2,61 @@
 
 > Automatic changelog of PDCA cycle completions. Updated when `/pdca report` is executed.
 
+## [2026-04-08] - Sprint 220: 1차/2차 PRD 자동 생성 (F454/F455)
+
+### Added
+- **BpHtmlParser** (`api/src/core/offering/services/bp-html-parser.ts`) — 사업기획서 HTML 구조화 파싱
+  - 7개 표준 섹션 정규화 (목적/타깃/시장/기술/범위/일정/리스크)
+  - 3단계 폴백: 헤더 → 단락 → rawText 전체 LLM
+  
+- **BpPrdGenerator** (`api/src/core/offering/services/bp-prd-generator.ts`) — PRD 생성 및 LLM 보강
+  - 8개 섹션 템플릿 (표준 7 + 성공 지표)
+  - DB INSERT: biz_generated_prds (source_type='business_plan')
+  
+- **PrdInterviewService** (`api/src/core/offering/services/prd-interview-service.ts`) — HITL 인터뷰 기반 2차 PRD 보강
+  - startInterview(): 5~8개 질문 자동 생성
+  - submitAnswer(): 응답 저장 + 마지막 응답 시 2차 PRD version=2 자동 생성
+  
+- **API 엔드포인트 (4개)**
+  - POST `/biz-items/:id/generate-prd-from-bp` (F454)
+  - POST `/biz-items/:id/prd-interview/start` (F455)
+  - POST `/biz-items/:id/prd-interview/answer` (F455)
+  - GET `/biz-items/:id/prd-interview/status` (F455)
+  
+- **Web 컴포넌트 (2개)**
+  - PrdFromBpPanel (1차 PRD 생성 진행 상태 표시)
+  - PrdInterviewPanel (질문→응답 루프 UI)
+  
+- **DB 마이그레이션 (2개)**
+  - 0119_prd_source_type.sql: biz_generated_prds에 source_type, bp_draft_id 추가
+  - 0120_prd_interviews.sql: prd_interviews 세션 관리 + prd_interview_qas 질문-응답 쌍
+  
+- **테스트 (23건)**
+  - unit: 11건 (bp-html-parser 4 + bp-prd-generator 2 + prd-interview-service 5)
+  - integration: 4건 (API 엔드포인트 검증)
+  - E2E: 8건 (UI 흐름 검증)
+
+### Changed
+- **biz-items.ts**: 4개 엔드포인트 추가 (API 라우트)
+- **discovery-detail.tsx**: PrdFromBpPanel + PrdInterviewPanel 통합 (형상화 탭)
+- **api-client.ts**: 7개 API 클라이언트 함수 추가
+
+### Technical Details
+- **Features**: F454 (1차 PRD 자동 생성), F455 (2차 PRD 보강)
+- **Sprint**: 220
+- **Duration**: 1일
+- **Match Rate**: 96% ✅
+- **Tests**: 23/23 passed (unit 11 + integration 4 + E2E 8)
+- **Coverage**: 96%
+- **New LOC**: 727 (API 439 + Web 203 + migrations 85)
+- **Phase**: 26 — BD Portfolio Management (B: PRD 생성 파이프라인)
+
+### Next Phase
+- Sprint 221 F456: 최종 PRD 확정 (3단계 PRD 통합 관리)
+- Sprint 222 F457: Prototype Builder 실행
+
+---
+
 ## [2026-04-03] - 세션 #173: ax plugin 자율점검 + 인프라 정비
 
 ### Changed
