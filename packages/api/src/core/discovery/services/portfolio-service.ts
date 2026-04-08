@@ -4,7 +4,7 @@
  * D1 환경에서 복잡한 JOIN 대신 개별 쿼리 8개를 Promise.all로 병렬 실행하여 트리를 조립해요.
  */
 
-import type { PortfolioTree, PortfolioProgress, PortfolioOffering } from "../schemas/portfolio.js";
+import type { PortfolioTree, PortfolioProgress, PortfolioOffering, PortfolioListItem, ArtifactLookupResponse } from "../schemas/portfolio.js";
 
 export class NotFoundError extends Error {
   constructor(message: string) {
@@ -375,6 +375,126 @@ export class PortfolioService {
       hasOffering: offerings.length > 0,
       hasPrototype: prototypes.length > 0,
       overallPercent: Math.round(stagePercent + criteriaPercent + planPercent + offeringPercent + prototypePercent),
+    };
+  }
+
+  // ─── Sprint 224: Gap 보강 메서드 ───
+
+  /**
+   * 전체 포트폴리오 목록 + coverage 요약 조회
+   * biz_items 기본 정보에 관련 테이블 카운트를 서브쿼리로 집계
+   */
+  async listWithCoverage(orgId: string): Promise<{ items: PortfolioListItem[]; total: number }> {
+    interface RawCoverageRow {
+      id: string;
+      title: string;
+      status: string;
+      created_at: string;
+      current_stage: string | null;
+      has_evaluation: number;
+      prd_count: number;
+      offering_count: number;
+      prototype_count: number;
+      criteria_completed: number;
+      criteria_total: number;
+    }
+
+    const { results } = await this.db
+      .prepare(
+        `SELECT
+          b.id,
+          b.title,
+          b.status,
+          b.created_at,
+          (SELECT ps.stage FROM pipeline_stages ps WHERE ps.biz_item_id = b.id ORDER BY ps.entered_at DESC LIMIT 1) AS current_stage,
+          (SELECT COUNT(*) FROM biz_evaluations be WHERE be.biz_item_id = b.id) AS has_evaluation,
+          (SELECT COUNT(*) FROM business_plan_drafts bp WHERE bp.biz_item_id = b.id) AS prd_count,
+          (SELECT COUNT(*) FROM offerings o WHERE o.biz_item_id = b.id) AS offering_count,
+          (SELECT COUNT(*) FROM prototypes p WHERE p.biz_item_id = b.id) AS prototype_count,
+          (SELECT COUNT(*) FROM biz_discovery_criteria dc WHERE dc.biz_item_id = b.id AND dc.status = 'completed') AS criteria_completed,
+          (SELECT COUNT(*) FROM biz_discovery_criteria dc WHERE dc.biz_item_id = b.id) AS criteria_total
+        FROM biz_items b
+        WHERE b.org_id = ?
+        ORDER BY b.created_at DESC`,
+      )
+      .bind(orgId)
+      .all<RawCoverageRow>();
+
+    const items: PortfolioListItem[] = results.map((r) => {
+      const currentStage = r.current_stage ?? "REGISTERED";
+      const stageIdx = STAGE_ORDER.indexOf(currentStage);
+      const completedStagesCount = Math.max(0, stageIdx + 1);
+
+      const stagePercent = (completedStagesCount / STAGE_ORDER.length) * 30;
+      const criteriaPercent = r.criteria_total > 0 ? (r.criteria_completed / 9) * 25 : 0;
+      const planPercent = r.prd_count > 0 ? 15 : 0;
+      const offeringPercent = r.offering_count > 0 ? 15 : 0;
+      const prototypePercent = r.prototype_count > 0 ? 15 : 0;
+
+      return {
+        id: r.id,
+        title: r.title,
+        status: r.status,
+        currentStage,
+        hasEvaluation: r.has_evaluation > 0,
+        prdCount: r.prd_count,
+        offeringCount: r.offering_count,
+        prototypeCount: r.prototype_count,
+        overallPercent: Math.round(stagePercent + criteriaPercent + planPercent + offeringPercent + prototypePercent),
+        createdAt: r.created_at,
+      };
+    });
+
+    return { items, total: items.length };
+  }
+
+  /**
+   * 산출물 ID로 연결된 사업 아이템 역방향 조회
+   * type: "prd" | "offering" | "prototype"
+   */
+  async findByArtifact(
+    type: "prd" | "offering" | "prototype",
+    artifactId: string,
+    orgId: string,
+  ): Promise<ArtifactLookupResponse> {
+    interface RawBizItemRef {
+      id: string;
+      title: string;
+      status: string;
+      current_stage: string | null;
+    }
+
+    const tableMap = {
+      prd: { table: "business_plan_drafts", fk: "biz_item_id" },
+      offering: { table: "offerings", fk: "biz_item_id" },
+      prototype: { table: "prototypes", fk: "biz_item_id" },
+    } as const;
+
+    const { table, fk } = tableMap[type];
+
+    const { results } = await this.db
+      .prepare(
+        `SELECT DISTINCT
+          b.id,
+          b.title,
+          b.status,
+          (SELECT ps.stage FROM pipeline_stages ps WHERE ps.biz_item_id = b.id ORDER BY ps.entered_at DESC LIMIT 1) AS current_stage
+        FROM biz_items b
+        INNER JOIN ${table} a ON a.${fk} = b.id
+        WHERE a.id = ? AND b.org_id = ?`,
+      )
+      .bind(artifactId, orgId)
+      .all<RawBizItemRef>();
+
+    return {
+      artifactType: type,
+      artifactId,
+      bizItems: results.map((r) => ({
+        id: r.id,
+        title: r.title,
+        status: r.status,
+        currentStage: r.current_stage ?? "REGISTERED",
+      })),
     };
   }
 }
