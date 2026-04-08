@@ -182,3 +182,57 @@ export function getImpeccableReference(): string {
     .map(([, content]) => content)
     .join("\n\n---\n\n");
 }
+
+// ─── F464: impeccable 7도메인 → Discriminator 체크리스트 자동 도출 (Sprint 230) ───
+
+const DOMAIN_CHECKLIST: Record<string, string[]> = {
+  typography: [
+    "과용 폰트(Arial, Inter, system-ui, Helvetica) 대신 전문 폰트 또는 Google Fonts를 사용한다",
+    "Type scale이 일관된 비율(1.25× 또는 1.333×)을 따른다",
+    "본문 line-height 1.5~1.7, 헤딩 1.1~1.3을 준수한다",
+    "letter-spacing이 적절하다 (헤딩 -0.02em, 본문 0)",
+  ],
+  colorContrast: [
+    "순수 흑색(#000000)을 피하고 약간의 채도가 있는 tinted neutral을 사용한다",
+    "순수 회색(#808080, #999999)을 피하고 채도 있는 색상 팔레트를 사용한다",
+    "텍스트와 배경의 명도 대비가 WCAG AA(4.5:1) 이상이다",
+    "색상 팔레트가 1 primary + 1 accent + tinted neutrals 구조이다",
+  ],
+  spatialDesign: [
+    "모든 spacing이 4px/8px 배수 시스템을 따른다",
+    "섹션 간 여백이 최소 64px이고 호흡감이 있다",
+    "카드 안에 카드를 중첩하는 패턴을 사용하지 않는다",
+  ],
+  motionDesign: [
+    "UI 전환이 200~350ms 범위이고 600ms를 초과하지 않는다",
+    "linear easing 대신 ease-out/ease-in-out을 사용한다",
+  ],
+  interactionDesign: [
+    "클릭 가능 요소의 최소 터치 타겟이 44×44px이다",
+    "모든 인터랙티브 요소에 hover/focus 상태가 정의되어 있다",
+  ],
+  responsiveDesign: [
+    "768px/1024px 브레이크포인트의 미디어 쿼리가 적용되어 있다",
+    "fluid typography(clamp())가 적용되어 있다",
+    "이미지에 max-width: 100%가 적용되어 있다",
+  ],
+  uxWriting: [
+    "h1, h2 또는 크기가 다른 텍스트로 타이포그래피 계층 구조가 명확하다",
+    "CTA 버튼이 동사 기반 레이블을 사용한다",
+  ],
+};
+
+/**
+ * 7도메인에서 체크리스트를 자동 도출하여 반환
+ * Discriminator의 getDefaultRubric()에서 호출
+ */
+export function getDiscriminatorChecklist(): string[] {
+  return Object.values(DOMAIN_CHECKLIST).flat();
+}
+
+/**
+ * 도메인별 체크리스트 매핑 반환 (Sentinel 정합성 감사용)
+ */
+export function getDomainChecklistMap(): Record<string, string[]> {
+  return DOMAIN_CHECKLIST;
+}
