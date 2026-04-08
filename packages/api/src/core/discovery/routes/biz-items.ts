@@ -181,18 +181,18 @@ bizItemsRoute.get("/biz-items/:id/shaping-artifacts", async (c) => {
   const db = c.env.DB;
 
   const [bpRow, offeringRow, prdRow, protoRow] = await Promise.all([
-    db.prepare("SELECT version, created_at FROM business_plan_drafts WHERE biz_item_id = ? ORDER BY version DESC LIMIT 1")
-      .bind(bizItemId).first<{ version: number; created_at: number }>(),
+    db.prepare("SELECT version, generated_at FROM business_plan_drafts WHERE biz_item_id = ? ORDER BY version DESC LIMIT 1")
+      .bind(bizItemId).first<{ version: number; generated_at: string }>(),
     db.prepare("SELECT id, status FROM offerings WHERE biz_item_id = ? AND org_id = ? LIMIT 1")
       .bind(bizItemId, orgId).first<{ id: string; status: string }>(),
     db.prepare("SELECT version, generated_at FROM biz_generated_prds WHERE biz_item_id = ? ORDER BY version DESC LIMIT 1")
-      .bind(bizItemId).first<{ version: number; generated_at: number }>(),
+      .bind(bizItemId).first<{ version: number; generated_at: string }>(),
     db.prepare("SELECT id FROM prototypes WHERE biz_item_id = ? LIMIT 1")
       .bind(bizItemId).first<{ id: string }>(),
   ]);
 
   return c.json({
-    businessPlan: bpRow ? { versionNum: bpRow.version, createdAt: new Date((bpRow.created_at ?? 0) * 1000).toISOString() } : null,
+    businessPlan: bpRow ? { versionNum: bpRow.version, createdAt: bpRow.generated_at } : null,
     offering: offeringRow ? { id: offeringRow.id, status: offeringRow.status } : null,
     prd: prdRow ? { versionNum: prdRow.version } : null,
     prototype: protoRow ? { id: protoRow.id } : null,
