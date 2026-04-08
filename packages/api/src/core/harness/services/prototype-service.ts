@@ -6,6 +6,7 @@
 interface ProtoRow {
   id: string;
   biz_item_id: string;
+  biz_item_title?: string;
   version: number;
   format: string;
   content: string;
@@ -41,15 +42,22 @@ interface TechReviewRow {
 export interface PrototypeListItem {
   id: string;
   bizItemId: string;
+  bizItemTitle: string;
   version: number;
   format: string;
   templateUsed: string | null;
   generatedAt: string;
 }
 
+export interface LinkedOffering {
+  offeringId: string;
+  offeringTitle: string;
+}
+
 export interface PrototypeDetail {
   id: string;
   bizItemId: string;
+  bizItemTitle: string;
   version: number;
   format: string;
   content: string;
@@ -57,6 +65,7 @@ export interface PrototypeDetail {
   modelUsed: string | null;
   tokensUsed: number;
   generatedAt: string;
+  linkedOfferings: LinkedOffering[];
   pocEnv: {
     id: string;
     prototypeId: string;
@@ -84,6 +93,7 @@ function toListItem(row: ProtoRow): PrototypeListItem {
   return {
     id: row.id,
     bizItemId: row.biz_item_id,
+    bizItemTitle: row.biz_item_title ?? row.biz_item_id,
     version: row.version,
     format: row.format,
     templateUsed: row.template_used,
@@ -135,7 +145,7 @@ export class PrototypeService {
     const countBindings: unknown[] = [];
 
     if (opts?.bizItemId) {
-      query = `SELECT p.* FROM prototypes p
+      query = `SELECT p.*, bi.title AS biz_item_title FROM prototypes p
         JOIN biz_items bi ON p.biz_item_id = bi.id
         WHERE bi.org_id = ? AND p.biz_item_id = ?
         ORDER BY p.generated_at DESC LIMIT ? OFFSET ?`;
@@ -146,7 +156,7 @@ export class PrototypeService {
         WHERE bi.org_id = ? AND p.biz_item_id = ?`;
       countBindings.push(tenantId, opts.bizItemId);
     } else {
-      query = `SELECT p.* FROM prototypes p
+      query = `SELECT p.*, bi.title AS biz_item_title FROM prototypes p
         JOIN biz_items bi ON p.biz_item_id = bi.id
         WHERE bi.org_id = ?
         ORDER BY p.generated_at DESC LIMIT ? OFFSET ?`;
@@ -169,11 +179,19 @@ export class PrototypeService {
 
   async getById(id: string, tenantId: string): Promise<PrototypeDetail | null> {
     const row = await this.db.prepare(
-      `SELECT p.* FROM prototypes p
+      `SELECT p.*, bi.title AS biz_item_title FROM prototypes p
        JOIN biz_items bi ON p.biz_item_id = bi.id
        WHERE p.id = ? AND bi.org_id = ?`
     ).bind(id, tenantId).first<ProtoRow>();
     if (!row) return null;
+
+    // Fetch linked offerings
+    const { results: offeringRows } = await this.db.prepare(
+      `SELECT o.id AS offering_id, o.title AS offering_title
+       FROM offering_prototypes op
+       JOIN offerings o ON o.id = op.offering_id
+       WHERE op.prototype_id = ?`
+    ).bind(id).all<{ offering_id: string; offering_title: string }>();
 
     // Fetch related poc_env and tech_review
     const pocRow = await this.db.prepare(
@@ -187,6 +205,7 @@ export class PrototypeService {
     return {
       id: row.id,
       bizItemId: row.biz_item_id,
+      bizItemTitle: row.biz_item_title ?? row.biz_item_id,
       version: row.version,
       format: row.format,
       content: row.content,
@@ -194,6 +213,10 @@ export class PrototypeService {
       modelUsed: row.model_used,
       tokensUsed: row.tokens_used,
       generatedAt: row.generated_at,
+      linkedOfferings: (offeringRows ?? []).map(r => ({
+        offeringId: r.offering_id,
+        offeringTitle: r.offering_title,
+      })),
       pocEnv: pocRow ? toPocEnv(pocRow) : null,
       techReview: reviewRow ? toTechReview(reviewRow) : null,
     };

@@ -8,13 +8,26 @@ import ReviewStatusBadge from "@/components/feature/hitl/ReviewStatusBadge";
 import ReviewSummaryBar from "@/components/feature/hitl/ReviewSummaryBar";
 import { VersionBadge } from "@/components/feature/VersionBadge";
 
+interface LinkedOffering {
+  offeringId: string;
+  offeringTitle: string;
+}
+
 interface PrototypeItem {
   id: string;
   bizItemId: string;
+  bizItemTitle: string;
   version: number;
   format: string;
   templateUsed: string | null;
   generatedAt: string;
+}
+
+interface PrototypeDetail extends PrototypeItem {
+  content: string;
+  modelUsed: string | null;
+  tokensUsed: number;
+  linkedOfferings: LinkedOffering[];
 }
 
 interface ReviewSummary {
@@ -40,6 +53,7 @@ const PROTOTYPE_SECTIONS = ["UI 레이아웃", "컴포넌트 구조", "네비게
 export function Component() {
   const [prototypes, setPrototypes] = useState<PrototypeItem[]>([]);
   const [selected, setSelected] = useState<PrototypeItem | null>(null);
+  const [detail, setDetail] = useState<PrototypeDetail | null>(null);
   const [summary, setSummary] = useState<ReviewSummary | null>(null);
   const [reviews, setReviews] = useState<SectionReview[]>([]);
   const [framework, setFramework] = useState<string>("react");
@@ -48,6 +62,19 @@ export function Component() {
     fetchApi<{ items: PrototypeItem[] }>("/ax-bd/prototypes")
       .then((data) => setPrototypes(data.items))
       .catch(() => {});
+  }, []);
+
+  const loadDetail = useCallback(async (p: PrototypeItem) => {
+    try {
+      const [d, s, r] = await Promise.all([
+        fetchApi<PrototypeDetail>(`/ax-bd/prototypes/${p.id}`),
+        fetchApi<ReviewSummary>(`/ax-bd/prototypes/${p.id}/review-summary`),
+        fetchApi<SectionReview[]>(`/ax-bd/prototypes/${p.id}/reviews`),
+      ]);
+      setDetail(d);
+      setSummary(s);
+      setReviews(r);
+    } catch { /* ignore */ }
   }, []);
 
   const loadReviews = useCallback(async () => {
@@ -63,8 +90,8 @@ export function Component() {
   }, [selected]);
 
   useEffect(() => {
-    if (selected) loadReviews();
-  }, [selected, loadReviews]);
+    if (selected) loadDetail(selected);
+  }, [selected, loadDetail]);
 
   return (
     <div className="space-y-6">
@@ -101,7 +128,7 @@ export function Component() {
               className="w-full rounded-lg border p-4 text-left hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center justify-between">
-                <span className="font-medium">{p.bizItemId}</span>
+                <span className="font-medium">{p.bizItemTitle || p.bizItemId}</span>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline">v{p.version}</Badge>
                   <Badge variant="secondary">{p.format}</Badge>
@@ -116,17 +143,34 @@ export function Component() {
       ) : (
         <div className="space-y-4">
           <button
-            onClick={() => { setSelected(null); setSummary(null); setReviews([]); }}
+            onClick={() => { setSelected(null); setDetail(null); setSummary(null); setReviews([]); }}
             className="text-sm text-muted-foreground hover:text-foreground"
           >
             &larr; 목록으로
           </button>
 
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-semibold">{selected.bizItemId}</h2>
+            <h2 className="text-xl font-semibold">{selected.bizItemTitle || selected.bizItemId}</h2>
             <Badge variant="outline">v{selected.version}</Badge>
             <Badge variant="secondary">{selected.format}</Badge>
           </div>
+
+          {detail && detail.linkedOfferings.length > 0 && (
+            <div className="rounded-lg border p-3 space-y-1">
+              <p className="text-xs font-medium text-muted-foreground">연결된 Offering</p>
+              <div className="flex flex-wrap gap-2">
+                {detail.linkedOfferings.map((o) => (
+                  <a
+                    key={o.offeringId}
+                    href={`/offering/${o.offeringId}`}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {o.offeringTitle}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
 
           {summary && <ReviewSummaryBar summary={summary} />}
 
