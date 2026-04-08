@@ -919,17 +919,21 @@ export class MockD1Database {
       CREATE INDEX IF NOT EXISTS idx_usage_records_org ON usage_records (org_id, month);
 
       -- 0037: biz_generated_prds (PRD 자동 생성)
+      -- 0121: status 컬럼 추가 (Sprint 221 F456)
       CREATE TABLE IF NOT EXISTS biz_generated_prds (
         id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
         biz_item_id TEXT NOT NULL,
         version INTEGER NOT NULL DEFAULT 1,
+        status TEXT NOT NULL DEFAULT 'draft',
         content TEXT NOT NULL,
         criteria_snapshot TEXT,
-        generated_at TEXT NOT NULL DEFAULT (datetime('now')),
+        generated_at INTEGER NOT NULL DEFAULT (unixepoch()),
         source_type TEXT NOT NULL DEFAULT 'discovery',
-        bp_draft_id TEXT
+        bp_draft_id TEXT,
+        UNIQUE(biz_item_id, version)
       );
       CREATE INDEX IF NOT EXISTS idx_generated_prds_item ON biz_generated_prds(biz_item_id);
+      CREATE INDEX IF NOT EXISTS idx_generated_prds_status ON biz_generated_prds(biz_item_id, status);
 
       -- 0120: PRD Interviews (Sprint 220 F455)
       CREATE TABLE IF NOT EXISTS prd_interviews (

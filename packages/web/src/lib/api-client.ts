@@ -2999,3 +2999,51 @@ export async function getPrdInterviewStatus(
 ): Promise<{ interview: PrdInterviewSession | null }> {
   return fetchApi<{ interview: PrdInterviewSession | null }>(`/biz-items/${bizItemId}/prd-interview/status`);
 }
+
+// ─── Sprint 221 F456: PRD 버전 관리 API ───
+
+export interface GeneratedPrdEntry {
+  id: string;
+  biz_item_id: string;
+  version: number;
+  status: "draft" | "reviewing" | "confirmed";
+  content: string;
+  contentPreview?: string;
+  criteria_snapshot: string | null;
+  generated_at: number;
+}
+
+export interface DiffHunk {
+  type: "added" | "removed" | "unchanged";
+  content: string;
+}
+
+export async function listPrds(bizItemId: string): Promise<{ prds: GeneratedPrdEntry[] }> {
+  return fetchApi<{ prds: GeneratedPrdEntry[] }>(`/biz-items/${bizItemId}/prds`);
+}
+
+export async function getPrd(bizItemId: string, prdId: string): Promise<GeneratedPrdEntry> {
+  return fetchApi<GeneratedPrdEntry>(`/biz-items/${bizItemId}/prds/${prdId}`);
+}
+
+export async function confirmPrd(bizItemId: string, prdId: string): Promise<GeneratedPrdEntry> {
+  return fetchApi<GeneratedPrdEntry>(`/biz-items/${bizItemId}/prds/${prdId}/confirm`, {
+    method: "POST",
+  });
+}
+
+export async function editPrd(bizItemId: string, prdId: string, content: string): Promise<GeneratedPrdEntry> {
+  return fetchApi<GeneratedPrdEntry>(`/biz-items/${bizItemId}/prds/${prdId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content }),
+  });
+}
+
+export async function diffPrds(
+  bizItemId: string,
+  v1Id: string,
+  v2Id: string,
+): Promise<{ v1: { id: string; version: number }; v2: { id: string; version: number }; hunks: DiffHunk[] }> {
+  return fetchApi(`/biz-items/${bizItemId}/prds/diff?v1=${encodeURIComponent(v1Id)}&v2=${encodeURIComponent(v2Id)}`);
+}
