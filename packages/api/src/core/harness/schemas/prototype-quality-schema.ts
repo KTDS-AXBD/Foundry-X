@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const GENERATION_MODES = ["max-cli", "cli", "api", "fallback"] as const;
+export const GENERATION_MODES = ["max-cli", "cli", "api", "fallback", "ogd"] as const;  // F467: ogd 추가
 
 export const InsertQualitySchema = z.object({
   jobId: z.string().min(1),

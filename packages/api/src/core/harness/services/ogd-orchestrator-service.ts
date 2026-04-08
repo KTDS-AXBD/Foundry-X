@@ -1,5 +1,6 @@
 // ─── F355: O-G-D Orchestrator Service (Sprint 160) ───
 // F431: FeedbackConverter 주입 + structured instructions 전달 (Sprint 207)
+// F467: PrototypeQualityService 주입 + runLoop 완료 후 prototype_quality INSERT (Sprint 228)
 // Generator → Discriminator → Feedback 루프 관리
 
 import { OGD_MAX_ROUNDS } from "@foundry-x/shared";
@@ -7,6 +8,7 @@ import type { OgdRound, OgdSummary, StructuredInstruction } from "@foundry-x/sha
 import { OgdGeneratorService } from "./ogd-generator-service.js";
 import { OgdDiscriminatorService } from "./ogd-discriminator-service.js";
 import { OgdFeedbackConverterService } from "./ogd-feedback-converter.js";
+import { PrototypeQualityService } from "./prototype-quality-service.js";
 
 interface OgdRoundRow {
   id: string;
@@ -53,12 +55,14 @@ export class OgdOrchestratorService {
     private generator: OgdGeneratorService,
     private discriminator: OgdDiscriminatorService,
     private feedbackConverter?: OgdFeedbackConverterService,
+    private qualityService?: PrototypeQualityService,  // F467
   ) {}
 
   async runLoop(
     orgId: string,
     jobId: string,
     prdContent: string,
+    initialFeedback?: string,  // F466: 재생성 시 첫 라운드에 외부 피드백 주입
   ): Promise<OgdSummary> {
     const checklist = this.discriminator.extractChecklist(prdContent);
     const rounds: OgdRound[] = [];
@@ -66,7 +70,7 @@ export class OgdOrchestratorService {
     let bestRound = 1;
     let passed = false;
     let totalCostUsd = 0;
-    let previousFeedback: string | undefined;
+    let previousFeedback: string | undefined = initialFeedback;
     let previousInstructions: StructuredInstruction[] | undefined;
 
     for (let round = 1; round <= OGD_MAX_ROUNDS; round++) {
@@ -152,6 +156,26 @@ export class OgdOrchestratorService {
       )
       .bind(bestScore, rounds.length, Math.floor(Date.now() / 1000), jobId, orgId)
       .run();
+
+    // F467: OGD 결과를 prototype_quality에 자동 적재
+    // totalScore: 0~100 스케일, 차원별 점수: 0~1 스케일 (스키마 기준)
+    if (this.qualityService) {
+      const bestRoundData = rounds[bestRound - 1];
+      await this.qualityService.insert({
+        jobId,
+        round: rounds.length,
+        totalScore: Math.round(bestScore * 100),
+        buildScore: bestScore,
+        uiScore: bestScore,
+        functionalScore: bestScore,
+        prdScore: bestScore,
+        codeScore: bestScore,
+        generationMode: "ogd",
+        costUsd: totalCostUsd,
+        feedback: bestRoundData?.feedback ?? null,
+        details: JSON.stringify({ ogdRounds: rounds.length, passed }),
+      });
+    }
 
     return {
       jobId,

@@ -1,6 +1,12 @@
 // ─── F356: Prototype Feedback Service (Sprint 160) ───
+// F466: triggerRegeneration — feedback_pending Job의 피드백을 Generator에 전달하여 재생성 (Sprint 228)
 
-import type { FeedbackCategory, PrototypeFeedback } from "@foundry-x/shared";
+import type { FeedbackCategory, PrototypeFeedback, OgdSummary } from "@foundry-x/shared";
+import { OgdOrchestratorService } from "./ogd-orchestrator-service.js";
+import { OgdGeneratorService } from "./ogd-generator-service.js";
+import { OgdDiscriminatorService } from "./ogd-discriminator-service.js";
+import { OgdFeedbackConverterService } from "./ogd-feedback-converter.js";
+import { PrototypeQualityService } from "./prototype-quality-service.js";
 
 interface FeedbackRow {
   id: string;
@@ -102,5 +108,77 @@ export class PrototypeFeedbackService {
       .bind(id, orgId)
       .first<FeedbackRow>();
     return row ? toFeedback(row) : null;
+  }
+
+  // F466: feedback_pending Job의 피드백을 Generator에 전달하여 재생성 트리거
+  async triggerRegeneration(
+    jobId: string,
+    orgId: string,
+    services: {
+      generator: OgdGeneratorService;
+      discriminator: OgdDiscriminatorService;
+      feedbackConverter?: OgdFeedbackConverterService;
+      qualityService?: PrototypeQualityService;
+    },
+  ): Promise<OgdSummary> {
+    const job = await this.db
+      .prepare(
+        "SELECT id, status, prd_content, feedback_content FROM prototype_jobs WHERE id = ? AND org_id = ?",
+      )
+      .bind(jobId, orgId)
+      .first<{ id: string; status: string; prd_content: string; feedback_content: string | null }>();
+
+    if (!job) throw new Error("Job not found");
+    if (job.status !== "feedback_pending") {
+      throw new Error(`Job is not in feedback_pending status (current: ${job.status})`);
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+
+    // building으로 전환
+    await this.db
+      .prepare("UPDATE prototype_jobs SET status = 'building', updated_at = ? WHERE id = ?")
+      .bind(now, jobId)
+      .run();
+
+    const orchestrator = new OgdOrchestratorService(
+      this.db,
+      services.generator,
+      services.discriminator,
+      services.feedbackConverter,
+      services.qualityService,
+    );
+
+    try {
+      const summary = await orchestrator.runLoop(
+        orgId,
+        jobId,
+        job.prd_content,
+        job.feedback_content ?? undefined,  // 외부 피드백을 첫 라운드에 주입
+      );
+
+      // 재생성 완료 → live 복귀
+      await this.db
+        .prepare("UPDATE prototype_jobs SET status = 'live', updated_at = ? WHERE id = ?")
+        .bind(Math.floor(Date.now() / 1000), jobId)
+        .run();
+
+      // pending 피드백 → applied 일괄 업데이트
+      await this.db
+        .prepare(
+          "UPDATE prototype_feedback SET status = 'applied' WHERE job_id = ? AND org_id = ? AND status = 'pending'",
+        )
+        .bind(jobId, orgId)
+        .run();
+
+      return summary;
+    } catch (err) {
+      // 실패 시 failed로 전환
+      await this.db
+        .prepare("UPDATE prototype_jobs SET status = 'failed', updated_at = ? WHERE id = ?")
+        .bind(Math.floor(Date.now() / 1000), jobId)
+        .run();
+      throw err;
+    }
   }
 }
