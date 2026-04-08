@@ -1,5 +1,6 @@
 /**
  * Sprint 118: F297 — Prototype 섹션별 HITL 리뷰 서비스
+ * Sprint 230: F470 — revision_requested → 피드백 자동 생성 연결
  */
 
 import type { SectionReviewInput } from "../../shaping/schemas/hitl-section.schema.js";
@@ -24,8 +25,23 @@ export interface PrototypeReviewSummary {
   revisionRequested: number;
 }
 
+// F470: revision_requested 시 피드백 자동 생성을 위한 콜백 타입
+export type OnRevisionRequestedFn = (
+  orgId: string,
+  prototypeId: string,
+  sectionId: string,
+  comment: string,
+) => Promise<void>;
+
 export class PrototypeReviewService {
+  private onRevisionRequested: OnRevisionRequestedFn | null = null;
+
   constructor(private db: D1Database) {}
+
+  /** F470: revision_requested 발생 시 호출될 콜백 등록 */
+  setOnRevisionRequested(fn: OnRevisionRequestedFn): void {
+    this.onRevisionRequested = fn;
+  }
 
   async reviewSection(
     orgId: string,
@@ -43,6 +59,11 @@ export class PrototypeReviewService {
       )
       .bind(id, orgId, prototypeId, input.sectionId, input.action, reviewerId, input.comment ?? null, framework)
       .run();
+
+    // F470: revision_requested 시 자동으로 피드백 생성
+    if (input.action === "revision_requested" && input.comment && this.onRevisionRequested) {
+      await this.onRevisionRequested(orgId, prototypeId, input.sectionId, input.comment);
+    }
 
     return {
       id,
