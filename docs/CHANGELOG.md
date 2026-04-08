@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #233 (2026-04-09)
+**형상화 3종 HTML 미리보기 — E2E 테스트 + 코드 개선**:
+- ✅ 사업기획서(/shaping/business-plan): 카드 클릭 → iframe HTML 미리보기 + 새 창 열기 버튼
+- ✅ Offering(/shaping/offerings): 카드 클릭 → 하단 미리보기 패널(iframe) + 새 창 열기 + 패널 전환
+- ✅ PRD(/shaping/prd): 기존 iframe에 "새 창에서 열기" 버튼 추가
+- ✅ E2E 테스트 16건 신규 작성 (shaping-html-view.spec.ts) — 전체 통과
+- ✅ SPEC.md 수치 갱신: services 40(adapters 13), D1 0121
+
+**검증 결과**: ✅ typecheck / E2E 16 passed / 기존 shaping E2E 5 passed (회귀 없음)
+
 ### 세션 #229 (2026-04-08)
 **Phase 27 BD Quality System — Sprint 226~230 Pipeline + 프로덕션 핫픽스**:
 - ✅ Sprint 226: F461 Prototype QSA + F462 Offering QSA (PR #380)
