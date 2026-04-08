@@ -2,11 +2,11 @@
 
 /**
  * F440 — 사업기획서 열람 컴포넌트
- * 마크다운 렌더링 + 버전 정보 표시
- * F446 — 내보내기 버튼 (PDF/PPTX)
+ * HTML 원본을 iframe으로 인라인 표시 + 내보내기 버튼
+ * S229: HTML iframe 렌더링으로 전환 (마크다운 변환 제거)
  */
-import { useState } from "react";
-import { FileText } from "lucide-react";
+import { useState, useEffect } from "react";
+import { FileText, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BASE_URL, exportBusinessPlanPptx, exportBusinessPlanHtml } from "@/lib/api-client";
@@ -17,38 +17,27 @@ interface BusinessPlanViewerProps {
   bizItemId: string;
 }
 
-/** 마크다운을 간단한 HTML로 변환 (외부 라이브러리 없이) */
-function renderMarkdown(text: string): string {
-  return text
-    .replace(/^### (.+)$/gm, '<h3 class="text-base font-semibold mt-4 mb-1">$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2 class="text-lg font-bold mt-5 mb-2">$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1 class="text-xl font-bold mt-6 mb-2">$1</h1>')
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.+?)\*/g, "<em>$1</em>")
-    .replace(/^- (.+)$/gm, '<li class="ml-4 list-disc">$1</li>')
-    .replace(/\n\n/g, '<br class="block mb-2" />')
-    .replace(/\n/g, "\n");
-}
-
 export default function BusinessPlanViewer({ plan, bizItemId }: BusinessPlanViewerProps) {
   const [isExporting, setIsExporting] = useState(false);
+  const [htmlContent, setHtmlContent] = useState<string | null>(null);
+  const [htmlLoading, setHtmlLoading] = useState(false);
 
-  function handleHtmlView() {
+  // HTML 원본을 export API에서 가져와 인라인 iframe으로 표시
+  useEffect(() => {
+    setHtmlLoading(true);
     exportBusinessPlanHtml(bizItemId)
-      .then((html) => {
-        const blob = new Blob([html], { type: "text/html" });
-        const url = URL.createObjectURL(blob);
-        window.open(url, "_blank");
-      })
-      .catch(() => {
-        // fallback
-        window.open(`${BASE_URL}/biz-items/${bizItemId}/business-plan/export?format=html`, "_blank");
-      });
-  }
+      .then(setHtmlContent)
+      .catch(() => setHtmlContent(null))
+      .finally(() => setHtmlLoading(false));
+  }, [bizItemId]);
 
-  function handlePdfExport() {
-    const url = `${BASE_URL}/biz-items/${bizItemId}/business-plan/export?format=html`;
-    window.open(url, "_blank");
+  function handleHtmlNewTab() {
+    if (htmlContent) {
+      const blob = new Blob([htmlContent], { type: "text/html" });
+      window.open(URL.createObjectURL(blob), "_blank");
+    } else {
+      window.open(`${BASE_URL}/biz-items/${bizItemId}/business-plan/export?format=html`, "_blank");
+    }
   }
 
   async function handlePptxExport() {
@@ -81,26 +70,26 @@ export default function BusinessPlanViewer({ plan, bizItemId }: BusinessPlanView
         </div>
         <Badge variant="outline">v{plan.versionNum}</Badge>
         {plan.isFinal && <Badge className="bg-green-100 text-green-700 border-green-200">최종</Badge>}
-        {/* HTML 보기 (새 창) */}
-        <Button variant="default" size="sm" onClick={handleHtmlView}>
-          HTML 보기
-        </Button>
-        {/* F446: 내보내기 버튼 */}
-        <Button variant="outline" size="sm" onClick={handlePdfExport}>
-          PDF 내보내기
+        <Button variant="outline" size="sm" onClick={handleHtmlNewTab}>
+          새 창에서 보기
         </Button>
         <Button variant="outline" size="sm" onClick={handlePptxExport} disabled={isExporting}>
           {isExporting ? "변환 중..." : "PPTX 내보내기"}
         </Button>
       </div>
 
-      {/* 본문 — HTML 원본이면 iframe sandbox (XSS 안전), 마크다운이면 변환 렌더링 */}
-      {plan.content.trim().startsWith("<") ? (
+      {/* 본문 — HTML 원본을 iframe으로 인라인 표시 */}
+      {htmlLoading ? (
+        <div className="flex items-center justify-center p-12 rounded-lg border bg-card">
+          <Loader2 className="size-6 animate-spin text-muted-foreground" />
+          <span className="ml-2 text-sm text-muted-foreground">HTML 원본 로딩 중...</span>
+        </div>
+      ) : htmlContent ? (
         <iframe
-          srcDoc={plan.content}
+          srcDoc={htmlContent}
           sandbox="allow-same-origin"
           className="w-full rounded-lg border bg-white"
-          style={{ minHeight: 600 }}
+          style={{ minHeight: 700 }}
           onLoad={(e) => {
             const frame = e.currentTarget;
             if (frame.contentDocument?.body) {
@@ -110,10 +99,9 @@ export default function BusinessPlanViewer({ plan, bizItemId }: BusinessPlanView
           title="사업기획서"
         />
       ) : (
-        <div
-          className="prose prose-sm max-w-none rounded-lg border bg-card p-6 text-sm leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: renderMarkdown(plan.content) }}
-        />
+        <div className="rounded-lg border bg-card p-6 text-sm text-muted-foreground text-center">
+          HTML 원본을 불러올 수 없어요. "새 창에서 보기"를 이용해주세요.
+        </div>
       )}
     </div>
   );
