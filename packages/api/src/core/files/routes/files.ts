@@ -89,12 +89,12 @@ filesRoute.get("/files", async (c) => {
 filesRoute.patch("/files/:id", async (c) => {
   const orgId = c.get("orgId");
   const fileId = c.req.param("id");
-  const body = await c.req.json<{ biz_item_id?: string }>().catch(() => ({}));
+  const body = await c.req.json().catch(() => ({})) as { biz_item_id?: string };
 
   const file = await fileService.getById(c.env, orgId, fileId);
   if (!file) return c.json({ error: "파일을 찾을 수 없어요" }, 404);
 
-  if (body.biz_item_id !== undefined) {
+  if ("biz_item_id" in body && body.biz_item_id !== undefined) {
     await c.env.DB.prepare(
       `UPDATE uploaded_files SET biz_item_id = ? WHERE id = ? AND tenant_id = ?`,
     )
@@ -244,7 +244,8 @@ filesRoute.post("/files/extract-item", async (c) => {
       return c.json({ error: "파싱된 문서가 없어요. 먼저 /parse를 호출하세요" }, 404);
     }
 
-    const extracted = await documentExtractService.extractItemInfo(c.env.AI, parsedTexts);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const extracted = await documentExtractService.extractItemInfo(c.env.AI as any, parsedTexts);
     return c.json(extracted);
   } catch (err) {
     const msg = err instanceof Error ? err.message : "추출에 실패했어요";
