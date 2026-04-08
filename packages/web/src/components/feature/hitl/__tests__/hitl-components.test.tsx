@@ -36,14 +36,16 @@ describe("ReviewSummaryBar", () => {
       <ReviewSummaryBar summary={{ total: 0, approved: 0, pending: 0, rejected: 0, revisionRequested: 0 }} />,
     );
     expect(screen.getByText("리뷰 진행률")).toBeDefined();
-    expect(screen.getByText("0/0 승인 (0%)")).toBeDefined();
+    // denominator = max(total, PROTOTYPE_SECTION_COUNT=5)
+    expect(screen.getByText("0/5 승인 (0%)")).toBeDefined();
   });
 
   it("renders correct percentage", () => {
     render(
       <ReviewSummaryBar summary={{ total: 4, approved: 3, pending: 0, rejected: 1, revisionRequested: 0 }} />,
     );
-    expect(screen.getByText("3/4 승인 (75%)")).toBeDefined();
+    // denominator = max(4, 5) = 5, pct = round(3/5*100) = 60%
+    expect(screen.getByText("3/5 승인 (60%)")).toBeDefined();
   });
 
   it("renders count labels", () => {
