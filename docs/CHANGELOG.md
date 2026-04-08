@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #229 (2026-04-08)
+**Phase 27 BD Quality System — Sprint 226~230 Pipeline + 프로덕션 핫픽스**:
+- ✅ Sprint 226: F461 Prototype QSA + F462 Offering QSA (PR #380)
+- ✅ Sprint 227: F464 Generation-Evaluation 정합성 + F465 Design Token 연결 (PR: Sprint 230에 통합)
+- ✅ Sprint 228: F466 Feedback→Regeneration 루프 + F467 Quality 데이터 통합 (PR #381)
+- ✅ Sprint 229: F468 BD Sentinel 구현 (PR #382)
+- ✅ Sprint 230: F464+F465+F469+F470 GAP 복구 + 디자인 고도화 (PR #384)
+- ✅ 핫픽스: dashboard TypeError (biz-items/summary 래핑), prototype-qsa typecheck, Prototype HTML R2 참조 서빙, BusinessPlanViewer iframe, BDP API fallback
+- ✅ Sprint 번호 재배정: 228~231 → 227~230 (연번 정리)
+- ✅ 사업기획서 목록 페이지 + BDP 목록 API 추가
+
+**검증 결과**: ✅ CI green (test + deploy-api + smoke-test + prod-e2e)
+
 ### 세션 #228 (2026-04-08)
 **형상화 UI 점검 — 미팅 전 프레젠테이션 대비 5건 개선**:
 - ✅ 사업기획서(/shaping/business-plan): 빈 랜딩 → 아이디어 전체 목록 + HTML 보기 버튼
