@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ### 세션 #227 (2026-04-08)
-**Google OAuth 디버깅 + Marker.io 자동화 + Issue 정리**:
+**Google OAuth 디버깅 + Marker.io 자동화 + Issue 정리 + CI 수정**:
 - ✅ COOP `same-origin-allow-popups` 헤더 추가 → GIS SDK 팝업 postMessage 차단 해소 (PR #361)
 - ✅ `hydrateFallbackElement` 추가 → React Router 7 lazy route hydration 경고 해소 (PR #361)
 - ✅ `refreshAccessToken` dedup → token rotation race condition 방지 (PR #361)
@@ -17,8 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ✅ tina-lock.json navigation 컬렉션 복원 (PR #369)
 - ✅ GitHub Issues 9건 → 0건 정리 (8건 닫기)
 - ✅ E2E 검증: prod smoke 7/7, auth-flow 10/10
+- ✅ CI 수정 7건: ink-testing-library import, FileUploadZone generic, FILES_BUCKET mock, jszip 의존성, files.ts typecheck, biz-items D1 mock(uploaded_files+parsed_documents), flaky dailyTrends assert
 
-**검증 결과**: ✅ typecheck / lint / build / Playwright E2E 17/17
+**검증 결과**: ✅ typecheck / lint / 3262 tests / CI green / deploy-api + smoke-test + prod-e2e 전부 pass
 
 ### 세션 #225 (2026-04-07)
 **대시보드 콘솔 에러 전수 해소 + API 배포 차단 해소**:
