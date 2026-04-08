@@ -112,3 +112,40 @@ export type PortfolioTree = z.infer<typeof PortfolioTreeSchema>;
 export type PortfolioProgress = z.infer<typeof PortfolioProgressSchema>;
 export type PortfolioOffering = z.infer<typeof PortfolioOfferingSchema>;
 export type PortfolioEvaluation = z.infer<typeof PortfolioEvaluationSchema>;
+
+// ─── Sprint 224: F459+F460 Gap 보강 스키마 ───
+
+export const PortfolioListItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  status: z.string(),
+  currentStage: z.string(),
+  hasEvaluation: z.boolean(),
+  prdCount: z.number(),
+  offeringCount: z.number(),
+  prototypeCount: z.number(),
+  overallPercent: z.number(),
+  createdAt: z.string(),
+});
+
+export const PortfolioListResponseSchema = z.object({
+  items: z.array(PortfolioListItemSchema),
+  total: z.number(),
+});
+
+export const ArtifactLookupItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  status: z.string(),
+  currentStage: z.string(),
+});
+
+export const ArtifactLookupResponseSchema = z.object({
+  artifactType: z.enum(["prd", "offering", "prototype"]),
+  artifactId: z.string(),
+  bizItems: z.array(ArtifactLookupItemSchema),
+});
+
+export type PortfolioListItem = z.infer<typeof PortfolioListItemSchema>;
+export type PortfolioListResponse = z.infer<typeof PortfolioListResponseSchema>;
+export type ArtifactLookupResponse = z.infer<typeof ArtifactLookupResponseSchema>;

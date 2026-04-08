@@ -3084,3 +3084,51 @@ export async function fetchPortfolio(bizItemId: string): Promise<PortfolioTree> 
   const res = await fetchApi<{ data: PortfolioTree }>(`/biz-items/${bizItemId}/portfolio`);
   return res.data;
 }
+
+// ─── Sprint 224: Gap 보강 API 함수 ───
+
+export interface PortfolioListItem {
+  id: string;
+  title: string;
+  status: string;
+  currentStage: string;
+  hasEvaluation: boolean;
+  prdCount: number;
+  offeringCount: number;
+  prototypeCount: number;
+  overallPercent: number;
+  createdAt: string;
+}
+
+export interface PortfolioListResponse {
+  items: PortfolioListItem[];
+  total: number;
+}
+
+export async function fetchPortfolioList(): Promise<PortfolioListResponse> {
+  const res = await fetchApi<{ data: PortfolioListResponse }>("/biz-items/portfolio-list");
+  return res.data;
+}
+
+export interface ArtifactLookupItem {
+  id: string;
+  title: string;
+  status: string;
+  currentStage: string;
+}
+
+export interface ArtifactLookupResponse {
+  artifactType: "prd" | "offering" | "prototype";
+  artifactId: string;
+  bizItems: ArtifactLookupItem[];
+}
+
+export async function fetchBizItemsByArtifact(
+  type: "prd" | "offering" | "prototype",
+  id: string,
+): Promise<ArtifactLookupResponse> {
+  const res = await fetchApi<{ data: ArtifactLookupResponse }>(
+    `/biz-items/by-artifact?type=${type}&id=${encodeURIComponent(id)}`,
+  );
+  return res.data;
+}

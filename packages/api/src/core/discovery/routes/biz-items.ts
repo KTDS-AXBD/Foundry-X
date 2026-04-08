@@ -118,6 +118,45 @@ bizItemsRoute.get("/biz-items", async (c) => {
   return c.json({ items });
 });
 
+// ─── GET /biz-items/portfolio-list — 전체 포트폴리오 목록 + coverage (F459, Sprint 224) ───
+// 주의: /biz-items/:id 라우트보다 먼저 등록 필수 (정적 경로 우선)
+
+bizItemsRoute.get("/biz-items/portfolio-list", async (c) => {
+  const orgId = c.get("orgId");
+
+  const service = new PortfolioService(c.env.DB);
+  try {
+    const result = await service.listWithCoverage(orgId);
+    return c.json({ data: result });
+  } catch {
+    return c.json({ error: "포트폴리오 목록 조회 중 오류가 발생했어요" }, 500);
+  }
+});
+
+// ─── GET /biz-items/by-artifact — 산출물 ID로 역방향 조회 (F459, Sprint 224) ───
+// 주의: /biz-items/:id 라우트보다 먼저 등록 필수
+
+bizItemsRoute.get("/biz-items/by-artifact", async (c) => {
+  const orgId = c.get("orgId");
+  const type = c.req.query("type") as "prd" | "offering" | "prototype" | undefined;
+  const id = c.req.query("id");
+
+  if (!type || !["prd", "offering", "prototype"].includes(type)) {
+    return c.json({ error: "type 파라미터는 prd | offering | prototype 이어야 해요" }, 400);
+  }
+  if (!id) {
+    return c.json({ error: "id 파라미터가 필요해요" }, 400);
+  }
+
+  const service = new PortfolioService(c.env.DB);
+  try {
+    const result = await service.findByArtifact(type, id, orgId);
+    return c.json({ data: result });
+  } catch {
+    return c.json({ error: "역방향 조회 중 오류가 발생했어요" }, 500);
+  }
+});
+
 // ─── GET /biz-items/:id — 상세 조회 ───
 
 bizItemsRoute.get("/biz-items/:id", async (c) => {
