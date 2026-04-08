@@ -107,6 +107,17 @@ const TABLES_SQL = `
     model_used TEXT, tokens_used INTEGER DEFAULT 0,
     generated_at TEXT NOT NULL, UNIQUE(biz_item_id, version)
   );
+  CREATE TABLE IF NOT EXISTS uploaded_files (
+    id TEXT PRIMARY KEY, tenant_id TEXT NOT NULL, biz_item_id TEXT,
+    filename TEXT NOT NULL, mime_type TEXT NOT NULL, r2_key TEXT NOT NULL UNIQUE,
+    size_bytes INTEGER NOT NULL DEFAULT 0, status TEXT NOT NULL DEFAULT 'pending',
+    created_at INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+  CREATE TABLE IF NOT EXISTS parsed_documents (
+    id TEXT PRIMARY KEY, file_id TEXT NOT NULL REFERENCES uploaded_files(id) ON DELETE CASCADE,
+    content_text TEXT NOT NULL, content_structured TEXT,
+    page_count INTEGER NOT NULL DEFAULT 0, parsed_at INTEGER NOT NULL DEFAULT (unixepoch())
+  );
 `;
 
 function seedBizItem(id: string = "item-1") {
