@@ -182,10 +182,10 @@ describe("F424: PrototypeOgdAdapter.getDefaultRubric() — 안티패턴 포함",
     expect(rubric).toContain("카드");
   });
 
-  it("getDefaultRubric()이 13개(5+8) 항목을 반환한다", () => {
+  it("getDefaultRubric()이 25개 항목을 반환한다", () => {
     const adapter = new PrototypeOgdAdapter(createMockAi());
     const rubric = adapter.getDefaultRubric();
     const lines = rubric.split("\n").filter((l) => l.trim());
-    expect(lines).toHaveLength(13);
+    expect(lines).toHaveLength(25);
   });
 });
