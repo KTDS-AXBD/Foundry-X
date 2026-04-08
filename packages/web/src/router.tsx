@@ -40,7 +40,7 @@ export const router = createBrowserRouter([
 
       // ── Phase 13 v1.3 신규 경로 ──
       { path: "discovery", lazy: () => import("@/routes/discovery-unified") },
-      { path: "shaping/business-plan", lazy: () => import("@/routes/ax-bd/index") },
+      { path: "shaping/business-plan", lazy: () => import("@/routes/business-plan-list") },
       { path: "nps-dashboard", lazy: () => import("@/routes/nps-dashboard") },
       { path: "settings", lazy: () => import("@/routes/settings-jira") },
 
