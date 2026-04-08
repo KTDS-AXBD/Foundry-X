@@ -85,7 +85,7 @@ foundry-x/
 ### .claude/ 프로젝트 설정
 - `.claude/rules/` — 코딩 규칙 5종 (coding-style, git-workflow, testing, security, sdd-triangle) — CC 세션 시작 시 자동 로딩
 - `.claude/hooks/` — PreToolUse (보호 파일 차단 + git guard) + PostToolUse 외부 스크립트 (post-edit-format.sh, post-edit-typecheck.sh, post-edit-test-warn.sh)
-- `.claude/agents/` — 커스텀 에이전트 16종 (deploy-verifier, spec-checker, build-validator, ogd-{orchestrator,generator,discriminator}, shaping-{orchestrator,generator,discriminator}, six-hats-moderator, expert-{ta,aa,ca,da,qa}, auto-reviewer)
+- `.claude/agents/` — 커스텀 에이전트 19종 (deploy-verifier, spec-checker, build-validator, ogd-{orchestrator,generator,discriminator}, shaping-{orchestrator,generator,discriminator}, six-hats-moderator, expert-{ta,aa,ca,da,qa}, auto-reviewer, ax-bd-offering-agent, prototype-qsa, prototype-sentinel)
 - `.claude/skills/ax-bd-discovery/` — AX BD 2단계 발굴 프로세스 오케스트레이터 (v8.2)
 - `.claude/skills/ax-bd-shaping/` — AX BD 형상화 파이프라인 (Stage 3→4, Phase A~E)
 - `.claude/skills/ai-biz/` — ai-biz 11종 서브스킬 (cost-model, feasibility-study 등)
