@@ -15,6 +15,7 @@ import {
   type FeedbackItem,
   type UserEvaluationItem,
 } from "@/lib/api-client";
+import { ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -165,13 +166,25 @@ export function Component() {
 
         <TabsContent value="preview" className="mt-4">
           {job.pagesUrl ? (
-            <div className="border rounded overflow-hidden" style={{ height: 600 }}>
-              <iframe
-                src={job.pagesUrl}
-                className="w-full h-full"
-                sandbox="allow-scripts allow-same-origin"
-                title="Prototype Preview"
-              />
+            <div className="space-y-3">
+              <div className="flex justify-end">
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={() => window.open(job.pagesUrl!, "_blank")}
+                >
+                  <ExternalLink className="size-4 mr-1" />
+                  새 창에서 열기 (프레젠테이션)
+                </Button>
+              </div>
+              <div className="border rounded overflow-hidden" style={{ height: 600 }}>
+                <iframe
+                  src={job.pagesUrl}
+                  className="w-full h-full"
+                  sandbox="allow-scripts allow-same-origin"
+                  title="Prototype Preview"
+                />
+              </div>
             </div>
           ) : (
             <div className="text-sm text-muted-foreground italic p-8 text-center border rounded">

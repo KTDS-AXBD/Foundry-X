@@ -73,6 +73,18 @@ export default function PrototypeCard({ job, onClick }: PrototypeCardProps) {
         <span>${job.costUsd.toFixed(4)}</span>
         <span className="ml-auto">{formatDate(job.createdAt)}</span>
       </div>
+
+      {job.pagesUrl && job.status === "live" && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            window.open(job.pagesUrl!, "_blank");
+          }}
+          className="mt-2 w-full rounded-md border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+        >
+          새 창에서 열기 (프레젠테이션)
+        </button>
+      )}
     </Card>
   );
 }

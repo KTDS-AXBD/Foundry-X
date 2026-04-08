@@ -122,22 +122,43 @@ export function Component() {
             <p className="text-muted-foreground">프로토타입이 없어요. 사업 아이템에서 생성해 주세요.</p>
           )}
           {prototypes.map((p) => (
-            <button
+            <div
               key={p.id}
-              onClick={() => setSelected(p)}
-              className="w-full rounded-lg border p-4 text-left hover:bg-muted/50 transition-colors"
+              className="rounded-lg border p-4 hover:bg-muted/50 transition-colors"
             >
-              <div className="flex items-center justify-between">
-                <span className="font-medium">{p.bizItemTitle || p.bizItemId}</span>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline">v{p.version}</Badge>
-                  <Badge variant="secondary">{p.format}</Badge>
+              <button
+                onClick={() => setSelected(p)}
+                className="w-full text-left"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{p.bizItemTitle || p.bizItemId}</span>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">v{p.version}</Badge>
+                    <Badge variant="secondary">{p.format}</Badge>
+                  </div>
                 </div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {p.templateUsed ?? "기본 템플릿"} &middot; {new Date(p.generatedAt).toLocaleDateString("ko")}
+                </div>
+              </button>
+              <div className="mt-2 flex justify-end">
+                <button
+                  onClick={async () => {
+                    try {
+                      const d = await fetchApi<PrototypeDetail>(`/ax-bd/prototypes/${p.id}`);
+                      if (d.content) {
+                        const blob = new Blob([d.content], { type: "text/html" });
+                        const url = URL.createObjectURL(blob);
+                        window.open(url, "_blank");
+                      }
+                    } catch { /* ignore */ }
+                  }}
+                  className="text-xs text-primary hover:underline"
+                >
+                  새 창에서 열기 →
+                </button>
               </div>
-              <div className="mt-1 text-xs text-muted-foreground">
-                {p.templateUsed ?? "기본 템플릿"} &middot; {new Date(p.generatedAt).toLocaleDateString("ko")}
-              </div>
-            </button>
+            </div>
           ))}
         </div>
       ) : (
@@ -153,6 +174,18 @@ export function Component() {
             <h2 className="text-xl font-semibold">{selected.bizItemTitle || selected.bizItemId}</h2>
             <Badge variant="outline">v{selected.version}</Badge>
             <Badge variant="secondary">{selected.format}</Badge>
+            {detail?.content && (
+              <button
+                onClick={() => {
+                  const blob = new Blob([detail.content], { type: "text/html" });
+                  const url = URL.createObjectURL(blob);
+                  window.open(url, "_blank");
+                }}
+                className="ml-auto rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              >
+                새 창에서 보기 (프레젠테이션)
+              </button>
+            )}
           </div>
 
           {detail && detail.linkedOfferings.length > 0 && (

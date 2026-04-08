@@ -62,7 +62,8 @@ export const router = createBrowserRouter([
       { path: "discovery/items/:bizItemId/prds", lazy: () => import("@/routes/prd-management") },
 
       // ── 3단계 형상화 (shaping) ──
-      { path: "shaping/prd", lazy: () => import("@/routes/spec-generator") },
+      { path: "shaping/prd", lazy: () => import("@/routes/shaping-prd") },
+      { path: "shaping/spec-generator", lazy: () => import("@/routes/spec-generator") },
       { path: "shaping/proposal", lazy: () => import("@/routes/ax-bd/index") },
       { path: "shaping/prototype", lazy: () => import("@/routes/shaping-prototype") },
       { path: "shaping/review", lazy: () => import("@/routes/ax-bd/shaping") },
