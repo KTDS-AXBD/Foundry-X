@@ -20,11 +20,28 @@ bdpRoute.get("/bdp/:bizItemId", async (c) => {
   const svc = new BdpService(c.env.DB);
   const version = await svc.getLatest(bizItemId, orgId);
 
-  if (!version) {
+  if (version) {
+    return c.json(version);
+  }
+
+  // Fallback: business_plan_drafts에서 조회 (bdp_versions 미등록 아이템용)
+  const bpDraft = await c.env.DB.prepare(
+    "SELECT id, biz_item_id, version, content, generated_at FROM business_plan_drafts WHERE biz_item_id = ? ORDER BY version DESC LIMIT 1"
+  ).bind(bizItemId).first<{ id: string; biz_item_id: string; version: number; content: string; generated_at: string }>();
+
+  if (!bpDraft) {
     return c.json({ error: "BDP를 찾을 수 없어요" }, 404);
   }
 
-  return c.json(version);
+  return c.json({
+    id: bpDraft.id,
+    bizItemId: bpDraft.biz_item_id,
+    versionNum: bpDraft.version,
+    content: bpDraft.content,
+    isFinal: false,
+    createdBy: "",
+    createdAt: bpDraft.generated_at,
+  });
 });
 
 // GET /bdp/:bizItemId/versions — 버전 히스토리
