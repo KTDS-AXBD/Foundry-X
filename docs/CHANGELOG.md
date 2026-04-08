@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #228 (2026-04-08)
+**형상화 UI 점검 — 미팅 전 프레젠테이션 대비 5건 개선**:
+- ✅ 사업기획서(/shaping/business-plan): 빈 랜딩 → 아이디어 전체 목록 + HTML 보기 버튼
+- ✅ Offering 상세: 에디터 기본 화면 → HTML 프리뷰 기본 + 새 창 보기
+- ✅ PRD(/shaping/prd): spec-generator → 아이템별 PRD 렌더링 (iframe srcDoc)
+- ✅ Prototype: 모든 화면에 "새 창에서 열기(프레젠테이션)" 버튼 추가
+- ✅ BusinessPlanViewer: HTML 원본 iframe 렌더링 + HTML 보기 버튼 + shaping-artifacts API 추가
+
+**검증 결과**: ✅ typecheck / 372 tests pass / build OK
+
 ### 세션 #227 (2026-04-08)
 **Google OAuth 디버깅 + Marker.io 자동화 + Issue 정리 + CI 수정**:
 - ✅ COOP `same-origin-allow-popups` 헤더 추가 → GIS SDK 팝업 postMessage 차단 해소 (PR #361)
