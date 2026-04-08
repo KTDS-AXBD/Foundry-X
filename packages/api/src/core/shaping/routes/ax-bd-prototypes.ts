@@ -183,10 +183,29 @@ axBdPrototypesRoute.post("/ax-bd/prototypes/:id/link-offering", async (c) => {
 });
 
 // GET /ax-bd/prototypes/:id/html — HTML 콘텐츠 직접 서빙 (프레젠테이션용)
+// content가 [R2:key] 참조이면 R2에서 실제 HTML을 가져옴
 axBdPrototypesRoute.get("/ax-bd/prototypes/:id/html", async (c) => {
   const svc = new PrototypeService(c.env.DB);
   const proto = await svc.getById(c.req.param("id"), c.get("orgId"));
   if (!proto) return c.json({ error: "Prototype not found" }, 404);
+
+  // R2 참조 패턴: [R2:org_xxx/proto_xxx.html] ...설명...
+  const r2Match = proto.content.match(/^\[R2:([^\]]+)\]/);
+  if (r2Match) {
+    const r2Key = r2Match[1]!;
+    const obj = await c.env.FILES_BUCKET.get(r2Key);
+    if (!obj) {
+      return c.json({ error: "R2에서 프로토타입 HTML을 찾을 수 없어요", r2Key }, 404);
+    }
+    return new Response(obj.body, {
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "public, max-age=3600",
+      },
+    });
+  }
+
+  // 인라인 HTML (content가 직접 HTML인 경우)
   return new Response(proto.content, {
     headers: { "Content-Type": "text/html; charset=utf-8" },
   });
