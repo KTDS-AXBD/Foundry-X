@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { fetchApi, BASE_URL } from "@/lib/api-client";
+import { fetchApi, fetchPrototypeHtml } from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
 import HitlSectionReview from "@/components/feature/hitl/HitlSectionReview";
 import ReviewStatusBadge from "@/components/feature/hitl/ReviewStatusBadge";
@@ -144,7 +144,10 @@ export function Component() {
               <div className="mt-2 flex justify-end">
                 <button
                   onClick={() => {
-                    window.open(`${BASE_URL}/ax-bd/prototypes/${p.id}/html`, "_blank");
+                    fetchPrototypeHtml(p.id).then((html) => {
+                      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+                      window.open(URL.createObjectURL(blob), "_blank");
+                    }).catch(() => {});
                   }}
                   className="text-xs text-primary hover:underline"
                 >
@@ -169,7 +172,10 @@ export function Component() {
             <Badge variant="secondary">{selected.format}</Badge>
             <button
               onClick={() => {
-                window.open(`${BASE_URL}/ax-bd/prototypes/${selected.id}/html`, "_blank");
+                fetchPrototypeHtml(selected.id).then((html) => {
+                  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+                  window.open(URL.createObjectURL(blob), "_blank");
+                }).catch(() => alert("프로토타입 HTML을 불러올 수 없어요"));
               }}
               className="ml-auto rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             >

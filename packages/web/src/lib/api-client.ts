@@ -2613,6 +2613,17 @@ export async function reorderOfferingSections(
   return putApi(`/offerings/${offeringId}/sections/reorder`, { sectionIds });
 }
 
+export async function fetchPrototypeHtml(prototypeId: string): Promise<string> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const res = await fetch(`${BASE_URL}/ax-bd/prototypes/${prototypeId}/html`, {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+  if (!res.ok) throw new ApiError(res.status, "프로토타입 HTML을 불러올 수 없어요");
+  return res.text();
+}
+
 export async function fetchOfferingHtmlPreview(offeringId: string): Promise<string> {
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const res = await fetch(`${BASE_URL}/offerings/${offeringId}/export?format=html`, {
