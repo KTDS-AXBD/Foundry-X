@@ -32,7 +32,7 @@ export function guardCss(html: string): { fixed: string; corrections: CssCorrect
   let fixed = html;
   const corrections: CssCorrection[] = [];
 
-  // 1. AI 기본 폰트 교체
+  // 1a. font-family 속성 내 AI 기본 폰트 교체
   for (const [bad, good] of Object.entries(FONT_REPLACEMENTS)) {
     const regex = new RegExp(`font-family:\\s*[^;]*\\b${bad}\\b`, "gi");
     const matches = fixed.match(regex);
@@ -44,7 +44,25 @@ export function guardCss(html: string): { fixed: string; corrections: CssCorrect
           type: "font",
           original: bad,
           corrected: good,
-          reason: `AI 기본 폰트 "${bad}" → 전문 폰트 교체`,
+          reason: `AI 기본 폰트 "${bad}" → 전문 폰트 교체 (font-family)`,
+        });
+      }
+    }
+  }
+
+  // 1b. CSS 변수 정의 내 AI 기본 폰트 교체 (--font, --sans 등)
+  for (const [bad, good] of Object.entries(FONT_REPLACEMENTS)) {
+    const varRegex = new RegExp(`(--[\\w-]*(?:font|sans|serif|mono)[\\w-]*:\\s*[^;]*)\\b${bad}\\b`, "gi");
+    const varMatches = fixed.match(varRegex);
+    if (varMatches) {
+      for (const m of varMatches) {
+        const corrected = m.replace(new RegExp(`\\b${bad}\\b`, "gi"), good);
+        fixed = fixed.replace(m, corrected);
+        corrections.push({
+          type: "font",
+          original: bad,
+          corrected: good,
+          reason: `AI 기본 폰트 "${bad}" → 전문 폰트 교체 (CSS 변수)`,
         });
       }
     }
