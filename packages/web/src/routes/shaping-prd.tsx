@@ -6,7 +6,7 @@
  */
 import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { FileText, ChevronDown, ChevronRight, Search } from "lucide-react";
+import { FileText, ChevronDown, ChevronRight, Search, ExternalLink } from "lucide-react";
 import { getBizItems, listPrds, type BizItemSummary, type GeneratedPrdEntry } from "@/lib/api-client";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -137,7 +137,7 @@ export function Component() {
                         {cache.prds.map((prd) => {
                           const status = STATUS_BADGE[prd.status] ?? { label: prd.status, color: "bg-slate-100 text-slate-600" };
                           return (
-                            <div key={prd.id} className="rounded-lg border bg-card">
+                            <div key={prd.id} className="rounded-lg border bg-card" data-testid={`prd-card-${prd.id}`}>
                               <div className="flex items-center gap-2 px-4 py-2 border-b">
                                 <span className="text-sm font-semibold">
                                   {VERSION_LABELS[prd.version] ?? `${prd.version}차`} PRD
@@ -146,6 +146,18 @@ export function Component() {
                                 <span className="text-xs text-muted-foreground ml-auto">
                                   {new Date(prd.generated_at * 1000).toLocaleDateString("ko")}
                                 </span>
+                                <button
+                                  onClick={() => {
+                                    const html = markdownToHtmlDoc(prd.content);
+                                    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+                                    window.open(URL.createObjectURL(blob), "_blank");
+                                  }}
+                                  className="ml-2 inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-primary hover:bg-muted/50 transition-colors"
+                                  data-testid={`prd-open-new-window-${prd.id}`}
+                                >
+                                  <ExternalLink className="size-3" />
+                                  새 창
+                                </button>
                               </div>
                               <iframe
                                 srcDoc={markdownToHtmlDoc(prd.content)}
@@ -153,6 +165,7 @@ export function Component() {
                                 style={{ height: 400 }}
                                 sandbox=""
                                 title={`PRD v${prd.version}`}
+                                data-testid={`prd-iframe-${prd.id}`}
                               />
                             </div>
                           );

@@ -7,9 +7,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   fetchOfferings,
   deleteOffering,
+  fetchOfferingHtmlPreview,
   type OfferingListItem,
 } from "@/lib/api-client";
-import { FileOutput, Plus, Trash2, FileText, Presentation } from "lucide-react";
+import { FileOutput, Plus, Trash2, FileText, Presentation, ExternalLink, X, Loader2 } from "lucide-react";
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "초안",
@@ -41,6 +42,9 @@ export function Component() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [previewId, setPreviewId] = useState<string | null>(null);
+  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -63,10 +67,38 @@ export function Component() {
     setDeleting(id);
     try {
       await deleteOffering(id);
+      if (previewId === id) {
+        setPreviewId(null);
+        setPreviewHtml(null);
+      }
       await loadData();
     } finally {
       setDeleting(null);
     }
+  };
+
+  const handleCardClick = async (id: string) => {
+    if (previewId === id) {
+      setPreviewId(null);
+      setPreviewHtml(null);
+      return;
+    }
+    setPreviewId(id);
+    setPreviewHtml(null);
+    setPreviewLoading(true);
+    try {
+      const html = await fetchOfferingHtmlPreview(id);
+      setPreviewHtml(html);
+    } catch {
+      setPreviewHtml(null);
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
+  const openInNewWindow = (html: string) => {
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    window.open(URL.createObjectURL(blob), "_blank");
   };
 
   return (
@@ -126,23 +158,27 @@ export function Component() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {offerings.map((offering) => (
-            <div
-              key={offering.id}
-              className="border rounded-lg p-4 hover:shadow-md transition-shadow relative group"
-            >
-              {/* Delete button */}
-              <button
-                onClick={() => handleDelete(offering.id)}
-                disabled={deleting === offering.id}
-                className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded hover:bg-red-50 text-muted-foreground hover:text-red-600"
-                title="삭제"
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {offerings.map((offering) => (
+              <div
+                key={offering.id}
+                className={`border rounded-lg p-4 transition-shadow relative group cursor-pointer ${
+                  previewId === offering.id ? "ring-2 ring-primary shadow-md" : "hover:shadow-md"
+                }`}
+                onClick={() => handleCardClick(offering.id)}
+                data-testid={`offering-card-${offering.id}`}
               >
-                <Trash2 className="h-4 w-4" />
-              </button>
+                {/* Delete button */}
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleDelete(offering.id); }}
+                  disabled={deleting === offering.id}
+                  className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded hover:bg-red-50 text-muted-foreground hover:text-red-600"
+                  title="삭제"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
 
-              <Link to={`/shaping/offering/${offering.id}/edit`} className="block">
                 {/* Status + Purpose badges */}
                 <div className="flex items-center gap-2 mb-3">
                   <span
@@ -162,7 +198,6 @@ export function Component() {
 
                 {/* Meta info */}
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  {/* Format */}
                   <span className="flex items-center gap-1">
                     {offering.format === "html" ? (
                       <FileText className="h-3 w-3" />
@@ -171,18 +206,80 @@ export function Component() {
                     )}
                     {offering.format.toUpperCase()}
                   </span>
-                  {/* Version */}
                   <span className="px-1.5 py-0.5 bg-slate-100 rounded text-xs">
                     v{offering.currentVersion}
                   </span>
-                  {/* Date */}
                   <span>
                     {new Date(offering.createdAt).toLocaleDateString("ko-KR")}
                   </span>
                 </div>
-              </Link>
+
+                {/* Action buttons */}
+                <div className="flex gap-2 mt-3 pt-3 border-t" onClick={(e) => e.stopPropagation()}>
+                  <Link to={`/shaping/offering/${offering.id}/edit`} className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full text-xs">
+                      편집
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Preview Panel */}
+          {previewId && (
+            <div className="rounded-lg border bg-card" data-testid="offering-preview-panel">
+              <div className="flex items-center justify-between px-4 py-3 border-b">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold">HTML 미리보기</span>
+                  <span className="text-xs text-muted-foreground">
+                    {offerings.find((o) => o.id === previewId)?.title}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {previewHtml && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openInNewWindow(previewHtml)}
+                      data-testid="offering-open-new-window"
+                    >
+                      <ExternalLink className="size-4 mr-1" />
+                      새 창에서 열기
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => { setPreviewId(null); setPreviewHtml(null); }}
+                  >
+                    <X className="size-4" />
+                  </Button>
+                </div>
+              </div>
+              {previewLoading && (
+                <div className="flex items-center justify-center py-12 text-muted-foreground">
+                  <Loader2 className="size-5 animate-spin mr-2" />
+                  미리보기 로딩 중...
+                </div>
+              )}
+              {!previewLoading && !previewHtml && (
+                <div className="py-8 text-center text-sm text-muted-foreground">
+                  HTML 미리보기를 불러올 수 없어요
+                </div>
+              )}
+              {previewHtml && (
+                <iframe
+                  srcDoc={previewHtml}
+                  className="w-full border-0"
+                  style={{ height: 500 }}
+                  sandbox="allow-same-origin"
+                  title="Offering HTML 미리보기"
+                  data-testid={`offering-iframe-${previewId}`}
+                />
+              )}
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>
