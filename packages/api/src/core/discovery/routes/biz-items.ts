@@ -47,6 +47,8 @@ import { BpPrdGenerator } from "../../offering/services/bp-prd-generator.js";
 import { PrdInterviewService } from "../../offering/services/prd-interview-service.js";
 import { GeneratePrdFromBpSchema } from "../../offering/schemas/bp-prd.js";
 import { StartInterviewSchema, AnswerInterviewSchema } from "../../offering/schemas/prd-interview.js";
+// Sprint 223 imports (F459)
+import { PortfolioService, NotFoundError } from "../services/portfolio-service.js";
 
 export const bizItemsRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
@@ -1257,5 +1259,23 @@ bizItemsRoute.patch("/biz-items/:bizItemId/prds/:prdId", async (c) => {
       if (err.message === "READ_ONLY") return c.json({ error: "READ_ONLY", message: "1차 PRD는 읽기 전용이에요" }, 403);
     }
     throw err;
+  }
+});
+
+// ─── GET /biz-items/:id/portfolio — 포트폴리오 연결 구조 검색 (F459, Sprint 223) ───
+
+bizItemsRoute.get("/biz-items/:id/portfolio", async (c) => {
+  const orgId = c.get("orgId");
+  const bizItemId = c.req.param("id");
+
+  const service = new PortfolioService(c.env.DB);
+  try {
+    const portfolio = await service.getPortfolioTree(bizItemId, orgId);
+    return c.json({ data: portfolio });
+  } catch (err) {
+    if (err instanceof NotFoundError) {
+      return c.json({ error: err.message }, 404);
+    }
+    return c.json({ error: "포트폴리오 조회 중 오류가 발생했어요" }, 500);
   }
 });

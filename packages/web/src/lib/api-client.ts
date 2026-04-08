@@ -3047,3 +3047,40 @@ export async function diffPrds(
 ): Promise<{ v1: { id: string; version: number }; v2: { id: string; version: number }; hunks: DiffHunk[] }> {
   return fetchApi(`/biz-items/${bizItemId}/prds/diff?v1=${encodeURIComponent(v1Id)}&v2=${encodeURIComponent(v2Id)}`);
 }
+
+// ─── Sprint 223: F459 포트폴리오 연결 구조 (F459) ───
+
+export interface PortfolioProgress {
+  currentStage: string;
+  completedStages: string[];
+  criteriaCompleted: number;
+  criteriaTotal: number;
+  hasBusinessPlan: boolean;
+  hasOffering: boolean;
+  hasPrototype: boolean;
+  overallPercent: number;
+}
+
+export interface PortfolioTree {
+  item: { id: string; title: string; description: string | null; source: string; status: string; createdAt: string };
+  classification: { itemType: string; confidence: number; classifiedAt: string } | null;
+  evaluations: Array<{
+    id: string; verdict: string; avgScore: number; totalConcerns: number; evaluatedAt: string;
+    scores: Array<{ personaId: string; businessViability: number; strategicFit: number; customerValue: number; summary: string | null }>;
+  }>;
+  startingPoint: { startingPoint: string; confidence: number; reasoning: string | null } | null;
+  criteria: Array<{ criterionId: number; status: string; evidence: string | null; completedAt: string | null }>;
+  businessPlans: Array<{ id: string; version: number; modelUsed: string | null; generatedAt: string }>;
+  offerings: Array<{
+    id: string; title: string; purpose: string; format: string; status: string;
+    currentVersion: number; sectionsCount: number; versionsCount: number; linkedPrototypeIds: string[];
+  }>;
+  prototypes: Array<{ id: string; version: number; format: string; templateUsed: string | null; generatedAt: string }>;
+  pipelineStages: Array<{ stage: string; enteredAt: string; exitedAt: string | null; notes: string | null }>;
+  progress: PortfolioProgress;
+}
+
+export async function fetchPortfolio(bizItemId: string): Promise<PortfolioTree> {
+  const res = await fetchApi<{ data: PortfolioTree }>(`/biz-items/${bizItemId}/portfolio`);
+  return res.data;
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { fetchApi } from "@/lib/api-client";
 import type {
@@ -85,6 +85,16 @@ const stageColors = [
   "bg-rose-500",
 ];
 
+// BD 파이프라인 단계 키(stage 번호 1-6) → DB 스테이지명 매핑
+const STAGE_NUM_TO_DB_KEY: Record<number, string> = {
+  1: "REGISTERED",
+  2: "DISCOVERY",
+  3: "FORMALIZATION",
+  4: "REVIEW",
+  5: "DECISION",
+  6: "OFFERING",
+};
+
 function ProcessPipeline({ stats }: { stats: PipelineStats | null }) {
   return (
     <div className="rounded-lg border bg-card p-5">
@@ -93,7 +103,8 @@ function ProcessPipeline({ stats }: { stats: PipelineStats | null }) {
       </h2>
       <div className="flex items-center gap-1">
         {STAGES.map((stage, i) => {
-          const count = stats?.byStage?.[stage.label] ?? 0;
+          const dbKey = STAGE_NUM_TO_DB_KEY[stage.stage] ?? stage.label;
+          const count = stats?.byStage?.[dbKey] ?? stats?.byStage?.[stage.label] ?? 0;
           return (
             <div key={stage.stage} className="flex items-center">
               <Link
@@ -166,12 +177,35 @@ function QuickActions() {
 /*  Dashboard Page                                                     */
 /* ------------------------------------------------------------------ */
 
+// Sprint 223: F460 — /biz-items/summary로 파이프라인 카운트 실제 데이터 연동
+const BD_STAGE_KEYS = ["REGISTERED", "DISCOVERY", "FORMALIZATION", "REVIEW", "DECISION", "OFFERING"];
+
 export function Component() {
   const health = useApi<HealthScore>("/health");
   const reqs = useApi<RequirementItem[]>("/requirements");
   const integrity = useApi<HarnessIntegrity>("/integrity");
   const freshness = useApi<FreshnessReport>("/freshness");
   const pipelineStats = useApi<PipelineStats>("/pipeline/stats");
+  const bizItemSummary = useApi<Array<{ bizItemId: string; title: string; currentStage: number }>>("/biz-items/summary");
+
+  // biz-items/summary → byStage (stageNum 기반 집계)
+  const bdByStage = useMemo(() => {
+    if (!bizItemSummary.data) return {};
+    const counts: Record<string, number> = {};
+    for (const item of bizItemSummary.data) {
+      const key = BD_STAGE_KEYS[item.currentStage - 1] ?? "REGISTERED";
+      counts[key] = (counts[key] ?? 0) + 1;
+    }
+    return counts;
+  }, [bizItemSummary.data]);
+
+  // pipeline/stats byStage 키가 DB 스테이지명(DISCOVERY 등)이지만,
+  // dashboard STAGES.label은 한국어(수집, 발굴...) — 실제 수치는 bizItemSummary로 보완
+  const mergedStats: PipelineStats | null = pipelineStats.data
+    ? { ...pipelineStats.data, byStage: bdByStage }
+    : bizItemSummary.data
+      ? { totalItems: bizItemSummary.data.length, byStage: bdByStage, avgDaysInStage: {} }
+      : null;
 
   const reqCounts = reqs.data
     ? {
@@ -186,7 +220,7 @@ export function Component() {
       <h1 className="mb-6 text-2xl font-bold">홈</h1>
 
       {/* 프로세스 파이프라인 (상단 메인) */}
-      <ProcessPipeline stats={pipelineStats.data} />
+      <ProcessPipeline stats={mergedStats} />
 
       {/* 퀵 액션 + Sprint Status */}
       <div className="mt-4 grid gap-4 md:grid-cols-2">
