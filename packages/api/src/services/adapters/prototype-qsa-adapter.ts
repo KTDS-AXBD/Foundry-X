@@ -189,7 +189,7 @@ export class PrototypeQsaAdapter implements DomainAdapterInterface {
     // 4/8px 비배수 spacing 검출
     const spacingMatches = html.matchAll(NON_GRID_SPACING_RE);
     for (const match of spacingMatches) {
-      const px = parseInt(match[1], 10);
+      const px = parseInt(match[1] ?? "0", 10);
       if (px > 0 && px % 4 !== 0) {
         detected.nonGridSpacing.push(`${px}px`);
       }
