@@ -11,6 +11,8 @@ import { TechReviewService } from "../../harness/services/tech-review-service.js
 import { PocEnvProvisionSchema } from "../../harness/schemas/prototype-ext.js";
 import { PrototypeReviewService } from "../../harness/services/prototype-review-service.js";
 import { sectionReviewSchema } from "../schemas/hitl-section.schema.js";
+import { PrototypeJobService } from "../../harness/services/prototype-job-service.js";
+import { PrototypeBuildSchema } from "../../harness/schemas/prototype-build.js";
 
 export const axBdPrototypesRoute = new Hono<{
   Bindings: Env;
@@ -144,4 +146,38 @@ axBdPrototypesRoute.get("/ax-bd/prototypes/:id/review-summary", async (c) => {
   const svc = new PrototypeReviewService(c.env.DB);
   const summary = await svc.getSummary(orgId, prototypeId);
   return c.json(summary);
+});
+
+// POST /ax-bd/prototypes/build — Prototype Builder 실행 (F457, Sprint 222)
+axBdPrototypesRoute.post("/ax-bd/prototypes/build", async (c) => {
+  const body = await c.req.json();
+  const parsed = PrototypeBuildSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+  }
+
+  const svc = new PrototypeJobService(c.env.DB);
+  const job = await svc.create(
+    c.get("orgId"),
+    parsed.data.prdContent,
+    parsed.data.prdTitle,
+  );
+  return c.json(job, 201);
+});
+
+// POST /ax-bd/prototypes/:id/link-offering — Offering 연결 (F458, Sprint 222)
+axBdPrototypesRoute.post("/ax-bd/prototypes/:id/link-offering", async (c) => {
+  const body = await c.req.json() as { offeringId?: string };
+  if (!body?.offeringId) {
+    return c.json({ error: "offeringId required" }, 400);
+  }
+
+  const prototypeId = c.req.param("id");
+  const id = crypto.randomUUID();
+  await c.env.DB.prepare(
+    `INSERT INTO offering_prototypes (id, offering_id, prototype_id)
+     VALUES (?, ?, ?)`
+  ).bind(id, body.offeringId, prototypeId).run();
+
+  return c.json({ id, offeringId: body.offeringId, prototypeId }, 201);
 });
