@@ -1,7 +1,7 @@
 import { z } from "@hono/zod-openapi";
 
 // --- 공통 열거형 ---
-export const bizItemSource = z.enum(["agent", "field", "idea_portal"]);
+export const bizItemSource = z.enum(["agent", "field", "idea_portal", "wizard"]);
 export const bizItemStatus = z.enum([
   "draft", "pending_review", "rejected",
   "classifying", "classified", "evaluating", "evaluated", "archived",
