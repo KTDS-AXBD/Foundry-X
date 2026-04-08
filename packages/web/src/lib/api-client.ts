@@ -2933,3 +2933,69 @@ export async function associateFilesToItem(
     fileIds.map((id) => patchApi(`/files/${id}`, { biz_item_id: bizItemId })),
   );
 }
+
+// ── Sprint 220 F454/F455: 사업기획서 기반 PRD + 인터뷰 ──
+
+export interface GeneratedPrdFromBp {
+  id: string;
+  bizItemId: string;
+  version: number;
+  content: string;
+  sourceType: "business_plan";
+  bpDraftId: string;
+  generatedAt: string;
+}
+
+export async function generatePrdFromBp(
+  bizItemId: string,
+  options?: { bpDraftId?: string; skipLlmRefine?: boolean },
+): Promise<GeneratedPrdFromBp> {
+  return postApi<GeneratedPrdFromBp>(`/biz-items/${bizItemId}/generate-prd-from-bp`, options ?? {});
+}
+
+export interface PrdInterviewQuestion {
+  seq: number;
+  question: string;
+  questionContext: string;
+  answer: string | null;
+  answeredAt: string | null;
+}
+
+export interface PrdInterviewSession {
+  id: string;
+  bizItemId: string;
+  prdId: string;
+  status: "in_progress" | "completed" | "cancelled";
+  questionCount: number;
+  answeredCount: number;
+  questions: PrdInterviewQuestion[];
+}
+
+export async function startPrdInterview(
+  bizItemId: string,
+  prdId?: string,
+): Promise<PrdInterviewSession> {
+  return postApi<PrdInterviewSession>(`/biz-items/${bizItemId}/prd-interview/start`, { prdId });
+}
+
+export async function submitPrdInterviewAnswer(
+  bizItemId: string,
+  interviewId: string,
+  seq: number,
+  answer: string,
+): Promise<{
+  interviewId: string;
+  seq: number;
+  answeredCount: number;
+  remainingCount: number;
+  isComplete: boolean;
+  updatedPrd?: { id: string; version: number; content: string };
+}> {
+  return postApi(`/biz-items/${bizItemId}/prd-interview/answer`, { interviewId, seq, answer });
+}
+
+export async function getPrdInterviewStatus(
+  bizItemId: string,
+): Promise<{ interview: PrdInterviewSession | null }> {
+  return fetchApi<{ interview: PrdInterviewSession | null }>(`/biz-items/${bizItemId}/prd-interview/status`);
+}

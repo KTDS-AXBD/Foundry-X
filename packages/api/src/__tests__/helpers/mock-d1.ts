@@ -917,6 +917,45 @@ export class MockD1Database {
         PRIMARY KEY (org_id, month)
       );
       CREATE INDEX IF NOT EXISTS idx_usage_records_org ON usage_records (org_id, month);
+
+      -- 0037: biz_generated_prds (PRD 자동 생성)
+      CREATE TABLE IF NOT EXISTS biz_generated_prds (
+        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+        biz_item_id TEXT NOT NULL,
+        version INTEGER NOT NULL DEFAULT 1,
+        content TEXT NOT NULL,
+        criteria_snapshot TEXT,
+        generated_at TEXT NOT NULL DEFAULT (datetime('now')),
+        source_type TEXT NOT NULL DEFAULT 'discovery',
+        bp_draft_id TEXT
+      );
+      CREATE INDEX IF NOT EXISTS idx_generated_prds_item ON biz_generated_prds(biz_item_id);
+
+      -- 0120: PRD Interviews (Sprint 220 F455)
+      CREATE TABLE IF NOT EXISTS prd_interviews (
+        id             TEXT PRIMARY KEY,
+        biz_item_id    TEXT NOT NULL,
+        prd_id         TEXT NOT NULL,
+        status         TEXT NOT NULL DEFAULT 'in_progress',
+        question_count INTEGER NOT NULL DEFAULT 0,
+        answered_count INTEGER NOT NULL DEFAULT 0,
+        started_at     INTEGER NOT NULL DEFAULT (unixepoch()),
+        completed_at   INTEGER
+      );
+
+      CREATE TABLE IF NOT EXISTS prd_interview_qas (
+        id                TEXT PRIMARY KEY,
+        interview_id      TEXT NOT NULL,
+        seq               INTEGER NOT NULL,
+        question          TEXT NOT NULL,
+        question_context  TEXT,
+        answer            TEXT,
+        answered_at       INTEGER,
+        UNIQUE(interview_id, seq)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_prd_interviews_biz_item ON prd_interviews(biz_item_id);
+      CREATE INDEX IF NOT EXISTS idx_prd_interview_qas_interview ON prd_interview_qas(interview_id);
     `);
     this.db.prepare("INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)").run("org_test", "Test Org", "test");
   }

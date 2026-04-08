@@ -1,5 +1,6 @@
 /**
  * Sprint 51~53: BizItems Routes — CRUD + 분류 + 평가 + Discovery 9기준 + 분석 컨텍스트 + PRD 생성
+ * Sprint 220: F454 사업기획서 기반 PRD 생성 + F455 PRD 인터뷰
  */
 import { Hono } from "hono";
 import type { Env } from "../../../env.js";
@@ -36,6 +37,12 @@ import { GeneratePrototypeSchema } from "../../harness/schemas/prototype.js";
 // Sprint 69 imports (F213)
 import { SetDiscoveryTypeSchema } from "../../shaping/schemas/viability-checkpoint.schema.js";
 import { getAnalysisPathV82, type DiscoveryType } from "../services/analysis-path-v82.js";
+// Sprint 220 imports (F454, F455)
+import { BpHtmlParser } from "../../offering/services/bp-html-parser.js";
+import { BpPrdGenerator } from "../../offering/services/bp-prd-generator.js";
+import { PrdInterviewService } from "../../offering/services/prd-interview-service.js";
+import { GeneratePrdFromBpSchema } from "../../offering/schemas/bp-prd.js";
+import { StartInterviewSchema, AnswerInterviewSchema } from "../../offering/schemas/prd-interview.js";
 
 export const bizItemsRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
@@ -1021,4 +1028,140 @@ bizItemsRoute.get("/biz-items/:id/analysis-path-v82", async (c) => {
 
   const analysisPath = getAnalysisPathV82(discoveryType as DiscoveryType);
   return c.json(analysisPath);
+});
+
+// ─── POST /biz-items/:id/generate-prd-from-bp — 사업기획서 기반 1차 PRD 자동 생성 (F454) ───
+
+bizItemsRoute.post("/biz-items/:id/generate-prd-from-bp", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = GeneratePrdFromBpSchema.safeParse(body);
+  const skipLlm = parsed.success ? parsed.data.skipLlmRefine : false;
+  const specificBpId = parsed.success ? parsed.data.bpDraftId : undefined;
+
+  // 사업기획서 조회 (지정 ID 또는 최신)
+  const bpRow = specificBpId
+    ? await c.env.DB
+        .prepare("SELECT * FROM business_plan_drafts WHERE id = ? AND biz_item_id = ?")
+        .bind(specificBpId, id)
+        .first<{ id: string; content: string }>()
+    : await c.env.DB
+        .prepare("SELECT * FROM business_plan_drafts WHERE biz_item_id = ? ORDER BY version DESC LIMIT 1")
+        .bind(id)
+        .first<{ id: string; content: string }>();
+
+  if (!bpRow) return c.json({ error: "BUSINESS_PLAN_NOT_FOUND" }, 404);
+
+  // HTML 파싱
+  const parser = new BpHtmlParser();
+  const parsedBp = parser.parse(bpRow.content);
+  if (parsedBp.sections.length === 0 && parsedBp.rawText.length < 50) {
+    return c.json({ error: "BP_PARSE_FAILED" }, 422);
+  }
+
+  const runner = createAgentRunner(c.env);
+  const generator = new BpPrdGenerator(c.env.DB, runner);
+
+  const prd = await generator.generate({
+    bizItemId: id,
+    bizItem: { title: item.title, description: item.description },
+    parsedBp,
+    bpDraftId: bpRow.id,
+    skipLlmRefine: skipLlm,
+  });
+
+  return c.json(prd, 201);
+});
+
+// ─── POST /biz-items/:id/prd-interview/start — PRD 인터뷰 시작 (F455) ───
+
+bizItemsRoute.post("/biz-items/:id/prd-interview/start", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = StartInterviewSchema.safeParse(body);
+  const specificPrdId = parsed.success ? parsed.data.prdId : undefined;
+
+  // PRD 조회 (지정 ID 또는 최신)
+  const prdRow = specificPrdId
+    ? await c.env.DB
+        .prepare("SELECT id FROM biz_generated_prds WHERE id = ? AND biz_item_id = ?")
+        .bind(specificPrdId, id)
+        .first<{ id: string }>()
+    : await c.env.DB
+        .prepare("SELECT id FROM biz_generated_prds WHERE biz_item_id = ? ORDER BY version DESC LIMIT 1")
+        .bind(id)
+        .first<{ id: string }>();
+
+  if (!prdRow) return c.json({ error: "PRD_NOT_FOUND" }, 404);
+
+  const runner = createAgentRunner(c.env);
+  const interviewService = new PrdInterviewService(c.env.DB, runner);
+
+  try {
+    const session = await interviewService.startInterview(id, prdRow.id);
+    return c.json(session, 201);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "UNKNOWN";
+    if (msg === "INTERVIEW_ALREADY_IN_PROGRESS") return c.json({ error: msg }, 409);
+    return c.json({ error: "INTERVIEW_START_FAILED" }, 500);
+  }
+});
+
+// ─── POST /biz-items/:id/prd-interview/answer — 인터뷰 응답 제출 (F455) ───
+
+bizItemsRoute.post("/biz-items/:id/prd-interview/answer", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = AnswerInterviewSchema.safeParse(body);
+  if (!parsed.success) return c.json({ error: "INVALID_REQUEST", details: parsed.error.flatten() }, 400);
+
+  const runner = createAgentRunner(c.env);
+  const interviewService = new PrdInterviewService(c.env.DB, runner);
+
+  try {
+    const result = await interviewService.submitAnswer(
+      parsed.data.interviewId,
+      parsed.data.seq,
+      parsed.data.answer,
+    );
+    return c.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "UNKNOWN";
+    if (msg === "QA_NOT_FOUND") return c.json({ error: msg }, 404);
+    return c.json({ error: "ANSWER_SUBMIT_FAILED" }, 500);
+  }
+});
+
+// ─── GET /biz-items/:id/prd-interview/status — 인터뷰 상태 조회 (F455) ───
+
+bizItemsRoute.get("/biz-items/:id/prd-interview/status", async (c) => {
+  const orgId = c.get("orgId");
+  const id = c.req.param("id");
+
+  const bizService = new BizItemService(c.env.DB);
+  const item = await bizService.getById(orgId, id);
+  if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  const interviewService = new PrdInterviewService(c.env.DB, null as unknown as ReturnType<typeof createAgentRunner>);
+  const session = await interviewService.getStatus(id);
+
+  return c.json({ interview: session });
 });
