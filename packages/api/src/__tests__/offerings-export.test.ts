@@ -123,6 +123,23 @@ describe("Offering Export API", () => {
     expect(res.status).toBe(200);
   });
 
+  it("GET /offerings/:id/export — falls back to business plan HTML when 0 sections", async () => {
+    await seedOffering(db);
+    // 섹션 없음. 연결된 biz-1 의 business_plan_drafts 에 draft 하나 시드.
+    await (db as Any).exec(
+      `INSERT INTO business_plan_drafts (id, biz_item_id, version, content, generated_at)
+       VALUES ('bpd-1', 'biz-1', 1, '## Executive Summary\n\nFallback business plan content', datetime('now'))`,
+    );
+
+    const res = await app.request("/api/offerings/off-1/export");
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    // BusinessPlanExportService.renderHtml 산출물에 포함되는 표식
+    expect(html).toContain("Fallback business plan content");
+    // offering-export-service.renderHtml 의 offering-header 클래스가 없어야 함 (BP HTML로 대체됨)
+    expect(html).not.toContain("offering-doc");
+  });
+
   it("GET /offerings/:id/export — sections ordered by sort_order", async () => {
     await seedOffering(db);
     await seedSection(db, "off-1", "s03", "제안 방향", "Third", 2);

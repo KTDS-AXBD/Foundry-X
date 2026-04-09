@@ -9,11 +9,12 @@ import {
   type SectionRow,
   type DesignTokenRow,
 } from "./pptx-renderer.js";
+import { BusinessPlanExportService } from "./business-plan-export-service.js";
 
 export type { OfferingRow, SectionRow, DesignTokenRow };
 
 export class OfferingExportService {
-  constructor(private db: D1Database) {}
+  constructor(private db: D1Database, private filesBucket?: R2Bucket) {}
 
   private async getOfferingData(
     orgId: string,
@@ -47,6 +48,15 @@ export class OfferingExportService {
   async exportHtml(orgId: string, offeringId: string): Promise<string | null> {
     const data = await this.getOfferingData(orgId, offeringId);
     if (!data) return null;
+
+    // Fallback: 섹션이 하나도 없으면 연결된 사업기획서 HTML로 대체.
+    // 편집기의 프론트엔드 fallback(offering-editor.tsx)과 일관되게 서버에서 처리.
+    if (data.sections.length === 0 && data.offering.biz_item_id) {
+      const bpSvc = new BusinessPlanExportService(this.db, this.filesBucket);
+      const bpHtml = await bpSvc.exportHtml(data.offering.biz_item_id);
+      if (bpHtml) return bpHtml;
+    }
+
     return this.renderHtml(data.offering, data.sections, data.tokens);
   }
 

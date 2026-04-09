@@ -20,7 +20,7 @@ offeringExportRoute.get("/offerings/:id/export", async (c) => {
     return c.json({ error: "Invalid query parameters", details: parsed.error.flatten() }, 400);
   }
 
-  const svc = new OfferingExportService(c.env.DB);
+  const svc = new OfferingExportService(c.env.DB, c.env.FILES_BUCKET);
   const { format } = parsed.data;
 
   if (format === "pptx") {

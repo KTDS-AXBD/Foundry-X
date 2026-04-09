@@ -34,6 +34,7 @@ interface PptxSlide {
 export interface OfferingRow {
   id: string;
   org_id: string;
+  biz_item_id: string;
   title: string;
   purpose: string;
   format: string;
