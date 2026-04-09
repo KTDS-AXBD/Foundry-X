@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #234b (2026-04-09)
+**F476+F477 피드백 파이프라인 v2 — 대시보드 + Agent 안정화**:
+- ✅ F476: 피드백 관리 대시보드 — feedback-dashboard.tsx (상태 필터 탭, 카드 상세 확장, 재처리/스킵 버튼, PR 링크)
+- ✅ F477: feedback-consumer.sh 전면 재작성 — retry_failed() 함수, 3단계 PR URL fallback, Agent 로그 보존, git stash+rebase 안전 워크플로우
+- ✅ API: JWT admin fallback 미들웨어 (Webhook Secret || JWT admin OR 인증)
+- ✅ Zod 스키마: feedbackQueueUpdateSchema에 "pending" 상태 추가 (재처리용)
+- ✅ Web: api-client 3함수 + sidebar.json 피드백 메뉴 + router.tsx lazy route
+- ✅ E2E: feedback-dashboard.spec.ts 8건 + mock-factory makeFeedbackQueueItem
+- ✅ PDCA: Plan + Design(33 검증항목) + Do + Gap Analysis 100% (33/33 PASS)
+
+**검증 결과**: ✅ typecheck / E2E 8 passed / Gap 100%
+
 ### 세션 #233 (2026-04-09)
 **형상화 3종 HTML 미리보기 — E2E 테스트 + 코드 개선**:
 - ✅ 사업기획서(/shaping/business-plan): 카드 클릭 → iframe HTML 미리보기 + 새 창 열기 버튼
