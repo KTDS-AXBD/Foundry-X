@@ -20,8 +20,12 @@ const TYPE_LABELS: Record<string, string> = {
 
 const STATUS_CONFIG: Record<string, { label: string; variant: "default" | "secondary" | "outline" | "destructive" }> = {
   draft: { label: "대기", variant: "outline" },
+  classifying: { label: "분류 중", variant: "default" },
+  classified: { label: "분류 완료", variant: "secondary" },
   analyzing: { label: "분석 중", variant: "default" },
   analyzed: { label: "분석 완료", variant: "secondary" },
+  evaluating: { label: "평가 중", variant: "default" },
+  evaluated: { label: "평가 완료", variant: "secondary" },
   shaping: { label: "형상화 중", variant: "default" },
   completed: { label: "완료", variant: "secondary" },
 };
