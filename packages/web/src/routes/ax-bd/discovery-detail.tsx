@@ -48,7 +48,10 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const STATUS_LABELS: Record<string, string> = {
-  draft: "대기", analyzing: "분석 중", analyzed: "분석 완료", shaping: "형상화 중", done: "완료",
+  draft: "대기", classifying: "분류 중", classified: "분류 완료",
+  analyzing: "분석 중", analyzed: "분석 완료",
+  evaluating: "평가 중", evaluated: "평가 완료",
+  shaping: "형상화 중", done: "완료",
 };
 
 export function Component() {

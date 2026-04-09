@@ -24,7 +24,7 @@ export const feedbackQueueListSchema = z.object({
 }).openapi("FeedbackQueueList");
 
 export const feedbackQueueUpdateSchema = z.object({
-  status: z.enum(["done", "failed", "skipped"]).optional(),
+  status: z.enum(["pending", "done", "failed", "skipped"]).optional(),
   agentPrUrl: z.string().optional(),
   agentLog: z.string().optional(),
   errorMessage: z.string().optional(),

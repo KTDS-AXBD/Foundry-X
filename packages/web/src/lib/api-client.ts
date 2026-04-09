@@ -3137,3 +3137,50 @@ export async function fetchBizItemsByArtifact(
   );
   return res.data;
 }
+
+// ─── F476: 피드백 관리 대시보드 ───
+
+export interface FeedbackQueueItem {
+  id: string;
+  org_id: string;
+  github_issue_number: number;
+  github_issue_url: string;
+  title: string;
+  body: string | null;
+  labels: string;
+  screenshot_url: string | null;
+  status: "pending" | "processing" | "done" | "failed" | "skipped";
+  agent_pr_url: string | null;
+  agent_log: string | null;
+  error_message: string | null;
+  retry_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FeedbackQueueList {
+  items: FeedbackQueueItem[];
+  total: number;
+}
+
+export async function getFeedbackQueue(
+  params?: { status?: string; limit?: number; offset?: number },
+): Promise<FeedbackQueueList> {
+  const qs = new URLSearchParams();
+  if (params?.status) qs.set("status", params.status);
+  if (params?.limit) qs.set("limit", String(params.limit));
+  if (params?.offset) qs.set("offset", String(params.offset));
+  const query = qs.toString();
+  return fetchApi(`/feedback-queue${query ? `?${query}` : ""}`);
+}
+
+export async function getFeedbackQueueItem(id: string): Promise<FeedbackQueueItem> {
+  return fetchApi(`/feedback-queue/${id}`);
+}
+
+export async function updateFeedbackQueueItem(
+  id: string,
+  body: { status?: "pending" | "done" | "failed" | "skipped"; agentPrUrl?: string; errorMessage?: string },
+): Promise<FeedbackQueueItem> {
+  return patchApi(`/feedback-queue/${id}`, body);
+}

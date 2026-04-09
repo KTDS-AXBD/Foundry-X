@@ -69,12 +69,13 @@ webhookRoute.openapi(gitWebhookRoute, async (c) => {
       return c.json({ error: "Invalid issue event payload" }, 400);
     }
 
-    // ── visual-feedback 라벨 감지 → 피드백 큐 등록 (F319) ──
+    // ── visual-feedback 라벨 또는 [Marker.io] 제목 감지 → 피드백 큐 등록 (F319, F475) ──
     let feedbackQueued = false;
     const hasVisualFeedback = parsed.data.issue.labels.some(
       (l) => l.name === "visual-feedback"
     );
-    if (hasVisualFeedback && (parsed.data.action === "opened" || parsed.data.action === "labeled")) {
+    const isMarkerIo = parsed.data.issue.title.startsWith("[Marker.io]");
+    if ((hasVisualFeedback || isMarkerIo) && (parsed.data.action === "opened" || parsed.data.action === "labeled")) {
       const queueService = new FeedbackQueueService(c.env.DB);
       const issueUrl = `https://github.com/${parsed.data.repository.full_name}/issues/${parsed.data.issue.number}`;
       await queueService.enqueue(orgId, {

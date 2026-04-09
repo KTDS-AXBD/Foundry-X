@@ -182,13 +182,24 @@ app.use("/api/github/*", authMiddleware);
 app.use("/api/github/*", tenantGuard);
 app.route("/api", githubRoute);
 
-// F340: Feedback Queue — Webhook Secret 인증 (JWT 면제, consumer용)
+// F340+F476: Feedback Queue — Webhook Secret 또는 JWT admin 인증
 app.use("/api/feedback-queue/*", async (c, next) => {
+  // 1) Webhook Secret 인증 (consumer.sh용)
   const secret = c.req.header("X-Webhook-Secret");
   if (secret && c.env.WEBHOOK_SECRET && secret === c.env.WEBHOOK_SECRET) {
     return next();
   }
-  return c.json({ error: "Unauthorized — X-Webhook-Secret required" }, 401);
+  // 2) JWT admin fallback (대시보드용 — F476)
+  try {
+    await authMiddleware(c, async () => {});
+    const payload = c.get("jwtPayload") as { role?: string } | undefined;
+    if (payload?.role === "admin") {
+      return next();
+    }
+  } catch {
+    // JWT 검증 실패 — fallthrough to 401
+  }
+  return c.json({ error: "Unauthorized — Webhook Secret or Admin JWT required" }, 401);
 });
 app.route("/api", feedbackQueueRoute);
 

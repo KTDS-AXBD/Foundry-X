@@ -2,6 +2,7 @@ import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { feedbackQueueItemSchema, feedbackQueueListSchema, feedbackQueueUpdateSchema } from "../schemas/feedback-queue.js";
 import { FeedbackQueueService } from "../services/feedback-queue-service.js";
+import { GitHubService } from "../services/github.js";
 import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
 
@@ -91,6 +92,25 @@ feedbackQueueRoute.openapi(updateRoute, async (c) => {
   const svc = new FeedbackQueueService(c.env.DB);
   const item = await svc.update(id, body);
   if (!item) return c.json({ error: "Not found" }, 404);
+
+  // ── 상태 변경 시 GitHub Issue에 자동 코멘트 (F475) ──
+  const typedItem = item as Record<string, unknown>;
+  if (body.status && c.env.GITHUB_TOKEN && c.env.GITHUB_REPO && typedItem.github_issue_number) {
+    const github = new GitHubService(c.env.GITHUB_TOKEN, c.env.GITHUB_REPO);
+    const issueNum = typedItem.github_issue_number as number;
+    let comment = "";
+    if (body.status === "done" && body.agentPrUrl) {
+      comment = `✅ **피드백 처리 완료**\n\nPR: ${body.agentPrUrl}\n\n이 피드백은 자동으로 분석되어 수정 PR이 생성되었어요.`;
+    } else if (body.status === "failed") {
+      comment = `⚠️ **자동 처리 실패**\n\n이 피드백은 자동 처리에 실패했어요. 수동으로 확인이 필요해요.\n\n${body.errorMessage ? `사유: ${body.errorMessage.slice(0, 200)}` : ""}`;
+    } else if (body.status === "skipped") {
+      comment = `⏭️ **피드백 스킵**\n\n이 피드백은 자동 처리 대상이 아니에요.\n\n${body.errorMessage ? `사유: ${body.errorMessage}` : ""}`;
+    }
+    if (comment) {
+      try { await github.addIssueComment(issueNum, comment); } catch { /* best-effort */ }
+    }
+  }
+
   return c.json(item as z.infer<typeof feedbackQueueItemSchema>);
 });
 

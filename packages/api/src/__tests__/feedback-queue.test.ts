@@ -57,6 +57,23 @@ describe("FeedbackQueueService — via API", () => {
     expect(data.feedbackQueued).toBe(true);
   });
 
+  it("webhook — [Marker.io] 제목 패턴 (라벨 없음) → 큐 등록 (F475)", async () => {
+    const res = await webhookReq({
+      action: "opened",
+      issue: {
+        number: 45,
+        title: "[Marker.io] Fix business plan display in new window",
+        body: "Screenshot from Marker.io",
+        state: "open",
+        labels: [],
+      },
+      repository: { full_name: "KTDS-AXBD/Foundry-X" },
+    });
+    expect(res.status).toBe(200);
+    const data = await res.json() as any;
+    expect(data.feedbackQueued).toBe(true);
+  });
+
   it("webhook — 일반 Issue (라벨 없음) → 큐 미등록", async () => {
     const res = await webhookReq({
       action: "opened",
