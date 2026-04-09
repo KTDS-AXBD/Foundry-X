@@ -85,7 +85,7 @@ interface BpData {
 // ── Service ──────────────────────────────────────
 
 export class BusinessPlanExportService {
-  constructor(private db: D1Database) {}
+  constructor(private db: D1Database, private filesBucket?: R2Bucket) {}
 
   private async getBpData(bizItemId: string): Promise<BpData | null> {
     const bizItem = await this.db
@@ -142,6 +142,21 @@ export class BusinessPlanExportService {
   async exportHtml(bizItemId: string): Promise<string | null> {
     const data = await this.getBpData(bizItemId);
     if (!data) return null;
+
+    if (data.sections.length === 0) {
+      // R2 참조인 경우: [R2:path] 형식 → R2에서 HTML 직접 가져오기
+      const r2Match = data.draft.content.match(/^\[R2:([^\]]+)\]/);
+      if (r2Match && this.filesBucket) {
+        const obj = await this.filesBucket.get(r2Match[1]!);
+        if (obj) return obj.text();
+      }
+
+      // content가 이미 완전한 HTML 문서이면 그대로 반환
+      if (isCompleteHtml(data.draft.content)) {
+        return data.draft.content;
+      }
+    }
+
     return this.renderHtml(data);
   }
 
@@ -381,6 +396,12 @@ interface PptxSlide {
 }
 
 // ── 유틸 ─────────────────────────────────────────
+
+/** content가 이미 완전한 HTML 문서인지 판별 */
+function isCompleteHtml(content: string): boolean {
+  const trimmed = content.trimStart().toLowerCase();
+  return trimmed.startsWith("<!doctype html") || trimmed.startsWith("<html");
+}
 
 function escapeHtml(str: string): string {
   return str

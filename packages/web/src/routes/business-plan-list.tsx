@@ -2,15 +2,38 @@
 
 /**
  * /shaping/business-plan — 사업기획서 목록 + HTML 미리보기
- * 카드 클릭 시 iframe으로 HTML 표시 + 새 창 열기 지원
+ * 카드 클릭 시 iframe으로 HTML 표시 + 새 창/전체보기 지원
  */
 import { useEffect, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
-import { Search, FileText, ExternalLink, Eye, ChevronDown, ChevronRight, Loader2 } from "lucide-react";
+import { Search, FileText, ExternalLink, Maximize2, ChevronDown, ChevronRight, Loader2 } from "lucide-react";
 import { getBizItems, exportBusinessPlanHtml, type BizItemSummary } from "@/lib/api-client";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+
+/** 풀 페이지 HTML을 iframe embed에 적합하게 스타일+스크립트 오버라이드 주입 */
+function makeEmbedFriendly(html: string): string {
+  const embedPatch = `<style data-embed-override>
+  nav { position: relative !important; }
+  #hero, [class*="hero"] { min-height: auto !important; height: auto !important; }
+  section { padding-top: 40px !important; padding-bottom: 40px !important; }
+  .fade-in { opacity: 1 !important; transform: none !important; transition: none !important; }
+  body { overflow: visible !important; }
+</style>
+<script data-embed-override>
+  document.querySelectorAll('.fade-in').forEach(function(el) { el.classList.add('visible'); });
+</script>`;
+  // </body> 앞에 삽입 — 마지막에 위치하여 override 확실, 스크립트로 .visible 강제 추가
+  if (html.includes("</body>")) {
+    return html.replace("</body>", `${embedPatch}</body>`);
+  }
+  // </html> 앞에 삽입 fallback
+  if (html.includes("</html>")) {
+    return html.replace("</html>", `${embedPatch}</html>`);
+  }
+  return html + embedPatch;
+}
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   draft: { label: "대기", color: "bg-slate-100 text-slate-600" },
@@ -31,6 +54,7 @@ export function Component() {
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [htmlCache, setHtmlCache] = useState<Record<string, { html: string; loading: boolean; error?: string }>>({});
+  const [sheetItem, setSheetItem] = useState<BizItemSummary | null>(null);
 
   useEffect(() => {
     getBizItems()
@@ -54,6 +78,11 @@ export function Component() {
       setExpanded(bizItemId);
       loadHtml(bizItemId);
     }
+  }
+
+  function openFullView(item: BizItemSummary) {
+    setSheetItem(item);
+    loadHtml(item.id);
   }
 
   function openInNewWindow(bizItemId: string) {
@@ -139,12 +168,16 @@ export function Component() {
                       <ExternalLink className="size-4 mr-1" />
                       새 창
                     </Button>
-                    <Link to={`/discovery/items/${item.id}`}>
-                      <Button variant="ghost" size="sm">
-                        <Eye className="size-4 mr-1" />
-                        상세
-                      </Button>
-                    </Link>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openFullView(item)}
+                      title="전체 보기"
+                      data-testid={`bp-full-view-${item.id}`}
+                    >
+                      <Maximize2 className="size-4 mr-1" />
+                      전체 보기
+                    </Button>
                   </div>
                 </div>
 
@@ -161,12 +194,18 @@ export function Component() {
                     )}
                     {cache?.html && (
                       <iframe
-                        srcDoc={cache.html}
-                        className="w-full border-0"
-                        style={{ height: 500 }}
-                        sandbox="allow-same-origin"
+                        srcDoc={makeEmbedFriendly(cache.html)}
+                        className="w-full border-0 bg-white rounded-b-lg"
+                        style={{ minHeight: 500 }}
+                        sandbox="allow-same-origin allow-scripts"
                         title={`사업기획서: ${item.title}`}
                         data-testid={`bp-iframe-${item.id}`}
+                        onLoad={(e) => {
+                          const frame = e.currentTarget;
+                          if (frame.contentDocument?.body) {
+                            frame.style.height = `${Math.min(frame.contentDocument.body.scrollHeight + 40, 1200)}px`;
+                          }
+                        }}
                       />
                     )}
                   </div>
@@ -176,6 +215,58 @@ export function Component() {
           })}
         </div>
       )}
+
+      {/* 전체 보기 Sheet — 사업기획서 HTML을 슬라이드 패널로 표시 */}
+      <Sheet open={!!sheetItem} onOpenChange={(open) => { if (!open) setSheetItem(null); }}>
+        <SheetContent side="right" className="w-full sm:max-w-[85vw] p-0 flex flex-col">
+          <SheetHeader className="px-6 py-4 border-b shrink-0">
+            <div className="flex items-center justify-between">
+              <div className="min-w-0 flex-1">
+                <SheetTitle className="text-lg font-bold truncate">
+                  {sheetItem?.title}
+                </SheetTitle>
+                <SheetDescription className="text-xs mt-0.5">
+                  사업기획서 전체 보기
+                </SheetDescription>
+              </div>
+              <div className="flex items-center gap-2 shrink-0 ml-4">
+                {sheetItem && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openInNewWindow(sheetItem.id)}
+                  >
+                    <ExternalLink className="size-4 mr-1" />
+                    새 창
+                  </Button>
+                )}
+              </div>
+            </div>
+          </SheetHeader>
+          <div className="flex-1 overflow-hidden">
+            {sheetItem && htmlCache[sheetItem.id]?.loading && (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                <Loader2 className="size-6 animate-spin mr-2" />
+                기획서 로딩 중...
+              </div>
+            )}
+            {sheetItem && htmlCache[sheetItem.id]?.error && (
+              <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
+                {htmlCache[sheetItem.id].error}
+              </div>
+            )}
+            {sheetItem && htmlCache[sheetItem.id]?.html && (
+              <iframe
+                srcDoc={htmlCache[sheetItem.id].html}
+                className="w-full h-full border-0 bg-white"
+                sandbox="allow-same-origin allow-scripts"
+                title={`사업기획서: ${sheetItem.title}`}
+                data-testid="bp-sheet-iframe"
+              />
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

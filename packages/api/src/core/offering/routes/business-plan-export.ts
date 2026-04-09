@@ -19,7 +19,7 @@ businessPlanExportRoute.get("/biz-items/:id/business-plan/export", async (c) => 
     return c.json({ error: "Invalid query parameters", details: parsed.error.flatten() }, 400);
   }
 
-  const svc = new BusinessPlanExportService(c.env.DB);
+  const svc = new BusinessPlanExportService(c.env.DB, c.env.FILES_BUCKET);
   const { format } = parsed.data;
 
   if (format === "pptx") {
