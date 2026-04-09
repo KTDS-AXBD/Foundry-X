@@ -3,6 +3,7 @@
  * R2 Presigned URL을 통한 drag-and-drop 파일 업로드
  */
 import { useState, useRef, useCallback, type DragEvent, type ChangeEvent } from "react";
+import { BASE_URL } from "@/lib/api-client";
 
 const ACCEPTED_MIMES: Record<string, string> = {
   "application/pdf": ".pdf",
@@ -14,12 +15,11 @@ const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 type UploadStatus = "idle" | "uploading" | "parsing" | "done" | "error";
 
 interface FileUploadZoneProps {
-  apiBaseUrl?: string;
   bizItemId?: string;
   onUploadComplete?: (fileId: string) => void;
 }
 
-export function FileUploadZone({ apiBaseUrl = "", bizItemId, onUploadComplete }: FileUploadZoneProps) {
+export function FileUploadZone({ bizItemId, onUploadComplete }: FileUploadZoneProps) {
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [progress, setProgress] = useState(0);
   const [filename, setFilename] = useState("");
@@ -51,7 +51,7 @@ export function FileUploadZone({ apiBaseUrl = "", bizItemId, onUploadComplete }:
 
     try {
       // Step 1: Presigned URL 발급
-      const presignRes = await fetch(`${apiBaseUrl}/api/files/presign`, {
+      const presignRes = await fetch(`${BASE_URL}/files/presign`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         body: JSON.stringify({
@@ -86,7 +86,7 @@ export function FileUploadZone({ apiBaseUrl = "", bizItemId, onUploadComplete }:
       setProgress(90);
 
       // Step 3: 업로드 확인
-      const confirmRes = await fetch(`${apiBaseUrl}/api/files/confirm`, {
+      const confirmRes = await fetch(`${BASE_URL}/files/confirm`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         body: JSON.stringify({ file_id }),
@@ -96,7 +96,7 @@ export function FileUploadZone({ apiBaseUrl = "", bizItemId, onUploadComplete }:
 
       // Step 4: 파싱 트리거
       setStatus("parsing");
-      const parseRes = await fetch(`${apiBaseUrl}/api/files/${file_id}/parse`, {
+      const parseRes = await fetch(`${BASE_URL}/files/${file_id}/parse`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       });
@@ -113,7 +113,7 @@ export function FileUploadZone({ apiBaseUrl = "", bizItemId, onUploadComplete }:
       setStatus("error");
       setErrorMsg(err instanceof Error ? err.message : "업로드에 실패했어요");
     }
-  }, [apiBaseUrl, bizItemId, onUploadComplete]);
+  }, [bizItemId, onUploadComplete]);
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
