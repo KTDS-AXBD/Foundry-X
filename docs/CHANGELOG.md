@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #235 (2026-04-09)
+**Wiki 시스템 개선 — Marker.io 가이드 등록 + Markdown 렌더링 + 시각 디자인**:
+- ✅ Marker.io 피드백 가이드 Wiki 등록 — `content/wiki/marker-io-guide.md` + D1 wiki_pages 테이블 INSERT
+- ✅ Wiki 페이지 본문 미표시 수정 — 개별 페이지 API 호출(`GET /wiki/:slug`) 추가
+- ✅ MarkdownViewer react-markdown + remark-gfm 전환 — proseComponents 스타일 맵 (h1~h4, table, blockquote, code 등)
+- ✅ Wiki 시각 디자인 개선 — 사이드바 스켈레톤, 모바일 오버레이, ToC 패널(xl), 문서 메타데이터 아이콘, ContentSkeleton
+- ✅ 테스트: MarkdownViewer assertion `getByRole("heading")` 전환 (react-markdown 반영)
+
+**검증 결과**: ✅ typecheck / tests passed / CI 배포 성공 (fx.minu.best/wiki 확인)
+
 ### 세션 #234b (2026-04-09)
 **F476+F477 피드백 파이프라인 v2 — 대시보드 + Agent 안정화**:
 - ✅ F476: 피드백 관리 대시보드 — feedback-dashboard.tsx (상태 필터 탭, 카드 상세 확장, 재처리/스킵 버튼, PR 링크)
