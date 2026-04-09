@@ -19,6 +19,7 @@ import {
   fetchBizItemDetail,
   fetchBdpLatest,
   generateBusinessPlan,
+  generatePrototype,
   getShapingArtifacts,
   getPipelineItemDetail,
   type BizItemDetail,
@@ -66,6 +67,8 @@ export function Component() {
   const [loading, setLoading] = useState(true);
   const [generatingPlan, setGeneratingPlan] = useState(false);
   const [planError, setPlanError] = useState<string | null>(null);
+  // F181: Prototype 생성 상태
+  const [generatingPrototype, setGeneratingPrototype] = useState(false);
   // F444: 편집기 상태
   const [editMode, setEditMode] = useState(false);
   const [showVersionPanel, setShowVersionPanel] = useState(false);
@@ -132,6 +135,23 @@ export function Component() {
       setPlanError(e instanceof Error ? e.message : "기획서 생성에 실패했어요.");
     } finally {
       setGeneratingPlan(false);
+    }
+  }
+
+  async function handleGeneratePrototype() {
+    if (!id || generatingPrototype) return;
+    setGeneratingPrototype(true);
+    setPlanError(null);
+    try {
+      await generatePrototype(id);
+      const newArtifacts = await getShapingArtifacts(id);
+      setArtifacts(newArtifacts);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Prototype 생성에 실패했어요.";
+      // STARTING_POINT_REQUIRED 등 백엔드 사유를 그대로 노출
+      setPlanError(msg);
+    } finally {
+      setGeneratingPrototype(false);
     }
   }
 
@@ -295,6 +315,8 @@ export function Component() {
                 artifacts={artifacts}
                 onGenerateBusinessPlan={() => setShowTemplateSelector(true)}
                 generatingPlan={generatingPlan}
+                onGeneratePrototype={handleGeneratePrototype}
+                generatingPrototype={generatingPrototype}
               />
             )}
           </div>

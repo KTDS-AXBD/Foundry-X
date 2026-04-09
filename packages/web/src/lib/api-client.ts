@@ -1781,6 +1781,14 @@ export async function generateBusinessPlan(
   return postApi(`/biz-items/${bizItemId}/generate-business-plan`, params ?? {});
 }
 
+// F181: Prototype 생성 (biz_item 기반 실제 생성 파이프라인 호출)
+export async function generatePrototype(
+  bizItemId: string,
+  params?: { template?: 'idea'|'market'|'problem'|'tech'|'service' },
+): Promise<{ id: string; bizItemId: string; versionNum: number }> {
+  return postApi(`/biz-items/${bizItemId}/generate-prototype`, params ?? {});
+}
+
 // ─── Sprint 215: F444 편집기 + F445 템플릿 APIs ───
 
 export interface BusinessPlanSectionItem {

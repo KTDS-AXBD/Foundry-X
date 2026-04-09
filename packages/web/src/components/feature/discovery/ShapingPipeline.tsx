@@ -14,6 +14,8 @@ interface ShapingPipelineProps {
   artifacts: ShapingArtifacts;
   onGenerateBusinessPlan: () => void;
   generatingPlan: boolean;
+  onGeneratePrototype?: () => void;
+  generatingPrototype?: boolean;
 }
 
 interface PipelineStage {
@@ -29,7 +31,7 @@ const STAGES: PipelineStage[] = [
   { key: "prototype", label: "Prototype", sublabel: "Proto" },
 ];
 
-export default function ShapingPipeline({ bizItemId: _bizItemId, artifacts, onGenerateBusinessPlan, generatingPlan }: ShapingPipelineProps) {
+export default function ShapingPipeline({ bizItemId: _bizItemId, artifacts, onGenerateBusinessPlan, generatingPlan, onGeneratePrototype, generatingPrototype }: ShapingPipelineProps) {
   const isCompleted = (key: keyof ShapingArtifacts) => artifacts[key] !== null;
 
   // 이전 단계가 완료되어야 다음 단계가 활성화
@@ -110,8 +112,19 @@ export default function ShapingPipeline({ bizItemId: _bizItemId, artifacts, onGe
                     {done && <Button variant="ghost" size="sm">재생성</Button>}
                   </>
                 )}
-                {/* Offering, PRD, Prototype — P1 후속 */}
-                {stage.key !== "businessPlan" && (
+                {/* Prototype — 실제 생성 파이프라인 호출 */}
+                {stage.key === "prototype" && (
+                  <Button
+                    size="sm"
+                    variant={done ? "outline" : "default"}
+                    disabled={!unlocked || !!generatingPrototype}
+                    onClick={done ? undefined : onGeneratePrototype}
+                  >
+                    {done ? "보기" : generatingPrototype ? "생성 중..." : "생성하기"}
+                  </Button>
+                )}
+                {/* Offering, PRD — P1 후속 (placeholder) */}
+                {(stage.key === "offering" || stage.key === "prd") && (
                   <Button variant="outline" size="sm" disabled={!unlocked}>
                     {done ? "보기" : "생성하기"}
                   </Button>
