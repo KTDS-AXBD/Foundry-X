@@ -93,4 +93,93 @@ draft → 대기, analyzing → 분석 중, analyzed → 분석 완료, shaping 
 - `packages/web/src/lib/api-client.ts` — 새 API 호출 추가 (discovery-stage 업데이트)
 
 ### 의존성
-- F478은 각 스테이지별 AI 분석 API가 필요 (2-3~2-10) — 현재 미구현이므로 stub 또는 단계적 구현 필요
+- F480은 각 스테이지별 AI 분석 API가 필요 (2-3~2-10) — 현재 미구현이므로 stub 또는 단계적 구현 필요
+
+---
+
+## 6. 추가 F-items (S236 세션 — 평가결과서 파이프라인 단절 Debugging)
+
+### 배경
+S236 세션에서 3개 아이템(KOAMI, XR Studio, IRIS)의 분석이 완료되었으나 평가결과서가 미등록된 원인을 조사한 결과, **Claude Code 스킬(CLAUDE_AXBD)에서 수행한 분석이 Foundry-X DB로 유입되는 파이프라인이 존재하지 않음**을 확인.
+
+| 레이어 | 기대 | 실제 | 근본 원인 |
+|--------|------|------|----------|
+| `bd_artifacts` | 분석 결과 저장 | 0건 | 스킬이 파일만 생성, API 호출 없음 |
+| `discovery_stages` | 단계별 completed | 전부 pending | 상태 갱신 트리거 없음 |
+| `evaluation_reports` | 보고서 생성 | 0건 | 아티팩트 없어 생성 불가 |
+
+### F481: 평가결과서 HTML 자동 생성 스킬
+
+**목적**: PRD-final(.md) 파일을 파싱하여 `03_AX사업개발_발굴단계완료(안).html` 포맷의 평가결과서 HTML을 자동 생성
+
+**구현 방안**:
+1. CLAUDE_AXBD 프로젝트에 `/generate-evaluation-report` 커맨드 추가
+2. 입력: `prd-{item}-final.md` 경로
+3. 처리: PRD 섹션을 9탭(2-1~2-9)으로 매핑 + HTML 템플릿 렌더링
+4. 출력: `04_발굴단계완료_{item}.html` — 템플릿 CSS + Chart.js + 인터랙티브 탭
+
+**PRD → 탭 매핑 규칙**:
+| 탭 | PRD 섹션 |
+|----|----------|
+| 2-1 레퍼런스 | Pain Points, 솔루션 개요, 기술 비교 |
+| 2-2 수요 시장 | TAM/SAM/SOM, 시장 성장 |
+| 2-3 경쟁·자사 | 경쟁 환경, SWOT, 비대칭 우위 |
+| 2-4 아이템 도출 | 솔루션, 기능 백로그, 엘리베이터 피치 |
+| 2-5 아이템 선정 | 성공 기준, 리스크, Commit Gate |
+| 2-6 타겟 고객 | 페르소나, 사용자 스토리 |
+| 2-7 비즈니스 모델 | BMC, 투자, 매출, 수익성 |
+| 2-8 패키징 | 실행 계획, GTM, Discovery Summary |
+| 2-9 멀티 페르소나 | AI 8인 평가 자동 생성 |
+
+**수정 파일**:
+- `docs/specs/axbd-skill/CLAUDE_AXBD/.claude/commands/generate-evaluation-report.md` (신규)
+- `docs/specs/axbd-skill/CLAUDE_AXBD/references/evaluation-report-template.html` (신규 — CSS 템플릿)
+
+### F482: bd_artifacts 자동 등록 파이프라인
+
+**목적**: Claude Code 스킬에서 분석 완료 시 Foundry-X API를 호출하여 bd_artifacts + discovery_stages를 자동 동기화
+
+**구현 방안**:
+1. API 엔드포인트: `POST /api/ax-bd/biz-items/:id/sync-artifacts`
+   - body: `{ stages: [{stage: "2-1", output_text: "...", skill_id: "competitor-analysis"}], source: "claude-skill" }`
+2. 서비스 로직:
+   - `bd_artifacts`에 각 stage별 output INSERT (upsert)
+   - `biz_item_discovery_stages` 상태를 `completed`로 갱신
+   - `biz_items.status`를 `evaluated`로 전환 (2-8 이상 완료 시)
+3. CLAUDE_AXBD 스킬에서 분석 완료 시 API 자동 호출 (curl/fetch)
+
+**수정 파일**:
+- `packages/api/src/core/discovery/routes/biz-items.ts` — sync-artifacts 엔드포인트 추가
+- `packages/api/src/core/discovery/services/artifact-sync-service.ts` (신규)
+- `docs/specs/axbd-skill/CLAUDE_AXBD/.claude/rules/skill-execution.md` — 분석 완료 시 API 호출 지침 추가
+
+### F483: 웹 평가결과서 뷰어
+
+**목적**: Discovery 아이템 상세 페이지에서 발굴단계완료 HTML 평가결과서를 iframe/embed로 조회하고 공유 링크를 생성
+
+**구현 방안**:
+1. `ax_discovery_reports.report_html` 컬럼 추가 (또는 R2 Storage에 HTML 파일 업로드)
+2. Discovery 상세 페이지에 "평가결과서" 탭 추가 → HTML 렌더링
+3. 공유 API: `POST /api/ax-bd/discovery-reports/:itemId/share` → shared_token 생성 → 공개 URL
+
+**수정 파일**:
+- `packages/web/src/routes/ax-bd/discovery-detail.tsx` — 평가결과서 탭 추가
+- `packages/web/src/components/feature/discovery/EvaluationReportViewer.tsx` (신규)
+- `packages/api/src/core/discovery/routes/discovery-reports.ts` — HTML 저장/조회 API
+- DB 마이그레이션: `report_html` 컬럼 또는 R2 연동
+
+## 7. 확장된 우선순위
+
+| 항목 | 복잡도 | 우선순위 | Sprint | 의존성 |
+|------|--------|----------|--------|--------|
+| F478 STATUS_CONFIG | 낮음 | P0 즉시 | 235 | 없음 |
+| F479 pipeline 전환 | 중간 | P0 즉시 | 235 | 없음 |
+| F481 평가결과서 HTML 스킬 | 중간 | P0 | 235 | 없음 (독립 스킬) |
+| F482 artifact 자동 등록 | 중간 | P0 | 235 | F479 (stages 전환 로직 재사용) |
+| F480 전체 스텝퍼 | 높음 | P1 | 236 | F479 |
+| F483 웹 뷰어 | 중간 | P1 | 236 | F481 (HTML 존재 전제) |
+
+## 8. Sprint 배치 제안
+
+**Sprint 235 (배치 1)**: F478 + F479 + F481 + F482 — 4건 병렬 (F478/F479는 소규모, F481/F482는 독립 작업)
+**Sprint 236 (배치 2)**: F480 + F483 — 2건 순차 (F480 스텝퍼 완료 후 F483 뷰어)
