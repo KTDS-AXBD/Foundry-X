@@ -1,21 +1,23 @@
 "use client";
 
 /**
- * Offering Pack 상세 — HTML 프리뷰를 기본 화면으로, 편집은 내부 토글
+ * Offering 상세 — HTML 프리뷰를 기본 화면으로, 편집은 별도 /edit 라우트.
+ * 2026-04-09: 구 offering_packs API → 신 /offerings/:id 로 이관.
  */
 import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ExternalLink, FileText, Shield, FileSpreadsheet, Edit, Maximize2 } from "lucide-react";
+import { ArrowLeft, FileText, Shield, FileSpreadsheet, Edit, Maximize2 } from "lucide-react";
 import {
-  fetchOfferingPackDetail,
+  fetchOfferingDetail,
   fetchOfferingHtmlPreview,
-  type OfferingPackDetail,
+  type OfferingDetail,
 } from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "초안",
+  generating: "생성중",
   review: "검토중",
   approved: "승인",
   shared: "공유됨",
@@ -29,11 +31,10 @@ function openHtmlInNewWindow(html: string) {
 
 export function Component() {
   const { id } = useParams<{ id: string }>();
-  const [pack, setPack] = useState<OfferingPackDetail | null>(null);
+  const [offering, setOffering] = useState<OfferingDetail | null>(null);
   const [htmlPreview, setHtmlPreview] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showItems, setShowItems] = useState(false);
 
   const loadPreview = useCallback(async () => {
     if (!id) return;
@@ -50,25 +51,25 @@ export function Component() {
 
   useEffect(() => {
     if (!id) return;
-    fetchOfferingPackDetail(id)
-      .then(setPack)
+    fetchOfferingDetail(id)
+      .then(setOffering)
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"));
     loadPreview();
   }, [id, loadPreview]);
 
   if (error) return <div className="p-8 text-destructive">{error}</div>;
-  if (!pack) return <div className="p-8 text-muted-foreground">로딩 중...</div>;
+  if (!offering) return <div className="p-8 text-muted-foreground">로딩 중...</div>;
 
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
         <div className="flex items-center gap-3">
-          <Link to="/shaping/offering" className="text-muted-foreground hover:text-foreground">
+          <Link to="/shaping/offerings" className="text-muted-foreground hover:text-foreground">
             <ArrowLeft className="size-5" />
           </Link>
-          <h1 className="text-lg font-bold">{pack.title}</h1>
-          <Badge>{STATUS_LABELS[pack.status] ?? pack.status}</Badge>
+          <h1 className="text-lg font-bold">{offering.title}</h1>
+          <Badge>{STATUS_LABELS[offering.status] ?? offering.status}</Badge>
         </div>
         <div className="flex gap-2">
           {htmlPreview && (
@@ -99,10 +100,6 @@ export function Component() {
         </div>
       </div>
 
-      {pack.description && (
-        <p className="text-sm text-muted-foreground px-4 py-2 border-b">{pack.description}</p>
-      )}
-
       {/* HTML Preview (기본 화면) */}
       <div className="flex-1 overflow-hidden">
         {previewLoading && (
@@ -131,32 +128,6 @@ export function Component() {
         )}
       </div>
 
-      {/* 패키지 항목 토글 */}
-      <div className="border-t">
-        <button
-          onClick={() => setShowItems(!showItems)}
-          className="w-full px-4 py-2 text-sm text-muted-foreground hover:bg-muted/50 flex items-center justify-between"
-        >
-          <span>패키지 항목 ({pack.items.length}개)</span>
-          <span>{showItems ? "▲" : "▼"}</span>
-        </button>
-        {showItems && (
-          <div className="px-4 pb-3 space-y-2 max-h-60 overflow-y-auto">
-            {pack.items.sort((a, b) => a.sortOrder - b.sortOrder).map((item) => (
-              <div key={item.id} className="flex items-center gap-3 text-sm rounded border p-2">
-                <FileText className="size-4 text-muted-foreground shrink-0" />
-                <span className="flex-1 truncate">{item.title}</span>
-                <Badge variant="outline" className="text-xs">{item.itemType}</Badge>
-                {item.url && (
-                  <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                    <ExternalLink className="size-3" />
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Plus, Printer, FileText } from "lucide-react";
-import { fetchOfferingBriefs, createOfferingBrief, fetchOfferingPackDetail, type OfferingBrief, type OfferingPackDetail } from "@/lib/api-client";
+import { fetchOfferingBriefs, createOfferingBrief, fetchOfferingDetail, type OfferingBrief, type OfferingDetail } from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
 
 const MEETING_LABELS: Record<string, string> = {
@@ -15,7 +15,7 @@ const MEETING_LABELS: Record<string, string> = {
 
 export function Component() {
   const { id } = useParams<{ id: string }>();
-  const [pack, setPack] = useState<OfferingPackDetail | null>(null);
+  const [pack, setPack] = useState<OfferingDetail | null>(null);
   const [briefs, setBriefs] = useState<OfferingBrief[]>([]);
   const [selectedBrief, setSelectedBrief] = useState<OfferingBrief | null>(null);
   const [creating, setCreating] = useState(false);
@@ -25,7 +25,7 @@ export function Component() {
     if (!id) return;
     try {
       const [packData, briefsData] = await Promise.all([
-        fetchOfferingPackDetail(id),
+        fetchOfferingDetail(id),
         fetchOfferingBriefs(id),
       ]);
       setPack(packData);
