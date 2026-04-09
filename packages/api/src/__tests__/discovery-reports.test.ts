@@ -78,4 +78,95 @@ describe("DiscoveryReportService", () => {
     expect(found).not.toBeNull();
     expect(found!.item_id).toBe(itemId);
   });
+
+  // ─── F483: 평가결과서 HTML 테스트 ───
+
+  it("saveHtml — 새 리포트에 HTML 저장", async () => {
+    const sampleHtml = "<html><body><h1>평가결과서</h1></body></html>";
+    const result = await svc.saveHtml(itemId, orgId, sampleHtml);
+
+    expect(result.updatedAt).toBeTruthy();
+
+    const html = await svc.getHtml(itemId);
+    expect(html).not.toBeNull();
+    expect(html!.html).toBe(sampleHtml);
+  });
+
+  it("saveHtml — 기존 리포트에 HTML 갱신", async () => {
+    await svc.upsert(itemId, orgId, {
+      reportJson: { tabs: {} },
+      overallVerdict: "Go",
+      teamDecision: null,
+    });
+
+    const sampleHtml = "<html><body>Updated</body></html>";
+    await svc.saveHtml(itemId, orgId, sampleHtml);
+
+    const html = await svc.getHtml(itemId);
+    expect(html!.html).toBe(sampleHtml);
+
+    // report_json은 그대로 유지
+    const report = await svc.getByItem(itemId);
+    expect(report!.overall_verdict).toBe("Go");
+  });
+
+  it("getHtml — HTML 미등록 시 null 반환", async () => {
+    await svc.upsert(itemId, orgId, {
+      reportJson: {},
+      overallVerdict: null,
+      teamDecision: null,
+    });
+
+    const result = await svc.getHtml(itemId);
+    expect(result).toBeNull();
+  });
+
+  it("getHtml — 리포트 자체가 없으면 null", async () => {
+    const result = await svc.getHtml("nonexistent");
+    expect(result).toBeNull();
+  });
+
+  it("getHtmlByToken — 공유 토큰으로 HTML 조회", async () => {
+    const sampleHtml = "<html><body>Shared Report</body></html>";
+    await svc.saveHtml(itemId, orgId, sampleHtml);
+
+    const token = await svc.generateShareToken(itemId);
+    const html = await svc.getHtmlByToken(token);
+    expect(html).toBe(sampleHtml);
+  });
+
+  it("getHtmlByToken — HTML 없으면 null", async () => {
+    await svc.upsert(itemId, orgId, {
+      reportJson: {},
+      overallVerdict: null,
+      teamDecision: null,
+    });
+
+    const token = await svc.generateShareToken(itemId);
+    const html = await svc.getHtmlByToken(token);
+    expect(html).toBeNull();
+  });
+
+  it("getHtmlByToken — 잘못된 토큰이면 null", async () => {
+    const html = await svc.getHtmlByToken("invalid_token_12345");
+    expect(html).toBeNull();
+  });
+
+  it("saveHtml + getHtml 라운드트립", async () => {
+    const fullHtml = `<!DOCTYPE html>
+<html lang="ko">
+<head><title>KOAMI 평가결과서</title></head>
+<body>
+  <div class="tabs">
+    <div id="tab-2-1">레퍼런스 분석</div>
+    <div id="tab-2-9">멀티페르소나 평가</div>
+  </div>
+</body>
+</html>`;
+
+    await svc.saveHtml(itemId, orgId, fullHtml);
+    const result = await svc.getHtml(itemId);
+    expect(result!.html).toBe(fullHtml);
+    expect(result!.updatedAt).toBeTruthy();
+  });
 });

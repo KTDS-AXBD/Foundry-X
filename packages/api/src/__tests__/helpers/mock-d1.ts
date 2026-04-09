@@ -700,6 +700,7 @@ export class MockD1Database {
         team_decision TEXT DEFAULT NULL
           CHECK(team_decision IN ('Go', 'Hold', 'Drop')),
         shared_token TEXT,
+        report_html TEXT,
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
         updated_at TEXT NOT NULL DEFAULT (datetime('now')),
         UNIQUE(item_id)

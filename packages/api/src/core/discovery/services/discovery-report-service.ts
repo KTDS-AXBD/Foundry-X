@@ -119,6 +119,55 @@ export class DiscoveryReportService {
       .first<ReportRow>();
   }
 
+  /** F483: 평가결과서 HTML 저장 (upsert) */
+  async saveHtml(itemId: string, orgId: string, html: string): Promise<{ updatedAt: string }> {
+    const existing = await this.getByItem(itemId);
+
+    if (existing) {
+      await this.db
+        .prepare(
+          `UPDATE ax_discovery_reports
+           SET report_html = ?, updated_at = datetime('now')
+           WHERE item_id = ?`,
+        )
+        .bind(html, itemId)
+        .run();
+    } else {
+      const id = generateId();
+      await this.db
+        .prepare(
+          `INSERT INTO ax_discovery_reports (id, item_id, org_id, report_html)
+           VALUES (?, ?, ?, ?)`,
+        )
+        .bind(id, itemId, orgId, html)
+        .run();
+    }
+
+    const row = await this.getByItem(itemId);
+    return { updatedAt: row!.updated_at };
+  }
+
+  /** F483: 평가결과서 HTML 조회 */
+  async getHtml(itemId: string): Promise<{ html: string; updatedAt: string } | null> {
+    const row = await this.db
+      .prepare("SELECT report_html, updated_at FROM ax_discovery_reports WHERE item_id = ?")
+      .bind(itemId)
+      .first<{ report_html: string | null; updated_at: string }>();
+
+    if (!row || !row.report_html) return null;
+    return { html: row.report_html, updatedAt: row.updated_at };
+  }
+
+  /** F483: 공유 토큰으로 HTML 조회 */
+  async getHtmlByToken(token: string): Promise<string | null> {
+    const row = await this.db
+      .prepare("SELECT report_html FROM ax_discovery_reports WHERE shared_token = ?")
+      .bind(token)
+      .first<{ report_html: string | null }>();
+
+    return row?.report_html ?? null;
+  }
+
   /** 집계: 스테이지/아티팩트 기반 리포트 생성 */
   async getReport(
     bizItemId: string,
