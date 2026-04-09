@@ -385,3 +385,25 @@ export function makeArtifacts(overrides?: Record<string, unknown>[]) {
   ];
   return overrides ? defaults.map((d, i) => ({ ...d, ...overrides[i] })) : defaults;
 }
+
+// F476: 피드백 큐 아이템
+export function makeFeedbackQueueItem(overrides?: Record<string, unknown>) {
+  return {
+    id: "fq-001",
+    org_id: "org-001",
+    github_issue_number: 386,
+    github_issue_url: "https://github.com/KTDS-AXBD/Foundry-X/issues/386",
+    title: "[Marker.io] API409 error occurred!",
+    body: "Screenshot from Marker.io widget",
+    labels: "visual-feedback",
+    screenshot_url: null,
+    status: "pending",
+    agent_pr_url: null,
+    agent_log: null,
+    error_message: null,
+    retry_count: 0,
+    created_at: "2026-04-08T10:00:00Z",
+    updated_at: "2026-04-08T10:00:00Z",
+    ...overrides,
+  };
+}

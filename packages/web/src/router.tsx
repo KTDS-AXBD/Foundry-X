@@ -42,6 +42,7 @@ export const router = createBrowserRouter([
       { path: "discovery", lazy: () => import("@/routes/discovery-unified") },
       { path: "shaping/business-plan", lazy: () => import("@/routes/business-plan-list") },
       { path: "nps-dashboard", lazy: () => import("@/routes/nps-dashboard") },
+      { path: "feedback-dashboard", lazy: () => import("@/routes/feedback-dashboard") },
       { path: "settings", lazy: () => import("@/routes/settings-jira") },
 
       // ── F434: 1/4/5/6단계 catch-all → /discovery 리다이렉트 ──

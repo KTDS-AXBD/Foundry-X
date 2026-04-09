@@ -59,7 +59,8 @@
       "items": [
         { "href": "/nps-dashboard", "label": "NPS 대시보드", "iconKey": "BarChart3", "visible": true, "sortOrder": 0 },
         { "href": "/dashboard/metrics", "label": "운영 지표", "iconKey": "TrendingUp", "visible": true, "sortOrder": 1 },
-        { "href": "/projects", "label": "프로젝트", "iconKey": "FolderKanban", "visible": true, "sortOrder": 2 }
+        { "href": "/projects", "label": "프로젝트", "iconKey": "FolderKanban", "visible": true, "sortOrder": 2 },
+        { "href": "/feedback-dashboard", "label": "피드백", "iconKey": "MessageSquare", "visible": true, "sortOrder": 3 }
       ]
     },
     {
