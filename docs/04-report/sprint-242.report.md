@@ -29,7 +29,7 @@ match_rate: 97
 ## 구현 완료 항목
 
 ### API
-- `0123_evaluation_reports_v2.sql` — `report_data TEXT` 컬럼 + 인덱스 추가
+- `0124_evaluation_reports_v2.sql` — `report_data TEXT` 컬럼 + 인덱스 추가
 - `evaluation-report.schema.ts` — `DiscoveryReportDataSchema` 9탭 Zod 스키마 + `EvaluationReport` 인터페이스에 `reportData` 필드 추가
 - `evaluation-report-service.ts` — `generateFromFixture()` 신규 메서드 (INSERT OR REPLACE, idempotent), 기존 `generate()` deprecated 유지
 - `evaluation-report.ts` (route) — `POST /ax-bd/evaluation-reports/seed-fixtures` 엔드포인트 추가, fixture 3개 정적 import

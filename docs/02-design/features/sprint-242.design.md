@@ -18,7 +18,7 @@ f_items: [F493]
 ### 1.1 D1 스키마 확장 (0123)
 
 ```sql
--- packages/api/src/db/migrations/0123_evaluation_reports_v2.sql
+-- packages/api/src/db/migrations/0124_evaluation_reports_v2.sql
 ALTER TABLE evaluation_reports ADD COLUMN report_data TEXT;
 -- nullable JSON blob. null이면 레거시 v1 (skill_scores 사용), 존재하면 v2 (report_data 사용)
 CREATE INDEX IF NOT EXISTS idx_eval_reports_biz_item ON evaluation_reports(org_id, biz_item_id);

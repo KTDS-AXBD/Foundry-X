@@ -64,7 +64,7 @@ f_items: [F493]
 
 ## 산출물 체크리스트
 
-- [ ] (F493 🔧) `packages/api/src/db/migrations/0123_evaluation_reports_v2.sql`
+- [ ] (F493 🔧) `packages/api/src/db/migrations/0124_evaluation_reports_v2.sql`
 - [ ] (F493 🔧) `packages/api/src/modules/gate/schemas/evaluation-report.schema.ts` 확장 (`DiscoveryReportData` Zod)
 - [ ] (F493 🔧) `packages/api/src/modules/gate/services/evaluation-report-service.ts` `generateFromFixture()` 추가
 - [ ] (F493 🔧) `packages/api/src/fixtures/discovery-reports/bi-koami-001.json`
