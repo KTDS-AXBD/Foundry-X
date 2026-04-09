@@ -11,7 +11,9 @@ import { cn } from "@/lib/utils";
 export function Component() {
   const [pages, setPages] = useState<WikiPageType[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
+  const [activePage, setActivePage] = useState<WikiPageType | null>(null);
   const [loading, setLoading] = useState(true);
+  const [contentLoading, setContentLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,7 +29,19 @@ export function Component() {
       });
   }, []);
 
-  const activePage = pages.find((p) => p.slug === selected);
+  useEffect(() => {
+    if (!selected) return;
+    setContentLoading(true);
+    fetchApi<WikiPageType>(`/wiki/${selected}`)
+      .then((data) => {
+        setActivePage(data);
+        setContentLoading(false);
+      })
+      .catch(() => {
+        setActivePage(pages.find((p) => p.slug === selected) ?? null);
+        setContentLoading(false);
+      });
+  }, [selected, pages]);
 
   if (loading) {
     return <p className="text-muted-foreground">Loading wiki...</p>;
@@ -81,7 +95,9 @@ export function Component() {
         {/* Right: document content */}
         <Card className="flex-1">
           <CardContent className="p-6">
-            {activePage ? (
+            {contentLoading ? (
+              <p className="text-muted-foreground">Loading...</p>
+            ) : activePage ? (
               <>
                 <h2 className="mb-1 text-xl font-semibold">
                   {activePage.title}
