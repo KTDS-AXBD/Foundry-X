@@ -291,19 +291,15 @@ packages/web/src/components/feature/discovery/report-v2/
 
 샘플 HTML의 컬러 변수(`--mint`, `--blue`, `--amber`, `--red`, `--purple`)는 이미 `packages/web/src/app/globals.css`의 `--discovery-*` 변수로 존재(router 확인됨). 이를 재사용.
 
-### 4.4 Chart.js 의존성
+### 4.4 Chart 의존성 (구현 시 변경)
 
-```json
-// packages/web/package.json dependencies
-"chart.js": "^4.4.1",
-"react-chartjs-2": "^5.2.0"
-```
-
-Lazy import:
+**설계 시 명세**: `react-chartjs-2` + `chart.js`  
+**실제 구현**: `recharts` (이미 `packages/web`에 설치됨)  
+**변경 사유**: 신규 의존성 추가 없이 동일 기능 달성 가능 — 번들 크기 최소화
 
 ```tsx
 const ChartBlock = lazy(() => import("./blocks/ChartBlock"));
-// ChartBlock 내부에서만 chart.js 로드
+// ChartBlock 내부에서만 recharts BarChart 로드
 ```
 
 ## 5. Fixture 작성 규칙 (Sonnet autopilot 지침)

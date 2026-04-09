@@ -1,9 +1,10 @@
 /**
  * F296: 통합 평가 결과서 생성 + 조회 서비스
- * bd_artifacts에서 biz-item별 산출물을 취합하여 스킬별 점수 + 신호등 산출
+ * F493: v2 DiscoveryReportData (9탭 리치 리포트) generateFromFixture() 추가
  */
 
 import type {
+  DiscoveryReportData,
   EvaluationReport,
   GenerateReportInput,
   ReportListQuery,
@@ -16,6 +17,7 @@ interface ReportRow {
   title: string;
   summary: string | null;
   skill_scores: string;
+  report_data: string | null;
   traffic_light: string;
   traffic_light_history: string;
   recommendation: string | null;
@@ -46,6 +48,15 @@ const SKILL_LABELS: Record<string, string> = {
 };
 
 function rowToReport(row: ReportRow): EvaluationReport {
+  let reportData: DiscoveryReportData | null = null;
+  if (row.report_data) {
+    try {
+      reportData = JSON.parse(row.report_data) as DiscoveryReportData;
+    } catch {
+      reportData = null;
+    }
+  }
+
   return {
     id: row.id,
     orgId: row.org_id,
@@ -53,6 +64,7 @@ function rowToReport(row: ReportRow): EvaluationReport {
     title: row.title,
     summary: row.summary,
     skillScores: JSON.parse(row.skill_scores),
+    reportData,
     trafficLight: row.traffic_light as EvaluationReport["trafficLight"],
     trafficLightHistory: JSON.parse(row.traffic_light_history),
     recommendation: row.recommendation,
@@ -76,6 +88,60 @@ function computeTrafficLight(scores: Record<string, { score: number }>): "green"
 export class EvaluationReportService {
   constructor(private db: D1Database) {}
 
+  /**
+   * F493: v2 fixture 기반 결과서 생성 (9탭 리치 리포트)
+   * INSERT OR REPLACE — idempotent (id = `eval-{bizItemId}-v1`)
+   */
+  async generateFromFixture(
+    orgId: string,
+    userId: string,
+    bizItemId: string,
+    fixtureData: DiscoveryReportData,
+  ): Promise<EvaluationReport> {
+    const id = `eval-${bizItemId}-v1`;
+    const now = new Date().toISOString();
+    const trafficLight = fixtureData.summary.trafficLight;
+
+    // v1 호환: skill_scores에도 요약 넣어두기 (레거시 페이지 폴백용)
+    const legacySkillScores: Record<string, { score: number; label: string; summary: string }> =
+      Object.fromEntries(
+        Object.entries(fixtureData.tabs).map(([stageId, tab]) => [
+          stageId,
+          { score: 80, label: tab.title, summary: tab.subtitle ?? "" },
+        ]),
+      );
+
+    await this.db
+      .prepare(
+        `INSERT OR REPLACE INTO evaluation_reports
+           (id, org_id, biz_item_id, title, summary, skill_scores, report_data,
+            traffic_light, traffic_light_history, recommendation, generated_by,
+            created_by, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'fixture', ?, ?, ?)`,
+      )
+      .bind(
+        id,
+        orgId,
+        bizItemId,
+        fixtureData.bizItemTitle,
+        fixtureData.summary.executiveSummary,
+        JSON.stringify(legacySkillScores),
+        JSON.stringify(fixtureData),
+        trafficLight,
+        JSON.stringify([{ date: now, value: trafficLight }]),
+        fixtureData.summary.recommendation,
+        userId,
+        now,
+        now,
+      )
+      .run();
+
+    return (await this.getById(orgId, id)) as EvaluationReport;
+  }
+
+  /**
+   * @deprecated Use generateFromFixture() for v2 reports, or future AI pipeline (Phase 31+)
+   */
   async generate(
     orgId: string,
     userId: string,
@@ -102,9 +168,7 @@ export class EvaluationReportService {
 
       const outputLen = art.output_text?.length ?? 0;
       const score = Math.min(100, Math.round((outputLen / 500) * 100));
-      const summary = art.output_text
-        ? art.output_text.slice(0, 200)
-        : "(산출물 없음)";
+      const summary = art.output_text ? art.output_text.slice(0, 200) : "(산출물 없음)";
 
       skillScores[art.skill_id] = {
         score,
@@ -149,6 +213,7 @@ export class EvaluationReportService {
       title,
       summary: null,
       skillScores,
+      reportData: null,
       trafficLight,
       trafficLightHistory: [{ date: now, value: trafficLight }],
       recommendation: null,
