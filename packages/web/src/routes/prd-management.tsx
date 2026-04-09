@@ -42,32 +42,45 @@ export function Component() {
   };
 
   return (
-    <div style={{ padding: 32, maxWidth: 1200, margin: "0 auto" }}>
+    <div className="mx-auto max-w-[1200px] p-8 text-foreground">
       {/* Breadcrumb */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24, fontSize: 13, color: "#94a3b8" }}>
-        <button onClick={() => navigate(-1)} style={{ border: "none", background: "none", cursor: "pointer", color: "#94a3b8" }}>
+      <div className="mb-6 flex items-center gap-2 text-[13px] text-muted-foreground">
+        <button
+          onClick={() => navigate(-1)}
+          className="cursor-pointer border-none bg-transparent text-muted-foreground hover:text-foreground"
+        >
           ← 뒤로
         </button>
         <span>/</span>
         <span>PRD 관리</span>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-        <h2 style={{ fontWeight: 700, fontSize: 22, margin: 0 }}>PRD 버전 관리</h2>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="m-0 text-[22px] font-bold">PRD 버전 관리</h2>
         {prds.length >= 2 && (
           <button
             onClick={() => openModal("diff")}
-            style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #cbd5e1", cursor: "pointer" }}
+            className="cursor-pointer rounded-lg border border-border bg-card px-4 py-2 text-sm text-foreground hover:bg-muted/40"
           >
             버전 비교
           </button>
         )}
       </div>
 
-      {loading && <div style={{ color: "#94a3b8" }}>불러오는 중…</div>}
-      {error && <div style={{ color: "#ef4444" }}>{error}</div>}
+      {loading && <div className="text-muted-foreground">불러오는 중…</div>}
+      {error && (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-destructive">
+          PRD 로드 실패: {error}
+        </div>
+      )}
 
-      {!loading && !error && (
+      {!loading && !error && prds.length === 0 && (
+        <div className="rounded-lg border border-dashed border-border p-6 text-center text-muted-foreground">
+          아직 생성된 PRD가 없어요. 발굴 과정에서 PRD가 생성되면 여기에 표시돼요.
+        </div>
+      )}
+
+      {!loading && !error && prds.length > 0 && (
         <PrdVersionList
           prds={prds}
           bizItemId={bizItemId}

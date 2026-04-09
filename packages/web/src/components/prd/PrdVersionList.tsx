@@ -1,5 +1,17 @@
 import type { GeneratedPrdEntry } from "../../lib/api-client";
 
+/** generated_at는 Unix 초(number) 또는 ISO 문자열 둘 다 가능 — 둘 다 정상 파싱 */
+function formatGeneratedAt(value: unknown): string {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return new Date(value * 1000).toLocaleDateString("ko-KR");
+  }
+  if (typeof value === "string") {
+    const d = new Date(value);
+    if (!Number.isNaN(d.getTime())) return d.toLocaleDateString("ko-KR");
+  }
+  return "-";
+}
+
 interface Props {
   prds: GeneratedPrdEntry[];
   bizItemId: string;
@@ -35,39 +47,34 @@ function VersionCard({
 
   return (
     <div
-      style={{
-        flex: 1,
-        minWidth: 240,
-        border: "1px solid #e2e8f0",
-        borderRadius: 12,
-        padding: 20,
-        background: prd ? "#fff" : "#f8fafc",
-      }}
+      className={`flex-1 min-w-[240px] rounded-xl border border-border p-5 ${
+        prd ? "bg-card" : "bg-muted/30"
+      }`}
     >
-      <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 8 }}>{label}</div>
+      <div className="mb-2 text-[15px] font-semibold text-foreground">{label}</div>
       {prd ? (
         <>
-          <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 4 }}>
+          <div className="mb-1 text-xs text-muted-foreground">
             {STATUS_BADGE[prd.status] ?? prd.status}
             {isReadOnly && " · 읽기 전용"}
           </div>
-          <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 12 }}>
-            {new Date(prd.generated_at * 1000).toLocaleDateString("ko-KR")}
+          <div className="mb-3 text-xs text-muted-foreground">
+            {formatGeneratedAt(prd.generated_at)}
           </div>
-          <div style={{ fontSize: 13, color: "#475569", marginBottom: 16, lineHeight: 1.5 }}>
+          <div className="mb-4 text-[13px] leading-relaxed text-foreground/80">
             {(prd.contentPreview ?? prd.content.slice(0, 120)).slice(0, 120)}…
           </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => onView(prd)}
-              style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid #cbd5e1", cursor: "pointer" }}
+              className="cursor-pointer rounded-md border border-border bg-background px-3 py-1 text-xs text-foreground hover:bg-muted/40"
             >
               상세 보기
             </button>
             {!isReadOnly && (
               <button
                 onClick={() => onEdit(prd)}
-                style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid #cbd5e1", cursor: "pointer" }}
+                className="cursor-pointer rounded-md border border-border bg-background px-3 py-1 text-xs text-foreground hover:bg-muted/40"
               >
                 편집
               </button>
@@ -75,14 +82,7 @@ function VersionCard({
             {version === 2 && !hasV3 && (
               <button
                 onClick={() => onConfirm(prd)}
-                style={{
-                  padding: "4px 12px",
-                  borderRadius: 6,
-                  border: "none",
-                  background: "#2563eb",
-                  color: "#fff",
-                  cursor: "pointer",
-                }}
+                className="cursor-pointer rounded-md border-none bg-primary px-3 py-1 text-xs text-primary-foreground hover:opacity-90"
               >
                 확정하기
               </button>
@@ -90,7 +90,7 @@ function VersionCard({
           </div>
         </>
       ) : (
-        <div style={{ fontSize: 13, color: "#94a3b8" }}>
+        <div className="text-[13px] text-muted-foreground">
           {version === 3 ? "2차 PRD 확정 시 생성돼요" : "아직 생성되지 않았어요"}
         </div>
       )}
@@ -104,7 +104,7 @@ export function PrdVersionList({ prds, bizItemId: _bizItemId, onView, onEdit, on
   const hasV3 = Boolean(byVersion[3]);
 
   return (
-    <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+    <div className="flex flex-wrap gap-4">
       {[1, 2, 3].map((v) => (
         <VersionCard
           key={v}

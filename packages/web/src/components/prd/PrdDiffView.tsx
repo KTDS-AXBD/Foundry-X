@@ -8,11 +8,22 @@ interface Props {
   onClose: () => void;
 }
 
-const HUNK_STYLE: Record<DiffHunk["type"], React.CSSProperties> = {
-  added: { background: "#dcfce7", color: "#166534" },
-  removed: { background: "#fee2e2", color: "#991b1b", textDecoration: "line-through" },
-  unchanged: { color: "#334155" },
+const HUNK_CLASS: Record<DiffHunk["type"], string> = {
+  added: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  removed: "bg-red-500/15 text-red-600 line-through dark:text-red-400",
+  unchanged: "text-foreground/80",
 };
+
+function formatGeneratedAt(value: unknown): string {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return new Date(value * 1000).toLocaleDateString("ko-KR");
+  }
+  if (typeof value === "string") {
+    const d = new Date(value);
+    if (!Number.isNaN(d.getTime())) return d.toLocaleDateString("ko-KR");
+  }
+  return "-";
+}
 
 export function PrdDiffView({ prds, bizItemId, onClose }: Props) {
   const [v1Id, setV1Id] = useState(prds[0]?.id ?? "");
@@ -36,43 +47,60 @@ export function PrdDiffView({ prds, bizItemId, onClose }: Props) {
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 1000, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: 40 }}>
-      <div style={{ background: "#fff", borderRadius: 16, width: "100%", maxWidth: 900, padding: 32, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+    <div className="fixed inset-0 z-[9999] flex items-start justify-center bg-black/50 p-10">
+      <div className="flex w-full max-w-[900px] max-h-[90vh] flex-col overflow-hidden rounded-2xl border border-border bg-card p-8 text-foreground shadow-xl">
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
-          <span style={{ fontWeight: 700, fontSize: 16 }}>PRD 버전 비교</span>
-          <button onClick={onClose} style={{ marginLeft: "auto", border: "none", background: "none", fontSize: 20, cursor: "pointer", color: "#94a3b8" }}>×</button>
+        <div className="mb-5 flex items-center">
+          <span className="text-base font-bold">PRD 버전 비교</span>
+          <button
+            onClick={onClose}
+            className="ml-auto cursor-pointer border-none bg-transparent text-xl text-muted-foreground hover:text-foreground"
+          >
+            ×
+          </button>
         </div>
 
         {/* Version selectors */}
-        <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 16 }}>
-          <select value={v1Id} onChange={(e) => setV1Id(e.target.value)} style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #cbd5e1" }}>
+        <div className="mb-4 flex items-center gap-3">
+          <select
+            value={v1Id}
+            onChange={(e) => setV1Id(e.target.value)}
+            className="rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground"
+          >
             {prds.map((p) => (
-              <option key={p.id} value={p.id}>{p.version}차 PRD ({new Date(p.generated_at * 1000).toLocaleDateString("ko-KR")})</option>
+              <option key={p.id} value={p.id}>
+                {p.version}차 PRD ({formatGeneratedAt(p.generated_at)})
+              </option>
             ))}
           </select>
-          <span style={{ color: "#94a3b8" }}>vs</span>
-          <select value={v2Id} onChange={(e) => setV2Id(e.target.value)} style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #cbd5e1" }}>
+          <span className="text-muted-foreground">vs</span>
+          <select
+            value={v2Id}
+            onChange={(e) => setV2Id(e.target.value)}
+            className="rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground"
+          >
             {prds.map((p) => (
-              <option key={p.id} value={p.id}>{p.version}차 PRD ({new Date(p.generated_at * 1000).toLocaleDateString("ko-KR")})</option>
+              <option key={p.id} value={p.id}>
+                {p.version}차 PRD ({formatGeneratedAt(p.generated_at)})
+              </option>
             ))}
           </select>
           <button
             onClick={handleCompare}
             disabled={loading || v1Id === v2Id}
-            style={{ padding: "6px 16px", borderRadius: 6, border: "none", background: "#2563eb", color: "#fff", cursor: loading ? "not-allowed" : "pointer" }}
+            className="rounded-md border-none bg-primary px-4 py-1.5 text-sm text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? "비교 중…" : "비교"}
           </button>
         </div>
 
-        {error && <div style={{ color: "#ef4444", fontSize: 13, marginBottom: 12 }}>{error}</div>}
+        {error && <div className="mb-3 text-[13px] text-destructive">{error}</div>}
 
         {/* Diff output */}
         {hunks && (
-          <div style={{ flex: 1, overflowY: "auto", fontFamily: "monospace", fontSize: 13, lineHeight: 1.7, borderTop: "1px solid #f1f5f9", paddingTop: 16 }}>
+          <div className="flex-1 overflow-y-auto border-t border-border pt-4 font-mono text-[13px] leading-[1.7]">
             {hunks.map((h, i) => (
-              <div key={i} style={{ ...HUNK_STYLE[h.type], padding: "1px 8px" }}>
+              <div key={i} className={`px-2 py-px ${HUNK_CLASS[h.type]}`}>
                 {h.type === "added" ? "+ " : h.type === "removed" ? "- " : "  "}
                 {h.content}
               </div>

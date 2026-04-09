@@ -50,33 +50,41 @@ export function PrdEditor({ prd, bizItemId, onSaved, onClose }: Props) {
   );
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 1000, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: 40 }}>
-      <div style={{ background: "#fff", borderRadius: 16, width: "100%", maxWidth: 900, padding: 32, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+    <div className="fixed inset-0 z-[9999] flex items-start justify-center bg-black/50 p-10">
+      <div className="flex w-full max-w-[900px] max-h-[90vh] flex-col overflow-hidden rounded-2xl border border-border bg-card p-8 text-foreground shadow-xl">
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
-          <span style={{ fontWeight: 700, fontSize: 16 }}>PRD 편집 — {prd.version}차</span>
-          {saving && <span style={{ marginLeft: 12, fontSize: 12, color: "#94a3b8" }}>저장 중…</span>}
-          {error && <span style={{ marginLeft: 12, fontSize: 12, color: "#ef4444" }}>{error}</span>}
-          <button onClick={() => setPreview((p) => !p)} style={{ marginLeft: "auto", padding: "4px 12px", borderRadius: 6, border: "1px solid #cbd5e1", cursor: "pointer" }}>
+        <div className="mb-4 flex items-center">
+          <span className="text-base font-bold">PRD 편집 — {prd.version}차</span>
+          {saving && <span className="ml-3 text-xs text-muted-foreground">저장 중…</span>}
+          {error && <span className="ml-3 text-xs text-destructive">{error}</span>}
+          <button
+            onClick={() => setPreview((p) => !p)}
+            className="ml-auto cursor-pointer rounded-md border border-border bg-background px-3 py-1 text-xs text-foreground hover:bg-muted/40"
+          >
             {preview ? "편집" : "미리보기"}
           </button>
-          <button onClick={onClose} style={{ marginLeft: 8, border: "none", background: "none", fontSize: 20, cursor: "pointer", color: "#94a3b8" }}>×</button>
+          <button
+            onClick={onClose}
+            className="ml-2 cursor-pointer border-none bg-transparent text-xl text-muted-foreground hover:text-foreground"
+          >
+            ×
+          </button>
         </div>
 
         {isReadOnly ? (
-          <div style={{ padding: 16, background: "#fef9c3", borderRadius: 8, fontSize: 13, color: "#92400e" }}>
+          <div className="rounded-lg bg-amber-500/10 p-4 text-[13px] text-amber-600 dark:text-amber-400">
             1차 PRD는 자동 생성된 원본으로 편집할 수 없어요.
           </div>
         ) : preview ? (
           <div
-            style={{ flex: 1, overflowY: "auto", lineHeight: 1.8, fontSize: 14, color: "#334155" }}
+            className="flex-1 overflow-y-auto text-sm leading-[1.8] text-foreground"
             dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}
           />
         ) : (
           <textarea
             value={content}
             onChange={(e) => handleChange(e.target.value)}
-            style={{ flex: 1, resize: "none", border: "1px solid #e2e8f0", borderRadius: 8, padding: 16, fontSize: 13, fontFamily: "monospace", lineHeight: 1.6, outline: "none" }}
+            className="flex-1 resize-none rounded-lg border border-border bg-background p-4 font-mono text-[13px] leading-relaxed text-foreground outline-none focus:border-primary"
           />
         )}
       </div>
