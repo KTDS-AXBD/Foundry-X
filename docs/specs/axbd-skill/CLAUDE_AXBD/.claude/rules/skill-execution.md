@@ -729,4 +729,53 @@ BCG 핵심 인사이트:
 
 ---
 
-*AX BD팀 · 2단계 발굴 프로세스 v8.2 · 2026-03-25 (사업성 판단 체크포인트 + 누적 신호등 추가)*
+---
+
+## Foundry-X 자동 동기화 (F482, Sprint 235)
+
+각 단계(2-1~2-10) 분석 완료 시, Foundry-X API를 호출하여 결과를 `bd_artifacts` + `biz_item_discovery_stages`에 자동 등록한다.
+
+### API 호출 방법
+
+```bash
+curl -X POST "${FOUNDRY_X_API_URL}/api/ax-bd/biz-items/${BIZ_ITEM_ID}/sync-artifacts" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -d '{
+    "stages": [
+      { "stage": "2-1", "outputText": "레퍼런스 분석 결과...", "skillId": "competitor-analysis" }
+    ],
+    "source": "claude-skill"
+  }'
+```
+
+### 필드 설명
+- `stages[].stage`: 발굴 단계 ID (`2-0` ~ `2-10`)
+- `stages[].outputText`: 해당 단계 분석 결과 (마크다운 텍스트)
+- `stages[].skillId`: 사용된 스킬 ID (예: `competitor-analysis`, `market-sizing`)
+- `source`: 호출 출처 (`claude-skill` 또는 `manual`)
+
+### 호출 시점
+- 각 단계 분석 완료 후 즉시 (개별 단계별 호출 권장)
+- 또는 여러 단계를 한꺼번에 배치 호출 가능
+- 분석 세션 종료 시 미동기화 단계를 일괄 호출
+
+### 환경 변수
+- `FOUNDRY_X_API_URL`: Foundry-X API 기본 URL (예: `https://foundry-x-api.ktds-axbd.workers.dev`)
+- `FOUNDRY_X_TOKEN`: API 인증 토큰 (Bearer)
+
+### 응답 예시
+```json
+{
+  "synced": 1,
+  "stagesUpdated": 1,
+  "statusChanged": false,
+  "artifacts": [
+    { "id": "abc123", "stageId": "2-1", "skillId": "competitor-analysis", "version": 1 }
+  ]
+}
+```
+
+---
+
+*AX BD팀 · 2단계 발굴 프로세스 v8.2 · 2026-04-09 (F482 Foundry-X 자동 동기화 추가)*
