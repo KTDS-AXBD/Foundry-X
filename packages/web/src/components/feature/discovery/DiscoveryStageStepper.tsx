@@ -1,0 +1,320 @@
+"use client";
+
+/**
+ * F480 — Discovery Stage 전체 스텝퍼 (AnalysisStepper 대체)
+ * 11단계 HITL 스텝퍼: 2-0~2-10, v82 유형별 강도 반영
+ */
+import { useState, useEffect, useCallback } from "react";
+import { CheckCircle2, Circle, Loader2, ChevronDown, ChevronUp, Play, MessageSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  getDiscoveryProgress,
+  runDiscoveryStage,
+  confirmDiscoveryStage,
+  analyzeStartingPoint,
+  classifyBizItem,
+  evaluateBizItem,
+  type DiscoveryProgress,
+  type StageRunResult,
+} from "@/lib/api-client";
+
+interface DiscoveryStageStepperProps {
+  bizItemId: string;
+  discoveryType: string | null;
+  onStageComplete?: (stage: string) => void;
+  onAllComplete?: () => void;
+}
+
+const INTENSITY_LABELS: Record<string, { label: string; color: string }> = {
+  core: { label: "심층", color: "bg-red-100 text-red-700" },
+  normal: { label: "보통", color: "bg-blue-100 text-blue-700" },
+  light: { label: "간소", color: "bg-green-100 text-green-700" },
+};
+
+// 2-0은 기존 starting-point + classify 통합, 2-9는 기존 evaluate 사용
+const LEGACY_STAGES = new Set(["2-0", "2-9"]);
+
+export default function DiscoveryStageStepper({
+  bizItemId,
+  discoveryType,
+  onStageComplete,
+  onAllComplete,
+}: DiscoveryStageStepperProps) {
+  const [progress, setProgress] = useState<DiscoveryProgress | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [runningStage, setRunningStage] = useState<string | null>(null);
+  const [stageResult, setStageResult] = useState<StageRunResult | null>(null);
+  const [feedback, setFeedback] = useState("");
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadProgress = useCallback(async () => {
+    try {
+      const data = await getDiscoveryProgress(bizItemId);
+      setProgress(data);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "진행률 조회 실패");
+    } finally {
+      setLoading(false);
+    }
+  }, [bizItemId]);
+
+  useEffect(() => { void loadProgress(); }, [loadProgress]);
+
+  async function handleRunStage(stage: string) {
+    setRunningStage(stage);
+    setError(null);
+    setStageResult(null);
+
+    try {
+      if (stage === "2-0") {
+        // 2-0: 기존 starting-point + classify 통합
+        await analyzeStartingPoint(bizItemId);
+        await classifyBizItem(bizItemId);
+        await loadProgress();
+        onStageComplete?.(stage);
+        setExpanded(null);
+      } else if (stage === "2-9") {
+        // 2-9: 기존 evaluate 사용
+        await evaluateBizItem(bizItemId);
+        await loadProgress();
+        onStageComplete?.(stage);
+        setExpanded(null);
+      } else {
+        // 2-1~2-8, 2-10: 신규 stage runner API
+        const result = await runDiscoveryStage(bizItemId, stage, feedback || undefined);
+        setStageResult(result);
+        setExpanded(stage);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : `${stage} 실행 실패`);
+    } finally {
+      setRunningStage(null);
+    }
+  }
+
+  async function handleConfirm(stage: string, answer: "go" | "pivot" | "stop") {
+    setRunningStage(stage);
+    setError(null);
+    try {
+      await confirmDiscoveryStage(bizItemId, stage, answer, feedback || undefined);
+      setStageResult(null);
+      setFeedback("");
+      setExpanded(null);
+      await loadProgress();
+      onStageComplete?.(stage);
+
+      // 모든 단계 완료 체크
+      const updated = await getDiscoveryProgress(bizItemId);
+      if (updated.completedCount === updated.totalCount) {
+        onAllComplete?.();
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "확인 실패");
+    } finally {
+      setRunningStage(null);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 text-muted-foreground p-4">
+        <Loader2 className="size-4 animate-spin" /> 진행률 로딩 중...
+      </div>
+    );
+  }
+
+  if (!progress) {
+    return <div className="text-sm text-destructive p-4">{error ?? "진행률을 불러올 수 없어요."}</div>;
+  }
+
+  const isRunnable = (stage: string, status: string, idx: number): boolean => {
+    if (status === "completed" || status === "skipped") return false;
+    if (runningStage) return false;
+    // 첫 번째 미완료 단계만 실행 가능
+    if (idx === 0) return true;
+    const prevStatus = progress.stages[idx - 1]?.status;
+    return prevStatus === "completed" || prevStatus === "skipped";
+  };
+
+  return (
+    <div className="rounded-lg border bg-card">
+      {/* 헤더 */}
+      <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-semibold">발굴 분석</h3>
+          <Badge variant="outline">
+            {progress.completedCount}/{progress.totalCount} 완료
+          </Badge>
+        </div>
+        {discoveryType && (
+          <Badge variant="secondary">{discoveryType}유형</Badge>
+        )}
+      </div>
+
+      {/* 에러 */}
+      {error && (
+        <div className="mx-4 mt-3 p-3 rounded-md bg-destructive/10 text-destructive text-sm">
+          {error}
+        </div>
+      )}
+
+      {/* 스테이지 목록 */}
+      <div className="divide-y">
+        {progress.stages.map((stage, idx) => {
+          const canRun = isRunnable(stage.stage, stage.status, idx);
+          const isExpanded = expanded === stage.stage;
+          const isRunning = runningStage === stage.stage;
+          const isLegacy = LEGACY_STAGES.has(stage.stage);
+          const showResult = stageResult?.stage === stage.stage;
+
+          return (
+            <div key={stage.stage} className="p-4">
+              {/* 스테이지 행 */}
+              <div className="flex items-center gap-3">
+                {/* 아이콘 */}
+                {stage.status === "completed" ? (
+                  <CheckCircle2 className="size-5 text-green-600 shrink-0" />
+                ) : isRunning ? (
+                  <Loader2 className="size-5 text-blue-600 animate-spin shrink-0" />
+                ) : stage.status === "in_progress" ? (
+                  <div className="size-5 rounded-full border-2 border-blue-600 bg-blue-100 shrink-0" />
+                ) : (
+                  <Circle className="size-5 text-muted-foreground shrink-0" />
+                )}
+
+                {/* 라벨 */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-sm font-medium ${stage.status === "completed" ? "text-muted-foreground" : ""}`}>
+                      {stage.stage} {stage.stageName}
+                    </span>
+                    {stage.status === "completed" && (
+                      <Badge variant="outline" className="text-xs bg-green-50">완료</Badge>
+                    )}
+                    {isLegacy && stage.status !== "completed" && (
+                      <Badge variant="outline" className="text-xs">자동</Badge>
+                    )}
+                  </div>
+                </div>
+
+                {/* 액션 */}
+                <div className="flex items-center gap-2 shrink-0">
+                  {canRun && (
+                    <Button
+                      size="sm"
+                      variant={isLegacy ? "default" : "outline"}
+                      onClick={() => handleRunStage(stage.stage)}
+                      disabled={isRunning}
+                    >
+                      {isRunning ? (
+                        <><Loader2 className="size-3 animate-spin mr-1" /> 실행 중</>
+                      ) : (
+                        <><Play className="size-3 mr-1" /> 실행</>
+                      )}
+                    </Button>
+                  )}
+                  {showResult && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setExpanded(isExpanded ? null : stage.stage)}
+                    >
+                      {isExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* 분석 결과 + HITL 패널 */}
+              {showResult && isExpanded && stageResult && (
+                <div className="mt-3 ml-8 rounded-lg border bg-muted/30 p-4 space-y-4">
+                  {/* AI 분석 결과 */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge className={INTENSITY_LABELS[stageResult.intensity]?.color ?? ""}>
+                        {INTENSITY_LABELS[stageResult.intensity]?.label ?? stageResult.intensity}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        신뢰도: {stageResult.result.confidence}%
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium mb-1">{stageResult.result.summary}</p>
+                    <div className="text-sm text-muted-foreground whitespace-pre-wrap max-h-60 overflow-y-auto">
+                      {stageResult.result.details}
+                    </div>
+                  </div>
+
+                  {/* Viability Question */}
+                  {stageResult.viabilityQuestion && (
+                    <div className="rounded-md bg-amber-50 border border-amber-200 p-3">
+                      <div className="flex items-start gap-2">
+                        <MessageSquare className="size-4 text-amber-600 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium text-amber-800">사업성 체크</p>
+                          <p className="text-sm text-amber-700 mt-1">{stageResult.viabilityQuestion}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Commit Gate Questions (2-5) */}
+                  {stageResult.commitGateQuestions && (
+                    <div className="rounded-md bg-purple-50 border border-purple-200 p-3">
+                      <p className="text-sm font-medium text-purple-800 mb-2">Commit Gate 질문</p>
+                      <ul className="space-y-1">
+                        {stageResult.commitGateQuestions.map((q, i) => (
+                          <li key={i} className="text-sm text-purple-700">• {q}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* 피드백 + Go/Pivot/Stop */}
+                  <div className="space-y-3">
+                    <textarea
+                      className="w-full p-2 text-sm border rounded-md bg-background resize-none"
+                      placeholder="피드백을 입력하세요 (선택사항)..."
+                      rows={2}
+                      value={feedback}
+                      onChange={(e) => setFeedback(e.target.value)}
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => handleConfirm(stageResult.stage, "go")}
+                        disabled={!!runningStage}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        Go ✅
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleConfirm(stageResult.stage, "pivot")}
+                        disabled={!!runningStage}
+                        className="border-amber-300 text-amber-700 hover:bg-amber-50"
+                      >
+                        Pivot 🔄
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleConfirm(stageResult.stage, "stop")}
+                        disabled={!!runningStage}
+                        className="border-red-300 text-red-700 hover:bg-red-50"
+                      >
+                        Stop ⛔
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
