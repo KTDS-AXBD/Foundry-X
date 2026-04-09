@@ -30,6 +30,7 @@ import { PasswordResetService } from "../services/password-reset-service.js";
 import { EmailService } from "../services/email-service.js";
 import { SwitchOrgSchema, InvitationTokenSchema } from "../../portal/schemas/org.js";
 import { OrgService, OrgError } from "../../portal/services/org.js";
+import { ensureSharedOrgMembership } from "../services/shared-org.js";
 
 export const authRoute = new OpenAPIHono<{ Bindings: Env }>({
   defaultHook: validationHook as any,
@@ -82,19 +83,28 @@ authRoute.openapi(signup, async (c) => {
     updatedAt: now,
   });
 
-  // Auto-create personal org for new user
-  const orgId = `org_${id.slice(0, 8)}`;
-  const orgSlug = (email.split("@")[0] ?? "user").replace(/[^a-z0-9-]/gi, "-").toLowerCase();
-  await c.env.DB.prepare(
-    "INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)"
-  ).bind(orgId, `${name}'s Org`, orgSlug).run();
-  await c.env.DB.prepare(
-    "INSERT OR IGNORE INTO org_members (org_id, user_id, role) VALUES (?, ?, 'owner')"
-  ).bind(orgId, id).run();
+  // Org 배정: 테스트 공유 Org가 설정돼 있으면 그곳에 소속, 아니면 개인 Org 자동 생성
+  const shared = await ensureSharedOrgMembership(c.env, id, "member");
+  let orgId: string;
+  let orgRole: "owner" | "admin" | "member" | "viewer";
+  if (shared) {
+    orgId = shared.orgId;
+    orgRole = shared.orgRole;
+  } else {
+    orgId = `org_${id.slice(0, 8)}`;
+    const orgSlug = (email.split("@")[0] ?? "user").replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+    await c.env.DB.prepare(
+      "INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)"
+    ).bind(orgId, `${name}'s Org`, orgSlug).run();
+    await c.env.DB.prepare(
+      "INSERT OR IGNORE INTO org_members (org_id, user_id, role) VALUES (?, ?, 'owner')"
+    ).bind(orgId, id).run();
+    orgRole = "owner";
+  }
 
   const secret = c.env.JWT_SECRET ?? "dev-secret";
   const { _refreshJti, ...tokens } = await createTokenPair(
-    { id, email, role: "member", orgId, orgRole: "owner" },
+    { id, email, role: "member", orgId, orgRole },
     secret,
   );
 
@@ -453,15 +463,19 @@ authRoute.openapi(setupPassword, async (c) => {
     updatedAt: now,
   });
 
-  // 4. Auto-create personal org
-  const personalOrgId = `org_${userId.slice(0, 8)}`;
-  const orgSlug = invEmail.split("@")[0]!.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
-  await c.env.DB.prepare(
-    "INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)"
-  ).bind(personalOrgId, `${name}'s Org`, orgSlug).run();
-  await c.env.DB.prepare(
-    "INSERT OR IGNORE INTO org_members (org_id, user_id, role) VALUES (?, ?, 'owner')"
-  ).bind(personalOrgId, userId).run();
+  // 4. Org 배정: 테스트 공유 Org 우선, 아니면 개인 Org 자동 생성
+  //    (초대받은 Org는 5단계 acceptInvitation에서 별도 소속)
+  const sharedSetup = await ensureSharedOrgMembership(c.env, userId, "member");
+  if (!sharedSetup) {
+    const personalOrgId = `org_${userId.slice(0, 8)}`;
+    const orgSlug = invEmail.split("@")[0]!.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+    await c.env.DB.prepare(
+      "INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)"
+    ).bind(personalOrgId, `${name}'s Org`, orgSlug).run();
+    await c.env.DB.prepare(
+      "INSERT OR IGNORE INTO org_members (org_id, user_id, role) VALUES (?, ?, 'owner')"
+    ).bind(personalOrgId, userId).run();
+  }
 
   // 5. Accept invitation — add to org
   const orgService = new OrgService(c.env.DB);
@@ -555,6 +569,8 @@ authRoute.openapi(googleAuth, async (c) => {
         "UPDATE users SET auth_provider = 'google', provider_id = ?, updated_at = datetime('now') WHERE id = ?"
       ).bind(googleUser.sub, existing.id).run();
     }
+    // 공유 Org 모드가 켜져 있으면 기존 유저도 공유 Org에 멤버십 보장 (멱등 backfill)
+    await ensureSharedOrgMembership(c.env, userId, "member");
   } else {
     // New user — create account
     userId = crypto.randomUUID();
@@ -571,15 +587,18 @@ authRoute.openapi(googleAuth, async (c) => {
       updatedAt: now,
     });
 
-    // Auto-create personal org
-    const orgId = `org_${userId.slice(0, 8)}`;
-    const orgSlug = googleUser.email.split("@")[0]!.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
-    await c.env.DB.prepare(
-      "INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)"
-    ).bind(orgId, `${userName}'s Org`, orgSlug).run();
-    await c.env.DB.prepare(
-      "INSERT OR IGNORE INTO org_members (org_id, user_id, role) VALUES (?, ?, 'owner')"
-    ).bind(orgId, userId).run();
+    // Org 배정: 테스트 공유 Org 우선, 아니면 개인 Org 자동 생성
+    const sharedGoogle = await ensureSharedOrgMembership(c.env, userId, "member");
+    if (!sharedGoogle) {
+      const orgId = `org_${userId.slice(0, 8)}`;
+      const orgSlug = googleUser.email.split("@")[0]!.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+      await c.env.DB.prepare(
+        "INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)"
+      ).bind(orgId, `${userName}'s Org`, orgSlug).run();
+      await c.env.DB.prepare(
+        "INSERT OR IGNORE INTO org_members (org_id, user_id, role) VALUES (?, ?, 'owner')"
+      ).bind(orgId, userId).run();
+    }
   }
 
   // Accept invitation if token provided
