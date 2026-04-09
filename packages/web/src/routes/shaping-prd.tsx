@@ -99,21 +99,23 @@ export function Component() {
             const cache = prdCache[item.id];
             return (
               <div key={item.id} className="rounded-lg border">
-                <button
-                  onClick={() => toggleExpand(item.id)}
-                  className="w-full flex items-center gap-3 p-4 hover:bg-muted/30 transition-colors text-left"
-                >
-                  {isExpanded ? <ChevronDown className="size-4 shrink-0" /> : <ChevronRight className="size-4 shrink-0" />}
-                  <FileText className="size-4 text-muted-foreground shrink-0" />
-                  <span className="font-medium text-sm flex-1">{item.title}</span>
+                <div className="flex items-center gap-3 p-4 hover:bg-muted/30 transition-colors">
+                  <button
+                    onClick={() => toggleExpand(item.id)}
+                    className="flex items-center gap-3 flex-1 text-left"
+                  >
+                    {isExpanded ? <ChevronDown className="size-4 shrink-0" /> : <ChevronRight className="size-4 shrink-0" />}
+                    <FileText className="size-4 text-muted-foreground shrink-0" />
+                    <span className="font-medium text-sm flex-1">{item.title}</span>
+                  </button>
                   <Link
-                    to={`/discovery/items/${item.id}`}
-                    className="text-xs text-primary hover:underline"
-                    onClick={(e) => e.stopPropagation()}
+                    to={`/discovery/items/${item.id}/prds`}
+                    className="shrink-0 inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20 transition-colors"
+                    data-testid={`prd-manage-link-${item.id}`}
                   >
                     PRD 관리 →
                   </Link>
-                </button>
+                </div>
 
                 {isExpanded && (
                   <div className="border-t px-4 pb-4">

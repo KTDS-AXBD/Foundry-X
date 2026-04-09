@@ -179,6 +179,20 @@ export class BizItemService {
       .bind(id, orgId, data.title, data.description ?? null, data.source ?? "field", userId, now, now)
       .run();
 
+    // 파이프라인 REGISTERED 단계 진입 — pipeline detail API가 active stage row를 요구
+    try {
+      const pipelineId = crypto.randomUUID().replace(/-/g, "");
+      await this.db
+        .prepare(
+          `INSERT INTO pipeline_stages (id, biz_item_id, org_id, stage, entered_at, entered_by)
+           VALUES (?, ?, ?, 'REGISTERED', ?, ?)`,
+        )
+        .bind(pipelineId, id, orgId, now, userId)
+        .run();
+    } catch {
+      // pipeline_stages 미존재 환경(테스트 등)에선 무시
+    }
+
     return {
       id,
       orgId,

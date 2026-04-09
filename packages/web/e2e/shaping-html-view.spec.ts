@@ -296,9 +296,9 @@ test.describe("PRD HTML 미리보기", () => {
     await page.goto("/shaping/prd");
     await expect(page.getByText("AI 헬스케어 플랫폼")).toBeVisible({ timeout: 10000 });
 
-    // PRD 관리 링크가 /discovery/items/:id 로 이동 (version 관리 페이지가 아님)
+    // PRD 관리 링크가 /discovery/items/:id/prds (PRD 버전 관리 페이지) 로 이동
     const link = page.getByRole("link", { name: /PRD 관리/ }).first();
-    await expect(link).toHaveAttribute("href", /\/discovery\/items\/item-1$/);
+    await expect(link).toHaveAttribute("href", /\/discovery\/items\/item-1\/prds$/);
   });
 
   test("PRD 상태 배지가 올바르게 표시돼요", async ({ authenticatedPage: page }) => {
