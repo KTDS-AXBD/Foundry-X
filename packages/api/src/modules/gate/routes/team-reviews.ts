@@ -90,8 +90,8 @@ teamReviewsRoute.post("/ax-bd/team-reviews/:itemId/decide", async (c) => {
 
   // ax_discovery_reports 테이블에 최종 결정 기록
   const existing = await c.env.DB
-    .prepare("SELECT id FROM ax_discovery_reports WHERE item_id = ? OR biz_item_id = ?")
-    .bind(itemId, itemId)
+    .prepare("SELECT id FROM ax_discovery_reports WHERE item_id = ?")
+    .bind(itemId)
     .first<{ id: string }>();
 
   if (!existing) {
@@ -99,7 +99,7 @@ teamReviewsRoute.post("/ax-bd/team-reviews/:itemId/decide", async (c) => {
     const id = generateId();
     await c.env.DB
       .prepare(
-        `INSERT INTO ax_discovery_reports (id, org_id, biz_item_id, report_json, team_decision, updated_at)
+        `INSERT INTO ax_discovery_reports (id, org_id, item_id, report_json, team_decision, updated_at)
          VALUES (?, ?, ?, '{}', ?, datetime('now'))`,
       )
       .bind(id, orgId, itemId, finalDecision)
