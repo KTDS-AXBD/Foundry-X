@@ -197,7 +197,7 @@ export function Component() {
                         srcDoc={makeEmbedFriendly(cache.html)}
                         className="w-full border-0 bg-white rounded-b-lg"
                         style={{ minHeight: 500 }}
-                        sandbox="allow-same-origin allow-scripts"
+                        sandbox="allow-scripts allow-same-origin"
                         title={`사업기획서: ${item.title}`}
                         data-testid={`bp-iframe-${item.id}`}
                         onLoad={(e) => {
@@ -259,7 +259,7 @@ export function Component() {
               <iframe
                 srcDoc={htmlCache[sheetItem.id].html}
                 className="w-full h-full border-0 bg-white"
-                sandbox="allow-same-origin allow-scripts"
+                sandbox="allow-scripts allow-same-origin"
                 title={`사업기획서: ${sheetItem.title}`}
                 data-testid="bp-sheet-iframe"
               />

@@ -29,7 +29,7 @@ export function HtmlPreview({ html, loading }: HtmlPreviewProps) {
       srcDoc={html}
       className="w-full h-full border-0 rounded-md bg-white"
       title="Offering HTML Preview"
-      sandbox="allow-same-origin"
+      sandbox="allow-scripts"
     />
   );
 }

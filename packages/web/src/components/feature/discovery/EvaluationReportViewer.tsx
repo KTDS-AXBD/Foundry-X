@@ -117,7 +117,8 @@ export default function EvaluationReportViewer({ bizItemId }: EvaluationReportVi
       {/* HTML 렌더링 (iframe) */}
       <iframe
         srcDoc={html}
-        sandbox="allow-same-origin"
+        // 백엔드 생성 템플릿 — 차트 스크립트 + parent contentDocument auto-resize 둘 다 필요 (의도된 trade-off)
+        sandbox="allow-scripts allow-same-origin"
         className="w-full rounded-lg border bg-white"
         style={{ minHeight: 700 }}
         onLoad={(e) => {

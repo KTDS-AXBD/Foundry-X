@@ -87,7 +87,9 @@ export default function BusinessPlanViewer({ plan, bizItemId }: BusinessPlanView
       ) : htmlContent ? (
         <iframe
           srcDoc={htmlContent}
-          sandbox="allow-same-origin"
+          // 백엔드 생성 템플릿 — 차트 스크립트 + parent의 contentDocument 기반 auto-resize 둘 다 필요.
+          // 브라우저 "sandbox escape" 경고는 의도된 trade-off.
+          sandbox="allow-scripts allow-same-origin"
           className="w-full rounded-lg border bg-white"
           style={{ minHeight: 700 }}
           onLoad={(e) => {

@@ -58,7 +58,8 @@ export function DesignTokenPreview({ htmlContent, tokens }: DesignTokenPreviewPr
             height: "100%",
             border: "none",
           }}
-          sandbox="allow-same-origin"
+          // Design Token CSS 변수 주입을 위해 parent가 iframe documentElement에 접근 필요
+          sandbox="allow-scripts allow-same-origin"
         />
       ) : (
         <div
