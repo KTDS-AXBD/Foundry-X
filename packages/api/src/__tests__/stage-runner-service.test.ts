@@ -35,6 +35,11 @@ const SCHEMA = `
     updated_at TEXT NOT NULL
   );
   CREATE UNIQUE INDEX IF NOT EXISTS idx_biz_discovery_criteria ON biz_discovery_criteria(biz_item_id, criterion_id);
+  CREATE TABLE IF NOT EXISTS pipeline_stages (
+    id TEXT PRIMARY KEY, biz_item_id TEXT NOT NULL, org_id TEXT NOT NULL,
+    stage TEXT NOT NULL, entered_at TEXT NOT NULL DEFAULT (datetime('now')),
+    exited_at TEXT, entered_by TEXT NOT NULL, notes TEXT
+  );
 `;
 
 const SEED = `
@@ -202,6 +207,73 @@ describe("StageRunnerService (F485+F486)", () => {
       ).bind("biz1").all();
 
       expect(results).toHaveLength(0);
+    });
+  });
+
+  describe("F494: confirmStage — pipeline_stages DISCOVERY→FORMALIZATION 자동 전진", () => {
+    beforeEach(() => {
+      initCriteria(db as any);
+      // DISCOVERY 단계 진입 상태 seed
+      (db as any).exec(`
+        INSERT INTO pipeline_stages (id, biz_item_id, org_id, stage, entered_at, entered_by)
+        VALUES ('ps-discovery', 'biz1', 'org1', 'DISCOVERY', '2026-01-01T00:00:00Z', 'system');
+      `);
+    });
+
+    async function confirmAllNineCriteria() {
+      // 2-1~2-8 완료 → criteria 1~9 모두 completed
+      for (const stage of ["2-1", "2-2", "2-3", "2-4", "2-5", "2-6", "2-7", "2-8"]) {
+        await service.confirmStage("biz1", "org1", stage, "go");
+      }
+    }
+
+    it("9/9 criteria 완료 시 DISCOVERY exit + FORMALIZATION enter", async () => {
+      await confirmAllNineCriteria();
+
+      const { results } = await db.prepare(
+        "SELECT stage, exited_at FROM pipeline_stages WHERE biz_item_id = ? ORDER BY entered_at",
+      ).bind("biz1").all();
+
+      expect(results).toHaveLength(2);
+      expect((results[0] as any).stage).toBe("DISCOVERY");
+      expect((results[0] as any).exited_at).not.toBeNull();
+      expect((results[1] as any).stage).toBe("FORMALIZATION");
+      expect((results[1] as any).exited_at).toBeNull();
+    });
+
+    it("일부 criteria만 완료 시 pipeline 전진 안함", async () => {
+      await service.confirmStage("biz1", "org1", "2-1", "go");
+      await service.confirmStage("biz1", "org1", "2-2", "go");
+
+      const { results } = await db.prepare(
+        "SELECT stage FROM pipeline_stages WHERE biz_item_id = ?",
+      ).bind("biz1").all();
+
+      expect(results).toHaveLength(1);
+      expect((results[0] as any).stage).toBe("DISCOVERY");
+    });
+
+    it("DISCOVERY 이미 exit 된 상태면 중복 전진 안함 (멱등성)", async () => {
+      await confirmAllNineCriteria();
+      // 한 번 더 호출 (이미 FORMALIZATION으로 전진한 상태)
+      await service.confirmStage("biz1", "org1", "2-1", "go");
+
+      const { results } = await db.prepare(
+        "SELECT stage FROM pipeline_stages WHERE biz_item_id = ? ORDER BY entered_at",
+      ).bind("biz1").all();
+
+      expect(results).toHaveLength(2); // 여전히 2개 (중복 INSERT 없음)
+    });
+
+    it("stop 결정 시 pipeline 전진 안함", async () => {
+      await service.confirmStage("biz1", "org1", "2-1", "stop");
+
+      const { results } = await db.prepare(
+        "SELECT stage FROM pipeline_stages WHERE biz_item_id = ?",
+      ).bind("biz1").all();
+
+      expect(results).toHaveLength(1);
+      expect((results[0] as any).stage).toBe("DISCOVERY");
     });
   });
 });

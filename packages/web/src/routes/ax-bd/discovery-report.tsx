@@ -6,7 +6,7 @@
  */
 import { useEffect, useState, lazy, Suspense } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { fetchDiscoveryReport, type DiscoveryReportData } from "@/lib/api-client";
@@ -69,6 +69,10 @@ export function Component() {
   if (error) return <div className="p-8 text-destructive">{error}</div>;
   if (!report) return <div className="p-8 text-muted-foreground">리포트 로딩 중...</div>;
 
+  // F494: bd_artifacts 비어있음 감지 — AI 분석이 실제 실행되지 않은 상태
+  const hasAnyTabData = Object.values(report.tabs).some((t) => t != null);
+  const isEmptyReport = report.completedStages.length === 0 && !hasAnyTabData;
+
   return (
     <div className="space-y-6 p-6" data-report-root>
       {/* 헤더 */}
@@ -89,6 +93,27 @@ export function Component() {
           {report.overallProgress}% 완료
         </Badge>
       </div>
+
+      {/* F494: 빈 리포트 fallback — bd_artifacts가 없으면 재실행 유도 */}
+      {isEmptyReport && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 flex items-start gap-3" data-testid="empty-report-fallback">
+          <AlertCircle className="size-5 text-amber-600 shrink-0 mt-0.5" />
+          <div className="flex-1 space-y-2">
+            <div>
+              <p className="font-medium text-amber-900">분석 결과가 비어 있어요</p>
+              <p className="text-sm text-amber-800 mt-0.5">
+                이 아이템은 발굴 상태이지만 AI 분석 산출물(bd_artifacts)이 없어요. 발굴 단계를 재실행해야 리포트를 볼 수 있어요.
+              </p>
+            </div>
+            <Link
+              to={`/discovery/items/${id}`}
+              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              발굴 단계 다시 실행하기
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* 9탭 */}
       <Tabs

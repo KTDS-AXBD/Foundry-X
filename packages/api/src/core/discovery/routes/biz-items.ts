@@ -330,10 +330,10 @@ bizItemsRoute.post("/biz-items/:id/evaluate", async (c) => {
       await c.env.DB.prepare(
         `UPDATE pipeline_stages SET exited_at = ? WHERE biz_item_id = ? AND stage = 'REGISTERED' AND exited_at IS NULL`,
       ).bind(now, id).run();
-      // DISCOVERY 단계 진입
+      // DISCOVERY 단계 진입 (entered_by NOT NULL 필수 — F494 드리프트 수정)
       const pipelineId = crypto.randomUUID().replace(/-/g, "");
       await c.env.DB.prepare(
-        `INSERT INTO pipeline_stages (id, biz_item_id, org_id, stage, entered_at) VALUES (?, ?, ?, 'DISCOVERY', ?)`,
+        `INSERT INTO pipeline_stages (id, biz_item_id, org_id, stage, entered_at, entered_by) VALUES (?, ?, ?, 'DISCOVERY', ?, 'system')`,
       ).bind(pipelineId, id, orgId, now).run();
     } catch {
       // pipeline_stages/discovery_stages 테이블 미존재 시 무시

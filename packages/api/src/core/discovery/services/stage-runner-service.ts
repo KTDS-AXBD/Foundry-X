@@ -181,6 +181,32 @@ export class StageRunnerService {
           });
         }
       }
+
+      // F494: 9/9 criteria 완료 시 pipeline_stages DISCOVERY→FORMALIZATION 자동 전진
+      // - gateStatus==='ready' 조건과 동치 (≥9)
+      // - DISCOVERY 단계가 열려있는 경우에만 전진 (멱등성)
+      // - 테이블 미존재 시 무시 (테스트 환경 대비)
+      try {
+        const criteriaSvc = new DiscoveryCriteriaService(this.db);
+        const progress = await criteriaSvc.getAll(bizItemId);
+        if (progress.gateStatus === "ready") {
+          const discoveryRow = await this.db.prepare(
+            `SELECT id FROM pipeline_stages WHERE biz_item_id = ? AND stage = 'DISCOVERY' AND exited_at IS NULL LIMIT 1`,
+          ).bind(bizItemId).first<{ id: string }>();
+          if (discoveryRow) {
+            const now = new Date().toISOString();
+            await this.db.prepare(
+              `UPDATE pipeline_stages SET exited_at = ? WHERE id = ?`,
+            ).bind(now, discoveryRow.id).run();
+            const formalizationId = crypto.randomUUID().replace(/-/g, "");
+            await this.db.prepare(
+              `INSERT INTO pipeline_stages (id, biz_item_id, org_id, stage, entered_at, entered_by) VALUES (?, ?, ?, 'FORMALIZATION', ?, 'system')`,
+            ).bind(formalizationId, bizItemId, orgId, now).run();
+          }
+        }
+      } catch {
+        // pipeline_stages 미존재 시 무시
+      }
     }
 
     // stop이면 다음 단계 없음
