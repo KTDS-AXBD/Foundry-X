@@ -31,7 +31,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DiscoveryCriteriaPanel from "@/components/feature/discovery/DiscoveryCriteriaPanel";
-import AnalysisStepper from "@/components/feature/discovery/AnalysisStepper";
+import DiscoveryStageStepper from "@/components/feature/discovery/DiscoveryStageStepper";
 import ShapingPipeline from "@/components/feature/discovery/ShapingPipeline";
 import BusinessPlanViewer from "@/components/feature/discovery/BusinessPlanViewer";
 import PipelineProgressStepper from "@/components/feature/discovery/PipelineProgressStepper";
@@ -169,11 +169,15 @@ export function Component() {
             )}
             <Badge
               className={
-                item.status === "analyzed" || item.status === "done"
+                item.status === "analyzed" || item.status === "evaluated" || item.status === "done"
                   ? "bg-green-100 text-green-700 border-green-200"
-                  : item.status === "analyzing"
-                    ? "bg-blue-100 text-blue-700 border-blue-200"
-                    : "bg-slate-100 text-slate-600 border-slate-200"
+                  : item.status === "classified"
+                    ? "bg-indigo-100 text-indigo-700 border-indigo-200"
+                    : item.status === "analyzing" || item.status === "classifying" || item.status === "evaluating"
+                      ? "bg-blue-100 text-blue-700 border-blue-200"
+                      : item.status === "shaping"
+                        ? "bg-amber-100 text-amber-700 border-amber-200"
+                        : "bg-slate-100 text-slate-600 border-slate-200"
               }
             >
               {statusLabel}
@@ -233,10 +237,15 @@ export function Component() {
 
         {/* ── 탭 2: 발굴분석 ── */}
         <TabsContent value="analysis" className="mt-4 space-y-6">
-          {/* F438 분석 스텝퍼 */}
+          {/* F480 Discovery Stage 전체 스텝퍼 */}
           <div>
             <h2 className="text-sm font-semibold mb-3">발굴 분석 실행</h2>
-            <AnalysisStepper bizItemId={item.id} onAnalysisComplete={loadData} />
+            <DiscoveryStageStepper
+              bizItemId={item.id}
+              discoveryType={item.discoveryType ?? null}
+              onStageComplete={loadData}
+              onAllComplete={loadData}
+            />
           </div>
 
           {/* F437 9기준 체크리스트 */}

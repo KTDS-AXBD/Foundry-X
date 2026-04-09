@@ -1427,6 +1427,45 @@ export async function updateDiscoveryStage(
   return postApi(`/biz-items/${bizItemId}/discovery-stage`, { stage, status });
 }
 
+// ─── Sprint 234: F480 Discovery Stage Runner API ───
+
+export interface StageAnalysisResult {
+  summary: string;
+  details: string;
+  confidence: number;
+}
+
+export interface StageRunResult {
+  stage: string;
+  stageName: string;
+  intensity: "core" | "normal" | "light";
+  result: StageAnalysisResult;
+  viabilityQuestion: string | null;
+  commitGateQuestions: string[] | null;
+}
+
+export interface StageConfirmResult {
+  ok: boolean;
+  nextStage: string | null;
+}
+
+export async function runDiscoveryStage(
+  bizItemId: string,
+  stage: string,
+  feedback?: string,
+): Promise<StageRunResult> {
+  return postApi(`/biz-items/${bizItemId}/discovery-stage/${stage}/run`, { feedback });
+}
+
+export async function confirmDiscoveryStage(
+  bizItemId: string,
+  stage: string,
+  viabilityAnswer: "go" | "pivot" | "stop",
+  feedback?: string,
+): Promise<StageConfirmResult> {
+  return postApi(`/biz-items/${bizItemId}/discovery-stage/${stage}/confirm`, { viabilityAnswer, feedback });
+}
+
 // ─── Sprint 211: F438 발굴 분석 실행 API ───
 
 export interface StartingPointResult {

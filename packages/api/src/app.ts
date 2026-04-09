@@ -32,7 +32,7 @@ import {
   axBdDiscoveryRoute, axBdArtifactsRoute,
   bizItemsRoute,
   discoveryRoute, discoveryPipelineRoute, discoveryReportRoute,
-  discoveryReportsRoute, discoveryStagesRoute, discoveryShapePipelineRoute,
+  discoveryReportsRoute, discoveryStagesRoute, discoveryShapePipelineRoute, discoveryStageRunnerRoute,
   // shaping (14 routes)
   shapingRoute, axBdBmcRoute, axBdAgentRoute, axBdCommentsRoute,
   axBdHistoryRoute, axBdLinksRoute, axBdViabilityRoute,
@@ -251,6 +251,9 @@ app.route("/api", bizItemsRoute);
 
 // Sprint 94: Discovery Stages — biz-item별 단계 진행 추적 (F263)
 app.route("/api", discoveryStagesRoute);
+
+// Sprint 234: Discovery Stage Runner — HITL 단계별 AI 분석 (F480)
+app.route("/api", discoveryStageRunnerRoute);
 
 // Sprint 57: Collection — 수집 채널 통합 (auth + tenant required)
 app.route("/api", collectionRoute);

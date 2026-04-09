@@ -7,6 +7,7 @@ export {
   bizItemsRoute,
   discoveryRoute, discoveryPipelineRoute, discoveryReportRoute,
   discoveryReportsRoute, discoveryStagesRoute, discoveryShapePipelineRoute,
+  discoveryStageRunnerRoute,
 } from "./discovery/index.js";
 
 // Shaping (S3 형상화) — 14 routes

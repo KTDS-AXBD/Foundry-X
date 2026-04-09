@@ -11,3 +11,4 @@ export { discoveryReportRoute } from "./routes/discovery-report.js";
 export { discoveryReportsRoute } from "./routes/discovery-reports.js";
 export { discoveryStagesRoute } from "./routes/discovery-stages.js";
 export { discoveryShapePipelineRoute } from "./routes/discovery-shape-pipeline.js";
+export { discoveryStageRunnerRoute } from "./routes/discovery-stage-runner.js";
