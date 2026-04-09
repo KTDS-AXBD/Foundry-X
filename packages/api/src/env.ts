@@ -28,4 +28,6 @@ export type Env = {
   RESEND_API_KEY?: string;
   // F441: R2 파일 스토리지 (Sprint 213)
   FILES_BUCKET: R2Bucket;
+  // 테스트 공유 Org (설정 시 signup/google/setup-password가 개인 Org 대신 이 Org에 멤버십 부여)
+  DEFAULT_SHARED_ORG_ID?: string;
 };
