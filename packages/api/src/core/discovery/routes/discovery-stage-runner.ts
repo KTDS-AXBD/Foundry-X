@@ -22,6 +22,32 @@ const StageConfirmSchema = z.object({
 
 export const discoveryStageRunnerRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
+// ─── GET /biz-items/:id/discovery-stage/:stage/result ─── (F485)
+discoveryStageRunnerRoute.get("/biz-items/:id/discovery-stage/:stage/result", async (c) => {
+  const bizItemId = c.req.param("id");
+  const stage = c.req.param("stage");
+  const orgId = c.get("orgId");
+
+  const item = await c.env.DB
+    .prepare("SELECT id FROM biz_items WHERE id = ? AND org_id = ?")
+    .bind(bizItemId, orgId)
+    .first();
+
+  if (!item) {
+    return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+  }
+
+  const runner = createAgentRunner(c.env);
+  const service = new StageRunnerService(c.env.DB, runner);
+
+  const result = await service.getStageResult(bizItemId, orgId, stage);
+  if (!result) {
+    return c.json({ error: "STAGE_RESULT_NOT_FOUND" }, 404);
+  }
+
+  return c.json(result);
+});
+
 // ─── POST /biz-items/:id/discovery-stage/:stage/run ───
 discoveryStageRunnerRoute.post("/biz-items/:id/discovery-stage/:stage/run", async (c) => {
   const bizItemId = c.req.param("id");

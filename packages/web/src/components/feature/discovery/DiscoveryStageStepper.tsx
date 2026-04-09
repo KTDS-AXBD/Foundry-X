@@ -2,10 +2,11 @@
 
 /**
  * F480 — Discovery Stage 전체 스텝퍼 (AnalysisStepper 대체)
+ * F485 — 완료 단계 결과 표시 + HITL 피드백 재실행
  * 11단계 HITL 스텝퍼: 2-0~2-10, v82 유형별 강도 반영
  */
 import { useState, useEffect, useCallback } from "react";
-import { CheckCircle2, Circle, Loader2, ChevronDown, ChevronUp, Play, MessageSquare } from "lucide-react";
+import { CheckCircle2, Circle, Loader2, ChevronDown, ChevronUp, Play, MessageSquare, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,8 +16,10 @@ import {
   analyzeStartingPoint,
   classifyBizItem,
   evaluateBizItem,
+  getStageResult,
   type DiscoveryProgress,
   type StageRunResult,
+  type StageResultResponse,
 } from "@/lib/api-client";
 
 interface DiscoveryStageStepperProps {
@@ -30,6 +33,12 @@ const INTENSITY_LABELS: Record<string, { label: string; color: string }> = {
   core: { label: "심층", color: "bg-red-100 text-red-700" },
   normal: { label: "보통", color: "bg-blue-100 text-blue-700" },
   light: { label: "간소", color: "bg-green-100 text-green-700" },
+};
+
+const DECISION_LABELS: Record<string, { label: string; color: string }> = {
+  go: { label: "Go", color: "bg-green-100 text-green-700" },
+  pivot: { label: "Pivot", color: "bg-amber-100 text-amber-700" },
+  drop: { label: "Stop", color: "bg-red-100 text-red-700" },
 };
 
 // 2-0은 기존 starting-point + classify 통합, 2-9는 기존 evaluate 사용
@@ -48,6 +57,10 @@ export default function DiscoveryStageStepper({
   const [feedback, setFeedback] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // F485: 완료 단계 결과 캐시 + 재실행 모드
+  const [completedResults, setCompletedResults] = useState<Record<string, StageResultResponse>>({});
+  const [loadingResult, setLoadingResult] = useState<string | null>(null);
+  const [rerunMode, setRerunMode] = useState<string | null>(null);
 
   const loadProgress = useCallback(async () => {
     try {
@@ -62,30 +75,54 @@ export default function DiscoveryStageStepper({
 
   useEffect(() => { void loadProgress(); }, [loadProgress]);
 
+  // F485: 완료 단계 결과 조회
+  async function handleLoadResult(stage: string) {
+    if (completedResults[stage]) {
+      setExpanded(expanded === stage ? null : stage);
+      return;
+    }
+
+    setLoadingResult(stage);
+    try {
+      const result = await getStageResult(bizItemId, stage);
+      setCompletedResults((prev) => ({ ...prev, [stage]: result }));
+      setExpanded(stage);
+    } catch {
+      // 결과가 없으면 (legacy 단계 등) 무시
+      setExpanded(expanded === stage ? null : stage);
+    } finally {
+      setLoadingResult(null);
+    }
+  }
+
   async function handleRunStage(stage: string) {
     setRunningStage(stage);
     setError(null);
     setStageResult(null);
+    setRerunMode(null);
 
     try {
       if (stage === "2-0") {
-        // 2-0: 기존 starting-point + classify 통합
         await analyzeStartingPoint(bizItemId);
         await classifyBizItem(bizItemId);
         await loadProgress();
         onStageComplete?.(stage);
         setExpanded(null);
       } else if (stage === "2-9") {
-        // 2-9: 기존 evaluate 사용
         await evaluateBizItem(bizItemId);
         await loadProgress();
         onStageComplete?.(stage);
         setExpanded(null);
       } else {
-        // 2-1~2-8, 2-10: 신규 stage runner API
         const result = await runDiscoveryStage(bizItemId, stage, feedback || undefined);
         setStageResult(result);
         setExpanded(stage);
+        // 재실행이었으면 캐시 무효화
+        setCompletedResults((prev) => {
+          const next = { ...prev };
+          delete next[stage];
+          return next;
+        });
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : `${stage} 실행 실패`);
@@ -102,10 +139,16 @@ export default function DiscoveryStageStepper({
       setStageResult(null);
       setFeedback("");
       setExpanded(null);
+      setRerunMode(null);
+      // 캐시 무효화 (새 결과가 저장됨)
+      setCompletedResults((prev) => {
+        const next = { ...prev };
+        delete next[stage];
+        return next;
+      });
       await loadProgress();
       onStageComplete?.(stage);
 
-      // 모든 단계 완료 체크
       const updated = await getDiscoveryProgress(bizItemId);
       if (updated.completedCount === updated.totalCount) {
         onAllComplete?.();
@@ -132,7 +175,6 @@ export default function DiscoveryStageStepper({
   const isRunnable = (stage: string, status: string, idx: number): boolean => {
     if (status === "completed" || status === "skipped") return false;
     if (runningStage) return false;
-    // 첫 번째 미완료 단계만 실행 가능
     if (idx === 0) return true;
     const prevStatus = progress.stages[idx - 1]?.status;
     return prevStatus === "completed" || prevStatus === "skipped";
@@ -168,13 +210,17 @@ export default function DiscoveryStageStepper({
           const isRunning = runningStage === stage.stage;
           const isLegacy = LEGACY_STAGES.has(stage.stage);
           const showResult = stageResult?.stage === stage.stage;
+          const isCompleted = stage.status === "completed";
+          const completedResult = completedResults[stage.stage];
+          const isLoadingResult = loadingResult === stage.stage;
+          const isRerunning = rerunMode === stage.stage;
 
           return (
             <div key={stage.stage} className="p-4">
               {/* 스테이지 행 */}
               <div className="flex items-center gap-3">
                 {/* 아이콘 */}
-                {stage.status === "completed" ? (
+                {isCompleted ? (
                   <CheckCircle2 className="size-5 text-green-600 shrink-0" />
                 ) : isRunning ? (
                   <Loader2 className="size-5 text-blue-600 animate-spin shrink-0" />
@@ -187,13 +233,13 @@ export default function DiscoveryStageStepper({
                 {/* 라벨 */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className={`text-sm font-medium ${stage.status === "completed" ? "text-muted-foreground" : ""}`}>
+                    <span className={`text-sm font-medium ${isCompleted ? "text-muted-foreground" : ""}`}>
                       {stage.stage} {stage.stageName}
                     </span>
-                    {stage.status === "completed" && (
+                    {isCompleted && (
                       <Badge variant="outline" className="text-xs bg-green-50">완료</Badge>
                     )}
-                    {isLegacy && stage.status !== "completed" && (
+                    {isLegacy && !isCompleted && (
                       <Badge variant="outline" className="text-xs">자동</Badge>
                     )}
                   </div>
@@ -215,7 +261,24 @@ export default function DiscoveryStageStepper({
                       )}
                     </Button>
                   )}
-                  {showResult && (
+                  {/* F485: 완료 단계 펼쳐보기 */}
+                  {isCompleted && !isLegacy && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleLoadResult(stage.stage)}
+                      disabled={isLoadingResult}
+                    >
+                      {isLoadingResult ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : isExpanded ? (
+                        <ChevronUp className="size-4" />
+                      ) : (
+                        <ChevronDown className="size-4" />
+                      )}
+                    </Button>
+                  )}
+                  {showResult && !isCompleted && (
                     <Button
                       size="sm"
                       variant="ghost"
@@ -227,7 +290,83 @@ export default function DiscoveryStageStepper({
                 </div>
               </div>
 
-              {/* 분석 결과 + HITL 패널 */}
+              {/* F485: 완료 단계 결과 표시 */}
+              {isCompleted && isExpanded && completedResult && !isRerunning && (
+                <div className="mt-3 ml-8 rounded-lg border bg-muted/30 p-4 space-y-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge className={INTENSITY_LABELS[completedResult.intensity]?.color ?? ""}>
+                      {INTENSITY_LABELS[completedResult.intensity]?.label ?? completedResult.intensity}
+                    </Badge>
+                    {completedResult.viabilityDecision && (
+                      <Badge className={DECISION_LABELS[completedResult.viabilityDecision]?.color ?? ""}>
+                        {DECISION_LABELS[completedResult.viabilityDecision]?.label ?? completedResult.viabilityDecision}
+                      </Badge>
+                    )}
+                    <span className="text-xs text-muted-foreground">
+                      신뢰도: {completedResult.result.confidence}%
+                    </span>
+                  </div>
+                  <p className="text-sm font-medium">{completedResult.result.summary}</p>
+                  <div className="text-sm text-muted-foreground whitespace-pre-wrap max-h-60 overflow-y-auto">
+                    {completedResult.result.details}
+                  </div>
+                  {completedResult.feedback && (
+                    <div className="text-xs text-muted-foreground border-t pt-2">
+                      <span className="font-medium">피드백:</span> {completedResult.feedback}
+                    </div>
+                  )}
+                  {/* 재실행 버튼 */}
+                  <div className="border-t pt-3">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setRerunMode(stage.stage);
+                        setFeedback("");
+                      }}
+                      disabled={!!runningStage}
+                    >
+                      <RotateCcw className="size-3 mr-1" /> 피드백 재실행
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* F485: 재실행 모드 — 피드백 입력 후 재실행 */}
+              {isCompleted && isExpanded && isRerunning && (
+                <div className="mt-3 ml-8 rounded-lg border bg-amber-50/50 p-4 space-y-3">
+                  <p className="text-sm font-medium text-amber-800">피드백을 입력하고 재실행하세요</p>
+                  <textarea
+                    className="w-full p-2 text-sm border rounded-md bg-background resize-none"
+                    placeholder="개선할 점이나 추가로 분석할 내용을 입력하세요..."
+                    rows={3}
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => handleRunStage(stage.stage)}
+                      disabled={!!runningStage || !feedback.trim()}
+                    >
+                      {runningStage === stage.stage ? (
+                        <><Loader2 className="size-3 animate-spin mr-1" /> 실행 중</>
+                      ) : (
+                        <><RotateCcw className="size-3 mr-1" /> 재실행</>
+                      )}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setRerunMode(null)}
+                    >
+                      취소
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* 현재 실행한 결과 + HITL 패널 (기존) */}
               {showResult && isExpanded && stageResult && (
                 <div className="mt-3 ml-8 rounded-lg border bg-muted/30 p-4 space-y-4">
                   {/* AI 분석 결과 */}
@@ -287,7 +426,7 @@ export default function DiscoveryStageStepper({
                         disabled={!!runningStage}
                         className="bg-green-600 hover:bg-green-700"
                       >
-                        Go ✅
+                        Go
                       </Button>
                       <Button
                         size="sm"
@@ -296,7 +435,7 @@ export default function DiscoveryStageStepper({
                         disabled={!!runningStage}
                         className="border-amber-300 text-amber-700 hover:bg-amber-50"
                       >
-                        Pivot 🔄
+                        Pivot
                       </Button>
                       <Button
                         size="sm"
@@ -305,7 +444,7 @@ export default function DiscoveryStageStepper({
                         disabled={!!runningStage}
                         className="border-red-300 text-red-700 hover:bg-red-50"
                       >
-                        Stop ⛔
+                        Stop
                       </Button>
                     </div>
                   </div>

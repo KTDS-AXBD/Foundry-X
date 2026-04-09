@@ -1,5 +1,6 @@
 /**
  * Sprint 234: F480 Discovery Stage Runner Service
+ * Sprint 238: F485 결과 저장 + F486 criteria 자동 갱신
  * 2-1~2-8, 2-10 단계별 AI 분석 실행 + HITL 확인 로직
  */
 import type { AgentRunner } from "../../agent/services/agent-runner.js";
@@ -7,6 +8,7 @@ import type { AgentExecutionRequest } from "../../agent/services/execution-types
 import type { DiscoveryType, Intensity, Stage } from "./analysis-path-v82.js";
 import { ANALYSIS_PATH_MAP, STAGE_NAMES, VIABILITY_QUESTIONS, COMMIT_GATE_QUESTIONS } from "./analysis-path-v82.js";
 import { DiscoveryStageService } from "./discovery-stage-service.js";
+import { DiscoveryCriteriaService } from "./discovery-criteria.js";
 
 export interface StageRunResult {
   stage: string;
@@ -29,6 +31,29 @@ export interface StageConfirmResult {
 }
 
 const STAGE_ORDER = ["2-0", "2-1", "2-2", "2-3", "2-4", "2-5", "2-6", "2-7", "2-8", "2-9", "2-10"];
+
+// F486: 단계 완료 시 자동 갱신할 criteria 매핑
+const STAGE_CRITERIA_MAP: Record<string, number[]> = {
+  "2-1": [1],     // 레퍼런스 분석 → 문제/고객 정의
+  "2-2": [2],     // 수요/시장 검증 → 시장 기회
+  "2-3": [3, 8],  // 경쟁 환경 → 경쟁 환경 + 차별화 근거
+  "2-4": [4],     // 아이템 도출 → 가치 제안 가설
+  "2-5": [5],     // 핵심 선정 → 수익 구조 가설
+  "2-6": [6],     // 타겟 고객 → 핵심 리스크 가정
+  "2-7": [7],     // 비즈니스 모델 → 규제/기술 제약
+  "2-8": [9],     // 패키징 → 검증 실험 계획
+};
+
+export interface StageResultResponse {
+  stage: string;
+  stageName: string;
+  intensity: string;
+  result: StageAnalysisResult;
+  viabilityDecision: string | null;
+  feedback: string | null;
+  completedAt: string | null;
+  artifactId: string | null;
+}
 
 const STAGE_PROMPTS: Record<string, string> = {
   "2-1": "이 사업 아이템에 대한 레퍼런스를 분석해주세요. 유사 사례, 기존 서비스, 해외 사례를 조사하고, 차별화 가능 영역을 도출해주세요.",
@@ -90,6 +115,18 @@ export class StageRunnerService {
 
     const analysisResult: StageAnalysisResult = this.parseResult(aiResult.output.analysis ?? "");
 
+    // F485: bd_artifacts에 결과 저장
+    const versionRow = await this.db.prepare(
+      "SELECT MAX(version) as max_ver FROM bd_artifacts WHERE biz_item_id = ? AND skill_id = ?",
+    ).bind(bizItemId, `discovery-${stage}`).first<{ max_ver: number | null }>();
+    const nextVersion = (versionRow?.max_ver ?? 0) + 1;
+
+    const artifactId = crypto.randomUUID().replace(/-/g, "");
+    await this.db.prepare(
+      `INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, version, input_text, output_text, model, status, created_by, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'claude-haiku-4-5-20250714', 'completed', 'system', datetime('now'))`,
+    ).bind(artifactId, orgId, bizItemId, `discovery-${stage}`, stage, nextVersion, prompt, JSON.stringify(analysisResult)).run();
+
     // viability question
     const viabilityQuestion = isV82Stage ? VIABILITY_QUESTIONS[stage as Stage] : null;
     const commitGateQuestions = stage === "2-5" ? [...COMMIT_GATE_QUESTIONS] : null;
@@ -132,6 +169,20 @@ export class StageRunnerService {
       ).bind(cpId, bizItemId, orgId, stage, dbDecision, viabilityQuestion, feedback ?? null, now).run();
     }
 
+    // F486: criteria 자동 갱신 (stop이 아닌 경우)
+    if (viabilityAnswer !== "stop") {
+      const criteriaIds = STAGE_CRITERIA_MAP[stage] ?? [];
+      if (criteriaIds.length > 0) {
+        const criteriaSvc = new DiscoveryCriteriaService(this.db);
+        for (const criterionId of criteriaIds) {
+          await criteriaSvc.update(bizItemId, criterionId, {
+            status: "completed",
+            evidence: `${stage} 단계 분석 완료 (${viabilityAnswer})`,
+          });
+        }
+      }
+    }
+
     // stop이면 다음 단계 없음
     if (viabilityAnswer === "stop") {
       return { ok: true, nextStage: null };
@@ -142,6 +193,60 @@ export class StageRunnerService {
     const nextStage = idx >= 0 && idx < STAGE_ORDER.length - 1 ? (STAGE_ORDER[idx + 1] ?? null) : null;
 
     return { ok: true, nextStage };
+  }
+
+  async getStageResult(
+    bizItemId: string,
+    orgId: string,
+    stage: string,
+  ): Promise<StageResultResponse | null> {
+    // bd_artifacts에서 최신 결과 조회
+    const artifact = await this.db.prepare(
+      `SELECT id, output_text, stage_id, created_at FROM bd_artifacts
+       WHERE biz_item_id = ? AND org_id = ? AND skill_id = ? AND status = 'completed'
+       ORDER BY version DESC LIMIT 1`,
+    ).bind(bizItemId, orgId, `discovery-${stage}`).first<{
+      id: string; output_text: string | null; stage_id: string; created_at: string;
+    }>();
+
+    if (!artifact?.output_text) return null;
+
+    // ax_viability_checkpoints에서 decision 조회
+    const checkpoint = await this.db.prepare(
+      `SELECT decision, reason FROM ax_viability_checkpoints
+       WHERE biz_item_id = ? AND org_id = ? AND stage = ?
+       ORDER BY decided_at DESC LIMIT 1`,
+    ).bind(bizItemId, orgId, stage).first<{ decision: string | null; reason: string | null }>();
+
+    // biz_item에서 discoveryType 조회하여 intensity 결정
+    const item = await this.db.prepare(
+      "SELECT discovery_type FROM biz_items WHERE id = ? AND org_id = ?",
+    ).bind(bizItemId, orgId).first<{ discovery_type: string | null }>();
+
+    const isV82Stage = stage in ANALYSIS_PATH_MAP;
+    const intensity: Intensity = isV82Stage && item?.discovery_type
+      ? ANALYSIS_PATH_MAP[stage as Stage][item.discovery_type as DiscoveryType]
+      : "normal";
+
+    let result: StageAnalysisResult;
+    try {
+      result = JSON.parse(artifact.output_text);
+    } catch {
+      result = { summary: "분석 결과", details: artifact.output_text, confidence: 70 };
+    }
+
+    const stageName = STAGE_NAMES[stage as Stage] ?? this.getStageName(stage);
+
+    return {
+      stage,
+      stageName,
+      intensity,
+      result,
+      viabilityDecision: checkpoint?.decision ?? null,
+      feedback: checkpoint?.reason ?? null,
+      completedAt: artifact.created_at,
+      artifactId: artifact.id,
+    };
   }
 
   private buildPrompt(
