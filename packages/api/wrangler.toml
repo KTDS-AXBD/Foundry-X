@@ -14,7 +14,8 @@ migrations_dir = "src/db/migrations"
 GITHUB_REPO = "KTDS-AXBD/Foundry-X"
 ENVIRONMENT = "production"
 # 테스트 공유 Org — 설정 시 신규 가입자는 개인 Org 대신 이 Org에 소속. 해제하려면 이 줄 삭제 후 redeploy
-DEFAULT_SHARED_ORG_ID = "org_axbd"
+# org_452b33c1 = 실제 "AX BD's Org" (slug: ktds-axbd, biz_items 3개 + 기존 멤버 9명)
+DEFAULT_SHARED_ORG_ID = "org_452b33c1"
 
 # Local development
 [env.dev]
@@ -39,7 +40,7 @@ migrations_dir = "src/db/migrations"
 [env.staging.vars]
 GITHUB_REPO = "KTDS-AXBD/Foundry-X"
 ENVIRONMENT = "staging"
-DEFAULT_SHARED_ORG_ID = "org_axbd"
+DEFAULT_SHARED_ORG_ID = "org_452b33c1"
 
 [[env.staging.kv_namespaces]]
 binding = "CACHE"
