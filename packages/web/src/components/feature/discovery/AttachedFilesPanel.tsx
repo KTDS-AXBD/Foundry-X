@@ -27,10 +27,9 @@ function formatBytes(bytes: number): string {
 
 interface AttachedFilesPanelProps {
   bizItemId: string;
-  apiBaseUrl?: string;
 }
 
-export default function AttachedFilesPanel({ bizItemId, apiBaseUrl = "" }: AttachedFilesPanelProps) {
+export default function AttachedFilesPanel({ bizItemId }: AttachedFilesPanelProps) {
   const [files, setFiles] = useState<UploadedFileMeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -105,7 +104,6 @@ export default function AttachedFilesPanel({ bizItemId, apiBaseUrl = "" }: Attac
       {showUpload && (
         <div className="rounded-lg border p-3">
           <FileUploadZone
-            apiBaseUrl={apiBaseUrl}
             bizItemId={bizItemId}
             onUploadComplete={(id) => {
               handleUploadComplete(id);
