@@ -4,12 +4,13 @@
  * /shaping/prd — 아이템별 PRD 목록 + 렌더링 뷰
  * 각 biz item에 연결된 PRD를 렌더링하여 표시
  */
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FileText, ChevronDown, ChevronRight, Search, ExternalLink } from "lucide-react";
+import { FileText, ChevronDown, ChevronRight, Search } from "lucide-react";
 import { getBizItems, listPrds, type BizItemSummary, type GeneratedPrdEntry } from "@/lib/api-client";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import MarkdownViewer from "@/components/feature/MarkdownViewer";
 
 const VERSION_LABELS: Record<number, string> = { 1: "1차", 2: "2차", 3: "3차" };
 const STATUS_BADGE: Record<string, { label: string; color: string }> = {
@@ -17,30 +18,6 @@ const STATUS_BADGE: Record<string, { label: string; color: string }> = {
   reviewing: { label: "검토중", color: "bg-amber-100 text-amber-700" },
   confirmed: { label: "확정", color: "bg-green-100 text-green-700" },
 };
-
-/** Markdown → HTML document for iframe srcDoc (isolated rendering, no XSS risk) */
-function markdownToHtmlDoc(md: string): string {
-  const body = md
-    .replace(/^#### (.+)$/gm, "<h4>$1</h4>")
-    .replace(/^### (.+)$/gm, "<h3>$1</h3>")
-    .replace(/^## (.+)$/gm, "<h2>$1</h2>")
-    .replace(/^# (.+)$/gm, "<h1>$1</h1>")
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.+?)\*/g, "<em>$1</em>")
-    .replace(/^- (.+)$/gm, "<li>$1</li>")
-    .replace(/\n\n/g, "<br/><br/>")
-    .replace(/\n/g, "<br/>");
-
-  return `<!DOCTYPE html><html><head><style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.8; color: #334155; padding: 16px; margin: 0; }
-    h1 { font-size: 20px; font-weight: 700; margin: 24px 0 10px; }
-    h2 { font-size: 17px; font-weight: 700; margin: 20px 0 8px; }
-    h3 { font-size: 15px; font-weight: 700; margin: 16px 0 6px; }
-    h4 { font-size: 14px; font-weight: 600; margin: 12px 0 4px; }
-    li { margin-left: 16px; list-style: disc; }
-    strong { font-weight: 600; }
-  </style></head><body>${body}</body></html>`;
-}
 
 export function Component() {
   const [items, setItems] = useState<BizItemSummary[]>([]);
@@ -116,7 +93,7 @@ export function Component() {
                   <FileText className="size-4 text-muted-foreground shrink-0" />
                   <span className="font-medium text-sm flex-1">{item.title}</span>
                   <Link
-                    to={`/discovery/items/${item.id}/prds`}
+                    to={`/discovery/items/${item.id}`}
                     className="text-xs text-primary hover:underline"
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -146,27 +123,13 @@ export function Component() {
                                 <span className="text-xs text-muted-foreground ml-auto">
                                   {new Date(prd.generated_at * 1000).toLocaleDateString("ko")}
                                 </span>
-                                <button
-                                  onClick={() => {
-                                    const html = markdownToHtmlDoc(prd.content);
-                                    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-                                    window.open(URL.createObjectURL(blob), "_blank");
-                                  }}
-                                  className="ml-2 inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-primary hover:bg-muted/50 transition-colors"
-                                  data-testid={`prd-open-new-window-${prd.id}`}
-                                >
-                                  <ExternalLink className="size-3" />
-                                  새 창
-                                </button>
                               </div>
-                              <iframe
-                                srcDoc={markdownToHtmlDoc(prd.content)}
-                                className="w-full border-0"
-                                style={{ height: 400 }}
-                                sandbox=""
-                                title={`PRD v${prd.version}`}
-                                data-testid={`prd-iframe-${prd.id}`}
-                              />
+                              <div
+                                className="max-h-[480px] overflow-y-auto px-5 py-4"
+                                data-testid={`prd-content-${prd.id}`}
+                              >
+                                <MarkdownViewer content={prd.content} />
+                              </div>
                             </div>
                           );
                         })}

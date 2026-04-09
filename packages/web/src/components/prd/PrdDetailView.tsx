@@ -1,4 +1,5 @@
 import type { GeneratedPrdEntry } from "../../lib/api-client";
+import MarkdownViewer from "../feature/MarkdownViewer";
 
 interface Props {
   prd: GeneratedPrdEntry;
@@ -14,19 +15,6 @@ const STATUS_BADGE: Record<string, { label: string; color: string }> = {
   reviewing: { label: "검토중", color: "#f59e0b" },
   confirmed: { label: "확정", color: "#22c55e" },
 };
-
-/** 간단 Markdown → HTML (heading, bold, italic, list) */
-function renderMarkdown(md: string): string {
-  return md
-    .replace(/^### (.+)$/gm, "<h3>$1</h3>")
-    .replace(/^## (.+)$/gm, "<h2>$1</h2>")
-    .replace(/^# (.+)$/gm, "<h1>$1</h1>")
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.+?)\*/g, "<em>$1</em>")
-    .replace(/^- (.+)$/gm, "<li>$1</li>")
-    .replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>")
-    .replace(/\n/g, "<br/>");
-}
 
 export function PrdDetailView({ prd, onEdit, onConfirm, onCompare, onClose }: Props) {
   const statusInfo = STATUS_BADGE[prd.status] ?? { label: prd.status, color: "#94a3b8" };
@@ -73,9 +61,11 @@ export function PrdDetailView({ prd, onEdit, onConfirm, onCompare, onClose }: Pr
 
         {/* Content */}
         <div
-          style={{ lineHeight: 1.8, fontSize: 14, color: "#334155", borderTop: "1px solid #f1f5f9", paddingTop: 20 }}
-          dangerouslySetInnerHTML={{ __html: renderMarkdown(prd.content) }}
-        />
+          style={{ borderTop: "1px solid #f1f5f9", paddingTop: 20 }}
+          data-testid="prd-detail-content"
+        >
+          <MarkdownViewer content={prd.content} />
+        </div>
       </div>
     </div>
   );

@@ -276,7 +276,7 @@ test.describe("PRD HTML 미리보기", () => {
     await expect(page.getByText("AI 헬스케어 플랫폼")).toBeVisible();
   });
 
-  test("아이템 클릭 시 PRD 목록이 iframe으로 표시돼요", async ({ authenticatedPage: page }) => {
+  test("아이템 클릭 시 PRD 목록이 마크다운으로 렌더돼요", async ({ authenticatedPage: page }) => {
     await page.goto("/shaping/prd");
     await expect(page.getByText("AI 헬스케어 플랫폼")).toBeVisible({ timeout: 10000 });
 
@@ -285,36 +285,20 @@ test.describe("PRD HTML 미리보기", () => {
     await expect(page.getByText("1차 PRD")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("2차 PRD")).toBeVisible();
 
-    const iframe = page.getByTestId("prd-iframe-prd-1");
-    await expect(iframe).toBeVisible({ timeout: 10000 });
+    // react-markdown으로 렌더된 PRD 본문 — heading "개요"가 실제 <h3>로 표시되는지 확인
+    const content = page.getByTestId("prd-content-prd-1");
+    await expect(content).toBeVisible({ timeout: 10000 });
+    await expect(content.getByRole("heading", { name: "개요" })).toBeVisible();
+    await expect(content).toContainText("AI 헬스케어 플랫폼 PRD");
   });
 
-  test("PRD 카드에 새 창 버튼이 있고 클릭 가능해요", async ({ authenticatedPage: page }) => {
+  test("PRD 관리 버튼은 내 아이템 페이지로 이동해요", async ({ authenticatedPage: page }) => {
     await page.goto("/shaping/prd");
     await expect(page.getByText("AI 헬스케어 플랫폼")).toBeVisible({ timeout: 10000 });
-    await page.getByText("AI 헬스케어 플랫폼").click();
-    await expect(page.getByText("1차 PRD")).toBeVisible({ timeout: 10000 });
 
-    // Intercept window.open
-    await page.evaluate(() => {
-      (window as unknown as Record<string, unknown>).__openedUrls = [];
-      const origOpen = window.open;
-      window.open = (url?: string | URL, ...args: unknown[]) => {
-        (window as unknown as Record<string, string[]>).__openedUrls.push(String(url));
-        return origOpen.call(window, "about:blank", ...args) as WindowProxy;
-      };
-    });
-
-    const newWindowBtn = page.getByTestId("prd-open-new-window-prd-1");
-    await expect(newWindowBtn).toBeVisible();
-    await newWindowBtn.click();
-
-    await page.waitForFunction(
-      () => (window as unknown as Record<string, string[]>).__openedUrls?.length > 0,
-      { timeout: 10000 },
-    );
-    const urls = await page.evaluate(() => (window as unknown as Record<string, string[]>).__openedUrls);
-    expect(urls[0]).toContain("blob:");
+    // PRD 관리 링크가 /discovery/items/:id 로 이동 (version 관리 페이지가 아님)
+    const link = page.getByRole("link", { name: /PRD 관리/ }).first();
+    await expect(link).toHaveAttribute("href", /\/discovery\/items\/item-1$/);
   });
 
   test("PRD 상태 배지가 올바르게 표시돼요", async ({ authenticatedPage: page }) => {
