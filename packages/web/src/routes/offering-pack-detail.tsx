@@ -114,7 +114,7 @@ export function Component() {
           <iframe
             srcDoc={htmlPreview}
             className="w-full h-full border-0"
-            sandbox="allow-scripts allow-same-origin"
+            sandbox="allow-scripts"
             title="Offering HTML Preview"
           />
         )}

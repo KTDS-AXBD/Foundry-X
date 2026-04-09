@@ -45,7 +45,7 @@ describe("EvaluationReportViewer", () => {
       const iframe = container.querySelector("iframe");
       expect(iframe).not.toBeNull();
       expect(iframe!.getAttribute("title")).toBe("발굴단계완료 평가결과서");
-      expect(iframe!.getAttribute("sandbox")).toBe("allow-same-origin");
+      expect(iframe!.getAttribute("sandbox")).toBe("allow-scripts allow-same-origin");
       expect(iframe!.getAttribute("srcdoc")).toBe(sampleHtml);
     });
   });

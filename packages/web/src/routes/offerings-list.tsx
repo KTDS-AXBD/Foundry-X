@@ -273,7 +273,7 @@ export function Component() {
                   srcDoc={previewHtml}
                   className="w-full border-0"
                   style={{ height: 500 }}
-                  sandbox="allow-same-origin"
+                  sandbox="allow-scripts"
                   title="Offering HTML 미리보기"
                   data-testid={`offering-iframe-${previewId}`}
                 />
