@@ -3223,3 +3223,23 @@ export async function updateFeedbackQueueItem(
 ): Promise<FeedbackQueueItem> {
   return patchApi(`/feedback-queue/${id}`, body);
 }
+
+// ─── F483: 평가결과서 HTML 뷰어 (Sprint 236) ───
+
+export async function fetchEvaluationReportHtml(itemId: string): Promise<string> {
+  const res = await fetchApi<{ data: { html: string; updatedAt: string } }>(
+    `/ax-bd/discovery-reports/${itemId}/html`,
+  );
+  return res.data.html;
+}
+
+export async function saveEvaluationReportHtml(itemId: string, html: string): Promise<void> {
+  await putApi(`/ax-bd/discovery-reports/${itemId}/html`, { html });
+}
+
+export async function shareEvaluationReport(itemId: string): Promise<string> {
+  const res = await postApi<{ data: { sharedToken: string } }>(
+    `/ax-bd/discovery-reports/${itemId}/share`,
+  );
+  return res.data.sharedToken;
+}

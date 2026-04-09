@@ -42,6 +42,7 @@ import TemplateSelector, { type TemplateParams } from "@/components/feature/disc
 import AttachedFilesPanel from "@/components/feature/discovery/AttachedFilesPanel";
 import PrdFromBpPanel from "@/components/feature/discovery/PrdFromBpPanel";
 import PrdInterviewPanel from "@/components/feature/discovery/PrdInterviewPanel";
+import EvaluationReportViewer from "@/components/feature/discovery/EvaluationReportViewer";
 
 const TYPE_LABELS: Record<string, string> = {
   I: "아이디어형", M: "시장·타겟형", P: "고객문제형", T: "기술형", S: "서비스형",
@@ -199,6 +200,7 @@ export function Component() {
           <TabsTrigger value="analysis">발굴분석</TabsTrigger>
           <TabsTrigger value="shaping">형상화</TabsTrigger>
           <TabsTrigger value="files">첨부 자료</TabsTrigger>
+          <TabsTrigger value="evaluation">평가결과서</TabsTrigger>
         </TabsList>
 
         {/* ── 탭 1: 기본정보 ── */}
@@ -394,6 +396,11 @@ export function Component() {
           <div className="rounded-lg border bg-card p-5">
             <AttachedFilesPanel bizItemId={id!} />
           </div>
+        </TabsContent>
+
+        {/* ── 탭 5: 평가결과서 (F483) ── */}
+        <TabsContent value="evaluation" className="mt-4">
+          <EvaluationReportViewer bizItemId={item.id} />
         </TabsContent>
       </Tabs>
     </div>

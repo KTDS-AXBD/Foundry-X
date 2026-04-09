@@ -10,3 +10,8 @@ export const UpsertDiscoveryReportSchema = z.object({
 });
 
 export type UpsertDiscoveryReportInput = z.infer<typeof UpsertDiscoveryReportSchema>;
+
+/** F483: 평가결과서 HTML 저장 스키마 */
+export const SaveReportHtmlSchema = z.object({
+  html: z.string().min(1).max(5_000_000),
+});
