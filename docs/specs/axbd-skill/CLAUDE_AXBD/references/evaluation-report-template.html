@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AX BD팀 2단계 발굴 리포트 — {{ITEM_NAME}}</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f7f8fa;--card:#fff;--border:#e5e8eb;--text:#191f28;--sub:#4e5968;--muted:#8b95a1;
+  --mint:#00c4b4;--mint-bg:#e6faf8;--mint-dark:#009e90;
+  --blue:#3182f6;--blue-bg:#e8f3ff;--blue-dark:#1b64da;
+  --amber:#ff9f43;--amber-bg:#fff5e6;--amber-dark:#e08600;
+  --red:#f04452;--red-bg:#ffe8ea;--red-dark:#d92638;
+  --purple:#8b5cf6;--purple-bg:#f0e8ff;--purple-dark:#6d28d9;
+  --radius:16px;--shadow:0 2px 8px rgba(0,0,0,.06);
+  --font:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,Roboto,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding:24px 20px 80px}
+header{text-align:center;padding:48px 0 32px}
+header h1{font-size:28px;font-weight:800;letter-spacing:-.5px}
+header .subtitle{color:var(--sub);font-size:15px;margin-top:8px}
+header .badge{display:inline-block;margin-top:12px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;background:var(--blue-bg);color:var(--blue)}
+.tab-bar{display:flex;gap:4px;overflow-x:auto;padding:4px;background:var(--card);border-radius:14px;border:1px solid var(--border);margin-bottom:32px;scrollbar-width:none}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:10px 18px;border:none;background:transparent;border-radius:10px;font-family:var(--font);font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;white-space:nowrap}
+.tab-btn:hover{color:var(--text);background:var(--bg)}
+.tab-btn.active{color:#fff;background:var(--blue)}
+.tab-btn[data-color="mint"].active{background:var(--mint)}
+.tab-btn[data-color="blue"].active{background:var(--blue)}
+.tab-btn[data-color="amber"].active{background:var(--amber)}
+.tab-btn[data-color="red"].active{background:var(--red)}
+.tab-btn[data-color="purple"].active{background:var(--purple)}
+.tab-panel{display:none;animation:fadeIn .3s ease}
+.tab-panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:32px;margin-bottom:24px;box-shadow:var(--shadow)}
+.card-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.card-header .icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.card-header h3{font-size:18px;font-weight:700}
+.card-header p{font-size:13px;color:var(--muted);margin-top:2px}
+.section-title{font-size:22px;font-weight:800;margin-bottom:8px;letter-spacing:-.3px}
+.section-sub{font-size:14px;color:var(--sub);margin-bottom:24px}
+.hitl-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;background:#e8f9ee;color:#0d7a3e;margin-bottom:24px}
+.hitl-badge::before{content:'';width:8px;height:8px;border-radius:50%;background:#22c55e}
+.tbl-wrap{overflow-x:auto;margin:16px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:var(--bg);font-weight:700;text-align:left;padding:12px 16px;border-bottom:2px solid var(--border);white-space:nowrap}
+td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--sub)}
+tr:hover td{background:var(--bg)}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:768px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+.metric{background:var(--bg);border-radius:12px;padding:20px;text-align:center}
+.metric .val{font-size:28px;font-weight:800;color:var(--blue)}
+.metric .label{font-size:12px;color:var(--muted);margin-top:4px}
+.metric.mint .val{color:var(--mint)}
+.metric.amber .val{color:var(--amber)}
+.metric.red .val{color:var(--red)}
+.insight-box{background:linear-gradient(135deg,var(--blue-bg),#f0e8ff);border-radius:14px;padding:24px 28px;margin:24px 0;border-left:4px solid var(--blue)}
+.insight-box h4{font-size:15px;font-weight:700;margin-bottom:10px;color:var(--blue-dark)}
+.insight-box ul{list-style:none;padding:0}
+.insight-box li{position:relative;padding-left:20px;margin-bottom:6px;font-size:14px;color:var(--sub)}
+.insight-box li::before{content:'\2192';position:absolute;left:0;color:var(--blue)}
+.next-step{background:var(--bg);border-radius:14px;padding:20px 24px;margin-top:24px;border:1px dashed var(--border)}
+.next-step h4{font-size:14px;font-weight:700;margin-bottom:8px;color:var(--muted)}
+.next-step p{font-size:14px;color:var(--sub)}
+.tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;margin:2px}
+.tag-mint{background:var(--mint-bg);color:var(--mint-dark)}
+.tag-blue{background:var(--blue-bg);color:var(--blue-dark)}
+.tag-amber{background:var(--amber-bg);color:var(--amber-dark)}
+.tag-red{background:var(--red-bg);color:var(--red-dark)}
+.tag-purple{background:var(--purple-bg);color:var(--purple-dark)}
+.chart-box{position:relative;max-width:480px;margin:20px auto}
+.compare-header{font-weight:700;color:var(--text) !important;background:var(--blue-bg) !important}
+.bmc-grid{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:auto auto;gap:2px;background:var(--border);border-radius:14px;overflow:hidden;margin:20px 0}
+.bmc-cell{background:var(--card);padding:16px;min-height:140px}
+.bmc-cell h5{font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:8px;letter-spacing:.5px}
+.bmc-cell ul{list-style:none;padding:0;font-size:13px;color:var(--sub)}
+.bmc-cell li{margin-bottom:4px;padding-left:14px;position:relative}
+.bmc-cell li::before{content:'\2022';position:absolute;left:0;color:var(--blue)}
+.bmc-kp{grid-column:1;grid-row:1/3}.bmc-ka{grid-column:2;grid-row:1}.bmc-kr{grid-column:2;grid-row:2}
+.bmc-vp{grid-column:3;grid-row:1/3}.bmc-cr{grid-column:4;grid-row:1}.bmc-ch{grid-column:4;grid-row:2}
+.bmc-cs{grid-column:5;grid-row:1/3}.bmc-cost{grid-column:1/3;grid-row:3}.bmc-rev{grid-column:3/6;grid-row:3}
+@media(max-width:768px){.bmc-grid{grid-template-columns:1fr;grid-template-rows:auto}.bmc-kp,.bmc-vp,.bmc-cs,.bmc-cost,.bmc-rev{grid-column:1;grid-row:auto}.bmc-ka,.bmc-kr,.bmc-cr,.bmc-ch{grid-column:1;grid-row:auto}}
+.swot-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border);border-radius:14px;overflow:hidden;margin:20px 0}
+.swot-cell{padding:24px;min-height:180px}
+.swot-cell h5{font-size:14px;font-weight:800;margin-bottom:12px}
+.swot-cell ul{list-style:none;padding:0;font-size:13px}
+.swot-cell li{margin-bottom:6px;padding-left:16px;position:relative}
+.swot-s{background:#e8f9ee}.swot-s h5{color:#0d7a3e}.swot-s li::before{content:'\2713';position:absolute;left:0;color:#22c55e}
+.swot-w{background:#fff5e6}.swot-w h5{color:#b45309}.swot-w li::before{content:'\25b3';position:absolute;left:0;color:var(--amber)}
+.swot-o{background:var(--blue-bg)}.swot-o h5{color:var(--blue-dark)}.swot-o li::before{content:'\2605';position:absolute;left:0;color:var(--blue)}
+.swot-t{background:var(--red-bg)}.swot-t h5{color:var(--red-dark)}.swot-t li::before{content:'\26a0';position:absolute;left:0;color:var(--red)}
+.persona-card{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:28px;position:relative;overflow:hidden}
+.persona-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+.persona-card.type-a::before{background:var(--blue)}
+.persona-card.type-b::before{background:var(--mint)}
+.persona-name{font-size:20px;font-weight:800;margin-bottom:4px}
+.persona-role{font-size:13px;color:var(--muted);margin-bottom:16px}
+.persona-section{margin-bottom:14px}
+.persona-section h5{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.persona-section p,.persona-section li{font-size:13px;color:var(--sub)}
+.persona-section ul{list-style:none;padding:0}
+.persona-section li{padding-left:14px;position:relative;margin-bottom:3px}
+.persona-section li::before{content:'\2022';position:absolute;left:0;color:var(--blue)}
+.journey-track{display:flex;gap:2px;margin:20px 0;overflow-x:auto}
+.journey-stage{flex:1;min-width:160px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative}
+.journey-stage h5{font-size:13px;font-weight:700;margin-bottom:8px}
+.journey-stage p{font-size:12px;color:var(--sub)}
+.journey-stage .emotion{font-size:20px;text-align:center;margin:8px 0}
+.score-bar{height:8px;border-radius:4px;background:var(--bg);overflow:hidden;margin:4px 0}
+.score-fill{height:100%;border-radius:4px;transition:width .5s ease}
+.ue-flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;margin:20px 0}
+.ue-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;text-align:center;min-width:120px}
+.ue-item .val{font-size:22px;font-weight:800}
+.ue-item .label{font-size:11px;color:var(--muted);margin-top:2px}
+.ue-arrow{font-size:20px;color:var(--muted)}
+.exec-hero{background:linear-gradient(135deg,#1b1b2f,#162447);color:#fff;border-radius:20px;padding:48px 40px;margin-bottom:32px;position:relative;overflow:hidden}
+.exec-hero::after{content:'';position:absolute;top:-50%;right:-20%;width:400px;height:400px;border-radius:50%;background:rgba(49,130,246,.15)}
+.exec-hero h2{font-size:26px;font-weight:800;margin-bottom:12px;position:relative}
+.exec-hero p{font-size:15px;color:rgba(255,255,255,.75);position:relative;max-width:640px;line-height:1.8}
+.exec-verdict{display:inline-block;margin-top:16px;padding:8px 20px;border-radius:10px;font-weight:800;font-size:14px;position:relative}
+.verdict-go{background:rgba(34,197,94,.2);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.step-header{margin-bottom:28px}
+.step-number{font-size:13px;font-weight:800;color:var(--blue);margin-bottom:4px}
+.step-eng{font-size:13px;color:var(--muted);margin-top:4px}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state p{font-size:14px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>AX BD팀 2단계 발굴 리포트</h1>
+  <p class="subtitle">{{ITEM_SUBTITLE}}</p>
+  <span class="badge">{{ITEM_TYPE}} · {{DATE}}</span>
+</header>
+
+<nav class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-tab="tab1" data-color="mint">2-1 레퍼런스 분석</button>
+  <button class="tab-btn" data-tab="tab2" data-color="mint">2-2 수요 시장</button>
+  <button class="tab-btn" data-tab="tab3" data-color="blue">2-3 경쟁·자사</button>
+  <button class="tab-btn" data-tab="tab4" data-color="blue">2-4 아이템 도출</button>
+  <button class="tab-btn" data-tab="tab5" data-color="amber">2-5 아이템 선정</button>
+  <button class="tab-btn" data-tab="tab6" data-color="amber">2-6 타겟 고객</button>
+  <button class="tab-btn" data-tab="tab7" data-color="amber">2-7 비즈니스 모델</button>
+  <button class="tab-btn" data-tab="tab8" data-color="red">2-8 패키징</button>
+  <button class="tab-btn" data-tab="tab9" data-color="purple">2-9 멀티 페르소나 평가</button>
+</nav>
+
+<!-- TAB 2-1: 레퍼런스 분석 -->
+<div class="tab-panel active" id="tab1">
+  <div class="step-header">
+    <div class="step-number">STEP 2-1</div>
+    <div class="section-title">레퍼런스 분석</div>
+    <div class="step-eng">Benchmark Deconstruction</div>
+    <div class="section-sub">{{TAB1_DESCRIPTION}}</div>
+  </div>
+  {{TAB1_CONTENT}}
+</div>
+
+<!-- TAB 2-2: 수요 시장 -->
+<div class="tab-panel" id="tab2">
+  <div class="step-header">
+    <div class="step-number">STEP 2-2</div>
+    <div class="section-title">수요 시장 검증</div>
+    <div class="step-eng">Market Validation</div>
+    <div class="section-sub">{{TAB2_DESCRIPTION}}</div>
+  </div>
+  {{TAB2_CONTENT}}
+</div>
+
+<!-- TAB 2-3: 경쟁·자사 분석 -->
+<div class="tab-panel" id="tab3">
+  <div class="step-header">
+    <div class="step-number">STEP 2-3</div>
+    <div class="section-title">경쟁·자사 분석</div>
+    <div class="step-eng">Competitive Analysis</div>
+    <div class="section-sub">{{TAB3_DESCRIPTION}}</div>
+  </div>
+  {{TAB3_CONTENT}}
+</div>
+
+<!-- TAB 2-4: 사업 아이템 도출 -->
+<div class="tab-panel" id="tab4">
+  <div class="step-header">
+    <div class="step-number">STEP 2-4</div>
+    <div class="section-title">사업 아이템 도출</div>
+    <div class="step-eng">Solution Design</div>
+    <div class="section-sub">{{TAB4_DESCRIPTION}}</div>
+  </div>
+  {{TAB4_CONTENT}}
+</div>
+
+<!-- TAB 2-5: 핵심 아이템 선정 -->
+<div class="tab-panel" id="tab5">
+  <div class="step-header">
+    <div class="step-number">STEP 2-5</div>
+    <div class="section-title">핵심 아이템 선정</div>
+    <div class="step-eng">Item Selection &amp; Commit Gate</div>
+    <div class="section-sub">{{TAB5_DESCRIPTION}}</div>
+  </div>
+  {{TAB5_CONTENT}}
+</div>
+
+<!-- TAB 2-6: 타겟 고객 정의 -->
+<div class="tab-panel" id="tab6">
+  <div class="step-header">
+    <div class="step-number">STEP 2-6</div>
+    <div class="section-title">타겟 고객 정의</div>
+    <div class="step-eng">Target Customer Definition</div>
+    <div class="section-sub">{{TAB6_DESCRIPTION}}</div>
+  </div>
+  {{TAB6_CONTENT}}
+</div>
+
+<!-- TAB 2-7: 비즈니스 모델 정의 -->
+<div class="tab-panel" id="tab7">
+  <div class="step-header">
+    <div class="step-number">STEP 2-7</div>
+    <div class="section-title">비즈니스 모델 정의</div>
+    <div class="step-eng">Business Model Design</div>
+    <div class="section-sub">{{TAB7_DESCRIPTION}}</div>
+  </div>
+  {{TAB7_CONTENT}}
+</div>
+
+<!-- TAB 2-8: 발굴 결과 패키징 -->
+<div class="tab-panel" id="tab8">
+  <div class="step-header">
+    <div class="step-number">STEP 2-8</div>
+    <div class="section-title">발굴 결과 패키징</div>
+    <div class="step-eng">Discovery Packaging &amp; GTM</div>
+    <div class="section-sub">{{TAB8_DESCRIPTION}}</div>
+  </div>
+  {{TAB8_CONTENT}}
+</div>
+
+<!-- TAB 2-9: AI 멀티 페르소나 평가 -->
+<div class="tab-panel" id="tab9">
+  <div class="step-header">
+    <div class="step-number">STEP 2-9</div>
+    <div class="section-title">AI 멀티 페르소나 사전 평가</div>
+    <div class="step-eng">Multi-Persona Pre-Evaluation</div>
+    <div class="section-sub">{{TAB9_DESCRIPTION}}</div>
+  </div>
+  {{TAB9_CONTENT}}
+</div>
+
+</div><!-- .wrap -->
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

@@ -50,6 +50,9 @@ import { StartInterviewSchema, AnswerInterviewSchema } from "../../offering/sche
 // Sprint 223 imports (F459)
 import { PortfolioService, NotFoundError } from "../services/portfolio-service.js";
 // Sprint 234 imports (F479)
+// Sprint 235 imports (F482)
+import { ArtifactSyncService } from "../services/artifact-sync-service.js";
+import { syncArtifactsSchema } from "../schemas/artifact-sync.js";
 import { DiscoveryStageService } from "../services/discovery-stage-service.js";
 
 export const bizItemsRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
@@ -1363,6 +1366,37 @@ bizItemsRoute.patch("/biz-items/:bizItemId/prds/:prdId", async (c) => {
     }
     throw err;
   }
+});
+
+// ─── POST /biz-items/:id/sync-artifacts — bd_artifacts 자동 등록 (F482, Sprint 235) ───
+
+bizItemsRoute.post("/biz-items/:id/sync-artifacts", async (c) => {
+  const orgId = c.get("orgId");
+  const bizItemId = c.req.param("id");
+  const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? "system";
+
+  const body = await c.req.json();
+  const parsed = syncArtifactsSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: "Invalid input", details: parsed.error.flatten() }, 400);
+  }
+
+  const service = new BizItemService(c.env.DB);
+  const item = await service.getById(orgId, bizItemId);
+  if (!item) {
+    return c.json({ error: "Biz item not found" }, 404);
+  }
+
+  const syncSvc = new ArtifactSyncService(c.env.DB);
+  const result = await syncSvc.syncFromSkill(
+    bizItemId,
+    orgId,
+    userId,
+    parsed.data.stages,
+    parsed.data.source,
+  );
+
+  return c.json(result);
 });
 
 // ─── GET /biz-items/:id/portfolio — 포트폴리오 연결 구조 검색 (F459, Sprint 223) ───
