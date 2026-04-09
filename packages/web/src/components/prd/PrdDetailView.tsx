@@ -1,6 +1,11 @@
 import type { GeneratedPrdEntry } from "../../lib/api-client";
 import MarkdownViewer from "../feature/MarkdownViewer";
 
+/** PRD content 앞에 붙는 YAML frontmatter(`---\n...\n---`) 블록 제거 */
+function stripFrontmatter(md: string): string {
+  return md.replace(/^\s*---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+}
+
 interface Props {
   prd: GeneratedPrdEntry;
   onEdit?: () => void;
@@ -64,7 +69,7 @@ export function PrdDetailView({ prd, onEdit, onConfirm, onCompare, onClose }: Pr
           style={{ borderTop: "1px solid #f1f5f9", paddingTop: 20 }}
           data-testid="prd-detail-content"
         >
-          <MarkdownViewer content={prd.content} />
+          <MarkdownViewer content={stripFrontmatter(prd.content)} />
         </div>
       </div>
     </div>

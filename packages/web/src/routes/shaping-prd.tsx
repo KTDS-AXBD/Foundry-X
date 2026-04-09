@@ -12,6 +12,11 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import MarkdownViewer from "@/components/feature/MarkdownViewer";
 
+/** PRD content 앞에 붙는 YAML frontmatter(`---\n...\n---`) 블록 제거 */
+function stripFrontmatter(md: string): string {
+  return md.replace(/^\s*---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+}
+
 const VERSION_LABELS: Record<number, string> = { 1: "1차", 2: "2차", 3: "3차" };
 const STATUS_BADGE: Record<string, { label: string; color: string }> = {
   draft: { label: "초안", color: "bg-slate-100 text-slate-600" },
@@ -128,7 +133,7 @@ export function Component() {
                                 className="max-h-[480px] overflow-y-auto px-5 py-4"
                                 data-testid={`prd-content-${prd.id}`}
                               >
-                                <MarkdownViewer content={prd.content} />
+                                <MarkdownViewer content={stripFrontmatter(prd.content)} />
                               </div>
                             </div>
                           );
