@@ -132,9 +132,9 @@ describe("AgentCard", () => {
 });
 
 describe("MarkdownViewer", () => {
-  it("renders plain content", () => {
+  it("renders markdown content as HTML", () => {
     render(<MarkdownViewer content="# Hello World" />);
-    expect(screen.getByText("# Hello World")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Hello World" })).toBeInTheDocument();
   });
 
   it("renders file metadata when provided", () => {
