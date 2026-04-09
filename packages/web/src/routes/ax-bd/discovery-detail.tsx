@@ -72,6 +72,8 @@ export function Component() {
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
   // F454/F455: PRD 인터뷰 상태
   const [prdInterviewPrdId, setPrdInterviewPrdId] = useState<string | null>(null);
+  // F486: criteria refresh 트리거
+  const [criteriaRefreshTrigger, setCriteriaRefreshTrigger] = useState(0);
 
   const loadData = useCallback(async () => {
     if (!id) return;
@@ -243,7 +245,10 @@ export function Component() {
             <DiscoveryStageStepper
               bizItemId={item.id}
               discoveryType={item.discoveryType ?? null}
-              onStageComplete={loadData}
+              onStageComplete={(stage) => {
+                void loadData();
+                setCriteriaRefreshTrigger((n) => n + 1);
+              }}
               onAllComplete={loadData}
             />
           </div>
@@ -251,7 +256,7 @@ export function Component() {
           {/* F437 9기준 체크리스트 */}
           <div>
             <h2 className="text-sm font-semibold mb-3">발굴 9기준 체크리스트</h2>
-            <DiscoveryCriteriaPanel bizItemId={item.id} />
+            <DiscoveryCriteriaPanel bizItemId={item.id} refreshTrigger={criteriaRefreshTrigger} />
           </div>
 
           {/* F448: 발굴 완료 → 형상화 자동 전환 CTA */}

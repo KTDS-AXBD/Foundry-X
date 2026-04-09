@@ -1466,6 +1466,26 @@ export async function confirmDiscoveryStage(
   return postApi(`/biz-items/${bizItemId}/discovery-stage/${stage}/confirm`, { viabilityAnswer, feedback });
 }
 
+// ─── Sprint 238: F485 단계별 결과 조회 API ───
+
+export interface StageResultResponse {
+  stage: string;
+  stageName: string;
+  intensity: string;
+  result: StageAnalysisResult;
+  viabilityDecision: string | null;
+  feedback: string | null;
+  completedAt: string | null;
+  artifactId: string | null;
+}
+
+export async function getStageResult(
+  bizItemId: string,
+  stage: string,
+): Promise<StageResultResponse> {
+  return fetchApi(`/biz-items/${bizItemId}/discovery-stage/${stage}/result`);
+}
+
 // ─── Sprint 211: F438 발굴 분석 실행 API ───
 
 export interface StartingPointResult {
