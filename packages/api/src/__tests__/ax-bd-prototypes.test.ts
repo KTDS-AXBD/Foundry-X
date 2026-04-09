@@ -133,6 +133,59 @@ describe("ax-bd-prototypes route", () => {
     });
   });
 
+  // ─── GET HTML (Marker.io 주입) ───
+
+  describe("GET /api/ax-bd/prototypes/:id/html", () => {
+    function createAppWithEnv(envExtras: Record<string, unknown>) {
+      const app = new Hono<{ Variables: Record<string, string> }>();
+      app.use("*", async (c, next) => {
+        c.set("orgId", "org_test");
+        c.set("userId", "user_1");
+        c.set("orgRole", "admin");
+        (c as any).env = { DB: db, ...envExtras };
+        await next();
+      });
+      app.route("/api", axBdPrototypesRoute);
+      return app;
+    }
+
+    beforeEach(async () => {
+      // 인라인 HTML content로 prototype 하나 더 준비 (</body> 포함)
+      const now = new Date().toISOString();
+      await db.prepare(
+        "INSERT INTO prototypes (id, biz_item_id, version, format, content, template_used, generated_at) VALUES (?, ?, ?, ?, ?, ?, ?)"
+      ).bind("proto_html", "bi_1", 2, "html", "<!DOCTYPE html><html><body><h1>Inline</h1></body></html>", "idea", now).run();
+    });
+
+    it("injects Marker.io snippet when MARKER_PROJECT_ID is set", async () => {
+      const scoped = createAppWithEnv({ MARKER_PROJECT_ID: "proj_abc123" });
+      const res = await scoped.request("/api/ax-bd/prototypes/proto_html/html");
+      expect(res.status).toBe(200);
+      expect(res.headers.get("Content-Type")).toContain("text/html");
+      const html = await res.text();
+      expect(html).toContain("window.markerConfig");
+      expect(html).toContain("\"proj_abc123\"");
+      expect(html).toContain("edge.marker.io/latest/shim.js");
+      // </body> 앞에 삽입되어야 함
+      expect(html.indexOf("edge.marker.io")).toBeLessThan(html.indexOf("</body>"));
+    });
+
+    it("serves HTML unchanged when MARKER_PROJECT_ID is absent", async () => {
+      const scoped = createAppWithEnv({});
+      const res = await scoped.request("/api/ax-bd/prototypes/proto_html/html");
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).not.toContain("edge.marker.io");
+      expect(html).toContain("<h1>Inline</h1>");
+    });
+
+    it("returns 404 for missing prototype", async () => {
+      const scoped = createAppWithEnv({ MARKER_PROJECT_ID: "proj_abc123" });
+      const res = await scoped.request("/api/ax-bd/prototypes/nope/html");
+      expect(res.status).toBe(404);
+    });
+  });
+
   // ─── DELETE ───
 
   describe("DELETE /api/ax-bd/prototypes/:id", () => {

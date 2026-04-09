@@ -91,6 +91,12 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: packages/api
+          # Marker.io 프로젝트 ID를 Workers secret으로 동기화 (web의 VITE_MARKER_PROJECT_ID 재사용)
+          # /ax-bd/prototypes/:id/html 응답에 피드백 위젯 snippet을 주입할 때 사용
+          secrets: |
+            MARKER_PROJECT_ID
+        env:
+          MARKER_PROJECT_ID: ${{ secrets.VITE_MARKER_PROJECT_ID }}
 
   # Production deploy (master push) — Web 변경 시에만
   deploy-web:

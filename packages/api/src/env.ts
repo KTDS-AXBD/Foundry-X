@@ -30,4 +30,6 @@ export type Env = {
   FILES_BUCKET: R2Bucket;
   // 테스트 공유 Org (설정 시 signup/google/setup-password가 개인 Org 대신 이 Org에 멤버십 부여)
   DEFAULT_SHARED_ORG_ID?: string;
+  // Marker.io project ID — /ax-bd/prototypes/:id/html 응답에 피드백 위젯 주입 시 사용
+  MARKER_PROJECT_ID?: string;
 };

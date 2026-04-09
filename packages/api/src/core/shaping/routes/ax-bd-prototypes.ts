@@ -184,12 +184,14 @@ axBdPrototypesRoute.post("/ax-bd/prototypes/:id/link-offering", async (c) => {
 
 // GET /ax-bd/prototypes/:id/html — HTML 콘텐츠 직접 서빙 (프레젠테이션용)
 // content가 [R2:key] 참조이면 R2에서 실제 HTML을 가져옴
+// 모든 응답에 Marker.io 피드백 위젯 snippet을 </body> 직전에 주입 (MARKER_PROJECT_ID 설정 시)
 axBdPrototypesRoute.get("/ax-bd/prototypes/:id/html", async (c) => {
   const svc = new PrototypeService(c.env.DB);
   const proto = await svc.getById(c.req.param("id"), c.get("orgId"));
   if (!proto) return c.json({ error: "Prototype not found" }, 404);
 
-  // R2 참조 패턴: [R2:org_xxx/proto_xxx.html] ...설명...
+  // 1) HTML 본문을 먼저 문자열로 확보
+  let html: string;
   const r2Match = proto.content.match(/^\[R2:([^\]]+)\]/);
   if (r2Match) {
     const r2Key = r2Match[1]!;
@@ -197,16 +199,32 @@ axBdPrototypesRoute.get("/ax-bd/prototypes/:id/html", async (c) => {
     if (!obj) {
       return c.json({ error: "R2에서 프로토타입 HTML을 찾을 수 없어요", r2Key }, 404);
     }
-    return new Response(obj.body, {
-      headers: {
-        "Content-Type": "text/html; charset=utf-8",
-        "Cache-Control": "public, max-age=3600",
-      },
-    });
+    html = await obj.text();
+  } else {
+    html = proto.content;
   }
 
-  // 인라인 HTML (content가 직접 HTML인 경우)
-  return new Response(proto.content, {
-    headers: { "Content-Type": "text/html; charset=utf-8" },
+  // 2) Marker.io 피드백 위젯 주입 (프로젝트 ID가 env에 설정되어 있을 때만)
+  const markerProjectId = c.env.MARKER_PROJECT_ID;
+  if (markerProjectId) {
+    const markerSnippet = `
+<script>
+  window.markerConfig = { project: ${JSON.stringify(markerProjectId)}, source: "prototype" };
+</script>
+<script src="https://edge.marker.io/latest/shim.js" async></script>
+`;
+    if (html.includes("</body>")) {
+      html = html.replace("</body>", `${markerSnippet}</body>`);
+    } else {
+      html = `${html}\n${markerSnippet}`;
+    }
+  }
+
+  return new Response(html, {
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      // 위젯 주입 캐시 오염 방지 — 항상 fresh 렌더
+      "Cache-Control": "no-store",
+    },
   });
 });
