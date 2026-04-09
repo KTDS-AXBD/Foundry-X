@@ -29,9 +29,10 @@ const DDL = `
   );
 `;
 
-// R2 mock
+// R2 bucket mock — Workers R2 바인딩 실제 API(put/get/delete)만 제공
+// createPresignedUrl은 존재하지 않으므로 Worker 프록시 업로드 패턴 사용 (S246)
 const mockR2 = {
-  createPresignedUrl: vi.fn().mockResolvedValue("https://r2.example.com/presigned?key=test"),
+  put: vi.fn().mockResolvedValue(undefined),
   delete: vi.fn().mockResolvedValue(undefined),
   get: vi.fn().mockResolvedValue({
     arrayBuffer: async () => new ArrayBuffer(8),
@@ -80,7 +81,8 @@ describe("F441: 파일 업로드 라우트", () => {
 
     expect(res.status).toBe(201);
     const body = await res.json<{ presigned_url: string; file_id: string }>();
-    expect(body.presigned_url).toContain("presigned");
+    // Worker 프록시 업로드 URL 패턴: ${origin}/api/files/${fileId}/upload
+    expect(body.presigned_url).toMatch(/\/api\/files\/file_[^/]+\/upload$/);
     expect(body.file_id).toMatch(/^file_/);
   });
 
