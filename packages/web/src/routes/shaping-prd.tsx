@@ -6,11 +6,12 @@
  */
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FileText, ChevronDown, ChevronRight, Search } from "lucide-react";
+import { FileText, ChevronDown, ChevronRight, Search, Maximize2 } from "lucide-react";
 import { getBizItems, listPrds, type BizItemSummary, type GeneratedPrdEntry } from "@/lib/api-client";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import MarkdownViewer from "@/components/feature/MarkdownViewer";
+import { PrdDetailView } from "@/components/prd/PrdDetailView";
 
 /** PRD content 앞에 붙는 YAML frontmatter(`---\n...\n---`) 블록 제거 */
 function stripFrontmatter(md: string): string {
@@ -30,6 +31,7 @@ export function Component() {
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [prdCache, setPrdCache] = useState<Record<string, { prds: GeneratedPrdEntry[]; loading: boolean }>>({});
+  const [detailPrd, setDetailPrd] = useState<GeneratedPrdEntry | null>(null);
 
   useEffect(() => {
     getBizItems()
@@ -83,6 +85,13 @@ export function Component() {
         </div>
       )}
 
+      {detailPrd && (
+        <PrdDetailView
+          prd={detailPrd}
+          onClose={() => setDetailPrd(null)}
+        />
+      )}
+
       {!loading && filtered.length > 0 && (
         <div className="space-y-3">
           {filtered.map((item) => {
@@ -128,6 +137,14 @@ export function Component() {
                                 <span className="text-xs text-muted-foreground ml-auto">
                                   {new Date(prd.generated_at * 1000).toLocaleDateString("ko")}
                                 </span>
+                                <button
+                                  onClick={() => setDetailPrd(prd)}
+                                  className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-primary hover:bg-muted/50 transition-colors"
+                                  data-testid={`prd-open-detail-${prd.id}`}
+                                >
+                                  <Maximize2 className="size-3" />
+                                  상세 보기
+                                </button>
                               </div>
                               <div
                                 className="max-h-[480px] overflow-y-auto px-5 py-4"
