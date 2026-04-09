@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 세션 #237 (2026-04-09)
+**Phase 28 Discovery Item Detail 점검 — F478~F487 (Sprint 233~238, 4 PR merged)**:
+- ✅ F478: STATUS_CONFIG 매핑 보완 — classifying/classified/evaluating/evaluated 4개 상태 UI 매핑 (PR #388)
+- ✅ F479: 분석 완료 → pipeline/discovery_stages 자동 전환 — REGISTERED→DISCOVERY + 2-0~2-2 동기화 (PR #388)
+- ✅ F480: AnalysisStepper → 11단계 HITL 스텝퍼 리뉴얼 — DiscoveryStageStepper + stage-runner API (PR #389)
+- ✅ F484: 파이프라인 진행률 UI 개선 — 현재 단계 pulse 강조 + 상태 라벨 (PR #390)
+- ✅ F485: 발굴 분석 결과 표시 + HITL 피드백 루프 — 완료 단계 결과 펼쳐보기 + 재실행 (PR #392)
+- ✅ F486: 9기준 체크리스트 UX 정리 — 역할/가이드 명확화 + AI 자동 평가 연동 (PR #392)
+- ✅ F487: 발굴 리포트 500 에러 수정 — item_id→biz_item_id 컬럼 불일치 해소 (PR #390)
+- 🔧 운영: BD 아이템 정리 — Deny 반도체 삭제 + KOAMI→shaping + XR Studio/IRIS→analyzing
+
+**검증 결과**:
+- ✅ Sprint 233: Match 100% | Sprint 234: Match 91→93% | Sprint 237: Match 100% | Sprint 238: Match 100%
+
 ### 세션 #235 (2026-04-09)
 **Wiki 시스템 개선 — Marker.io 가이드 등록 + Markdown 렌더링 + 시각 디자인**:
 - ✅ Marker.io 피드백 가이드 Wiki 등록 — `content/wiki/marker-io-guide.md` + D1 wiki_pages 테이블 INSERT
