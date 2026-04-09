@@ -28,7 +28,7 @@ export function FileUploadZone({ bizItemId, onUploadComplete }: FileUploadZonePr
   const [isDragging, setIsDragging] = useState(false);
 
   const getAuthHeaders = (): Record<string, string> => {
-    const token = localStorage.getItem("fx_token");
+    const token = localStorage.getItem("token");
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
@@ -70,15 +70,18 @@ export function FileUploadZone({ bizItemId, onUploadComplete }: FileUploadZonePr
         file_id: string;
       };
 
-      // Step 2: R2에 직접 PUT (XMLHttpRequest로 진행바 지원)
+      // Step 2: Worker 프록시 PUT (XMLHttpRequest로 진행바 지원)
+      // presigned_url은 `${origin}/api/files/${file_id}/upload` — Worker의 authMiddleware를 통과해야 함
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open("PUT", presigned_url);
         xhr.setRequestHeader("Content-Type", file.type);
+        const authToken = localStorage.getItem("token");
+        if (authToken) xhr.setRequestHeader("Authorization", `Bearer ${authToken}`);
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 90));
         };
-        xhr.onload = () => (xhr.status < 300 ? resolve() : reject(new Error("R2 업로드 실패")));
+        xhr.onload = () => (xhr.status < 300 ? resolve() : reject(new Error(`업로드 실패 (${xhr.status})`)));
         xhr.onerror = () => reject(new Error("네트워크 오류"));
         xhr.send(file);
       });

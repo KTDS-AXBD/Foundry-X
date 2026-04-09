@@ -21,16 +21,14 @@ export class FileService {
     env: Env,
     tenantId: string,
     input: PresignFileInput,
+    originUrl: string,
   ): Promise<{ presigned_url: string; file_id: string; r2_key: string }> {
     const fileId = generateId();
     const r2Key = generateR2Key(tenantId, input.filename);
 
-    // R2 Presigned URL 생성 (1시간 유효)
-    // Note: createPresignedUrl은 Workers R2 바인딩의 확장 API (타입 단언 필요)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const presignedUrl = await (env.FILES_BUCKET as any).createPresignedUrl("PUT", r2Key, {
-      expiresIn: 3600,
-    }) as string;
+    // Workers R2 바인딩에는 createPresignedUrl이 없어서 Worker 프록시 업로드로 전환
+    // 클라이언트는 이 URL로 PUT하고, /files/:id/upload 라우트가 FILES_BUCKET.put()로 중계
+    const presignedUrl = `${originUrl}/api/files/${fileId}/upload`;
 
     // D1에 pending 상태로 메타 저장
     await env.DB.prepare(
@@ -43,21 +41,55 @@ export class FileService {
     return { presigned_url: presignedUrl, file_id: fileId, r2_key: r2Key };
   }
 
+  async proxyUpload(
+    env: Env,
+    tenantId: string,
+    fileId: string,
+    body: ReadableStream<Uint8Array> | ArrayBuffer,
+    contentType: string,
+  ): Promise<{ ok: true }> {
+    const meta = await env.DB.prepare(
+      `SELECT r2_key, mime_type, status FROM uploaded_files WHERE id = ? AND tenant_id = ?`,
+    )
+      .bind(fileId, tenantId)
+      .first<{ r2_key: string; mime_type: string; status: string }>();
+
+    if (!meta) {
+      throw new Error("파일을 찾을 수 없어요");
+    }
+    if (meta.status !== "pending") {
+      throw new Error("이미 업로드된 파일이에요");
+    }
+
+    await env.FILES_BUCKET.put(meta.r2_key, body, {
+      httpMetadata: { contentType: contentType || meta.mime_type },
+    });
+
+    await env.DB.prepare(
+      `UPDATE uploaded_files SET status = 'uploaded' WHERE id = ? AND tenant_id = ?`,
+    )
+      .bind(fileId, tenantId)
+      .run();
+
+    return { ok: true };
+  }
+
   async confirm(
     env: Env,
     tenantId: string,
     fileId: string,
   ): Promise<UploadedFile> {
+    // proxyUpload가 이미 status='uploaded'로 바꿨을 수 있으므로 idempotent 처리
     const result = await env.DB.prepare(
       `UPDATE uploaded_files SET status = 'uploaded'
-       WHERE id = ? AND tenant_id = ? AND status = 'pending'
+       WHERE id = ? AND tenant_id = ? AND status IN ('pending', 'uploaded')
        RETURNING *`,
     )
       .bind(fileId, tenantId)
       .first<UploadedFile>();
 
     if (!result) {
-      throw new Error("파일을 찾을 수 없거나 이미 확인된 파일이에요");
+      throw new Error("파일을 찾을 수 없어요");
     }
     return result;
   }

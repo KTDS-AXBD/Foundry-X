@@ -18,7 +18,7 @@ const ExtractItemSchema = z.object({
 
 export const filesRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
-// ─── F441: POST /files/presign — Presigned URL 발급 ───
+// ─── F441: POST /files/presign — Worker 프록시 업로드 URL 발급 ───
 filesRoute.post("/files/presign", async (c) => {
   const orgId = c.get("orgId");
   const body = await c.req.json();
@@ -29,10 +29,30 @@ filesRoute.post("/files/presign", async (c) => {
   }
 
   try {
-    const result = await fileService.presign(c.env, orgId, parsed.data);
+    const origin = new URL(c.req.url).origin;
+    const result = await fileService.presign(c.env, orgId, parsed.data, origin);
     return c.json(result, 201);
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Presigned URL 생성에 실패했어요";
+    const msg = err instanceof Error ? err.message : "업로드 URL 생성에 실패했어요";
+    return c.json({ error: msg }, 500);
+  }
+});
+
+// ─── F441: PUT /files/:id/upload — Worker 프록시 업로드 (R2 바인딩 경유) ───
+filesRoute.put("/files/:id/upload", async (c) => {
+  const orgId = c.get("orgId");
+  const fileId = c.req.param("id");
+  const contentType = c.req.header("Content-Type") ?? "application/octet-stream";
+
+  if (!c.req.raw.body) {
+    return c.json({ error: "요청 바디가 비어 있어요" }, 400);
+  }
+
+  try {
+    await fileService.proxyUpload(c.env, orgId, fileId, c.req.raw.body, contentType);
+    return c.json({ ok: true }, 200);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "업로드에 실패했어요";
     return c.json({ error: msg }, 500);
   }
 });
