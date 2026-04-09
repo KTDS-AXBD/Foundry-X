@@ -49,6 +49,9 @@ import { GeneratePrdFromBpSchema } from "../../offering/schemas/bp-prd.js";
 import { StartInterviewSchema, AnswerInterviewSchema } from "../../offering/schemas/prd-interview.js";
 // Sprint 223 imports (F459)
 import { PortfolioService, NotFoundError } from "../services/portfolio-service.js";
+// Sprint 233 imports (F479)
+import { DiscoveryStageService } from "../services/discovery-stage-service.js";
+import { PipelineService } from "../../../modules/launch/services/pipeline-service.js";
 
 export const bizItemsRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
@@ -242,6 +245,14 @@ bizItemsRoute.post("/biz-items/:id/classify", async (c) => {
 
     await service.updateStatus(id, "classified");
 
+    // Sprint 233 F479: discovery_stages 2-1 완료 동기화
+    try {
+      const stageSvc = new DiscoveryStageService(c.env.DB);
+      await stageSvc.updateStage(id, orgId, "2-1", "completed");
+    } catch {
+      // biz_item_discovery_stages 테이블 미존재 시 무시
+    }
+
     return c.json(result);
   } catch (e) {
     await service.updateStatus(id, "draft");
@@ -305,6 +316,21 @@ bizItemsRoute.post("/biz-items/:id/evaluate", async (c) => {
     );
 
     await service.updateStatus(id, "evaluated");
+
+    // Sprint 233 F479: discovery_stages 2-2 완료 + pipeline REGISTERED→DISCOVERY 전환
+    try {
+      const stageSvc = new DiscoveryStageService(c.env.DB);
+      await stageSvc.updateStage(id, orgId, "2-2", "completed");
+
+      const pipelineSvc = new PipelineService(c.env.DB);
+      const currentStage = await pipelineSvc.getCurrentStage(id);
+      if (currentStage?.stage === "REGISTERED") {
+        const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? "system";
+        await pipelineSvc.advanceStage(id, orgId, "DISCOVERY", userId, "evaluate 완료 → 자동 전환");
+      }
+    } catch {
+      // pipeline_stages/discovery_stages 테이블 미존재 시 무시
+    }
 
     return c.json({
       id: evalId,
@@ -377,6 +403,14 @@ bizItemsRoute.post("/biz-items/:id/starting-point", async (c) => {
       await criteriaService.initialize(id);
     } catch {
       // biz_discovery_criteria 테이블 미존재 시 무시 (마이그레이션 미적용 환경)
+    }
+
+    // Sprint 233 F479: discovery_stages 2-0 완료 동기화
+    try {
+      const stageSvc = new DiscoveryStageService(c.env.DB);
+      await stageSvc.updateStage(id, orgId, "2-0", "completed");
+    } catch {
+      // biz_item_discovery_stages 테이블 미존재 시 무시
     }
 
     return c.json({

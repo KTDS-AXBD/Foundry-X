@@ -14,8 +14,12 @@ import { Button } from "@/components/ui/button";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   draft: { label: "대기", color: "bg-slate-100 text-slate-600" },
+  classifying: { label: "분류 중", color: "bg-blue-100 text-blue-700" },
+  classified: { label: "분류 완료", color: "bg-indigo-100 text-indigo-700" },
   analyzing: { label: "분석 중", color: "bg-blue-100 text-blue-700" },
   analyzed: { label: "분석 완료", color: "bg-green-100 text-green-700" },
+  evaluating: { label: "평가 중", color: "bg-blue-100 text-blue-700" },
+  evaluated: { label: "평가 완료", color: "bg-purple-100 text-purple-700" },
   shaping: { label: "형상화 중", color: "bg-amber-100 text-amber-700" },
   completed: { label: "완료", color: "bg-emerald-100 text-emerald-700" },
 };
