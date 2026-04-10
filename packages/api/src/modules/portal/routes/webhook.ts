@@ -41,20 +41,19 @@ webhookRoute.openapi(gitWebhookRoute, async (c) => {
   const body = await c.req.text();
   const signature = c.req.header("x-hub-signature-256");
 
+  // Reject unsigned requests when a secret is configured
+  if (c.env.WEBHOOK_SECRET && !signature) {
+    return c.json({ error: "Missing webhook signature" }, 401);
+  }
+
   // Resolve org from webhook signature (handles HMAC verification internally)
   const orgId = await resolveOrgFromWebhook(c.env.DB, body, c.env.WEBHOOK_SECRET, signature);
 
-  // If global secret is set and signature doesn't match any org, reject
-  if (c.env.WEBHOOK_SECRET && !signature) {
-    // No signature provided but secret is configured — allow for backwards compat
-  } else if (c.env.WEBHOOK_SECRET && signature) {
-    // Signature was checked inside resolveOrgFromWebhook;
-    // if orgId came back as "org_default" but global secret didn't match, verify separately
+  // If signature was provided but didn't match any known secret, reject
+  if (c.env.WEBHOOK_SECRET && signature && orgId === "org_default") {
     const expected = await computeHmacSha256(c.env.WEBHOOK_SECRET, body);
-    if (orgId === "org_default" && signature !== `sha256=${expected}`) {
-      // Check if any org matched — if resolveOrgFromWebhook returned org_default,
-      // it might be because global secret matched, which is fine
-      // The function already does this check, so org_default means it matched or no match found
+    if (signature !== `sha256=${expected}`) {
+      return c.json({ error: "Invalid webhook signature" }, 401);
     }
   }
 

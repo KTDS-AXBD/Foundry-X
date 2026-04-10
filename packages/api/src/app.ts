@@ -182,11 +182,21 @@ app.use("/api/github/*", authMiddleware);
 app.use("/api/github/*", tenantGuard);
 app.route("/api", githubRoute);
 
+// Constant-time string comparison to prevent timing attacks on secret comparison
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
+
 // F340+F476: Feedback Queue — Webhook Secret 또는 JWT admin 인증
 app.use("/api/feedback-queue/*", async (c, next) => {
-  // 1) Webhook Secret 인증 (consumer.sh용)
+  // 1) Webhook Secret 인증 (consumer.sh용) — constant-time 비교
   const secret = c.req.header("X-Webhook-Secret");
-  if (secret && c.env.WEBHOOK_SECRET && secret === c.env.WEBHOOK_SECRET) {
+  if (secret && c.env.WEBHOOK_SECRET && timingSafeEqual(secret, c.env.WEBHOOK_SECRET)) {
     return next();
   }
   // 2) JWT admin fallback (대시보드용 — F476)
