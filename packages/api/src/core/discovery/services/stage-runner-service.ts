@@ -140,27 +140,42 @@ export class StageRunnerService {
       constraints: [],
     };
     let analysisResult: StageAnalysisResult;
-    try {
-      const aiResult = await this.runner.execute(request);
-      if (aiResult.status === "failed") {
-        const errMsg = aiResult.output?.analysis ?? "AI runner failed";
-        console.error(`[stage-runner] ${stage} failed:`, errMsg);
+    const MAX_RETRIES = 1;
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const aiResult = await this.runner.execute(request);
+        if (aiResult.status === "failed") {
+          const errMsg = aiResult.output?.analysis ?? "AI runner failed";
+          const isTimeout = errMsg.includes("timed out") || errMsg.includes("timeout");
+          if (isTimeout && attempt < MAX_RETRIES) {
+            console.warn(`[stage-runner] ${stage} timeout (attempt ${attempt + 1}), retrying...`);
+            continue;
+          }
+          console.error(`[stage-runner] ${stage} failed:`, errMsg);
+          analysisResult = {
+            summary: "AI 분석 일시 실패 — 수동 편집으로 결과를 작성해 주세요.",
+            details: `자동 분석이 실패했어요.\n\n사유: ${errMsg}\n\n오른쪽 편집 버튼으로 직접 작성하거나 잠시 후 다시 시도해 주세요.`,
+            confidence: CONFIDENCE_ON_ERROR,
+          };
+        } else {
+          analysisResult = this.parseResult(aiResult.output?.analysis ?? "");
+        }
+        break;
+      } catch (e) {
+        const errMsg = e instanceof Error ? e.message : String(e);
+        const isTimeout = errMsg.includes("timed out") || errMsg.includes("timeout") || errMsg.includes("aborted");
+        if (isTimeout && attempt < MAX_RETRIES) {
+          console.warn(`[stage-runner] ${stage} threw timeout (attempt ${attempt + 1}), retrying...`);
+          continue;
+        }
+        console.error(`[stage-runner] ${stage} threw:`, errMsg);
         analysisResult = {
           summary: "AI 분석 일시 실패 — 수동 편집으로 결과를 작성해 주세요.",
-          details: `자동 분석이 실패했어요.\n\n사유: ${errMsg}\n\n오른쪽 편집 버튼으로 직접 작성하거나 잠시 후 다시 시도해 주세요.`,
+          details: `자동 분석 호출 중 오류가 발생했어요.\n\n사유: ${errMsg}\n\n오른쪽 편집 버튼으로 직접 작성하거나 잠시 후 다시 시도해 주세요.`,
           confidence: CONFIDENCE_ON_ERROR,
         };
-      } else {
-        analysisResult = this.parseResult(aiResult.output?.analysis ?? "");
+        break;
       }
-    } catch (e) {
-      const errMsg = e instanceof Error ? e.message : String(e);
-      console.error(`[stage-runner] ${stage} threw:`, errMsg);
-      analysisResult = {
-        summary: "AI 분석 일시 실패 — 수동 편집으로 결과를 작성해 주세요.",
-        details: `자동 분석 호출 중 오류가 발생했어요.\n\n사유: ${errMsg}\n\n오른쪽 편집 버튼으로 직접 작성하거나 잠시 후 다시 시도해 주세요.`,
-        confidence: CONFIDENCE_ON_ERROR,
-      };
     }
 
     // F485: bd_artifacts에 결과 저장

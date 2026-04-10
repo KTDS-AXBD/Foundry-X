@@ -49,7 +49,7 @@ function safeParseJson(raw: string | null): unknown {
   }
 }
 
-const TOTAL_STAGES = 9; // 2-1 ~ 2-9
+const TOTAL_STAGES = 11; // 2-0 ~ 2-10
 
 export class DiscoveryReportService {
   constructor(private db: D1Database) {}

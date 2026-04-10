@@ -112,15 +112,17 @@ export class PrdGeneratorService {
   }
 
   async refineWithLlm(draft: string, input: PrdGenerationInput): Promise<string> {
-    try {
-      const result = await this.runner.execute({
-        taskId: `prd-refine-${Date.now()}`,
-        agentId: "prd-generator",
-        taskType: "policy-evaluation",
-        context: {
-          repoUrl: "",
-          branch: "",
-          instructions: `당신은 KT DS AX BD팀 사업개발 전문가입니다.
+    const MAX_RETRIES = 1;
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const result = await this.runner.execute({
+          taskId: `prd-refine-${Date.now()}`,
+          agentId: "prd-generator",
+          taskType: "policy-evaluation",
+          context: {
+            repoUrl: "",
+            branch: "",
+            instructions: `당신은 KT DS AX BD팀 사업개발 전문가입니다.
 아래는 Discovery 분석 결과를 기반으로 자동 생성된 PRD 초안입니다.
 각 섹션을 전문적으로 다듬고, 누락된 내용을 보완해주세요.
 기존 evidence를 삭제하지 않고, 보강만 수행하세요.
@@ -130,19 +132,32 @@ export class PrdGeneratorService {
 
 --- PRD 초안 ---
 ${draft}`,
-          systemPromptOverride: "당신은 사업개발 PRD 전문 편집자입니다. 구조화된 PRD를 전문적으로 다듬어주세요.",
-        },
-        constraints: [],
-      });
+            systemPromptOverride: "당신은 사업개발 PRD 전문 편집자입니다. 구조화된 PRD를 전문적으로 다듬어주세요.",
+          },
+          constraints: [],
+        });
 
-      if (result.status === "success" && result.output?.analysis) {
-        return result.output.analysis;
+        if (result.status === "success" && result.output?.analysis) {
+          return result.output.analysis;
+        }
+        const errMsg = result.output?.analysis ?? "";
+        const isTimeout = errMsg.includes("timed out") || errMsg.includes("timeout");
+        if (isTimeout && attempt < MAX_RETRIES) {
+          console.warn(`[prd-generator] LLM timeout (attempt ${attempt + 1}), retrying...`);
+          continue;
+        }
+        return draft;
+      } catch (e) {
+        const errMsg = e instanceof Error ? e.message : String(e);
+        const isTimeout = errMsg.includes("timed out") || errMsg.includes("timeout") || errMsg.includes("aborted");
+        if (isTimeout && attempt < MAX_RETRIES) {
+          console.warn(`[prd-generator] LLM threw timeout (attempt ${attempt + 1}), retrying...`);
+          continue;
+        }
+        return draft;
       }
-      // Fallback to template if LLM fails
-      return draft;
-    } catch {
-      return draft;
     }
+    return draft;
   }
 
   async getLatest(bizItemId: string): Promise<GeneratedPrd | null> {
