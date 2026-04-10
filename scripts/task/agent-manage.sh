@@ -140,8 +140,8 @@ dashboard() {
   echo -e "${CYAN}║${NC}    monitor: ${mon_label}   watch: ${watch_label}          ${CYAN}║${NC}"
 
   # Pending signals
-  local sig_count
-  sig_count=$(ls "${FX_SIGNAL_DIR}/${PROJECT}-"*.signal 2>/dev/null | wc -w || echo 0)
+  local sig_count=0
+  sig_count=$(find "${FX_SIGNAL_DIR}" -name "${PROJECT}-*.signal" 2>/dev/null | wc -l)
   if [ "$sig_count" -gt 0 ]; then
     echo -e "${CYAN}║${NC}    ${YELLOW}⚡ 미처리 signal: ${sig_count}건${NC}                              ${CYAN}║${NC}"
   fi
