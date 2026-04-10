@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { EvaluationReportService } from "../modules/gate/services/evaluation-report-service.js";
+import {
+  EvaluationReportService,
+  EvaluationReportError,
+} from "../modules/gate/services/evaluation-report-service.js";
 import type { DiscoveryReportData } from "../modules/gate/schemas/evaluation-report.schema.js";
 
 const DDL = `
@@ -9,6 +12,16 @@ const DDL = `
     name TEXT NOT NULL DEFAULT ''
   );
   INSERT OR IGNORE INTO organizations (id, name) VALUES ('org_test', 'Test Org');
+
+  CREATE TABLE IF NOT EXISTS biz_items (
+    id TEXT PRIMARY KEY,
+    org_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'draft',
+    created_by TEXT NOT NULL DEFAULT 'user-test',
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
 
   CREATE TABLE IF NOT EXISTS bd_artifacts (
     id TEXT PRIMARY KEY,
@@ -81,7 +94,16 @@ const MINIMAL_FIXTURE: DiscoveryReportData = {
 };
 
 let seedCounter = 0;
-function seedArtifacts(db: D1Database, bizItemId: string, skills: string[]) {
+async function seedBizItem(db: D1Database, bizItemId: string, title = `Biz ${bizItemId}`) {
+  const exec = (db as unknown as { exec: (q: string) => Promise<void> }).exec.bind(db);
+  await exec(
+    `INSERT OR IGNORE INTO biz_items (id, org_id, title)
+     VALUES ('${bizItemId}', 'org_test', '${title}')`,
+  );
+}
+
+async function seedArtifacts(db: D1Database, bizItemId: string, skills: string[]) {
+  await seedBizItem(db, bizItemId);
   const exec = (db as unknown as { exec: (q: string) => Promise<void> }).exec.bind(db);
   const promises = skills.map((skillId) => {
     const id = `art-${++seedCounter}`;
@@ -193,13 +215,34 @@ describe("EvaluationReportService (F296)", () => {
       expect(report.title).toBe("Custom Report Title");
     });
 
-    it("returns red traffic light when no artifacts exist", async () => {
-      const report = await service.generate("org_test", "user-1", {
-        bizItemId: "biz-empty",
-      });
+    it("throws NO_DISCOVERY_DATA when biz item exists but has no completed artifacts", async () => {
+      await seedBizItem(db, "biz-empty", "빈 아이템");
 
-      expect(report.trafficLight).toBe("red");
-      expect(Object.keys(report.skillScores)).toHaveLength(0);
+      await expect(
+        service.generate("org_test", "user-1", { bizItemId: "biz-empty" }),
+      ).rejects.toMatchObject({
+        name: "EvaluationReportError",
+        code: "NO_DISCOVERY_DATA",
+        userMessage: expect.stringContaining("빈 아이템"),
+        nextAction: expect.objectContaining({ href: "/discovery/items/biz-empty" }),
+      });
+    });
+
+    it("throws BIZ_ITEM_NOT_FOUND when biz item does not exist", async () => {
+      await expect(
+        service.generate("org_test", "user-1", { bizItemId: "ghost-item" }),
+      ).rejects.toBeInstanceOf(EvaluationReportError);
+    });
+
+    it("uses biz_items.title as default report title (not raw bizItemId)", async () => {
+      await seedBizItem(db, "biz-3", "스마트 팩토리 AI");
+      await seedArtifacts(db, "biz-3", ["2-1"]);
+      // seedArtifacts seeds biz_items with generic title; overwrite with explicit title
+      const exec = (db as unknown as { exec: (q: string) => Promise<void> }).exec.bind(db);
+      await exec(`UPDATE biz_items SET title='스마트 팩토리 AI' WHERE id='biz-3'`);
+
+      const report = await service.generate("org_test", "user-1", { bizItemId: "biz-3" });
+      expect(report.title).toBe("스마트 팩토리 AI 통합 평가 결과서");
     });
   });
 

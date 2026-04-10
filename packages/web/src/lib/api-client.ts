@@ -7,6 +7,7 @@ export class ApiError extends Error {
   constructor(
     public status: number,
     message: string,
+    public data: unknown = null,
   ) {
     super(message);
     this.name = "ApiError";
@@ -78,7 +79,31 @@ async function requestWithRetry(
       window.location.href = "/login";
       throw new ApiError(401, "로그인이 필요해요");
     }
-    throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+    // 본문에 {error, message, ...} 형태가 있으면 그대로 보존해서 호출자가 활용할 수 있게
+    let data: unknown = null;
+    let bodyMessage: string | null = null;
+    try {
+      const text = await res.clone().text();
+      if (text) {
+        try {
+          data = JSON.parse(text);
+          if (data && typeof data === "object") {
+            const d = data as Record<string, unknown>;
+            if (typeof d.message === "string") bodyMessage = d.message;
+            else if (typeof d.error === "string") bodyMessage = d.error;
+          }
+        } catch {
+          bodyMessage = text.slice(0, 200);
+        }
+      }
+    } catch {
+      /* ignore body read failures */
+    }
+    throw new ApiError(
+      res.status,
+      bodyMessage ?? `API ${res.status}: ${res.statusText}`,
+      data,
+    );
   }
   return res;
 }

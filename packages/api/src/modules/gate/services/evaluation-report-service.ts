@@ -35,6 +35,21 @@ interface ArtifactRow {
   duration_ms: number;
 }
 
+/**
+ * 명시적 도메인 에러 — 라우트에서 4xx로 매핑
+ */
+export class EvaluationReportError extends Error {
+  constructor(
+    public code: "BIZ_ITEM_NOT_FOUND" | "NO_DISCOVERY_DATA",
+    message: string,
+    public userMessage: string,
+    public nextAction?: { label: string; href: string },
+  ) {
+    super(message);
+    this.name = "EvaluationReportError";
+  }
+}
+
 /** 스킬 ID → 사람이 읽을 수 있는 라벨 */
 const SKILL_LABELS: Record<string, string> = {
   "2-1": "시장 규모 분석",
@@ -141,12 +156,29 @@ export class EvaluationReportService {
 
   /**
    * @deprecated Use generateFromFixture() for v2 reports, or future AI pipeline (Phase 31+)
+   *
+   * biz item 존재 여부 + 산출물 존재 여부를 사전 검증하여, 빈 상태로 무의미한
+   * 리포트가 생성되는 문제를 방지해요.
    */
   async generate(
     orgId: string,
     userId: string,
     input: GenerateReportInput,
   ): Promise<EvaluationReport> {
+    // 0. biz item 조회 (title 확보 + 존재 검증)
+    const bizItem = await this.db
+      .prepare("SELECT id, title FROM biz_items WHERE id = ? AND org_id = ?")
+      .bind(input.bizItemId, orgId)
+      .first<{ id: string; title: string }>();
+
+    if (!bizItem) {
+      throw new EvaluationReportError(
+        "BIZ_ITEM_NOT_FOUND",
+        `biz item not found: ${input.bizItemId}`,
+        "해당 사업 아이템을 찾을 수 없어요.",
+      );
+    }
+
     // 1. biz-item의 산출물 조회
     const { results: artifacts } = await this.db
       .prepare(
@@ -158,7 +190,17 @@ export class EvaluationReportService {
       .bind(orgId, input.bizItemId)
       .all<ArtifactRow>();
 
-    // 2. 스킬별 최신 산출물로 그룹핑 → 점수 산출
+    // 2. 산출물이 전혀 없으면 — 결과서를 만들 근거가 없음 → 명시적 에러
+    if (!artifacts || artifacts.length === 0) {
+      throw new EvaluationReportError(
+        "NO_DISCOVERY_DATA",
+        `no completed bd_artifacts for bizItemId=${input.bizItemId}`,
+        `'${bizItem.title}' 아이템은 아직 9단계 발굴 분석이 완료되지 않았어요. 발굴 분석을 먼저 진행해 주세요.`,
+        { label: "발굴 분석 시작하기", href: `/discovery/items/${input.bizItemId}` },
+      );
+    }
+
+    // 3. 스킬별 최신 산출물로 그룹핑 → 점수 산출
     const seen = new Set<string>();
     const skillScores: Record<string, { score: number; label: string; summary: string }> = {};
 
@@ -177,10 +219,10 @@ export class EvaluationReportService {
       };
     }
 
-    // 3. 신호등 산출
+    // 4. 신호등 산출
     const trafficLight = computeTrafficLight(skillScores);
     const now = new Date().toISOString();
-    const title = input.title ?? `${input.bizItemId} 통합 평가 결과서`;
+    const title = input.title ?? `${bizItem.title} 통합 평가 결과서`;
 
     // 4. INSERT
     const id = crypto.randomUUID().replace(/-/g, "").slice(0, 32);

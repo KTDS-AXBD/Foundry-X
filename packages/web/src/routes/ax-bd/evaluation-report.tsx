@@ -5,7 +5,14 @@
  * 9탭 리치 리포트 전면 개편 (in-place 재작성, F296 레거시 폴백 유지)
  */
 import { useState, useEffect, useCallback } from "react";
-import { fetchApi, postApi, getBizItems, type BizItemSummary } from "@/lib/api-client";
+import { Link } from "react-router-dom";
+import {
+  fetchApi,
+  postApi,
+  getBizItems,
+  ApiError,
+  type BizItemSummary,
+} from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
 import { DiscoveryReportV2View } from "@/components/feature/discovery/report-v2/DiscoveryReportV2View";
 
@@ -40,6 +47,49 @@ const LIGHT_COLORS = {
 // ── 레거시 v1 상세 뷰 (reportData === null 폴백) ──────────────────────────────
 
 function LegacyReportDetail({ report }: { report: EvalReport }) {
+  const hasScores = Object.keys(report.skillScores ?? {}).length > 0;
+
+  // 산출물이 전혀 없는 경우 — 친절한 빈 상태 + CTA
+  // (원칙적으로는 서버에서 422로 차단하지만, 과거 데이터 호환을 위해 클라에서도 방어)
+  if (!hasScores) {
+    return (
+      <div className="space-y-6">
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-6 space-y-4">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">⚠️</span>
+            <div className="flex-1 space-y-1">
+              <h3 className="text-base font-semibold text-foreground">
+                발굴 분석 데이터가 없어요
+              </h3>
+              <p className="text-sm text-foreground/80 leading-relaxed">
+                이 결과서는 9단계 발굴 분석이 완료되기 전에 생성되어, 평가 근거가 비어
+                있어요. 발굴 분석을 먼저 진행한 후 결과서를 다시 생성해 주세요.
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 pt-2">
+            <Link
+              to={`/discovery/items/${report.bizItemId}`}
+              className="bg-[var(--discovery-mint)] text-white px-4 py-1.5 rounded text-sm font-medium hover:opacity-90"
+            >
+              발굴 분석 시작하기 →
+            </Link>
+            <Link
+              to={`/discovery/items/${report.bizItemId}/stages`}
+              className="border border-border text-foreground/80 px-4 py-1.5 rounded text-sm hover:bg-muted"
+            >
+              9단계 진행 상태 보기
+            </Link>
+          </div>
+        </div>
+
+        <div className="text-xs text-muted-foreground">
+          생성 시각: {new Date(report.createdAt).toLocaleString()}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
@@ -93,6 +143,10 @@ export function Component() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickedBizItemId, setPickedBizItemId] = useState<string>("");
   const [generating, setGenerating] = useState(false);
+  const [pickerError, setPickerError] = useState<{
+    message: string;
+    nextAction?: { label: string; href: string };
+  } | null>(null);
 
   const loadReports = useCallback(async () => {
     try {
@@ -116,6 +170,7 @@ export function Component() {
 
   async function openPicker() {
     setError(null);
+    setPickerError(null);
     setPickerOpen(true);
     if (bizItems.length === 0) {
       try {
@@ -127,7 +182,7 @@ export function Component() {
           setPickedBizItemId(v2First?.id ?? data.items[0].id);
         }
       } catch (e) {
-        setError((e as Error).message);
+        setPickerError({ message: (e as Error).message });
       }
     }
   }
@@ -136,7 +191,7 @@ export function Component() {
     if (!pickedBizItemId) return;
     try {
       setGenerating(true);
-      setError(null);
+      setPickerError(null);
       const report = await postApi<EvalReport>("/ax-bd/evaluation-reports/generate", {
         bizItemId: pickedBizItemId,
       });
@@ -145,7 +200,18 @@ export function Component() {
       // 방금 생성한 리포트를 바로 상세 뷰로 열어주기
       setSelected(report);
     } catch (e) {
-      setError((e as Error).message);
+      // 서버 422 (NO_DISCOVERY_DATA) 응답은 data.nextAction 포함 → picker 내에서 CTA 표시
+      if (e instanceof ApiError) {
+        const data = e.data as
+          | { error?: string; message?: string; nextAction?: { label: string; href: string } }
+          | null;
+        setPickerError({
+          message: data?.message ?? e.message,
+          nextAction: data?.nextAction,
+        });
+      } else {
+        setPickerError({ message: (e as Error).message });
+      }
     } finally {
       setGenerating(false);
     }
@@ -208,6 +274,23 @@ export function Component() {
                 9단계 발굴 분석 결과를 기반으로 통합 평가결과서를 생성해요.
               </p>
             </div>
+
+            {pickerError && (
+              <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 space-y-2">
+                <p className="text-sm text-foreground leading-relaxed">
+                  {pickerError.message}
+                </p>
+                {pickerError.nextAction && (
+                  <Link
+                    to={pickerError.nextAction.href}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-[var(--discovery-mint)] hover:underline"
+                    onClick={() => setPickerOpen(false)}
+                  >
+                    {pickerError.nextAction.label} →
+                  </Link>
+                )}
+              </div>
+            )}
 
             {bizItems.length === 0 ? (
               <div className="text-sm text-muted-foreground py-6 text-center">

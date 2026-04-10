@@ -1,7 +1,10 @@
 import { Hono } from "hono";
 import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
-import { EvaluationReportService } from "../services/evaluation-report-service.js";
+import {
+  EvaluationReportService,
+  EvaluationReportError,
+} from "../services/evaluation-report-service.js";
 import {
   DiscoveryReportDataSchema,
   GenerateReportSchema,
@@ -79,9 +82,24 @@ evaluationReportRoute.post("/ax-bd/evaluation-reports/generate", async (c) => {
     }
   }
 
-  // Legacy v1 폴백
-  const report = await svc.generate(orgId, userId, parsed.data);
-  return c.json(report, 201);
+  // Legacy v1 폴백 — 산출물 없음/아이템 없음은 422로 친절히 응답
+  try {
+    const report = await svc.generate(orgId, userId, parsed.data);
+    return c.json(report, 201);
+  } catch (e) {
+    if (e instanceof EvaluationReportError) {
+      const status = e.code === "BIZ_ITEM_NOT_FOUND" ? 404 : 422;
+      return c.json(
+        {
+          error: e.code,
+          message: e.userMessage,
+          nextAction: e.nextAction,
+        },
+        status,
+      );
+    }
+    throw e;
+  }
 });
 
 // GET /ax-bd/evaluation-reports — 결과서 목록
