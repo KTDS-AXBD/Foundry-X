@@ -139,7 +139,11 @@ export class StageRunnerService {
       },
       constraints: [],
     };
-    let analysisResult: StageAnalysisResult;
+    let analysisResult: StageAnalysisResult = {
+      summary: "AI 분석 일시 실패 — 수동 편집으로 결과를 작성해 주세요.",
+      details: "분석이 실행되지 않았어요. 다시 시도해 주세요.",
+      confidence: CONFIDENCE_ON_ERROR,
+    };
     const MAX_RETRIES = 1;
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {

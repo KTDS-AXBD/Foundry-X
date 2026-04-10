@@ -102,4 +102,5 @@ export const TASK_TYPE_TO_MCP_TOOL: Record<AgentTaskType, string> = {
   "bmc-generation": "foundry_bmc_generation",
   "bmc-insight": "foundry_bmc_insight",
   "market-summary": "foundry_market_summary",
+  "discovery-analysis": "foundry_discovery_analysis",
 };

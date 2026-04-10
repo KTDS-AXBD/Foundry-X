@@ -130,7 +130,10 @@ export type AgentTaskType =
   | 'policy-evaluation'
   | 'skill-query'
   | 'ontology-lookup'
-  | 'bmc-generation';
+  | 'bmc-generation'
+  | 'bmc-insight'
+  | 'market-summary'
+  | 'discovery-analysis';
 
 /** F53: 에이전트 실행 요청 */
 export interface AgentExecutionRequest {
