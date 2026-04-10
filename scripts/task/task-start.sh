@@ -1,0 +1,197 @@
+#!/usr/bin/env bash
+# scripts/task/task-start.sh — /ax:task start (S-α MVP)
+#
+# Usage:  task-start.sh <track> "<title>"
+#   track: F | B | C | X
+#
+# Implements PRD §4.1.1 — flock allocator + push SHA pinning + commit body
+# fx-task-meta + tmux split + GitHub Issue creation.
+#
+# Exit 0 on success, non-zero with message on abort. State machine:
+#   FAILED_SETUP — SPEC commit / push / WT create / tmux split failure
+#   IN_PROGRESS (degraded) — Issue creation failure (cache pending_issue=true)
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib.sh
+source "$SCRIPT_DIR/lib.sh"
+
+TRACK="${1:?track required (F|B|C|X)}"
+TITLE="${2:?title required}"
+
+case "$TRACK" in F|B|C|X) ;; *) echo "[fx-task] invalid track: $TRACK" >&2; exit 2;; esac
+
+REPO_ROOT=$(_repo_root)
+[ -n "$REPO_ROOT" ] || { echo "[fx-task] not a git repo" >&2; exit 2; }
+cd "$REPO_ROOT"
+
+assert_no_sprint_context
+assert_master_clean
+assert_wip_capacity
+
+CUR_BRANCH=$(git branch --show-current)
+if [ "$CUR_BRANCH" != "master" ]; then
+  echo "[fx-task] master에서만 실행 가능 (현재: $CUR_BRANCH)" >&2
+  exit 2
+fi
+
+# ─── Step 1: ID allocator + SPEC register (under flock) ──────────────────────
+ID_LOCK="$FX_LOCK_DIR/id-allocator.lock"
+PUSH_LOCK="$FX_LOCK_DIR/master-push.lock"
+
+TASK_ID=""
+PUSHED_SHA=""
+
+(
+  flock -x -w 10 9 || { echo "[fx-task] id-allocator lock timeout" >&2; exit 3; }
+
+  TASK_ID=$(allocate_id "$TRACK")
+  echo "[fx-task] 발급: $TASK_ID — $TITLE" >&2
+
+  # Minimal SPEC.md registration: append a one-line entry to a dedicated section.
+  # S-α scope: append to a fenced "Task Orchestrator Backlog" block at end of §5.
+  # If the marker isn't present, create it before §6.
+  STATUS_EMOJI="🔧"
+  REQ_PLACEHOLDER="(FX-REQ-pending)"
+  ENTRY="| ${TASK_ID} | ${TITLE} ${REQ_PLACEHOLDER} | — | ${STATUS_EMOJI} | task orchestrator |"
+
+  if ! grep -q "<!-- fx-task-orchestrator-backlog -->" SPEC.md; then
+    # Insert marker block right before "## §7 기술 스택"
+    awk -v block='\n<!-- fx-task-orchestrator-backlog -->\n### Task Orchestrator Backlog (F/B/C/X)\n\n| ID | 제목 | Sprint | 상태 | 비고 |\n|----|------|--------|:----:|------|\n<!-- /fx-task-orchestrator-backlog -->\n' \
+      '/^## §7 기술 스택/ && !done {print block; done=1} {print}' \
+      SPEC.md > SPEC.md.tmp && mv SPEC.md.tmp SPEC.md
+  fi
+
+  # Insert entry before closing marker
+  awk -v entry="$ENTRY" \
+    '/<!-- \/fx-task-orchestrator-backlog -->/ && !done {print entry; done=1} {print}' \
+    SPEC.md > SPEC.md.tmp && mv SPEC.md.tmp SPEC.md
+
+  git add SPEC.md
+  if ! git commit -m "chore(${TASK_ID}): register task — ${TITLE}" >/dev/null; then
+    git checkout -- SPEC.md
+    echo "[fx-task] SPEC commit 실패" >&2
+    log_event "$TASK_ID" "failed_setup" '{"step":"spec_commit"}'
+    exit 4
+  fi
+
+  # ─── Step 2: push under master-push lock ───────────────────────────────────
+  (
+    flock -x -w 30 8 || {
+      git reset --hard HEAD^ >/dev/null
+      echo "[fx-task] master-push lock timeout" >&2
+      exit 5
+    }
+    if ! git push origin master >/dev/null 2>&1; then
+      git reset --hard HEAD^ >/dev/null
+      echo "[fx-task] push failed (non-fast-forward 가능성). pull --rebase 후 재시도" >&2
+      log_event "$TASK_ID" "failed_setup" '{"step":"push"}'
+      exit 6
+    fi
+    PUSHED_SHA=$(git rev-parse HEAD)
+    echo "$TASK_ID|$PUSHED_SHA" > "$FX_LOCK_DIR/.last-allocation"
+  ) 8>"$PUSH_LOCK"
+
+) 9>"$ID_LOCK"
+
+# Read back from subshell-set file
+[ -f "$FX_LOCK_DIR/.last-allocation" ] || { echo "[fx-task] allocator output 누락" >&2; exit 7; }
+TASK_ID=$(cut -d'|' -f1 "$FX_LOCK_DIR/.last-allocation")
+PUSHED_SHA=$(cut -d'|' -f2 "$FX_LOCK_DIR/.last-allocation")
+rm -f "$FX_LOCK_DIR/.last-allocation"
+
+SLUG=$(slugify "$TITLE")
+BRANCH="task/${TASK_ID}-${SLUG}"
+WT_BASE="${CLAUDE_WT_BASE:-$HOME/work/worktrees}"
+PROJECT=$(basename "$REPO_ROOT")
+WT_PATH="${WT_BASE}/${PROJECT}/${TASK_ID}-${SLUG}"
+
+# ─── Step 3: create worktree pinned to pushed_sha ────────────────────────────
+mkdir -p "$(dirname "$WT_PATH")"
+if ! git worktree add -b "$BRANCH" "$WT_PATH" "$PUSHED_SHA" >/dev/null 2>&1; then
+  # rollback master commit
+  git push origin "+${PUSHED_SHA}^:master" >/dev/null 2>&1 || true
+  git reset --hard HEAD^ >/dev/null 2>&1 || true
+  echo "[fx-task] worktree 생성 실패 — master 등록 revert 시도" >&2
+  log_event "$TASK_ID" "failed_setup" '{"step":"worktree"}'
+  exit 8
+fi
+
+# ─── Step 4: write fx-task-meta commit (authority source) ────────────────────
+ISSUE_URL_PLACEHOLDER=""
+META_JSON=$(jq -nc \
+  --arg id "$TASK_ID" --arg t "$TRACK" --arg title "$TITLE" \
+  --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  --arg branch "$BRANCH" --arg sha "$PUSHED_SHA" \
+  '{task_id:$id, task_type:$t, title:$title, started_at:$ts, branch:$branch, base_sha:$sha, scope_files:[], scope_dirs:[]}')
+
+(
+  cd "$WT_PATH"
+  cat > .task-context <<EOF
+TASK_ID=$TASK_ID
+TASK_TYPE=$TRACK
+TITLE=$TITLE
+STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+BRANCH=$BRANCH
+WT_PATH=$WT_PATH
+BASE_SHA=$PUSHED_SHA
+PID=$$
+LAST_HEARTBEAT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+EOF
+
+  # ensure local gitignore (worktree branch only) hides .task-context
+  if [ ! -f .gitignore ] || ! grep -q '^\.task-context' .gitignore; then
+    echo ".task-context" >> .gitignore
+    git add .gitignore
+  fi
+
+  git commit --allow-empty -m "$(printf 'chore(meta): %s task context init\n\n```fx-task-meta\n%s\n```' "$TASK_ID" "$META_JSON")" >/dev/null
+)
+
+# ─── Step 5: tmux split (best effort — non-fatal in S-α) ─────────────────────
+PANE_ID=""
+if [ -n "${TMUX:-}" ]; then
+  PANE_ID=$(tmux split-window -h -P -F '#{pane_id}' -c "$WT_PATH" 2>/dev/null || echo "")
+  if [ -n "$PANE_ID" ]; then
+    tmux select-pane -t "$PANE_ID" -T "${TASK_ID} ${TITLE}" 2>/dev/null || true
+    # bidirectional verification via user-data
+    tmux set -p -t "$PANE_ID" @fx-task-id "$TASK_ID" 2>/dev/null || true
+  fi
+fi
+
+# ─── Step 6: GitHub Issue creation (degraded on failure) ─────────────────────
+ISSUE_URL=""
+if command -v gh >/dev/null 2>&1; then
+  GH_TOKEN_TMP=""
+  if [ -f .git/.credentials ]; then
+    GH_TOKEN_TMP=$(sed 's|.*://[^:]*:\([^@]*\)@.*|\1|' .git/.credentials 2>/dev/null || true)
+  fi
+  if ISSUE_URL=$(GH_TOKEN="${GH_TOKEN:-$GH_TOKEN_TMP}" gh issue create \
+       --repo "KTDS-AXBD/Foundry-X" \
+       --title "[$TASK_ID] $TITLE" \
+       --label "fx:track:$TRACK,fx:status:in_progress,fx:wip:active,fx:risk:medium" \
+       --body "$(printf 'Task Orchestrator entry — auto-created by /ax:task start.\n\n- ID: %s\n- Track: %s\n- Branch: `%s`\n- Base SHA: `%s`\n- WT: `%s`\n' "$TASK_ID" "$TRACK" "$BRANCH" "$PUSHED_SHA" "$WT_PATH")" \
+       2>/dev/null); then
+    : # ok
+  else
+    echo "[fx-task] GitHub Issue 생성 실패 (degraded). doctor가 후속 처리" >&2
+    ISSUE_URL=""
+  fi
+fi
+
+# ─── Step 7: cache + log ─────────────────────────────────────────────────────
+cache_upsert_task "$TASK_ID" "in_progress" "$TRACK" "$PANE_ID" "$WT_PATH" "$BRANCH" "$ISSUE_URL"
+log_event "$TASK_ID" "started" "$(jq -nc \
+  --arg track "$TRACK" --arg branch "$BRANCH" --arg wt "$WT_PATH" \
+  --arg pane "$PANE_ID" --arg issue "$ISSUE_URL" --arg sha "$PUSHED_SHA" \
+  '{track:$track, branch:$branch, wt:$wt, pane:$pane, issue_url:$issue, base_sha:$sha}')"
+
+cat <<EOF
+[fx-task] ✅ ${TASK_ID} 시작
+  branch:  ${BRANCH}
+  wt:      ${WT_PATH}
+  pane:    ${PANE_ID:-(no tmux)}
+  issue:   ${ISSUE_URL:-(degraded)}
+  base:    ${PUSHED_SHA:0:8}
+EOF
