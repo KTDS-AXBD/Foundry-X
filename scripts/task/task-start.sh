@@ -238,7 +238,10 @@ else
   INJECT_STATUS="⏭️  tmux 없음 — 수동 시작 필요"
 fi
 
-# ─── Step 8: auto-start monitor (if not already running) ────────────────────
+# ─── Step 8: auto-start monitor + watch (if not already running) ──────────────
+mkdir -p /tmp/task-signals
+
+# 8a. task-monitor (signal → merge → cleanup, 30s interval)
 MONITOR_PID_FILE="/tmp/task-signals/.monitor.pid"
 MONITOR_RUNNING=false
 if [ -f "$MONITOR_PID_FILE" ] && kill -0 "$(cat "$MONITOR_PID_FILE")" 2>/dev/null; then
@@ -246,7 +249,6 @@ if [ -f "$MONITOR_PID_FILE" ] && kill -0 "$(cat "$MONITOR_PID_FILE")" 2>/dev/nul
 fi
 
 if [ "$MONITOR_RUNNING" = false ]; then
-  mkdir -p /tmp/task-signals
   nohup bash "$REPO_ROOT/scripts/task/task-monitor.sh" --interval 30 \
     > "/tmp/task-signals/monitor-${PROJECT}.log" 2>&1 &
   echo $! > "$MONITOR_PID_FILE"
@@ -254,6 +256,27 @@ if [ "$MONITOR_RUNNING" = false ]; then
   MONITOR_STATUS="✅ monitor 시작 (PID $(cat "$MONITOR_PID_FILE"), 30초 간격)"
 else
   MONITOR_STATUS="✅ monitor 실행 중 (PID $(cat "$MONITOR_PID_FILE"))"
+fi
+
+# 8b. task-watch (pane 실시간 감시 — 권한 자동승인 + idle/완료/에러 감지, 20s interval)
+WATCH_PID_FILE="/tmp/task-signals/.watch.pid"
+WATCH_RUNNING=false
+if [ -f "$WATCH_PID_FILE" ] && kill -0 "$(cat "$WATCH_PID_FILE")" 2>/dev/null; then
+  WATCH_RUNNING=true
+fi
+
+if [ "$WATCH_RUNNING" = false ] && [ -f "$REPO_ROOT/scripts/task/task-watch.sh" ]; then
+  nohup bash "$REPO_ROOT/scripts/task/task-watch.sh" --interval 20 \
+    > "/tmp/task-signals/watch-${PROJECT}.log" 2>&1 &
+  echo $! > "$WATCH_PID_FILE"
+  disown
+  WATCH_STATUS="✅ watch 시작 (PID $(cat "$WATCH_PID_FILE"), 20초 간격)"
+else
+  if [ "$WATCH_RUNNING" = true ]; then
+    WATCH_STATUS="✅ watch 실행 중 (PID $(cat "$WATCH_PID_FILE"))"
+  else
+    WATCH_STATUS="⏭️  watch 스크립트 없음"
+  fi
 fi
 
 cat <<EOF
@@ -265,4 +288,5 @@ cat <<EOF
   base:    ${PUSHED_SHA:0:8}
   inject:  ${INJECT_STATUS}
   monitor: ${MONITOR_STATUS}
+  watch:   ${WATCH_STATUS}
 EOF
