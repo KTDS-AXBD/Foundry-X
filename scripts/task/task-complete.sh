@@ -62,6 +62,12 @@ if [ -n "$DIRTY" ] || [ -n "$UNTRACKED" ]; then
   git commit -m "chore(${TASK_ID}): auto-commit on task complete" 2>/dev/null || true
 fi
 
+# ─── Step 2b: web 변경 시 스크린샷 검증 ──────────────────────────────────────
+SCREENSHOT_SCRIPT="$MAIN_REPO/scripts/screenshot-verify.sh"
+if [ -f "$SCREENSHOT_SCRIPT" ]; then
+  bash "$SCREENSHOT_SCRIPT" 2>&1 | sed 's/^/  /' || true
+fi
+
 # ─── Step 3: push + PR 생성 ─────────────────────────────────────────────────
 PR_URL=""
 COMMIT_COUNT=$(git rev-list master..HEAD --count 2>/dev/null || echo "0")
