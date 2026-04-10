@@ -15,11 +15,26 @@ function req(method: string, path: string, opts?: { body?: unknown; headers?: Re
   return app.request(url, init, env);
 }
 
-function webhookReq(body: unknown) {
+async function computeHmac(secret: string, body: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    "raw", new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" }, false, ["sign"],
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(body));
+  return "sha256=" + [...new Uint8Array(sig)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function webhookReq(body: unknown) {
+  const bodyStr = JSON.stringify(body);
+  const signature = await computeHmac("test-webhook-secret", bodyStr);
   return app.request("http://localhost/api/webhook/git", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "x-github-event": "issues" },
-    body: JSON.stringify(body),
+    headers: {
+      "Content-Type": "application/json",
+      "x-github-event": "issues",
+      "x-hub-signature-256": signature,
+    },
+    body: bodyStr,
   }, env);
 }
 
@@ -261,6 +276,35 @@ describe("FeedbackQueueService — via API", () => {
     expect(skipRes.status).toBe(200);
     const skipped = await skipRes.json() as any;
     expect(skipped.status).toBe("skipped");
+  });
+
+  it("PATCH status=failed → retry_count 자동 증가 (D+K fix)", async () => {
+    await webhookReq({
+      action: "opened",
+      issue: { number: 700, title: "Retry count test", body: null, state: "open", labels: [{ name: "visual-feedback" }] },
+      repository: { full_name: "KTDS-AXBD/Foundry-X" },
+    });
+
+    const consumeRes = await req("POST", "/api/feedback-queue/consume");
+    const consumed = await consumeRes.json() as any;
+    expect(consumed.retry_count).toBe(0);
+
+    // 1차 실패
+    const fail1 = await req("PATCH", `/api/feedback-queue/${consumed.id}`, {
+      body: { status: "failed", errorMessage: "Attempt 1" },
+    });
+    const fail1Data = await fail1.json() as any;
+    expect(fail1Data.retry_count).toBe(1);
+
+    // pending으로 리셋 후 다시 실패
+    await req("PATCH", `/api/feedback-queue/${consumed.id}`, {
+      body: { status: "pending" },
+    });
+    const fail2 = await req("PATCH", `/api/feedback-queue/${consumed.id}`, {
+      body: { status: "failed", errorMessage: "Attempt 2" },
+    });
+    const fail2Data = await fail2.json() as any;
+    expect(fail2Data.retry_count).toBe(2);
   });
 
   it("list — status 필터링 (pending only)", async () => {

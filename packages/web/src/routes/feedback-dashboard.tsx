@@ -30,6 +30,10 @@ function relativeTime(dateStr: string): string {
   return `${days}일 전`;
 }
 
+function parseLabels(raw: string): string[] {
+  try { return JSON.parse(raw); } catch { return []; }
+}
+
 function StatusBadge({ status }: { status: string }) {
   return (
     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[status] ?? "bg-gray-100 text-gray-600"}`}>
@@ -87,9 +91,9 @@ function FeedbackCard({
 
           {item.labels && (
             <div className="flex flex-wrap gap-1">
-              {item.labels.split(",").map((label) => (
+              {parseLabels(item.labels).map((label) => (
                 <span key={label} className="rounded bg-muted px-1.5 py-0.5 text-xs">
-                  {label.trim()}
+                  {label}
                 </span>
               ))}
             </div>

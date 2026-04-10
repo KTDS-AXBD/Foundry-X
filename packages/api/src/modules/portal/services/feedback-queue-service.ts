@@ -81,6 +81,7 @@ export class FeedbackQueueService {
     const binds: unknown[] = [];
 
     if (data.status) { sets.push("status = ?"); binds.push(data.status); }
+    if (data.status === "failed") { sets.push("retry_count = retry_count + 1"); }
     if (data.agentPrUrl !== undefined) { sets.push("agent_pr_url = ?"); binds.push(data.agentPrUrl); }
     if (data.agentLog !== undefined) { sets.push("agent_log = ?"); binds.push(data.agentLog); }
     if (data.errorMessage !== undefined) { sets.push("error_message = ?"); binds.push(data.errorMessage); }

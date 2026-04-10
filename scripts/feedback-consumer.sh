@@ -17,10 +17,11 @@ API_BASE="${API_BASE:-https://foundry-x-api.ktds-axbd.workers.dev}"
 REPO_DIR="${REPO_DIR:-$(pwd)}"
 ONCE=false
 
-for arg in "$@"; do
-  case "$arg" in
-    --once) ONCE=true ;;
-    --interval) shift; INTERVAL="$2" ;;
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --once) ONCE=true; shift ;;
+    --interval) INTERVAL="$2"; shift 2 ;;
+    *) shift ;;
   esac
 done
 
@@ -139,22 +140,27 @@ ${BODY}
 
   # 5. 상태 업데이트 — F477: Agent 로그 보존
   local AGENT_LOG
-  AGENT_LOG=$(echo "$RESULT" | tail -c 2000 | jq -Rs '.' | sed 's/^"//;s/"$//')
+  AGENT_LOG=$(echo "$RESULT" | tail -c 2000)
 
   if [ -n "$PR_URL" ]; then
     log "SUCCESS: PR created — $PR_URL"
+    local PATCH_BODY
+    PATCH_BODY=$(jq -n --arg url "$PR_URL" --arg log "$AGENT_LOG" \
+      '{status:"done", agentPrUrl:$url, agentLog:$log}')
     curl -sf -X PATCH "$API_BASE/api/feedback-queue/$ITEM_ID" \
       -H "$AUTH_HEADER" \
       -H "Content-Type: application/json" \
-      -d "{\"status\":\"done\",\"agentPrUrl\":\"$PR_URL\",\"agentLog\":\"$AGENT_LOG\"}" >/dev/null
+      -d "$PATCH_BODY" >/dev/null
   else
     log "FAILED: No PR created for Issue #$ISSUE_NUM"
-    local ERR_MSG
-    ERR_MSG=$(echo "$RESULT" | tail -5 | jq -Rs '.' | sed 's/^"//;s/"$//')
+    local ERR_MSG PATCH_BODY
+    ERR_MSG=$(echo "$RESULT" | tail -5 | head -c 200)
+    PATCH_BODY=$(jq -n --arg err "No PR created: $ERR_MSG" --arg log "$AGENT_LOG" \
+      '{status:"failed", errorMessage:$err, agentLog:$log}')
     curl -sf -X PATCH "$API_BASE/api/feedback-queue/$ITEM_ID" \
       -H "$AUTH_HEADER" \
       -H "Content-Type: application/json" \
-      -d "{\"status\":\"failed\",\"errorMessage\":\"No PR created: $ERR_MSG\",\"agentLog\":\"$AGENT_LOG\"}" >/dev/null
+      -d "$PATCH_BODY" >/dev/null
   fi
 
   git checkout master
