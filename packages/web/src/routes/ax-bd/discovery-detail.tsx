@@ -22,10 +22,12 @@ import {
   generatePrototype,
   getShapingArtifacts,
   getPipelineItemDetail,
+  getDiscoveryProgress,
   type BizItemDetail,
   type BdpVersion,
   type ShapingArtifacts,
   type PipelineItemDetail,
+  type DiscoveryProgress,
   type BusinessPlanResult,
 } from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +35,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DiscoveryCriteriaPanel from "@/components/feature/discovery/DiscoveryCriteriaPanel";
 import DiscoveryStageStepper from "@/components/feature/discovery/DiscoveryStageStepper";
+import DiscoveryPipeline from "@/components/feature/discovery/DiscoveryPipeline";
 import ShapingPipeline from "@/components/feature/discovery/ShapingPipeline";
 import BusinessPlanViewer from "@/components/feature/discovery/BusinessPlanViewer";
 import PipelineProgressStepper from "@/components/feature/discovery/PipelineProgressStepper";
@@ -63,6 +66,7 @@ export function Component() {
   const [plan, setPlan] = useState<BdpVersion | null>(null);
   const [artifacts, setArtifacts] = useState<ShapingArtifacts | null>(null);
   const [pipelineDetail, setPipelineDetail] = useState<PipelineItemDetail | null>(null);
+  const [discoveryProgress, setDiscoveryProgress] = useState<DiscoveryProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [generatingPlan, setGeneratingPlan] = useState(false);
@@ -83,16 +87,18 @@ export function Component() {
     if (!id) return;
     setLoading(true);
     try {
-      const [itemData, artifactsData, pipelineData] = await Promise.all([
+      const [itemData, artifactsData, pipelineData, progressData] = await Promise.all([
         fetchBizItemDetail(id),
         getShapingArtifacts(id).catch(() => ({
           businessPlan: null, offering: null, prd: null, prototype: null,
         } as ShapingArtifacts)),
         getPipelineItemDetail(id).catch(() => null),
+        getDiscoveryProgress(id).catch(() => null),
       ]);
       setItem(itemData);
       setArtifacts(artifactsData);
       setPipelineDetail(pipelineData);
+      setDiscoveryProgress(progressData);
       // 기획서가 있으면 상세 조회
       if (artifactsData.businessPlan) {
         fetchBdpLatest(id).then(setPlan).catch(() => null);
@@ -212,8 +218,23 @@ export function Component() {
         </div>
       </div>
 
-      {/* F447: 파이프라인 진행률 스테퍼 */}
-      {pipelineDetail && <PipelineProgressStepper detail={pipelineDetail} />}
+      {/* F447 + F495: 파이프라인 진행률 스테퍼 (발굴/형상화 2-stage + 세부 진척) */}
+      {pipelineDetail && (
+        <PipelineProgressStepper
+          detail={pipelineDetail}
+          discoveryProgress={
+            discoveryProgress
+              ? {
+                  done: discoveryProgress.stages.filter(
+                    (s) => s.status === "completed" && /^2-[1-9]$/.test(s.stage),
+                  ).length,
+                  total: 9,
+                }
+              : undefined
+          }
+          shapingArtifacts={artifacts}
+        />
+      )}
 
       {/* 4탭 허브 (F443: "첨부 자료" 탭 추가) */}
       <Tabs defaultValue="info">
@@ -261,7 +282,13 @@ export function Component() {
 
         {/* ── 탭 2: 발굴분석 ── */}
         <TabsContent value="analysis" className="mt-4 space-y-6">
-          {/* F480 Discovery Stage 전체 스텝퍼 */}
+          {/* F495: 발굴 파이프라인 시각화 (9 스테이지 읽기전용) */}
+          <div>
+            <h2 className="text-sm font-semibold mb-3">발굴 파이프라인</h2>
+            <DiscoveryPipeline progress={discoveryProgress} />
+          </div>
+
+          {/* F480 Discovery Stage 전체 스텝퍼 (실행 엔진) */}
           <div>
             <h2 className="text-sm font-semibold mb-3">발굴 분석 실행</h2>
             <DiscoveryStageStepper
