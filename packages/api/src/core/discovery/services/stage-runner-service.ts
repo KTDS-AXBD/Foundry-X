@@ -111,9 +111,29 @@ export class StageRunnerService {
       },
       constraints: [],
     };
-    const aiResult = await this.runner.execute(request);
-
-    const analysisResult: StageAnalysisResult = this.parseResult(aiResult.output.analysis ?? "");
+    let analysisResult: StageAnalysisResult;
+    try {
+      const aiResult = await this.runner.execute(request);
+      if (aiResult.status === "failed") {
+        const errMsg = aiResult.output?.analysis ?? "AI runner failed";
+        console.error(`[stage-runner] ${stage} failed:`, errMsg);
+        analysisResult = {
+          summary: "AI 분석 일시 실패 — 수동 편집으로 결과를 작성해 주세요.",
+          details: `자동 분석이 실패했어요.\n\n사유: ${errMsg}\n\n오른쪽 편집 버튼으로 직접 작성하거나 잠시 후 다시 시도해 주세요.`,
+          confidence: 50,
+        };
+      } else {
+        analysisResult = this.parseResult(aiResult.output?.analysis ?? "");
+      }
+    } catch (e) {
+      const errMsg = e instanceof Error ? e.message : String(e);
+      console.error(`[stage-runner] ${stage} threw:`, errMsg);
+      analysisResult = {
+        summary: "AI 분석 일시 실패 — 수동 편집으로 결과를 작성해 주세요.",
+        details: `자동 분석 호출 중 오류가 발생했어요.\n\n사유: ${errMsg}\n\n오른쪽 편집 버튼으로 직접 작성하거나 잠시 후 다시 시도해 주세요.`,
+        confidence: 50,
+      };
+    }
 
     // F485: bd_artifacts에 결과 저장
     const versionRow = await this.db.prepare(
@@ -122,10 +142,15 @@ export class StageRunnerService {
     const nextVersion = (versionRow?.max_ver ?? 0) + 1;
 
     const artifactId = crypto.randomUUID().replace(/-/g, "");
-    await this.db.prepare(
-      `INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, version, input_text, output_text, model, status, created_by, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'claude-haiku-4-5-20250714', 'completed', 'system', datetime('now'))`,
-    ).bind(artifactId, orgId, bizItemId, `discovery-${stage}`, stage, nextVersion, prompt, JSON.stringify(analysisResult)).run();
+    try {
+      await this.db.prepare(
+        `INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, version, input_text, output_text, model, status, created_by, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'claude-haiku-4-5-20250714', 'completed', 'system', datetime('now'))`,
+      ).bind(artifactId, orgId, bizItemId, `discovery-${stage}`, stage, nextVersion, prompt, JSON.stringify(analysisResult)).run();
+    } catch (e) {
+      console.error(`[stage-runner] bd_artifacts INSERT failed:`, e instanceof Error ? e.message : String(e));
+      // 결과는 반환하되 DB 저장 실패는 로그만 — 사용자가 편집/재시도 가능
+    }
 
     // viability question
     const viabilityQuestion = isV82Stage ? VIABILITY_QUESTIONS[stage as Stage] : null;
@@ -235,7 +260,44 @@ export class StageRunnerService {
       id: string; output_text: string | null; stage_id: string; created_at: string;
     }>();
 
-    if (!artifact?.output_text) return null;
+    if (!artifact?.output_text) {
+      // Fallback: 2-1 단계는 biz_item_classifications에서 합성
+      // (legacy classify 경로는 bd_artifacts를 만들지 않음)
+      if (stage === "2-1") {
+        const cls = await this.db.prepare(
+          `SELECT item_type, confidence, turn_1_answer, turn_2_answer, turn_3_answer, classified_at
+           FROM biz_item_classifications WHERE biz_item_id = ?`,
+        ).bind(bizItemId).first<{
+          item_type: string; confidence: number;
+          turn_1_answer: string | null; turn_2_answer: string | null; turn_3_answer: string | null;
+          classified_at: string;
+        }>();
+        if (cls) {
+          const item = await this.db.prepare(
+            "SELECT discovery_type FROM biz_items WHERE id = ? AND org_id = ?",
+          ).bind(bizItemId, orgId).first<{ discovery_type: string | null }>();
+          const intensity: Intensity = item?.discovery_type
+            ? ANALYSIS_PATH_MAP["2-1" as Stage][item.discovery_type as DiscoveryType]
+            : "normal";
+          return {
+            stage,
+            stageName: STAGE_NAMES["2-1" as Stage] ?? this.getStageName(stage),
+            intensity,
+            result: {
+              summary: `아이템 유형: ${cls.item_type} (신뢰도 ${Math.round(cls.confidence * 100)}%)`,
+              details: [cls.turn_1_answer, cls.turn_2_answer, cls.turn_3_answer]
+                .filter(Boolean).join("\n\n") || "분류 분석 결과",
+              confidence: Math.round(cls.confidence * 100),
+            },
+            viabilityDecision: null,
+            feedback: null,
+            completedAt: cls.classified_at,
+            artifactId: `legacy-classify-${bizItemId}`,
+          };
+        }
+      }
+      return null;
+    }
 
     // ax_viability_checkpoints에서 decision 조회
     const checkpoint = await this.db.prepare(
@@ -297,6 +359,27 @@ export class StageRunnerService {
           ? Math.max(0, Math.min(100, patch.confidence))
           : current.result.confidence,
     };
+
+    // legacy classify fallback의 경우 bd_artifacts 행을 새로 생성
+    if (current.artifactId?.startsWith("legacy-classify-") || !current.artifactId) {
+      const newId = crypto.randomUUID();
+      await this.db
+        .prepare(
+          `INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, version, input_text, output_text, model, status, created_by, created_at)
+           VALUES (?, ?, ?, ?, ?, 1, ?, ?, 'manual-edit', 'completed', 'user', datetime('now'))`,
+        )
+        .bind(
+          newId,
+          orgId,
+          bizItemId,
+          `discovery-${stage}`,
+          stage,
+          "manual edit (legacy)",
+          JSON.stringify(next),
+        )
+        .run();
+      return { ...current, result: next, artifactId: newId };
+    }
 
     await this.db
       .prepare(`UPDATE bd_artifacts SET output_text = ? WHERE id = ?`)
