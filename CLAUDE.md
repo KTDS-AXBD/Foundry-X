@@ -160,32 +160,11 @@ pnpm e2e                          # Playwright E2E
 
 ## Current Phase
 
-- **Phase 1~5:** ✅ 완료 (Sprint 1~74) — CLI + API + Web + 멀티테넌시 + SSO + Agent Evolution + AX BD 통합 + TDD 자동화
-- **Phase 6:** ✅ 완료 (Sprint 75~78) — Ecosystem Integration (BMAD/OpenSpec 벤치마킹)
-- **Phase 7:** ✅ 완료 (Sprint 79~81) — BD Pipeline End-to-End 통합 (FX-BD-V1)
-- **Phase 8:** ✅ 완료 (Sprint 82~86) — IA 구조 개선 + 인증 강화
-- **Phase 9:** ✅ 완료 (Sprint 87~100) — 팀 온보딩 + BD 스킬 통합 + GIVC PoC + 발굴 UX(F263~F266) + BD 스킬 배포(F267) + Plugin 전환(F268) + 발굴 IA 정리(F269)
-- **Phase 10:** ✅ 완료 (Sprint 101~112) — O-G-D Agent Loop(F270~F273 ✅) + Skill Evolution(F274~F278 ✅) + BD 데모(F279~F281 ✅) + BD 형상화 A~F(F282~F287 ✅)
-- **Phase 11:** ✅ 완료 (Sprint 113~121) — IA 대개편 F288~F299 (12/12 완료). 11-A ✅ 구조 기반 + 11-B ✅ 기능 확장 + 11-C ✅ 고도화+GTM
-- **Phase 12:** ✅ 완료 (Sprint 125~128) — Skill Unification: 3개 스킬 시스템 통합 (F303~F308 ✅). D1~D4 4대 단절 해소. PRD: `docs/specs/fx-skill-unify/prd-final.md`
-- **Phase 13:** ✅ 완료 (Sprint 139~143) — IA 재설계 v1.3: Member 25→12 메뉴(52% 축소), 탭 통합 3건(발굴/검증/제품화), 버전관리 패턴, 대시보드 ToDo. F322~F328 ✅ (7/7). 근거: `docs/specs/FX-IA-Change-Plan-v1.3.docx`
-- **Phase 14:** ✅ 완료 (Sprint 148~152) — Agent Orchestration Infrastructure F333~F337. 근거: `docs/specs/FX-Unified-Integration-Plan.md`
-- **Phase 15:** ✅ 완료 (Sprint 154~157) — Discovery UI/UX 고도화 v2 F342~F350. PRD: `docs/specs/fx-discovery-ui-v2/prd-final.md`
-- **Phase 16:** ✅ 완료 (Sprint 158~160) — Prototype Auto-Gen F351~F356. PRD: `docs/specs/prototype-auto-gen/prd-final.md`
-- **Phase 17:** ✅ 완료 (Sprint 161~164) — Self-Evolving Harness v2 F357~F362. Guard Rail 자동 제안 + O-G-D 4도메인 범용화 + 운영 지표 대시보드. PRD: `docs/specs/fx-harness-evolution/prd-final.md`. 전략: `docs/specs/self-evolving-harness-strategy.md`
-- **Phase 18:** ✅ 완료 (Sprint 165~174) — Offering Pipeline F363~F383 (21/21, Match 93%). 형상화 자동화: HTML/PPTX Skill + Offering Agent + Full UI + 콘텐츠 어댑터 + 파이프라인. PRD: `docs/specs/fx-offering-pipeline/prd-final.md`
-- **Phase 19:** ✅ 완료 (Sprint 175~178) — Builder Evolution F384~F391. 5차원 품질 스코어링 + CLI 듀얼모드 + Enhanced O-G-D + Quality Dashboard. PRD: `docs/specs/fx-builder-evolution/prd-final.md`
-- **Phase 20:** ✅ 완료 (Sprint 179~188) — AX BD MSA 재조정 F392~F401. 모놀리스 모듈화(20-A) + harness-kit + 이벤트/프록시(20-B). 2단계 접근법: 모듈화→실제분리. PRD: `docs/specs/ax-bd-msa/prd-final.md`
-- **Phase 21:** ✅ 완료 (Sprint 189~197) — Gate-X 독립 서비스 F402~F413. harness-kit 기반 독립 Workers. PRD: `docs/specs/gate-x/prd-final.md`
-- **Phase 22:** ✅ 완료 (Sprint 198~207) — Offering Skill v2 + Builder v2 F414~F431 (18/18). PRD: `docs/specs/axbd-offering/prd-final.md`, `docs/specs/fx-builder-v2/prd-final.md`
-- **Phase 23:** ✅ 완료 (Sprint 208) — Sprint Automation v2 F432~F433 (Match 98%)
-- **Phase 24:** ✅ 완료 (Sprint 209~212) — Discovery Native F434~F440 (Match 97%). PRD: `docs/specs/fx-discovery-native/prd-final.md`
-- **Phase 25:** ✅ 완료 (Sprint 213~218) — Discovery Pipeline v2 F441~F450 (Match ~99%). 파일 업로드+파싱+편집기+템플릿+내보내기+파이프라인추적+운영품질. PRD: `docs/specs/fx-discovery-pipeline-v2/prd-final.md`
-- **Phase 26:** ✅ 완료 (Sprint 219~223) — BD Portfolio Management F451~F460 (Match 96%)
-- **Phase 27:** ✅ 완료 (Sprint 225~230) — BD Quality System F461~F470. BD 산출물 전체 품질 관리: QSA 3종(F461~F463) + GAP 복구(F464~F467) + BD Sentinel(F468) + 디자인 고도화(F469~F470). PRD: `docs/specs/fx-bd-quality-system/prd-final.md`
-- **Phase 28:** 진행 중 (Sprint 233~238) — Discovery 동기화 파이프라인. F478~F480 ✅ (STATUS_CONFIG+pipeline전환+11단계 스텝퍼) + F484~F487 ✅ (파이프라인UI+HITL루프+체크리스트UX+리포트500수정). F481~F483 잔여
-- **수치 확인:** `/ax:daily-check` 실행 또는 SPEC.md §2 "실시간 수치" 블록 참조 (하드코딩 금지 — drift 방지)
-- **Phase 이력 상세:** SPEC.md §5 참조 | Sprint별 Plan/Design: `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
+- **Phase 1~28:** ✅ 완료 (Sprint 1~238) — 상세 이력은 SPEC.md §5 참조. 주요 PRD는 "Key Documents" 섹션에 정리됨
+- **Phase 29:** ✅ 완료 (Sprint 240) — 요구사항 거버넌스 자동화 F488+F489 (PR #405 Match 100%). `/ax:req-manage new --create-issue` 기본화 + `/ax:gov-retro` Phase 역순 소급 등록
+- **독립 트랙:** F490 (E2E timeout 최적화, P2) + F491 (공유 Org 모드, P3, 커밋 대기)
+- **수치 확인:** `/ax:daily-check` 또는 SPEC.md §2 "실시간 수치" 블록 (하드코딩 금지 — drift 방지)
+- **Sprint 이력:** `docs/01-plan/`, `docs/02-design/`, `docs/archive/`
 
 ## Git Workflow
 
