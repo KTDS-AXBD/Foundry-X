@@ -96,9 +96,15 @@ cache_upsert_task() {
 }
 
 # ─── slug ────────────────────────────────────────────────────────────────────
+# ASCII-safe: lowercase, replace whitespace with -, drop everything outside
+# [a-z0-9-], collapse runs, trim to 40 chars. Korean/CJK is dropped intentionally
+# to keep branch names portable across filesystems and CI runners.
 slugify() {
-  echo "$1" | tr '[:upper:]' '[:lower:]' \
-    | sed 's/[^a-z0-9가-힣 ]//g' \
-    | tr ' ' '-' | tr -s '-' \
+  printf '%s' "$1" \
+    | tr '[:upper:]' '[:lower:]' \
+    | LC_ALL=C tr -c 'a-z0-9 \n' '-' \
+    | tr ' ' '-' \
+    | tr -s '-' \
+    | sed 's/^-//;s/-$//' \
     | cut -c1-40
 }

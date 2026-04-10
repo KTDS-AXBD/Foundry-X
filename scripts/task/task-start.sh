@@ -36,6 +36,16 @@ if [ "$CUR_BRANCH" != "master" ]; then
   exit 2
 fi
 
+# ─── Step 0: pre-compute slug + paths (fail early before any side effects) ───
+SLUG=$(slugify "$TITLE")
+if [ -z "$SLUG" ]; then
+  echo "[fx-task] title에서 ASCII slug 추출 실패 — 영문/숫자 토큰을 1개 이상 포함시켜 주세요" >&2
+  exit 2
+fi
+
+WT_BASE="${CLAUDE_WT_BASE:-$HOME/work/worktrees}"
+PROJECT=$(basename "$REPO_ROOT")
+
 # ─── Step 1: ID allocator + SPEC register (under flock) ──────────────────────
 ID_LOCK="$FX_LOCK_DIR/id-allocator.lock"
 PUSH_LOCK="$FX_LOCK_DIR/master-push.lock"
@@ -101,18 +111,16 @@ TASK_ID=$(cut -d'|' -f1 "$FX_LOCK_DIR/.last-allocation")
 PUSHED_SHA=$(cut -d'|' -f2 "$FX_LOCK_DIR/.last-allocation")
 rm -f "$FX_LOCK_DIR/.last-allocation"
 
-SLUG=$(slugify "$TITLE")
 BRANCH="task/${TASK_ID}-${SLUG}"
-WT_BASE="${CLAUDE_WT_BASE:-$HOME/work/worktrees}"
-PROJECT=$(basename "$REPO_ROOT")
 WT_PATH="${WT_BASE}/${PROJECT}/${TASK_ID}-${SLUG}"
 
 # ─── Step 3: create worktree pinned to pushed_sha ────────────────────────────
 mkdir -p "$(dirname "$WT_PATH")"
-if ! git worktree add -b "$BRANCH" "$WT_PATH" "$PUSHED_SHA" >/dev/null 2>&1; then
-  # rollback master commit
-  git push origin "+${PUSHED_SHA}^:master" >/dev/null 2>&1 || true
-  git reset --hard HEAD^ >/dev/null 2>&1 || true
+if ! git worktree add -b "$BRANCH" "$WT_PATH" "$PUSHED_SHA" 2>&1; then
+  # rollback master commit (force-push parent over master)
+  PARENT_SHA=$(git rev-parse "${PUSHED_SHA}^")
+  git push origin "+${PARENT_SHA}:master" >/dev/null 2>&1 || true
+  git reset --hard "$PARENT_SHA" >/dev/null 2>&1 || true
   echo "[fx-task] worktree 생성 실패 — master 등록 revert 시도" >&2
   log_event "$TASK_ID" "failed_setup" '{"step":"worktree"}'
   exit 8
