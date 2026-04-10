@@ -36,8 +36,10 @@ enqueue() {
   local track="$1" title="$2" prompt="${3:-}"
   local priority="${4:-5}"
 
-  case "$track" in F|B|C|X) ;; *)
-    echo "[agent-loop] invalid track: $track (F|B|C|X)" >&2; exit 1;;
+  case "$track" in B|C|X) ;; F)
+    echo "[agent-loop] F-track은 Sprint 전용이에요. B/C/X를 사용해주세요." >&2; exit 1;;
+  *)
+    echo "[agent-loop] invalid track: $track (B|C|X)" >&2; exit 1;;
   esac
 
   jq -nc \
