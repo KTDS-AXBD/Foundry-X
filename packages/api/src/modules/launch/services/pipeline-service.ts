@@ -240,7 +240,37 @@ export class PipelineService {
       .bind(bizItemId, orgId)
       .first<Record<string, unknown>>();
 
-    if (!item) return null;
+    // Fallback: pipeline_stages 행이 없는 고아 아이템(구버전 생성 경로)
+    // → biz_items만으로 상세를 합성하여 404 대신 빈 stageHistory로 응답
+    if (!item) {
+      const bare = await this.db
+        .prepare(
+          `SELECT id, title, description, created_by, created_at, status
+           FROM biz_items WHERE id = ? AND org_id = ?`,
+        )
+        .bind(bizItemId, orgId)
+        .first<Record<string, unknown>>();
+
+      if (!bare) return null;
+
+      // biz_items.status 기반으로 currentStage 추정 (backfill 실패 대비)
+      const status = (bare.status as string) ?? "draft";
+      const inferredStage: PipelineStage =
+        ["shaping", "done"].includes(status) ? "FORMALIZATION"
+        : ["evaluated", "analyzed"].includes(status) ? "DISCOVERY"
+        : "REGISTERED";
+
+      return {
+        id: bare.id as string,
+        title: bare.title as string,
+        description: bare.description as string | null,
+        currentStage: inferredStage,
+        stageEnteredAt: bare.created_at as string,
+        createdBy: bare.created_by as string,
+        createdAt: bare.created_at as string,
+        stageHistory: [],
+      };
+    }
 
     const { results } = await this.db
       .prepare(

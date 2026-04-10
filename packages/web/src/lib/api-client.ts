@@ -1486,6 +1486,15 @@ export async function getStageResult(
   return fetchApi(`/biz-items/${bizItemId}/discovery-stage/${stage}/result`);
 }
 
+// 단계 결과 수동 편집 (사용자가 AI 결과를 직접 수정)
+export async function updateStageResult(
+  bizItemId: string,
+  stage: string,
+  patch: { summary?: string; details?: string; confidence?: number },
+): Promise<StageResultResponse> {
+  return patchApi(`/biz-items/${bizItemId}/discovery-stage/${stage}/result`, patch);
+}
+
 // ─── Sprint 211: F438 발굴 분석 실행 API ───
 
 export interface StartingPointResult {

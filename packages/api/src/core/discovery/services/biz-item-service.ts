@@ -240,6 +240,47 @@ export class BizItemService {
     return toCamelCase(row, cls);
   }
 
+  /**
+   * 기존 분류 결과를 ClassificationResult 형태로 재구성해 반환.
+   * classify 멱등성(409→200 전환)에 사용.
+   */
+  async getFullClassification(bizItemId: string): Promise<{
+    itemType: string;
+    confidence: number;
+    turnAnswers: { turn1: string; turn2: string; turn3: string };
+    analysisWeights: Record<string, number>;
+    reasoning: string;
+    cached: true;
+  } | null> {
+    const row = await this.db
+      .prepare(
+        `SELECT item_type, confidence, turn_1_answer, turn_2_answer, turn_3_answer, analysis_weights
+         FROM biz_item_classifications WHERE biz_item_id = ?`,
+      )
+      .bind(bizItemId)
+      .first<{
+        item_type: string;
+        confidence: number;
+        turn_1_answer: string | null;
+        turn_2_answer: string | null;
+        turn_3_answer: string | null;
+        analysis_weights: string | null;
+      }>();
+    if (!row) return null;
+    return {
+      itemType: row.item_type,
+      confidence: row.confidence,
+      turnAnswers: {
+        turn1: row.turn_1_answer ?? "",
+        turn2: row.turn_2_answer ?? "",
+        turn3: row.turn_3_answer ?? "",
+      },
+      analysisWeights: JSON.parse(row.analysis_weights || "{}"),
+      reasoning: "",
+      cached: true,
+    };
+  }
+
   async updateStatus(id: string, status: string): Promise<void> {
     const now = new Date().toISOString();
     await this.db

@@ -5,8 +5,8 @@
  * F485 — 완료 단계 결과 표시 + HITL 피드백 재실행
  * 11단계 HITL 스텝퍼: 2-0~2-10, v82 유형별 강도 반영
  */
-import { useState, useEffect, useCallback } from "react";
-import { CheckCircle2, Circle, Loader2, ChevronDown, ChevronUp, Play, MessageSquare, RotateCcw } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { CheckCircle2, Circle, Loader2, ChevronDown, ChevronUp, Play, MessageSquare, RotateCcw, Pencil, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -17,6 +17,7 @@ import {
   classifyBizItem,
   evaluateBizItem,
   getStageResult,
+  updateStageResult,
   type DiscoveryProgress,
   type StageRunResult,
   type StageResultResponse,
@@ -61,6 +62,14 @@ export default function DiscoveryStageStepper({
   const [completedResults, setCompletedResults] = useState<Record<string, StageResultResponse>>({});
   const [loadingResult, setLoadingResult] = useState<string | null>(null);
   const [rerunMode, setRerunMode] = useState<string | null>(null);
+  // 재클릭 방어: useState 업데이트 전에도 즉시 차단되도록 ref로 가드
+  const runLockRef = useRef<Set<string>>(new Set());
+  // 결과 수동 편집 모드
+  const [editingStage, setEditingStage] = useState<string | null>(null);
+  const [editSummary, setEditSummary] = useState("");
+  const [editDetails, setEditDetails] = useState("");
+  const [editConfidence, setEditConfidence] = useState(70);
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const loadProgress = useCallback(async () => {
     try {
@@ -96,6 +105,10 @@ export default function DiscoveryStageStepper({
   }
 
   async function handleRunStage(stage: string) {
+    // 재클릭 방어: ref 기반 즉시 차단 (setState 반영 전 이중 클릭 방지)
+    if (runLockRef.current.has(stage) || runningStage) return;
+    runLockRef.current.add(stage);
+
     setRunningStage(stage);
     setError(null);
     setStageResult(null);
@@ -103,8 +116,18 @@ export default function DiscoveryStageStepper({
 
     try {
       if (stage === "2-0") {
-        await analyzeStartingPoint(bizItemId);
-        await classifyBizItem(bizItemId);
+        // 각 호출을 독립적으로 catch — 한쪽이 404/기타 에러로 실패해도
+        // 다른 쪽은 계속 진행 (idempotent 백엔드 보장 하에 안전)
+        try {
+          await analyzeStartingPoint(bizItemId);
+        } catch (spErr) {
+          console.warn("analyzeStartingPoint failed, continuing", spErr);
+        }
+        try {
+          await classifyBizItem(bizItemId);
+        } catch (clErr) {
+          console.warn("classifyBizItem failed", clErr);
+        }
         await loadProgress();
         onStageComplete?.(stage);
         setExpanded(null);
@@ -128,6 +151,44 @@ export default function DiscoveryStageStepper({
       setError(e instanceof Error ? e.message : `${stage} 실행 실패`);
     } finally {
       setRunningStage(null);
+      runLockRef.current.delete(stage);
+    }
+  }
+
+  function handleStartEdit(stage: string, current: StageResultResponse) {
+    setEditingStage(stage);
+    setEditSummary(current.result.summary);
+    setEditDetails(current.result.details);
+    setEditConfidence(current.result.confidence);
+    setRerunMode(null);
+  }
+
+  function handleCancelEdit() {
+    setEditingStage(null);
+    setEditSummary("");
+    setEditDetails("");
+    setEditConfidence(70);
+  }
+
+  async function handleSaveEdit(stage: string) {
+    if (!editSummary.trim() || !editDetails.trim()) {
+      setError("요약과 상세 내용은 비워둘 수 없어요.");
+      return;
+    }
+    setSavingEdit(true);
+    setError(null);
+    try {
+      const updated = await updateStageResult(bizItemId, stage, {
+        summary: editSummary.trim(),
+        details: editDetails.trim(),
+        confidence: editConfidence,
+      });
+      setCompletedResults((prev) => ({ ...prev, [stage]: updated }));
+      setEditingStage(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "저장 실패");
+    } finally {
+      setSavingEdit(false);
     }
   }
 
@@ -214,6 +275,7 @@ export default function DiscoveryStageStepper({
           const completedResult = completedResults[stage.stage];
           const isLoadingResult = loadingResult === stage.stage;
           const isRerunning = rerunMode === stage.stage;
+          const isEditing = editingStage === stage.stage;
 
           return (
             <div key={stage.stage} className="p-4">
@@ -291,7 +353,7 @@ export default function DiscoveryStageStepper({
               </div>
 
               {/* F485: 완료 단계 결과 표시 */}
-              {isCompleted && isExpanded && completedResult && !isRerunning && (
+              {isCompleted && isExpanded && completedResult && !isRerunning && !isEditing && (
                 <div className="mt-3 ml-8 rounded-lg border bg-muted/30 p-4 space-y-3">
                   <div className="flex items-center gap-2 mb-2">
                     <Badge className={INTENSITY_LABELS[completedResult.intensity]?.color ?? ""}>
@@ -315,8 +377,16 @@ export default function DiscoveryStageStepper({
                       <span className="font-medium">피드백:</span> {completedResult.feedback}
                     </div>
                   )}
-                  {/* 재실행 버튼 */}
-                  <div className="border-t pt-3">
+                  {/* 액션: 편집 + 피드백 재실행 */}
+                  <div className="border-t pt-3 flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleStartEdit(stage.stage, completedResult)}
+                      disabled={!!runningStage}
+                    >
+                      <Pencil className="size-3 mr-1" /> 직접 편집
+                    </Button>
                     <Button
                       size="sm"
                       variant="outline"
@@ -327,6 +397,70 @@ export default function DiscoveryStageStepper({
                       disabled={!!runningStage}
                     >
                       <RotateCcw className="size-3 mr-1" /> 피드백 재실행
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* 결과 수동 편집 모드 */}
+              {isCompleted && isExpanded && isEditing && (
+                <div className="mt-3 ml-8 rounded-lg border-2 border-blue-300 bg-blue-50/50 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-blue-900">결과 직접 편집</p>
+                    <span className="text-xs text-muted-foreground">변경 사항은 즉시 저장돼요</span>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">요약</label>
+                    <input
+                      type="text"
+                      className="w-full p-2 text-sm border rounded-md bg-background"
+                      value={editSummary}
+                      onChange={(e) => setEditSummary(e.target.value)}
+                      placeholder="1~2문장 요약"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">상세 (마크다운)</label>
+                    <textarea
+                      className="w-full p-2 text-sm border rounded-md bg-background resize-y"
+                      rows={10}
+                      value={editDetails}
+                      onChange={(e) => setEditDetails(e.target.value)}
+                      placeholder="마크다운 상세 분석"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                      신뢰도: {editConfidence}%
+                    </label>
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      step={5}
+                      className="w-full"
+                      value={editConfidence}
+                      onChange={(e) => setEditConfidence(Number(e.target.value))}
+                    />
+                  </div>
+
+                  <div className="flex gap-2 pt-1">
+                    <Button
+                      size="sm"
+                      onClick={() => handleSaveEdit(stage.stage)}
+                      disabled={savingEdit || !editSummary.trim() || !editDetails.trim()}
+                    >
+                      {savingEdit ? (
+                        <><Loader2 className="size-3 animate-spin mr-1" /> 저장 중</>
+                      ) : (
+                        <><Save className="size-3 mr-1" /> 저장</>
+                      )}
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={handleCancelEdit} disabled={savingEdit}>
+                      <X className="size-3 mr-1" /> 취소
                     </Button>
                   </div>
                 </div>

@@ -217,8 +217,20 @@ bizItemsRoute.post("/biz-items/:id/classify", async (c) => {
     return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
   }
 
+  // 멱등성: 이미 분류된 경우 기존 결과 반환 (409→200)
+  // 재클릭/새로고침 후 재실행 시 409 에러 제거
   if (item.classification) {
-    return c.json({ error: "ALREADY_CLASSIFIED" }, 409);
+    const cached = await service.getFullClassification(id);
+    if (cached) {
+      // discovery_stages 2-1 동기화 보장 (idempotent)
+      try {
+        const stageSvc = new DiscoveryStageService(c.env.DB);
+        await stageSvc.updateStage(id, orgId, "2-1", "completed");
+      } catch {
+        // 테이블 미존재 무시
+      }
+      return c.json(cached);
+    }
   }
 
   const body = await c.req.json().catch(() => ({}));
@@ -388,6 +400,19 @@ bizItemsRoute.post("/biz-items/:id/starting-point", async (c) => {
   const service = new BizItemService(c.env.DB);
   const item = await service.getById(orgId, id);
   if (!item) return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+
+  // 멱등성: 이미 시작점이 분류된 경우 기존 결과 반환
+  const existingSp = await service.getStartingPoint(id);
+  if (existingSp) {
+    return c.json({
+      startingPoint: existingSp.startingPoint,
+      confidence: existingSp.confidence,
+      reasoning: existingSp.reasoning,
+      needsConfirmation: false,
+      analysisPath: getAnalysisPath(existingSp.startingPoint as StartingPointType),
+      cached: true,
+    });
+  }
 
   const body = await c.req.json().catch(() => ({}));
   const parsed = ClassifyStartingPointSchema.safeParse(body);

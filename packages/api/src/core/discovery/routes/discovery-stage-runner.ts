@@ -20,6 +20,14 @@ const StageConfirmSchema = z.object({
   feedback: z.string().optional(),
 });
 
+const StageResultPatchSchema = z.object({
+  summary: z.string().min(1).optional(),
+  details: z.string().min(1).optional(),
+  confidence: z.number().int().min(0).max(100).optional(),
+}).refine((v) => v.summary !== undefined || v.details !== undefined || v.confidence !== undefined, {
+  message: "At least one field must be provided",
+});
+
 export const discoveryStageRunnerRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
 // ─── GET /biz-items/:id/discovery-stage/:stage/result ─── (F485)
@@ -46,6 +54,38 @@ discoveryStageRunnerRoute.get("/biz-items/:id/discovery-stage/:stage/result", as
   }
 
   return c.json(result);
+});
+
+// ─── PATCH /biz-items/:id/discovery-stage/:stage/result ─── (수동 편집)
+discoveryStageRunnerRoute.patch("/biz-items/:id/discovery-stage/:stage/result", async (c) => {
+  const bizItemId = c.req.param("id");
+  const stage = c.req.param("stage");
+  const orgId = c.get("orgId");
+
+  const item = await c.env.DB
+    .prepare("SELECT id FROM biz_items WHERE id = ? AND org_id = ?")
+    .bind(bizItemId, orgId)
+    .first();
+
+  if (!item) {
+    return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+  }
+
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = StageResultPatchSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+  }
+
+  const runner = createAgentRunner(c.env);
+  const service = new StageRunnerService(c.env.DB, runner);
+
+  const updated = await service.updateStageResult(bizItemId, orgId, stage, parsed.data);
+  if (!updated) {
+    return c.json({ error: "STAGE_RESULT_NOT_FOUND" }, 404);
+  }
+
+  return c.json(updated);
 });
 
 // ─── POST /biz-items/:id/discovery-stage/:stage/run ───

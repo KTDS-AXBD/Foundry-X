@@ -168,15 +168,16 @@ describe("BizItems Starting Point Routes (F182)", () => {
     expect(res.status).toBe(200);
   });
 
-  it("POST /starting-point — 재분류 (UPSERT)", async () => {
+  it("POST /starting-point — 재호출 멱등 (캐시 반환)", async () => {
     seedBizItem();
     seedStartingPoint("item-1", "idea", 0.7);
 
     const res = await req("POST", "/api/biz-items/item-1/starting-point", { headers: authHeader, body: {} });
     expect(res.status).toBe(200);
     const body = await res.json() as any;
-    // mock returns "tech", overwriting previous "idea"
-    expect(body.startingPoint).toBe("tech");
+    // 멱등성: 기존 분류가 있으면 캐시 반환 (재클릭 방어)
+    expect(body.startingPoint).toBe("idea");
+    expect(body.cached).toBe(true);
   });
 
   // ─── PATCH /biz-items/:id/starting-point ───

@@ -252,7 +252,7 @@ describe("BizItems Routes", () => {
     expect(res.status).toBe(404);
   });
 
-  it("POST /api/biz-items/:id/classify: returns 409 if already classified", async () => {
+  it("POST /api/biz-items/:id/classify: idempotent — returns cached result on re-classify", async () => {
     const createRes = await req("POST", "/api/biz-items", {
       headers: authHeader,
       body: { title: "Already Classified" },
@@ -260,14 +260,16 @@ describe("BizItems Routes", () => {
     const { id } = (await createRes.json()) as any;
 
     // First classify
-    await req("POST", `/api/biz-items/${id}/classify`, { headers: authHeader, body: {} });
+    const first = await req("POST", `/api/biz-items/${id}/classify`, { headers: authHeader, body: {} });
+    const firstData = (await first.json()) as any;
 
-    // Second classify → 409
+    // Second classify → 200 with cached result (멱등)
     const res = await req("POST", `/api/biz-items/${id}/classify`, { headers: authHeader, body: {} });
 
-    expect(res.status).toBe(409);
+    expect(res.status).toBe(200);
     const data = (await res.json()) as any;
-    expect(data.error).toBe("ALREADY_CLASSIFIED");
+    expect(data.cached).toBe(true);
+    expect(data.itemType).toBe(firstData.itemType);
   });
 
   // ─── POST /api/biz-items/:id/evaluate ───

@@ -275,6 +275,37 @@ export class StageRunnerService {
     };
   }
 
+  /**
+   * 단계 결과 수동 편집 — 사용자가 AI 결과를 직접 수정.
+   * bd_artifacts 최신 행의 output_text를 갱신한다 (새 버전 생성하지 않음).
+   * 향후 감사 로그가 필요하면 별도 history 테이블 추가.
+   */
+  async updateStageResult(
+    bizItemId: string,
+    orgId: string,
+    stage: string,
+    patch: { summary?: string; details?: string; confidence?: number },
+  ): Promise<StageResultResponse | null> {
+    const current = await this.getStageResult(bizItemId, orgId, stage);
+    if (!current) return null;
+
+    const next: StageAnalysisResult = {
+      summary: patch.summary ?? current.result.summary,
+      details: patch.details ?? current.result.details,
+      confidence:
+        typeof patch.confidence === "number"
+          ? Math.max(0, Math.min(100, patch.confidence))
+          : current.result.confidence,
+    };
+
+    await this.db
+      .prepare(`UPDATE bd_artifacts SET output_text = ? WHERE id = ?`)
+      .bind(JSON.stringify(next), current.artifactId)
+      .run();
+
+    return { ...current, result: next };
+  }
+
   private buildPrompt(
     stage: string,
     item: { title: string; description: string | null; source: string | null },
