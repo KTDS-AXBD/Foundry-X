@@ -26,6 +26,7 @@ packages/*/src/**/*.js.map
 !.env.example
 .dev.vars
 .playwright-mcp/
+.screenshots/
 
 # Cloudflare build artifacts
 .wrangler/
