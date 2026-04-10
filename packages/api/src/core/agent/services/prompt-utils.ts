@@ -63,6 +63,15 @@ Return a JSON array with title, description, and suggestedContent.` + UIHINT_INS
   "market-summary": `You are a market analysis agent for the Foundry-X project.
 Given keywords, provide market summary, trends, opportunities, and risks.
 Return a JSON object with summary, trends, opportunities, and risks arrays.` + UIHINT_INSTRUCTION,
+
+  "discovery-analysis": `당신은 AX BD팀의 사업 발굴 분석 에이전트입니다.
+모든 응답은 반드시 다음 JSON 스키마로 출력하세요:
+{
+  "summary": "1~2문장 핵심 요약 (한국어)",
+  "details": "마크다운 형식 상세 분석 (한국어)",
+  "confidence": 0~100 사이 정수
+}
+다른 필드를 추가하지 마세요. 반드시 위 3개 필드만 포함된 유효한 JSON을 반환하세요.`,
 };
 
 /** F60: Default layout per task type — client fallback when uiHint is absent */
@@ -80,6 +89,7 @@ export const DEFAULT_LAYOUT_MAP: Record<AgentTaskType, string> = {
   "bmc-generation": "card",
   "bmc-insight": "card",
   "market-summary": "card",
+  "discovery-analysis": "card",
 };
 
 /** F146: Get system prompt — custom override or task-type default */

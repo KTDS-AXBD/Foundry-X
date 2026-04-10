@@ -8,7 +8,7 @@ import { TASK_SYSTEM_PROMPTS, buildUserPrompt, getSystemPrompt } from "./prompt-
 export const DEFAULT_BASE_URL = "https://openrouter.ai/api/v1";
 export const DEFAULT_MODEL = "anthropic/claude-sonnet-4";
 export const DEFAULT_MAX_TOKENS = 4096;
-export const REQUEST_TIMEOUT_MS = 30_000;
+export const REQUEST_TIMEOUT_MS = 60_000;
 
 interface OpenRouterResponse {
   id: string;
