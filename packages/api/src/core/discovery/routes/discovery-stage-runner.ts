@@ -122,6 +122,9 @@ discoveryStageRunnerRoute.post("/biz-items/:id/discovery-stage/:stage/run", asyn
     return c.json(result);
   } catch (e) {
     const message = e instanceof Error ? e.message : "Stage run failed";
+    if (message === "STAGE_ALREADY_RUNNING") {
+      return c.json({ error: "STAGE_ALREADY_RUNNING", message: "이 단계가 이미 실행 중이에요." }, 409);
+    }
     return c.json({ error: "STAGE_RUN_FAILED", message }, 500);
   }
 });

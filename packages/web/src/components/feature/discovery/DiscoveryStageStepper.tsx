@@ -18,6 +18,7 @@ import {
   evaluateBizItem,
   getStageResult,
   updateStageResult,
+  updateDiscoveryStage,
   type DiscoveryProgress,
   type StageRunResult,
   type StageResultResponse,
@@ -118,8 +119,10 @@ export default function DiscoveryStageStepper({
       if (stage === "2-0") {
         // 각 호출을 독립적으로 catch — 한쪽이 404/기타 에러로 실패해도
         // 다른 쪽은 계속 진행 (idempotent 백엔드 보장 하에 안전)
+        let spOk = false;
         try {
           await analyzeStartingPoint(bizItemId);
+          spOk = true;
         } catch (spErr) {
           console.warn("analyzeStartingPoint failed, continuing", spErr);
         }
@@ -127,6 +130,12 @@ export default function DiscoveryStageStepper({
           await classifyBizItem(bizItemId);
         } catch (clErr) {
           console.warn("classifyBizItem failed", clErr);
+        }
+        // starting-point 실패 시 2-0 단계를 명시적으로 완료 마킹
+        if (!spOk) {
+          try {
+            await updateDiscoveryStage(bizItemId, "2-0", "completed");
+          } catch { /* 무시 */ }
         }
         await loadProgress();
         onStageComplete?.(stage);
@@ -148,7 +157,9 @@ export default function DiscoveryStageStepper({
         });
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : `${stage} 실행 실패`);
+      const msg = e instanceof Error ? e.message : `${stage} 실행 실패`;
+      // 409 race condition — 다른 탭/세션에서 이미 실행 중
+      setError(msg.includes("STAGE_ALREADY_RUNNING") ? "이 단계가 이미 실행 중이에요. 잠시 후 새로고침해 주세요." : msg);
     } finally {
       setRunningStage(null);
       runLockRef.current.delete(stage);
