@@ -22,7 +22,7 @@ TRACK="${1:?track required (F|B|C|X)}"
 TITLE="${2:?title required}"
 PROMPT="${3:-}"
 
-case "$TRACK" in F|B|C|X) ;; *) echo "[fx-task] invalid track: $TRACK" >&2; exit 2;; esac
+case "$TRACK" in B|C|X) ;; F) echo "[fx-task] F-track은 Sprint/Phase 전용이에요. Task에는 B/C/X를 사용해주세요." >&2; echo "[fx-task]   Feature급 작업 → Sprint 경로: bash -i -c 'sprint N'" >&2; exit 2;; *) echo "[fx-task] invalid track: $TRACK (B|C|X)" >&2; exit 2;; esac
 
 REPO_ROOT=$(_repo_root)
 [ -n "$REPO_ROOT" ] || { echo "[fx-task] not a git repo" >&2; exit 2; }
@@ -61,16 +61,20 @@ PUSHED_SHA=""
   TASK_ID=$(allocate_id "$TRACK")
   echo "[fx-task] 발급: $TASK_ID — $TITLE" >&2
 
+  # REQ code auto-allocation (GAP-2 fix)
+  REQ_ID=$(allocate_req_id SPEC.md)
+  echo "[fx-task] REQ: $REQ_ID" >&2
+
   # Minimal SPEC.md registration: append a one-line entry to a dedicated section.
   # S-α scope: append to a fenced "Task Orchestrator Backlog" block at end of §5.
-  # If the marker isn't present, create it before §6.
-  STATUS_EMOJI="🔧"
-  REQ_PLACEHOLDER="(FX-REQ-pending)"
-  ENTRY="| ${TASK_ID} | ${TITLE} ${REQ_PLACEHOLDER} | — | ${STATUS_EMOJI} | task orchestrator |"
+  # If the marker isn't present, create it before §7.
+  # Status uses text (PLANNED/DONE/CANCELLED/REJECTED/CLOSED_LEARNED) per PRD §3.3.
+  # Type column added per GAP-4 decision.
+  ENTRY="| ${TASK_ID} | ${TRACK} | ${TITLE} (${REQ_ID}) | — | PLANNED | task orchestrator |"
 
   if ! grep -q "<!-- fx-task-orchestrator-backlog -->" SPEC.md; then
     # Insert marker block right before "## §7 기술 스택"
-    awk -v block='\n<!-- fx-task-orchestrator-backlog -->\n### Task Orchestrator Backlog (F/B/C/X)\n\n| ID | 제목 | Sprint | 상태 | 비고 |\n|----|------|--------|:----:|------|\n<!-- /fx-task-orchestrator-backlog -->\n' \
+    awk -v block='\n<!-- fx-task-orchestrator-backlog -->\n### Task Orchestrator Backlog (B/C/X)\n\n| ID | Type | 제목 | Sprint | 상태 | 비고 |\n|----|------|------|--------|------|------|\n<!-- /fx-task-orchestrator-backlog -->\n' \
       '/^## §7 기술 스택/ && !done {print block; done=1} {print}' \
       SPEC.md > SPEC.md.tmp && mv SPEC.md.tmp SPEC.md
   fi
@@ -102,7 +106,7 @@ PUSHED_SHA=""
       exit 6
     fi
     PUSHED_SHA=$(git rev-parse HEAD)
-    echo "$TASK_ID|$PUSHED_SHA" > "$FX_LOCK_DIR/.last-allocation"
+    echo "$TASK_ID|$PUSHED_SHA|$REQ_ID" > "$FX_LOCK_DIR/.last-allocation"
   ) 8>"$PUSH_LOCK"
 
 ) 9>"$ID_LOCK"
@@ -111,6 +115,7 @@ PUSHED_SHA=""
 [ -f "$FX_LOCK_DIR/.last-allocation" ] || { echo "[fx-task] allocator output 누락" >&2; exit 7; }
 TASK_ID=$(cut -d'|' -f1 "$FX_LOCK_DIR/.last-allocation")
 PUSHED_SHA=$(cut -d'|' -f2 "$FX_LOCK_DIR/.last-allocation")
+REQ_ID=$(cut -d'|' -f3 "$FX_LOCK_DIR/.last-allocation")
 rm -f "$FX_LOCK_DIR/.last-allocation"
 
 BRANCH="task/${TASK_ID}-${SLUG}"
@@ -133,8 +138,8 @@ ISSUE_URL_PLACEHOLDER=""
 META_JSON=$(jq -nc \
   --arg id "$TASK_ID" --arg t "$TRACK" --arg title "$TITLE" \
   --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-  --arg branch "$BRANCH" --arg sha "$PUSHED_SHA" \
-  '{task_id:$id, task_type:$t, title:$title, started_at:$ts, branch:$branch, base_sha:$sha, scope_files:[], scope_dirs:[]}')
+  --arg branch "$BRANCH" --arg sha "$PUSHED_SHA" --arg req "$REQ_ID" \
+  '{task_id:$id, task_type:$t, title:$title, started_at:$ts, branch:$branch, base_sha:$sha, req_id:$req, scope_files:[], scope_dirs:[]}')
 
 (
   cd "$WT_PATH"
@@ -142,6 +147,7 @@ META_JSON=$(jq -nc \
 TASK_ID=$TASK_ID
 TASK_TYPE=$TRACK
 TITLE=$TITLE
+REQ_ID=$REQ_ID
 STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 BRANCH=$BRANCH
 WT_PATH=$WT_PATH

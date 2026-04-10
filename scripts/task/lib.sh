@@ -34,20 +34,43 @@ log_event() {
 
 # ─── ID allocation (flock guarded) ───────────────────────────────────────────
 # Scans SPEC.md + task-log.ndjson + cache for max ID per track, returns next.
+# F-track is reserved for Sprint/Phase features — Task Orchestrator uses B/C/X only.
 allocate_id() {
-  local track="$1"  # F | B | C | X
+  local track="$1"  # B | C | X (F is Sprint-only)
   local spec="${2:-$(_repo_root)/SPEC.md}"
+
+  if [ "$track" = "F" ]; then
+    echo "[fx-task] F-track은 Sprint/Phase 전용이에요. Task에는 B/C/X를 사용해주세요." >&2
+    echo "[fx-task]   Feature급 작업 → Sprint 경로: bash -i -c 'sprint N'" >&2
+    return 1
+  fi
+
   local max_spec=0 max_log=0
+  # Scan only the Task Orchestrator Backlog section (between markers) to avoid
+  # collision with Sprint F-items (F1~F499) in §5.
   if [ -f "$spec" ]; then
-    max_spec=$(grep -oE "\| ${track}[0-9]+ \|" "$spec" 2>/dev/null \
+    max_spec=$(sed -n '/<!-- fx-task-orchestrator-backlog -->/,/<!-- \/fx-task-orchestrator-backlog -->/p' "$spec" \
+      | grep -oE "\| ${track}[0-9]+ \|" 2>/dev/null \
       | grep -oE "[0-9]+" | sort -n | tail -1 || echo 0)
   fi
   max_log=$(jq -r --arg t "$track" '
     [.tasks | to_entries[] | select(.key | startswith($t)) | .key | ltrimstr($t) | tonumber] | max // 0
   ' "$FX_CACHE" 2>/dev/null || echo 0)
   local next=$(( ${max_spec:-0} > ${max_log:-0} ? ${max_spec:-0} + 1 : ${max_log:-0} + 1 ))
-  # F-track legacy collision: SPEC has F1..F496, ensure we step beyond
   echo "${track}${next}"
+}
+
+# ─── REQ code allocation ────────────────────────────────────────────────────
+# Scans SPEC.md for max FX-REQ-NNN and returns next number.
+allocate_req_id() {
+  local spec="${1:-$(_repo_root)/SPEC.md}"
+  local max_req=0
+  if [ -f "$spec" ]; then
+    max_req=$(grep -oE 'FX-REQ-[0-9]+' "$spec" 2>/dev/null \
+      | grep -oE '[0-9]+' | sort -n | tail -1 || echo 0)
+  fi
+  local next=$(( ${max_req:-0} + 1 ))
+  echo "FX-REQ-$(printf '%03d' "$next")"
 }
 
 # ─── repo/git helpers ────────────────────────────────────────────────────────

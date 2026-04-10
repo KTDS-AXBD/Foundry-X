@@ -45,8 +45,14 @@ classify_track() {
     return
   fi
 
-  # Default: Feature
-  echo "F"
+  # Feature indicators → Sprint route (F-track is Sprint-only)
+  if echo "$desc_lower" | grep -qE 'feature|기능|신규|추가|구현|implement|새로운|new'; then
+    echo "SPRINT"
+    return
+  fi
+
+  # Default: Chore (F-track is reserved for Sprint/Phase)
+  echo "C"
 }
 
 # ─── 2. 규모 판정 ──────────────────────────────────────────────────────────
@@ -139,10 +145,10 @@ SCOPE_DIRS=$(estimate_scope_dirs "$DESC")
 WIP_CUR=$(wip_count)
 
 case "$TRACK" in
-  F) TRACK_LABEL="Feature (F)" ;;
   B) TRACK_LABEL="Bug Fix (B)" ;;
   C) TRACK_LABEL="Chore (C)" ;;
   X) TRACK_LABEL="Experiment (X)" ;;
+  SPRINT) TRACK_LABEL="Feature → Sprint 경로 (F-track은 Sprint 전용)" ; SCOPE="SPRINT" ;;
 esac
 
 case "$SCOPE" in
@@ -202,6 +208,8 @@ elif [ "$WIP_CUR" -ge "$WIP_CAP" ]; then
 │  강제:  FX_WIP_OVERRIDE=1 bash scripts/task/task-start.sh ${TRACK} "${SUGGESTED_TITLE}"
 │
 EOF
+elif [ "$TRACK" = "SPRINT" ]; then
+  : # already handled by SCOPE=SPRINT above
 else
   cat <<EOF
 │  bash scripts/task/task-start.sh ${TRACK} "<영문 제목>"

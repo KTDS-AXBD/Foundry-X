@@ -96,6 +96,15 @@ phase_signals() {
       tmux kill-pane -t "$PANE_ID" 2>/dev/null || true
     fi
 
+    # SPEC.md backlog status → DONE (PRD §3.3: merge 시 1회 갱신)
+    if [ "$MERGED" = true ] && [ -f "$REPO_ROOT/SPEC.md" ]; then
+      if grep -q "| ${TASK_ID} |" "$REPO_ROOT/SPEC.md"; then
+        sed -i "s/| ${TASK_ID} \\(|.*|\\) PLANNED \\(|.*\\)/| ${TASK_ID} \\1 DONE \\2/" "$REPO_ROOT/SPEC.md" 2>/dev/null || true
+        (cd "$REPO_ROOT" && git add SPEC.md && git commit -m "chore(${TASK_ID}): mark DONE in SPEC backlog" >/dev/null 2>&1) || true
+        log "📝 ${TASK_ID} SPEC backlog → DONE"
+      fi
+    fi
+
     # cache + cleanup
     local FINAL_STATUS="merged"
     [ "$MERGED" = false ] && FINAL_STATUS="done_pending_merge"
