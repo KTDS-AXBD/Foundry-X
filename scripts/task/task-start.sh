@@ -279,45 +279,18 @@ else
   INJECT_STATUS="⏭️  tmux 없음 — 수동 시작 필요"
 fi
 
-# ─── Step 8: auto-start monitor + watch (if not already running) ──────────────
-mkdir -p /tmp/task-signals
-
-# 8a. task-monitor (signal → merge → cleanup, 30s interval)
-MONITOR_PID_FILE="/tmp/task-signals/.monitor.pid"
-MONITOR_RUNNING=false
-if [ -f "$MONITOR_PID_FILE" ] && kill -0 "$(cat "$MONITOR_PID_FILE")" 2>/dev/null; then
-  MONITOR_RUNNING=true
+# ─── Step 8: auto-start task-daemon (통합 데몬 — 감시+처리+큐+복구) ──────────
+DAEMON_PID_FILE="/tmp/task-signals/.daemon.pid"
+DAEMON_RUNNING=false
+if [ -f "$DAEMON_PID_FILE" ] && kill -0 "$(cat "$DAEMON_PID_FILE")" 2>/dev/null; then
+  DAEMON_RUNNING=true
 fi
 
-if [ "$MONITOR_RUNNING" = false ]; then
-  nohup bash "$REPO_ROOT/scripts/task/task-monitor.sh" --interval 30 \
-    > "/tmp/task-signals/monitor-${PROJECT}.log" 2>&1 &
-  echo $! > "$MONITOR_PID_FILE"
-  disown
-  MONITOR_STATUS="✅ monitor 시작 (PID $(cat "$MONITOR_PID_FILE"), 30초 간격)"
+if [ "$DAEMON_RUNNING" = false ] && [ -f "$REPO_ROOT/scripts/task/task-daemon.sh" ]; then
+  bash "$REPO_ROOT/scripts/task/task-daemon.sh" --bg 2>/dev/null
+  DAEMON_STATUS="✅ daemon 시작 (PID $(cat "$DAEMON_PID_FILE" 2>/dev/null))"
 else
-  MONITOR_STATUS="✅ monitor 실행 중 (PID $(cat "$MONITOR_PID_FILE"))"
-fi
-
-# 8b. task-watch (pane 실시간 감시 — 권한 자동승인 + idle/완료/에러 감지, 20s interval)
-WATCH_PID_FILE="/tmp/task-signals/.watch.pid"
-WATCH_RUNNING=false
-if [ -f "$WATCH_PID_FILE" ] && kill -0 "$(cat "$WATCH_PID_FILE")" 2>/dev/null; then
-  WATCH_RUNNING=true
-fi
-
-if [ "$WATCH_RUNNING" = false ] && [ -f "$REPO_ROOT/scripts/task/task-watch.sh" ]; then
-  nohup bash "$REPO_ROOT/scripts/task/task-watch.sh" --interval 20 \
-    > "/tmp/task-signals/watch-${PROJECT}.log" 2>&1 &
-  echo $! > "$WATCH_PID_FILE"
-  disown
-  WATCH_STATUS="✅ watch 시작 (PID $(cat "$WATCH_PID_FILE"), 20초 간격)"
-else
-  if [ "$WATCH_RUNNING" = true ]; then
-    WATCH_STATUS="✅ watch 실행 중 (PID $(cat "$WATCH_PID_FILE"))"
-  else
-    WATCH_STATUS="⏭️  watch 스크립트 없음"
-  fi
+  DAEMON_STATUS="✅ daemon 실행 중 (PID $(cat "$DAEMON_PID_FILE" 2>/dev/null))"
 fi
 
 cat <<EOF
@@ -328,6 +301,5 @@ cat <<EOF
   issue:   ${ISSUE_URL:-(degraded)}
   base:    ${PUSHED_SHA:0:8}
   inject:  ${INJECT_STATUS}
-  monitor: ${MONITOR_STATUS}
-  watch:   ${WATCH_STATUS}
+  daemon:  ${DAEMON_STATUS}
 EOF
