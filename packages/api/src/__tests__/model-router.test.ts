@@ -181,7 +181,7 @@ describe("DEFAULT_MODEL_MAP", () => {
       expect(typeof DEFAULT_MODEL_MAP[tt]).toBe("string");
     }
 
-    expect(Object.keys(DEFAULT_MODEL_MAP)).toHaveLength(13);
+    expect(Object.keys(DEFAULT_MODEL_MAP)).toHaveLength(14);
   });
 });
 

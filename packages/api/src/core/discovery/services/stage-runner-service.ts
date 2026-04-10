@@ -117,7 +117,7 @@ export class StageRunnerService {
     const request: AgentExecutionRequest = {
       taskId: `stage-${stage}-${bizItemId}`,
       agentId: "discovery-stage-runner",
-      taskType: "spec-analysis",
+      taskType: "discovery-analysis",
       context: {
         repoUrl: "",
         branch: "",

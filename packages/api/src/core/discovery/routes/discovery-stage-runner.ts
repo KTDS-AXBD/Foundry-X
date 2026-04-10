@@ -7,7 +7,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
-import { createAgentRunner } from "../../agent/services/agent-runner.js";
+import { createAgentRunner, createRoutedRunner } from "../../agent/services/agent-runner.js";
 import { StageRunnerService } from "../services/stage-runner-service.js";
 import type { DiscoveryType } from "../services/analysis-path-v82.js";
 
@@ -108,7 +108,7 @@ discoveryStageRunnerRoute.post("/biz-items/:id/discovery-stage/:stage/run", asyn
   const parsed = StageRunSchema.safeParse(body);
   const feedback = parsed.success ? parsed.data.feedback : undefined;
 
-  const runner = createAgentRunner(c.env);
+  const runner = await createRoutedRunner(c.env, "discovery-analysis", c.env.DB);
   const service = new StageRunnerService(c.env.DB, runner);
 
   try {
