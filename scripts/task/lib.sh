@@ -19,8 +19,13 @@ mkdir -p "$FX_LOCK_DIR" "$FX_HOME/scripts"
 [ -f "$FX_LOG" ] || : > "$FX_LOG"
 
 # ─── logging ─────────────────────────────────────────────────────────────────
+# Note: do NOT use ${3:-{}} as default — bash parses it as ${3:-{} followed by
+# a literal }, which appends a stray } even when $3 is provided. Use explicit
+# if-form instead.
 log_event() {
-  local task_id="$1" event="$2" extra="${3:-{}}"
+  local task_id="$1" event="$2"
+  local extra
+  if [ "$#" -ge 3 ] && [ -n "$3" ]; then extra="$3"; else extra='{}'; fi
   local ts; ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   jq -nc \
     --arg ts "$ts" --arg id "$task_id" --arg ev "$event" --argjson extra "$extra" \
