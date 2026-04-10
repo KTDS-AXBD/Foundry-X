@@ -238,6 +238,22 @@ health_check() {
     done <<< "$wt_list"
   fi
 
+  # 4. Agent Doctor — watch 패턴 진단
+  echo ""
+  echo "  ── agent-doctor 진단 ──"
+  if [ -x "$REPO_ROOT/scripts/task/agent-doctor.sh" ]; then
+    local doctor_issues
+    doctor_issues=$(bash "$REPO_ROOT/scripts/task/agent-doctor.sh" --check 2>&1 | grep -c '⚠️\|❌' || echo 0)
+    if [ "$doctor_issues" -gt 0 ]; then
+      echo "  ⚠️  agent-doctor: ${doctor_issues}건 이슈 — \`agent-doctor.sh --learn\`으로 상세 확인"
+      issues=$((issues + doctor_issues))
+    else
+      echo "  ✅ agent-doctor: watch 패턴 정상"
+    fi
+  else
+    echo "  ⏭️  agent-doctor.sh 미설치 — 건너뜀"
+  fi
+
   echo ""
   if [ "$issues" -eq 0 ]; then
     echo "  🎉 모든 점검 통과 — 이상 없음"

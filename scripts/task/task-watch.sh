@@ -37,14 +37,31 @@ PERM_PATTERNS=(
 )
 
 # ─── Completion patterns (WT Claude finished work) ─────────────────────────
+# NOTE: These patterns are checked against the last 40 lines of pane content.
+# Add new patterns when agent-doctor --learn discovers unmatched completions.
 DONE_PATTERNS=(
+  # Claude Code timing banner (most reliable signal)
   "Cooked for"
   "Baked for"
   "Brewed for"
   "Befuddling"
+  # Korean completion phrases
   "작업 완료"
+  "작업이 완료"
   "수고하셨어요"
   "다른 작업 없"
+  "완료됐어요"
+  "완료했어요"
+  "끝났어요"
+  "마무리됐"
+  # Delegation to task-complete (F498 failure case — Claude says "run task-complete")
+  "task-complete"
+  "task complete"
+  # Common English completion phrases
+  "All done"
+  "work is complete"
+  "finished"
+  "I'm done"
 )
 
 # ─── Error patterns ────────────────────────────────────────────────────────
@@ -101,9 +118,12 @@ check_pane() {
     fi
   done
 
-  # Check if prompt is waiting (❯ with no activity)
+  # Check if prompt is waiting (Claude Code uses ⏵⏵, also check ❯ and $)
+  # Strip ANSI escape codes before matching to handle colored prompts.
   local prompt_idle=false
-  if echo "$content" | tail -3 | grep -q '^❯ *$'; then
+  local tail_clean
+  tail_clean=$(echo "$content" | tail -5 | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g; s/\x1b\][^\x07]*\x07//g')
+  if echo "$tail_clean" | grep -qE '^\s*(⏵|❯|\$)\s*$'; then
     prompt_idle=true
   fi
 
