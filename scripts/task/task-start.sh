@@ -177,8 +177,40 @@ if [ -n "${TMUX:-}" ]; then
     tmux set -p -t "$PANE_ID" @fx-task-id "$TASK_ID" 2>/dev/null || true
     # enable pane border labels so task ID is visible in tmux UI
     tmux set-option pane-border-status top 2>/dev/null || true
-    # 전체 pane을 균등 너비로 재배치 — WT 3개 이상일 때 가독성 유지
-    tmux select-layout even-horizontal 2>/dev/null || true
+    # fx-task pane들만 균등 너비 재배치 (고정 pane 제외)
+    # @fx-task-id가 설정된 pane + Master pane만 대상
+    WINDOW_WIDTH=$(tmux display -p '#{window_width}' 2>/dev/null || echo 0)
+    # 고정 pane 너비 합산 (fx-task-id 미설정 + Master 아닌 pane)
+    FIXED_WIDTH=0
+    FIXED_COUNT=0
+    TASK_PANES=""
+    TASK_COUNT=0
+    while IFS='|' read -r pid pw ptitle ptask; do
+      ptask=$(echo "$ptask" | tr -d '[:space:]')
+      # Master pane은 task pane으로 취급
+      if echo "$ptitle" | grep -qi "master"; then
+        TASK_PANES="${TASK_PANES} ${pid}"
+        TASK_COUNT=$((TASK_COUNT + 1))
+      elif [ -n "$ptask" ]; then
+        TASK_PANES="${TASK_PANES} ${pid}"
+        TASK_COUNT=$((TASK_COUNT + 1))
+      else
+        FIXED_WIDTH=$((FIXED_WIDTH + pw))
+        FIXED_COUNT=$((FIXED_COUNT + 1))
+      fi
+    done < <(tmux list-panes -F '#{pane_id}|#{pane_width}|#{pane_title}|#{@fx-task-id}' 2>/dev/null)
+
+    if [ "$TASK_COUNT" -gt 0 ] && [ "$WINDOW_WIDTH" -gt 0 ]; then
+      # 구분선(pane border) 보정: 전체 pane 수 - 1
+      TOTAL_PANES=$((TASK_COUNT + FIXED_COUNT))
+      BORDERS=$((TOTAL_PANES - 1))
+      AVAIL=$((WINDOW_WIDTH - FIXED_WIDTH - BORDERS))
+      EACH=$((AVAIL / TASK_COUNT))
+      [ "$EACH" -lt 40 ] && EACH=40  # 최소 40컬럼 보장
+      for pid in $TASK_PANES; do
+        tmux resize-pane -t "$pid" -x "$EACH" 2>/dev/null || true
+      done
+    fi
   fi
 fi
 
