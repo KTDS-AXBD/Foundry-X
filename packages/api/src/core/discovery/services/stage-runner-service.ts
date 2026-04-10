@@ -32,6 +32,10 @@ export interface StageConfirmResult {
 
 const STAGE_ORDER = ["2-0", "2-1", "2-2", "2-3", "2-4", "2-5", "2-6", "2-7", "2-8", "2-9", "2-10"];
 
+/** confidence 기본값 — AI 실패 시 또는 파싱 fallback */
+const CONFIDENCE_FALLBACK = 70;
+const CONFIDENCE_ON_ERROR = 50;
+
 // F486: 단계 완료 시 자동 갱신할 criteria 매핑
 const STAGE_CRITERIA_MAP: Record<string, number[]> = {
   "2-1": [1],     // 레퍼런스 분석 → 문제/고객 정의
@@ -102,6 +106,15 @@ export class StageRunnerService {
       ? ANALYSIS_PATH_MAP[stage as Stage][discoveryType]
       : "normal";
 
+    // Race condition 방어: 이미 in_progress인 단계는 중복 실행 차단
+    const currentStatus = await this.db.prepare(
+      "SELECT status FROM biz_item_discovery_stages WHERE biz_item_id = ? AND stage = ?",
+    ).bind(bizItemId, stage).first<{ status: string }>();
+
+    if (currentStatus?.status === "in_progress") {
+      throw new Error("STAGE_ALREADY_RUNNING");
+    }
+
     // stage 상태를 in_progress로
     await stageSvc.updateStage(bizItemId, orgId, stage as never, "in_progress");
 
@@ -135,7 +148,7 @@ export class StageRunnerService {
         analysisResult = {
           summary: "AI 분석 일시 실패 — 수동 편집으로 결과를 작성해 주세요.",
           details: `자동 분석이 실패했어요.\n\n사유: ${errMsg}\n\n오른쪽 편집 버튼으로 직접 작성하거나 잠시 후 다시 시도해 주세요.`,
-          confidence: 50,
+          confidence: CONFIDENCE_ON_ERROR,
         };
       } else {
         analysisResult = this.parseResult(aiResult.output?.analysis ?? "");
@@ -146,7 +159,7 @@ export class StageRunnerService {
       analysisResult = {
         summary: "AI 분석 일시 실패 — 수동 편집으로 결과를 작성해 주세요.",
         details: `자동 분석 호출 중 오류가 발생했어요.\n\n사유: ${errMsg}\n\n오른쪽 편집 버튼으로 직접 작성하거나 잠시 후 다시 시도해 주세요.`,
-        confidence: 50,
+        confidence: CONFIDENCE_ON_ERROR,
       };
     }
 
@@ -189,25 +202,39 @@ export class StageRunnerService {
     viabilityAnswer: "go" | "pivot" | "stop",
     feedback?: string,
   ): Promise<StageConfirmResult> {
-    const stageSvc = new DiscoveryStageService(this.db);
+    // D1 batch로 stage 완료 + viability checkpoint를 원자적으로 처리
+    const now = new Date().toISOString().replace("T", " ").slice(0, 19);
+    const isoNow = new Date().toISOString();
 
-    // stage 완료 처리
-    await stageSvc.updateStage(bizItemId, orgId, stage as never, "completed");
-
-    // ax_viability_checkpoints: stage CHECK 2-1~2-7만 허용, decision CHECK go/pivot/drop
     const VIABILITY_STAGES = new Set(["2-1", "2-2", "2-3", "2-4", "2-5", "2-6", "2-7"]);
+    const batchStmts: D1PreparedStatement[] = [];
+
+    // 1) stage 완료 처리
+    batchStmts.push(
+      this.db.prepare(
+        `UPDATE biz_item_discovery_stages
+         SET status = 'completed', completed_at = ?, updated_at = datetime('now')
+         WHERE biz_item_id = ? AND stage = ?`,
+      ).bind(now, bizItemId, stage),
+    );
+
+    // 2) viability checkpoint (2-1~2-7만)
     if (VIABILITY_STAGES.has(stage)) {
       const viabilityQuestion: string = stage in VIABILITY_QUESTIONS
         ? (VIABILITY_QUESTIONS[stage as Stage] ?? "")
         : "";
       const cpId = crypto.randomUUID().replace(/-/g, "");
-      const now = new Date().toISOString();
       const dbDecision = viabilityAnswer === "stop" ? "drop" : viabilityAnswer;
-      await this.db.prepare(
-        `INSERT OR REPLACE INTO ax_viability_checkpoints (id, biz_item_id, org_id, stage, decision, question, reason, decided_by, decided_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 'system', ?)`,
-      ).bind(cpId, bizItemId, orgId, stage, dbDecision, viabilityQuestion, feedback ?? null, now).run();
+      batchStmts.push(
+        this.db.prepare(
+          `INSERT OR REPLACE INTO ax_viability_checkpoints (id, biz_item_id, org_id, stage, decision, question, reason, decided_by, decided_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, 'system', ?)`,
+        ).bind(cpId, bizItemId, orgId, stage, dbDecision, viabilityQuestion, feedback ?? null, isoNow),
+      );
     }
+
+    // batch 실행 — 원자적 커밋
+    await this.db.batch(batchStmts);
 
     // F486: criteria 자동 갱신 (stop이 아닌 경우)
     if (viabilityAnswer !== "stop") {
@@ -335,7 +362,7 @@ export class StageRunnerService {
     try {
       result = JSON.parse(artifact.output_text);
     } catch {
-      result = { summary: "분석 결과", details: artifact.output_text, confidence: 70 };
+      result = { summary: "분석 결과", details: artifact.output_text, confidence: CONFIDENCE_FALLBACK };
     }
 
     const stageName = STAGE_NAMES[stage as Stage] ?? this.getStageName(stage);
@@ -435,7 +462,7 @@ export class StageRunnerService {
         return {
           summary: parsed.summary ?? "분석이 완료되었습니다.",
           details: parsed.details ?? output,
-          confidence: typeof parsed.confidence === "number" ? parsed.confidence : 70,
+          confidence: typeof parsed.confidence === "number" ? parsed.confidence : CONFIDENCE_FALLBACK,
         };
       }
     } catch {
@@ -444,7 +471,7 @@ export class StageRunnerService {
     return {
       summary: "분석이 완료되었습니다.",
       details: output,
-      confidence: 70,
+      confidence: CONFIDENCE_FALLBACK,
     };
   }
 

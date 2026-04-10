@@ -331,10 +331,11 @@ bizItemsRoute.post("/biz-items/:id/evaluate", async (c) => {
 
     await service.updateStatus(id, "evaluated");
 
-    // F479: discovery_stages 2-2 완료 + pipeline REGISTERED→DISCOVERY 자동 전환
+    // F479: discovery_stages 2-9(평가) 완료 + pipeline REGISTERED→DISCOVERY 자동 전환
+    // NOTE: evaluate는 DiscoveryStageStepper 2-9에서 호출 — 2-9를 마킹해야 정확
     try {
       const stageSvc = new DiscoveryStageService(c.env.DB);
-      await stageSvc.updateStage(id, orgId, "2-2", "completed");
+      await stageSvc.updateStage(id, orgId, "2-9", "completed");
 
       // pipeline_stages: REGISTERED → DISCOVERY 진행
       const now = new Date().toISOString();
