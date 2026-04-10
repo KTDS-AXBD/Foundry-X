@@ -224,7 +224,7 @@ while [ \$WAITED -lt \$MAX_WAIT ]; do
 done
 
 if [ \$WAITED -ge \$MAX_WAIT ]; then
-  echo "[inject] ⚠️  ${TASK_ID}: Claude 부팅 ${MAX_WAIT}초 초과 — 수동 주입 필요" >> /tmp/task-signals/inject.log
+  echo "[inject] ⚠️  ${TASK_ID}: Claude 부팅 \${MAX_WAIT}초 초과 — 수동 주입 필요" >> /tmp/task-signals/inject.log
   exit 1
 fi
 
@@ -236,7 +236,7 @@ sleep 1
 PROMPT_TEXT=\$(cat "${WT_PATH}/.task-prompt" 2>/dev/null | tr '\n' ' ' | cut -c1-500)
 tmux send-keys -t "\$PANE" "/ax:session-start \${PROMPT_TEXT}" Enter
 
-echo "[inject] ✅ ${TASK_ID}: 주입 완료 (boot=${WAITED}s)" >> /tmp/task-signals/inject.log
+echo "[inject] ✅ ${TASK_ID}: 주입 완료 (boot=\${WAITED}s)" >> /tmp/task-signals/inject.log
 rm -f "${INJECT_SCRIPT}"
 INJECT_EOF
 
