@@ -195,10 +195,14 @@ if [ -n "$PANE_ID" ]; then
   # Write prompt to WT for Claude to pick up
   echo "$PROMPT" > "${WT_PATH}/.task-prompt"
 
-  # Background: start Claude session → wait for boot → inject prompt
+  # Background: start Claude session → wait for boot → rename + inject prompt
+  RENAME_LABEL="${TASK_ID} ${TITLE}"
   (
     tmux send-keys -t "$PANE_ID" "ccs" Enter
     sleep 8
+    # /rename으로 세션 이름 설정 — pane 식별용
+    tmux send-keys -t "$PANE_ID" "/rename ${RENAME_LABEL}" Enter
+    sleep 1
     tmux send-keys -t "$PANE_ID" "/ax:session-start $(printf '%s' "$PROMPT" | tr '\n' ' ')" Enter
   ) &
   disown
