@@ -1,5 +1,5 @@
 /**
- * F493: CardBlock — CardSchema 렌더러
+ * F493: CardBlock — CardSchema 렌더러 (가독성 개선: 본문/subtitle 대비↑, spacing↑)
  */
 import { MetricBlock } from "./MetricBlock.js";
 import { TableBlock } from "./TableBlock.js";
@@ -51,31 +51,35 @@ export function CardBlock({ card }: CardBlockProps) {
   const iconColor = card.iconColor ? ICON_COLOR_MAP[card.iconColor] : undefined;
 
   return (
-    <div className="rounded-lg border bg-card p-4 space-y-3">
+    <div className="rounded-lg border bg-card p-5 space-y-4">
       <div className="flex items-start gap-3">
         {card.icon && (
           <span
-            className="flex items-center justify-center w-8 h-8 rounded-md text-base flex-shrink-0"
+            className="flex items-center justify-center w-10 h-10 rounded-md text-lg flex-shrink-0"
             style={{ backgroundColor: iconBg, color: iconColor }}
           >
             {card.icon}
           </span>
         )}
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold leading-snug">{card.title}</h3>
+          <h3 className="text-[15px] font-semibold leading-snug text-foreground">
+            {card.title}
+          </h3>
           {card.subtitle && (
-            <p className="text-xs text-muted-foreground mt-0.5">{card.subtitle}</p>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+              {card.subtitle}
+            </p>
           )}
         </div>
       </div>
 
       {card.body && (
-        <p className="text-sm text-muted-foreground leading-relaxed">{card.body}</p>
+        <p className="text-sm leading-relaxed text-foreground/85 whitespace-pre-line">
+          {card.body}
+        </p>
       )}
 
-      {card.metrics && card.metrics.length > 0 && (
-        <MetricBlock metrics={card.metrics} />
-      )}
+      {card.metrics && card.metrics.length > 0 && <MetricBlock metrics={card.metrics} />}
 
       {card.table && <TableBlock table={card.table} />}
     </div>

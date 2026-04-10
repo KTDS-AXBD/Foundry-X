@@ -1,6 +1,6 @@
 /**
  * F493: TabRenderer — TabSchema → JSX 범용 렌더러
- * 탭별 React 컴포넌트 9개 대신 이 단일 컴포넌트가 모든 탭을 처리한다
+ * 카드는 기본 1열 (md 이상부터 2열) → 테이블/메트릭 가독성 확보
  */
 import { lazy, Suspense } from "react";
 import { Badge } from "@/components/ui/badge.js";
@@ -8,7 +8,6 @@ import { CardBlock } from "./blocks/CardBlock.js";
 import { InsightBox } from "./blocks/InsightBox.js";
 import { NextStepBox } from "./blocks/NextStepBox.js";
 
-// ChartBlock은 lazy 로드
 const ChartBlock = lazy(() =>
   import("./blocks/ChartBlock.js").then((m) => ({ default: m.ChartBlock })),
 );
@@ -66,41 +65,55 @@ export function TabRenderer({ stepKey, tab }: TabRendererProps) {
               : "purple"
     ] ?? "var(--foreground)";
 
+  // 카드가 테이블을 포함하면 1열로만 렌더 (테이블 가독성 확보)
+  const hasAnyTable = (tab.cards as Array<{ table?: unknown }> | undefined)?.some(
+    (c) => c && typeof c === "object" && "table" in c && !!c.table,
+  );
+
   return (
-    <div className="space-y-5 p-1" data-step={stepKey}>
+    <div className="space-y-6 p-1" data-step={stepKey}>
       {/* 헤더 */}
-      <div className="flex items-start justify-between gap-3 border-b pb-3" style={{ borderColor: stepColor }}>
-        <div className="flex items-start gap-3">
+      <div
+        className="flex items-start justify-between gap-3 border-b pb-4"
+        style={{ borderColor: `color-mix(in srgb, ${stepColor} 40%, transparent)` }}
+      >
+        <div className="flex items-start gap-3 min-w-0">
           <span
-            className="flex items-center justify-center min-w-[2rem] h-8 rounded-full text-white text-xs font-bold px-2"
+            className="flex items-center justify-center min-w-[2.5rem] h-9 rounded-full text-white text-xs font-bold px-2.5 flex-shrink-0"
             style={{ backgroundColor: stepColor }}
           >
             {tab.stepNumber.replace("STEP ", "")}
           </span>
-          <div>
-            <h2 className="text-base font-semibold leading-snug">{tab.title}</h2>
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold text-foreground leading-snug">
+              {tab.title}
+            </h2>
             {tab.engTitle && (
-              <p className="text-xs text-muted-foreground">{tab.engTitle}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{tab.engTitle}</p>
             )}
             {tab.subtitle && (
-              <p className="text-xs text-muted-foreground mt-0.5 italic">{tab.subtitle}</p>
+              <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
+                {tab.subtitle}
+              </p>
             )}
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {tab.hitlVerified && (
-            <Badge className="bg-mint-100 text-mint-800 text-[10px]">✓ HITL 검증</Badge>
+            <Badge className="bg-green-100 text-green-800 text-[11px] h-6 px-2">
+              ✓ HITL 검증
+            </Badge>
           )}
         </div>
       </div>
 
       {/* 태그 */}
       {tab.tags && tab.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {tab.tags.map((tag, i) => (
             <span
               key={i}
-              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${TAG_CLASS_MAP[tag.color] ?? ""}`}
+              className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${TAG_CLASS_MAP[tag.color] ?? ""}`}
             >
               {tag.label}
             </span>
@@ -108,9 +121,9 @@ export function TabRenderer({ stepKey, tab }: TabRendererProps) {
         </div>
       )}
 
-      {/* 카드 그리드 */}
+      {/* 카드 그리드 — 테이블 포함 시 1열, 아니면 lg:2열 */}
       {tab.cards.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className={`grid gap-4 ${hasAnyTable ? "grid-cols-1" : "lg:grid-cols-2"}`}>
           {(tab.cards as Parameters<typeof CardBlock>[0]["card"][]).map((card, i) => (
             <CardBlock key={i} card={card as Parameters<typeof CardBlock>[0]["card"]} />
           ))}
@@ -131,9 +144,7 @@ export function TabRenderer({ stepKey, tab }: TabRendererProps) {
       )}
 
       {/* 인사이트 박스 */}
-      {tab.insight && (
-        <InsightBox title={tab.insight.title} items={tab.insight.items} />
-      )}
+      {tab.insight && <InsightBox title={tab.insight.title} items={tab.insight.items} />}
 
       {/* 다음 단계 */}
       {tab.nextStep && <NextStepBox text={tab.nextStep.text} />}
