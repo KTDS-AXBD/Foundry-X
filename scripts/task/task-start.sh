@@ -177,6 +177,8 @@ if [ -n "${TMUX:-}" ]; then
     tmux set -p -t "$PANE_ID" @fx-task-id "$TASK_ID" 2>/dev/null || true
     # enable pane border labels so task ID is visible in tmux UI
     tmux set-option pane-border-status top 2>/dev/null || true
+    # 전체 pane을 균등 너비로 재배치 — WT 3개 이상일 때 가독성 유지
+    tmux select-layout even-horizontal 2>/dev/null || true
   fi
 fi
 
