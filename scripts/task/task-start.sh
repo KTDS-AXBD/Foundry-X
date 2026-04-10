@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # scripts/task/task-start.sh — /ax:task start (S-α MVP)
 #
-# Usage:  task-start.sh <track> "<title>"
+# Usage:  task-start.sh <track> "<title>" ["<prompt>"]
 #   track: F | B | C | X
+#   prompt: optional — injected into WT pane Claude session (default: auto-generated)
 #
 # Implements PRD §4.1.1 — flock allocator + push SHA pinning + commit body
 # fx-task-meta + tmux split + GitHub Issue creation.
@@ -19,6 +20,7 @@ source "$SCRIPT_DIR/lib.sh"
 
 TRACK="${1:?track required (F|B|C|X)}"
 TITLE="${2:?title required}"
+PROMPT="${3:-}"
 
 case "$TRACK" in F|B|C|X) ;; *) echo "[fx-task] invalid track: $TRACK" >&2; exit 2;; esac
 
@@ -148,11 +150,13 @@ PID=$$
 LAST_HEARTBEAT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 EOF
 
-  # ensure local gitignore (worktree branch only) hides .task-context
-  if [ ! -f .gitignore ] || ! grep -q '^\.task-context' .gitignore; then
-    echo ".task-context" >> .gitignore
-    git add .gitignore
-  fi
+  # ensure local gitignore (worktree branch only) hides task files
+  for f in .task-context .task-prompt; do
+    if [ ! -f .gitignore ] || ! grep -q "^\\${f}" .gitignore; then
+      echo "$f" >> .gitignore
+    fi
+  done
+  git add .gitignore
 
   git commit --allow-empty -m "$(printf 'chore(meta): %s task context init\n\n```fx-task-meta\n%s\n```' "$TASK_ID" "$META_JSON")" >/dev/null
 )
@@ -166,6 +170,31 @@ if [ -n "${TMUX:-}" ]; then
     # bidirectional verification via user-data
     tmux set -p -t "$PANE_ID" @fx-task-id "$TASK_ID" 2>/dev/null || true
   fi
+fi
+
+# ─── Step 5b: auto-inject Claude session + prompt (background) ──────────────
+if [ -n "$PANE_ID" ]; then
+  # Generate default prompt if not provided
+  if [ -z "$PROMPT" ]; then
+    case "$TRACK" in
+      F) TRACK_DESC="Feature 구현" ;;
+      B) TRACK_DESC="Bug 수정" ;;
+      C) TRACK_DESC="점검/Chore 작업" ;;
+      X) TRACK_DESC="실험/Spike 탐색" ;;
+    esac
+    PROMPT="이 worktree는 task ${TASK_ID} — ${TITLE}. .task-context 파일을 읽고 ${TRACK_DESC}을 진행해줘."
+  fi
+
+  # Write prompt to WT for Claude to pick up
+  echo "$PROMPT" > "${WT_PATH}/.task-prompt"
+
+  # Background: start Claude session → wait for boot → inject prompt
+  (
+    tmux send-keys -t "$PANE_ID" "ccs" Enter
+    sleep 8
+    tmux send-keys -t "$PANE_ID" "/ax:session-start $(printf '%s' "$PROMPT" | tr '\n' ' ')" Enter
+  ) &
+  disown
 fi
 
 # ─── Step 6: GitHub Issue creation (degraded on failure) ─────────────────────
@@ -195,6 +224,13 @@ log_event "$TASK_ID" "started" "$(jq -nc \
   --arg pane "$PANE_ID" --arg issue "$ISSUE_URL" --arg sha "$PUSHED_SHA" \
   '{track:$track, branch:$branch, wt:$wt, pane:$pane, issue_url:$issue, base_sha:$sha}')"
 
+INJECT_STATUS=""
+if [ -n "$PANE_ID" ]; then
+  INJECT_STATUS="✅ ccs + prompt 주입 중 (8초 후 자동 시작)"
+else
+  INJECT_STATUS="⏭️  tmux 없음 — 수동 시작 필요"
+fi
+
 cat <<EOF
 [fx-task] ✅ ${TASK_ID} 시작
   branch:  ${BRANCH}
@@ -202,4 +238,5 @@ cat <<EOF
   pane:    ${PANE_ID:-(no tmux)}
   issue:   ${ISSUE_URL:-(degraded)}
   base:    ${PUSHED_SHA:0:8}
+  inject:  ${INJECT_STATUS}
 EOF
