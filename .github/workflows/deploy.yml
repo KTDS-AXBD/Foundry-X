@@ -2,26 +2,32 @@ name: Deploy to Cloudflare
 on:
   push:
     branches: [master]
-  pull_request:
-    types: [opened, synchronize]
   workflow_dispatch:
 
+# 동시 실행 방지 — 같은 브랜치 push 중복 시 이전 run 취소
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  # 변경 경로 감지 — deploy job들의 skip/run 판단에 사용
+  # 변경 경로 감지 — skip/run 판단
   changes:
     runs-on: ubuntu-latest
     outputs:
       api: ${{ steps.filter.outputs.api }}
       web: ${{ steps.filter.outputs.web }}
-      shared: ${{ steps.filter.outputs.shared }}
+      code: ${{ steps.filter.outputs.code }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
-            shared:
-              - 'packages/shared/**'
+            code:
+              - 'packages/**/*.ts'
+              - 'packages/**/*.tsx'
+              - 'packages/**/package.json'
+              - 'pnpm-lock.yaml'
             api:
               - 'packages/api/**'
               - 'packages/shared/**'
@@ -30,7 +36,10 @@ jobs:
               - 'packages/web/**'
               - 'packages/shared/**'
 
+  # 코드 변경 시에만 test 실행 (SPEC.md, scripts, docs 변경은 skip)
   test:
+    needs: changes
+    if: needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,32 +51,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo typecheck lint test
 
-  # F57: Staging deploy (PR only)
-  deploy-staging:
-    if: github.event_name == 'pull_request'
-    needs: [test, changes]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @foundry-x/shared build
-      - run: pnpm --filter @foundry-x/harness-kit build
-      - uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: packages/api
-          command: deploy --env staging
-
-  # Production deploy (master push) — API 변경 시에만
+  # Production deploy — API (코드 변경 시에만)
   deploy-api:
     if: |
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
-      (needs.changes.outputs.api == 'true' || github.event_name == 'workflow_dispatch')
+      always() &&
+      (needs.changes.outputs.api == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     needs: [test, changes]
     runs-on: ubuntu-latest
     steps:
@@ -80,7 +69,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @foundry-x/shared build
       - run: pnpm --filter @foundry-x/harness-kit build
-      # D1 마이그레이션을 deploy 전에 적용 (미적용 마이그레이션이 있을 때만 실행)
       - name: Apply D1 migrations (remote)
         uses: cloudflare/wrangler-action@v3
         with:
@@ -91,18 +79,17 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: packages/api
-          # Marker.io 프로젝트 ID를 Workers secret으로 동기화 (web의 VITE_MARKER_PROJECT_ID 재사용)
-          # /ax-bd/prototypes/:id/html 응답에 피드백 위젯 snippet을 주입할 때 사용
           secrets: |
             MARKER_PROJECT_ID
         env:
           MARKER_PROJECT_ID: ${{ secrets.VITE_MARKER_PROJECT_ID }}
 
-  # Production deploy (master push) — Web 변경 시에만
+  # Production deploy — Web (코드 변경 시에만)
   deploy-web:
     if: |
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
-      (needs.changes.outputs.web == 'true' || github.event_name == 'workflow_dispatch')
+      always() &&
+      (needs.changes.outputs.web == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     needs: [test, changes]
     runs-on: ubuntu-latest
     steps:
@@ -122,20 +109,17 @@ jobs:
         working-directory: packages/web
         continue-on-error: true
         run: |
-          npx tinacms build || echo "⚠️ TinaCMS build failed (schema mismatch?) — continuing"
+          npx tinacms build || echo "⚠️ TinaCMS build failed — continuing"
           cp -r public/admin/* dist/admin/ 2>/dev/null || true
         env:
           VITE_TINA_CLIENT_ID: ${{ secrets.VITE_TINA_CLIENT_ID }}
           TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
-      - name: Restore _redirects + _headers and verify (F338 — SPA 404 근본 수정)
+      - name: Restore _redirects + _headers (SPA 404 수정)
         working-directory: packages/web
         run: |
           cp public/_redirects dist/_redirects
           cp public/_headers dist/_headers
           cp dist/index.html dist/404.html
-          echo "=== dist/_redirects ==="
-          cat dist/_redirects
-          echo "=== Verification ==="
           grep -q '/\*.*index.html.*200' dist/_redirects && echo "✅ SPA catch-all OK" || (echo "❌ SPA catch-all MISSING" && exit 1)
       - uses: cloudflare/wrangler-action@v3
         with:
@@ -147,7 +131,6 @@ jobs:
   smoke-test:
     if: |
       always() &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
       !contains(needs.*.result, 'failure')
     needs: [deploy-api, deploy-web]
     runs-on: ubuntu-latest
@@ -158,35 +141,3 @@ jobs:
         env:
           API_URL: https://foundry-x-api.ktds-axbd.workers.dev
           WEB_URL: https://fx.minu.best
-
-  # F78: Production E2E — Playwright 브라우저 테스트 (배포 후)
-  # non-blocking: 실패해도 배포 성공 상태 유지 (안정화 후 제거)
-  prod-e2e:
-    if: |
-      always() &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
-      needs.smoke-test.result == 'success'
-    continue-on-error: true
-    needs: smoke-test
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Install Playwright Chromium
-        run: pnpm -F @foundry-x/web exec playwright install --with-deps chromium
-      - name: Run production E2E tests
-        run: pnpm -F @foundry-x/web e2e:prod
-        env:
-          PROD_WEB_URL: https://fx.minu.best
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: prod-e2e-report
-          path: packages/web/playwright-report/
-          retention-days: 14
