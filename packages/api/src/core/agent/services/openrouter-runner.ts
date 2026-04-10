@@ -86,7 +86,7 @@ export class OpenRouterRunner implements AgentRunner {
         return {
           status: "success",
           output: {
-            analysis: parsed.analysis,
+            analysis: parsed.analysis ?? text,
             generatedCode: parsed.generatedCode,
             reviewComments: parsed.reviewComments,
             uiHint: parsed.uiHint,

@@ -294,6 +294,39 @@ describe("OpenRouterRunner", () => {
     expect(await emptyRunner.isAvailable()).toBe(false);
   });
 
+  // 15-b. analysis fallback — custom 스키마(summary/details/confidence)일 때 analysis 없어도 raw text로 보존
+  it("execute() falls back to raw text when response lacks analysis field", async () => {
+    const customSchemaResponse = {
+      ...mockOpenRouterResponse,
+      choices: [
+        {
+          index: 0,
+          message: {
+            role: "assistant",
+            content: JSON.stringify({
+              summary: "AI 챗봇 분석 결과",
+              details: "상세 내용",
+              confidence: 85,
+            }),
+          },
+          finish_reason: "stop",
+        },
+      ],
+    };
+
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(customSchemaResponse),
+    });
+
+    const result = await runner.execute(makeRequest({ taskType: "spec-analysis" }));
+
+    expect(result.status).toBe("success");
+    // parsed.analysis is undefined → falls back to raw text
+    expect(result.output.analysis).toContain("summary");
+    expect(result.output.analysis).toContain("AI 챗봇 분석 결과");
+  });
+
   // 15. supportsTaskType
   it("supportsTaskType() returns true for known types, false for unknown", () => {
     expect(runner.supportsTaskType("code-review")).toBe(true);

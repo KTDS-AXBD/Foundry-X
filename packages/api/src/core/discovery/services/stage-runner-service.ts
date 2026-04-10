@@ -55,6 +55,20 @@ export interface StageResultResponse {
   artifactId: string | null;
 }
 
+/**
+ * Discovery 단계 분석 전용 시스템 프롬프트.
+ * AI가 반드시 {summary, details, confidence} 스키마로 응답하도록 강제.
+ * "analysis" 필드 언급 없음 — runner가 custom 스키마 그대로 전달받아야 함.
+ */
+const DISCOVERY_STAGE_SYSTEM_PROMPT = `당신은 AX BD팀의 사업 발굴 분석 에이전트입니다.
+모든 응답은 반드시 다음 JSON 스키마로 출력하세요:
+{
+  "summary": "1~2문장 핵심 요약 (한국어)",
+  "details": "마크다운 형식 상세 분석 (한국어)",
+  "confidence": 0~100 사이 정수
+}
+다른 필드를 추가하지 마세요. 반드시 위 3개 필드만 포함된 유효한 JSON을 반환하세요.`;
+
 const STAGE_PROMPTS: Record<string, string> = {
   "2-1": "이 사업 아이템에 대한 레퍼런스를 분석해주세요. 유사 사례, 기존 서비스, 해외 사례를 조사하고, 차별화 가능 영역을 도출해주세요.",
   "2-2": "이 사업 아이템의 수요와 시장을 검증해주세요. 시장 규모(TAM/SAM/SOM), 성장률, 주요 수요처, 타이밍 적절성을 분석해주세요.",
@@ -108,6 +122,7 @@ export class StageRunnerService {
         repoUrl: "",
         branch: "",
         instructions: prompt,
+        systemPromptOverride: DISCOVERY_STAGE_SYSTEM_PROMPT,
       },
       constraints: [],
     };

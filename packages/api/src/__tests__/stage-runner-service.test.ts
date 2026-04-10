@@ -105,6 +105,27 @@ describe("StageRunnerService (F485+F486)", () => {
       expect((artifact as any).status).toBe("completed");
     });
 
+    it("runner에 systemPromptOverride({summary,details,confidence} 스키마)를 전달해야 한다", async () => {
+      let capturedRequest: any = null;
+      const capturingRunner = {
+        execute: async (req: any) => {
+          capturedRequest = req;
+          return mockRunner.execute();
+        },
+      };
+      const svc = new StageRunnerService(db as unknown as D1Database, capturingRunner as any);
+      await svc.runStage("biz1", "org1", "2-1", "I");
+
+      expect(capturedRequest).toBeTruthy();
+      const override = capturedRequest.context.systemPromptOverride;
+      expect(override).toBeTruthy();
+      expect(override).toContain("summary");
+      expect(override).toContain("details");
+      expect(override).toContain("confidence");
+      // "analysis" 필드 언급이 없어야 함 (custom 스키마이므로)
+      expect(override).not.toContain('"analysis"');
+    });
+
     it("재실행 시 version이 증가해야 한다", async () => {
       await service.runStage("biz1", "org1", "2-1", "I");
       await service.runStage("biz1", "org1", "2-1", "I", "더 자세하게 분석해주세요");

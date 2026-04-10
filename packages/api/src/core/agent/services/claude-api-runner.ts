@@ -3,7 +3,7 @@ import type {
   AgentExecutionResult,
 } from "./execution-types.js";
 import type { AgentRunner } from "./agent-runner.js";
-import { TASK_SYSTEM_PROMPTS, buildUserPrompt } from "./prompt-utils.js";
+import { TASK_SYSTEM_PROMPTS, buildUserPrompt, getSystemPrompt } from "./prompt-utils.js";
 
 // Re-export for backward compatibility (tests import from this module)
 export { UIHINT_INSTRUCTION, TASK_SYSTEM_PROMPTS, DEFAULT_LAYOUT_MAP, buildUserPrompt } from "./prompt-utils.js";
@@ -19,7 +19,7 @@ export class ClaudeApiRunner implements AgentRunner {
   async execute(request: AgentExecutionRequest): Promise<AgentExecutionResult> {
     const startTime = Date.now();
 
-    const systemPrompt = TASK_SYSTEM_PROMPTS[request.taskType];
+    const systemPrompt = getSystemPrompt(request);
     const userPrompt = buildUserPrompt(request);
 
     const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -66,7 +66,7 @@ export class ClaudeApiRunner implements AgentRunner {
       return {
         status: "success",
         output: {
-          analysis: parsed.analysis,
+          analysis: parsed.analysis ?? text,
           generatedCode: parsed.generatedCode,
           reviewComments: parsed.reviewComments,
           uiHint: parsed.uiHint,  // F60
