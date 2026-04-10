@@ -48,7 +48,7 @@ const ENV_META: Record<
     icon: Terminal,
     label: "Claude Code (터미널)",
     badge: "권장",
-    desc: "터미널에서 claude 명령으로 실행. ax plugin(23개 워크플로우 스킬) + CLAUDE_AXBD(76개 BD 분석 스킬) 모두 사용 가능.",
+    desc: "터미널에서 claude 명령으로 실행. ax plugin(24개 워크플로우 스킬) + CLAUDE_AXBD(76개 BD 분석 스킬) 모두 사용 가능.",
   },
   "claude-desktop": {
     icon: Monitor,
@@ -86,7 +86,7 @@ const STEPS: Record<Environment, SetupStep[]> = {
       number: 1,
       title: "ax 워크플로우 Plugin 설치",
       description:
-        "세션 관리, Sprint, 거버넌스, 요구사항 관리 등 23개 개발 워크플로우 스킬을 설치해요.",
+        "세션 관리, Sprint, 거버넌스, 요구사항 관리 등 24개 개발 워크플로우 스킬을 설치해요.",
       why: "Plugin으로 설치하면 어떤 프로젝트 폴더에서든 ax:session-start, ax:sprint 등을 사용할 수 있어요.",
       commands: [
         "claude plugin install ax@ax-marketplace",
@@ -364,7 +364,7 @@ function ResourcesSection() {
   const resources = [
     {
       title: "ax plugin (개발 워크플로우)",
-      desc: "23개 워크플로우 스킬 — 세션/Sprint/거버넌스/요구사항",
+      desc: "24개 워크플로우 스킬 — 세션/Sprint/거버넌스/요구사항",
       href: "https://github.com/KTDS-AXBD/ax-plugin",
       internal: false,
     },
