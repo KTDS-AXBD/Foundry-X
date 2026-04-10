@@ -196,15 +196,52 @@ if [ -n "$PANE_ID" ]; then
   echo "$PROMPT" > "${WT_PATH}/.task-prompt"
 
   # Background: start Claude session → wait for boot → rename + inject prompt
+  # inject 스크립트를 별도 파일로 생성 → nohup으로 실행 (subshell 조기 종료 방지)
   RENAME_LABEL="${TASK_ID} ${TITLE}"
-  (
-    tmux send-keys -t "$PANE_ID" "ccs" Enter
-    sleep 8
-    # /rename으로 세션 이름 설정 — pane 식별용
-    tmux send-keys -t "$PANE_ID" "/rename ${RENAME_LABEL}" Enter
-    sleep 1
-    tmux send-keys -t "$PANE_ID" "/ax:session-start $(printf '%s' "$PROMPT" | tr '\n' ' ')" Enter
-  ) &
+  INJECT_SCRIPT="/tmp/task-signals/inject-${TASK_ID}.sh"
+  CCS_BIN=$(command -v ccs 2>/dev/null || echo "/home/sinclair/.local/bin/ccs")
+
+  cat > "$INJECT_SCRIPT" << INJECT_EOF
+#!/usr/bin/env bash
+# Auto-inject script for ${TASK_ID}
+PANE="${PANE_ID}"
+MAX_WAIT=30
+BOOT_CHECK_INTERVAL=2
+
+# Step 1: ccs 실행
+tmux send-keys -t "\$PANE" "${CCS_BIN}" Enter
+sleep 3
+
+# Step 2: Claude 부팅 대기 (프롬프트 '❯' 출현까지, 최대 MAX_WAIT초)
+WAITED=0
+while [ \$WAITED -lt \$MAX_WAIT ]; do
+  SNAP=\$(tmux capture-pane -t "\$PANE" -p -S -5 2>/dev/null || true)
+  if echo "\$SNAP" | grep -q '❯'; then
+    break
+  fi
+  sleep \$BOOT_CHECK_INTERVAL
+  WAITED=\$((WAITED + BOOT_CHECK_INTERVAL))
+done
+
+if [ \$WAITED -ge \$MAX_WAIT ]; then
+  echo "[inject] ⚠️  ${TASK_ID}: Claude 부팅 ${MAX_WAIT}초 초과 — 수동 주입 필요" >> /tmp/task-signals/inject.log
+  exit 1
+fi
+
+# Step 3: /rename
+tmux send-keys -t "\$PANE" "/rename ${RENAME_LABEL}" Enter
+sleep 1
+
+# Step 4: /ax:session-start (PROMPT는 .task-prompt에서 읽기 — 길이 제한 회피)
+PROMPT_TEXT=\$(cat "${WT_PATH}/.task-prompt" 2>/dev/null | tr '\n' ' ' | cut -c1-500)
+tmux send-keys -t "\$PANE" "/ax:session-start \${PROMPT_TEXT}" Enter
+
+echo "[inject] ✅ ${TASK_ID}: 주입 완료 (boot=${WAITED}s)" >> /tmp/task-signals/inject.log
+rm -f "${INJECT_SCRIPT}"
+INJECT_EOF
+
+  chmod +x "$INJECT_SCRIPT"
+  nohup bash "$INJECT_SCRIPT" > /dev/null 2>&1 &
   disown
 fi
 
