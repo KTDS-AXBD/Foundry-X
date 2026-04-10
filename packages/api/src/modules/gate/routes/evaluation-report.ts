@@ -51,6 +51,8 @@ evaluationReportRoute.post("/ax-bd/evaluation-reports/seed-fixtures", async (c) 
 });
 
 // POST /ax-bd/evaluation-reports/generate — 결과서 생성
+// - 해당 bizItemId에 v2 fixture가 있으면 v2 리치 리포트로 생성 (generateFromFixture)
+// - 없으면 legacy generate()로 폴백 (bd_artifacts 기반 v1, Phase 31+ AI 파이프라인까지 임시)
 evaluationReportRoute.post("/ax-bd/evaluation-reports/generate", async (c) => {
   const body = await c.req.json();
   const parsed = GenerateReportSchema.safeParse(body);
@@ -59,7 +61,26 @@ evaluationReportRoute.post("/ax-bd/evaluation-reports/generate", async (c) => {
   }
 
   const svc = new EvaluationReportService(c.env.DB);
-  const report = await svc.generate(c.get("orgId"), c.get("userId"), parsed.data);
+  const orgId = c.get("orgId");
+  const userId = c.get("userId");
+
+  // v2 fixture 우선 (현재는 3개 샘플 bizItemId만 해당)
+  const rawFixture = FIXTURE_MAP[parsed.data.bizItemId];
+  if (rawFixture) {
+    const fixtureParsed = DiscoveryReportDataSchema.safeParse(rawFixture);
+    if (fixtureParsed.success) {
+      const report = await svc.generateFromFixture(
+        orgId,
+        userId,
+        parsed.data.bizItemId,
+        fixtureParsed.data,
+      );
+      return c.json(report, 201);
+    }
+  }
+
+  // Legacy v1 폴백
+  const report = await svc.generate(orgId, userId, parsed.data);
   return c.json(report, 201);
 });
 

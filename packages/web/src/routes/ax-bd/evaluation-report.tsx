@@ -5,9 +5,12 @@
  * 9탭 리치 리포트 전면 개편 (in-place 재작성, F296 레거시 폴백 유지)
  */
 import { useState, useEffect, useCallback } from "react";
-import { fetchApi, postApi } from "@/lib/api-client";
+import { fetchApi, postApi, getBizItems, type BizItemSummary } from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
 import { DiscoveryReportV2View } from "@/components/feature/discovery/report-v2/DiscoveryReportV2View";
+
+// v2 리치 리포트 fixture를 가진 bizItemId (서버 FIXTURE_MAP과 동기화)
+const V2_FIXTURE_IDS = new Set(["bi-koami-001", "bi-xr-studio-001", "bi-iris-001"]);
 
 interface SkillScore {
   score: number;
@@ -83,8 +86,13 @@ export function Component() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [seeding, setSeeding] = useState(false);
   const [selected, setSelected] = useState<EvalReport | null>(null);
+
+  // 결과서 생성 UI 상태
+  const [bizItems, setBizItems] = useState<BizItemSummary[]>([]);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickedBizItemId, setPickedBizItemId] = useState<string>("");
+  const [generating, setGenerating] = useState(false);
 
   const loadReports = useCallback(async () => {
     try {
@@ -106,16 +114,40 @@ export function Component() {
     void loadReports();
   }, [loadReports]);
 
-  async function handleSeedFixtures() {
+  async function openPicker() {
+    setError(null);
+    setPickerOpen(true);
+    if (bizItems.length === 0) {
+      try {
+        const data = await getBizItems();
+        setBizItems(data.items);
+        if (!pickedBizItemId && data.items.length > 0) {
+          // v2 fixture 있는 아이템을 우선 기본 선택
+          const v2First = data.items.find((it) => V2_FIXTURE_IDS.has(it.id));
+          setPickedBizItemId(v2First?.id ?? data.items[0].id);
+        }
+      } catch (e) {
+        setError((e as Error).message);
+      }
+    }
+  }
+
+  async function handleGenerate() {
+    if (!pickedBizItemId) return;
     try {
-      setSeeding(true);
+      setGenerating(true);
       setError(null);
-      await postApi("/ax-bd/evaluation-reports/seed-fixtures", {});
+      const report = await postApi<EvalReport>("/ax-bd/evaluation-reports/generate", {
+        bizItemId: pickedBizItemId,
+      });
+      setPickerOpen(false);
       await loadReports();
+      // 방금 생성한 리포트를 바로 상세 뷰로 열어주기
+      setSelected(report);
     } catch (e) {
       setError((e as Error).message);
     } finally {
-      setSeeding(false);
+      setGenerating(false);
     }
   }
 
@@ -153,13 +185,86 @@ export function Component() {
           </p>
         </div>
         <button
-          onClick={handleSeedFixtures}
-          disabled={seeding}
-          className="bg-[var(--discovery-mint)] text-white px-4 py-2 rounded text-sm hover:opacity-90 disabled:opacity-50"
+          onClick={openPicker}
+          className="bg-[var(--discovery-mint)] text-white px-4 py-2 rounded text-sm font-medium hover:opacity-90"
         >
-          {seeding ? "시드 중..." : "결과서 생성 (fixture)"}
+          + 결과서 생성
         </button>
       </div>
+
+      {/* 결과서 생성 picker 모달 */}
+      {pickerOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+          onClick={() => !generating && setPickerOpen(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-lg border bg-card shadow-xl p-5 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div>
+              <h2 className="text-base font-semibold text-foreground">결과서 생성</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                9단계 발굴 분석 결과를 기반으로 통합 평가결과서를 생성해요.
+              </p>
+            </div>
+
+            {bizItems.length === 0 ? (
+              <div className="text-sm text-muted-foreground py-6 text-center">
+                발굴 아이템을 불러오는 중...
+              </div>
+            ) : (
+              <>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground/80">
+                    발굴 아이템 선택
+                  </label>
+                  <select
+                    value={pickedBizItemId}
+                    onChange={(e) => setPickedBizItemId(e.target.value)}
+                    disabled={generating}
+                    className="w-full border rounded-md px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-[var(--discovery-mint)]"
+                  >
+                    {bizItems.map((it) => (
+                      <option key={it.id} value={it.id}>
+                        {it.title} {V2_FIXTURE_IDS.has(it.id) ? " — v2 샘플" : ""}
+                      </option>
+                    ))}
+                  </select>
+                  {pickedBizItemId && V2_FIXTURE_IDS.has(pickedBizItemId) ? (
+                    <p className="text-[11px] text-[var(--discovery-mint)]">
+                      ✓ 9탭 리치 리포트 샘플이 제공돼요
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-muted-foreground">
+                      샘플 데이터가 없는 아이템은 기본 결과서(v1)로 생성돼요
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setPickerOpen(false)}
+                    disabled={generating}
+                    className="px-3 py-1.5 rounded text-sm text-foreground/80 hover:bg-muted disabled:opacity-50"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleGenerate}
+                    disabled={!pickedBizItemId || generating}
+                    className="bg-[var(--discovery-mint)] text-white px-4 py-1.5 rounded text-sm font-medium hover:opacity-90 disabled:opacity-50"
+                  >
+                    {generating ? "생성 중..." : "생성하기"}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {error && <div className="bg-red-50 text-red-700 p-3 rounded text-sm">{error}</div>}
 
