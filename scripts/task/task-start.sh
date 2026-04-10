@@ -169,6 +169,8 @@ if [ -n "${TMUX:-}" ]; then
     tmux select-pane -t "$PANE_ID" -T "${TASK_ID} ${TITLE}" 2>/dev/null || true
     # bidirectional verification via user-data
     tmux set -p -t "$PANE_ID" @fx-task-id "$TASK_ID" 2>/dev/null || true
+    # enable pane border labels so task ID is visible in tmux UI
+    tmux set-option pane-border-status top 2>/dev/null || true
   fi
 fi
 
@@ -182,7 +184,12 @@ if [ -n "$PANE_ID" ]; then
       C) TRACK_DESC="점검/Chore 작업" ;;
       X) TRACK_DESC="실험/Spike 탐색" ;;
     esac
-    PROMPT="이 worktree는 task ${TASK_ID} — ${TITLE}. .task-context 파일을 읽고 ${TRACK_DESC}을 진행해줘."
+    PROMPT="이 worktree는 task ${TASK_ID} — ${TITLE}. .task-context 파일을 읽고 ${TRACK_DESC}을 진행해줘. 작업 완료 후 반드시 bash scripts/task/task-complete.sh 를 실행해서 커밋/PR/signal 처리해줘."
+  fi
+
+  # Append completion instruction to custom prompts
+  if ! echo "$PROMPT" | grep -q "task-complete.sh"; then
+    PROMPT="${PROMPT} 작업 완료 후 반드시 bash scripts/task/task-complete.sh 를 실행해서 커밋/PR/signal 처리해줘."
   fi
 
   # Write prompt to WT for Claude to pick up
@@ -231,6 +238,24 @@ else
   INJECT_STATUS="⏭️  tmux 없음 — 수동 시작 필요"
 fi
 
+# ─── Step 8: auto-start monitor (if not already running) ────────────────────
+MONITOR_PID_FILE="/tmp/task-signals/.monitor.pid"
+MONITOR_RUNNING=false
+if [ -f "$MONITOR_PID_FILE" ] && kill -0 "$(cat "$MONITOR_PID_FILE")" 2>/dev/null; then
+  MONITOR_RUNNING=true
+fi
+
+if [ "$MONITOR_RUNNING" = false ]; then
+  mkdir -p /tmp/task-signals
+  nohup bash "$REPO_ROOT/scripts/task/task-monitor.sh" --interval 30 \
+    > "/tmp/task-signals/monitor-${PROJECT}.log" 2>&1 &
+  echo $! > "$MONITOR_PID_FILE"
+  disown
+  MONITOR_STATUS="✅ monitor 시작 (PID $(cat "$MONITOR_PID_FILE"), 30초 간격)"
+else
+  MONITOR_STATUS="✅ monitor 실행 중 (PID $(cat "$MONITOR_PID_FILE"))"
+fi
+
 cat <<EOF
 [fx-task] ✅ ${TASK_ID} 시작
   branch:  ${BRANCH}
@@ -239,4 +264,5 @@ cat <<EOF
   issue:   ${ISSUE_URL:-(degraded)}
   base:    ${PUSHED_SHA:0:8}
   inject:  ${INJECT_STATUS}
+  monitor: ${MONITOR_STATUS}
 EOF
