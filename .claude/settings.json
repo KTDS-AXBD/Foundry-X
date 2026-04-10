@@ -54,6 +54,17 @@
     ],
     "PostToolUse": [
       {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/task/heartbeat-hook.sh",
+            "timeout": 5000,
+            "statusMessage": "heartbeat"
+          }
+        ]
+      },
+      {
         "matcher": "Edit|Write",
         "hooks": [
           {

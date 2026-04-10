@@ -53,6 +53,20 @@ allocate_id() {
 # ─── repo/git helpers ────────────────────────────────────────────────────────
 _repo_root() { git rev-parse --show-toplevel 2>/dev/null; }
 
+# Original project name (works in both main repo and worktrees).
+# In a worktree, --show-toplevel returns the WT path, not the main repo.
+# --git-common-dir returns <main-repo>/.git, so we strip /.git suffix.
+_project_name() {
+  local common_dir; common_dir=$(git rev-parse --git-common-dir 2>/dev/null)
+  if [ -n "$common_dir" ]; then
+    # common_dir = /path/to/main-repo/.git or /path/to/main-repo/.git/worktrees/...
+    local main_git="${common_dir%%/worktrees/*}"
+    basename "$(dirname "$main_git")"
+  else
+    basename "$(_repo_root)"
+  fi
+}
+
 assert_master_clean() {
   if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
     echo "[fx-task] master에 미커밋 변경 — 먼저 정리 필요" >&2
@@ -98,6 +112,92 @@ cache_upsert_task() {
         updated_at: $ts
       } | .tasks[$id].started_at = (.tasks[$id].started_at // $ts)' \
     "$FX_CACHE" > "$tmp" && mv "$tmp" "$FX_CACHE"
+}
+
+# ─── heartbeat ───────────────────────────────────────────────────────────────
+# Update LAST_HEARTBEAT in a .task-context file (atomic sed in-place).
+update_heartbeat() {
+  local ctx="${1:-.task-context}"
+  [ -f "$ctx" ] || return 1
+  local ts; ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  sed -i "s/^LAST_HEARTBEAT=.*/LAST_HEARTBEAT=$ts/" "$ctx"
+}
+
+# Read a key from .task-context (key=value format).
+read_task_ctx() {
+  local ctx="$1" key="$2"
+  grep "^${key}=" "$ctx" 2>/dev/null | head -1 | cut -d= -f2-
+}
+
+# Liveness probe for a single task.
+# Returns: "ok" | "stale" | "dead"
+#   ok    — PID alive + heartbeat within 5 min
+#   stale — heartbeat older than 10 min (Claude Code crash 의심)
+#   dead  — PID not running
+check_liveness() {
+  local ctx="$1"
+  [ -f "$ctx" ] || { echo "dead"; return; }
+
+  local pid; pid=$(read_task_ctx "$ctx" "PID")
+  local hb; hb=$(read_task_ctx "$ctx" "LAST_HEARTBEAT")
+
+  # Heartbeat freshness is the primary liveness indicator.
+  # PID check is secondary — hook subprocesses have transient PIDs,
+  # so a stale heartbeat is more reliable than PID existence.
+  if [ -n "$hb" ]; then
+    local hb_epoch now_epoch age_sec
+    hb_epoch=$(date -d "$hb" +%s 2>/dev/null || echo 0)
+    now_epoch=$(date +%s)
+    age_sec=$(( now_epoch - hb_epoch ))
+    if [ "$age_sec" -gt 600 ]; then
+      # 10+ min stale — likely crashed
+      echo "dead"
+      return
+    elif [ "$age_sec" -gt 300 ]; then
+      # 5~10 min — suspicious
+      echo "stale"
+      return
+    fi
+    echo "ok"
+    return
+  fi
+
+  # No heartbeat timestamp at all — check PID as fallback
+  if [ -n "$pid" ] && ! kill -0 "$pid" 2>/dev/null; then
+    echo "dead"
+    return
+  fi
+
+  echo "ok"
+}
+
+# ─── signal files (Master IPC) ──────────────────────────────────────────────
+FX_SIGNAL_DIR="/tmp/task-signals"
+
+# Write a completion signal file for Master to detect.
+# Usage: write_signal <task_id> <status> [extra_key=value ...]
+write_signal() {
+  local task_id="$1" status="$2"
+  shift 2
+  local project; project=$(_project_name 2>/dev/null || echo "unknown")
+  mkdir -p "$FX_SIGNAL_DIR"
+  local sig_file="${FX_SIGNAL_DIR}/${project}-${task_id}.signal"
+  cat > "$sig_file" <<EOF
+TASK_ID=$task_id
+STATUS=$status
+TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+PROJECT=$project
+EOF
+  # Append any extra key=value pairs
+  for kv in "$@"; do
+    echo "$kv" >> "$sig_file"
+  done
+}
+
+# Read all pending signals for this project. Returns signal file paths.
+read_signals() {
+  local project; project=$(_project_name 2>/dev/null || echo "unknown")
+  ls "${FX_SIGNAL_DIR}/${project}-"*.signal 2>/dev/null || true
 }
 
 # ─── slug ────────────────────────────────────────────────────────────────────
