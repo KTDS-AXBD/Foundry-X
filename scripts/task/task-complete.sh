@@ -188,6 +188,20 @@ log_event "$TASK_ID" "completed" "$(jq -nc \
   --arg pr "${PR_URL:-}" --arg commits "$COMMIT_COUNT" \
   '{pr_url:$pr, commit_count:($commits|tonumber)}')"
 
+# ─── Step 6: daemon auto-restart hook (C30) ─────────────────────────────────
+# squash merge 후 HEAD~1→HEAD diff에 daemon/lib.sh 변경이 있으면 daemon 재기동.
+# 재기동 실패는 경고만 — task-complete 자체는 성공으로 유지.
+DAEMON_MODIFIED=$(git -C "$REPO_ROOT" diff --name-only HEAD~1 HEAD 2>/dev/null \
+  | grep -E '^scripts/task/(task-daemon|lib)\.sh$' || true)
+if [ -n "$DAEMON_MODIFIED" ]; then
+  echo "[fx-task-complete] daemon code modified — restarting daemon" >&2
+  if bash "$REPO_ROOT/scripts/task/task-daemon.sh" --bg 2>/dev/null; then
+    echo "[fx-task-complete] daemon restarted ✅" >&2
+  else
+    echo "[fx-task-complete] ⚠️  daemon restart failed — manual restart may be needed" >&2
+  fi
+fi
+
 cat <<EOF
 [fx-task-complete] ✅ ${TASK_ID} 완료
   branch:  ${BRANCH}
