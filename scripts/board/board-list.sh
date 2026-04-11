@@ -12,7 +12,7 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # shellcheck source=_common.sh
 source "${HERE}/_common.sh"
-board::require
+board::require_projects
 
 COLUMN="Backlog"
 while [ $# -gt 0 ]; do

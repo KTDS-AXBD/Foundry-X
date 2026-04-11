@@ -8,12 +8,18 @@ set -euo pipefail
 : "${PROJECT_TITLE:=Foundry-X Kanban}"
 
 board::require() {
+  # 기본 의존성 검사 (gh + jq만)
+  # pr-body-enrich.sh, board-on-merge.sh 등 Projects API를 쓰지 않는 스크립트용
   command -v gh >/dev/null 2>&1 || { echo "[board] gh CLI 필요" >&2; exit 1; }
   command -v jq >/dev/null 2>&1 || { echo "[board] jq 필요" >&2; exit 1; }
-  # GitHub Projects v2 scope 검증 — 빠뜨리면 gh project list가 silent fail
-  # S255 audit 교훈: scope 부족 → 빈 출력 → drift 오판
+}
+
+board::require_projects() {
+  # Projects v2 API 의존성 추가 검사 (board-list/move/sync-spec에서만 호출)
+  # S255 dogfood 교훈: scope 부족 → gh project list 빈 출력 → drift 오판
+  board::require
   if ! gh auth status 2>&1 | grep -q "Token scopes.*read:project"; then
-    echo "[board] 토큰 scope 부족: 'read:project' 필요" >&2
+    echo "[board] Projects API scope 부족: 'read:project' 필요" >&2
     echo "[board] 수정: gh auth refresh -s read:project,project" >&2
     exit 3
   fi

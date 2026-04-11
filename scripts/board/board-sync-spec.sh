@@ -18,7 +18,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 # shellcheck source=_common.sh
 source "${HERE}/_common.sh"
-board::require
+board::require_projects
 
 MODE="report"   # report | json | fix
 DRY_RUN=false

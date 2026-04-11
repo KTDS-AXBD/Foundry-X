@@ -11,7 +11,7 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # shellcheck source=_common.sh
 source "${HERE}/_common.sh"
-board::require
+board::require_projects
 
 ISSUE="${1:-}"
 COLUMN="${2:-}"
