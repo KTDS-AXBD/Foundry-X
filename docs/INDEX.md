@@ -41,6 +41,7 @@
 | FX-PLAN-002 | Plumb Internal Contracts Documentation | 1.0 | Draft | [01-plan/features/plumb-contracts.plan.md](01-plan/features/plumb-contracts.plan.md) |
 | FX-PLAN-013 | Web 빌드/배포 최적화 — Next.js → Vite 전환 계획 | 1.0 | Draft | [01-plan/features/web-build-optimization.plan.md](01-plan/features/web-build-optimization.plan.md) |
 | FX-PLAN-014 | Team Shared Data Layer 계획 | 1.0 | Draft | [01-plan/FX-PLAN-014_team-shared-data.md](01-plan/FX-PLAN-014_team-shared-data.md) |
+| FX-PLAN-X5 | 장기 백로그 재평가 — F112/F117/F118/F245 (X5 task) | 1.0 | Draft | [01-plan/X5-backlog-reevaluation.plan.md](01-plan/X5-backlog-reevaluation.plan.md) |
 | FX-PLAN-016 | Phase 3 로드맵 — 멀티테넌시 + 외부 연동 + 고객 파일럿 준비 | 0.1 | Draft | [01-plan/features/phase-3-roadmap.md](01-plan/features/phase-3-roadmap.md) |
 | FX-PLAN-022 | executePlan() repoUrl 실제 리포 URL 연동 | 1.0 | Draft | [01-plan/features/execute-plan-repo-url.plan.md](01-plan/features/execute-plan-repo-url.plan.md) |
 | FX-PLAN-034 | Sprint 34 — OpenRouter 게이트웨이 통합 (F135) | 1.0 | Active | [01-plan/features/sprint-34.plan.md](01-plan/features/sprint-34.plan.md) |
