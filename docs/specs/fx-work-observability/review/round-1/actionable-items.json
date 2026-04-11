@@ -1,0 +1,263 @@
+{
+  "generated": "2026-04-11T22:44:53.747Z",
+  "totalItems": 42,
+  "byType": {
+    "flaw": 1,
+    "gap": 4,
+    "risk": 34
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**성공기준**이 ‘아 이제 보인다’라는 주관적 인지로 끝남. MVP 단계임을 감안해도, 최소한 1~2가지 실제 업무 시나리오(예: “작업 시작→진행→완료→이력 추적”이 실제로 한 번이라도 end-to-end로 가능한가?)로 보완 필요.",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트/검증 방법**이 현저히 부족함.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**모듈간 데이터 모델 정의**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영/장애 대응**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**(향후 확장 대비) 공통 API 스펙/버전 관리**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**성공기준**이 ‘아 이제 보인다’라는 주관적 인지로 끝남. MVP 단계임을 감안해도, 최소한 1~2가지 실제 업무 시나리오(예: “작업 시작→진행→완료→이력 추적”이 실제로 한 번이라도 end-to-end로 가능한가?)로 보완 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**4~8시간**이라는 일정은 지나치게 낙관적임.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**인프라/도구 신뢰성** 문제",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**M4 (자연어 분류)**는 LLM 응답 품질, 토큰 제한, 네트워크 지연 등 외부 변수에 매우 취약.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트/검증 방법**이 현저히 부족함.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**모듈간 데이터 모델 정의**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/장애 대응**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**(향후 확장 대비) 공통 API 스펙/버전 관리**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**일정 초과 리스크**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**데이터 소스 통합 실패**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**LLM 연동의 불확실성**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트/검증 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**과도한 요구사항/문서화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**최소 구현 범위 명확화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트/검증 기준 보완**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**데이터 모델(통합 객체) 명세 추가**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**에러/장애 대응 플로우 도식화**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**기술 스택 적합성**: 제안된 기술 스택(Vite, React, Hono, Cloudflare Workers)은 요구사항을 충족할 수 있습니다. 특히 Cloudflare Workers와 D1의 결합은 빠른 응답과 간단한 데이터 저장에 적합합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**병목 가능성**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**M1 Aggregator**: 여러 데이터 소스(`SPEC.md`, `/tmp/task-signals/*.log`, `git log`, `gh pr list`)를 실시간으로 집계하는 과정에서 성능 병목이 발생할 가능성이 있습니다. 특히 `git log`와 `gh pr list`는 I/O와 네트워크 지연이 발생할 수 있습니다. 캐싱 또는 배치 처리로 완화",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**M4 Claude API 호출**: Claude API의 응답 시간과 비용이 예측 불가능할 수 있습니다. 특히 context overflow나 API rate limit이 발생할 경우 fallback(regex)으로 대체해야 하는데, 이 경우 정확도가 떨어질 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**확장성**: 현재 아키텍처는 혼자 개발 모드를 가정하고 있어 다중 사용자나 팀 확장 시 문제가 발생할 수 있습니다. 예를 들어 RBAC와 multi-tenant 지원이 없어 향후 재설계가 필요할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**유지보수성**: `packages/work-observability`가 신규 패키지로 추가되면서 기존 패키지와의 결합도가 높아질 수 있습니다. 특히 `packages/shared`에 새로운 타입이 추가되면 의존성 관리가 복잡해질 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**대안 아키텍처**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Event-Driven 아키텍처**: 실시간 업데이트가 중요한 경우 WebSocket을 활용한 이벤트 기반 아키텍처를 고려할 수 있습니다. 현재는 polling 방식이지만, 이는 확장성과 실시간성에서 한계가 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Microservices**: 향후 팀 확장을 고려한다면 독립적인 마이크로서비스로 분리하는 것이 더 나을 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**과소평가된 기술적 난이도**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**M1 Aggregator**: 여러 데이터 소스를 실시간으로 통합하는 것은 예상보다 복잡할 수 있습니다. 특히 데이터 소스 간의 일관성과 동기화 문제가 발생할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**M4 자연어 분류**: Claude API를 사용한 자연어 분류는 간단해 보이지만, 실제로는 다양한 edge case(예: 중의성, 문맥 부족)를 처리해야 합니다. regex fallback의 정확도도 보장하기 어렵습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**동시성 문제**: 여러 채널(Web UI, JSON API, CLI, Live feed)이 동시에 데이터를 요청할 경우 동시성 문제가 발생할 수 있습니다. 특히 `/tmp/task-signals/*.log`와 같은 공유 리소스에 대한 동시 접근이 문제가 될 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**가장 큰 우려 요인**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Claude API 의존성**: Claude API의 비용, 응답 시간, 정확도가 예측 불가능하며, API가 실패할 경우 regex fallback의 정확도가 낮아 전체 시스템의 신뢰성이 떨어질 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**성능 병목**: `M1 Aggregator`의 실시간 데이터 집계가 성능 병목이 될 가능성이 높습니다. 특히 여러 외부 시스템(`git log`, `gh pr list`)에 의존하는 부분이 취약합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**확장성 부족**: 현재 아키텍처는 혼자 개발 모드를 가정하고 있어 향후 팀 확장 시 재설계가 필요할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}
