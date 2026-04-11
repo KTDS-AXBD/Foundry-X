@@ -152,6 +152,20 @@ handle_merge() {
       || git worktree remove "$wt_path" --force >>"$LOG_FILE" 2>&1 || true
   fi
 
+  # 5b) local branch cleanup — `gh pr merge --delete-branch` only removes
+  # the REMOTE ref, so whatever branch was tracked by this sprint signal
+  # lingers locally until the next orphan-scan sweep. Delete it here too,
+  # covering any name pattern (sprint/*, task/*, fix/*, feat/*, …). Must
+  # run after `worktree remove` since git refuses to delete a branch that
+  # is currently checked out in a worktree.
+  #
+  # Daemon CWD is assumed to be inside the main repo (nohup background
+  # started from master pane). Best-effort (`|| true`): a stale ref or
+  # already-deleted branch must not break the daemon loop.
+  if [ -n "$branch" ]; then
+    git branch -D "$branch" >>"$LOG_FILE" 2>&1 || true
+  fi
+
   # 6) Board 동기화 (F504) — 연관 Issue를 Done 컬럼으로 이동
   local script_dir
   script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

@@ -46,6 +46,15 @@ TASK_ID=$(grep '^TASK_ID=' "$TASK_CTX" | cut -d= -f2)
 BRANCH=$(grep '^BRANCH=' "$TASK_CTX" | cut -d= -f2)
 TASK_TYPE=$(grep '^TASK_TYPE=' "$TASK_CTX" | cut -d= -f2)
 TITLE=$(grep '^TITLE=' "$TASK_CTX" | cut -d= -f2)
+ISSUE_URL=$(grep '^ISSUE_URL=' "$TASK_CTX" | cut -d= -f2- || true)
+
+# Extract numeric issue ID from ISSUE_URL (e.g. ".../issues/488" → "488")
+# so the PR body can declare `Closes #488`. GitHub resolves this to an
+# auto-close link only when the PR is merged into the default branch.
+ISSUE_NUM=""
+if [ -n "${ISSUE_URL:-}" ]; then
+  ISSUE_NUM=$(echo "$ISSUE_URL" | grep -oE '/issues/[0-9]+' | grep -oE '[0-9]+$' || true)
+fi
 
 [ -n "$TASK_ID" ] || { echo "[fx-task-complete] TASK_ID 비어있음" >&2; exit 1; }
 [ -n "$BRANCH" ] || { echo "[fx-task-complete] BRANCH 비어있음" >&2; exit 1; }
@@ -135,17 +144,25 @@ if [ "$COMMIT_COUNT" -gt 0 ]; then
       echo "[fx-task-complete] 기존 PR: ${PR_URL}"
     else
       DIFF_STAT=$(git diff --stat master..HEAD 2>/dev/null | tail -1 || echo "")
+      # Build PR body: include `Closes #<n>` so GitHub auto-closes the task
+      # issue on merge. Omit the line entirely when ISSUE_NUM is empty
+      # (degraded start where gh issue create failed) to avoid a literal
+      # "Closes #" text in the PR body.
+      CLOSES_LINE=""
+      [ -n "$ISSUE_NUM" ] && CLOSES_LINE="$(printf '\n\nCloses #%s' "$ISSUE_NUM")"
+      PR_BODY=$(printf 'Task Orchestrator — auto-created by task-complete.\n\n- ID: %s\n- Track: %s\n- Commits: %s\n- Changes: %s%s\n' \
+        "$TASK_ID" "$TASK_TYPE" "$COMMIT_COUNT" "$DIFF_STAT" "$CLOSES_LINE")
       PR_URL=$(gh pr create \
         --repo "KTDS-AXBD/Foundry-X" \
         --base master \
         --head "$BRANCH" \
         --title "[${TASK_ID}] ${TITLE}" \
-        --body "$(printf 'Task Orchestrator — auto-created by task-complete.\n\n- ID: %s\n- Track: %s\n- Commits: %s\n- Changes: %s\n' "$TASK_ID" "$TASK_TYPE" "$COMMIT_COUNT" "$DIFF_STAT")" \
+        --body "$PR_BODY" \
         2>/dev/null) || {
         echo "[fx-task-complete] PR 생성 실패 (degraded)" >&2
         PR_URL=""
       }
-      [ -n "$PR_URL" ] && echo "[fx-task-complete] PR 생성: ${PR_URL}"
+      [ -n "$PR_URL" ] && echo "[fx-task-complete] PR 생성: ${PR_URL}${ISSUE_NUM:+ (Closes #${ISSUE_NUM})}"
     fi
   fi
 else
