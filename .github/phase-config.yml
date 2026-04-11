@@ -1,0 +1,22 @@
+# Foundry-X Phase (Epic) SSOT — F506
+# GitHub Milestones 생성용 구성 파일.
+# SPEC.md §5의 Phase 정의와 동기화 필수.
+# 갱신 시: docs/metrics/velocity/README.md 갱신 규칙 참조.
+version: 1
+repo: KTDS-AXBD/Foundry-X
+phases:
+  - number: 29
+    title: "Phase 29 — Discovery Item Detail"
+    description: "F478~F489 — 발굴 상세 페이지 + 거버넌스 통합 (req-manage, gov-retro 소급)"
+    due_on: "2026-04-08T00:00:00Z"
+    state: closed
+  - number: 30
+    title: "Phase 30 — 발굴/형상화 2-stage 재구조화"
+    description: "F493~F496 — 9기준 체크리스트 v2 + 파이프라인 전진 버그 수정"
+    due_on: "2026-04-09T00:00:00Z"
+    state: closed
+  - number: 31
+    title: "Phase 31 — Task Orchestrator + Governance"
+    description: "F497~F506 — Task Orchestrator S-α/S-β + Projects Board + CHANGELOG + Velocity + Epic"
+    due_on: "2026-04-15T00:00:00Z"
+    state: open
