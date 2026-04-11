@@ -67,3 +67,6 @@ packages/web/playwright-report/
 .sprint-watch-config
 .task-context
 .task-prompt
+
+# F507 priority-history flock files (S255 교훈)
+docs/priority-history/.*.lock
