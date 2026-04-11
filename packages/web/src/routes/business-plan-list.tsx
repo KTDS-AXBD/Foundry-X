@@ -1,39 +1,16 @@
 "use client";
 
 /**
- * /shaping/business-plan — 사업기획서 목록 + HTML 미리보기
- * 카드 클릭 시 iframe으로 HTML 표시 + 새 창/전체보기 지원
+ * /shaping/business-plan — 사업기획서 목록
+ * 카드 클릭 시 새 창에서 HTML 표시 + 전체보기 Sheet 지원
  */
 import { useEffect, useState, useCallback } from "react";
-import { Search, FileText, ExternalLink, Maximize2, ChevronDown, ChevronRight, Loader2 } from "lucide-react";
+import { Search, FileText, ExternalLink, Maximize2, Loader2 } from "lucide-react";
 import { getBizItems, exportBusinessPlanHtml, type BizItemSummary } from "@/lib/api-client";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
-
-/** 풀 페이지 HTML을 iframe embed에 적합하게 스타일+스크립트 오버라이드 주입 */
-function makeEmbedFriendly(html: string): string {
-  const embedPatch = `<style data-embed-override>
-  nav { position: relative !important; }
-  #hero, [class*="hero"] { min-height: auto !important; height: auto !important; }
-  section { padding-top: 40px !important; padding-bottom: 40px !important; }
-  .fade-in { opacity: 1 !important; transform: none !important; transition: none !important; }
-  body { overflow: visible !important; }
-</style>
-<script data-embed-override>
-  document.querySelectorAll('.fade-in').forEach(function(el) { el.classList.add('visible'); });
-</script>`;
-  // </body> 앞에 삽입 — 마지막에 위치하여 override 확실, 스크립트로 .visible 강제 추가
-  if (html.includes("</body>")) {
-    return html.replace("</body>", `${embedPatch}</body>`);
-  }
-  // </html> 앞에 삽입 fallback
-  if (html.includes("</html>")) {
-    return html.replace("</html>", `${embedPatch}</html>`);
-  }
-  return html + embedPatch;
-}
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   draft: { label: "대기", color: "bg-slate-100 text-slate-600" },
@@ -52,7 +29,6 @@ export function Component() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
-  const [expanded, setExpanded] = useState<string | null>(null);
   const [htmlCache, setHtmlCache] = useState<Record<string, { html: string; loading: boolean; error?: string }>>({});
   const [sheetItem, setSheetItem] = useState<BizItemSummary | null>(null);
 
@@ -70,15 +46,6 @@ export function Component() {
       .then((html) => setHtmlCache((c) => ({ ...c, [bizItemId]: { html, loading: false } })))
       .catch(() => setHtmlCache((c) => ({ ...c, [bizItemId]: { html: "", loading: false, error: "기획서를 불러올 수 없어요" } })));
   }, [htmlCache]);
-
-  function toggleExpand(bizItemId: string) {
-    if (expanded === bizItemId) {
-      setExpanded(null);
-    } else {
-      setExpanded(bizItemId);
-      loadHtml(bizItemId);
-    }
-  }
 
   function openFullView(item: BizItemSummary) {
     setSheetItem(item);
@@ -135,18 +102,16 @@ export function Component() {
         <div className="space-y-3">
           {filtered.map((item) => {
             const cfg = STATUS_CONFIG[item.status] ?? { label: item.status, color: "bg-slate-100 text-slate-600" };
-            const isExpanded = expanded === item.id;
-            const cache = htmlCache[item.id];
 
             return (
               <div key={item.id} className="rounded-lg border">
                 <div
-                  onClick={() => toggleExpand(item.id)}
+                  onClick={() => openInNewWindow(item.id)}
                   className="w-full flex items-center gap-3 p-4 hover:bg-muted/30 transition-colors text-left cursor-pointer"
                   role="button"
                   data-testid={`bp-card-${item.id}`}
                 >
-                  {isExpanded ? <ChevronDown className="size-4 shrink-0" /> : <ChevronRight className="size-4 shrink-0" />}
+                  <ExternalLink className="size-4 shrink-0 text-muted-foreground" />
                   <FileText className="size-5 text-muted-foreground shrink-0" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -180,36 +145,6 @@ export function Component() {
                     </Button>
                   </div>
                 </div>
-
-                {isExpanded && (
-                  <div className="border-t">
-                    {cache?.loading && (
-                      <div className="flex items-center justify-center py-12 text-muted-foreground">
-                        <Loader2 className="size-5 animate-spin mr-2" />
-                        기획서 로딩 중...
-                      </div>
-                    )}
-                    {cache?.error && (
-                      <div className="py-8 text-center text-sm text-muted-foreground">{cache.error}</div>
-                    )}
-                    {cache?.html && (
-                      <iframe
-                        srcDoc={makeEmbedFriendly(cache.html)}
-                        className="w-full border-0 bg-white rounded-b-lg"
-                        style={{ minHeight: 500 }}
-                        sandbox="allow-scripts allow-same-origin"
-                        title={`사업기획서: ${item.title}`}
-                        data-testid={`bp-iframe-${item.id}`}
-                        onLoad={(e) => {
-                          const frame = e.currentTarget;
-                          if (frame.contentDocument?.body) {
-                            frame.style.height = `${Math.min(frame.contentDocument.body.scrollHeight + 40, 1200)}px`;
-                          }
-                        }}
-                      />
-                    )}
-                  </div>
-                )}
               </div>
             );
           })}
