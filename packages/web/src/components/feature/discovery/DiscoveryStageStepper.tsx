@@ -10,6 +10,7 @@ import { CheckCircle2, Circle, Loader2, ChevronDown, ChevronUp, Play, MessageSqu
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
+  ApiError,
   getDiscoveryProgress,
   runDiscoveryStage,
   confirmDiscoveryStage,
@@ -157,9 +158,20 @@ export default function DiscoveryStageStepper({
         });
       }
     } catch (e) {
-      const msg = e instanceof Error ? e.message : `${stage} 실행 실패`;
-      // 409 race condition — 다른 탭/세션에서 이미 실행 중
-      setError(msg.includes("STAGE_ALREADY_RUNNING") ? "이 단계가 이미 실행 중이에요. 잠시 후 새로고침해 주세요." : msg);
+      // 409 race condition — 다른 탭/세션에서 이미 실행 중이거나 stuck 상태
+      const is409 = e instanceof ApiError && e.status === 409;
+      if (is409) {
+        try {
+          await updateDiscoveryStage(bizItemId, stage, "pending");
+          await loadProgress();
+          setError("이전 실행이 중단된 상태였어요. 초기화했으니 다시 실행해 주세요.");
+        } catch {
+          setError("이 단계가 이미 실행 중이에요. 잠시 후 새로고침해 주세요.");
+        }
+      } else {
+        const msg = e instanceof Error ? e.message : `${stage} 실행 실패`;
+        setError(msg);
+      }
     } finally {
       setRunningStage(null);
       runLockRef.current.delete(stage);
