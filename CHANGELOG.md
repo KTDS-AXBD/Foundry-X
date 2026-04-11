@@ -20,11 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Phase 32] - 2026-04-11
 
 거버넌스 갭 G1~G7 전건 해소 — Work Management System 4-Layer (Intake→Planning→Execution→Tracking).
-Sprint 244~248, 7 F-items, 평균 Match Rate ~99%.
+Sprint 245~248, 7 F-items, 평균 Match Rate ~99%.
 
 ### Added
-- F499: Task Orchestrator S-β — doctor/adopt/park + Master IPC (Sprint 244)
-- F500: Sprint auto Monitor+Merge 파이프라인 — signal 감시→PR review→squash→cleanup (Sprint 244, C11 승격)
 - F501: GitHub Projects Board 초기 설정 — Kanban 6컬럼 + 자동 라벨링 (Sprint 245, G1/G3/G6 해소)
 - F502: CHANGELOG.md 도입 — Keep a Changelog 형식 + session-end/gov-retro 연동 (Sprint 245, G4 해소)
 - F503: `/ax:todo` Board 연동 — `scripts/board/{list,move,sync-spec}` + 양방향 동기화 (Sprint 246, G3 해소)
@@ -40,8 +38,13 @@ Sprint 244~248, 7 F-items, 평균 Match Rate ~99%.
 
 ## [Phase 31] - 2026-04-10
 
+Task Orchestrator 기반 인프라 — Master pane 내 F/B/C/X 4트랙 + flock 동시성 + Sprint 자동 merge-monitor.
+Sprint 241~244, 3 F-items.
+
 ### Added
-- F497: Task Orchestrator MVP (S-α) — start/list + daemon + 4-track
+- F497: Task Orchestrator MVP (S-α) — `/ax:task start|list|adopt|doctor` + flock ID allocator + fx-task-meta + 4트랙
+- F499: Task Orchestrator S-β — doctor/adopt/park 서브커맨드 + Master↔Worker IPC + heartbeat (Sprint 244)
+- F500: Sprint auto Monitor+Merge 파이프라인 — signal 감시→PR review→squash merge→cleanup 자동 체인 (Sprint 244, C11 승격)
 
 ## [Phase 30] - 2026-04-09
 

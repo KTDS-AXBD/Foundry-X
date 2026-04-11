@@ -16,7 +16,12 @@ phases:
     due_on: "2026-04-09T00:00:00Z"
     state: closed
   - number: 31
-    title: "Phase 31 — Task Orchestrator + Governance"
-    description: "F497~F506 — Task Orchestrator S-α/S-β + Projects Board + CHANGELOG + Velocity + Epic"
-    due_on: "2026-04-15T00:00:00Z"
-    state: open
+    title: "Phase 31 — Task Orchestrator (S-α + S-β)"
+    description: "F497 S-α MVP + F499 S-β (doctor/adopt/park) + F500 Sprint auto merge-monitor (C11 승격)"
+    due_on: "2026-04-10T00:00:00Z"
+    state: closed
+  - number: 32
+    title: "Phase 32 — Work Management System"
+    description: "F501~F507 — Projects Board / CHANGELOG / /ax:todo+session-end Board 연동 / Velocity / Epic / Priority history. Phase 32-E F508 Integration Gap 해소 포함 (S255 post-audit)"
+    due_on: "2026-04-11T00:00:00Z"
+    state: closed
