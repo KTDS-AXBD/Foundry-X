@@ -142,7 +142,14 @@ handle_merge() {
       || git worktree remove "$wt_path" --force >>"$LOG_FILE" 2>&1 || true
   fi
 
-  # 6) mark merged
+  # 6) Board 동기화 (F504) — 연관 Issue를 Done 컬럼으로 이동
+  local board_script
+  board_script="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/board/board-on-merge.sh"
+  if [ -f "$board_script" ]; then
+    bash "$board_script" "$pr_num" >>"$LOG_FILE" 2>&1 || true
+  fi
+
+  # 7) mark merged
   sig_set "$sig" "STATUS" "MERGED"
   sig_set "$sig" "MERGED_AT" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   log "sprint-${sprint_num} — ✅ MERGED PR #${pr_num}"
