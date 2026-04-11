@@ -435,6 +435,17 @@ if command -v gh >/dev/null 2>&1; then
   fi
 fi
 
+# Persist ISSUE_URL into the WT's .task-context so task-complete.sh can
+# emit `Closes #N` in the generated PR body (which is how GitHub closes
+# the task issue automatically at merge time). Previously only the cache
+# held this link, so manual completion in a WT lost the reference and
+# issues were left OPEN after merge (S258 residual: #470/471/475/476/
+# 481/483/485/488 all required manual close). Append (not rewrite) so
+# we don't disturb existing keys.
+if [ -n "$ISSUE_URL" ] && [ -f "$WT_PATH/.task-context" ]; then
+  echo "ISSUE_URL=$ISSUE_URL" >> "$WT_PATH/.task-context"
+fi
+
 # ─── Step 6b: GitHub Projects Board 추가 (F501) ──────────────────────────────
 # Issue 생성 성공 시 Foundry-X Kanban 보드에 자동 추가.
 # 실패해도 task 시작은 계속 — board 연동은 부가 기능.
