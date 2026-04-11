@@ -1,0 +1,12 @@
+{
+  "sprint": 246,
+  "phase": 32,
+  "f_items": "F503,F504",
+  "f_count": 2,
+  "match_rate": 98.0,
+  "duration_minutes": 0,
+  "test_result": "pass",
+  "created": "2026-04-11T00:00:00+09:00",
+  "recorded_at": "2026-04-11T13:50:00+09:00",
+  "note": "backfilled by S255 audit (record-sprint.sh was not auto-wired into sprint-merge-monitor at the time)"
+}

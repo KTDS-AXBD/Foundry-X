@@ -1,0 +1,12 @@
+{
+  "sprint": 248,
+  "phase": 32,
+  "f_items": "F507",
+  "f_count": 1,
+  "match_rate": 100.0,
+  "duration_minutes": 0,
+  "test_result": "pass",
+  "created": "2026-04-11T12:00:00+09:00",
+  "recorded_at": "2026-04-11T13:50:00+09:00",
+  "note": "backfilled by S255 audit; Phase 32-D 완성, G7 (Priority 변경 추적) 해소"
+}

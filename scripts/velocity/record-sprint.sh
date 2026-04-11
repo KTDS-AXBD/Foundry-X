@@ -40,15 +40,44 @@ if git rev-parse --verify "$BRANCH" >/dev/null 2>&1; then
   fi
 fi
 
-# Phase 추출 — MEMORY.md "Phase NN ... DONE/진행" 패턴 우선, 없으면 최대 Phase 번호
+# Phase 추출 — 우선순위:
+#   1) .sprint-context PHASE=NN (명시적)
+#   2) SPEC.md §5 에서 현재 Sprint 번호가 속한 Phase 행 검색
+#   3) 첫 F-item이 SPEC.md Phase NN 표에 등장하는 위치
+#   4) fallback: SPEC.md/CLAUDE.md/MEMORY.md의 최대 Phase 숫자
 PHASE=""
-MEM_FILE="$HOME/.claude/projects/-home-sinclair-work-axbd-Foundry-X/memory/MEMORY.md"
-for src in "$MEM_FILE" CLAUDE.md SPEC.md; do
-  [ -z "$PHASE" ] || break
-  [ -f "$src" ] || continue
-  # "Phase NN" 최대값 추출 (가장 최근 Phase로 가정)
-  PHASE=$( (grep -oP 'Phase \K\d+' "$src" 2>/dev/null || true) | sort -n | tail -1)
+PHASE=$(read_ctx PHASE)
+
+# MEMORY.md — C10 symlink 이후 두 경로 모두 fallback
+MEM_FILE=""
+for candidate in \
+  "$HOME/.claude-work/.claude/projects/-home-sinclair-work-axbd-Foundry-X/memory/MEMORY.md" \
+  "$HOME/.claude/projects/-home-sinclair-work-axbd-Foundry-X/memory/MEMORY.md"; do
+  if [ -f "$candidate" ]; then MEM_FILE="$candidate"; break; fi
 done
+
+# 2) SPEC.md에서 F-item 코드로 Phase 역매핑
+if [ -z "$PHASE" ] && [ -n "$F_ITEMS" ] && [ -f SPEC.md ]; then
+  FIRST_F=$(echo "$F_ITEMS" | tr ',' '\n' | head -1 | tr -d ' ')
+  if [ -n "$FIRST_F" ]; then
+    # SPEC.md 라인 번호 추출
+    F_LINE=$(grep -nF "| ${FIRST_F} |" SPEC.md | head -1 | cut -d: -f1)
+    if [ -n "$F_LINE" ]; then
+      # F-item 이전 라인에서 가장 가까운 "Phase NN:" 헤더 검색
+      PHASE=$(sed -n "1,${F_LINE}p" SPEC.md \
+        | grep -oP '\*\*Phase \K\d+' | tail -1)
+    fi
+  fi
+fi
+
+# 3) fallback: 전체 문서 최대 Phase 번호
+if [ -z "$PHASE" ]; then
+  for src in SPEC.md CLAUDE.md "$MEM_FILE"; do
+    [ -z "$PHASE" ] || break
+    [ -n "$src" ] && [ -f "$src" ] || continue
+    PHASE=$( (grep -oP 'Phase \K\d+' "$src" 2>/dev/null || true) | sort -n | tail -1)
+  done
+fi
 
 # F-item 개수
 F_COUNT=0
