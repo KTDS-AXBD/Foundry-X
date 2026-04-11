@@ -93,6 +93,28 @@ phase_signals() {
     if [ "$MERGED" = true ] || { [ "${PR_URL:-none}" = "none" ] && [ "${COMMIT_COUNT:-0}" = "0" ]; }; then
       # WT 제거
       if [ -n "$WT_PATH" ] && [ -d "$WT_PATH" ]; then
+        # Pre-evict: cache에 기록된 $PANE_ID 외에도 wtsplit/manual join/WT 탭으로
+        # 같은 WT에 cwd를 둔 pane들이 있으면, --force remove가 디렉토리를 밀고
+        # 해당 pane들은 cwd-deleted 좀비가 되어 tmux 3.4가 불안정해진다 (S257/S258 후속).
+        # 루프에서 $WT_PATH 자체 또는 $WT_PATH/* 하위 cwd를 가진 모든 pane을 찾아
+        # kill-pane으로 선행 evict한다.
+        if command -v tmux >/dev/null 2>&1 && tmux list-panes -a >/dev/null 2>&1; then
+          local evicted_panes=""
+          while IFS=$'\t' read -r _pid _pcwd; do
+            [ -z "$_pid" ] && continue
+            case "$_pcwd" in
+              "$WT_PATH"|"$WT_PATH"/*)
+                tmux kill-pane -t "$_pid" 2>/dev/null || true
+                evicted_panes="${evicted_panes}${_pid} "
+                log "🧹 ${TASK_ID}: pre-evict pane ${_pid} (cwd=${_pcwd})"
+                ;;
+            esac
+          done < <(tmux list-panes -a -F '#{pane_id}'$'\t''#{pane_current_path}' 2>/dev/null || true)
+          if [ -n "$evicted_panes" ]; then
+            log_event "$TASK_ID" "daemon_pre_evict" \
+              "$(jq -nc --arg wt "$WT_PATH" --arg panes "${evicted_panes% }" '{wt_path:$wt, panes:$panes}')"
+          fi
+        fi
         (cd "$REPO_ROOT" && git worktree remove "$WT_PATH" --force 2>/dev/null) || true
       fi
       [ -n "$BRANCH" ] && (cd "$REPO_ROOT" && git branch -D "$BRANCH" 2>/dev/null) || true
