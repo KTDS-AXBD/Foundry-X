@@ -55,10 +55,19 @@ fi
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 HIST_DIR="${REPO_ROOT}/docs/priority-history"
 HIST_FILE="${HIST_DIR}/${F_NUM}.md"
+LOCK_FILE="${HIST_DIR}/.${F_NUM}.lock"
 mkdir -p "$HIST_DIR"
 
 TS=$(date -Iseconds)
 ACTOR=$(git config user.email 2>/dev/null || echo "unknown")
+
+# Race guard: flock 확보 (workflow + manual 동시 실행 방지, 10초 timeout)
+# 파일 생성/append 전 구간을 원자화하여 손상 방지
+exec 9>"$LOCK_FILE"
+if ! flock -w 10 9; then
+  echo "ERROR: lock 획득 실패 (${LOCK_FILE}) — 다른 프로세스가 기록 중" >&2
+  exit 2
+fi
 
 # 이력 파일 초기화 (없으면)
 if [ ! -f "$HIST_FILE" ]; then
@@ -80,10 +89,22 @@ created: ${CREATED_DATE}
 HEADER
 fi
 
+# 중복 append 방지: 마지막 행이 동일한 (OLD,NEW,REASON)이면 skip
+LAST_ROW=$(tail -1 "$HIST_FILE" 2>/dev/null || true)
+NEW_KEY="${OLD_P} → ${NEW_P} | ${REASON}"
+if echo "$LAST_ROW" | grep -qF "| ${NEW_KEY} |"; then
+  echo "ℹ️  중복 감지 — 마지막 행과 동일 (${NEW_KEY}), skip"
+  flock -u 9
+  exit 0
+fi
+
 # Append 이력 행
 REASON_ESC=$(echo "$REASON" | sed 's/|/\\|/g')
 echo "| ${TS} | ${OLD_P} → ${NEW_P} | ${REASON_ESC} | ${ACTOR} |" >> "$HIST_FILE"
 echo "✅ history: ${HIST_FILE}"
+
+# Lock 해제 (파일 close 시 자동이지만 명시)
+flock -u 9
 
 # GitHub 동기화
 if [ "$NO_ISSUE" = "true" ]; then
