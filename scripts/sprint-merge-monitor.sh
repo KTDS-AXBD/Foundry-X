@@ -148,8 +148,7 @@ handle_merge() {
 
   # 5) worktree cleanup
   if [ -n "$wt_path" ] && [ -d "$wt_path" ]; then
-    git -C "$wt_path/../.." worktree remove "$wt_path" --force >>"$LOG_FILE" 2>&1 \
-      || git worktree remove "$wt_path" --force >>"$LOG_FILE" 2>&1 || true
+    git worktree remove "$wt_path" --force >>"$LOG_FILE" 2>&1 || true
   fi
 
   # 5b) local branch cleanup — `gh pr merge --delete-branch` only removes
