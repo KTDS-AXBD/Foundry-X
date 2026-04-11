@@ -58,6 +58,8 @@ jq -r '.tasks | to_entries[] | [.key, .value.track, .value.status, .value.branch
   br_short="${branch:0:32}"
 
   # Liveness probe — check .task-context in WT path
+  # Thinking-heavy workers have stale heartbeats (hook fires on Write/Edit only),
+  # so fall back to tmux pane PID check before declaring stale/dead.
   hb="—"
   case "$status" in
     done|cancelled|aborted|rejected|planned|parked) hb="—" ;;
@@ -65,6 +67,14 @@ jq -r '.tasks | to_entries[] | [.key, .value.track, .value.status, .value.branch
       if [ -n "$wt" ] && [ -d "$wt" ]; then
         local_ctx="${wt}/.task-context"
         hb_raw=$(check_liveness "$local_ctx")
+        # Pane fallback: if heartbeat stale/dead but tmux pane still has a live
+        # claude process, treat as ok (prevents false-negative during thinking).
+        if [ "$hb_raw" != "ok" ] && [ -n "$pane" ] && command -v tmux >/dev/null 2>&1; then
+          pane_cmd=$(tmux list-panes -a -F "#{pane_id} #{pane_current_command} #{pane_dead}" 2>/dev/null | awk -v p="$pane" '$1==p {print $2"/"$3}')
+          if [ -n "$pane_cmd" ] && [[ "$pane_cmd" == claude/0 ]]; then
+            hb_raw="ok"
+          fi
+        fi
         hb=$(hb_display "$hb_raw")
       fi
       ;;
