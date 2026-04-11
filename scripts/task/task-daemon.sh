@@ -93,26 +93,38 @@ phase_signals() {
     if [ "$MERGED" = true ] || { [ "${PR_URL:-none}" = "none" ] && [ "${COMMIT_COUNT:-0}" = "0" ]; }; then
       # WT 제거
       if [ -n "$WT_PATH" ] && [ -d "$WT_PATH" ]; then
-        # Pre-evict: cache에 기록된 $PANE_ID 외에도 wtsplit/manual join/WT 탭으로
-        # 같은 WT에 cwd를 둔 pane들이 있으면, --force remove가 디렉토리를 밀고
-        # 해당 pane들은 cwd-deleted 좀비가 되어 tmux 3.4가 불안정해진다 (S257/S258 후속).
-        # 루프에서 $WT_PATH 자체 또는 $WT_PATH/* 하위 cwd를 가진 모든 pane을 찾아
-        # kill-pane으로 선행 evict한다.
+        # Pre-evict: wtsplit/manual join/WT 탭으로 같은 WT에 cwd를 둔 "extras"
+        # pane들을 --force remove 전에 선행 kill한다. 그대로 두면 cwd-deleted
+        # 좀비가 되어 tmux 3.4가 불안정해진다 (S257/S258 후속).
+        #
+        # C29/S261: primary $PANE_ID는 이 스윕에서 제외한다. primary는 line 127
+        # 일반 cleanup에서 처리되며, 여기서는 "예기치 않은 extra pane"만 evict
+        # 한다. 이 구분이 있어야 `daemon_pre_evict` 이벤트 0건이 healthy
+        # baseline이 된다 — 이전에는 primary가 항상 스윕에 걸려 매 cleanup마다
+        # ≥1건이라 "0건 유지" 회귀 감시 메트릭이 무력했음 (S260 MEMORY 참조).
         if command -v tmux >/dev/null 2>&1 && tmux list-panes -a >/dev/null 2>&1; then
           local evicted_panes=""
+          local extras_count=0
           while IFS=$'\t' read -r _pid _pcwd; do
             [ -z "$_pid" ] && continue
+            # primary pane은 건너뛴다 — line 127-128 일반 cleanup에서 처리
+            if [ -n "${PANE_ID:-}" ] && [ "$_pid" = "$PANE_ID" ]; then
+              continue
+            fi
             case "$_pcwd" in
               "$WT_PATH"|"$WT_PATH"/*)
                 tmux kill-pane -t "$_pid" 2>/dev/null || true
                 evicted_panes="${evicted_panes}${_pid} "
-                log "🧹 ${TASK_ID}: pre-evict pane ${_pid} (cwd=${_pcwd})"
+                extras_count=$((extras_count + 1))
+                log "🧹 ${TASK_ID}: pre-evict extra pane ${_pid} (cwd=${_pcwd})"
                 ;;
             esac
           done < <(tmux list-panes -a -F '#{pane_id}'$'\t''#{pane_current_path}' 2>/dev/null || true)
-          if [ -n "$evicted_panes" ]; then
+          if [ "$extras_count" -gt 0 ]; then
             log_event "$TASK_ID" "daemon_pre_evict" \
-              "$(jq -nc --arg wt "$WT_PATH" --arg panes "${evicted_panes% }" '{wt_path:$wt, panes:$panes}')"
+              "$(jq -nc --arg wt "$WT_PATH" --arg panes "${evicted_panes% }" \
+                        --arg primary "${PANE_ID:-}" --argjson extras "$extras_count" \
+                        '{wt_path:$wt, primary_pane:$primary, extras_count:$extras, panes:$panes}')"
           fi
         fi
         (cd "$REPO_ROOT" && git worktree remove "$WT_PATH" --force 2>/dev/null) || true
