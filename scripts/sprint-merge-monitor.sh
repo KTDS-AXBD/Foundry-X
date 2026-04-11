@@ -69,9 +69,12 @@ auto_approve() {
 }
 
 # Wait for CI checks on a PR. Returns 0 on success, 1 on failure/timeout.
+# Uses --foreground so timeout can signal the process group, and --kill-after
+# to force-kill if SIGTERM is ignored by gh's --watch polling loop.
 wait_ci() {
   local pr_num="$1" repo="$2"
-  timeout "${CI_TIMEOUT}s" gh pr checks "$pr_num" --repo "$repo" --watch --fail-fast >>"$LOG_FILE" 2>&1
+  timeout --foreground --kill-after=10s "${CI_TIMEOUT}s" \
+    gh pr checks "$pr_num" --repo "$repo" --watch --fail-fast >>"$LOG_FILE" 2>&1
 }
 
 # Main merge routine for a single DONE signal.
