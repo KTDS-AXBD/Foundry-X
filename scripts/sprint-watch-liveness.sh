@@ -17,12 +17,16 @@ MAX_RESTART=3
 mkdir -p "$SIGNAL_DIR"
 touch "$RESTART_COUNT_FILE"
 
+# Locate repo scripts directory (this script lives under <repo>/scripts).
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SPRINT_SCRIPTS_DIR="${SPRINT_SCRIPTS_DIR:-$SELF_DIR}"
+
 # 감시 대상: 이름:재시작 커맨드
-# sprint-pipeline-finalize 는 one-shot 이므로 제외 (sprint-watch once 가 별도 트리거).
+# F500: sprint-merge-monitor 상시 감시 대상으로 추가.
+# sprint-auto-approve 는 단발성이라 감시 대상 아님 (merge-monitor 내부 호출).
+# sprint-pipeline-finalize 는 one-shot 이므로 제외.
 MONITORS=(
-  "sprint-merge-monitor:bash $HOME/scripts/sprint-merge-monitor.sh"
-  "sprint-status-monitor:bash $HOME/scripts/sprint-status-monitor.sh 45 60"
-  "sprint-auto-approve:bash $HOME/scripts/sprint-auto-approve.sh 10 120"
+  "sprint-merge-monitor:bash ${SPRINT_SCRIPTS_DIR}/sprint-merge-monitor.sh"
 )
 
 get_count() {

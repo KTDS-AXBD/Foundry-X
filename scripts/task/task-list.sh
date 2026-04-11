@@ -37,15 +37,15 @@ emoji_for() {
 
 hb_display() {
   case "$1" in
-    ok)    echo "ok" ;;
-    stale) echo "⚠ stale" ;;
-    dead)  echo "✗ dead" ;;
+    ok)    echo "✅" ;;
+    stale) echo "⚠️" ;;
+    dead)  echo "❌" ;;
     *)     echo "—" ;;
   esac
 }
 
-printf "%-6s %-4s %-4s %-32s %-8s %-10s %s\n" "ID" "TRK" "ST" "BRANCH" "AGE" "HB" "PANE"
-printf "%-6s %-4s %-4s %-32s %-8s %-10s %s\n" "------" "----" "----" "--------------------------------" "--------" "----------" "--------"
+printf "%-6s %-4s %-4s %-32s %-8s %-6s %s\n" "ID" "TRK" "ST" "BRANCH" "AGE" "LIVE" "PANE"
+printf "%-6s %-4s %-4s %-32s %-8s %-6s %s\n" "------" "----" "----" "--------------------------------" "--------" "------" "--------"
 
 now_epoch=$(date +%s)
 
@@ -59,13 +59,18 @@ jq -r '.tasks | to_entries[] | [.key, .value.track, .value.status, .value.branch
 
   # Liveness probe — check .task-context in WT path
   hb="—"
-  if [ -n "$wt" ] && [ -d "$wt" ]; then
-    local_ctx="${wt}/.task-context"
-    hb_raw=$(check_liveness "$local_ctx")
-    hb=$(hb_display "$hb_raw")
-  fi
+  case "$status" in
+    done|cancelled|aborted|rejected|planned|parked) hb="—" ;;
+    *)
+      if [ -n "$wt" ] && [ -d "$wt" ]; then
+        local_ctx="${wt}/.task-context"
+        hb_raw=$(check_liveness "$local_ctx")
+        hb=$(hb_display "$hb_raw")
+      fi
+      ;;
+  esac
 
-  printf "%-6s %-4s %-4s %-32s %-8s %-10s %s\n" "$id" "$track" "$emoji" "$br_short" "$age" "$hb" "${pane:-—}"
+  printf "%-6s %-4s %-4s %-32s %-8s %-6s %s\n" "$id" "$track" "$emoji" "$br_short" "$age" "$hb" "${pane:-—}"
 done
 
 # Check for pending signals

@@ -88,8 +88,9 @@ RECENT_MERGES=$(git log --oneline -5 --grep="Sprint" 2>/dev/null)
 # 4. Monitor 생존 감시 + 자동 재시작 (liveness 스크립트 위임)
 #
 # F433 (Sprint 243) — 인라인 로직을 scripts/sprint-watch-liveness.sh 로 분리.
-# 감시 대상 3종 (merge/status/auto-approve). 재시작 상한 3회.
-# sprint-pipeline-finalize 는 one-shot 이므로 대상 제외 (아래 "6. Pipeline Finalize 트리거" 에서 별도 처리).
+# F500 (Sprint 244) — 상시 감시 대상은 sprint-merge-monitor 1종.
+#   (sprint-auto-approve 는 단발성 → merge-monitor 내부에서 호출.
+#    sprint-pipeline-finalize 는 one-shot → "6. Pipeline Finalize 트리거" 경로.)
 LIVENESS_SCRIPT="$(git rev-parse --show-toplevel 2>/dev/null)/scripts/sprint-watch-liveness.sh"
 if [ -f "$LIVENESS_SCRIPT" ]; then
   MONITOR_TABLE=$(bash "$LIVENESS_SCRIPT")
