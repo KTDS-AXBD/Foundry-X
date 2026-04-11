@@ -404,15 +404,19 @@ if [ \$WAITED -ge \$MAX_WAIT ]; then
 fi
 
 # Step 3: /rename
-tmux send-keys -t "\$PANE" "/rename ${RENAME_LABEL}" Enter
+tmux send-keys -t "\$PANE" "/rename ${RENAME_LABEL}"
+sleep 0.3
+tmux send-keys -t "\$PANE" Enter
 sleep 1
 
 # Step 4: /ax:session-start (PROMPT는 .task-prompt에서 읽기 — 길이 제한 회피)
 # S257b fix: 이전 500자 컷이 실제 워커 프롬프트를 중간 문장에서 끊어서 C14/C15가
 # 빈 PR로 머지되는 사고 발생. 8000자로 상향 — 대부분 현실적 태스크 프롬프트 커버.
-# 근본 해결은 워커가 .task-prompt를 직접 read 하는 것이지만, 그건 별도 작업 이관.
+# S260 C31 fix: text/Enter 분리로 bracket paste workaround. .task-prompt read 방식은 C32+ 후보.
 PROMPT_TEXT=\$(cat "${WT_PATH}/.task-prompt" 2>/dev/null | tr '\n' ' ' | cut -c1-8000)
-tmux send-keys -t "\$PANE" "/ax:session-start \${PROMPT_TEXT}" Enter
+tmux send-keys -t "\$PANE" "/ax:session-start \${PROMPT_TEXT}"
+sleep 0.5
+tmux send-keys -t "\$PANE" Enter
 
 echo "[inject] ✅ ${TASK_ID}: 주입 완료 (boot=\${WAITED}s)" >> /tmp/task-signals/inject.log
 rm -f "${INJECT_SCRIPT}"
