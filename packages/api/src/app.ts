@@ -68,6 +68,7 @@ import { shardDocRoute } from "./routes/shard-doc.js";
 import { specLibraryRoute } from "./routes/spec-library.js";
 import { helpAgentRoute } from "./routes/help-agent.js";
 import { eventStatusRoute } from "./routes/event-status.js";
+import { workRoute } from "./routes/work.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -435,6 +436,9 @@ app.route("/api", billingRoute);
 
 // Sprint 213: 파일 업로드 + 문서 파싱 (F441, F442)
 app.route("/api", filesRoute);
+
+// Sprint 261: Work Observability Walking Skeleton (F509)
+app.route("/api", workRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

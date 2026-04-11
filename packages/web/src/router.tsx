@@ -118,6 +118,9 @@ export const router = createBrowserRouter([
       { path: "settings/nps", lazy: () => import("@/routes/nps-dashboard") },
       { path: "backup", lazy: () => import("@/routes/backup") },
 
+      // ── Sprint 261: Work Observability Walking Skeleton (F509) ──
+      { path: "work-management", lazy: () => import("@/routes/work-management") },
+
       // ── Redirects ──
       { path: "ax-bd/discovery", element: <Navigate to="/discovery/items" replace /> },
       { path: "ax-bd/discovery/:id", element: <RedirectDiscoveryDetail /> },
