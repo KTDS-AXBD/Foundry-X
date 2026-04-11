@@ -17,7 +17,7 @@ author: Sinclair Seo
 Foundry-X CLI — 사람과 AI 에이전트가 동등한 팀원으로 협업하는 조직 협업 플랫폼의 Phase 1 CLI 도구.
 핵심 철학: "Git이 진실, Foundry-X는 렌즈"
 
-- **PRD**: [[FX-SPEC-PRD-V8]] (`docs/specs/prd-v8-final.md`) + [[FX-BD-V1]] (`docs/specs/fx-bd-v1/prd-final.md`) + [[FX-DISCOVERY-UI-V2]] (`docs/specs/fx-discovery-ui-v2/prd-final.md`)
+- **PRD**: [[FX-SPEC-PRD-V8]] (`docs/specs/FX-SPEC-PRD-V8_foundry-x.md`) + [[FX-BD-V1]] (`docs/specs/fx-bd-v1/prd-final.md`) + [[FX-DISCOVERY-UI-V2]] (`docs/specs/fx-discovery-ui-v2/prd-final.md`)
 - **Phase**: **Phase 28** ✅ 완료 — Discovery 동기화 파이프라인 F478~F487 (Sprint 233~238, 10/10 ✅, 평균 Match ~98%) | **Phase 29** ✅ 완료 — 요구사항 거버넌스 자동화 F488+F489 (Sprint 240, PR #405 Match 100%, F489는 F488 dogfood로 Issue #407 생성)
 - **Sprint**: 148~238 (✅)
 - **Phase 14 근거**: `docs/specs/FX-Unified-Integration-Plan.md` (GAN R2 CONDITIONAL_PASS)

@@ -4,8 +4,9 @@ title: "Foundry-X PRD v8 — AI 에이전트 오케스트레이션 플랫폼"
 version: 8.0
 status: Active
 category: SPEC
+system-version: Sprint 256
 created: 2026-03-16
-updated: 2026-03-22
+updated: 2026-04-11
 author: AX BD팀
 ---
 

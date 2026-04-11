@@ -10,7 +10,7 @@ author: Sinclair Seo
 references:
   - "[[FX-SPEC-001]] F166"
   - "[[FX-GUID-003]]"
-  - "prd-v8-final.md §6.4"
+  - "FX-SPEC-PRD-V8_foundry-x.md §6.4"
 ---
 
 # KT DS 보안 체크리스트 (AI 서비스 운영)

@@ -44,7 +44,7 @@ Phase 6 Ecosystem Integration의 두 번째 물결로, Sprint 75/76에서 구현
 
 ### 1.3 Related Documents
 
-- PRD: `docs/specs/prd-v8-final.md`
+- PRD: `docs/specs/FX-SPEC-PRD-V8_foundry-x.md`
 - Phase 6 PRD: FX-PLAN-012
 - Sprint 75 Plan/Design: FX-PLAN-075, FX-DSGN-075
 - Sprint 76 Plan/Design: FX-PLAN-076, FX-DSGN-076

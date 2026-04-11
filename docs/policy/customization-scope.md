@@ -10,7 +10,7 @@ author: Sinclair Seo
 references:
   - "[[FX-SPEC-001]] F164"
   - "[[FX-PLAN-047]]"
-  - "prd-v8-final.md §4, §9"
+  - "FX-SPEC-PRD-V8_foundry-x.md §4, §9"
 ---
 
 # Foundry-X 커스터마이징 범위 정의서

@@ -10,7 +10,7 @@ author: Sinclair Seo
 references:
   - "[[FX-SPEC-001]] F166"
   - "[[FX-PLAN-047]]"
-  - "prd-v8-final.md §6.4, §13.2"
+  - "FX-SPEC-PRD-V8_foundry-x.md §6.4, §13.2"
 ---
 
 # 외부 AI API 데이터 거버넌스 정책

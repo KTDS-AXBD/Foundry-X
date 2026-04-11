@@ -611,4 +611,4 @@ Web 에디터에서 실시간 CSS 커스터마이징
 | Shaping PRD v1 | `docs/specs/ax-bd-shaping/prd-shaping-v1.md` | 6-Phase shaping 파이프라인 상세 |
 | Prototype Auto-Gen PRD | `docs/specs/prototype-auto-gen/prd-prototype-autogen-v1.md` | Phase 16 요구사항 |
 | GAN Agent Architecture | `harness-gan-agent-architecture.md` | O-G-D 패턴 정의 |
-| PRD v8 | `docs/specs/prd-v8-final.md` | 현행 PRD (권위 문서) |
+| PRD v8 | `docs/specs/FX-SPEC-PRD-V8_foundry-x.md` | 현행 PRD (권위 문서) |
