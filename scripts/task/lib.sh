@@ -64,6 +64,33 @@ allocate_id() {
   echo "${track}${next}"
 }
 
+# ─── Backlog row lookup (--reuse-id support) ────────────────────────────────
+# Find an existing Task Orchestrator Backlog row by ID and extract its
+# REQ code + status. Returns "REQ_ID|STATUS" on stdout (REQ = "—" if the
+# row carries no REQ, STATUS = "UNKNOWN" if it lacks a recognized token).
+# Returns non-zero if no matching row exists (lets --reuse-id fail cleanly).
+#
+# Column parsing is intentionally avoided: historic rows (C1~C9) have 5~7
+# pipe columns while newer rows (C10+) have 7, so we extract semantically:
+#   REQ    — first FX-REQ-\d+ occurrence anywhere in the row
+#   STATUS — first match of the known status enum anywhere in the row
+lookup_backlog_row() {
+  local id="$1"
+  local spec="${2:-$(_repo_root)/SPEC.md}"
+  [ -f "$spec" ] || return 1
+
+  local row
+  row=$(sed -n '/<!-- fx-task-orchestrator-backlog -->/,/<!-- \/fx-task-orchestrator-backlog -->/p' "$spec" \
+    | grep -E "^\| ${id} \|" | head -1)
+  [ -n "$row" ] || return 1
+
+  local req status
+  req=$(echo "$row" | grep -oE 'FX-REQ-[0-9]+' | head -1)
+  status=$(echo "$row" | grep -oE 'PLANNED|IN_PROGRESS|DONE|CANCELLED|CLOSED_EMPTY|CLOSED_LEARNED|REJECTED' | head -1)
+
+  echo "${req:-—}|${status:-UNKNOWN}"
+}
+
 # ─── REQ code allocation ────────────────────────────────────────────────────
 # Scans SPEC.md for max FX-REQ-NNN and returns next number.
 allocate_req_id() {

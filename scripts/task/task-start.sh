@@ -1,9 +1,17 @@
 #!/usr/bin/env bash
 # scripts/task/task-start.sh — /ax:task start (S-α MVP)
 #
-# Usage:  task-start.sh <track> "<title>" ["<prompt>"]
+# Usage:  task-start.sh [--reuse-id <ID>] <track> "<title>" ["<prompt>"]
 #   track: F | B | C | X
 #   prompt: optional — injected into WT pane Claude session (default: auto-generated)
+#
+# --reuse-id <ID>
+#   Bypass the auto-allocator and consume an existing Task Orchestrator
+#   Backlog row by exact ID (e.g. C20). Prevents the "ID forward" trap
+#   where allocate_id() returns max+1 regardless of the row's status,
+#   so a user-pre-registered C20 silently becomes C22 on execution.
+#   The existing row is left untouched (it stays as the "intent" record);
+#   REQ code + track are read back from the row. See S258 MEMORY.
 #
 # Implements PRD §4.1.1 — flock allocator + push SHA pinning + commit body
 # fx-task-meta + tmux split + GitHub Issue creation.
@@ -18,9 +26,90 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib.sh
 source "$SCRIPT_DIR/lib.sh"
 
+# ─────────────────────────────────────────────────────────────────────────────
+# --reuse-id risk policy
+# ─────────────────────────────────────────────────────────────────────────────
+# Invoked by the reuse path after lookup_backlog_row() returns the existing
+# row's status. Decide per-status whether to pass (return 0), warn + pass, or
+# block (return non-zero). This is intentionally a plain function — the user
+# defines the team's policy here, not a config file, so it shows up in git
+# blame and code review.
+#
+# User answered (S259): all statuses are reusable, but the risk profile
+# varies enormously:
+#   PLANNED        — normal case, intent row awaiting work
+#   CLOSED_EMPTY   — S257-style abandoned row (tmux 3.4 segfault victims)
+#   IN_PROGRESS    — another pane/daemon may be actively working, double-run
+#                    means merge-queue collision + signal file stomp
+#   DONE / CANCELLED / CLOSED_LEARNED / REJECTED / UNKNOWN
+#                  — overwriting finished history, destructive
+#
+# Expected behavior (write ~5-10 lines below):
+#   • Echo a short rationale to stderr describing the risk
+#   • Optionally require `FX_REUSE_FORCE=1` env var to bypass the dangerous
+#     cases (IN_PROGRESS and DONE family), so the default is safe but a
+#     deliberate override path exists
+#   • Return 0 to proceed, non-zero to abort
+#
+# Parameters:
+#   $1 — TASK_ID being reused (e.g. "C20")
+#   $2 — existing status from SPEC row
+warn_reuse_risk() {
+  local id="$1" status="$2"
+  case "$status" in
+    PLANNED)
+      return 0 ;;
+    CLOSED_EMPTY)
+      echo "[fx-task] reusing $id (CLOSED_EMPTY — S257-style retry, ok)" >&2
+      return 0 ;;
+    IN_PROGRESS|DONE|CANCELLED|CLOSED_LEARNED|REJECTED|UNKNOWN)
+      if [ -n "${FX_REUSE_FORCE:-}" ]; then
+        echo "[fx-task] WARN: reusing $id with status=$status (FX_REUSE_FORCE=1 set)" >&2
+        return 0
+      fi
+      echo "[fx-task] ABORT: $id has status=$status — set FX_REUSE_FORCE=1 to override" >&2
+      return 10 ;;
+    *)
+      echo "[fx-task] WARN: unknown status '$status' for $id — proceeding" >&2
+      return 0 ;;
+  esac
+}
+
+# ─── Flag parsing (leading --long options only) ─────────────────────────────
+REUSE_ID=""
+while [[ "${1:-}" == --* ]]; do
+  case "$1" in
+    --reuse-id)
+      REUSE_ID="${2:?--reuse-id requires an ID (e.g. C20)}"
+      shift 2
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      echo "[fx-task] unknown option: $1" >&2
+      exit 2
+      ;;
+  esac
+done
+
 TRACK="${1:?track required (F|B|C|X)}"
 TITLE="${2:?title required}"
 PROMPT="${3:-}"
+
+# ─── --reuse-id sanity: ID prefix must match track ──────────────────────────
+if [ -n "$REUSE_ID" ]; then
+  if [[ ! "$REUSE_ID" =~ ^([BCX])[0-9]+$ ]]; then
+    echo "[fx-task] --reuse-id format invalid: '$REUSE_ID' (expected B|C|X + digits, e.g. C20)" >&2
+    exit 2
+  fi
+  REUSE_TRACK="${BASH_REMATCH[1]}"
+  if [ "$REUSE_TRACK" != "$TRACK" ]; then
+    echo "[fx-task] --reuse-id track mismatch: $REUSE_ID prefix='$REUSE_TRACK' != track='$TRACK'" >&2
+    exit 2
+  fi
+fi
 
 case "$TRACK" in B|C|X) ;; F) echo "[fx-task] F-track은 Sprint/Phase 전용이에요. Task에는 B/C/X를 사용해주세요." >&2; echo "[fx-task]   Feature급 작업 → Sprint 경로: bash -i -c 'sprint N'" >&2; exit 2;; *) echo "[fx-task] invalid track: $TRACK (B|C|X)" >&2; exit 2;; esac
 
@@ -58,56 +147,87 @@ PUSHED_SHA=""
 (
   flock -x -w 10 9 || { echo "[fx-task] id-allocator lock timeout" >&2; exit 3; }
 
-  TASK_ID=$(allocate_id "$TRACK")
-  echo "[fx-task] 발급: $TASK_ID — $TITLE" >&2
-
-  # REQ code auto-allocation (GAP-2 fix)
-  REQ_ID=$(allocate_req_id SPEC.md)
-  echo "[fx-task] REQ: $REQ_ID" >&2
-
-  # Minimal SPEC.md registration: append a one-line entry to a dedicated section.
-  # S-α scope: append to a fenced "Task Orchestrator Backlog" block at end of §5.
-  # If the marker isn't present, create it before §7.
-  # Status uses text (PLANNED/DONE/CANCELLED/REJECTED/CLOSED_LEARNED) per PRD §3.3.
-  # Type column added per GAP-4 decision.
-  ENTRY="| ${TASK_ID} | ${TRACK} | ${TITLE} (${REQ_ID}) | — | PLANNED | task orchestrator |"
-
-  if ! grep -q "<!-- fx-task-orchestrator-backlog -->" SPEC.md; then
-    # Insert marker block right before "## §7 기술 스택"
-    awk -v block='\n<!-- fx-task-orchestrator-backlog -->\n### Task Orchestrator Backlog (B/C/X)\n\n| ID | Type | 제목 | Sprint | 상태 | 비고 |\n|----|------|------|--------|------|------|\n<!-- /fx-task-orchestrator-backlog -->\n' \
-      '/^## §7 기술 스택/ && !done {print block; done=1} {print}' \
-      SPEC.md > SPEC.md.tmp && mv SPEC.md.tmp SPEC.md
-  fi
-
-  # Insert entry before closing marker
-  awk -v entry="$ENTRY" \
-    '/<!-- \/fx-task-orchestrator-backlog -->/ && !done {print entry; done=1} {print}' \
-    SPEC.md > SPEC.md.tmp && mv SPEC.md.tmp SPEC.md
-
-  git add SPEC.md
-  if ! git commit -m "chore(${TASK_ID}): register task — ${TITLE}" >/dev/null; then
-    git checkout -- SPEC.md
-    echo "[fx-task] SPEC commit 실패" >&2
-    log_event "$TASK_ID" "failed_setup" '{"step":"spec_commit"}'
-    exit 4
-  fi
-
-  # ─── Step 2: push under master-push lock ───────────────────────────────────
-  (
-    flock -x -w 30 8 || {
-      git reset --hard HEAD^ >/dev/null
-      echo "[fx-task] master-push lock timeout" >&2
-      exit 5
+  if [ -n "$REUSE_ID" ]; then
+    # ── Reuse path: consume an existing backlog row by exact ID ────────────
+    ROW_INFO=$(lookup_backlog_row "$REUSE_ID" SPEC.md) || {
+      echo "[fx-task] --reuse-id '$REUSE_ID' not found in SPEC Task Orchestrator Backlog" >&2
+      exit 4
     }
-    if ! git push origin master >/dev/null 2>&1; then
-      git reset --hard HEAD^ >/dev/null
-      echo "[fx-task] push failed (non-fast-forward 가능성). pull --rebase 후 재시도" >&2
-      log_event "$TASK_ID" "failed_setup" '{"step":"push"}'
-      exit 6
-    fi
+    TASK_ID="$REUSE_ID"
+    REQ_ID="${ROW_INFO%|*}"
+    EXISTING_STATUS="${ROW_INFO#*|}"
+    echo "[fx-task] 재사용: $TASK_ID (status=$EXISTING_STATUS, REQ=$REQ_ID) — $TITLE" >&2
+
+    # User-configured risk policy: decide whether to warn, block, or pass
+    # based on the existing row's status. Implemented in task-start helper
+    # below (warn_reuse_risk). Exits non-zero to abort when policy blocks.
+    warn_reuse_risk "$TASK_ID" "$EXISTING_STATUS" || exit $?
+
+    # SPEC row is intentionally left untouched — per S258 pattern, the
+    # existing row acts as "intent record" and the execution evidence lives
+    # in git history + task-complete commit. No commit needed on master
+    # in this branch; skip straight to push-lock step so WT base_sha is
+    # pinned to the current HEAD.
     PUSHED_SHA=$(git rev-parse HEAD)
     echo "$TASK_ID|$PUSHED_SHA|$REQ_ID" > "$FX_LOCK_DIR/.last-allocation"
-  ) 8>"$PUSH_LOCK"
+  else
+    # ── Normal path: allocate next ID + append new SPEC row ────────────────
+    TASK_ID=$(allocate_id "$TRACK")
+    echo "[fx-task] 발급: $TASK_ID — $TITLE" >&2
+
+    # REQ code auto-allocation (GAP-2 fix)
+    REQ_ID=$(allocate_req_id SPEC.md)
+    echo "[fx-task] REQ: $REQ_ID" >&2
+
+    # Minimal SPEC.md registration: append a one-line entry to a dedicated section.
+    # S-α scope: append to a fenced "Task Orchestrator Backlog" block at end of §5.
+    # If the marker isn't present, create it before §7.
+    # Status uses text (PLANNED/DONE/CANCELLED/REJECTED/CLOSED_LEARNED) per PRD §3.3.
+    # Type column added per GAP-4 decision.
+    ENTRY="| ${TASK_ID} | ${TRACK} | ${TITLE} (${REQ_ID}) | — | PLANNED | task orchestrator |"
+
+    if ! grep -q "<!-- fx-task-orchestrator-backlog -->" SPEC.md; then
+      # Insert marker block right before "## §7 기술 스택"
+      awk -v block='\n<!-- fx-task-orchestrator-backlog -->\n### Task Orchestrator Backlog (B/C/X)\n\n| ID | Type | 제목 | Sprint | 상태 | 비고 |\n|----|------|------|--------|------|------|\n<!-- /fx-task-orchestrator-backlog -->\n' \
+        '/^## §7 기술 스택/ && !done {print block; done=1} {print}' \
+        SPEC.md > SPEC.md.tmp && mv SPEC.md.tmp SPEC.md
+    fi
+
+    # Insert entry before closing marker
+    awk -v entry="$ENTRY" \
+      '/<!-- \/fx-task-orchestrator-backlog -->/ && !done {print entry; done=1} {print}' \
+      SPEC.md > SPEC.md.tmp && mv SPEC.md.tmp SPEC.md
+
+    git add SPEC.md
+    if ! git commit -m "chore(${TASK_ID}): register task — ${TITLE}" >/dev/null; then
+      git checkout -- SPEC.md
+      echo "[fx-task] SPEC commit 실패" >&2
+      log_event "$TASK_ID" "failed_setup" '{"step":"spec_commit"}'
+      exit 4
+    fi
+  fi
+
+  # ─── Step 2: push under master-push lock (normal path only) ───────────────
+  # Reuse path already wrote .last-allocation above with current HEAD and
+  # has no new commit to push — skip push lock entirely to avoid the
+  # destructive `git reset --hard HEAD^` error handler.
+  if [ -z "$REUSE_ID" ]; then
+    (
+      flock -x -w 30 8 || {
+        git reset --hard HEAD^ >/dev/null
+        echo "[fx-task] master-push lock timeout" >&2
+        exit 5
+      }
+      if ! git push origin master >/dev/null 2>&1; then
+        git reset --hard HEAD^ >/dev/null
+        echo "[fx-task] push failed (non-fast-forward 가능성). pull --rebase 후 재시도" >&2
+        log_event "$TASK_ID" "failed_setup" '{"step":"push"}'
+        exit 6
+      fi
+      PUSHED_SHA=$(git rev-parse HEAD)
+      echo "$TASK_ID|$PUSHED_SHA|$REQ_ID" > "$FX_LOCK_DIR/.last-allocation"
+    ) 8>"$PUSH_LOCK"
+  fi
 
 ) 9>"$ID_LOCK"
 
