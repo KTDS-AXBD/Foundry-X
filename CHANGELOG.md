@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_(비어있음 — 다음 Phase 착수 시 여기부터 기록)_
+### Added
+- F508: Phase 32 Integration Gap 해소 — ax 스킬 4종(gov-retro, req-manage, session-end, todo)에 Phase 32 스크립트 통합 + sprint-merge-monitor 3훅 (pr-body-enrich/velocity/epic) + CHANGELOG [Phase 32] 롤업 + priority-history F507 backfill + velocity phase 감지 버그 수정 + Sprint 245~248 velocity backfill + board-sync-spec --fix 모드 (Sprint 255 S255)
+
+### Fixed
+- F505: velocity record-sprint.sh의 MEMORY.md 경로가 C10 symlink 이후 미대응이었던 문제 (.claude-work/ 우선 fallback)
+- F505: velocity phase 감지 휴리스틱 버그 — "max Phase 번호" 방식이 Sprint 245/247을 Phase 31로 잘못 기록 (S255 audit에서 감지, 4단계 cascade로 재설계)
+- F505: record-sprint.sh가 빈 F_ITEMS 실행 시 기존 backfill 데이터를 clobber하던 문제 (보호 guard 추가)
+- F507: record-change.sh append race condition — workflow + manual 동시 실행 시 파일 손상 가능 (flock 10s + dedupe)
+- F503: board/_common.sh의 gh token scope 부족을 silent fail로 처리하던 문제 (loud error + 안내 메시지)
 
 ## [Phase 32] - 2026-04-11
 
