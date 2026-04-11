@@ -1,6 +1,9 @@
 # bkit runtime state
 .bkit/
 
+# Claude Code session lock files
+.claude/scheduled_tasks.lock
+
 # O-G-D workspace (라운드 산출물 임시 저장)
 _workspace/
 
