@@ -1,6 +1,6 @@
 ---
 name: ax-task
-description: Task Orchestrator (S-α MVP) — B/C/X 3트랙 task 등록 + WT 생성 + tmux split + GitHub Issue + REQ 자동 발급. F-track은 Sprint 전용. /ax:task start|list 지원.
+description: Task Orchestrator (S-β) — B/C/X 3트랙 task 등록 + WT 생성 + tmux split + GitHub Issue + REQ 자동 발급. F-track은 Sprint 전용. /ax:task start|list|doctor|adopt|park|resume 지원.
 ---
 
 # ax-task — Task Orchestrator (S-α MVP)
@@ -62,8 +62,43 @@ bash scripts/task/task-start.sh B "presign Worker proxy hot fix"
 `~/.foundry-x/tasks-cache.json` 을 읽어 활성 task 테이블 출력. S-α 는 cache-only — liveness probe (PID/heartbeat) + GitHub label 동기화는 S-β 에서 추가.
 
 ```bash
-bash scripts/task/task-list.sh           # 표 형식
+bash scripts/task/task-list.sh           # 표 형식 (LIVE 컬럼 포함)
 bash scripts/task/task-list.sh --json    # 원본 cache 덤프
+```
+
+LIVE 컬럼: ✅ alive / ⚠️ stale (5~10분) / ❌ dead (>10분) / — 감시 대상 아님.
+
+### `/ax:task doctor` (S-β)
+
+SPEC ↔ Issue ↔ WT ↔ cache ↔ log ↔ signal 9개 정합성 검사를 실행합니다.
+
+```bash
+bash scripts/task/task-doctor.sh           # 검사만 (dry-run)
+bash scripts/task/task-doctor.sh --fix     # 자동 보정
+bash scripts/task/task-doctor.sh --task C5 # 특정 task만
+```
+
+auto-fix 가능: #3 orphan WT 재등록 · #4 heartbeat reset · #5 stale PID 정리 · #6 signal↔cache drift · #7 orphan lock · #8 cache rebuild. 그 외(#1/#2/#9)는 수동 판단.
+
+### `/ax:task adopt` (S-β)
+
+`git worktree list` 에 있지만 cache 에서 빠진 고아 WT를 다시 등록합니다.
+
+```bash
+bash scripts/task/task-adopt.sh                    # 모든 고아 WT 탐색
+bash scripts/task/task-adopt.sh --wt <path>        # 특정 WT 1개
+bash scripts/task/task-adopt.sh --dry-run          # 미리보기만
+```
+
+복구 소스 우선순위: `.task-context` → 없으면 commit body 의 `fx-task-meta` JSON 트레일러(권위 소스).
+
+### `/ax:task park|resume` (S-β)
+
+진행 중 task 를 일시 정지/재개합니다. heartbeat daemon 중단, Issue label `fx:status:in_progress` ↔ `fx:status:parked` 전환, cache status 동기화.
+
+```bash
+bash scripts/task/task-park.sh park C5 --reason "waiting for dependency"
+bash scripts/task/task-park.sh resume C5
 ```
 
 ## Steps (Claude 가 실행할 절차)

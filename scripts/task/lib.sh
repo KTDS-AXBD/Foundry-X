@@ -223,6 +223,42 @@ read_signals() {
   ls "${FX_SIGNAL_DIR}/${project}-"*.signal 2>/dev/null || true
 }
 
+# ─── orphan WT detection ────────────────────────────────────────────────────
+# Returns list of worktree paths present in `git worktree list` but missing
+# from tasks-cache.json. Sprint WTs (.sprint-context) and master are excluded.
+list_orphan_wts() {
+  local wt_list cache_wts
+  wt_list=$(git worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2}')
+  cache_wts=$(jq -r '.tasks[] | select(.wt != null and .wt != "") | .wt' "$FX_CACHE" 2>/dev/null || true)
+  while IFS= read -r wt; do
+    [ -z "$wt" ] && continue
+    [ -f "$wt/.sprint-context" ] && continue
+    [ ! -f "$wt/.task-context" ] && continue
+    if ! printf '%s\n' "$cache_wts" | grep -qxF "$wt"; then
+      printf '%s\n' "$wt"
+    fi
+  done <<< "$wt_list"
+}
+
+# Rebuild tasks-cache.json from task-log.ndjson (event replay).
+# Latest event per task_id wins; cache is atomically replaced.
+rebuild_cache() {
+  local tmp; tmp=$(mktemp)
+  jq -s '
+    {
+      version: 1,
+      tasks: (
+        reduce .[] as $e ({};
+          .[$e.id] = ((.[$e.id] // {}) + {
+            status: $e.event,
+            updated_at: $e.ts
+          } + ($e.extra // {}))
+        )
+      )
+    }
+  ' "$FX_LOG" > "$tmp" 2>/dev/null && mv "$tmp" "$FX_CACHE" || rm -f "$tmp"
+}
+
 # ─── slug ────────────────────────────────────────────────────────────────────
 # ASCII-safe: lowercase, replace whitespace with -, drop everything outside
 # [a-z0-9-], collapse runs, trim to 40 chars. Korean/CJK is dropped intentionally
