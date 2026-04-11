@@ -9,7 +9,7 @@ updated: 2026-03-22
 author: Sinclair Seo
 references:
   - "[[FX-PLAN-046]]"
-  - "prd-v8-final.md"
+  - "FX-SPEC-PRD-V8_foundry-x.md"
 ---
 
 # Foundry-X SI 파트너 역할 분담 정의서

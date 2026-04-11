@@ -10,7 +10,7 @@ author: Sinclair Seo (AI-assisted)
 sprint: 66
 features: [F205, F208]
 req: [FX-REQ-197, FX-REQ-200]
-prd: docs/specs/prd-v8-final.md, docs/specs/ax-bd-atoz/prd-final.md
+prd: docs/specs/FX-SPEC-PRD-V8_foundry-x.md, docs/specs/ax-bd-atoz/prd-final.md
 depends-on: Sprint 64 완료 (F203+F204)
 ---
 

@@ -25,7 +25,7 @@
 
 | 제목 | 상태 | 파일 |
 |------|:----:|------|
-| PRD v8-final (현행 권위 문서) | Active | [specs/prd-v8-final.md](specs/prd-v8-final.md) |
+| PRD v8-final (현행 권위 문서) | Active | [specs/FX-SPEC-PRD-V8_foundry-x.md](specs/FX-SPEC-PRD-V8_foundry-x.md) |
 | AX BD A-to-Z PRD | Active | [specs/ax-bd-atoz/prd-final.md](specs/ax-bd-atoz/prd-final.md) |
 | BD Pipeline E2E PRD | Active | [specs/fx-bd-v1/prd-final.md](specs/fx-bd-v1/prd-final.md) |
 | 발굴 UX 개선 PRD | Active | [specs/fx-discovery-ux/prd-final.md](specs/fx-discovery-ux/prd-final.md) |

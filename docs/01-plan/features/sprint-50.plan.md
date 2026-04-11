@@ -58,7 +58,7 @@ Phase 5 Conditional #4(Adoption 데이터 수집)의 **실질적 해소**를 위
 ### 1.3 Related Documents
 
 - SPEC.md §5: F173, F174 (신규 등록 예정)
-- PRD v8: `docs/specs/prd-v8-final.md`
+- PRD v8: `docs/specs/FX-SPEC-PRD-V8_foundry-x.md`
 - Sprint 29 Plan: Getting Started + 피드백 (archived)
 - Sprint 49 Plan: IA 재설계 + 온보딩 투어 (`docs/01-plan/features/sprint-49.plan.md`)
 

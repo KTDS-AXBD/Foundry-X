@@ -48,7 +48,7 @@ AX 사업개발팀 동료 6명이 Foundry-X 대시보드에 처음 접속했을 
 ### 1.3 Related Documents
 
 - SPEC.md §6 F171, F172
-- PRD v8: `docs/specs/prd-v8-final.md`
+- PRD v8: `docs/specs/FX-SPEC-PRD-V8_foundry-x.md`
 - 기존 getting-started: `packages/web/src/app/(app)/getting-started/page.tsx`
 
 ---

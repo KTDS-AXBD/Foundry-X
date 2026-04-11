@@ -41,7 +41,7 @@ Phase 1~32 완료 (Sprint 1~255). Phase 32 Work Management 7/7 ✅ (F501~F507) +
 
 ## Key References
 
-- 현행 PRD: `docs/specs/prd-v8-final.md` (v8)
+- 현행 PRD: `docs/specs/FX-SPEC-PRD-V8_foundry-x.md` (v8)
 - AX BD: `docs/specs/ax-bd-atoz/prd-final.md` + `docs/specs/axbd/`
 - PRD 목록: `docs/specs/*/prd-final.md` (Phase별)
 - 기술 결정: `docs/02-design/features/tech-stack-review.design.md`

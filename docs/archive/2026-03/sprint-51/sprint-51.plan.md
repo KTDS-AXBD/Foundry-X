@@ -66,7 +66,7 @@ AX-Discovery-Process v0.8에서 정의한 **2단계 발굴 프로세스**의 핵
 
 - SPEC.md §5: F175, F178 (📋 PLANNED)
 - 프로세스 정의: [[FX-SPEC-BDP-001]]
-- PRD v8: `docs/specs/prd-v8-final.md`
+- PRD v8: `docs/specs/FX-SPEC-PRD-V8_foundry-x.md`
 - 에이전트 아키텍처: Sprint 37~39 Design 문서 (archived)
 
 ---

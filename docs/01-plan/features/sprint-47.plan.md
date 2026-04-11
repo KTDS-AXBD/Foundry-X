@@ -13,7 +13,7 @@ phase: "Phase 5"
 references:
   - "[[FX-PLAN-046]]"
   - "[[FX-SPEC-001]]"
-  - "prd-v8-final.md"
+  - "FX-SPEC-PRD-V8_foundry-x.md"
 ---
 
 ## Executive Summary

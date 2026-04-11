@@ -50,7 +50,7 @@ Phase 6 Ecosystem Integration의 첫 Sprint로, CLI의 핵심 기능인 Init과 
 
 ### 1.3 Related Documents
 
-- PRD: `docs/specs/prd-v8-final.md` (v8: AI 에이전트 오케스트레이션 플랫폼)
+- PRD: `docs/specs/FX-SPEC-PRD-V8_foundry-x.md` (v8: AI 에이전트 오케스트레이션 플랫폼)
 - Phase 6 PRD: `docs/specs/FX-PLAN-012/` (Ecosystem Integration)
 - SPEC.md F220, F222 정의
 

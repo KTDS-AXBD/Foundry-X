@@ -10,7 +10,7 @@ author: Sinclair Seo
 references:
   - "[[FX-SPEC-001]] F165"
   - "[[FX-PLAN-047]]"
-  - "prd-v8-final.md §6.4, §13.2"
+  - "FX-SPEC-PRD-V8_foundry-x.md §6.4, §13.2"
 ---
 
 # AI 생성 코드 법적/윤리적 가이드라인
