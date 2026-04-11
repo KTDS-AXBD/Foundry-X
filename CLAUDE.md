@@ -26,7 +26,7 @@ turbo test / lint / typecheck  # 전체 검증
 
 ## Current Phase
 
-Phase 1~29 완료 (Sprint 1~240). 상세: SPEC.md §5
+Phase 1~32 완료 (Sprint 1~248). Phase 32 Work Management 7/7 ✅ (F501~F507). 상세: SPEC.md §5
 - 독립 트랙: F490 (E2E timeout, P2) + F491 (공유 Org, P3)
 - 수치: `/ax:daily-check` 또는 SPEC.md §2 (하드코딩 금지)
 
