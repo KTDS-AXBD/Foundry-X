@@ -6,12 +6,13 @@
  */
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FileText, ChevronDown, ChevronRight, Search, Maximize2 } from "lucide-react";
+import { FileText, ChevronDown, ChevronRight, Search, Maximize2, Pencil } from "lucide-react";
 import { getBizItems, listPrds, type BizItemSummary, type GeneratedPrdEntry } from "@/lib/api-client";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import MarkdownViewer from "@/components/feature/MarkdownViewer";
 import { PrdDetailView } from "@/components/prd/PrdDetailView";
+import { PrdEditor } from "@/components/prd/PrdEditor";
 
 /** PRD content 앞에 붙는 YAML frontmatter(`---\n...\n---`) 블록 제거 */
 function stripFrontmatter(md: string): string {
@@ -32,6 +33,7 @@ export function Component() {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [prdCache, setPrdCache] = useState<Record<string, { prds: GeneratedPrdEntry[]; loading: boolean }>>({});
   const [detailPrd, setDetailPrd] = useState<GeneratedPrdEntry | null>(null);
+  const [editTarget, setEditTarget] = useState<{ prd: GeneratedPrdEntry; bizItemId: string } | null>(null);
 
   useEffect(() => {
     getBizItems()
@@ -88,7 +90,37 @@ export function Component() {
       {detailPrd && (
         <PrdDetailView
           prd={detailPrd}
+          onEdit={detailPrd.version !== 1 ? () => {
+            const bizItemId = Object.keys(prdCache).find((id) =>
+              prdCache[id]?.prds.some((p) => p.id === detailPrd.id),
+            );
+            if (bizItemId) {
+              setDetailPrd(null);
+              setEditTarget({ prd: detailPrd, bizItemId });
+            }
+          } : undefined}
           onClose={() => setDetailPrd(null)}
+        />
+      )}
+
+      {editTarget && (
+        <PrdEditor
+          prd={editTarget.prd}
+          bizItemId={editTarget.bizItemId}
+          onSaved={(updated) => {
+            setPrdCache((c) => {
+              const entry = c[editTarget.bizItemId];
+              if (!entry) return c;
+              return {
+                ...c,
+                [editTarget.bizItemId]: {
+                  ...entry,
+                  prds: entry.prds.map((p) => (p.id === updated.id ? updated : p)),
+                },
+              };
+            });
+          }}
+          onClose={() => setEditTarget(null)}
         />
       )}
 
@@ -139,6 +171,16 @@ export function Component() {
                                 <span className="text-xs text-muted-foreground ml-auto">
                                   {new Date(prd.generated_at * 1000).toLocaleDateString("ko")}
                                 </span>
+                                {prd.version !== 1 && (
+                                  <button
+                                    onClick={() => setEditTarget({ prd, bizItemId: item.id })}
+                                    className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-primary hover:bg-muted/50 transition-colors"
+                                    data-testid={`prd-edit-${prd.id}`}
+                                  >
+                                    <Pencil className="size-3" />
+                                    편집
+                                  </button>
+                                )}
                                 <button
                                   onClick={() => setDetailPrd(prd)}
                                   className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-primary hover:bg-muted/50 transition-colors"
