@@ -4,7 +4,7 @@ title: Foundry-X Project Specification
 version: 5.75
 status: Active
 category: SPEC
-system-version: Sprint 248
+system-version: Sprint 255
 created: 2026-03-16
 updated: 2026-04-11
 author: Sinclair Seo
@@ -220,7 +220,7 @@ Foundry-X CLI — 사람과 AI 에이전트가 동등한 팀원으로 협업하�
 > ls packages/api/src/db/migrations/*.sql | sort | tail -1  # D1 latest
 > turbo test --output-logs=errors-only    # 테스트 수 (전체 실행)
 > ```
-> **마지막 실측** (Sprint 245, 2026-04-11): ~9 routes, ~40 services (adapters 13 포함), ~13 schemas, D1 0125, tests ~3447 (E2E 263) — Phase 20-21 MSA 재조정으로 core/modules가 gate-x·harness-kit으로 이전
+> **마지막 실측** (Sprint 255, 2026-04-11): ~9 routes, ~40 services (adapters 13 포함), ~13 schemas, D1 0125, tests ~3447 (E2E 263) — 수치 변동 없음 (S255은 scripts/docs 위주, packages/api 미변경)
 
 ## §3 마일스톤
 
