@@ -53,8 +53,12 @@ auto_approve() {
   local pr_num="$1" repo="$2"
   local required
   required=$(gh api "repos/${repo}/branches/master/protection" \
-    --jq '.required_pull_request_reviews.required_approving_review_count' 2>/dev/null || echo "0")
-  if [ "${required:-0}" -gt 0 ]; then
+    --jq '.required_pull_request_reviews.required_approving_review_count' 2>/dev/null) || required="0"
+  # Ensure numeric — API 404 (unprotected branch) returns JSON error string
+  case "$required" in
+    ''|*[!0-9]*) required=0 ;;
+  esac
+  if [ "$required" -gt 0 ]; then
     if [ -x "${SCRIPT_DIR}/sprint-auto-approve.sh" ]; then
       bash "${SCRIPT_DIR}/sprint-auto-approve.sh" "$pr_num" "$repo" >>"$LOG_FILE" 2>&1 || true
     else
