@@ -85,70 +85,91 @@ done
 # 3. 최근 master 커밋 (merge 감지)
 RECENT_MERGES=$(git log --oneline -5 --grep="Sprint" 2>/dev/null)
 
-# 4. Monitor 생존 감시 + 자동 재시작
-MONITORS=(
-  "sprint-merge-monitor:bash ~/scripts/sprint-merge-monitor.sh"
-  "sprint-status-monitor:bash ~/scripts/sprint-status-monitor.sh 45 60"
-  "sprint-auto-approve:bash ~/scripts/sprint-auto-approve.sh 10 120"
-)
-MONITOR_TABLE=""
-RESTART_COUNT_FILE="/tmp/sprint-signals/monitor-restart-counts"
-touch "$RESTART_COUNT_FILE"
+# 4. Monitor 생존 감시 + 자동 재시작 (liveness 스크립트 위임)
+#
+# F433 (Sprint 243) — 인라인 로직을 scripts/sprint-watch-liveness.sh 로 분리.
+# 감시 대상 3종 (merge/status/auto-approve). 재시작 상한 3회.
+# sprint-pipeline-finalize 는 one-shot 이므로 대상 제외 (아래 "6. Pipeline Finalize 트리거" 에서 별도 처리).
+LIVENESS_SCRIPT="$(git rev-parse --show-toplevel 2>/dev/null)/scripts/sprint-watch-liveness.sh"
+if [ -f "$LIVENESS_SCRIPT" ]; then
+  MONITOR_TABLE=$(bash "$LIVENESS_SCRIPT")
+else
+  MONITOR_TABLE="| (liveness script missing) | — | — | ⚠️ |"
+fi
 
-for ENTRY in "${MONITORS[@]}"; do
-  NAME="${ENTRY%%:*}"
-  CMD="${ENTRY#*:}"
-  PID=$(pgrep -f "$NAME" | head -1)
-
-  if [ -n "$PID" ]; then
-    UPTIME=$(ps -o etime= -p "$PID" 2>/dev/null | tr -d ' ')
-    MONITOR_TABLE+="| $NAME | $PID | $UPTIME | ✅ |\n"
-  else
-    # 재시작 카운터 확인 (3회 초과 시 중단)
-    PREV_COUNT=$(grep "^${NAME}=" "$RESTART_COUNT_FILE" 2>/dev/null | cut -d= -f2 || echo 0)
-    if [ "${PREV_COUNT:-0}" -lt 3 ]; then
-      LOG="/tmp/sprint-signals/${NAME}-restart.log"
-      nohup $CMD > "$LOG" 2>&1 & disown
-      NEW_PID=$!
-      NEW_COUNT=$((PREV_COUNT + 1))
-      sed -i "/^${NAME}=/d" "$RESTART_COUNT_FILE"
-      echo "${NAME}=${NEW_COUNT}" >> "$RESTART_COUNT_FILE"
-      MONITOR_TABLE+="| $NAME | $NEW_PID | 0s | 🔄 재시작 (${NEW_COUNT}/3) |\n"
-    else
-      MONITOR_TABLE+="| $NAME | — | — | ❌ 재시작 한도 초과 |\n"
-    fi
-  fi
-done
-
-# 5. Pipeline State 읽기 (Pipeline 활성 시)
+# 5. Pipeline State 읽기 (Phase 6~8 실데이터 연동 — F433)
 STATE_FILE="/tmp/sprint-pipeline-state.json"
 PIPELINE_ACTIVE=false
 if [ -f "$STATE_FILE" ]; then
-  PIPELINE_STATUS=$(python3 -c "
+  PIPELINE_STATUS=$(python3 <<'PY' 2>/dev/null
 import json, sys
 try:
-    with open('$STATE_FILE') as f:
-        state = json.load(f)
-    if state.get('status') != 'completed':
-        phases = [
-            ('1~3 배치 계획', 'done' if state.get('batches') else 'pending'),
-            ('4 배치 실행', 'done' if all(b.get('status')=='done' for b in state.get('batches',[])) else 'running'),
-            ('5 완료 보고', 'done' if state.get('phase6',{}).get('status')!='pending' else 'pending'),
-            ('6 Gap Analyze', state.get('phase6',{}).get('status','pending')),
-            ('7 Iterator', state.get('phase7',{}).get('status','pending')),
-            ('8 Session-End', state.get('phase8',{}).get('status','pending')),
-        ]
-        icons = {'done':'✅','running':'🔧','pending':'⏳','skipped':'⏭️','failed':'❌'}
-        for name, status in phases:
-            icon = icons.get(status, '?')
-            print(f'| {name} | {icon} |')
-        print('ACTIVE')
-    else:
-        print('COMPLETED')
+    s = json.load(open("/tmp/sprint-pipeline-state.json"))
 except Exception as e:
-    print(f'ERROR: {e}', file=sys.stderr)
-  " 2>/dev/null)
+    print(f"ERROR: {e}", file=sys.stderr); sys.exit(0)
+
+if s.get("status") == "completed":
+    print("COMPLETED"); sys.exit(0)
+
+batches = s.get("batches", [])
+b_all = bool(batches) and all(b.get("status") == "completed" for b in batches)
+p6 = s.get("phase6", {}) or {}
+p7 = s.get("phase7", {}) or {}
+p8 = s.get("phase8", {}) or {}
+
+agg = p6.get("aggregate_match_rate")
+mn  = p6.get("min_match_rate")
+p6_label = f"6 Gap Analyze (avg {agg if agg is not None else '-'}%, min {mn if mn is not None else '-'}%)"
+p7_label = f"7 Iterator (count {p7.get('iterate_count', 0)}/{p7.get('max_iterate', 3)})"
+p8_label = "8 Session-End"
+
+rows = [
+    ("1~3 배치 계획", "completed" if batches else "pending"),
+    ("4 배치 실행", "completed" if b_all else "running"),
+    ("5 완료 보고 (배치 단위)", "completed" if b_all else "pending"),
+    (p6_label, p6.get("status", "pending")),
+    (p7_label, p7.get("status", "pending")),
+    (p8_label, p8.get("status", "pending")),
+]
+icons = {"completed": "✅", "done": "✅", "running": "🔧", "pending": "⏳", "skipped": "⏭️", "failed": "❌"}
+for name, st in rows:
+    print(f"| {name} | {icons.get(st, '?')} |")
+print("ACTIVE")
+PY
+)
   echo "$PIPELINE_STATUS" | grep -q "ACTIVE" && PIPELINE_ACTIVE=true
+fi
+
+# 6. Pipeline Finalize 트리거 (F432/F433)
+#
+# 모든 배치 completed + phase8 pending 이면 finalize.sh 를 background 로 1회만 실행.
+# idempotent 보장: finalize.sh 는 state 기반 판정 → 재호출해도 안전.
+if [ -f "$STATE_FILE" ]; then
+  NEEDS_FINALIZE=$(python3 <<'PY'
+import json
+try:
+    s = json.load(open("/tmp/sprint-pipeline-state.json"))
+except Exception:
+    print("no"); raise SystemExit
+if s.get("status") == "completed":
+    print("no"); raise SystemExit
+batches = s.get("batches", [])
+if not batches:
+    print("no"); raise SystemExit
+b_all = all(b.get("status") == "completed" for b in batches)
+p8 = (s.get("phase8") or {}).get("status", "pending")
+print("yes" if (b_all and p8 in ("pending", "running")) else "no")
+PY
+)
+  if [ "$NEEDS_FINALIZE" = "yes" ]; then
+    if ! pgrep -f sprint-pipeline-finalize > /dev/null 2>&1; then
+      FINALIZE="$(git rev-parse --show-toplevel 2>/dev/null)/scripts/sprint-pipeline-finalize.sh"
+      if [ -f "$FINALIZE" ]; then
+        nohup bash "$FINALIZE" > /tmp/sprint-pipeline-finalize.log 2>&1 & disown
+        echo "🚀 sprint-pipeline-finalize 자동 실행 (PID: $!)"
+      fi
+    fi
+  fi
 fi
 ```
 
