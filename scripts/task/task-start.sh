@@ -305,6 +305,18 @@ if command -v gh >/dev/null 2>&1; then
   fi
 fi
 
+# ─── Step 6b: GitHub Projects Board 추가 (F501) ──────────────────────────────
+# Issue 생성 성공 시 Foundry-X Kanban 보드에 자동 추가.
+# 실패해도 task 시작은 계속 — board 연동은 부가 기능.
+if [ -n "$ISSUE_URL" ] && command -v gh >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+  PROJECT_NUM=$(GH_TOKEN="${GH_TOKEN:-$GH_TOKEN_TMP}" gh project list --owner KTDS-AXBD --format json 2>/dev/null \
+    | jq -r '.projects[]? | select(.title=="Foundry-X Kanban") | .number' | head -1 || true)
+  if [ -n "$PROJECT_NUM" ]; then
+    GH_TOKEN="${GH_TOKEN:-$GH_TOKEN_TMP}" gh project item-add "$PROJECT_NUM" \
+      --owner KTDS-AXBD --url "$ISSUE_URL" >/dev/null 2>&1 || true
+  fi
+fi
+
 # ─── Step 7: cache + log ─────────────────────────────────────────────────────
 cache_upsert_task "$TASK_ID" "in_progress" "$TRACK" "$PANE_ID" "$WT_PATH" "$BRANCH" "$ISSUE_URL"
 log_event "$TASK_ID" "started" "$(jq -nc \
