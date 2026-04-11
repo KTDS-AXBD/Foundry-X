@@ -358,25 +358,97 @@ phase_recover() {
 
   [ -d "$wt" ] || { log "복구: ${tid} WT 없음 — 포기"; return 1; }
 
-  # 미커밋 변경이 있으면 WT에서 task-complete 실행
-  local dirty
-  dirty=$(cd "$wt" && git status --porcelain 2>/dev/null | head -1 || true)
-  local commits
-  commits=$(cd "$wt" && git rev-list master..HEAD --count 2>/dev/null || echo 0)
+  # working tree 활동 측정 (FX-REQ-517 / C23):
+  # task-start.sh가 만든 meta init 커밋과 hook이 갱신하는 .task-context/.task-prompt는
+  # "worker 작업 흔적"이 아니므로 모두 제외한다.
+  #
+  #   work_commits = BASE_SHA..HEAD 중 'task context init' 메시지가 아닌 커밋 수
+  #   additions    = .task-context/.task-prompt 제외한 uncommitted line additions 합
+  #   work_files   = .task-context/.task-prompt 제외한 porcelain 엔트리 수 (untracked 포함)
+  local base_sha=""
+  [ -f "$wt/.task-context" ] && \
+    base_sha=$(grep '^BASE_SHA=' "$wt/.task-context" 2>/dev/null | head -1 | cut -d= -f2- || true)
 
-  if [ -n "$dirty" ] || [ "$commits" -gt 0 ]; then
-    log "복구: ${tid} — 변경 ${commits} commits + dirty=${dirty:+yes} → task-complete 실행"
-    (cd "$wt" && bash "$REPO_ROOT/scripts/task/task-complete.sh") >> "$DAEMON_LOG" 2>&1 || {
-      log "복구: ${tid} task-complete 실패"
-      return 1
-    }
+  local work_commits=0
+  if [ -n "$base_sha" ]; then
+    work_commits=$(cd "$wt" && git log --format='%s' "${base_sha}..HEAD" 2>/dev/null \
+      | grep -cv 'task context init' || true)
   else
-    # 변경 없으면 빈 signal 생성
-    log "복구: ${tid} — 변경 없음 → 빈 signal 생성"
-    write_signal "$tid" "DONE" \
-      "BRANCH=$(jq -r --arg id "$tid" '.tasks[$id].branch // ""' "$FX_CACHE")" \
-      "PR_URL=none" "COMMIT_COUNT=0" "WT_PATH=$wt" "PANE_ID=unknown"
+    # BASE_SHA 미상 — master..HEAD에서 meta init 1개를 보수적으로 차감
+    local total
+    total=$(cd "$wt" && git rev-list master..HEAD --count 2>/dev/null || echo 0)
+    work_commits=$(( total > 0 ? total - 1 : 0 ))
   fi
+
+  local additions
+  additions=$(cd "$wt" && git diff --numstat HEAD 2>/dev/null \
+    | awk '$1 != "-" && $3 != ".task-context" && $3 != ".task-prompt" {sum+=$1} END {print sum+0}')
+
+  local work_files
+  work_files=$(cd "$wt" && git status --porcelain 2>/dev/null \
+    | grep -Ev '(^| )\.task-(context|prompt)$' \
+    | grep -c . || true)
+
+  : "${additions:=0}" "${work_files:=0}" "${work_commits:=0}"
+
+  # Empty-diff guard: worker가 실제 작업 산출물을 0건 만든 경우 → retry 큐로 라우팅.
+  # 기존 동작은 빈 signal을 써서 silently DONE 처리했지만, 이는 부팅 실패 / Claude
+  # crash 와 구분 불가 → 사용자 인지 기회 상실 (S256 교훈). 이제 명시 승인 필요.
+  if [ "$work_files" -eq 0 ] && [ "$work_commits" -eq 0 ] && [ "$additions" -eq 0 ]; then
+    enqueue_retry "$tid" "$wt"
+    return 0
+  fi
+
+  log "복구: ${tid} — work_commits=${work_commits} work_files=${work_files} → task-complete 실행"
+  (cd "$wt" && bash "$REPO_ROOT/scripts/task/task-complete.sh") >> "$DAEMON_LOG" 2>&1 || {
+    log "복구: ${tid} task-complete 실패"
+    return 1
+  }
+}
+
+# Worker가 파일 변경 없이 idle/dead 상태로 빠진 task를 retry queue에 등록.
+# /tmp/task-retry/{project}-{task_id}.json — task-retry.sh가 사용자 승인 후 재실행.
+# attempts는 호출마다 누적 (기존 파일 보존하면서 카운터만 증가).
+enqueue_retry() {
+  local tid="$1" wt="$2"
+  local retry_dir="/tmp/task-retry"
+  mkdir -p "$retry_dir"
+  local retry_file="${retry_dir}/${PROJECT}-${tid}.json"
+
+  local req_code="" track="" title="" branch="" prompt=""
+  if [ -f "$wt/.task-context" ]; then
+    req_code=$(grep '^REQ_ID=' "$wt/.task-context" 2>/dev/null | head -1 | cut -d= -f2- || true)
+    track=$(grep '^TASK_TYPE=' "$wt/.task-context" 2>/dev/null | head -1 | cut -d= -f2- || true)
+    title=$(grep '^TITLE=' "$wt/.task-context" 2>/dev/null | head -1 | cut -d= -f2- || true)
+    branch=$(grep '^BRANCH=' "$wt/.task-context" 2>/dev/null | head -1 | cut -d= -f2- || true)
+  fi
+  [ -f "$wt/.task-prompt" ] && prompt=$(cat "$wt/.task-prompt")
+
+  local prev_attempts=0
+  if [ -f "$retry_file" ]; then
+    prev_attempts=$(jq -r '.attempts // 0' "$retry_file" 2>/dev/null || echo 0)
+  fi
+  local attempts=$(( prev_attempts + 1 ))
+
+  local tmp; tmp=$(mktemp)
+  jq -n \
+    --arg id "$tid" \
+    --arg req "$req_code" \
+    --arg tr "$track" \
+    --arg ti "$title" \
+    --arg pr "$prompt" \
+    --argjson at "$attempts" \
+    --arg er "worker_inactive_empty_diff" \
+    --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    --arg w "$wt" \
+    --arg br "$branch" \
+    '{task_id:$id, req_code:$req, track:$tr, title:$ti, prompt:$pr,
+      attempts:$at, last_error:$er, timestamp:$ts, wt_path:$w, branch:$br}' \
+    > "$tmp" && mv "$tmp" "$retry_file"
+
+  log "❗ retry:${tid} — worker inactive, no file changes detected (attempts=${attempts})"
+  log_event "$tid" "phase_recover_retry_queued" \
+    "$(jq -nc --argjson a "$attempts" '{attempts:$a, reason:"worker_inactive_empty_diff"}')"
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -499,6 +571,10 @@ case "${1:-}" in
     ;;
   --status)
     show_status
+    ;;
+  __debug-recover)
+    # 단위 테스트 진입점 — phase_recover 직접 호출 (FX-REQ-517 / C23)
+    phase_recover "${2:?task_id required}" "${3:?wt_path required}"
     ;;
   --enqueue)
     # 편의 기능: 큐 추가
