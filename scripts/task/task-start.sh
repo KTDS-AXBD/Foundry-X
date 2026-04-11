@@ -290,7 +290,11 @@ EOF
 # ─── Step 5: tmux split (best effort — non-fatal in S-α) ─────────────────────
 PANE_ID=""
 if [ -n "${TMUX:-}" ]; then
-  PANE_ID=$(tmux split-window -h -P -F '#{pane_id}' -c "$WT_PATH" 2>/dev/null || echo "")
+  # S260 C28 HOME propagation — tmux default shell이 login shell로 뜨면서
+  # HOME을 pwent 값(/home/sinclair)으로 리셋하는 것을 -e HOME=로 명시 override.
+  # Master의 multi-account HOME(.claude-work)을 worker가 상속하여
+  # statusline/oauth/subscription 계정 정합성 유지.
+  PANE_ID=$(tmux split-window -h -e HOME="$HOME" -P -F '#{pane_id}' -c "$WT_PATH" 2>/dev/null || echo "")
   if [ -n "$PANE_ID" ]; then
     tmux select-pane -t "$PANE_ID" -T "${TASK_ID} ${TITLE}" 2>/dev/null || true
     # bidirectional verification via user-data
@@ -367,6 +371,10 @@ if [ -n "$PANE_ID" ]; then
   RENAME_LABEL="${TASK_ID} ${TITLE}"
   INJECT_SCRIPT="/tmp/task-signals/inject-${TASK_ID}.sh"
   CCS_BIN=$(command -v ccs 2>/dev/null || echo "/home/sinclair/.local/bin/ccs")
+  # S260 C28: WT worker는 토큰 비용 절감 위해 Sonnet 강제.
+  # feedback_sprint_model.md "Master=Opus, WT=Sonnet" 원칙의 구현.
+  # 사용자는 worker 세션에서 /model 명령으로 수동 변경 가능.
+  CCS_WT_CMD="${CCS_BIN} --model claude-sonnet-4-6"
 
   cat > "$INJECT_SCRIPT" << INJECT_EOF
 #!/usr/bin/env bash
@@ -376,7 +384,7 @@ MAX_WAIT=30
 BOOT_CHECK_INTERVAL=2
 
 # Step 1: ccs 실행
-tmux send-keys -t "\$PANE" "${CCS_BIN}" Enter
+tmux send-keys -t "\$PANE" "${CCS_WT_CMD}" Enter
 sleep 3
 
 # Step 2: Claude 부팅 대기 (프롬프트 '❯' 출현까지, 최대 MAX_WAIT초)
