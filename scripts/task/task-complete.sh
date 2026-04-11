@@ -27,7 +27,13 @@ else
 fi
 
 NO_PR=false
-[ "${1:-}" = "--no-pr" ] && NO_PR=true
+DRY_RUN=false
+for arg in "$@"; do
+  case "$arg" in
+    --no-pr)   NO_PR=true ;;
+    --dry-run) DRY_RUN=true ;;
+  esac
+done
 
 # ─── Step 1: .task-context 읽기 ─────────────────────────────────────────────
 TASK_CTX=".task-context"
@@ -68,10 +74,39 @@ if [ -f "$SCREENSHOT_SCRIPT" ]; then
   bash "$SCREENSHOT_SCRIPT" 2>&1 | sed 's/^/  /' || true
 fi
 
-# ─── Step 3: push + PR 생성 ─────────────────────────────────────────────────
+# ─── Step 2c: empty commit 감지 (FX-REQ-514 / C22) ───────────────────────────
+# Worker가 아무 파일 변경 없이 (또는 --allow-empty로) 커밋만 만든 경우, PR 생성·
+# signal 작성·cache 'done' 갱신을 모두 거부하고 exit 22로 종료해요.
+# 측정 범위는 master..HEAD 전체 합계 — 여러 커밋 중 마지막만 빈 false-positive 회피.
+# `- -` (binary) 행은 숫자 2개 행 조건에 걸리지 않으므로 무시되지만, 바이너리-only
+# 변경도 유효한 변경이므로 별도로 1을 더해줘요.
 PR_URL=""
 COMMIT_COUNT=$(git rev-list master..HEAD --count 2>/dev/null || echo "0")
 
+if [ "$COMMIT_COUNT" -gt 0 ]; then
+  TOTAL_CHANGES=$(git diff --numstat master..HEAD 2>/dev/null | awk '
+    BEGIN { sum = 0 }
+    $1 ~ /^[0-9]+$/ && $2 ~ /^[0-9]+$/ { sum += $1 + $2; next }
+    $1 == "-" && $2 == "-" { sum += 1 }
+    END { print sum+0 }
+  ')
+  if [ "${TOTAL_CHANGES:-0}" -eq 0 ]; then
+    echo "[fx-task-complete] ❌ EMPTY_COMMIT_REJECTED — worker produced no file changes, empty commit rejected" >&2
+    if [ "$DRY_RUN" = false ]; then
+      cache_upsert_task "$TASK_ID" "empty_rejected" "$TASK_TYPE" "${TMUX_PANE:-}" "$(pwd)" "$BRANCH" ""
+      log_event "$TASK_ID" "empty_commit_rejected" \
+        "$(jq -nc --arg commits "$COMMIT_COUNT" '{commit_count: ($commits|tonumber)}')"
+    fi
+    exit 22
+  fi
+fi
+
+if [ "$DRY_RUN" = true ]; then
+  echo "[fx-task-complete] dry-run OK — empty check passed (changes=${TOTAL_CHANGES:-0}, commits=${COMMIT_COUNT})"
+  exit 0
+fi
+
+# ─── Step 3: push + PR 생성 ─────────────────────────────────────────────────
 if [ "$COMMIT_COUNT" -gt 0 ]; then
   echo "[fx-task-complete] ${COMMIT_COUNT} commits — push to ${BRANCH}"
   # Fail-fast: if push fails with commits present, do NOT write a DONE signal.
