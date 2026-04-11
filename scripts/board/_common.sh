@@ -10,6 +10,13 @@ set -euo pipefail
 board::require() {
   command -v gh >/dev/null 2>&1 || { echo "[board] gh CLI 필요" >&2; exit 1; }
   command -v jq >/dev/null 2>&1 || { echo "[board] jq 필요" >&2; exit 1; }
+  # GitHub Projects v2 scope 검증 — 빠뜨리면 gh project list가 silent fail
+  # S255 audit 교훈: scope 부족 → 빈 출력 → drift 오판
+  if ! gh auth status 2>&1 | grep -q "Token scopes.*read:project"; then
+    echo "[board] 토큰 scope 부족: 'read:project' 필요" >&2
+    echo "[board] 수정: gh auth refresh -s read:project,project" >&2
+    exit 3
+  fi
 }
 
 board::project_num() {

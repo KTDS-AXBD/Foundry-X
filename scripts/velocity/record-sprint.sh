@@ -93,6 +93,17 @@ OUT_DIR="docs/metrics/velocity"
 mkdir -p "$OUT_DIR"
 OUT="${OUT_DIR}/sprint-${SPRINT_NUM}.json"
 
+# Clobber guard (S255 dogfood 교훈): 기존 파일에 F-items가 있고, 이번 실행이
+# 빈 F-items (context 부재)라면 overwrite 거부 — 수동/backfill 데이터 보호
+if [ -f "$OUT" ] && [ -z "$F_ITEMS" ]; then
+  EXISTING_F=$(grep -oP '"f_items"\s*:\s*"\K[^"]+' "$OUT" 2>/dev/null || true)
+  if [ -n "$EXISTING_F" ]; then
+    echo "⏭️  $OUT 이미 존재 (f_items=$EXISTING_F) — F-items 없는 실행으로 overwrite 거부" >&2
+    echo "   강제 갱신 필요 시 .sprint-context에 F_ITEMS= 를 설정하거나 --force 플래그 사용" >&2
+    exit 0
+  fi
+fi
+
 cat > "$OUT" <<JSON
 {
   "sprint": ${SPRINT_NUM},
