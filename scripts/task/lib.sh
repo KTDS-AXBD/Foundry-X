@@ -11,10 +11,14 @@ FX_LOCK_DIR="$FX_HOME/locks"
 FX_LOG="$FX_HOME/task-log.ndjson"
 FX_CACHE="$FX_HOME/tasks-cache.json"
 FX_WIP_LOG="$FX_HOME/wip-overrides.log"
+FX_SIGNAL_DIR="/tmp/task-signals"
 
 WIP_CAP="${FX_WIP_CAP:-3}"
 
-mkdir -p "$FX_LOCK_DIR" "$FX_HOME/scripts"
+# Ensure all FX runtime dirs exist — task-start.sh references FX_SIGNAL_DIR
+# before the first write_signal call (Step 5b inject script), so creating it
+# here guarantees all callers can write without a prior mkdir.
+mkdir -p "$FX_LOCK_DIR" "$FX_HOME/scripts" "$FX_SIGNAL_DIR"
 [ -f "$FX_CACHE" ] || echo '{"version":1,"tasks":{}}' > "$FX_CACHE"
 [ -f "$FX_LOG" ] || : > "$FX_LOG"
 
@@ -195,7 +199,7 @@ check_liveness() {
 }
 
 # ─── signal files (Master IPC) ──────────────────────────────────────────────
-FX_SIGNAL_DIR="/tmp/task-signals"
+# FX_SIGNAL_DIR is declared and created at top of this file (SSOT).
 
 # Write a completion signal file for Master to detect.
 # Usage: write_signal <task_id> <status> [extra_key=value ...]

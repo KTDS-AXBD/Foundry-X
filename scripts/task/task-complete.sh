@@ -74,9 +74,23 @@ COMMIT_COUNT=$(git rev-list master..HEAD --count 2>/dev/null || echo "0")
 
 if [ "$COMMIT_COUNT" -gt 0 ]; then
   echo "[fx-task-complete] ${COMMIT_COUNT} commits — push to ${BRANCH}"
-  git push origin "$BRANCH" -u 2>/dev/null || {
-    echo "[fx-task-complete] push 실패" >&2
-  }
+  # Fail-fast: if push fails with commits present, do NOT write a DONE signal.
+  # Otherwise the daemon sees PR_URL=none + COMMIT_COUNT>0, leaves MERGED=false,
+  # then still removes the worktree and deletes the branch (task-daemon.sh
+  # phase_signals lines 89–92) — permanently dropping the local commits.
+  # S257 investigation (#4): this was the silent-drop root cause.
+  if ! git push origin "$BRANCH" -u; then
+    echo "[fx-task-complete] ❌ push 실패 — signal 작성을 중단합니다." >&2
+    echo "[fx-task-complete] 복구: 원인 확인 후 수동 'git push origin ${BRANCH}' → 다시 task-complete 실행." >&2
+    exit 20
+  fi
+  # Belt-and-suspenders: verify remote contains local HEAD before proceeding.
+  LOCAL_HEAD=$(git rev-parse HEAD)
+  REMOTE_HEAD=$(git rev-parse "origin/${BRANCH}" 2>/dev/null || echo "")
+  if [ -z "$REMOTE_HEAD" ] || [ "$LOCAL_HEAD" != "$REMOTE_HEAD" ]; then
+    echo "[fx-task-complete] ❌ 원격 검증 실패 — local=${LOCAL_HEAD:0:8} remote=${REMOTE_HEAD:0:8}. signal 작성을 중단합니다." >&2
+    exit 21
+  fi
 
   if [ "$NO_PR" = false ] && command -v gh >/dev/null 2>&1; then
     # PR이 이미 있는지 확인

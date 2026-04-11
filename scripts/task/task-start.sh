@@ -216,6 +216,13 @@ fi
 
 # ─── Step 5b: auto-inject Claude session + prompt (background) ──────────────
 if [ -n "$PANE_ID" ]; then
+  # Autonomous completion principle — appended to every task prompt to
+  # prevent the "worker-blocked-on-user" interview loop. Workers must drive
+  # tasks to completion without asking Master for confirmation on routine
+  # decisions; only block on genuine ambiguity (conflicting requirements,
+  # missing access). See MEMORY feedback: S256 interview-loop incident.
+  AUTONOMY_RULE="자율 완료 원칙: 결정이 필요한 지점에서 사용자 확인을 기다리지 말고 합리적 기본값으로 진행하세요. 막히면 commit+stash 후 task-complete로 넘기세요. 진짜 막힌 경우(권한 부재/요구 충돌)만 예외. 작업 완료 후 반드시 bash scripts/task/task-complete.sh 를 실행해서 커밋/PR/signal 처리해줘."
+
   # Generate default prompt if not provided
   if [ -z "$PROMPT" ]; then
     case "$TRACK" in
@@ -224,12 +231,12 @@ if [ -n "$PANE_ID" ]; then
       C) TRACK_DESC="점검/Chore 작업" ;;
       X) TRACK_DESC="실험/Spike 탐색" ;;
     esac
-    PROMPT="이 worktree는 task ${TASK_ID} — ${TITLE}. .task-context 파일을 읽고 ${TRACK_DESC}을 진행해줘. 작업 완료 후 반드시 bash scripts/task/task-complete.sh 를 실행해서 커밋/PR/signal 처리해줘."
+    PROMPT="이 worktree는 task ${TASK_ID} — ${TITLE}. .task-context 파일을 읽고 ${TRACK_DESC}을 진행해줘. ${AUTONOMY_RULE}"
   fi
 
-  # Append completion instruction to custom prompts
+  # Append autonomy + completion instruction to custom prompts
   if ! echo "$PROMPT" | grep -q "task-complete.sh"; then
-    PROMPT="${PROMPT} 작업 완료 후 반드시 bash scripts/task/task-complete.sh 를 실행해서 커밋/PR/signal 처리해줘."
+    PROMPT="${PROMPT} ${AUTONOMY_RULE}"
   fi
 
   # Write prompt to WT for Claude to pick up

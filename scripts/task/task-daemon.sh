@@ -85,14 +85,24 @@ phase_signals() {
       (cd "$REPO_ROOT" && git pull origin master --ff-only 2>/dev/null) || true
     fi
 
-    # WT 제거
-    if [ -n "$WT_PATH" ] && [ -d "$WT_PATH" ]; then
-      (cd "$REPO_ROOT" && git worktree remove "$WT_PATH" --force 2>/dev/null) || true
+    # Safety guard (S257 #4): only destroy WT+branch when either
+    #   (a) merge succeeded, OR (b) truly zero commits + no PR (empty task).
+    # If commits exist but nothing was merged, the WT/branch are the only
+    # place those commits live — removing them = silent data loss.
+    local PRESERVED=false
+    if [ "$MERGED" = true ] || { [ "${PR_URL:-none}" = "none" ] && [ "${COMMIT_COUNT:-0}" = "0" ]; }; then
+      # WT 제거
+      if [ -n "$WT_PATH" ] && [ -d "$WT_PATH" ]; then
+        (cd "$REPO_ROOT" && git worktree remove "$WT_PATH" --force 2>/dev/null) || true
+      fi
+      [ -n "$BRANCH" ] && (cd "$REPO_ROOT" && git branch -D "$BRANCH" 2>/dev/null) || true
+    else
+      log "🛡️  ${TASK_ID}: MERGED=false + commits=${COMMIT_COUNT:-0} — WT/branch 보존 (silent drop 방지)"
+      PRESERVED=true
     fi
-    [ -n "$BRANCH" ] && (cd "$REPO_ROOT" && git branch -D "$BRANCH" 2>/dev/null) || true
 
-    # pane 종료
-    if [ -n "$PANE_ID" ] && [ "$PANE_ID" != "unknown" ]; then
+    # pane 종료 (preserved task는 pane도 살려둬서 수동 복구 가능)
+    if [ "$PRESERVED" = false ] && [ -n "$PANE_ID" ] && [ "$PANE_ID" != "unknown" ]; then
       tmux kill-pane -t "$PANE_ID" 2>/dev/null || true
     fi
 
@@ -107,7 +117,11 @@ phase_signals() {
 
     # cache + cleanup
     local FINAL_STATUS="merged"
-    [ "$MERGED" = false ] && FINAL_STATUS="done_pending_merge"
+    if [ "$PRESERVED" = true ]; then
+      FINAL_STATUS="needs_manual_review"
+    elif [ "$MERGED" = false ]; then
+      FINAL_STATUS="done_pending_merge"
+    fi
     cache_upsert_task "$TASK_ID" "$FINAL_STATUS" "" "" "" "$BRANCH" "${PR_URL:-}"
     log_event "$TASK_ID" "daemon_processed" "$(jq -nc --arg s "$FINAL_STATUS" '{status:$s}')"
     rm -f "$sig_file"
