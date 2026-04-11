@@ -1,0 +1,11 @@
+{
+  "sprint": 244,
+  "phase": 31,
+  "f_items": "F499,F500",
+  "f_count": 2,
+  "match_rate": 95.0,
+  "duration_minutes": 38,
+  "test_result": "pass",
+  "created": "2026-04-10T20:00:00+09:00",
+  "recorded_at": "2026-04-11T13:50:00+09:00"
+}
