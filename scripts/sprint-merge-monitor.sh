@@ -119,6 +119,16 @@ handle_merge() {
     return
   fi
 
+  # 3b) PR 본문 enrich (F504) — Sprint/F-item/Match Rate 메타 블록 삽입
+  local f_items match_rate enrich_script
+  f_items=$(sig_get "$sig" "F_ITEMS")
+  match_rate=$(sig_get "$sig" "MATCH_RATE")
+  enrich_script="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/board/pr-body-enrich.sh"
+  if [ -f "$enrich_script" ] && [ -n "$f_items" ]; then
+    bash "$enrich_script" "$pr_num" "$sprint_num" "$f_items" "${match_rate:-N/A}" \
+      >>"$LOG_FILE" 2>&1 || log "sprint-${sprint_num} — warn: pr-body-enrich failed (non-fatal)"
+  fi
+
   # 4) squash merge with retry/backoff
   local merged=0
   for attempt in $(seq 1 "$MAX_RETRY"); do
@@ -143,10 +153,24 @@ handle_merge() {
   fi
 
   # 6) Board 동기화 (F504) — 연관 Issue를 Done 컬럼으로 이동
-  local board_script
-  board_script="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/board/board-on-merge.sh"
-  if [ -f "$board_script" ]; then
-    bash "$board_script" "$pr_num" >>"$LOG_FILE" 2>&1 || true
+  local script_dir
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  if [ -f "${script_dir}/board/board-on-merge.sh" ]; then
+    bash "${script_dir}/board/board-on-merge.sh" "$pr_num" >>"$LOG_FILE" 2>&1 || true
+  fi
+
+  # 6b) Velocity 메트릭 기록 (F505) — docs/metrics/velocity/sprint-N.json
+  if [ -f "${script_dir}/velocity/record-sprint.sh" ]; then
+    (cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" \
+      && bash "${script_dir}/velocity/record-sprint.sh" "$sprint_num") \
+      >>"$LOG_FILE" 2>&1 || log "sprint-${sprint_num} — warn: velocity record failed (non-fatal)"
+  fi
+
+  # 6c) Phase 진행률 갱신 (F506) — Milestone 기반 phase-progress
+  if [ -f "${script_dir}/epic/phase-progress.sh" ] && [ -n "$f_items" ]; then
+    (cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" \
+      && bash "${script_dir}/epic/phase-progress.sh") \
+      >>"$LOG_FILE" 2>&1 || log "sprint-${sprint_num} — warn: phase-progress failed (non-fatal)"
   fi
 
   # 7) mark merged
