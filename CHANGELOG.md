@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - F508: Phase 32 Integration Gap 해소 — ax 스킬 4종(gov-retro, req-manage, session-end, todo)에 Phase 32 스크립트 통합 + sprint-merge-monitor 3훅 (pr-body-enrich/velocity/epic) + CHANGELOG [Phase 32] 롤업 + priority-history F507 backfill + velocity phase 감지 버그 수정 + Sprint 245~248 velocity backfill + board-sync-spec --fix 모드 (Sprint 255 S255)
 
 ### Fixed
+- **S260 C27** (PR #494, FX-REQ-521): task-daemon `phase_signals` cleanup에 pre-eviction 스윕 추가 — `git worktree remove --force` 직전에 `tmux list-panes -a`로 `$WT_PATH` 자체/하위 cwd를 가진 모든 pane을 `kill-pane`, `log_event daemon_pre_evict` JSONL 기록. S257 tmux 3.4 segfault 이후 3층 방어(3.5a 근본 + pre-evict 실행중 + orphan-scan Phase 4 post-hoc)의 두 번째 층
+- **S260 HOME scan Phase 4** (git 비추적): `/home/sinclair/scripts/git-orphan-scan.sh`에 tmux pane zombie 탐지 phase 추가 — cwd 물리 부재 / `$CLAUDE_WT_BASE/$PROJECT/*` 하위 worktree list 이탈 / `pane_dead=1`. quiet 모드에 `(tmux zombies: N)` suffix, JSON `zombie_panes` 배열. exit code는 git orphan에만 반응(좀비는 환경 상태)
 - F505: velocity record-sprint.sh의 MEMORY.md 경로가 C10 symlink 이후 미대응이었던 문제 (.claude-work/ 우선 fallback)
 - F505: velocity phase 감지 휴리스틱 버그 — "max Phase 번호" 방식이 Sprint 245/247을 Phase 31로 잘못 기록 (S255 audit에서 감지, 4단계 cascade로 재설계)
 - F505: record-sprint.sh가 빈 F_ITEMS 실행 시 기존 backfill 데이터를 clobber하던 문제 (보호 guard 추가)
