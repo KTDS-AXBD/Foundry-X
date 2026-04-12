@@ -44,6 +44,10 @@
 ### Green 커밋 규칙
 - 메시지: `feat(scope): F### green — describe implementation`
 
+## Refactor Phase (선택)
+- Green 통과 후 코드 정리. 테스트 여전히 PASS 유지
+- 커밋: `refactor(scope): F### — describe cleanup`
+
 ## E2E Red Phase 특칙
 
 - Playwright `page.route()` mock 설정은 "테스트 인프라"로 간주하여 Red Phase에서 허용
