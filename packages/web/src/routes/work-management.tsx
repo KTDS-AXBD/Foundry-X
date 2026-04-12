@@ -40,6 +40,27 @@ interface ClassifyResult {
   method: "llm" | "regex";
 }
 
+type SessionStatus = "busy" | "idle" | "done";
+type SessionProfile = "coder" | "reviewer" | "tester" | "unknown";
+
+interface AgentSession {
+  id: string;
+  name: string;
+  status: SessionStatus;
+  profile: SessionProfile;
+  worktree?: string;
+  branch?: string;
+  windows: number;
+  last_activity?: string;
+  collected_at: string;
+}
+
+interface SessionList {
+  sessions: AgentSession[];
+  worktrees: Array<{ path: string; branch: string }>;
+  last_sync: string;
+}
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const COLUMNS: { key: WorkStatus; label: string; color: string }[] = [
@@ -122,6 +143,198 @@ function ItemCard({ item }: { item: WorkItem }) {
         {item.priority && <Badge label={priority} color={PRIORITY_COLORS[priority] ?? "#6b7280"} />}
         {item.req_code && <Badge label={item.req_code} color="#0ea5e9" />}
       </div>
+    </div>
+  );
+}
+
+const STATUS_META: Record<SessionStatus, { label: string; dot: string; color: string }> = {
+  busy:  { label: "BUSY",  dot: "🟢", color: "#22c55e" },
+  idle:  { label: "IDLE",  dot: "🟡", color: "#f59e0b" },
+  done:  { label: "DONE",  dot: "⚫", color: "#6b7280" },
+};
+
+const PROFILE_META: Record<SessionProfile, { label: string; color: string }> = {
+  coder:    { label: "coder",    color: "#3b82f6" },
+  reviewer: { label: "reviewer", color: "#8b5cf6" },
+  tester:   { label: "tester",   color: "#06b6d4" },
+  unknown:  { label: "unknown",  color: "#6b7280" },
+};
+
+function SessionCard({ session }: { session: AgentSession }) {
+  const statusMeta = STATUS_META[session.status];
+  const profileMeta = PROFILE_META[session.profile];
+  return (
+    <div
+      style={{
+        background: "#1e293b",
+        border: `1px solid ${statusMeta.color}44`,
+        borderRadius: 8,
+        padding: "10px 12px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{ fontSize: 14 }}>{statusMeta.dot}</span>
+        <span style={{ fontWeight: 600, fontSize: 13, color: "#f1f5f9", flex: 1 }}>{session.name}</span>
+        <Badge label={statusMeta.label} color={statusMeta.color} />
+      </div>
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+        <Badge label={profileMeta.label} color={profileMeta.color} />
+        {session.windows > 1 && (
+          <Badge label={`${session.windows}w`} color="#475569" />
+        )}
+      </div>
+      {session.branch && (
+        <div style={{ fontSize: 11, color: "#64748b", fontFamily: "monospace" }}>
+          {session.branch}
+        </div>
+      )}
+      {session.last_activity && (
+        <div style={{ fontSize: 11, color: "#334155" }}>
+          활동: {formatDate(session.last_activity)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SessionsTab({ data }: { data: SessionList | null }) {
+  if (!data) {
+    return <div style={{ color: "#94a3b8", padding: 20 }}>불러오는 중…</div>;
+  }
+
+  const busy = data.sessions.filter(s => s.status === "busy");
+  const idle = data.sessions.filter(s => s.status === "idle");
+  const done = data.sessions.filter(s => s.status === "done");
+
+  const syncAge = data.last_sync
+    ? Math.round((Date.now() - new Date(data.last_sync).getTime()) / 1000)
+    : null;
+
+  const syncStale = syncAge !== null && syncAge > 120;
+
+  return (
+    <div>
+      {/* Status bar */}
+      <div
+        style={{
+          display: "flex",
+          gap: 20,
+          marginBottom: 20,
+          background: "#0f172a",
+          padding: "10px 14px",
+          borderRadius: 8,
+          alignItems: "center",
+        }}
+      >
+        {[
+          { label: "Busy",  value: busy.length,  color: "#22c55e" },
+          { label: "Idle",  value: idle.length,  color: "#f59e0b" },
+          { label: "Done",  value: done.length,  color: "#6b7280" },
+        ].map(({ label, value, color }) => (
+          <div key={label} style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color }}>{value}</div>
+            <div style={{ fontSize: 11, color: "#64748b" }}>{label}</div>
+          </div>
+        ))}
+        <div style={{ marginLeft: "auto", fontSize: 11, color: syncStale ? "#ef4444" : "#334155" }}>
+          {syncAge !== null
+            ? syncStale
+              ? `⚠️ sync 끊김 (${syncAge}s ago)`
+              : `Last sync: ${syncAge}s ago`
+            : "동기화 대기 중"}
+        </div>
+      </div>
+
+      {data.sessions.length === 0 ? (
+        <div
+          style={{
+            border: "1px dashed #1e293b",
+            borderRadius: 8,
+            padding: 24,
+            color: "#475569",
+            textAlign: "center",
+            fontSize: 13,
+          }}
+        >
+          활성 세션 없음 — session-collector.sh가 실행 중인지 확인하세요
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 24 }}>
+          {[
+            { label: "BUSY",  items: busy,  color: "#22c55e" },
+            { label: "IDLE",  items: idle,  color: "#f59e0b" },
+            { label: "DONE",  items: done,  color: "#6b7280" },
+          ].map(col => (
+            <div key={col.label}>
+              <div
+                style={{
+                  padding: "6px 10px",
+                  background: col.color + "22",
+                  border: `1px solid ${col.color}44`,
+                  borderRadius: 6,
+                  marginBottom: 8,
+                  fontWeight: 600,
+                  fontSize: 12,
+                  color: col.color,
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <span>{col.label}</span>
+                <span style={{ opacity: 0.7 }}>{col.items.length}</span>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {col.items.length === 0 ? (
+                  <div
+                    style={{
+                      border: "1px dashed #1e293b",
+                      borderRadius: 6,
+                      padding: 12,
+                      color: "#334155",
+                      fontSize: 12,
+                      textAlign: "center",
+                    }}
+                  >
+                    비어있음
+                  </div>
+                ) : (
+                  col.items.map(s => <SessionCard key={s.id} session={s} />)
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Worktrees */}
+      {data.worktrees.length > 0 && (
+        <section>
+          <h3 style={{ color: "#94a3b8", fontSize: 13, marginBottom: 10 }}>
+            Worktrees ({data.worktrees.length})
+          </h3>
+          <div style={{ fontFamily: "monospace" }}>
+            {data.worktrees.map((wt, i) => (
+              <div
+                key={i}
+                style={{
+                  padding: "6px 10px",
+                  borderBottom: "1px solid #1e293b",
+                  fontSize: 12,
+                  display: "flex",
+                  gap: 10,
+                }}
+              >
+                <span style={{ color: "#64748b" }}>└</span>
+                <span style={{ color: "#cbd5e1", flex: 1 }}>{wt.path}</span>
+                <span style={{ color: "#f59e0b" }}>{wt.branch}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
@@ -436,12 +649,13 @@ function ClassifyTab() {
 
 // ─── Main Route Component ─────────────────────────────────────────────────────
 
-type Tab = "kanban" | "context" | "classify";
+type Tab = "kanban" | "context" | "classify" | "sessions";
 
 export function Component() {
   const [tab, setTab] = useState<Tab>("kanban");
   const [snapshot, setSnapshot] = useState<WorkSnapshot | null>(null);
   const [ctx, setCtx] = useState<WorkContext | null>(null);
+  const [sessions, setSessions] = useState<SessionList | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
   const fetchSnapshot = useCallback(async () => {
@@ -467,18 +681,34 @@ export function Component() {
     }
   }, []);
 
+  const fetchSessions = useCallback(async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/work/sessions`);
+      if (res.ok) {
+        setSessions((await res.json()) as SessionList);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
   // Initial fetch + 5s polling
   useEffect(() => {
     fetchSnapshot();
     fetchContext();
-    const id = setInterval(fetchSnapshot, 5000);
+    fetchSessions();
+    const id = setInterval(() => {
+      fetchSnapshot();
+      fetchSessions();
+    }, 5000);
     return () => clearInterval(id);
-  }, [fetchSnapshot, fetchContext]);
+  }, [fetchSnapshot, fetchContext, fetchSessions]);
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "kanban",   label: "Kanban" },
     { key: "context",  label: "Context Resume" },
     { key: "classify", label: "Classify" },
+    { key: "sessions", label: "Sessions" },
   ];
 
   return (
@@ -529,6 +759,7 @@ export function Component() {
       {tab === "kanban"   && <KanbanTab   snapshot={snapshot} />}
       {tab === "context"  && <ContextTab  ctx={ctx} />}
       {tab === "classify" && <ClassifyTab />}
+      {tab === "sessions" && <SessionsTab data={sessions} />}
     </div>
   );
 }

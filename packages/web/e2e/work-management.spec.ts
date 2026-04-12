@@ -1,8 +1,8 @@
 import { test, expect } from "./fixtures/auth";
 
 // @service: portal
-// @sprint: 261
-// @tagged-by: F509
+// @sprint: 261, 262
+// @tagged-by: F509, F510
 // @spec: docs/specs/fx-work-observability/prd-v1.md §5.2.1 (End-to-end 시나리오 S1)
 
 // ─── Mock payloads ───────────────────────────────────────────────────────────
@@ -32,6 +32,26 @@ const MOCK_CONTEXT = {
   note: "test-only mock context",
 };
 
+const MOCK_SESSIONS = {
+  sessions: [
+    {
+      id: "sprint-262", name: "sprint-262", status: "busy", profile: "coder",
+      worktree: "/home/sinclair/work/worktrees/Foundry-X/sprint-262",
+      branch: "sprint/262", windows: 2, last_activity: "2026-04-12T10:00:00Z",
+      collected_at: "2026-04-12T10:00:00Z",
+    },
+    {
+      id: "sprint-261", name: "sprint-261", status: "idle", profile: "reviewer",
+      branch: "sprint/261", windows: 1, last_activity: "2026-04-12T09:30:00Z",
+      collected_at: "2026-04-12T10:00:00Z",
+    },
+  ],
+  worktrees: [
+    { path: "/home/sinclair/work/worktrees/Foundry-X/sprint-262", branch: "sprint/262" },
+  ],
+  last_sync: "2026-04-12T10:00:00Z",
+};
+
 const MOCK_CLASSIFY = {
   track: "F" as const,
   priority: "P1" as const,
@@ -55,6 +75,13 @@ async function mockWorkApi(page: import("@playwright/test").Page) {
       status: 200,
       contentType: "application/json",
       body: JSON.stringify(MOCK_CONTEXT),
+    }),
+  );
+  await page.route("**/api/work/sessions", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(MOCK_SESSIONS),
     }),
   );
   await page.route("**/api/work/classify", (route) => {
@@ -129,6 +156,29 @@ test.describe("Work Management (F509 Walking Skeleton)", () => {
     await expect(page.getByText("다음 가능 Action")).toBeVisible();
     await expect(page.getByText("Sprint 261 F509 post-merge 검증")).toBeVisible();
     await expect(page.getByText("fx.minu.best /work-management 실물 확인")).toBeVisible();
+  });
+
+  test("sessions tab — renders session cards and worktrees (F510 M4)", async ({ authenticatedPage: page }) => {
+    await mockWorkApi(page);
+    await page.goto("/work-management");
+
+    await page.getByRole("button", { name: "Sessions" }).click();
+
+    // Status summary bar
+    await expect(page.getByText("Busy", { exact: true })).toBeVisible();
+    await expect(page.getByText("Idle", { exact: true })).toBeVisible();
+
+    // Session cards
+    await expect(page.getByText("sprint-262")).toBeVisible();
+    await expect(page.getByText("sprint-261")).toBeVisible();
+
+    // Profile badges
+    await expect(page.getByText("coder", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("reviewer", { exact: true }).first()).toBeVisible();
+
+    // Worktrees section
+    await expect(page.getByText("Worktrees (1)")).toBeVisible();
+    await expect(page.getByText("sprint/262")).toBeVisible();
   });
 
   test("classify flow — PRD §5.2.1 S1 step 2 (자연어 → track/priority/title)", async ({ authenticatedPage: page }) => {
