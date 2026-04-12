@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **S268** (PR #532, #534): /work-management 대시보드 대폭 개선 — Roadmap 탭(Phase 타임라인 + ROADMAP.md 미래 계획), Changelog 탭(react-markdown 렌더링), 불필요 탭 4개 제거(Context Resume/Sessions/Pipeline/Velocity), AXIS 디자인 토큰 적용, 탭 한글화, `GET /api/work/changelog` + `GET /api/work/roadmap` 엔드포인트
+- **C44/C45/C49** (PR #534): Backlog C/B/X-track 파싱(`parseBacklogItems`), 작업 분류 사용법 안내, `getPhaseProgress` SPEC §3 직접 파싱, `fetchSpecText` 캐시
+- **Phase 37 Work Lifecycle Platform** (PRD final): F516 Backlog 인입 파이프라인 + 실시간 동기화, F517 메타데이터 트레이서빌리티, F518 Work Ontology — 3 Sprint (267~269)
+- **C50**: req-interview 스코어카드 채점 메커니즘 개선 Backlog 등록
 - **C33** (PR #510): eslint `no-explicit-any` cleanup — 코드 품질 개선
 - **C33~C37** backlog 5건 PLANNED 등록: lint cleanup / Node 24 / git author 분리 / sidebar link / Gap E2E 확장
 - **ax-plugin infra-selfcheck C9**: Plugin Cache Drift 점검 추가 ([ax-plugin PR #1](https://github.com/KTDS-AXBD/ax-plugin/pull/1)) — Same-HOME source(flat) ↔ cache(versioned `ax/<version>/`) drift 감지. skills/ + hooks/ `diff -rq`, FAIL severity, version 자동 탐지
