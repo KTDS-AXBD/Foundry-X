@@ -168,17 +168,17 @@ test.describe("Work Management (F509 Walking Skeleton)", () => {
     await expect(page.getByText("Busy", { exact: true })).toBeVisible();
     await expect(page.getByText("Idle", { exact: true })).toBeVisible();
 
-    // Session cards
-    await expect(page.getByText("sprint-262")).toBeVisible();
+    // Session cards (sprint-262 appears in both card and worktree path, use .first())
+    await expect(page.getByText("sprint-262").first()).toBeVisible();
     await expect(page.getByText("sprint-261")).toBeVisible();
 
     // Profile badges
     await expect(page.getByText("coder", { exact: true }).first()).toBeVisible();
     await expect(page.getByText("reviewer", { exact: true }).first()).toBeVisible();
 
-    // Worktrees section
+    // Worktrees section (sprint/262 appears in session card branch + worktree list)
     await expect(page.getByText("Worktrees (1)")).toBeVisible();
-    await expect(page.getByText("sprint/262")).toBeVisible();
+    await expect(page.getByText("sprint/262").first()).toBeVisible();
   });
 
   test("classify flow — PRD §5.2.1 S1 step 2 (자연어 → track/priority/title)", async ({ authenticatedPage: page }) => {
