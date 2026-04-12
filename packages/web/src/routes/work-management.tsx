@@ -3,14 +3,6 @@ import { fetchApi, postApi, ApiError } from "@/lib/api-client";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-// F514 — Analytics types (B-4, B-5)
-interface VelocityData {
-  sprints: Array<{ sprint: number; f_items_done: number; week: string }>;
-  avg_per_sprint: number;
-  trend: "up" | "down" | "stable";
-  generated_at: string;
-}
-
 interface PhaseProgressData {
   phases: Array<{
     id: number; name: string;
@@ -49,14 +41,6 @@ interface WorkSnapshot {
   generated_at: string;
 }
 
-interface WorkContext {
-  recent_commits: Array<{ sha: string; message: string; date: string; author: string }>;
-  worktrees: string[];
-  daemon_events: Array<{ event: string; timestamp: string }>;
-  next_actions: string[];
-  note?: string;
-}
-
 interface ClassifyResult {
   track: WorkTrack;
   priority: WorkPriority;
@@ -65,48 +49,52 @@ interface ClassifyResult {
   method: "llm" | "regex";
 }
 
-type SessionStatus = "busy" | "idle" | "done";
-type SessionProfile = "coder" | "reviewer" | "tester" | "unknown";
+// ─── Design Tokens ──────────────────────────────────────────────────────────
 
-interface AgentSession {
-  id: string;
-  name: string;
-  status: SessionStatus;
-  profile: SessionProfile;
-  worktree?: string;
-  branch?: string;
-  windows: number;
-  last_activity?: string;
-  collected_at: string;
-}
-
-interface SessionList {
-  sessions: AgentSession[];
-  worktrees: Array<{ path: string; branch: string }>;
-  last_sync: string;
-}
-
-// ─── Constants ───────────────────────────────────────────────────────────────
+const T = {
+  font: "var(--font-sans, 'Plus Jakarta Sans Variable', system-ui, sans-serif)",
+  mono: "var(--font-mono, 'JetBrains Mono Variable', monospace)",
+  bg: {
+    page:    "#080c14",
+    surface: "#0f1726",
+    card:    "#162032",
+    hover:   "#1c2a42",
+    inset:   "#0a0f1a",
+  },
+  border: {
+    subtle:  "#1e2d45",
+    default: "#253552",
+    accent:  "#3b82f6",
+  },
+  text: {
+    primary:   "#e8edf5",
+    secondary: "#8b9cc0",
+    muted:     "#4e6085",
+    accent:    "#6ea8fe",
+  },
+  status: {
+    done:       "#34d399",
+    active:     "#60a5fa",
+    planned:    "#f59e0b",
+    backlog:    "#64748b",
+    warning:    "#fbbf24",
+    error:      "#f87171",
+  },
+} as const;
 
 const COLUMNS: { key: WorkStatus; label: string; color: string }[] = [
-  { key: "planned",     label: "PLANNED",     color: "#3b82f6" },
-  { key: "in_progress", label: "IN PROGRESS",  color: "#f59e0b" },
-  { key: "done",        label: "DONE",         color: "#22c55e" },
-  { key: "backlog",     label: "BACKLOG",      color: "#6b7280" },
+  { key: "planned",     label: "PLANNED",      color: T.status.planned },
+  { key: "in_progress", label: "IN PROGRESS",  color: T.status.active },
+  { key: "done",        label: "DONE",          color: T.status.done },
+  { key: "backlog",     label: "BACKLOG",       color: T.status.backlog },
 ];
 
 const PRIORITY_COLORS: Record<WorkPriority, string> = {
-  P0: "#ef4444",
-  P1: "#f97316",
-  P2: "#3b82f6",
-  P3: "#6b7280",
+  P0: "#ef4444", P1: "#f97316", P2: "#3b82f6", P3: "#6b7280",
 };
 
 const TRACK_COLORS: Record<WorkTrack, string> = {
-  F: "#8b5cf6",
-  B: "#ef4444",
-  C: "#6b7280",
-  X: "#06b6d4",
+  F: "#8b5cf6", B: "#ef4444", C: "#6b7280", X: "#06b6d4",
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -114,10 +102,7 @@ const TRACK_COLORS: Record<WorkTrack, string> = {
 function formatDate(iso: string) {
   try {
     return new Date(iso).toLocaleString("ko-KR", {
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
+      month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit",
     });
   } catch {
     return iso.slice(0, 16);
@@ -131,13 +116,16 @@ function Badge({ label, color }: { label: string; color: string }) {
     <span
       style={{
         display: "inline-block",
-        padding: "1px 6px",
-        borderRadius: 4,
-        fontSize: 11,
-        fontWeight: 600,
+        padding: "2px 7px",
+        borderRadius: 5,
+        fontSize: 10,
+        fontWeight: 700,
+        fontFamily: T.mono,
+        letterSpacing: "0.02em",
         color: "#fff",
         background: color,
         marginRight: 4,
+        textTransform: "uppercase",
       }}
     >
       {label}
@@ -150,18 +138,22 @@ function ItemCard({ item }: { item: WorkItem }) {
   return (
     <div
       style={{
-        background: "#1e293b",
-        border: "1px solid #334155",
-        borderRadius: 6,
-        padding: "8px 10px",
+        background: T.bg.card,
+        border: `1px solid ${T.border.subtle}`,
+        borderRadius: 8,
+        padding: "10px 12px",
         marginBottom: 6,
         fontSize: 12,
+        fontFamily: T.font,
+        transition: "border-color 0.15s",
       }}
+      onMouseEnter={e => (e.currentTarget.style.borderColor = T.border.default)}
+      onMouseLeave={e => (e.currentTarget.style.borderColor = T.border.subtle)}
     >
-      <div style={{ fontWeight: 600, marginBottom: 4, color: "#f1f5f9" }}>
-        {item.id} {item.sprint ? <span style={{ color: "#64748b" }}>#{item.sprint}</span> : null}
+      <div style={{ fontWeight: 600, marginBottom: 4, color: T.text.primary, fontFamily: T.mono, fontSize: 11 }}>
+        {item.id} {item.sprint ? <span style={{ color: T.text.muted }}>#{item.sprint}</span> : null}
       </div>
-      <div style={{ color: "#cbd5e1", marginBottom: 6, lineHeight: 1.4 }}>
+      <div style={{ color: T.text.secondary, marginBottom: 6, lineHeight: 1.5 }}>
         {item.title}
       </div>
       <div>
@@ -172,462 +164,45 @@ function ItemCard({ item }: { item: WorkItem }) {
   );
 }
 
-const STATUS_META: Record<SessionStatus, { label: string; dot: string; color: string }> = {
-  busy:  { label: "BUSY",  dot: "🟢", color: "#22c55e" },
-  idle:  { label: "IDLE",  dot: "🟡", color: "#f59e0b" },
-  done:  { label: "DONE",  dot: "⚫", color: "#6b7280" },
-};
-
-const PROFILE_META: Record<SessionProfile, { label: string; color: string }> = {
-  coder:    { label: "coder",    color: "#3b82f6" },
-  reviewer: { label: "reviewer", color: "#8b5cf6" },
-  tester:   { label: "tester",   color: "#06b6d4" },
-  unknown:  { label: "unknown",  color: "#6b7280" },
-};
-
-function SessionCard({ session }: { session: AgentSession }) {
-  const statusMeta = STATUS_META[session.status];
-  const profileMeta = PROFILE_META[session.profile];
-  return (
-    <div
-      style={{
-        background: "#1e293b",
-        border: `1px solid ${statusMeta.color}44`,
-        borderRadius: 8,
-        padding: "10px 12px",
-        display: "flex",
-        flexDirection: "column",
-        gap: 6,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{ fontSize: 14 }}>{statusMeta.dot}</span>
-        <span style={{ fontWeight: 600, fontSize: 13, color: "#f1f5f9", flex: 1 }}>{session.name}</span>
-        <Badge label={statusMeta.label} color={statusMeta.color} />
-      </div>
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-        <Badge label={profileMeta.label} color={profileMeta.color} />
-        {session.windows > 1 && (
-          <Badge label={`${session.windows}w`} color="#475569" />
-        )}
-      </div>
-      {session.branch && (
-        <div style={{ fontSize: 11, color: "#64748b", fontFamily: "monospace" }}>
-          {session.branch}
-        </div>
-      )}
-      {session.last_activity && (
-        <div style={{ fontSize: 11, color: "#334155" }}>
-          활동: {formatDate(session.last_activity)}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function SessionsTab({ data }: { data: SessionList | null }) {
-  if (!data) {
-    return <div style={{ color: "#94a3b8", padding: 20 }}>불러오는 중…</div>;
-  }
-
-  const busy = data.sessions.filter(s => s.status === "busy");
-  const idle = data.sessions.filter(s => s.status === "idle");
-  const done = data.sessions.filter(s => s.status === "done");
-
-  const syncAge = data.last_sync
-    ? Math.round((Date.now() - new Date(data.last_sync).getTime()) / 1000)
-    : null;
-
-  const syncStale = syncAge !== null && syncAge > 120;
-
-  return (
-    <div>
-      {/* Status bar */}
-      <div
-        style={{
-          display: "flex",
-          gap: 20,
-          marginBottom: 20,
-          background: "#0f172a",
-          padding: "10px 14px",
-          borderRadius: 8,
-          alignItems: "center",
-        }}
-      >
-        {[
-          { label: "Busy",  value: busy.length,  color: "#22c55e" },
-          { label: "Idle",  value: idle.length,  color: "#f59e0b" },
-          { label: "Done",  value: done.length,  color: "#6b7280" },
-        ].map(({ label, value, color }) => (
-          <div key={label} style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color }}>{value}</div>
-            <div style={{ fontSize: 11, color: "#64748b" }}>{label}</div>
-          </div>
-        ))}
-        <div style={{ marginLeft: "auto", fontSize: 11, color: syncStale ? "#ef4444" : "#334155" }}>
-          {syncAge !== null
-            ? syncStale
-              ? `⚠️ sync 끊김 (${syncAge}s ago)`
-              : `Last sync: ${syncAge}s ago`
-            : "동기화 대기 중"}
-        </div>
-      </div>
-
-      {data.sessions.length === 0 ? (
-        <div
-          style={{
-            border: "1px dashed #1e293b",
-            borderRadius: 8,
-            padding: 24,
-            color: "#475569",
-            textAlign: "center",
-            fontSize: 13,
-          }}
-        >
-          활성 세션 없음 — session-collector.sh가 실행 중인지 확인하세요
-        </div>
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 24 }}>
-          {[
-            { label: "BUSY",  items: busy,  color: "#22c55e" },
-            { label: "IDLE",  items: idle,  color: "#f59e0b" },
-            { label: "DONE",  items: done,  color: "#6b7280" },
-          ].map(col => (
-            <div key={col.label}>
-              <div
-                style={{
-                  padding: "6px 10px",
-                  background: col.color + "22",
-                  border: `1px solid ${col.color}44`,
-                  borderRadius: 6,
-                  marginBottom: 8,
-                  fontWeight: 600,
-                  fontSize: 12,
-                  color: col.color,
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <span>{col.label}</span>
-                <span style={{ opacity: 0.7 }}>{col.items.length}</span>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {col.items.length === 0 ? (
-                  <div
-                    style={{
-                      border: "1px dashed #1e293b",
-                      borderRadius: 6,
-                      padding: 12,
-                      color: "#334155",
-                      fontSize: 12,
-                      textAlign: "center",
-                    }}
-                  >
-                    비어있음
-                  </div>
-                ) : (
-                  col.items.map(s => <SessionCard key={s.id} session={s} />)
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Worktrees */}
-      {data.worktrees.length > 0 && (
-        <section>
-          <h3 style={{ color: "#94a3b8", fontSize: 13, marginBottom: 10 }}>
-            Worktrees ({data.worktrees.length})
-          </h3>
-          <div style={{ fontFamily: "monospace" }}>
-            {data.worktrees.map((wt, i) => (
-              <div
-                key={i}
-                style={{
-                  padding: "6px 10px",
-                  borderBottom: "1px solid #1e293b",
-                  fontSize: 12,
-                  display: "flex",
-                  gap: 10,
-                }}
-              >
-                <span style={{ color: "#64748b" }}>└</span>
-                <span style={{ color: "#cbd5e1", flex: 1 }}>{wt.path}</span>
-                <span style={{ color: "#f59e0b" }}>{wt.branch}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
-  );
-}
-
-// ─── F514 Tab Components ──────────────────────────────────────────────────────
-
-function PipelineFlowTab({
-  snapshot,
-  backlogHealth,
-}: {
-  snapshot: WorkSnapshot | null;
-  backlogHealth: BacklogHealthData | null;
-}) {
-  const summary = snapshot?.summary;
-
-  const stages: Array<{ label: string; count: number; color: string }> = [
-    { label: "Backlog",      count: summary?.backlog      ?? 0, color: "#6b7280" },
-    { label: "Planned",      count: summary?.planned      ?? 0, color: "#3b82f6" },
-    { label: "In Progress",  count: summary?.in_progress  ?? 0, color: "#f59e0b" },
-    { label: "Done (Today)", count: summary?.done_today   ?? 0, color: "#22c55e" },
-  ];
-  const maxCount = Math.max(...stages.map(s => s.count), 1);
-
-  const scoreColor = backlogHealth
-    ? backlogHealth.health_score >= 80 ? "#22c55e"
-      : backlogHealth.health_score >= 60 ? "#f59e0b"
-      : "#ef4444"
-    : "#94a3b8";
-
-  return (
-    <div>
-      <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 20, color: "#e2e8f0" }}>
-        Pipeline Flow
-      </h2>
-
-      {/* Stage bars */}
-      <div style={{ marginBottom: 28 }}>
-        {stages.map((stage) => (
-          <div key={stage.label} style={{ marginBottom: 12 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 13 }}>
-              <span style={{ color: "#cbd5e1" }}>{stage.label}</span>
-              <span style={{ color: stage.color, fontWeight: 600 }}>{stage.count}</span>
-            </div>
-            <div style={{ background: "#1e293b", borderRadius: 4, height: 10 }}>
-              <div
-                style={{
-                  width: `${Math.round((stage.count / maxCount) * 100)}%`,
-                  height: "100%",
-                  background: stage.color,
-                  borderRadius: 4,
-                  transition: "width 0.3s ease",
-                }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Backlog Health */}
-      {backlogHealth && (
-        <div
-          style={{
-            background: "#0f172a",
-            border: "1px solid #1e293b",
-            borderRadius: 8,
-            padding: "16px 20px",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-            <span style={{ fontSize: 14, color: "#94a3b8" }}>Health Score</span>
-            <span
-              style={{
-                fontSize: 20,
-                fontWeight: 700,
-                color: scoreColor,
-              }}
-            >
-              {backlogHealth.health_score}
-              <span style={{ fontSize: 13, fontWeight: 400, color: "#64748b" }}>/100</span>
-            </span>
-            <span style={{ fontSize: 12, color: "#64748b" }}>
-              Total: {backlogHealth.total_backlog} items
-            </span>
-          </div>
-
-          {backlogHealth.warnings.length > 0 && (
-            <div style={{ marginBottom: 12 }}>
-              {backlogHealth.warnings.map((w, i) => (
-                <div key={i} style={{ fontSize: 12, color: "#f59e0b", marginBottom: 4 }}>
-                  ⚠ {w}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {backlogHealth.stale_items.length > 0 && (
-            <div>
-              <div style={{ fontSize: 12, color: "#64748b", marginBottom: 8 }}>
-                Stale Items ({backlogHealth.stale_items.length})
-              </div>
-              {backlogHealth.stale_items.map((item) => (
-                <div
-                  key={item.id}
-                  style={{
-                    display: "flex",
-                    gap: 10,
-                    fontSize: 12,
-                    padding: "6px 0",
-                    borderBottom: "1px solid #1e293b",
-                    color: "#94a3b8",
-                  }}
-                >
-                  <span style={{ color: "#f59e0b", minWidth: 40 }}>{item.id}</span>
-                  <span style={{ flex: 1 }}>{item.title}</span>
-                  <span style={{ color: "#64748b" }}>{item.age_sprints}+ sprints</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {!snapshot && !backlogHealth && (
-        <div style={{ color: "#94a3b8", padding: 20 }}>불러오는 중…</div>
-      )}
-    </div>
-  );
-}
-
-function VelocityTab({
-  velocity,
-  phaseProgress,
-}: {
-  velocity: VelocityData | null;
-  phaseProgress: PhaseProgressData | null;
-}) {
-  const maxDone = velocity
-    ? Math.max(...velocity.sprints.map(s => s.f_items_done), 1)
-    : 1;
-
-  const trendLabel = velocity?.trend === "up"   ? "↑ UP"
-                   : velocity?.trend === "down" ? "↓ DOWN"
-                   : "→ stable";
-  const trendColor = velocity?.trend === "up"   ? "#22c55e"
-                   : velocity?.trend === "down" ? "#ef4444"
-                   : "#94a3b8";
-
-  return (
-    <div>
-      <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 20, color: "#e2e8f0" }}>
-        Sprint Velocity
-      </h2>
-
-      {velocity ? (
-        <>
-          {/* Summary row */}
-          <div style={{ display: "flex", gap: 16, marginBottom: 20, alignItems: "center" }}>
-            <div style={{ fontSize: 13, color: "#94a3b8" }}>
-              Avg:{" "}
-              <span style={{ color: "#f1f5f9", fontWeight: 600 }}>
-                {velocity.avg_per_sprint}
-              </span>{" "}
-              F-items/sprint
-            </div>
-            <span style={{ fontSize: 12, fontWeight: 600, color: trendColor }}>
-              {trendLabel}
-            </span>
-          </div>
-
-          {/* Sprint bars */}
-          <div style={{ marginBottom: 28 }}>
-            {velocity.sprints.slice(-10).map((s) => (
-              <div key={s.sprint} style={{ marginBottom: 10 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 12 }}>
-                  <span style={{ color: "#94a3b8" }}>Sprint {s.sprint}</span>
-                  <span style={{ color: "#f1f5f9", fontWeight: 600 }}>{s.f_items_done}</span>
-                </div>
-                <div style={{ background: "#1e293b", borderRadius: 4, height: 8 }}>
-                  <div
-                    style={{
-                      width: `${Math.round((s.f_items_done / maxDone) * 100)}%`,
-                      height: "100%",
-                      background: "#3b82f6",
-                      borderRadius: 4,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
-      ) : (
-        <div style={{ color: "#94a3b8", marginBottom: 28 }}>Velocity 불러오는 중…</div>
-      )}
-
-      {/* Phase Progress */}
-      {phaseProgress && (
-        <>
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: "#e2e8f0", marginBottom: 14 }}>
-            Phase Progress (current: Phase {phaseProgress.current_phase})
-          </h3>
-          {phaseProgress.phases.slice(-8).map((phase) => (
-            <div key={phase.id} style={{ marginBottom: 10 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 12 }}>
-                <span style={{ color: "#94a3b8" }}>{phase.name}</span>
-                <span style={{ color: "#64748b" }}>
-                  {phase.done}/{phase.total} ({phase.pct}%)
-                </span>
-              </div>
-              <div style={{ background: "#1e293b", borderRadius: 4, height: 6 }}>
-                <div
-                  style={{
-                    width: `${phase.pct}%`,
-                    height: "100%",
-                    background: phase.pct === 100 ? "#22c55e" : "#3b82f6",
-                    borderRadius: 4,
-                  }}
-                />
-              </div>
-            </div>
-          ))}
-        </>
-      )}
-    </div>
-  );
-}
+// ─── Backlog Health Tab ───────────────────────────────────────────────────────
 
 function BacklogHealthTab({ health }: { health: BacklogHealthData | null }) {
   if (!health) {
-    return <div style={{ color: "#94a3b8", padding: 20 }}>불러오는 중…</div>;
+    return <div style={{ color: T.text.secondary, padding: 20, fontFamily: T.font }}>불러오는 중…</div>;
   }
 
-  const scoreColor = health.health_score >= 80 ? "#22c55e"
-                   : health.health_score >= 60 ? "#f59e0b"
-                   : "#ef4444";
+  const scoreColor = health.health_score >= 80 ? T.status.done
+                   : health.health_score >= 60 ? T.status.planned
+                   : T.status.error;
 
   return (
-    <div>
-      <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 20, color: "#e2e8f0" }}>
-        Backlog Health
-      </h2>
-
+    <div style={{ fontFamily: T.font }}>
       {/* Score card */}
       <div
         style={{
-          background: "#0f172a",
+          background: T.bg.inset,
           border: `1px solid ${scoreColor}33`,
-          borderRadius: 8,
-          padding: "20px 24px",
-          marginBottom: 20,
+          borderRadius: 10,
+          padding: "24px 28px",
+          marginBottom: 24,
           display: "flex",
           alignItems: "center",
-          gap: 24,
+          gap: 28,
         }}
       >
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 36, fontWeight: 700, color: scoreColor }}>
+          <div style={{ fontSize: 40, fontWeight: 800, color: scoreColor, fontFamily: T.mono, lineHeight: 1 }}>
             {health.health_score}
           </div>
-          <div style={{ fontSize: 11, color: "#64748b" }}>/ 100</div>
+          <div style={{ fontSize: 11, color: T.text.muted, marginTop: 4 }}>/ 100</div>
         </div>
         <div>
-          <div style={{ fontSize: 14, color: "#94a3b8", marginBottom: 4 }}>Health Score</div>
-          <div style={{ fontSize: 13, color: "#cbd5e1" }}>
+          <div style={{ fontSize: 14, color: T.text.secondary, marginBottom: 4, fontWeight: 500 }}>Health Score</div>
+          <div style={{ fontSize: 13, color: T.text.primary }}>
             Total: <strong>{health.total_backlog}</strong> backlog items
           </div>
           {health.stale_items.length > 0 && (
-            <div style={{ fontSize: 12, color: "#f59e0b", marginTop: 4 }}>
+            <div style={{ fontSize: 12, color: T.status.planned, marginTop: 4 }}>
               {health.stale_items.length} stale item(s)
             </div>
           )}
@@ -637,21 +212,20 @@ function BacklogHealthTab({ health }: { health: BacklogHealthData | null }) {
       {/* Warnings */}
       {health.warnings.length > 0 && (
         <div style={{ marginBottom: 20 }}>
-          <h3 style={{ fontSize: 13, color: "#64748b", marginBottom: 8 }}>Warnings</h3>
           {health.warnings.map((w, i) => (
             <div
               key={i}
               style={{
-                background: "#1e293b",
-                borderLeft: "3px solid #f59e0b",
-                padding: "8px 12px",
-                borderRadius: "0 4px 4px 0",
+                background: T.bg.card,
+                borderLeft: `3px solid ${T.status.planned}`,
+                padding: "10px 14px",
+                borderRadius: "0 6px 6px 0",
                 fontSize: 13,
-                color: "#fbbf24",
+                color: T.status.warning,
                 marginBottom: 6,
               }}
             >
-              ⚠ {w}
+              {w}
             </div>
           ))}
         </div>
@@ -659,10 +233,10 @@ function BacklogHealthTab({ health }: { health: BacklogHealthData | null }) {
 
       {/* Stale items */}
       {health.stale_items.length > 0 && (
-        <div>
-          <h3 style={{ fontSize: 13, color: "#64748b", marginBottom: 8 }}>
+        <div style={{ background: T.bg.card, borderRadius: 8, overflow: "hidden" }}>
+          <div style={{ padding: "10px 14px", fontSize: 12, color: T.text.muted, fontWeight: 600, borderBottom: `1px solid ${T.border.subtle}` }}>
             Stale Items ({health.stale_items.length})
-          </h3>
+          </div>
           {health.stale_items.map((item) => (
             <div
               key={item.id}
@@ -670,21 +244,20 @@ function BacklogHealthTab({ health }: { health: BacklogHealthData | null }) {
                 display: "flex",
                 gap: 12,
                 padding: "10px 14px",
-                background: "#0f172a",
-                borderBottom: "1px solid #1e293b",
+                borderBottom: `1px solid ${T.border.subtle}`,
                 fontSize: 13,
               }}
             >
-              <span style={{ color: "#f59e0b", minWidth: 48, fontWeight: 600 }}>{item.id}</span>
-              <span style={{ flex: 1, color: "#94a3b8" }}>{item.title}</span>
-              <span style={{ color: "#64748b", fontSize: 12 }}>{item.age_sprints}+ sprints</span>
+              <span style={{ color: T.status.planned, minWidth: 48, fontWeight: 600, fontFamily: T.mono, fontSize: 12 }}>{item.id}</span>
+              <span style={{ flex: 1, color: T.text.secondary }}>{item.title}</span>
+              <span style={{ color: T.text.muted, fontSize: 12 }}>{item.age_sprints}+ sprints</span>
             </div>
           ))}
         </div>
       )}
 
       {health.stale_items.length === 0 && health.warnings.length === 0 && (
-        <div style={{ color: "#22c55e", fontSize: 13 }}>✓ 백로그가 건강해요</div>
+        <div style={{ color: T.status.done, fontSize: 13, padding: 20 }}>백로그가 건강해요</div>
       )}
     </div>
   );
@@ -694,68 +267,72 @@ function BacklogHealthTab({ health }: { health: BacklogHealthData | null }) {
 
 function KanbanTab({ snapshot }: { snapshot: WorkSnapshot | null }) {
   if (!snapshot) {
-    return <div style={{ color: "#94a3b8", padding: 20 }}>불러오는 중…</div>;
+    return <div style={{ color: T.text.secondary, padding: 20, fontFamily: T.font }}>불러오는 중…</div>;
   }
 
   return (
-    <div>
+    <div style={{ fontFamily: T.font }}>
       {/* Summary bar */}
       <div
         style={{
           display: "flex",
-          gap: 16,
-          marginBottom: 20,
-          background: "#0f172a",
-          padding: "10px 14px",
-          borderRadius: 8,
+          gap: 20,
+          marginBottom: 24,
+          background: T.bg.inset,
+          padding: "14px 18px",
+          borderRadius: 10,
+          border: `1px solid ${T.border.subtle}`,
         }}
       >
         {[
-          { label: "Backlog", value: snapshot.summary.backlog, color: "#6b7280" },
-          { label: "Planned", value: snapshot.summary.planned, color: "#3b82f6" },
-          { label: "In Progress", value: snapshot.summary.in_progress, color: "#f59e0b" },
-          { label: "Done", value: snapshot.summary.done_today, color: "#22c55e" },
+          { label: "Backlog",     value: snapshot.summary.backlog,      color: T.status.backlog },
+          { label: "Planned",     value: snapshot.summary.planned,      color: T.status.active },
+          { label: "In Progress", value: snapshot.summary.in_progress,  color: T.status.planned },
+          { label: "Done",        value: snapshot.summary.done_today,   color: T.status.done },
         ].map(({ label, value, color }) => (
           <div key={label} style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color }}>{value}</div>
-            <div style={{ fontSize: 11, color: "#64748b" }}>{label}</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color, fontFamily: T.mono }}>{value}</div>
+            <div style={{ fontSize: 10, color: T.text.muted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 600 }}>{label}</div>
           </div>
         ))}
-        <div style={{ marginLeft: "auto", fontSize: 11, color: "#475569", alignSelf: "center" }}>
+        <div style={{ marginLeft: "auto", fontSize: 11, color: T.text.muted, alignSelf: "center", fontFamily: T.mono }}>
           {formatDate(snapshot.generated_at)}
         </div>
       </div>
 
       {/* Kanban columns */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
         {COLUMNS.map(col => {
           const colItems = snapshot.items.filter(i => i.status === col.key);
           return (
             <div key={col.key}>
               <div
                 style={{
-                  padding: "6px 10px",
-                  background: col.color + "22",
-                  border: `1px solid ${col.color}44`,
-                  borderRadius: 6,
-                  marginBottom: 8,
-                  fontWeight: 600,
-                  fontSize: 12,
+                  padding: "7px 12px",
+                  background: col.color + "15",
+                  border: `1px solid ${col.color}30`,
+                  borderRadius: 8,
+                  marginBottom: 10,
+                  fontWeight: 700,
+                  fontSize: 11,
                   color: col.color,
                   display: "flex",
                   justifyContent: "space-between",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
+                  fontFamily: T.mono,
                 }}
               >
                 <span>{col.label}</span>
-                <span style={{ opacity: 0.7 }}>{colItems.length}</span>
+                <span style={{ opacity: 0.6 }}>{colItems.length}</span>
               </div>
               {colItems.length === 0 ? (
                 <div
                   style={{
-                    border: "1px dashed #1e293b",
-                    borderRadius: 6,
-                    padding: 12,
-                    color: "#334155",
+                    border: `1px dashed ${T.border.subtle}`,
+                    borderRadius: 8,
+                    padding: 16,
+                    color: T.text.muted,
                     fontSize: 12,
                     textAlign: "center",
                   }}
@@ -772,114 +349,40 @@ function KanbanTab({ snapshot }: { snapshot: WorkSnapshot | null }) {
 
       {/* Recent PRs */}
       {snapshot.prs.length > 0 && (
-        <div style={{ marginTop: 24 }}>
-          <h3 style={{ color: "#94a3b8", fontSize: 13, marginBottom: 10 }}>Recent PRs</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <div style={{ marginTop: 28 }}>
+          <div style={{ fontSize: 12, color: T.text.muted, fontWeight: 600, marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+            Recent PRs
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             {snapshot.prs.slice(0, 8).map(pr => (
               <div
                 key={pr.number}
                 style={{
-                  background: "#1e293b",
-                  border: "1px solid #334155",
-                  borderRadius: 6,
-                  padding: "6px 10px",
+                  background: T.bg.card,
+                  border: `1px solid ${T.border.subtle}`,
+                  borderRadius: 8,
+                  padding: "8px 12px",
                   fontSize: 12,
                   display: "flex",
                   alignItems: "center",
                   gap: 8,
+                  fontFamily: T.font,
                 }}
               >
                 <Badge
                   label={pr.state}
-                  color={pr.state === "open" ? "#22c55e" : pr.state === "closed" ? "#6b7280" : "#8b5cf6"}
+                  color={pr.state === "open" ? T.status.done : pr.state === "closed" ? T.status.backlog : "#8b5cf6"}
                 />
-                <a href={pr.url} target="_blank" rel="noreferrer" style={{ color: "#93c5fd" }}>
+                <a href={pr.url} target="_blank" rel="noreferrer" style={{ color: T.text.accent, fontFamily: T.mono, fontSize: 11 }}>
                   #{pr.number}
                 </a>
-                <span style={{ color: "#cbd5e1" }}>{pr.title}</span>
-                <span style={{ marginLeft: "auto", color: "#475569" }}>
+                <span style={{ color: T.text.primary, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pr.title}</span>
+                <span style={{ color: T.text.muted, fontFamily: T.mono, fontSize: 10 }}>
                   {formatDate(pr.created_at)}
                 </span>
               </div>
             ))}
           </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ContextTab({ ctx }: { ctx: WorkContext | null }) {
-  if (!ctx) {
-    return <div style={{ color: "#94a3b8", padding: 20 }}>불러오는 중…</div>;
-  }
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {/* Next Actions */}
-      <section>
-        <h3 style={{ color: "#94a3b8", fontSize: 13, marginBottom: 10 }}>다음 가능 Action</h3>
-        {ctx.next_actions.map((action, i) => (
-          <div
-            key={i}
-            style={{
-              background: "#1e293b",
-              border: "1px solid #1e3a5f",
-              borderRadius: 6,
-              padding: "8px 12px",
-              marginBottom: 6,
-              fontSize: 13,
-              color: "#bfdbfe",
-            }}
-          >
-            → {action}
-          </div>
-        ))}
-      </section>
-
-      {/* Recent Commits */}
-      <section>
-        <h3 style={{ color: "#94a3b8", fontSize: 13, marginBottom: 10 }}>
-          최근 커밋 ({ctx.recent_commits.length})
-        </h3>
-        <div style={{ fontFamily: "monospace" }}>
-          {ctx.recent_commits.map((c, i) => (
-            <div
-              key={i}
-              style={{
-                padding: "6px 10px",
-                borderBottom: "1px solid #1e293b",
-                fontSize: 12,
-                display: "flex",
-                gap: 10,
-                alignItems: "center",
-              }}
-            >
-              <span style={{ color: "#f59e0b", flexShrink: 0 }}>{c.sha}</span>
-              <span style={{ color: "#cbd5e1", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {c.message}
-              </span>
-              <span style={{ color: "#475569", flexShrink: 0, fontSize: 11 }}>
-                {formatDate(c.date)}
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Worktrees / Daemon */}
-      {ctx.note && (
-        <div
-          style={{
-            background: "#1c1917",
-            border: "1px solid #292524",
-            borderRadius: 6,
-            padding: "10px 12px",
-            fontSize: 12,
-            color: "#78716c",
-          }}
-        >
-          ℹ️ {ctx.note}
         </div>
       )}
     </div>
@@ -908,9 +411,9 @@ function ClassifyTab() {
   }, [input]);
 
   return (
-    <div style={{ maxWidth: 600 }}>
-      <p style={{ color: "#94a3b8", fontSize: 13, marginBottom: 16 }}>
-        자연어 한 줄 입력 → track / priority / title 자동 분류 (S1 step 2)
+    <div style={{ maxWidth: 600, fontFamily: T.font }}>
+      <p style={{ color: T.text.secondary, fontSize: 13, marginBottom: 16 }}>
+        자연어로 작업을 입력하면 유형과 우선순위를 자동으로 분류해요.
       </p>
 
       <textarea
@@ -920,16 +423,20 @@ function ClassifyTab() {
         style={{
           width: "100%",
           minHeight: 80,
-          background: "#1e293b",
-          border: "1px solid #334155",
-          borderRadius: 6,
-          padding: "10px 12px",
-          color: "#f1f5f9",
+          background: T.bg.card,
+          border: `1px solid ${T.border.subtle}`,
+          borderRadius: 8,
+          padding: "12px 14px",
+          color: T.text.primary,
           fontSize: 13,
+          fontFamily: T.font,
           resize: "vertical",
-          marginBottom: 10,
+          marginBottom: 12,
           boxSizing: "border-box",
+          outline: "none",
         }}
+        onFocus={e => (e.currentTarget.style.borderColor = T.border.accent)}
+        onBlur={e => (e.currentTarget.style.borderColor = T.border.subtle)}
         onKeyDown={e => {
           if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) handleClassify();
         }}
@@ -939,53 +446,45 @@ function ClassifyTab() {
         onClick={handleClassify}
         disabled={loading || !input.trim()}
         style={{
-          background: loading ? "#334155" : "#3b82f6",
+          background: loading ? T.bg.hover : T.border.accent,
           color: "#fff",
           border: "none",
-          borderRadius: 6,
-          padding: "8px 20px",
+          borderRadius: 8,
+          padding: "10px 24px",
           cursor: loading ? "not-allowed" : "pointer",
           fontSize: 13,
           fontWeight: 600,
+          fontFamily: T.font,
         }}
       >
-        {loading ? "분류 중…" : "분류 (Ctrl+Enter)"}
+        {loading ? "분류 중…" : "분류하기"}
       </button>
 
       {error && (
-        <div style={{ marginTop: 12, color: "#f87171", fontSize: 13 }}>{error}</div>
+        <div style={{ marginTop: 12, color: T.status.error, fontSize: 13 }}>{error}</div>
       )}
 
       {result && (
         <div
           style={{
-            marginTop: 16,
-            background: "#0f172a",
-            border: "1px solid #1e3a5f",
-            borderRadius: 8,
-            padding: "14px 16px",
+            marginTop: 20,
+            background: T.bg.inset,
+            border: `1px solid ${T.border.default}`,
+            borderRadius: 10,
+            padding: "16px 18px",
           }}
         >
           <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
             <Badge label={result.track} color={TRACK_COLORS[result.track]} />
-            <Badge
-              label={result.priority}
-              color={PRIORITY_COLORS[result.priority] ?? "#6b7280"}
-            />
-            <Badge
-              label={result.method === "llm" ? "AI" : "regex"}
-              color={result.method === "llm" ? "#8b5cf6" : "#6b7280"}
-            />
+            <Badge label={result.priority} color={PRIORITY_COLORS[result.priority] ?? "#6b7280"} />
+            <Badge label={result.method === "llm" ? "AI" : "regex"} color={result.method === "llm" ? "#8b5cf6" : "#6b7280"} />
           </div>
-          <div style={{ color: "#f1f5f9", fontSize: 14, fontWeight: 600 }}>
+          <div style={{ color: T.text.primary, fontSize: 14, fontWeight: 700 }}>
             {result.title}
           </div>
           {result.req_code && (
-            <div style={{ color: "#0ea5e9", fontSize: 12, marginTop: 6 }}>{result.req_code}</div>
+            <div style={{ color: T.text.accent, fontSize: 12, marginTop: 6, fontFamily: T.mono }}>{result.req_code}</div>
           )}
-          <div style={{ marginTop: 12, color: "#475569", fontSize: 11 }}>
-            S1 step 3: 승인 후 bash scripts/task/task-start.sh {result.track} "{result.title}" "..." 실행
-          </div>
         </div>
       )}
     </div>
@@ -994,15 +493,265 @@ function ClassifyTab() {
 
 // ─── Main Route Component ─────────────────────────────────────────────────────
 
-type Tab = "kanban" | "context" | "classify" | "sessions" | "pipeline" | "velocity" | "backlog";
+// ─── Phase name mapping (frontend-only, avoids API change) ───────────────────
+
+const PHASE_NAMES: Record<number, string> = {
+  1: "Foundation",
+  20: "BD Pipeline 2.0",
+  21: "BD Pipeline 2.0",
+  22: "Discovery Engine",
+  23: "Discovery Engine",
+  24: "Shaping Pipeline",
+  25: "Shaping Pipeline",
+  26: "Offering/Prototype",
+  27: "BD Quality System",
+  28: "BD Quality System",
+  29: "Observability v1",
+  30: "발굴 평가결과서 v2",
+  31: "Task Orchestrator",
+  32: "Work Management",
+  33: "Work Observability",
+  34: "Multi-Agent Sessions",
+  35: "Quality Hardening",
+  36: "Work Mgmt Enhancement",
+};
+
+function getPhaseLabel(id: number, name: string): string {
+  return PHASE_NAMES[id] ?? name;
+}
+
+// ─── Roadmap Tab ─────────────────────────────────────────────────────────────
+
+function RoadmapTab({ phaseProgress }: { phaseProgress: PhaseProgressData | null }) {
+  if (!phaseProgress) {
+    return <div style={{ color: T.text.secondary, padding: 20, fontFamily: T.font }}>불러오는 중…</div>;
+  }
+
+  const phases = phaseProgress.phases;
+  const currentId = phaseProgress.current_phase;
+
+  const completed = phases.filter(p => p.pct === 100);
+  const active = phases.filter(p => p.pct < 100 && p.pct > 0);
+  const planned = phases.filter(p => p.pct === 0 && p.total > 0);
+
+  const renderPhaseRow = (phase: PhaseProgressData["phases"][0], isCurrent: boolean) => {
+    const label = getPhaseLabel(phase.id, phase.name);
+    const barColor = phase.pct === 100 ? T.status.done : isCurrent ? T.status.active : T.text.muted;
+
+    return (
+      <div
+        key={phase.id}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 14,
+          padding: "10px 14px",
+          background: isCurrent ? T.bg.card : "transparent",
+          borderRadius: 8,
+          borderLeft: isCurrent ? `3px solid ${T.status.active}` : "3px solid transparent",
+          transition: "background 0.15s",
+        }}
+      >
+        <span style={{ color: T.text.muted, fontSize: 11, minWidth: 56, fontFamily: T.mono, fontWeight: 600 }}>
+          Phase {phase.id}
+        </span>
+        <span style={{ color: isCurrent ? T.text.primary : T.text.secondary, fontSize: 13, minWidth: 180, fontWeight: isCurrent ? 600 : 400 }}>
+          {label}
+        </span>
+        <div style={{ flex: 1, background: T.bg.inset, borderRadius: 4, height: 6, overflow: "hidden" }}>
+          <div
+            style={{
+              width: `${phase.pct}%`,
+              height: "100%",
+              background: barColor,
+              borderRadius: 4,
+              transition: "width 0.3s ease",
+            }}
+          />
+        </div>
+        <span style={{ color: barColor, fontSize: 11, fontWeight: 700, minWidth: 44, textAlign: "right", fontFamily: T.mono }}>
+          {phase.done}/{phase.total}
+        </span>
+      </div>
+    );
+  };
+
+  const sectionLabel = (label: string, color: string, count?: number) => (
+    <div style={{
+      fontSize: 10,
+      color,
+      fontWeight: 700,
+      marginBottom: 8,
+      textTransform: "uppercase",
+      letterSpacing: "0.08em",
+      fontFamily: T.mono,
+    }}>
+      {label}{count !== undefined ? ` (${count})` : ""}
+    </div>
+  );
+
+  return (
+    <div style={{ fontFamily: T.font }}>
+      <div style={{ fontSize: 12, color: T.text.muted, marginBottom: 24, fontFamily: T.mono }}>
+        Phase {currentId} active · {phases.length} phases tracked
+      </div>
+
+      {active.length > 0 && (
+        <section style={{ marginBottom: 28 }}>
+          {sectionLabel("진행 중", T.status.planned)}
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            {active.map(p => renderPhaseRow(p, p.id === currentId))}
+          </div>
+        </section>
+      )}
+
+      {planned.length > 0 && (
+        <section style={{ marginBottom: 28 }}>
+          {sectionLabel("예정", T.status.active)}
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            {planned.map(p => renderPhaseRow(p, false))}
+          </div>
+        </section>
+      )}
+
+      {completed.length > 0 && (
+        <section>
+          {sectionLabel("완료", T.status.done, completed.length)}
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {completed.slice(-8).map(p => renderPhaseRow(p, false))}
+          </div>
+          {completed.length > 8 && (
+            <div style={{ fontSize: 11, color: T.text.muted, marginTop: 8, paddingLeft: 40 }}>
+              … 이전 {completed.length - 8}개 Phase 완료
+            </div>
+          )}
+        </section>
+      )}
+    </div>
+  );
+}
+
+// ─── Changelog Tab ───────────────────────────────────────────────────────────
+
+interface ChangelogSection {
+  heading: string;
+  lines: string[];
+}
+
+function parseChangelog(raw: string): ChangelogSection[] {
+  const sections: ChangelogSection[] = [];
+  let current: ChangelogSection | null = null;
+
+  for (const line of raw.split("\n")) {
+    if (line.startsWith("## ")) {
+      if (current) sections.push(current);
+      current = { heading: line.replace("## ", "").trim(), lines: [] };
+    } else if (current) {
+      current.lines.push(line);
+    }
+  }
+  if (current) sections.push(current);
+  return sections;
+}
+
+function ChangelogTab() {
+  const [content, setContent] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchApi<{ content: string }>("/work/changelog")
+      .then(data => setContent(data.content))
+      .catch(() => setError("CHANGELOG을 불러올 수 없어요"));
+  }, []);
+
+  if (error) return <div style={{ color: T.status.error, padding: 20, fontFamily: T.font }}>{error}</div>;
+  if (content === null) return <div style={{ color: T.text.secondary, padding: 20, fontFamily: T.font }}>불러오는 중…</div>;
+  if (!content) return <div style={{ color: T.text.muted, padding: 20, fontFamily: T.font }}>CHANGELOG.md가 비어있어요</div>;
+
+  const sections = parseChangelog(content);
+
+  return (
+    <div style={{ fontFamily: T.font }}>
+      {sections.map((section, i) => {
+        const isUnreleased = section.heading.toLowerCase().includes("unreleased");
+        return (
+          <div
+            key={i}
+            style={{
+              marginBottom: 20,
+              background: T.bg.card,
+              border: `1px solid ${isUnreleased ? T.status.planned + "44" : T.border.subtle}`,
+              borderRadius: 10,
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                padding: "12px 18px",
+                background: isUnreleased ? T.status.planned + "0a" : T.bg.inset,
+                borderBottom: `1px solid ${T.border.subtle}`,
+                fontSize: 14,
+                fontWeight: 700,
+                color: isUnreleased ? T.status.warning : T.text.primary,
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+              }}
+            >
+              {isUnreleased && (
+                <span style={{
+                  fontSize: 9,
+                  background: T.status.planned + "33",
+                  padding: "2px 8px",
+                  borderRadius: 4,
+                  fontFamily: T.mono,
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                }}>NEXT</span>
+              )}
+              {section.heading}
+            </div>
+            <div
+              style={{
+                padding: "14px 18px",
+                fontSize: 12,
+                lineHeight: 1.8,
+                color: T.text.secondary,
+                whiteSpace: "pre-wrap",
+                fontFamily: T.mono,
+                maxHeight: 400,
+                overflow: "auto",
+              }}
+            >
+              {section.lines
+                .filter(l => l.trim())
+                .map((line, j) => {
+                  if (line.startsWith("### ")) {
+                    return (
+                      <div key={j} style={{ fontWeight: 700, color: T.text.primary, margin: "14px 0 6px", fontSize: 13, fontFamily: T.font }}>
+                        {line.replace("### ", "")}
+                      </div>
+                    );
+                  }
+                  if (line.trimStart().startsWith("- ")) {
+                    return <div key={j} style={{ paddingLeft: 12 }}>{line}</div>;
+                  }
+                  return <div key={j}>{line}</div>;
+                })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+type Tab = "kanban" | "context" | "classify" | "sessions" | "pipeline" | "velocity" | "backlog" | "roadmap" | "changelog";
 
 export function Component() {
   const [tab, setTab] = useState<Tab>("kanban");
   const [snapshot, setSnapshot] = useState<WorkSnapshot | null>(null);
-  const [ctx, setCtx] = useState<WorkContext | null>(null);
-  const [sessions, setSessions] = useState<SessionList | null>(null);
-  // F514 — analytics state
-  const [velocity, setVelocity] = useState<VelocityData | null>(null);
   const [phaseProgress, setPhaseProgress] = useState<PhaseProgressData | null>(null);
   const [backlogHealth, setBacklogHealth] = useState<BacklogHealthData | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
@@ -1027,118 +776,112 @@ export function Component() {
     }
   }, []);
 
-  const fetchContext = useCallback(async () => {
-    try {
-      setCtx(await fetchApi<WorkContext>("/work/context"));
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  const fetchSessions = useCallback(async () => {
-    try {
-      setSessions(await fetchApi<SessionList>("/work/sessions"));
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  // F514 — fetch analytics endpoints once on mount
   const fetchAnalytics = useCallback(async () => {
-    try { setVelocity(await fetchApi<VelocityData>("/work/velocity")); } catch { /* ignore */ }
     try { setPhaseProgress(await fetchApi<PhaseProgressData>("/work/phase-progress")); } catch { /* ignore */ }
     try { setBacklogHealth(await fetchApi<BacklogHealthData>("/work/backlog-health")); } catch { /* ignore */ }
   }, []);
 
-  // Initial fetch + 5s polling
   useEffect(() => {
     fetchSnapshot();
-    fetchContext();
-    fetchSessions();
     fetchAnalytics();
-    const id = setInterval(() => {
-      fetchSnapshot();
-      fetchSessions();
-    }, 5000);
+    const id = setInterval(fetchSnapshot, 5000);
     return () => clearInterval(id);
-  }, [fetchSnapshot, fetchContext, fetchSessions, fetchAnalytics]);
+  }, [fetchSnapshot, fetchAnalytics]);
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: "kanban",   label: "Kanban" },
-    { key: "context",  label: "Context Resume" },
-    { key: "classify", label: "Classify" },
-    { key: "sessions", label: "Sessions" },
-    { key: "pipeline", label: "Pipeline" },
-    { key: "velocity", label: "Velocity" },
-    { key: "backlog",  label: "Backlog" },
+    { key: "kanban",    label: "작업 현황" },
+    { key: "roadmap",   label: "Roadmap" },
+    { key: "backlog",   label: "Backlog" },
+    { key: "changelog", label: "Changelog" },
+    { key: "classify",  label: "작업 분류" },
   ];
 
   return (
     <div
       style={{
-        padding: "24px 28px",
-        background: "#0f172a",
+        padding: "28px 32px",
+        background: T.bg.page,
         minHeight: "100vh",
-        color: "#f1f5f9",
-        fontFamily: "'Inter', system-ui, sans-serif",
+        color: T.text.primary,
+        fontFamily: T.font,
       }}
     >
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 20 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>Work Management</h1>
-        <span style={{ fontSize: 12, color: "#475569" }}>F509 · Phase 33</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 28 }}>
+        <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>
+          작업 현황
+        </h1>
+        <div style={{
+          height: 20,
+          width: 1,
+          background: T.border.subtle,
+        }} />
+        <span style={{ fontSize: 11, color: T.text.muted, fontFamily: T.mono }}>
+          Foundry-X
+        </span>
         {lastUpdate && (
-          <span style={{ fontSize: 11, color: "#334155", marginLeft: "auto" }}>
-            갱신: {formatDate(lastUpdate.toISOString())} · 5s polling
+          <span style={{ fontSize: 10, color: T.text.muted, marginLeft: "auto", fontFamily: T.mono }}>
+            {formatDate(lastUpdate.toISOString())}
           </span>
         )}
       </div>
 
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 20, borderBottom: "1px solid #1e293b", paddingBottom: 0 }}>
-        {tabs.map(t => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            style={{
-              padding: "8px 16px",
-              fontSize: 13,
-              fontWeight: tab === t.key ? 600 : 400,
-              color: tab === t.key ? "#f1f5f9" : "#64748b",
-              background: "none",
-              border: "none",
-              borderBottom: tab === t.key ? "2px solid #3b82f6" : "2px solid transparent",
-              cursor: "pointer",
-              marginBottom: -1,
-            }}
-          >
-            {t.label}
-          </button>
-        ))}
+      <div style={{
+        display: "flex",
+        gap: 2,
+        marginBottom: 28,
+        borderBottom: `1px solid ${T.border.subtle}`,
+      }}>
+        {tabs.map(t => {
+          const isActive = tab === t.key;
+          return (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              style={{
+                padding: "10px 18px",
+                fontSize: 13,
+                fontWeight: isActive ? 700 : 400,
+                color: isActive ? T.text.primary : T.text.muted,
+                background: isActive ? T.bg.card : "transparent",
+                border: "none",
+                borderBottom: isActive ? `2px solid ${T.border.accent}` : "2px solid transparent",
+                borderRadius: "6px 6px 0 0",
+                cursor: "pointer",
+                marginBottom: -1,
+                transition: "all 0.15s",
+                fontFamily: T.font,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              {t.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Tab content */}
       {fetchError && !snapshot && (
-        <div style={{ textAlign: "center", padding: "40px 0", color: "#94a3b8" }}>
-          <div style={{ fontSize: 16, marginBottom: 12 }}>{fetchError}</div>
+        <div style={{ textAlign: "center", padding: "60px 0", color: T.text.secondary }}>
+          <div style={{ fontSize: 15, marginBottom: 16 }}>{fetchError}</div>
           <button
             onClick={() => { setFetchError(null); void fetchSnapshot(); }}
             style={{
-              background: "#3b82f6", color: "#fff", border: "none",
-              borderRadius: 6, padding: "8px 20px", cursor: "pointer", fontSize: 13,
+              background: T.border.accent, color: "#fff", border: "none",
+              borderRadius: 8, padding: "10px 24px", cursor: "pointer", fontSize: 13,
+              fontWeight: 600, fontFamily: T.font,
             }}
           >
             다시 시도
           </button>
         </div>
       )}
-      {(!fetchError || snapshot) && tab === "kanban"   && <KanbanTab   snapshot={snapshot} />}
-      {(!fetchError || snapshot) && tab === "context"  && <ContextTab  ctx={ctx} />}
-      {tab === "classify" && <ClassifyTab />}
-      {(!fetchError || snapshot) && tab === "sessions" && <SessionsTab data={sessions} />}
-      {tab === "pipeline" && <PipelineFlowTab snapshot={snapshot} backlogHealth={backlogHealth} />}
-      {tab === "velocity" && <VelocityTab velocity={velocity} phaseProgress={phaseProgress} />}
-      {tab === "backlog"  && <BacklogHealthTab health={backlogHealth} />}
+      {(!fetchError || snapshot) && tab === "kanban"   && <KanbanTab snapshot={snapshot} />}
+      {tab === "roadmap"   && <RoadmapTab phaseProgress={phaseProgress} />}
+      {tab === "backlog"   && <BacklogHealthTab health={backlogHealth} />}
+      {tab === "changelog" && <ChangelogTab />}
+      {tab === "classify"  && <ClassifyTab />}
     </div>
   );
 }

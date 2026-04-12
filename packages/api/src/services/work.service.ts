@@ -433,6 +433,23 @@ export class WorkService {
     return { synced: input.sessions.length, removed };
   }
 
+  async getChangelog() {
+    try {
+      const repo = this.env.GITHUB_REPO || "KTDS-AXBD/Foundry-X";
+      const url = `https://raw.githubusercontent.com/${repo}/master/CHANGELOG.md`;
+      const res = await fetch(url, {
+        headers: this.env.GITHUB_TOKEN
+          ? { Authorization: `token ${this.env.GITHUB_TOKEN}` }
+          : {},
+      });
+      if (!res.ok) return { content: "", generated_at: new Date().toISOString() };
+      const content = await res.text();
+      return { content, generated_at: new Date().toISOString() };
+    } catch {
+      return { content: "", generated_at: new Date().toISOString() };
+    }
+  }
+
   private classifyWithRegex(text: string) {
     const lower = text.toLowerCase();
 
