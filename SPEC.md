@@ -4,7 +4,7 @@ title: Foundry-X Project Specification
 version: 5.78
 status: Active
 category: SPEC
-system-version: Sprint 260
+system-version: Sprint 261
 created: 2026-03-16
 updated: 2026-04-12
 author: Sinclair Seo
@@ -220,7 +220,7 @@ Foundry-X CLI — 사람과 AI 에이전트가 동등한 팀원으로 협업하�
 > ls packages/api/src/db/migrations/*.sql | sort | tail -1  # D1 latest
 > turbo test --output-logs=errors-only    # 테스트 수 (전체 실행)
 > ```
-> **마지막 실측** (Sprint 259, 2026-04-12): ~9 routes, ~40 services (adapters 13 포함), ~13 schemas, D1 0125, tests ~3447 (E2E 263) — 수치 변동 없음 (S259는 scripts/task/{task-start,task-complete,lib,test-reuse-id}.sh + scripts/sprint-merge-monitor.sh 위주, packages/api 미변경)
+> **마지막 실측** (Sprint 261, 2026-04-12): ~10 routes, ~41 services (adapters 13 포함), ~14 schemas, D1 0125, tests ~3452 (E2E 268) — Phase 33 F509 fx-work-observability Walking Skeleton으로 packages/api routes/services/schemas 각 +1(`work.ts` + `work.service.ts` + `work.ts` schemas), packages/web e2e +1 spec (`work-management.spec.ts` +5 tests), D1 변동 없음
 
 ## §3 마일스톤
 

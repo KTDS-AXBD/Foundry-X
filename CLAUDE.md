@@ -26,8 +26,8 @@ turbo test / lint / typecheck  # 전체 검증
 
 ## Current Phase
 
-Phase 1~32 완료 (Sprint 1~255). Phase 32 Work Management 7/7 ✅ (F501~F507) + 32-E (F508 통합 정합성) ✅. 상세: SPEC.md §5
-- 신규 backlog 대기 (📋 4건: F112/F117/F118/F245, 모두 장기)
+Phase 1~33 완료 (Sprint 1~261). Phase 32 Work Management 7/7 ✅ (F501~F507) + 32-E (F508) ✅ + **Phase 33 Work Management Observability** ✅ (F509 fx-work-observability Walking Skeleton, Sprint 261, PR #503, Gap 98%). 상세: SPEC.md §5
+- 신규 backlog 대기 (📋 장기 2건: F112, F117)
 - 수치: `/ax:daily-check` 또는 SPEC.md §2 (하드코딩 금지)
 
 ## Deployment
