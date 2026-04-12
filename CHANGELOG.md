@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Sprint 268 MSA Walking Skeleton** (PR #535): `packages/fx-gateway/` API 게이트웨이 Worker + `packages/fx-discovery/` Discovery 독립 Worker 생성 (F520/F521 ✅, Gap 100%). PRD: `docs/specs/fx-msa-roadmap/prd-final.md` (3-AI R2 검토, Ambiguity 0.150)
 - **S268** (PR #532, #534): /work-management 대시보드 대폭 개선 — Roadmap 탭(Phase 타임라인 + ROADMAP.md 미래 계획), Changelog 탭(react-markdown 렌더링), 불필요 탭 4개 제거(Context Resume/Sessions/Pipeline/Velocity), AXIS 디자인 토큰 적용, 탭 한글화, `GET /api/work/changelog` + `GET /api/work/roadmap` 엔드포인트
 - **C44/C45/C49** (PR #534): Backlog C/B/X-track 파싱(`parseBacklogItems`), 작업 분류 사용법 안내, `getPhaseProgress` SPEC §3 직접 파싱, `fetchSpecText` 캐시
 - **Phase 37 Work Lifecycle Platform** (PRD final): F516 Backlog 인입 파이프라인 + 실시간 동기화, F517 메타데이터 트레이서빌리티, F518 Work Ontology — 3 Sprint (267~269)
@@ -20,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **F509** (Sprint 261, PR #503 `e942b87d`, Gap 98%, 실소요 ~3h): **Phase 33 Work Management Observability Walking Skeleton** — Backlog/REQ/Task/Sprint/Epic 4-channel 통합 뷰 + 자연어 분류 파이프라인. M1 `GET /api/work/snapshot`(SPEC.md GitHub raw + commits + PRs 집계), M2 `/work-management` React Router 4컬럼 Kanban + 5s polling, M3 `GET /api/work/context`(recent commits + next_actions), M4 `POST /api/work/classify`(Claude Sonnet LLM + regex fallback). `/ax:req-interview` dogfood로 PRD 생성 (Phase 2 API Review 73/100 Conditional + ChatGPT flaw §5.2.1 수동 보강). PRD: `docs/specs/fx-work-observability/prd-v1.md`, REQ: FX-REQ-526
 - **E2E work-management.spec.ts** (PR #507 `6a9d395e`): `/ax:e2e-audit Sprint 261`로 coverage gap 0건 감지 후 5 tests 신규 작성 — route render, kanban 4 columns, snapshot polling, tab switching, classify flow (PRD §5.2.1 S1). 모든 mock은 `page.route` fulfill (LLM 의존 제거, CI safe). autopilot Gap 98%의 E2E 측정 범위 한계 실증
 - F508: Phase 32 Integration Gap 해소 — ax 스킬 4종(gov-retro, req-manage, session-end, todo)에 Phase 32 스크립트 통합 + sprint-merge-monitor 3훅 (pr-body-enrich/velocity/epic) + CHANGELOG [Phase 32] 롤업 + priority-history F507 backfill + velocity phase 감지 버그 수정 + Sprint 245~248 velocity backfill + board-sync-spec --fix 모드 (Sprint 255 S255)
+
+### Changed
+- **cs(Claude Squad) 제거** (`sprint-ops.md`): Sprint 세션 이중 구조 충돌 해소 — `wt-claude-worktree.sh`에서 cs 자동 실행 제거, ccs 단일 경로로 단순화. feedback memory → `.claude/rules/sprint-ops.md` 승격
+- **SPEC F번호 충돌 정비** (`b753e555`): Phase 37~39 이중 등록 해소 + Sprint 268 결과(F520/F521 ✅) 매핑
 
 ### Fixed
 - **S267** (`6461fcce`): task-daemon nullglob leak + phase error isolation — `phase_sprint_signals()`가 `shopt -s nullglob`을 복원하지 않아 다음 tick `phase_signals()`의 `ls` glob이 빈 확장 → `source AGENTS.md` → daemon crash. 수정: nullglob 저장/복원, `ls` glob → for-glob 전환, run_daemon loop에 `|| log` 방어, `cd "$REPO_ROOT"` → `git -C`, grep pipefail 방어

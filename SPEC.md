@@ -43,7 +43,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 > ```
 > wc -l SPEC.md && find packages/api/src/db/migrations/*.sql | sort | tail -1
 > ```
-> **마지막 실측** (Sprint 264, 2026-04-12): ~10 routes, ~28 services, ~14 schemas, D1 0126, tests ~3452 (E2E 273) — Phase 36 F512 SPEC 경량화(1377→226줄) + F513 Work Analytics API 3건 + F514 대시보드 확장
+> **마지막 실측** (Sprint 268, 2026-04-12): ~10 routes, ~28 services, ~14 schemas, D1 0127, 10 packages, tests ~3452 (E2E 273) — Phase 39 MSA Walking Skeleton F520/F521 ✅ (fx-gateway + fx-discovery 신규)
 
 ## §3 Phase 진행 현황
 
