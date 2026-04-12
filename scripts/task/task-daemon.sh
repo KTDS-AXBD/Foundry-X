@@ -522,12 +522,21 @@ phase_merged_prs() {
         pane_id=$(jq -r --arg id "$task_id" '.tasks[$id].pane // ""' "$FX_CACHE" 2>/dev/null)
         task_branch=$(jq -r --arg id "$task_id" '.tasks[$id].branch // ""' "$FX_CACHE" 2>/dev/null)
 
-        write_signal "$task_id" "DONE" \
-          "BRANCH=${task_branch:-$branch}" \
-          "PR_URL=https://github.com/KTDS-AXBD/Foundry-X/pull/${pr_num}" \
-          "COMMIT_COUNT=1" \
-          "WT_PATH=${wt_path}" \
-          "PANE_ID=${pane_id}"
+        # write_signal은 _project_name()으로 프로젝트명을 결정하는데,
+        # daemon은 nohup 백그라운드라 cwd가 달라 "."을 반환할 수 있음.
+        # daemon의 $PROJECT 변수를 직접 사용하여 signal 파일 작성.
+        local _sig="${FX_SIGNAL_DIR}/${PROJECT}-${task_id}.signal"
+        cat > "$_sig" <<SIGEOF
+TASK_ID=$task_id
+STATUS=DONE
+TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+PROJECT=$PROJECT
+BRANCH=${task_branch:-$branch}
+PR_URL=https://github.com/KTDS-AXBD/Foundry-X/pull/${pr_num}
+COMMIT_COUNT=1
+WT_PATH=${wt_path}
+PANE_ID=${pane_id}
+SIGEOF
         log "📡 ${task_id}: merged PR signal 합성 (PR #${pr_num})"
       done
 }
@@ -575,12 +584,18 @@ phase_orphan_wts() {
         log "🔍 WT orphan: ${task_id} (remote branch 소멸 → PR #${pr_num} merged)"
         local pane_id
         pane_id=$(jq -r --arg id "$task_id" '.tasks[$id].pane // ""' "$FX_CACHE" 2>/dev/null)
-        write_signal "$task_id" "DONE" \
-          "BRANCH=${branch}" \
-          "PR_URL=https://github.com/KTDS-AXBD/Foundry-X/pull/${pr_num}" \
-          "COMMIT_COUNT=1" \
-          "WT_PATH=${wt_path}" \
-          "PANE_ID=${pane_id}"
+        local _sig="${FX_SIGNAL_DIR}/${PROJECT}-${task_id}.signal"
+        cat > "$_sig" <<SIGEOF
+TASK_ID=$task_id
+STATUS=DONE
+TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+PROJECT=$PROJECT
+BRANCH=${branch}
+PR_URL=https://github.com/KTDS-AXBD/Foundry-X/pull/${pr_num}
+COMMIT_COUNT=1
+WT_PATH=${wt_path}
+PANE_ID=${pane_id}
+SIGEOF
         log "📡 ${task_id}: WT orphan signal 합성 (PR #${pr_num})"
       done
 }
