@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { fetchApi, postApi, ApiError } from "@/lib/api-client";
+import ReactMarkdown from "react-markdown";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -412,9 +413,23 @@ function ClassifyTab() {
 
   return (
     <div style={{ maxWidth: 600, fontFamily: T.font }}>
-      <p style={{ color: T.text.secondary, fontSize: 13, marginBottom: 16 }}>
-        자연어로 작업을 입력하면 유형과 우선순위를 자동으로 분류해요.
-      </p>
+      <div style={{ marginBottom: 20 }}>
+        <p style={{ color: T.text.secondary, fontSize: 13, marginBottom: 8 }}>
+          자연어로 작업 아이디어를 입력하면 AI가 자동으로 분류해요.
+        </p>
+        <div style={{ background: T.bg.card, border: `1px solid ${T.border.subtle}`, borderRadius: 8, padding: "10px 14px", fontSize: 12, color: T.text.muted, lineHeight: 1.6 }}>
+          <div style={{ fontWeight: 600, color: T.text.secondary, marginBottom: 4 }}>사용 방법</div>
+          <div>1. 아래 텍스트 영역에 하고 싶은 작업을 자연어로 입력해요</div>
+          <div>2. <strong style={{ color: T.text.primary }}>분류하기</strong> 버튼을 누르면 AI가 유형(F/B/C/X)과 우선순위(P0~P3)를 분류해요</div>
+          <div>3. 결과를 확인하고 CLI에서 <code style={{ background: T.bg.inset, padding: "1px 4px", borderRadius: 3, fontFamily: T.mono, fontSize: 11 }}>task-start.sh</code> 명령으로 등록해요</div>
+          <div style={{ marginTop: 6, color: T.text.muted, fontSize: 11 }}>
+            유형: <strong style={{ color: "#8b5cf6" }}>F</strong>=Feature &nbsp;
+            <strong style={{ color: "#ef4444" }}>B</strong>=Bug &nbsp;
+            <strong style={{ color: "#6b7280" }}>C</strong>=Chore &nbsp;
+            <strong style={{ color: "#06b6d4" }}>X</strong>=Experiment
+          </div>
+        </div>
+      </div>
 
       <textarea
         value={input}
@@ -522,7 +537,7 @@ function getPhaseLabel(id: number, name: string): string {
 
 // ─── Roadmap Tab ─────────────────────────────────────────────────────────────
 
-function RoadmapTab({ phaseProgress }: { phaseProgress: PhaseProgressData | null }) {
+function RoadmapTab({ phaseProgress, roadmapContent }: { phaseProgress: PhaseProgressData | null; roadmapContent: string | null }) {
   if (!phaseProgress) {
     return <div style={{ color: T.text.secondary, padding: 20, fontFamily: T.font }}>불러오는 중…</div>;
   }
@@ -627,6 +642,61 @@ function RoadmapTab({ phaseProgress }: { phaseProgress: PhaseProgressData | null
           )}
         </section>
       )}
+
+      {/* Future plans from ROADMAP.md */}
+      {roadmapContent && (
+        <section style={{ marginTop: 32, borderTop: `1px solid ${T.border.subtle}`, paddingTop: 24 }}>
+          {sectionLabel("향후 계획", T.text.accent)}
+          <div
+            style={{
+              background: T.bg.card,
+              borderRadius: 10,
+              padding: "16px 20px",
+              border: `1px solid ${T.border.subtle}`,
+              fontSize: 13,
+              lineHeight: 1.7,
+              color: T.text.secondary,
+            }}
+          >
+            <ReactMarkdown
+              components={{
+                h2: ({ children }) => (
+                  <div style={{ fontWeight: 700, color: T.text.primary, margin: "18px 0 8px", fontSize: 15, fontFamily: T.font }}>{children}</div>
+                ),
+                h3: ({ children }) => (
+                  <div style={{ fontWeight: 600, color: T.text.primary, margin: "14px 0 6px", fontSize: 13 }}>{children}</div>
+                ),
+                li: ({ children }) => (
+                  <li style={{ marginBottom: 4, color: T.text.secondary, fontSize: 12 }}>{children}</li>
+                ),
+                strong: ({ children }) => (
+                  <strong style={{ color: T.text.primary }}>{children}</strong>
+                ),
+                a: ({ href, children }) => (
+                  <a href={href} target="_blank" rel="noreferrer" style={{ color: T.text.accent }}>{children}</a>
+                ),
+                code: ({ children }) => (
+                  <code style={{ background: T.bg.inset, padding: "1px 5px", borderRadius: 3, fontSize: 11, fontFamily: T.mono }}>{children}</code>
+                ),
+                table: ({ children }) => (
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, margin: "8px 0" }}>{children}</table>
+                ),
+                th: ({ children }) => (
+                  <th style={{ textAlign: "left", padding: "6px 10px", borderBottom: `1px solid ${T.border.subtle}`, color: T.text.muted, fontWeight: 600 }}>{children}</th>
+                ),
+                td: ({ children }) => (
+                  <td style={{ padding: "6px 10px", borderBottom: `1px solid ${T.border.subtle}` }}>{children}</td>
+                ),
+                p: ({ children }) => (
+                  <p style={{ margin: "6px 0" }}>{children}</p>
+                ),
+              }}
+            >
+              {roadmapContent}
+            </ReactMarkdown>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
@@ -715,30 +785,46 @@ function ChangelogTab() {
             <div
               style={{
                 padding: "14px 18px",
-                fontSize: 12,
-                lineHeight: 1.8,
+                fontSize: 13,
+                lineHeight: 1.7,
                 color: T.text.secondary,
-                whiteSpace: "pre-wrap",
-                fontFamily: T.mono,
-                maxHeight: 400,
+                maxHeight: 500,
                 overflow: "auto",
               }}
+              className="changelog-md"
             >
-              {section.lines
-                .filter(l => l.trim())
-                .map((line, j) => {
-                  if (line.startsWith("### ")) {
-                    return (
-                      <div key={j} style={{ fontWeight: 700, color: T.text.primary, margin: "14px 0 6px", fontSize: 13, fontFamily: T.font }}>
-                        {line.replace("### ", "")}
-                      </div>
-                    );
-                  }
-                  if (line.trimStart().startsWith("- ")) {
-                    return <div key={j} style={{ paddingLeft: 12 }}>{line}</div>;
-                  }
-                  return <div key={j}>{line}</div>;
-                })}
+              <ReactMarkdown
+                components={{
+                  h3: ({ children }) => (
+                    <div style={{ fontWeight: 700, color: T.text.primary, margin: "16px 0 8px", fontSize: 14, fontFamily: T.font }}>
+                      {children}
+                    </div>
+                  ),
+                  li: ({ children }) => (
+                    <li style={{ marginBottom: 4, paddingLeft: 4, color: T.text.secondary, fontSize: 12 }}>
+                      {children}
+                    </li>
+                  ),
+                  strong: ({ children }) => (
+                    <strong style={{ color: T.text.primary, fontWeight: 600 }}>{children}</strong>
+                  ),
+                  a: ({ href, children }) => (
+                    <a href={href} target="_blank" rel="noreferrer" style={{ color: T.text.accent, textDecoration: "none" }}>
+                      {children}
+                    </a>
+                  ),
+                  code: ({ children }) => (
+                    <code style={{ background: T.bg.inset, padding: "1px 5px", borderRadius: 3, fontSize: 11, fontFamily: T.mono, color: T.status.planned }}>
+                      {children}
+                    </code>
+                  ),
+                  p: ({ children }) => (
+                    <p style={{ margin: "6px 0", fontSize: 12, lineHeight: 1.6 }}>{children}</p>
+                  ),
+                }}
+              >
+                {section.lines.join("\n")}
+              </ReactMarkdown>
             </div>
           </div>
         );
@@ -754,6 +840,7 @@ export function Component() {
   const [snapshot, setSnapshot] = useState<WorkSnapshot | null>(null);
   const [phaseProgress, setPhaseProgress] = useState<PhaseProgressData | null>(null);
   const [backlogHealth, setBacklogHealth] = useState<BacklogHealthData | null>(null);
+  const [roadmapContent, setRoadmapContent] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const hasSnapshotData = useRef(false);
@@ -779,6 +866,10 @@ export function Component() {
   const fetchAnalytics = useCallback(async () => {
     try { setPhaseProgress(await fetchApi<PhaseProgressData>("/work/phase-progress")); } catch { /* ignore */ }
     try { setBacklogHealth(await fetchApi<BacklogHealthData>("/work/backlog-health")); } catch { /* ignore */ }
+    try {
+      const rm = await fetchApi<{ content: string }>("/work/roadmap");
+      setRoadmapContent(rm.content);
+    } catch { /* ignore */ }
   }, []);
 
   useEffect(() => {
@@ -878,7 +969,7 @@ export function Component() {
         </div>
       )}
       {(!fetchError || snapshot) && tab === "kanban"   && <KanbanTab snapshot={snapshot} />}
-      {tab === "roadmap"   && <RoadmapTab phaseProgress={phaseProgress} />}
+      {tab === "roadmap"   && <RoadmapTab phaseProgress={phaseProgress} roadmapContent={roadmapContent} />}
       {tab === "backlog"   && <BacklogHealthTab health={backlogHealth} />}
       {tab === "changelog" && <ChangelogTab />}
       {tab === "classify"  && <ClassifyTab />}

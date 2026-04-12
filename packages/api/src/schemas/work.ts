@@ -148,3 +148,10 @@ export const ChangelogSchema = z.object({
   content: z.string(),
   generated_at: z.string(),
 });
+
+// ─── Roadmap ────────────────────────────────────────────────────────────────
+
+export const RoadmapSchema = z.object({
+  content: z.string(),
+  generated_at: z.string(),
+});

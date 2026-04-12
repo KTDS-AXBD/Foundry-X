@@ -11,6 +11,7 @@ import {
   PhaseProgressSchema,
   BacklogHealthSchema,
   ChangelogSchema,
+  RoadmapSchema,
 } from "../schemas/work.js";
 import type { Env } from "../env.js";
 import { WorkService } from "../services/work.service.js";
@@ -219,5 +220,26 @@ const getChangelog = createRoute({
 workRoute.openapi(getChangelog, async (c) => {
   const svc = new WorkService(c.env);
   const data = await svc.getChangelog();
+  return c.json(data);
+});
+
+// ─── GET /api/work/roadmap ───────────────────────────────────────────────────
+
+const getRoadmap = createRoute({
+  method: "get",
+  path: "/work/roadmap",
+  tags: ["Work Observability"],
+  summary: "ROADMAP.md content — short/mid/long-term plans",
+  responses: {
+    200: {
+      content: { "application/json": { schema: RoadmapSchema } },
+      description: "Roadmap content",
+    },
+  },
+});
+
+workRoute.openapi(getRoadmap, async (c) => {
+  const svc = new WorkService(c.env);
+  const data = await svc.getRoadmap();
   return c.json(data);
 });

@@ -82,7 +82,10 @@ export class WorkService {
     return this.classifyWithRegex(text);
   }
 
-  private async parseSpecItems(): Promise<WorkItem[]> {
+  private specTextCache: string | null = null;
+
+  private async fetchSpecText(): Promise<string> {
+    if (this.specTextCache) return this.specTextCache;
     try {
       const repo = this.env.GITHUB_REPO || "KTDS-AXBD/Foundry-X";
       const url = `https://raw.githubusercontent.com/${repo}/master/SPEC.md`;
@@ -91,12 +94,18 @@ export class WorkService {
           ? { Authorization: `token ${this.env.GITHUB_TOKEN}` }
           : {},
       });
-      if (!res.ok) return [];
-      const text = await res.text();
-      return this.parseFItems(text);
+      if (!res.ok) return "";
+      this.specTextCache = await res.text();
+      return this.specTextCache;
     } catch {
-      return [];
+      return "";
     }
+  }
+
+  private async parseSpecItems(): Promise<WorkItem[]> {
+    const text = await this.fetchSpecText();
+    if (!text) return [];
+    return [...this.parseFItems(text), ...this.parseBacklogItems(text)];
   }
 
   private parseFItems(specText: string): WorkItem[] {
@@ -119,6 +128,38 @@ export class WorkService {
         title: title.trim().slice(0, 100),
         status,
         sprint,
+        priority: title.match(/P[0-3]/)?.[0],
+        req_code: title.match(/FX-REQ-\d+/)?.[0],
+      });
+    }
+
+    return items;
+  }
+
+  // C45/C49: Parse Backlog table rows (C/B/X tracks)
+  // Format: | C43 | C | title... | REQ | Sprint | 상태 | 비고 |
+  private parseBacklogItems(specText: string): WorkItem[] {
+    const linePattern = /^\|\s*([CBXF]\d+)\s*\|\s*[CBXF]\s*\|\s*([^|]{3,}?)\s*\|[^|]*\|[^|]*\|\s*([^|]*?)\s*\|/gm;
+    const items: WorkItem[] = [];
+
+    for (const match of specText.matchAll(linePattern)) {
+      const id = match[1] ?? "";
+      const title = match[2] ?? "";
+      const statusCol = match[3] ?? "";
+
+      if (!id || id.startsWith("F")) continue; // F-items already parsed above
+
+      let status: WorkItem["status"] = "backlog";
+      const st = statusCol.trim().toUpperCase();
+      if (st === "DONE" || st.includes("✅")) status = "done";
+      else if (st.includes("IN_PROGRESS") || st.includes("🔧")) status = "in_progress";
+      else if (st.includes("PLANNED") || st.includes("📋")) status = "planned";
+      else if (st.includes("CANCELLED") || st.includes("CLOSED") || st.includes("REJECTED")) status = "rejected";
+
+      items.push({
+        id: id.trim(),
+        title: title.trim().slice(0, 100),
+        status,
         priority: title.match(/P[0-3]/)?.[0],
         req_code: title.match(/FX-REQ-\d+/)?.[0],
       });
@@ -269,36 +310,80 @@ export class WorkService {
   }
 
   async getPhaseProgress() {
-    const items = await this.parseSpecItems();
-
-    // Group by phase inferred from F-item numbering (every ~30 items = one phase)
-    const phaseMap = new Map<number, { total: number; done: number; in_progress: number }>();
-    const ITEMS_PER_PHASE = 15;
-
-    for (const item of items) {
-      const num = parseInt(item.id.replace("F", ""), 10);
-      const phaseId = Math.max(1, Math.ceil(num / ITEMS_PER_PHASE));
-      const entry = phaseMap.get(phaseId) ?? { total: 0, done: 0, in_progress: 0 };
-      entry.total++;
-      if (item.status === "done") entry.done++;
-      if (item.status === "in_progress") entry.in_progress++;
-      phaseMap.set(phaseId, entry);
+    const specText = await this.fetchSpecText();
+    if (!specText) {
+      return { phases: [], current_phase: 1, generated_at: new Date().toISOString() };
     }
 
-    const phases = Array.from(phaseMap.entries())
-      .sort(([a], [b]) => a - b)
-      .map(([id, data]) => ({
-        id,
-        name: `Phase ${id}`,
-        total: data.total,
-        done: data.done,
-        in_progress: data.in_progress,
-        pct: data.total > 0 ? Math.round((data.done / data.total) * 100) : 0,
-      }));
+    // Parse SPEC §3 Phase table directly instead of inferring from F-item numbers
+    // Format: | Phase 33 Work Observability (F509) | ✅ Sprint 261 |
+    // or:     | **Phase 36 Work Management Enhancement** (...) | | | |
+    const phasePattern = /^\|\s*\*{0,2}Phase\s+(\d+)[:\s]*([^(|*]*)/gm;
+    const statusPattern = /\|\s*(✅|🔧|📋)/;
 
-    const current_phase = phases.length > 0 ? (phases[phases.length - 1]?.id ?? 1) : 1;
+    const phases: Array<{ id: number; name: string; total: number; done: number; in_progress: number; pct: number }> = [];
+    const seen = new Set<number>();
+
+    for (const match of specText.matchAll(phasePattern)) {
+      const id = parseInt(match[1] ?? "0", 10);
+      if (id === 0 || seen.has(id)) continue;
+      seen.add(id);
+
+      const rawName = (match[2] ?? "").trim().replace(/\*+$/, "").trim();
+      const name = rawName || `Phase ${id}`;
+
+      // Find status in the same line
+      const lineEnd = specText.indexOf("\n", match.index ?? 0);
+      const fullLine = specText.slice(match.index ?? 0, lineEnd > 0 ? lineEnd : undefined);
+      const statusMatch = fullLine.match(statusPattern);
+      const statusEmoji = statusMatch?.[1] ?? "";
+
+      // Count F-items belonging to this phase by checking next Phase boundary
+      const items = await this.parseSpecItems();
+      const phaseItems = items.filter(i => {
+        if (!i.id.startsWith("F")) return false;
+        // Check if item is mentioned in the Phase section header or nearby rows
+        const itemIdx = specText.indexOf(`| ${i.id} |`);
+        if (itemIdx < 0) return false;
+        const phaseIdx = match.index ?? 0;
+        // Find next Phase header
+        const nextPhaseMatch = specText.slice(phaseIdx + 1).match(/^\|\s*\*{0,2}Phase\s+\d+/m);
+        const nextPhaseIdx = nextPhaseMatch ? phaseIdx + 1 + (nextPhaseMatch.index ?? specText.length) : specText.length;
+        return itemIdx > phaseIdx && itemIdx < nextPhaseIdx;
+      });
+
+      const total = phaseItems.length || 1;
+      const done = phaseItems.filter(i => i.status === "done").length || (statusEmoji === "✅" ? 1 : 0);
+      const in_progress = phaseItems.filter(i => i.status === "in_progress").length || (statusEmoji === "🔧" ? 1 : 0);
+      const pct = total > 0 ? Math.round((done / total) * 100) : (statusEmoji === "✅" ? 100 : 0);
+
+      phases.push({ id, name, total, done, in_progress, pct });
+    }
+
+    phases.sort((a, b) => a.id - b.id);
+    const current_phase = phases.find(p => p.pct < 100 && p.pct > 0)?.id
+      ?? phases[phases.length - 1]?.id
+      ?? 1;
 
     return { phases, current_phase, generated_at: new Date().toISOString() };
+  }
+
+  // C44: Parse ROADMAP.md for future plans
+  async getRoadmap() {
+    try {
+      const repo = this.env.GITHUB_REPO || "KTDS-AXBD/Foundry-X";
+      const url = `https://raw.githubusercontent.com/${repo}/master/docs/ROADMAP.md`;
+      const res = await fetch(url, {
+        headers: this.env.GITHUB_TOKEN
+          ? { Authorization: `token ${this.env.GITHUB_TOKEN}` }
+          : {},
+      });
+      if (!res.ok) return { content: "", generated_at: new Date().toISOString() };
+      const content = await res.text();
+      return { content, generated_at: new Date().toISOString() };
+    } catch {
+      return { content: "", generated_at: new Date().toISOString() };
+    }
   }
 
   async getBacklogHealth() {

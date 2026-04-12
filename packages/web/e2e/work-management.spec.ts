@@ -49,6 +49,11 @@ const MOCK_BACKLOG_HEALTH = {
   generated_at: "2026-04-12T11:00:00Z",
 };
 
+const MOCK_ROADMAP = {
+  content: "## 3. Mid-term (Phase 37~38)\n\n| 후보 | 방향 |\n|------|------|\n| 웹 대시보드 관리 기능 | F-item 상태 전이 |\n| 에이전트 자율 운영 강화 | autopilot Gap% E2E 측정 확장 |\n",
+  generated_at: "2026-04-12T11:00:00Z",
+};
+
 const MOCK_CHANGELOG = {
   content: "# Changelog\n\n## [Unreleased]\n\n### Added\n- Roadmap 뷰 추가\n- Changelog 웹 뷰 추가\n\n## [Phase 32] - 2026-04-11\n\n### Added\n- F501: GitHub Projects Board\n",
   generated_at: "2026-04-12T11:00:00Z",
@@ -91,6 +96,13 @@ async function mockWorkApi(page: import("@playwright/test").Page) {
       status: 200,
       contentType: "application/json",
       body: JSON.stringify(MOCK_CHANGELOG),
+    }),
+  );
+  await page.route("**/api/work/roadmap", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(MOCK_ROADMAP),
     }),
   );
 }
@@ -166,6 +178,9 @@ test.describe("Work Management (F509 Walking Skeleton)", () => {
     await expect(page.getByText(/2\/4/)).toBeVisible();
     // Completed section — Phase 33 (pct: 100)
     await expect(page.getByText(/완료/)).toBeVisible();
+    // Future plans from ROADMAP.md
+    await expect(page.getByText("향후 계획")).toBeVisible();
+    await expect(page.getByText(/웹 대시보드 관리 기능/)).toBeVisible();
   });
 
   // ─── Changelog Tab ────────────────────────────────────────────────────────
@@ -209,6 +224,9 @@ test.describe("Work Management (F509 Walking Skeleton)", () => {
     await page.goto("/work-management");
 
     await page.getByRole("button", { name: "작업 분류" }).click();
+
+    // C45: 사용 방법 안내 표시 확인
+    await expect(page.getByText("사용 방법")).toBeVisible();
 
     const textarea = page.getByPlaceholder("예: 작업 관찰성 view에 burndown chart 추가 필요");
     await expect(textarea).toBeVisible();
