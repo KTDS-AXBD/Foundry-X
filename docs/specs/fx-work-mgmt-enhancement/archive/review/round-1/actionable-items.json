@@ -1,0 +1,341 @@
+{
+  "generated": "2026-04-12T06:07:50.035Z",
+  "totalItems": 55,
+  "byType": {
+    "flaw": 8,
+    "gap": 16,
+    "risk": 28
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**문제-해결-측정의 세부 연결 미흡**: 예를 들어, F-item 세부 상태 도입이 실제 생산성/가시성/의사결정에 어떻게 기여할지, 측정 기준이 \"괄호 표기 적용률\" 이상의 실질적 효과(예: 평균 cycle time, blocker 발생률 등)로 드러나지 않음.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**사용자 페르소나의 행동 변화에 대한 가설 부재**: 현행 '1인+AI' 체계에서 문서 구조 분리/경량화가 실제 작업 흐름(예: 온보딩, 일간 업무, AI prompt 구동)에 어떤 질적 변화를 줄지 더 명확한 설명 필요.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**테스트 보강이 API 확장 리스크 저감으로 이어지는 논리**가 KPI에만 반영되고, 실제 regression catch coverage 등 품질 개선 수치(예: bug rate, release roll-back 빈도 등)는 빠짐.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**문서 구조 변경에 따른 파편화 및 파서/스크립트/AI agent 동작 불능**: SPEC 경량화/아카이브/상태 세분화가 기존 자동화/에이전트/스크립트와 호환되지 않으면, 무중단 운영 저해. 이슈 1,2,5에서 암시됐으나, 실제 영향 범위가 넓고, 롤백 플랜이 명확하지 않음.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**테스트 보강 미흡 시 회귀 리스크 심각**: 기존 테스트 coverage가 낮은 상태에서 대규모 구조변경을 병행하면, 누락된 결함이 서비스 전체 안정성에 악영향.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**1인 체계의 병목**: 업무량 집중에 따른 일정 지연, 품질 저하, Burnout.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**AI agent 의존도 과도**: 자동화/테스트/문서 편집 등에서 AI가 인간 수준의 신뢰도로 작업을 수행할지 불확실.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**운영 중 장애 발생 시 대응력 약화**: 변경 후 예상치 못한 장애(예: 문서 참조 실패, 데이터 불일치, 자동화 오류) 시, 즉각적인 원인 파악/복구 체계가 미흡.",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Change Management/Communication Plan 부재**: 구조 변경(문서/상태/자동화/아카이브)이 있을 때, AI agent, 미래 팀원, 기존 사용자(혹은 자동화 파이프라인)의 혼란 최소화를 위한 migration guide, notice, backward compatibility, 롤백 플랜 등이 빠져 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**데이터 마이그레이션/검증 절차 부재**: 아카이브/경로 변경 시, 기존 데이터가 정상 이전/연결되는지 검증 체크리스트 및 validation step 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Monitoring/Alerting 부재**: API/자동화/스크립트/문서 갱신 자동화가 실패했을 때 알람, 롤백, log 기록 등 운영 레벨의 관리 항목이 없다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Quality Gate/Release Readiness Criteria 부재**: \"MVP 최소 기준\"은 있으나, 실제 배포 전 검증(테스트 coverage, 주요 유즈케이스 시나리오, 에이전트/웹/스크립트 동작 확인 등) 체크리스트가 빠져 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**에이전트/자동화 연동 영향도 분석 부족**: 파서/스크립트가 새 문서 구조/상태 표기를 제대로 인식하지 못하면, 즉각적으로 문제를 감지·치료할 체계(예: smoke test, sanity check)가 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**문서 구조 변경에 따른 파편화 및 파서/스크립트/AI agent 동작 불능**: SPEC 경량화/아카이브/상태 세분화가 기존 자동화/에이전트/스크립트와 호환되지 않으면, 무중단 운영 저해. 이슈 1,2,5에서 암시됐으나, 실제 영향 범위가 넓고, 롤백 플랜이 명확하지 않음.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트 보강 미흡 시 회귀 리스크 심각**: 기존 테스트 coverage가 낮은 상태에서 대규모 구조변경을 병행하면, 누락된 결함이 서비스 전체 안정성에 악영향.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**1인 체계의 병목**: 업무량 집중에 따른 일정 지연, 품질 저하, Burnout.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**AI agent 의존도 과도**: 자동화/테스트/문서 편집 등에서 AI가 인간 수준의 신뢰도로 작업을 수행할지 불확실.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영 중 장애 발생 시 대응력 약화**: 변경 후 예상치 못한 장애(예: 문서 참조 실패, 데이터 불일치, 자동화 오류) 시, 즉각적인 원인 파악/복구 체계가 미흡.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**문서 구조 변경/아카이브/상태 세분화에 대한 영향도 분석 및 롤백 플랜 상세화**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트 보강 우선순위 상향 및 커버리지 목표 명확화**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Change Management/Communication Plan 보완**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**데이터 마이그레이션/검증 체크리스트 작성**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영 중 장애 모니터링 및 알람 체계 설계**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**문제-해결-측정의 세부 연결 미흡**: 예를 들어, F-item 세부 상태 도입이 실제 생산성/가시성/의사결정에 어떻게 기여할지, 측정 기준이 \"괄호 표기 적용률\" 이상의 실질적 효과(예: 평균 cycle time, blocker 발생률 등)로 드러나지 않음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**사용자 페르소나의 행동 변화에 대한 가설 부재**: 현행 '1인+AI' 체계에서 문서 구조 분리/경량화가 실제 작업 흐름(예: 온보딩, 일간 업무, AI prompt 구동)에 어떤 질적 변화를 줄지 더 명확한 설명 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트 보강이 API 확장 리스크 저감으로 이어지는 논리**가 KPI에만 반영되고, 실제 regression catch coverage 등 품질 개선 수치(예: bug rate, release roll-back 빈도 등)는 빠짐.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Change Management/Communication Plan 부재**: 구조 변경(문서/상태/자동화/아카이브)이 있을 때, AI agent, 미래 팀원, 기존 사용자(혹은 자동화 파이프라인)의 혼란 최소화를 위한 migration guide, notice, backward compatibility, 롤백 플랜 등이 빠져 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**데이터 마이그레이션/검증 절차 부재**: 아카이브/경로 변경 시, 기존 데이터가 정상 이전/연결되는지 검증 체크리스트 및 validation step 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Monitoring/Alerting 부재**: API/자동화/스크립트/문서 갱신 자동화가 실패했을 때 알람, 롤백, log 기록 등 운영 레벨의 관리 항목이 없다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Quality Gate/Release Readiness Criteria 부재**: \"MVP 최소 기준\"은 있으나, 실제 배포 전 검증(테스트 coverage, 주요 유즈케이스 시나리오, 에이전트/웹/스크립트 동작 확인 등) 체크리스트가 빠져 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**에이전트/자동화 연동 영향도 분석 부족**: 파서/스크립트가 새 문서 구조/상태 표기를 제대로 인식하지 못하면, 즉각적으로 문제를 감지·치료할 체계(예: smoke test, sanity check)가 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**문서 구조 변경에 따른 파편화 및 파서/스크립트/AI agent 동작 불능**: SPEC 경량화/아카이브/상태 세분화가 기존 자동화/에이전트/스크립트와 호환되지 않으면, 무중단 운영 저해. 이슈 1,2,5에서 암시됐으나, 실제 영향 범위가 넓고, 롤백 플랜이 명확하지 않음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트 보강 미흡 시 회귀 리스크 심각**: 기존 테스트 coverage가 낮은 상태에서 대규모 구조변경을 병행하면, 누락된 결함이 서비스 전체 안정성에 악영향.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**1인 체계의 병목**: 업무량 집중에 따른 일정 지연, 품질 저하, Burnout.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**AI agent 의존도 과도**: 자동화/테스트/문서 편집 등에서 AI가 인간 수준의 신뢰도로 작업을 수행할지 불확실.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영 중 장애 발생 시 대응력 약화**: 변경 후 예상치 못한 장애(예: 문서 참조 실패, 데이터 불일치, 자동화 오류) 시, 즉각적인 원인 파악/복구 체계가 미흡.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**문서 구조 변경/아카이브/상태 세분화에 대한 영향도 분석 및 롤백 플랜 상세화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트 보강 우선순위 상향 및 커버리지 목표 명확화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Change Management/Communication Plan 보완**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**데이터 마이그레이션/검증 체크리스트 작성**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영 중 장애 모니터링 및 알람 체계 설계**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "누락된 시장 관점\n\n이 PRD는 내부 도구 개선에 초점을 맞추고 있으며, 그 관점에서는 매우 충실하게 작성되었습니다. 다만, 'IT 시장 트렌드'라는 더 넓은 관점에서 몇 가지 고려할 수 있는 점이 있습니다.\n\n*   **AI-Native PM 솔루션으로서의 확장성/표준화:** 현재는 'Foundry-X'라는 특정 프로젝트의 '1인 AI-native 개발 ",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Ready",
+      "severity": "info"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "기술적 실현 가능성\n\n**긍정적 측면:**\n- Phase A(문서 정비)는 기술적 리스크가 낮고 즉시 착수 가능\n- 기존 기술 스택(Vite/React/Hono/Cloudflare) 내에서 구현 가능한 범위\n- TDD 접근 방식(B-0 선행)이 회귀 방지에 효과적\n\n**우려되는 기술적 제약:**\n\n**1. Cloudflare Workers 환경 제약:**\n",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**완화 방안:** B-0(테스트 보강)을 Phase A로 이동, 파서 변경 전 테스트 커버리지 확보",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**완화 방안:** Phase B 시작 전 PoC로 기술 검증",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**완화 방안:** 심볼릭 링크 또는 자동 리다이렉트 생성 스크립트 선행 구현",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Phase A 수정 필요:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Phase B 전 필수 PoC:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**명시적 롤백 계획 추가:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "즉시 착수: A-0(파서 테스트) + A-1/A-2(Blueprint/Roadmap 신규 작성)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "보류: A-3~A-8(SPEC.md 수정) → 테스트 커버리지 80% 달성 후",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "재설계: Phase B 아키텍처 → GitHub Actions 기반 데이터 수집 파이프라인으로 변경 검토",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}

@@ -1,0 +1,287 @@
+{
+  "generated": "2026-04-12T06:10:09.748Z",
+  "totalItems": 46,
+  "byType": {
+    "flaw": 1,
+    "gap": 13,
+    "risk": 29
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**문제-해결-성공기준** 삼각구조는 비교적 명확하게 연결되어 있습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Automated Regression/Smoke Test Framework 구체화**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Change Freeze & Communication Protocol**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**장애 발생 시 Escalation/Responsibility**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Rollback 시나리오 상세화**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실제 사용자(미래 팀원, 신규 에이전트) 관점의 온보딩/테스트**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**파서/자동화/에이전트 연동 장애**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트/회귀 검증 과소**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**1인 체계의 병목 및 피로 누적**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**마이그레이션/링크 무결성 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**자동화 실패 감지/복구 부실**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "실행 가능성\n\n#### 평가\n- **범위**\n    - 1인 개발자(본인) + AI agent 기반으로, “문서 구조 정비 → 데이터 표면화/API화 → 자동화 연계” 3단계, 그리고 각 단계별 산출물/테스트/자동화 요구\n    - “코드 변경 0건”으로 명시된 Phase A는 확실히 빠르게 진행 가능\n- **일정**\n    - Phase A: 5세션(1~",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Automated Regression/Smoke Test Framework 구체화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Change Freeze & Communication Protocol**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**장애 발생 시 Escalation/Responsibility**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Rollback 시나리오 상세화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 사용자(미래 팀원, 신규 에이전트) 관점의 온보딩/테스트**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**파서/자동화/에이전트 연동 장애**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트/회귀 검증 과소**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**1인 체계의 병목 및 피로 누적**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**마이그레이션/링크 무결성 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**자동화 실패 감지/복구 부실**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Regression/Smoke Test 상세 플랜 수립 및 선행**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Change Freeze/Communication Protocol 명확화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Rollback/복구 프로세스 문서화 및 Dry Run 완료**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**마이그레이션/링크 무결성 Validation Checklist 작성**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영 장애 대응(알림/로그/복구) 체계 사전 검증**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**A-0 단계의 철저한 수행:** \"파서/자동화 테스트 보강, Regression catch coverage 80% 이상, 영향도 분석, 구조 변경 PoC/검증/롤백 플랜 문서화 및 사전 시연\"은 문서 구조 변경 및 상태 세분화가 기존 시스템에 미칠 잠재적 파괴력을 고려할 때, **가장 중요한 선행 조건**입니다. 이 단계가 부실하면 이후 모든 작업에서 ",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**1인 개발자 체계의 리스크 관리:** 방대한 문서 구조 변경, API 개발, 대시보드 구현, 복잡한 자동화 스크립트 연동 등 프로젝트의 규모가 1인 개발자(AI 에이전트 보조 포함)에게는 상당한 부담입니다. PRD에서 \"과업 집중으로 인한 일정 지연/품질 저하/Burnout 리스크\"를 명시한 만큼, **일정 관리, AI 에이전트 신뢰도 검증, 그리고 예",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**가설 검증 및 KPI 모니터링:** \"온보딩 속도 단축\", \"토큰 소비 감소\", \"Cycle Time 단축\" 등 핵심 가설과 KPI는 실제 효과를 측정하고 지속적으로 개선하기 위한 중요한 지표입니다. **초기 배포 후 이러한 지표들을 꾸준히 모니터링하고, 필요시 솔루션을 조정하는 피드백 루프**가 반드시 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**Cloudflare Workers 환경 제약 PoC 선행:** Open Issue 3, 4에서 언급된 Cloudflare Workers 환경에서의 파일 접근 및 쉘 스크립트 실행 제약은 기술적 실현 가능성에 직접적인 영향을 미칩니다. **Phase B 착수 전 해당 PoC를 완료하여 기술적 불확실성을 해소**해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**에이전트 호환성 보장**: Claude 에이전트가 새 문서 구조를 이해하도록 프롬프트/컨텍스트를 조정해야 합니다. 이는 **단순 문서 변경 이상의 작업**이며, 에이전트 행동 회귀 테스트가 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**링크 무결성 유지**: 아카이브 이동 시 `docs/INDEX.md` 및 기존 마크다운 내 상대 경로가 깨질 가능성이 높습니다. **자동 리다이렉트 생성기**가 필수적이며, edge case가 많습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**상태 머신 구현 누락**: `shared/task-state.ts`의 10-상태 머신과 SPEC.md 표기법의 매핑이 구체화되지 않았습니다. **상태 전이 규칙 검증 로직**이 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Cloudflare Workers 환경 제약**: Phase B의 `phase-progress.sh` 실행이 주요 문제입니다. Workers는 쉘 스크립트 실행을 지원하지 않으므로, **사전 계산된 JSON 캐싱 전략**이 필수적입니다. GitHub Actions에서 주기적으로 스크립트 실행 후 결과를 JSON으로 저장하고 Workers에서 fetch하",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**파서 호환성 리스크**: 16개 기존 스크립트(board-sync-spec.sh 등)가 SPEC.md 구조 변경에 민감합니다. **Dual Operation 기간(1주)이 불충분**할 수 있으며, 정규식 기반 파싱은 미묘한 형식 변화에도 쉽게 깨집니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**상태 동기화 문제**: F-item 세부 상태(괄호 표기)는 SPEC.md에만 존재하고 D1 캐시와의 실시간 동기화 메커니즘이 명확하지 않습니다. **상태 불일치 가능성**이 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**파서 연쇄 고장(Cascading Parser Failure)**: 하나의 스크립트가 깨지면 의존하는 다른 자동화(예: 아카이브, 리포트 생성)가 연쇄적으로 실패할 수 있습니다. **격리 및 회복 메커니즘이 미흡**합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**1인 개발 병목의 극대화**: 모든 변경(문서, API, 테스트, 자동화)을 동시에 진행하면서 **품질 관리와 일정 관리가 동시에 무너질 위험**이 높습니다. Phase A의 \"코드 변경 0건\"은 사실상 불가능합니다(파서 수정 필요).",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**모니터링/알림 체계의 실질적 공백**: PRD에는 모니터링 요구사항이 명시되었지만, **기존 인프라에 알림 시스템이 존재하지 않습니다**. 새로운 운영 부담이 추가됩니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Phase A-0 확대 실행**: 기존 16개 파서 스크립트에 대한 **호환성 테스트 스위트**를 먼저 구축하고, 모든 스크립트가 새 문서 구조에서 정상 동작함을 **자동화된 검증**으로 확인해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**롤백 메커니즘의 실제 시연**: 문서/아카이브/상태 변경을 **완전히 되돌릴 수 있는 스크립트 세트**를 사전에 작성하고, 실제 롤백 시나리오를 테스트해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**에이전트 컨텍스트 마이그레이션 계획 수립**: Claude 프롬프트 및 컨텍스트 설정 변경을 체계적으로 관리할 **버전 관리 및 A/B 테스트 방안**을 마련해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}
