@@ -172,6 +172,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C36 | C | sidebar에 `/work-management` 링크 추가 — admin-core 그룹, Kanban 아이콘 (FX-REQ-531) | — | DONE | PR #513. sidebar.json + navigation-loader.ts Kanban 아이콘 등록 |
 | C37 | C | autopilot Gap% 측정 범위 확장 — Step 5b E2E audit 자동 호출 추가 (FX-REQ-532) | — | DONE | sprint-autopilot SKILL.md Step 5b 신설. Playwright 있을 때 `/ax:e2e-audit coverage` 자동 실행, 갭 시 WARN (중단 안 함) |
 | C38 | C | work-unit-taxonomy 용어사전 + 승격기준 + Milestone정리 (FX-REQ-539) | — | DONE | task orchestrator |
+| C39 | C | task-daemon 자동 감지 근본 개선 — 세션 간 지속성 + 완료 감지 다중화 (FX-REQ-540) | — | PLANNED | task orchestrator |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
