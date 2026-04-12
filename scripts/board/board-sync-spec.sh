@@ -50,11 +50,24 @@ ROWS=$(echo "$ITEMS" | jq -r '
   | @tsv' 2>/dev/null || true)
 
 # SPEC 상태 이모지 → Board 컬럼 매핑
+# Phase 36+: 괄호 세부 상태 (🔧(impl), 📋(plan) 등) 도 올바르게 처리함.
+# 매핑 원칙: 괄호 세부 상태는 기본 이모지 기준으로 같은 컬럼에 배정.
 spec_to_board() {
-  case "$1" in
+  local status="$1"
+  case "$status" in
     *✅*) echo "Done" ;;
     *🔧*) echo "In Progress" ;;
     *📋*) echo "Sprint Ready" ;;
+    *) echo "" ;;
+  esac
+}
+
+# 세부 상태 suffix 반환 — board 컬럼명에 [BLOCKED] 등 표시용
+# 예: 🔧(blocked) → "[BLOCKED]", 🔧(impl) → "", ✅(deployed) → ""
+spec_sub_status() {
+  local status="$1"
+  case "$status" in
+    *\(blocked\)*) echo "[BLOCKED]" ;;
     *) echo "" ;;
   esac
 }
@@ -78,13 +91,14 @@ case "$MODE" in
     ;;
 
   report)
-    printf '%-8s  %-6s  %-14s  %s\n' "F-item" "Issue" "Board" "SPEC"
-    printf '%-8s  %-6s  %-14s  %s\n' "------" "-----" "-----" "----"
+    printf '%-8s  %-6s  %-18s  %-22s  %s\n' "F-item" "Issue" "Board" "SPEC" "Sub"
+    printf '%-8s  %-6s  %-18s  %-22s  %s\n' "------" "-----" "-----" "----" "---"
     while IFS=$'\t' read -r NUM COL FITEM; do
       [ -z "${FITEM:-}" ] && continue
       TOTAL+=1
       SPEC_STATUS=$(awk -F'|' -v f="$FITEM" '$2 ~ ("^ *"f" *$") {print $5; exit}' "$SPEC_FILE" | tr -d ' ')
       EXPECTED=$(spec_to_board "$SPEC_STATUS")
+      SUB=$(spec_sub_status "$SPEC_STATUS")
       if [ -z "$EXPECTED" ]; then
         UNMATCHED+=1
       elif [ "$COL" = "$EXPECTED" ]; then
@@ -92,7 +106,7 @@ case "$MODE" in
       else
         DRIFT+=1
       fi
-      printf '%-8s  #%-5s  %-14s  %s\n' "$FITEM" "$NUM" "$COL" "${SPEC_STATUS:-?}"
+      printf '%-8s  #%-5s  %-18s  %-22s  %s\n' "$FITEM" "$NUM" "$COL" "${SPEC_STATUS:-?}" "${SUB}"
     done <<< "$ROWS"
     echo
     echo "Summary: total=${TOTAL} ok=${OK} drift=${DRIFT} unmatched=${UNMATCHED}"
