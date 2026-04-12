@@ -197,4 +197,49 @@ describe("WorkService.syncSessions", () => {
     const list = await svc.getSessions();
     expect(list.sessions).toHaveLength(0);
   });
+
+  // T3: SQL injection 방어 (F511)
+  it("rejects SQL injection in session name without error", async () => {
+    const svc = new WorkService(makeEnv(db));
+    await svc.syncSessions({
+      sessions: [
+        {
+          name: "'; DROP TABLE agent_sessions; --",
+          status: "idle",
+          profile: "coder",
+          windows: 1,
+          last_activity: 0,
+        },
+      ],
+      worktrees: [],
+      collected_at: "2026-04-12T10:06:00Z",
+    });
+    const list = await svc.getSessions();
+    expect(list.sessions).toHaveLength(1);
+    expect(list.sessions[0]?.name).toContain("DROP");
+  });
+});
+
+// T4: ORDER BY 명시적 순서 (F511)
+describe("WorkService.getSessions — ORDER BY", () => {
+  let db: MockSessionsD1;
+
+  beforeAll(() => {
+    db = new MockSessionsD1();
+  });
+
+  it("returns sessions ordered: busy first, then idle, then done", async () => {
+    const svc = new WorkService(makeEnv(db));
+    await svc.syncSessions({
+      sessions: [
+        { name: "s-idle", status: "idle",  profile: "coder",    windows: 1, last_activity: 100 },
+        { name: "s-busy", status: "busy",  profile: "coder",    windows: 1, last_activity: 200 },
+        { name: "s-done", status: "done",  profile: "tester",   windows: 1, last_activity: 300 },
+      ],
+      worktrees: [],
+      collected_at: "2026-04-12T10:07:00Z",
+    });
+    const list = await svc.getSessions();
+    expect(list.sessions.map(s => s.status)).toEqual(["busy", "idle", "done"]);
+  });
 });

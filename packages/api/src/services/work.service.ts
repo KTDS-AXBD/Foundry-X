@@ -237,7 +237,9 @@ export class WorkService {
   async getSessions() {
     const result = await this.env.DB.prepare(
       `SELECT id, name, status, profile, worktree, branch, windows, last_activity, collected_at
-       FROM agent_sessions ORDER BY status ASC, last_activity DESC`
+       FROM agent_sessions
+       ORDER BY CASE status WHEN 'busy' THEN 0 WHEN 'idle' THEN 1 WHEN 'done' THEN 2 ELSE 3 END,
+                last_activity DESC`
     ).all<{
       id: string; name: string; status: string; profile: string;
       worktree: string | null; branch: string | null; windows: number;
@@ -308,12 +310,13 @@ export class WorkService {
     }
 
     // Remove sessions not present in this batch (stale = terminated)
-    const activeNames = input.sessions.map(s => `'${s.name.replace(/'/g, "''")}'`).join(",");
+    const names = input.sessions.map(s => s.name);
     let removed = 0;
-    if (activeNames.length > 0) {
+    if (names.length > 0) {
+      const placeholders = names.map(() => "?").join(",");
       const del = await this.env.DB.prepare(
-        `DELETE FROM agent_sessions WHERE id NOT IN (${activeNames})`
-      ).run();
+        `DELETE FROM agent_sessions WHERE id NOT IN (${placeholders})`
+      ).bind(...names).run();
       removed = del.meta.changes ?? 0;
     } else {
       // No sessions reported → clear all

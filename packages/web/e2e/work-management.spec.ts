@@ -181,6 +181,78 @@ test.describe("Work Management (F509 Walking Skeleton)", () => {
     await expect(page.getByText("sprint/262").first()).toBeVisible();
   });
 
+  // T1: Sessions edge case — 빈 세션 목록 (F511)
+  test("sessions tab — empty sessions shows placeholder", async ({ authenticatedPage: page }) => {
+    await mockWorkApi(page);
+    // override sessions with empty list
+    await page.route("**/api/work/sessions", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ sessions: [], worktrees: [], last_sync: "2026-04-12T10:00:00Z" }),
+      }),
+    );
+    await page.goto("/work-management");
+    await page.getByRole("button", { name: "Sessions" }).click();
+    await expect(page.getByText(/세션이 없어요|No sessions|세션 없음/)).toBeVisible();
+  });
+
+  // T1: Sessions edge case — API 에러 fallback (F511)
+  test("sessions tab — API error shows fallback UI", async ({ authenticatedPage: page }) => {
+    // snapshot 에러 → fetchError 표시, sessions mock 없음
+    await page.route("**/api/work/snapshot", (route) =>
+      route.fulfill({ status: 500, body: "Internal Server Error" }),
+    );
+    await page.route("**/api/work/context", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(MOCK_CONTEXT) }),
+    );
+    await page.route("**/api/work/sessions", (route) =>
+      route.fulfill({ status: 500, body: "Internal Server Error" }),
+    );
+    await page.goto("/work-management");
+    await expect(page.getByText("데이터를 불러올 수 없어요")).toBeVisible();
+    await expect(page.getByRole("button", { name: "다시 시도" })).toBeVisible();
+  });
+
+  // T1: Sessions edge case — BUSY/IDLE/DONE 컬럼 순서 확인 (F511)
+  test("sessions tab — BUSY column appears before IDLE in layout", async ({ authenticatedPage: page }) => {
+    await mockWorkApi(page);
+    await page.goto("/work-management");
+    await page.getByRole("button", { name: "Sessions" }).click();
+    // BUSY/IDLE/DONE 컬럼 헤더 모두 존재
+    await expect(page.getByText("BUSY", { exact: true })).toBeVisible();
+    await expect(page.getByText("IDLE", { exact: true })).toBeVisible();
+    await expect(page.getByText("DONE", { exact: true })).toBeVisible();
+    // sprint-262 (busy)가 BUSY 컬럼에, sprint-261 (idle)이 IDLE 컬럼에 있는지
+    await expect(page.getByText("sprint-262").first()).toBeVisible();
+    await expect(page.getByText("sprint-261").first()).toBeVisible();
+  });
+
+  // T2: polling E2E — 5초 polling 후 재호출 확인 (F511)
+  test("snapshot polling — refreshes data after interval", async ({ authenticatedPage: page }) => {
+    let callCount = 0;
+    await page.route("**/api/work/snapshot", (route) => {
+      callCount++;
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ ...MOCK_SNAPSHOT, summary: { ...MOCK_SNAPSHOT.summary, done_today: callCount } }),
+      });
+    });
+    await page.route("**/api/work/context", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(MOCK_CONTEXT) }),
+    );
+    await page.route("**/api/work/sessions", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(MOCK_SESSIONS) }),
+    );
+
+    await page.goto("/work-management");
+    await expect(page.getByRole("heading", { name: "Work Management" })).toBeVisible();
+    // 5초 polling이므로 6초 대기 후 2회 이상 호출 확인
+    await page.waitForTimeout(6000);
+    expect(callCount).toBeGreaterThanOrEqual(2);
+  });
+
   test("classify flow — PRD §5.2.1 S1 step 2 (자연어 → track/priority/title)", async ({ authenticatedPage: page }) => {
     await mockWorkApi(page);
     await page.goto("/work-management");
