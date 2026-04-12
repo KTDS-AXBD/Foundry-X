@@ -7,6 +7,9 @@ import {
   SessionListSchema,
   SessionSyncInputSchema,
   SessionSyncOutputSchema,
+  VelocitySchema,
+  PhaseProgressSchema,
+  BacklogHealthSchema,
 } from "../schemas/work.js";
 import type { Env } from "../env.js";
 import { WorkService } from "../services/work.service.js";
@@ -132,4 +135,67 @@ workRoute.openapi(syncSessions, async (c) => {
   const svc = new WorkService(c.env);
   const result = await svc.syncSessions(body);
   return c.json(result);
+});
+
+// ─── GET /api/work/velocity (F513 B-1) ────────────────────────────────────────
+
+const getVelocity = createRoute({
+  method: "get",
+  path: "/work/velocity",
+  tags: ["Work Observability"],
+  summary: "Sprint velocity — done F-items per sprint with trend",
+  responses: {
+    200: {
+      content: { "application/json": { schema: VelocitySchema } },
+      description: "Velocity data",
+    },
+  },
+});
+
+workRoute.openapi(getVelocity, async (c) => {
+  const svc = new WorkService(c.env);
+  const data = await svc.getVelocity();
+  return c.json(data);
+});
+
+// ─── GET /api/work/phase-progress (F513 B-2) ─────────────────────────────────
+
+const getPhaseProgress = createRoute({
+  method: "get",
+  path: "/work/phase-progress",
+  tags: ["Work Observability"],
+  summary: "Phase-level progress — done/in-progress/total per phase",
+  responses: {
+    200: {
+      content: { "application/json": { schema: PhaseProgressSchema } },
+      description: "Phase progress",
+    },
+  },
+});
+
+workRoute.openapi(getPhaseProgress, async (c) => {
+  const svc = new WorkService(c.env);
+  const data = await svc.getPhaseProgress();
+  return c.json(data);
+});
+
+// ─── GET /api/work/backlog-health (F513 B-3) ─────────────────────────────────
+
+const getBacklogHealth = createRoute({
+  method: "get",
+  path: "/work/backlog-health",
+  tags: ["Work Observability"],
+  summary: "Backlog health score — stale items + warnings",
+  responses: {
+    200: {
+      content: { "application/json": { schema: BacklogHealthSchema } },
+      description: "Backlog health",
+    },
+  },
+});
+
+workRoute.openapi(getBacklogHealth, async (c) => {
+  const svc = new WorkService(c.env);
+  const data = await svc.getBacklogHealth();
+  return c.json(data);
 });

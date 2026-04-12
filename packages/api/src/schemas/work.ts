@@ -103,3 +103,41 @@ export const ClassifyOutputSchema = z.object({
   req_code: z.string().optional(),
   method: z.enum(["llm", "regex"]),
 });
+
+// ─── Work Management Analytics (F513 B-1~B-3) ────────────────────────────────
+
+export const VelocitySchema = z.object({
+  sprints: z.array(z.object({
+    sprint: z.number(),
+    f_items_done: z.number(),
+    week: z.string(),
+  })),
+  avg_per_sprint: z.number(),
+  trend: z.enum(["up", "down", "stable"]),
+  generated_at: z.string(),
+});
+
+export const PhaseProgressSchema = z.object({
+  phases: z.array(z.object({
+    id: z.number(),
+    name: z.string(),
+    total: z.number(),
+    done: z.number(),
+    in_progress: z.number(),
+    pct: z.number(),
+  })),
+  current_phase: z.number(),
+  generated_at: z.string(),
+});
+
+export const BacklogHealthSchema = z.object({
+  total_backlog: z.number(),
+  stale_items: z.array(z.object({
+    id: z.string(),
+    title: z.string(),
+    age_sprints: z.number(),
+  })),
+  health_score: z.number().min(0).max(100),
+  warnings: z.array(z.string()),
+  generated_at: z.string(),
+});
