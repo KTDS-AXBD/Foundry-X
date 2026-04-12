@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { fetchApi, postApi } from "@/lib/api-client";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { fetchApi, postApi, ApiError } from "@/lib/api-client";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -651,14 +651,24 @@ export function Component() {
   const [ctx, setCtx] = useState<WorkContext | null>(null);
   const [sessions, setSessions] = useState<SessionList | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const hasSnapshotData = useRef(false);
 
   const fetchSnapshot = useCallback(async () => {
     try {
       const data = await fetchApi<WorkSnapshot>("/work/snapshot");
       setSnapshot(data);
       setLastUpdate(new Date());
-    } catch {
-      // silently ignore — stale data shows
+      setFetchError(null);
+      hasSnapshotData.current = true;
+    } catch (e) {
+      if (!hasSnapshotData.current) {
+        setFetchError(
+          e instanceof ApiError && e.status === 401
+            ? "로그인이 필요해요"
+            : "데이터를 불러올 수 없어요",
+        );
+      }
     }
   }, []);
 
@@ -742,10 +752,24 @@ export function Component() {
       </div>
 
       {/* Tab content */}
-      {tab === "kanban"   && <KanbanTab   snapshot={snapshot} />}
-      {tab === "context"  && <ContextTab  ctx={ctx} />}
+      {fetchError && !snapshot && (
+        <div style={{ textAlign: "center", padding: "40px 0", color: "#94a3b8" }}>
+          <div style={{ fontSize: 16, marginBottom: 12 }}>{fetchError}</div>
+          <button
+            onClick={() => { setFetchError(null); void fetchSnapshot(); }}
+            style={{
+              background: "#3b82f6", color: "#fff", border: "none",
+              borderRadius: 6, padding: "8px 20px", cursor: "pointer", fontSize: 13,
+            }}
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
+      {(!fetchError || snapshot) && tab === "kanban"   && <KanbanTab   snapshot={snapshot} />}
+      {(!fetchError || snapshot) && tab === "context"  && <ContextTab  ctx={ctx} />}
       {tab === "classify" && <ClassifyTab />}
-      {tab === "sessions" && <SessionsTab data={sessions} />}
+      {(!fetchError || snapshot) && tab === "sessions" && <SessionsTab data={sessions} />}
     </div>
   );
 }
