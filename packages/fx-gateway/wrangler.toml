@@ -6,6 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 ENVIRONMENT = "production"
+# DISCOVERY_ENABLED = "true"  # fx-discovery Worker 배포 후 활성화
 
 # F517: Service Binding — 기존 API Worker (잔여 도메인)
 [[services]]

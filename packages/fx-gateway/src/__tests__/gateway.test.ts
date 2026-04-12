@@ -21,10 +21,10 @@ const makeDiscoveryMock = (status = 200, body = '{"domain":"discovery"}') => ({
 }) as unknown as Fetcher;
 
 describe("F517: Gateway routing", () => {
-  it("routes /api/discovery/* to DISCOVERY binding when available", async () => {
+  it("routes /api/discovery/* to DISCOVERY binding when DISCOVERY_ENABLED=true", async () => {
     const discovery = makeDiscoveryMock();
     const mainApi = makeMainApiMock();
-    const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery };
+    const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery, DISCOVERY_ENABLED: "true" };
 
     const res = await app.request("/api/discovery/health", {}, env);
 
@@ -33,7 +33,7 @@ describe("F517: Gateway routing", () => {
     expect(res.status).toBe(200);
   });
 
-  it("falls back to MAIN_API when DISCOVERY binding absent", async () => {
+  it("falls back to MAIN_API when DISCOVERY_ENABLED is unset", async () => {
     const mainApi = makeMainApiMock();
     const env: GatewayEnv = { MAIN_API: mainApi };
 
