@@ -56,9 +56,10 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | Phase 34 Multi-Agent Sessions (F510) | ✅ Sprint 262 |
 | Phase 35 Quality Hardening (F511) | ✅ Sprint 263 |
 | **Phase 36 Work Management Enhancement** (F512~F515) | ✅ Sprint 264~266 |
-| ↳ Sprint 264 — Phase 36-A(F512) + Phase 36-B 착수(F513) | 🔧 진행 중 |
-| ↳ Sprint 265 — Phase 36-B 완성 (F514) | 📋 |
+| ↳ Sprint 264 — Phase 36-A(F512) + Phase 36-B 착수(F513) | ✅ |
+| ↳ Sprint 265 — Phase 36-B 완성 (F514) | ✅ |
 | ↳ Sprint 266 — Phase 36-C (F515) | ✅ |
+| **Phase 37 Dashboard Overhaul** (F516) | 📋 Sprint 267 |
 
 ## §4 성공 지표
 
@@ -118,6 +119,9 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F514 | Work Management 대시보드 확장 — B-4 Pipeline Flow 뷰(Idea→Done 단계별 F-item 수) + B-5 Velocity/Phase Progress 차트 + E2E 테스트 (FX-REQ-537, P1) | Sprint 265 | ✅ | PR #524. Pipeline Flow + Velocity + Backlog Health 대시보드 |
 | **Phase 36-C: 자동화 연결** | | | | Phase A/B 자동화 스크립트 연결 |
 | F515 | 자동화 연결 — C-1 board-sync-spec 세부 상태 파싱 + C-2 Roadmap 자동 갱신 + C-3 Blueprint 버전 범프 + C-4 아카이브 자동화 + C-5 CHANGELOG 자동 생성 (FX-REQ-538, P1) | Sprint 266 | ✅ | PR #529. Gap 95.1%. 5종 스크립트 |
+
+| **Phase 37: Dashboard Overhaul (대시보드 현행화)** | | | | 서비스 범위(발굴~형상화)에 맞춰 대시보드 전면 정리 |
+| F516 | 대시보드 현행화 — (1) 파이프라인 6단계→2단계(발굴~형상화) 축소 (2) 퀵 액션 dead link 제거 + 현행 기능 반영 (3) 개발 내부 위젯 4개 삭제(Sprint Status/SDD Triangle/Harness Health/Freshness) (4) ToDo List UI/UX 개선 (5) 업무 가이드 삭제 + Wiki 링크 대체 (FX-REQ-544, P1) | Sprint 267 | 📋(plan) | |
 
 <!-- fx-task-orchestrator-backlog -->
 ### Task Orchestrator Backlog (B/C/X)
