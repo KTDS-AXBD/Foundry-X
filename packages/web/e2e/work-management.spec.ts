@@ -168,8 +168,8 @@ test.describe("Work Management (F509 Walking Skeleton)", () => {
     await expect(page.getByText("Busy", { exact: true })).toBeVisible();
     await expect(page.getByText("Idle", { exact: true })).toBeVisible();
 
-    // Session cards
-    await expect(page.getByText("sprint-262")).toBeVisible();
+    // Session cards (sprint-262 appears in both card and worktree path, use .first())
+    await expect(page.getByText("sprint-262").first()).toBeVisible();
     await expect(page.getByText("sprint-261")).toBeVisible();
 
     // Profile badges
