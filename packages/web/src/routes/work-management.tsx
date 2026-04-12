@@ -3,6 +3,31 @@ import { fetchApi, postApi, ApiError } from "@/lib/api-client";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
+// F514 — Analytics types (B-4, B-5)
+interface VelocityData {
+  sprints: Array<{ sprint: number; f_items_done: number; week: string }>;
+  avg_per_sprint: number;
+  trend: "up" | "down" | "stable";
+  generated_at: string;
+}
+
+interface PhaseProgressData {
+  phases: Array<{
+    id: number; name: string;
+    total: number; done: number; in_progress: number; pct: number;
+  }>;
+  current_phase: number;
+  generated_at: string;
+}
+
+interface BacklogHealthData {
+  total_backlog: number;
+  stale_items: Array<{ id: string; title: string; age_sprints: number }>;
+  health_score: number;
+  warnings: string[];
+  generated_at: string;
+}
+
 type WorkStatus = "backlog" | "planned" | "in_progress" | "done" | "rejected" | "closed";
 type WorkTrack = "F" | "B" | "C" | "X";
 type WorkPriority = "P0" | "P1" | "P2" | "P3";
@@ -339,6 +364,332 @@ function SessionsTab({ data }: { data: SessionList | null }) {
   );
 }
 
+// ─── F514 Tab Components ──────────────────────────────────────────────────────
+
+function PipelineFlowTab({
+  snapshot,
+  backlogHealth,
+}: {
+  snapshot: WorkSnapshot | null;
+  backlogHealth: BacklogHealthData | null;
+}) {
+  const summary = snapshot?.summary;
+
+  const stages: Array<{ label: string; count: number; color: string }> = [
+    { label: "Backlog",      count: summary?.backlog      ?? 0, color: "#6b7280" },
+    { label: "Planned",      count: summary?.planned      ?? 0, color: "#3b82f6" },
+    { label: "In Progress",  count: summary?.in_progress  ?? 0, color: "#f59e0b" },
+    { label: "Done (Today)", count: summary?.done_today   ?? 0, color: "#22c55e" },
+  ];
+  const maxCount = Math.max(...stages.map(s => s.count), 1);
+
+  const scoreColor = backlogHealth
+    ? backlogHealth.health_score >= 80 ? "#22c55e"
+      : backlogHealth.health_score >= 60 ? "#f59e0b"
+      : "#ef4444"
+    : "#94a3b8";
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 20, color: "#e2e8f0" }}>
+        Pipeline Flow
+      </h2>
+
+      {/* Stage bars */}
+      <div style={{ marginBottom: 28 }}>
+        {stages.map((stage) => (
+          <div key={stage.label} style={{ marginBottom: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 13 }}>
+              <span style={{ color: "#cbd5e1" }}>{stage.label}</span>
+              <span style={{ color: stage.color, fontWeight: 600 }}>{stage.count}</span>
+            </div>
+            <div style={{ background: "#1e293b", borderRadius: 4, height: 10 }}>
+              <div
+                style={{
+                  width: `${Math.round((stage.count / maxCount) * 100)}%`,
+                  height: "100%",
+                  background: stage.color,
+                  borderRadius: 4,
+                  transition: "width 0.3s ease",
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Backlog Health */}
+      {backlogHealth && (
+        <div
+          style={{
+            background: "#0f172a",
+            border: "1px solid #1e293b",
+            borderRadius: 8,
+            padding: "16px 20px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+            <span style={{ fontSize: 14, color: "#94a3b8" }}>Health Score</span>
+            <span
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                color: scoreColor,
+              }}
+            >
+              {backlogHealth.health_score}
+              <span style={{ fontSize: 13, fontWeight: 400, color: "#64748b" }}>/100</span>
+            </span>
+            <span style={{ fontSize: 12, color: "#64748b" }}>
+              Total: {backlogHealth.total_backlog} items
+            </span>
+          </div>
+
+          {backlogHealth.warnings.length > 0 && (
+            <div style={{ marginBottom: 12 }}>
+              {backlogHealth.warnings.map((w, i) => (
+                <div key={i} style={{ fontSize: 12, color: "#f59e0b", marginBottom: 4 }}>
+                  ⚠ {w}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {backlogHealth.stale_items.length > 0 && (
+            <div>
+              <div style={{ fontSize: 12, color: "#64748b", marginBottom: 8 }}>
+                Stale Items ({backlogHealth.stale_items.length})
+              </div>
+              {backlogHealth.stale_items.map((item) => (
+                <div
+                  key={item.id}
+                  style={{
+                    display: "flex",
+                    gap: 10,
+                    fontSize: 12,
+                    padding: "6px 0",
+                    borderBottom: "1px solid #1e293b",
+                    color: "#94a3b8",
+                  }}
+                >
+                  <span style={{ color: "#f59e0b", minWidth: 40 }}>{item.id}</span>
+                  <span style={{ flex: 1 }}>{item.title}</span>
+                  <span style={{ color: "#64748b" }}>{item.age_sprints}+ sprints</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {!snapshot && !backlogHealth && (
+        <div style={{ color: "#94a3b8", padding: 20 }}>불러오는 중…</div>
+      )}
+    </div>
+  );
+}
+
+function VelocityTab({
+  velocity,
+  phaseProgress,
+}: {
+  velocity: VelocityData | null;
+  phaseProgress: PhaseProgressData | null;
+}) {
+  const maxDone = velocity
+    ? Math.max(...velocity.sprints.map(s => s.f_items_done), 1)
+    : 1;
+
+  const trendLabel = velocity?.trend === "up"   ? "↑ UP"
+                   : velocity?.trend === "down" ? "↓ DOWN"
+                   : "→ stable";
+  const trendColor = velocity?.trend === "up"   ? "#22c55e"
+                   : velocity?.trend === "down" ? "#ef4444"
+                   : "#94a3b8";
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 20, color: "#e2e8f0" }}>
+        Sprint Velocity
+      </h2>
+
+      {velocity ? (
+        <>
+          {/* Summary row */}
+          <div style={{ display: "flex", gap: 16, marginBottom: 20, alignItems: "center" }}>
+            <div style={{ fontSize: 13, color: "#94a3b8" }}>
+              Avg:{" "}
+              <span style={{ color: "#f1f5f9", fontWeight: 600 }}>
+                {velocity.avg_per_sprint}
+              </span>{" "}
+              F-items/sprint
+            </div>
+            <span style={{ fontSize: 12, fontWeight: 600, color: trendColor }}>
+              {trendLabel}
+            </span>
+          </div>
+
+          {/* Sprint bars */}
+          <div style={{ marginBottom: 28 }}>
+            {velocity.sprints.slice(-10).map((s) => (
+              <div key={s.sprint} style={{ marginBottom: 10 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 12 }}>
+                  <span style={{ color: "#94a3b8" }}>Sprint {s.sprint}</span>
+                  <span style={{ color: "#f1f5f9", fontWeight: 600 }}>{s.f_items_done}</span>
+                </div>
+                <div style={{ background: "#1e293b", borderRadius: 4, height: 8 }}>
+                  <div
+                    style={{
+                      width: `${Math.round((s.f_items_done / maxDone) * 100)}%`,
+                      height: "100%",
+                      background: "#3b82f6",
+                      borderRadius: 4,
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div style={{ color: "#94a3b8", marginBottom: 28 }}>Velocity 불러오는 중…</div>
+      )}
+
+      {/* Phase Progress */}
+      {phaseProgress && (
+        <>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: "#e2e8f0", marginBottom: 14 }}>
+            Phase Progress (current: Phase {phaseProgress.current_phase})
+          </h3>
+          {phaseProgress.phases.slice(-8).map((phase) => (
+            <div key={phase.id} style={{ marginBottom: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 12 }}>
+                <span style={{ color: "#94a3b8" }}>{phase.name}</span>
+                <span style={{ color: "#64748b" }}>
+                  {phase.done}/{phase.total} ({phase.pct}%)
+                </span>
+              </div>
+              <div style={{ background: "#1e293b", borderRadius: 4, height: 6 }}>
+                <div
+                  style={{
+                    width: `${phase.pct}%`,
+                    height: "100%",
+                    background: phase.pct === 100 ? "#22c55e" : "#3b82f6",
+                    borderRadius: 4,
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+function BacklogHealthTab({ health }: { health: BacklogHealthData | null }) {
+  if (!health) {
+    return <div style={{ color: "#94a3b8", padding: 20 }}>불러오는 중…</div>;
+  }
+
+  const scoreColor = health.health_score >= 80 ? "#22c55e"
+                   : health.health_score >= 60 ? "#f59e0b"
+                   : "#ef4444";
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 20, color: "#e2e8f0" }}>
+        Backlog Health
+      </h2>
+
+      {/* Score card */}
+      <div
+        style={{
+          background: "#0f172a",
+          border: `1px solid ${scoreColor}33`,
+          borderRadius: 8,
+          padding: "20px 24px",
+          marginBottom: 20,
+          display: "flex",
+          alignItems: "center",
+          gap: 24,
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 36, fontWeight: 700, color: scoreColor }}>
+            {health.health_score}
+          </div>
+          <div style={{ fontSize: 11, color: "#64748b" }}>/ 100</div>
+        </div>
+        <div>
+          <div style={{ fontSize: 14, color: "#94a3b8", marginBottom: 4 }}>Health Score</div>
+          <div style={{ fontSize: 13, color: "#cbd5e1" }}>
+            Total: <strong>{health.total_backlog}</strong> backlog items
+          </div>
+          {health.stale_items.length > 0 && (
+            <div style={{ fontSize: 12, color: "#f59e0b", marginTop: 4 }}>
+              {health.stale_items.length} stale item(s)
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Warnings */}
+      {health.warnings.length > 0 && (
+        <div style={{ marginBottom: 20 }}>
+          <h3 style={{ fontSize: 13, color: "#64748b", marginBottom: 8 }}>Warnings</h3>
+          {health.warnings.map((w, i) => (
+            <div
+              key={i}
+              style={{
+                background: "#1e293b",
+                borderLeft: "3px solid #f59e0b",
+                padding: "8px 12px",
+                borderRadius: "0 4px 4px 0",
+                fontSize: 13,
+                color: "#fbbf24",
+                marginBottom: 6,
+              }}
+            >
+              ⚠ {w}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Stale items */}
+      {health.stale_items.length > 0 && (
+        <div>
+          <h3 style={{ fontSize: 13, color: "#64748b", marginBottom: 8 }}>
+            Stale Items ({health.stale_items.length})
+          </h3>
+          {health.stale_items.map((item) => (
+            <div
+              key={item.id}
+              style={{
+                display: "flex",
+                gap: 12,
+                padding: "10px 14px",
+                background: "#0f172a",
+                borderBottom: "1px solid #1e293b",
+                fontSize: 13,
+              }}
+            >
+              <span style={{ color: "#f59e0b", minWidth: 48, fontWeight: 600 }}>{item.id}</span>
+              <span style={{ flex: 1, color: "#94a3b8" }}>{item.title}</span>
+              <span style={{ color: "#64748b", fontSize: 12 }}>{item.age_sprints}+ sprints</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {health.stale_items.length === 0 && health.warnings.length === 0 && (
+        <div style={{ color: "#22c55e", fontSize: 13 }}>✓ 백로그가 건강해요</div>
+      )}
+    </div>
+  );
+}
+
 // ─── Tabs ─────────────────────────────────────────────────────────────────────
 
 function KanbanTab({ snapshot }: { snapshot: WorkSnapshot | null }) {
@@ -643,13 +994,17 @@ function ClassifyTab() {
 
 // ─── Main Route Component ─────────────────────────────────────────────────────
 
-type Tab = "kanban" | "context" | "classify" | "sessions";
+type Tab = "kanban" | "context" | "classify" | "sessions" | "pipeline" | "velocity" | "backlog";
 
 export function Component() {
   const [tab, setTab] = useState<Tab>("kanban");
   const [snapshot, setSnapshot] = useState<WorkSnapshot | null>(null);
   const [ctx, setCtx] = useState<WorkContext | null>(null);
   const [sessions, setSessions] = useState<SessionList | null>(null);
+  // F514 — analytics state
+  const [velocity, setVelocity] = useState<VelocityData | null>(null);
+  const [phaseProgress, setPhaseProgress] = useState<PhaseProgressData | null>(null);
+  const [backlogHealth, setBacklogHealth] = useState<BacklogHealthData | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const hasSnapshotData = useRef(false);
@@ -688,23 +1043,34 @@ export function Component() {
     }
   }, []);
 
+  // F514 — fetch analytics endpoints once on mount
+  const fetchAnalytics = useCallback(async () => {
+    try { setVelocity(await fetchApi<VelocityData>("/work/velocity")); } catch { /* ignore */ }
+    try { setPhaseProgress(await fetchApi<PhaseProgressData>("/work/phase-progress")); } catch { /* ignore */ }
+    try { setBacklogHealth(await fetchApi<BacklogHealthData>("/work/backlog-health")); } catch { /* ignore */ }
+  }, []);
+
   // Initial fetch + 5s polling
   useEffect(() => {
     fetchSnapshot();
     fetchContext();
     fetchSessions();
+    fetchAnalytics();
     const id = setInterval(() => {
       fetchSnapshot();
       fetchSessions();
     }, 5000);
     return () => clearInterval(id);
-  }, [fetchSnapshot, fetchContext, fetchSessions]);
+  }, [fetchSnapshot, fetchContext, fetchSessions, fetchAnalytics]);
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "kanban",   label: "Kanban" },
     { key: "context",  label: "Context Resume" },
     { key: "classify", label: "Classify" },
     { key: "sessions", label: "Sessions" },
+    { key: "pipeline", label: "Pipeline" },
+    { key: "velocity", label: "Velocity" },
+    { key: "backlog",  label: "Backlog" },
   ];
 
   return (
@@ -770,6 +1136,9 @@ export function Component() {
       {(!fetchError || snapshot) && tab === "context"  && <ContextTab  ctx={ctx} />}
       {tab === "classify" && <ClassifyTab />}
       {(!fetchError || snapshot) && tab === "sessions" && <SessionsTab data={sessions} />}
+      {tab === "pipeline" && <PipelineFlowTab snapshot={snapshot} backlogHealth={backlogHealth} />}
+      {tab === "velocity" && <VelocityTab velocity={velocity} phaseProgress={phaseProgress} />}
+      {tab === "backlog"  && <BacklogHealthTab health={backlogHealth} />}
     </div>
   );
 }
