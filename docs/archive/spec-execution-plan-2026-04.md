@@ -1,303 +1,472 @@
----
-code: FX-SPEC-001
-title: Foundry-X Project Specification
-version: 5.80
-status: Active
-category: SPEC
-system-version: Sprint 264
-created: 2026-03-16
-updated: 2026-04-12
-author: Sinclair Seo
+# SPEC.md §6 Execution Plan — 아카이브
+
+> **원본**: SPEC.md §6 (Sprint 264 이전 전체 실행 계획)
+> **아카이브 일자**: 2026-04-12
+> **사유**: SPEC.md 경량화 (Phase 36 F512 A-4). 현행 Sprint 계획은 ROADMAP.md + docs/01-plan/ 참조.
+
 ---
 
-# Foundry-X Project Specification
-
-## §1 프로젝트 개요
-
-Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화하는 오케스트레이션 플랫폼.
-핵심 철학: **"Git이 진실, Foundry-X는 렌즈"** — 명세/코드/테스트/결정 이력은 Git에, Foundry-X는 읽기/분석/동기화 레이어.
-
-- **상세 개요 + 아키텍처**: [BLUEPRINT.md](BLUEPRINT.md)
-- **Phase 로드맵 + 계획**: [ROADMAP.md](ROADMAP.md)
-- **현행 PRD**: `docs/specs/FX-SPEC-PRD-V8_foundry-x.md` (v8)
-
-## §2 현재 상태
-
-> Sprint 1~160 이력: [docs/archive/spec-current-state-2026-04.md](archive/spec-current-state-2026-04.md)
-
-| Sprint | 상태 |
-|--------|------|
-| Sprint 261 | ✅ 완료 — ax-plugin source↔cache drift 방지 + C33 eslint cleanup (PR #508/#510) |
-| Sprint 262 | ✅ 완료 — Phase 35 F511 Work Management 품질 보강 (D1 0126, ~3452 tests, E2E 273) |
-| Sprint 263 | ✅ 완료 — Phase 36-A 착수: SPEC 파서 테스트 A-0 (48건 PR #517) |
-| Sprint 264 | 🔧(impl) 진행 중 — F512 Phase A 정비 (A-3~A-8) + F513 TDD (B-0~B-3) |
-
-| 항목 | 상태 |
-|------|------|
-| Workers | foundry-x-api.ktds-axbd.workers.dev ✅ |
-| Pages | fx.minu.best ✅ |
-| typecheck | ✅ |
-| lint | ✅ (0 error) |
-
-> **📏 실시간 수치** — 하드코딩 금지. `/ax:daily-check` 자동 수집 또는:
-> ```
-> wc -l SPEC.md && find packages/api/src/db/migrations/*.sql | sort | tail -1
-> ```
-> **마지막 실측** (Sprint 263): ~10 routes, ~28 services, D1 0126, tests ~3452 (E2E 273)
-
-## §3 마일스톤
-
-> 전체 Phase 마일스톤: [ROADMAP.md](ROADMAP.md)
-
-| 마일스톤 | 상태 |
-|----------|:----:|
-| Phase 33 Work Observability (F509) | ✅ Sprint 261 |
-| Phase 34 Multi-Agent Sessions (F510) | ✅ Sprint 262 |
-| Phase 35 Quality Hardening (F511) | ✅ Sprint 263 |
-| **Phase 36 Work Management Enhancement** (F512~F515) | 🔧 Sprint 264~266 |
-| Sprint 264 — Phase 36-A(F512) + Phase 36-B 착수(F513) | 🔧 진행 중 |
-| Sprint 265 — Phase 36-B 완성 (F514) | 📋 |
-| Sprint 266 — Phase 36-C (F515) | 📋 |
-
-## §4 성공 지표
-
-> 상세 KPI + 측정 방법: [BLUEPRINT.md](BLUEPRINT.md)
-
-| 지표 | 목표 | 현재 |
-|------|------|------|
-| docs/ 활성 파일 | ≤ 100개 | 아카이브 진행 중 |
-| Work Mgmt API 테스트 | 30건+ | TDD 예정 |
-| Gap Analysis Match Rate | ≥ 90% | 전 Sprint 달성 |
-| `--no-verify` 우회 비율 | < 20% | 0% |
-
-## §5 기능 항목 (F-items)
-
-> F-item SSOT. 파서(work.service.ts)가 이 섹션에서 Sprint/status를 추출함.
-> Phase 36 F-items에 세부 상태 표기: `🔧(impl)`, `🔧(review)`, `📋(plan)` 등
-
-## §5 기능 항목 (F-items)
-
-### Sprint 1 — 완료 (v0.1.0)
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F1 | 모노리포 scaffolding (FX-REQ-001, P1) | v0.1 | ✅ | pnpm workspace + Turborepo |
-| F2 | 공유 타입 모듈 (FX-REQ-002, P1) | v0.1 | ✅ | packages/shared (types.ts) |
-| F3 | Harness 모듈 (FX-REQ-003, P1) | v0.1 | ✅ | detect, discover, analyze, generate, verify, merge-utils |
-| F4 | PlumbBridge subprocess 래퍼 (FX-REQ-004, P1) | v0.1 | ✅ | bridge, errors, types |
-| F5 | Services 모듈 (FX-REQ-005, P1) | v0.1 | ✅ | config-manager, health-score, logger |
-
-### Sprint 2 — 완료 (v0.2.0)
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F6 | init 커맨드 구현 (FX-REQ-006, P1) | v0.2 | ✅ | harness pipeline 통합 |
-| F7 | sync 커맨드 구현 (FX-REQ-007, P1) | v0.2 | ✅ | PlumbBridge 연동 |
-| F8 | status 커맨드 구현 (FX-REQ-008, P1) | v0.2 | ✅ | Triangle Health Score 포함 |
-| F9 | 하네스 템플릿 생성 (FX-REQ-009, P1) | v0.2 | ✅ | default + kt-ds-sr + lint |
-| F10 | 검증 스크립트 (FX-REQ-010, P2) | v0.2 | ✅ | verify-harness.sh, check-sync.sh |
-| F11 | npm publish + 온보딩 (FX-REQ-011, P1) | v0.2 | ✅ | foundry-x@0.1.1, npx init ✅ |
-
-### 완료 (v0.2.0 이후)
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F12 | ADR-000 작성 (FX-REQ-012, P2) | v0.2 | ✅ | docs/adr/ADR-000.md |
-| F13 | .plumb 출력 + decisions.jsonl 내부 계약 (FX-REQ-013, P2) | v0.2 | ✅ | FX-SPEC-002 |
-| F14 | subprocess 오류 처리 계약 (FX-REQ-014, P2) | v0.2 | ✅ | FX-SPEC-003 |
-
-### Sprint 3 — 완료 (v0.3.0)
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F15 | Ink TUI 공통 컴포넌트 (FX-REQ-015, P1) | v0.3 | ✅ | ui/components/ 5개 + ui/render.tsx |
-| F16 | status 커맨드 Ink TUI 전환 (FX-REQ-016, P1) | v0.3 | ✅ | StatusView.tsx + runStatus() |
-| F17 | init 커맨드 Ink TUI 전환 (FX-REQ-017, P1) | v0.3 | ✅ | InitView.tsx + runInit() |
-| F18 | sync 커맨드 Ink TUI 전환 (FX-REQ-018, P1) | v0.3 | ✅ | SyncView.tsx + runSync() |
-| F19 | eslint flat config 설정 (FX-REQ-019, P1) | v0.3 | ✅ | TD-02 해소 완료 |
-| F20 | non-TTY 폴백 (FX-REQ-020, P2) | v0.3 | ✅ | render.tsx 4-branch dispatch |
-| F21 | 프로젝트 관리 점검 및 개선 (FX-REQ-021, P0) | v0.3 | ✅ | GitHub Projects 보드 + Branch Protection + PR/Issue 템플릿 + 온보딩 가이드 (PDCA 90%) |
-
-### Sprint 4 — 완료 (v0.4.0)
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F22 | ink-testing-library 도입 + vitest TSX 설정 (FX-REQ-022, P1) | v0.4 | ✅ | vitest .test.tsx + test-data factory |
-| F23 | 공통 컴포넌트 단위 테스트 (FX-REQ-023, P1) | v0.4 | ✅ | 5개 컴포넌트 24 tests |
-| F24 | View + render.tsx 통합 테스트 (FX-REQ-024, P1) | v0.4 | ✅ | 3 View + render 12 tests |
-| F25 | status --watch 실시간 모니터링 (FX-REQ-025, P1) | v0.4 | ✅ | StatusWatchView + fs.watch + debounce |
-
-### Sprint 5 — Frontend Design + 하네스 확장 (v0.5.0)
-
-**Part A: Frontend Design**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F26 | 팀 정보 공유 대시보드 (FX-REQ-026, P1) | v0.5 | ✅ | Next.js 대시보드 — SDD Triangle + Sprint + Harness Health (PDCA ~90%) |
-| F27 | Human Readable Document + Wiki (FX-REQ-027, P1) | v0.5 | ✅ | Wiki CRUD + D3 소유권 마커 보호 (PDCA ~90%) |
-| F28 | 아키텍처 뷰 (FX-REQ-028, P1) | v0.5 | ✅ | 4탭: ModuleMap, Diagram, Roadmap, Requirements (PDCA ~90%) |
-| F29 | 개인 워크스페이스 (FX-REQ-029, P1) | v0.5 | ✅ | ToDo + Messages + Settings, shared 타입 사용 (PDCA ~90%) |
-| F30 | Agent 투명성 뷰 (FX-REQ-030, P1) | v0.5 | ✅ | AgentCard 3소스 통합 + SSE EventSource (PDCA ~90%) |
-| F31 | Token/비용 관리 (FX-REQ-031, P1) | v0.5 | ✅ | Summary + 모델/Agent별 비용 테이블 (PDCA ~90%) |
-
-**Part B: 하네스 산출물 확장**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F32 | 동적 ARCHITECTURE.md 생성 (FX-REQ-032, P1) | v0.5 | ✅ | RepoProfile 기반 모듈 맵·레이어·진입점 (PDCA 93%) |
-| F33 | 동적 CONSTITUTION.md 생성 (FX-REQ-033, P1) | v0.5 | ✅ | 스택별 Always/Ask/Never 경계 규칙 (Node/Python/Go/Java) |
-| F34 | 동적 CLAUDE.md + AGENTS.md 생성 (FX-REQ-034, P1) | v0.5 | ✅ | 빌드/테스트/린트 커맨드 자동 감지 + scripts 필드 |
-| F35 | verify.ts 강화 (FX-REQ-035, P1) | v0.5 | ✅ | 플레이스홀더 잔존 감지 + 모듈 맵 일관성 검증 |
-| F36 | 하네스 신선도 검사 (FX-REQ-036, P2) | v0.5 | ✅ | status에서 하네스 문서 갱신 시점 비교 |
-
-### Phase 2 — API Server + Web Dashboard + 인프라
-
-**Sprint 6 — 인프라 + 인증 (v0.6.0)**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F37 | Cloudflare 배포 파이프라인 (FX-REQ-037, P0) | v0.6 | ✅ | Workers + Pages + D1 + deploy.yml, Match 92% |
-| F38 | OpenAPI 3.1 계약서 + API 리팩토링 (FX-REQ-038, P1) | v0.7 | ✅ | createRoute 17 endpoints + Zod 21스키마, Match 98% |
-| F39 | D1 스키마 + Drizzle ORM (FX-REQ-039, P1) | v0.6 | ✅ | 6테이블 + 마이그레이션 + seed, Match 97% |
-| F40 | JWT 인증 + RBAC 미들웨어 (FX-REQ-040, P1) | v0.6 | ✅ | signup/login/refresh + RBAC 적용, Match 100% |
-
-**Sprint 7 — API 실데이터 + OpenAPI (v0.7.0)**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F38 | OpenAPI 3.1 계약서 + API 리팩토링 (FX-REQ-038, P1) | v0.7 | ✅ | createRoute 17 endpoints + Zod 21스키마, Match 98% |
-| F41 | API 엔드포인트 실데이터 연결 (FX-REQ-041, P1) | v0.7 | ✅ | D1 실데이터 전환, Match 72% |
-| F42 | shadcn/ui + 웹 컴포넌트 고도화 (FX-REQ-042, P1) | v0.7 | ✅ | shadcn/ui + 다크모드 + 반응형, Match 95% |
-| F43 | API + Web 테스트 스위트 (FX-REQ-043, P1) | v0.7 | ✅ | D1 mock + auth/middleware 테스트 176건, Match 90% |
-
-**Sprint 8 — API 완성 + 핵심 기능 (v0.8.0)**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F44 | SSE 실시간 통신 (FX-REQ-044, P1) | v0.8 | ✅ | SSEManager D1 폴링, 3 이벤트 타입, Match 92% |
-| F45 | NL→Spec 변환 (FX-REQ-045, P0) | v0.8 | ✅ | LLMService(Workers AI+Claude), Zod 검증, Match 96% |
-| F46 | Wiki Git 동기화 (FX-REQ-046, P2) | v0.8 | ✅ | WikiSyncService 양방향, webhook HMAC, Match 94% |
-| F47 | Production Site Design — fx.minu.best 랜딩+대시보드 통합 (FX-REQ-047, P1) | v0.8 | ✅ | Route Groups + Digital Forge 디자인, Match 90% |
-
-**Sprint 9 — 프로덕션 배포 + E2E + 에이전트 오케스트레이션 (v0.9.0)**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F48 | 프로덕션 배포 파이프라인 완성 (FX-REQ-048, P0) | v0.9 | ✅ | deploy.yml Pages job + smoke-test.sh + deployment-runbook.md, Match 97% |
-| F49 | E2E 테스트 인프라 + 크리티컬 패스 (FX-REQ-049, P1) | v0.9 | ✅ | Playwright config + 5 E2E specs + auth fixture + e2e.yml CI, Match 92% |
-| F50 | 에이전트 오케스트레이션 기초 (FX-REQ-050, P1) | v0.9 | ✅ | 0004 migration + agent-orchestrator + constraint-guard + 13 tests, Match 91% |
-| F51 | 옵저버빌리티 + 배포 후 검증 (FX-REQ-051, P2) | v0.9 | ✅ | health.ts 상세 + logger.ts + health schema 확장, Match 95% |
-
-**Sprint 10 — 에이전트 실연동 + NL→Spec 충돌 감지 (v0.10.0)**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F52 | 프로덕션 실배포 실행 (FX-REQ-052, P0) | v0.10 | ✅ | Workers secrets + D1 migration remote + deploy + smoke test 검증, Match 97% |
-| F53 | 에이전트 실연동 — Claude API + MCP 어댑터 인터페이스 (FX-REQ-053, P0) | v0.10 | ✅ | AgentRunner + ClaudeApiRunner + MCP 어댑터 + 21 tests, Match 92% |
-| F54 | NL→Spec 충돌 감지 + 사용자 선택 (FX-REQ-054, P1) | v0.10 | ✅ | ConflictDetector 2-phase + 충돌 UI + 14 tests, Match 94% |
-
-**Sprint 11 — SSE 완성 + E2E 고도화 + 배포 자동화 + MCP 설계 (v0.11.0)**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F55 | SSE 이벤트 완성 — 에이전트 작업 실시간 전파 (FX-REQ-055, P1) | v0.11 | ✅ | SSEManager pushEvent + 대시보드 실시간 UI, Match 95% |
-| F56 | E2E 테스트 고도화 — 에이전트+충돌 흐름 (FX-REQ-056, P1) | v0.11 | ✅ | Playwright 8 E2E + API 통합 9건, Match 88% |
-| F57 | 프로덕션 배포 자동화 — CI/CD 파이프라인 (FX-REQ-057, P2) | v0.11 | ✅ | staging 환경 분리 + PR 트리거 + smoke-test 강화, Match 100% |
-| F58 | MCP 실 구현 설계 — McpAgentRunner 계획 (FX-REQ-058, P2) | v0.11 | ✅ | MCP 프로토콜 타입 + 설계 문서 + 매핑 상수, Match 91% |
-
-**Sprint 12 — ouroboros 패턴 + Generative UI + MCP 구현 + v1.0 준비 (v0.12.0)**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F59 | ouroboros 패턴 차용 — Ambiguity Score + Socratic 질문법 + 3-stage Evaluation (FX-REQ-059, P1) | v0.12 | ✅ | ax-14 Ambiguity Score + plan-plus Ontological Q + gap-detector Semantic, Match 100% |
-| F60 | Generative UI 패턴 도입 — 에이전트 결과 인터랙티브 렌더링 (FX-REQ-060, P1) | v0.12 | ✅ | UIHint + DynamicRenderer + SectionRenderer + WidgetRenderer, Match 95% |
-| F61 | MCP 실 구현 — McpAgentRunner + SseTransport (FX-REQ-061, P1) | v0.12 | ✅ | SseTransport + HttpTransport + McpRunner + Registry + 5 endpoints + UI, Match 95% |
-| F62 | v1.0.0 릴리스 준비 — 안정화 + 문서 + 배포 (FX-REQ-062, P1) | v1.0 | ✅ | D1 migration remote + version bump + git tag + 릴리스 |
-| F63 | 테스트 커버리지 강화 — E2E + API 통합 보강 (FX-REQ-063, P2) | v0.12 | ✅ | MCP 통합 8건 + E2E 2건 + SSE 헬퍼, Match 85% |
-
-**Sprint 13 — MCP Sampling/Prompts + 에이전트 자동 PR (v1.1.0)**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F64 | MCP Sampling + Prompts 확장 — 양방향 MCP 통합 완성 (FX-REQ-064, P1) | v1.1 | ✅ | SamplingHandler + PromptsClient + 4 endpoints + UI 브라우저, Match 91% |
-| F65 | 에이전트 자동 PR 파이프라인 — branch→PR→review→merge 전체 자동화 (FX-REQ-065, P0) | v1.1 | ✅ | PrPipelineService + ReviewerAgent + 7-gate auto-merge + 4 endpoints, Match 93% |
-| F66 | v1.1.0 릴리스 + 안정화 (FX-REQ-066, P2) | v1.1 | ✅ | version bump + CHANGELOG + SPEC v3.1 + git tag (D1 remote: 별도 적용) |
-
-**Sprint 14 — MCP Resources + 멀티 에이전트 동시 PR + Phase 3 기반 (v1.2.0)**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F67 | MCP Resources + Notifications — 파일/데이터 리소스 발견·읽기·구독 (FX-REQ-067, P1) | v1.2 | ✅ | McpResourcesClient + 4 endpoints + Resources 브라우저 UI, Match 92% |
-| F68 | 멀티 에이전트 동시 PR + 충돌 해결 — Merge Queue + 파일 충돌 감지 (FX-REQ-068, P0) | v1.2 | ✅ | MergeQueueService + 병렬 실행 + 순차 merge + 5 endpoints, Match 92.5% |
-| F69 | v1.2.0 릴리스 + Phase 3 기반 구축 — 멀티테넌시 설계 + 로드맵 (FX-REQ-069, P2) | v1.2 | ✅ | v1.3.0 릴리스에서 배포 완료, 멀티테넌시 설계는 Sprint 16+ |
-
-**Sprint 15 — PlannerAgent + 에이전트 inbox 통신 + git worktree 격리 (v1.3.0)**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F70 | PlannerAgent 도입 — 태스크 실행 전 코드베이스 리서치 + 계획 수립 + 인간 승인 (FX-REQ-070, P1) | v1.3 | ✅ | PlannerAgent 6 메서드 + API 3 endpoints + Orchestrator 통합, Match 92% |
-| F71 | 에이전트 간 inbox 통신 — Leader/Worker 비동기 메시지 큐 + SSE 이벤트 (FX-REQ-071, P1) | v1.3 | ✅ | AgentInbox 4 메서드 + inbox 라우트 3 endpoints + SSE, Match 90% |
-| F72 | git worktree 격리 — 에이전트별 독립 worktree 자동 할당 + WorktreeManager (FX-REQ-072, P2) | v1.3 | ✅ | WorktreeManager gitExecutor DI + D1 + executeTaskIsolated, Match 92% |
-| F73 | 제품 포지셔닝 재점검 — 기존 서비스(Discovery-X·AXIS DS·AI Foundry) 연동 계획 + 정체성 재정립 (FX-REQ-073, P0) | v1.3 | ✅ | Plan §5에 반영, C1/C2/C3 연동 경로 확정 |
-
-**Sprint 16 — PlannerAgent LLM 실 연동 + AgentInboxPanel UI + 프로덕션 배포 (v1.4.0)**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F75 | PlannerAgent LLM 실 연동 — Mock→Claude API 전환 + JSON 파싱 + 폴백 (FX-REQ-075, P1) | v1.4 | ✅ | analyzeCodebase() + 3단계 폴백 + 313 tests, Match 92% |
-| F76 | AgentInboxPanel UI + AgentPlanCard shared import 정리 (FX-REQ-076, P1) | v1.4 | ✅ | AgentInboxPanel 161 LOC + Plans 탭 실 렌더링 + api-client 6함수, Match 91% |
-| F77 | v1.4.0 프로덕션 배포 + D1 migration 0009 remote (FX-REQ-077, P2) | v1.4 | ✅ | D1 22테이블 확인 + CI/CD deploy 성공 + v1.4.0 bump |
-
-### 단독 작업 — 프로젝트 소개 페이지 개편
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F74 | 프로젝트 소개 페이지 전면 개편 — 정체성 재정립 + 아키텍처/로드맵/블루프린트 (FX-REQ-074, P1) | v1.4 | ✅ | 7섹션 전면 재작성, AXIS DS 토큰 연동, smoke-test 수정 포함 |
-
-**Sprint 17 — AI Foundry MCP 연동 + AgentInbox 스레드 뷰 + PlannerAgent Orchestrator 통합 (v1.5.0)**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F80 | AI Foundry MCP 연동 — 설계 문서 + 서비스 등록 흐름 + 외부 MCP 호출 경로 (FX-REQ-080, P1) | v1.5 | ✅ | McpServerRegistry.createServerPreset("ai-foundry") + PRESET_CONFIGS + externalTool type, Match 100% |
-| F81 | AgentInboxPanel 스레드 뷰 — parentMessageId 기반 대화 맥락 UI + 스레드 라우트 (FX-REQ-081, P1) | v1.5 | ✅ | GET /agents/inbox/:parentMessageId/thread + viewMode(flat/threaded) + groupByThread(), Match 100% |
-| F82 | PlannerAgent → Orchestrator 실 연동 — createPlanAndWait 승인 대기 + executePlan 라이프사이클 (FX-REQ-082, P1) | v1.5 | ✅ | createPlanAndWait() 폴링 + executePlan() lifecycle + D1 migration 0010 + Plan API 2 endpoints, Match 97% |
-
-**Sprint 18 — 멀티테넌시 기초 + GitHub/Slack 외부 도구 연동 (v1.6.0)**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F83 | 멀티테넌시 기초 — Organizations + tenant_id + RLS 미들웨어 (FX-REQ-083, P0) | v1.6 | ✅ | organizations + org_members + tenantGuard + JWT orgId + D1 migration 0011~0012, Match 93% |
-| F84 | GitHub 양방향 동기화 — Issues/PR 실시간 연동 (FX-REQ-084, P1) | v1.6 | ✅ | GitHubSyncService + webhook 확장 + Octokit 인증 + 17 tests, Match 95% |
-| F85 | Slack 통합 — 에이전트 알림 + 슬래시 커맨드 (FX-REQ-085, P1) | v1.6 | ✅ | SlackService + Block Kit + /foundry-x 커맨드 + SSE→Slack 브릿지 + 12 tests, Match 90% |
-| F86 | Sprint 18 통합 + v1.6.0 릴리스 (FX-REQ-086, P2) | v1.6 | ✅ | D1 0011~0012 remote 적용 완료 + Workers 배포 완료 |
-
-**Sprint 19 — AgentInbox 스레드 답장 (v1.7.0)**
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F87 | ThreadReplyForm UI — 스레드 상세 뷰 + 답장 폼 + getInboxThread 연동 (FX-REQ-087, P1) | v1.7 | ✅ | MessageItem 분리 + ThreadReplyForm + ThreadDetailView, Match 100% |
-| F88 | 스레드 답장 API 보강 — 답장 알림 + 읽음 처리 확장 + mock-d1 보완 (FX-REQ-088, P1) | v1.7 | ✅ | ackThread() + SSE thread_reply + 라우트 1개, Match 100% |
-| F89 | 스레드 통합 테스트 + E2E — API 라우트 테스트 + Playwright 스레드 흐름 (FX-REQ-089, P2) | v1.7 | ✅ | mock-d1 보완 + inbox-routes 10건 + E2E 4건, Match 100% |
-
-### 단독 작업 — Production E2E + AXIS Design System 리디자인
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F78 | Production 사이트 E2E 테스트 — fx.minu.best smoke + 크리티컬 패스 검증 (FX-REQ-078, P1) | v1.4 | ✅ | playwright.prod.config + 2 E2E specs, Match Rate 94% |
-| F79 | UI/UX 전면 리디자인 — AXIS Design System 연동 (FX-REQ-079, P1) | v1.4 | ✅ | forge→axis 전환 완료, 잔존 0건, Match Rate 96% |
-
-### 단독 작업 — PlannerAgent 외부 도구 프롬프트 연동
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F90 | PlannerAgent gatherExternalToolInfo() 프롬프트 연동 — MCP 도구 정보 수집 + LLM 프롬프트 주입 (FX-REQ-090, P2) | v1.5+ | ✅ | Match Rate 96%, 363 tests, PDCA FX-RPRT-021 |
-
-### 단독 작업 — executePlan() repoUrl 연동
-
-| F# | 제목 (REQ, Priority) | 버전 | 상태 | 비고 |
-|----|----------------------|:----:|:----:|------|
-| F91 | executePlan() repoUrl 실제 리포 URL 연동 — options 파라미터 + 라우트 조회 (FX-REQ-091, P2) | v1.5+ | ✅ | FX-PLAN-022, 366 tests |
-
+## §6 Execution Plan
+
+### Sprint 1 (v0.1.0) ✅
+- [x] 모노리포 구조 생성 (FX-REQ-001 DONE)
+- [x] packages/shared 타입 정의 (FX-REQ-002 DONE)
+- [x] harness 모듈 6개 구현 (FX-REQ-003 DONE)
+- [x] PlumbBridge 래퍼 구현 (FX-REQ-004 DONE)
+- [x] services 모듈 3개 구현 (FX-REQ-005 DONE)
+- [x] typecheck + build 통과
+
+### Sprint 2 (v0.2.0) ✅
+- [x] init 커맨드 — harness detect→generate 파이프라인 (FX-REQ-006 DONE)
+- [x] sync 커맨드 — PlumbBridge review 연동 (FX-REQ-007 DONE)
+- [x] status 커맨드 — Triangle Health Score 표시 (FX-REQ-008 DONE)
+- [x] 하네스 템플릿 3종 생성 (FX-REQ-009 DONE)
+- [x] 검증 스크립트 2개 작성 (FX-REQ-010 DONE)
+- [x] typecheck ✅ tests 35/35 ✅
+- [x] npm publish + npx 검증 (FX-REQ-011 DONE)
+- [x] ADR-000 작성 (FX-REQ-012 DONE)
+- [x] 내부 계약 문서 2건 (FX-REQ-013 DONE, FX-REQ-014 DONE)
+
+### Sprint 3 (v0.3.0) ✅
+- [x] eslint flat config 설정 + 기존 코드 lint fix (FX-REQ-019 DONE)
+- [x] Ink TUI 공통 컴포넌트 — StatusBadge, HealthBar, ProgressStep, Header, ErrorBox (FX-REQ-015 DONE)
+- [x] non-TTY 감지 + Ink/plain 분기 유틸 (FX-REQ-020 DONE)
+- [x] status 커맨드 Ink TUI 전환 (FX-REQ-016 DONE)
+- [x] init 커맨드 Ink TUI 전환 (FX-REQ-017 DONE)
+- [x] sync 커맨드 Ink TUI 전환 (FX-REQ-018 DONE)
+- [x] 프로젝트 관리 점검 및 개선 — GitHub Projects + Branch Protection + 온보딩 가이드 (FX-REQ-021 DONE)
+- [x] 기존 35개 테스트 통과 + typecheck + build + lint 검증
+
+### Sprint 4 (v0.4.0) ✅
+- [x] ink-testing-library 설치 + vitest.config.ts TSX 패턴 추가 (FX-REQ-022 DONE)
+- [x] test-data.ts 중앙 팩토리 생성 (FX-REQ-022 DONE)
+- [x] 공통 컴포넌트 테스트 5개 — Header(3), StatusBadge(5), HealthBar(7), ProgressStep(6), ErrorBox(3) (FX-REQ-023 DONE)
+- [x] View 테스트 3개 — StatusView(3), InitView(2), SyncView(2) (FX-REQ-024 DONE)
+- [x] render.tsx 4-branch 분기 테스트 5개 (FX-REQ-024 DONE)
+- [x] StatusWatchView.tsx — fs.watch + debounce + useInput('q') (FX-REQ-025 DONE)
+- [x] status.ts --watch, --interval 옵션 추가 (FX-REQ-025 DONE)
+- [x] 71개 테스트 전부 통과 + typecheck + build + lint 검증
+
+### Sprint 5 (v0.5.0) — Frontend Design + 하네스 확장
+**Part A: Frontend Design** ✅
+- [x] 팀 정보 공유 대시보드 (FX-REQ-026 DONE)
+- [x] Human Readable Document + Wiki (FX-REQ-027 DONE)
+- [x] 아키텍처 뷰 — 4탭 (FX-REQ-028 DONE)
+- [x] 개인 워크스페이스 — ToDo, Message, Setting (FX-REQ-029 DONE)
+- [x] Agent 투명성 뷰 — AgentCard + SSE (FX-REQ-030 DONE)
+- [x] Token/비용 관리 — Summary + 비용 테이블 (FX-REQ-031 DONE)
+
+**Part B: 하네스 산출물 확장** ✅
+- [x] 동적 ARCHITECTURE.md 생성 — RepoProfile 기반 모듈 맵 (FX-REQ-032 DONE)
+- [x] 동적 CONSTITUTION.md 생성 — 스택별 경계 규칙 (FX-REQ-033 DONE)
+- [x] 동적 CLAUDE.md + AGENTS.md 생성 — 커맨드 자동 감지 (FX-REQ-034 DONE)
+- [x] verify.ts 강화 — 플레이스홀더 잔존·일관성 (FX-REQ-035 DONE)
+- [x] 하네스 신선도 검사 — status에서 갱신 시점 비교 (FX-REQ-036 DONE)
+- [x] 22파일 106테스트 전부 통과 + typecheck + build + lint 검증
+
+### Sprint 6 (v0.6.0) — 인프라 + 인증 ✅
+- [x] Cloudflare Workers 배포 파이프라인 — wrangler.toml + deploy.yml (FX-REQ-037 DONE)
+- [x] D1 스키마 6테이블 + Drizzle ORM + 마이그레이션 + seed (FX-REQ-039 DONE)
+- [x] JWT 인증 (signup/login/refresh) + RBAC (admin/member/viewer) 미들웨어 적용 (FX-REQ-040 DONE)
+- [x] OpenAPI 3.1 계약서 — Sprint 7 완료 (FX-REQ-038 DONE, Match 98%)
+- [x] 38파일 145테스트 전부 통과 + typecheck + build + lint 검증
+- [x] PDCA 2회 iteration — 61% → 84% (F37+F39+F40 = 96%)
+
+### Sprint 7 (v0.7.0) — OpenAPI + 실데이터 + Web 고도화 ✅
+- [x] OpenAPI 3.1 전환 — createRoute 17 endpoints + Zod 21스키마 (FX-REQ-038 DONE, Match 98%)
+- [x] API 실데이터 연결 — D1 전환, data-reader 제거 (FX-REQ-041 DONE, Match 72%)
+- [x] shadcn/ui + 다크모드 + 반응형 — 웹 컴포넌트 고도화 (FX-REQ-042 DONE, Match 95%)
+- [x] 테스트 스위트 — D1 mock + auth/middleware 테스트 (FX-REQ-043 DONE, Match 90%)
+- [x] 31파일 176테스트 전부 통과 + typecheck + build 검증
+- [x] PDCA 1회 iteration — Agent Teams 병렬, Overall 89%
+
+### Sprint 8 (v0.8.0) — API 완성 + 핵심 기능 ✅
+- [x] requirements GitHub API + KV 캐시 (FX-REQ-041 DONE)
+- [x] health/integrity/freshness 실데이터 전환 (FX-REQ-041 DONE)
+- [x] SSE 실시간 통신 — Agent/Sync 상태 스트리밍 (FX-REQ-044 DONE)
+- [x] NL→Spec 변환 — LLM 통합 파이프라인 (FX-REQ-045 DONE)
+- [x] Wiki Git 동기화 — D1 ↔ Git 양방향 (FX-REQ-046 DONE)
+- [x] Production Site Design — fx.minu.best 랜딩+대시보드 통합 (FX-REQ-047 DONE)
+- [x] ~~Workers 프로덕션 재배포~~ (Sprint 9 F48에서 대체)
+- [x] ~~npm publish foundry-x@0.8.0~~ (v0.5.0→v1.0.0 직행, 건너뜀)
+- [x] 42파일 216테스트 전부 통과 + typecheck + build + lint 검증 (PDCA 93%)
+
+### Sprint 9 (v0.9.0) — 프로덕션 배포 + E2E + 에이전트 오케스트레이션 ✅
+- [x] Workers secrets 설정 + D1 migration remote 적용 (FX-REQ-048 DONE)
+- [x] Pages deploy job 복원 + 배포 Runbook 작성 (FX-REQ-048 DONE)
+- [x] Playwright E2E 인프라 설정 + CI 통합 (FX-REQ-049 DONE)
+- [x] 크리티컬 패스 E2E: login→dashboard→agents→spec-generator (FX-REQ-049 DONE)
+- [x] API 통합 테스트 — 서비스 간 호출 검증 (FX-REQ-049 DONE)
+- [x] 에이전트 Capability 실 정의 + Constraint 강제 로직 (FX-REQ-050 DONE)
+- [x] 에이전트 브랜치 기반 격리 — PR 기반 작업 흐름 (FX-REQ-050 DONE)
+- [x] Smoke test + health check 강화 (FX-REQ-051 DONE)
+- [x] Workers + Pages 프로덕션 배포 검증 (FX-REQ-048 DONE)
+- [x] typecheck + build + tests 통과 — 48파일 241테스트 ✅ (PDCA 94%)
+
+### Sprint 10 (v0.10.0) — 에이전트 실연동 + NL→Spec 충돌 감지 ✅
+- [x] Workers secrets 설정 + D1 migration remote 적용 (FX-REQ-052 DONE)
+- [x] Workers + Pages 프로덕션 배포 + smoke test 검증 (FX-REQ-052 DONE)
+- [x] AgentRunner 추상화 계층 + ClaudeApiRunner 구현 (FX-REQ-053 DONE)
+- [x] MCP 어댑터 인터페이스 설계 (FX-REQ-053 DONE)
+- [x] 에이전트 실행 → agent_tasks 실데이터 기록 (FX-REQ-053 DONE)
+- [x] NL→Spec 기존 명세 충돌 감지 엔진 (FX-REQ-054 DONE)
+- [x] 충돌 표시 + 사용자 선택 UI (수락/거절/수정) (FX-REQ-054 DONE)
+- [x] typecheck + build + tests 276건 통과 (PDCA 93%)
+
+### Sprint 11 (v0.11.0) — SSE 완성 + E2E 고도화 + 배포 자동화 + MCP 설계 ✅
+- [x] SSE agent.task.started/completed 이벤트 전파 (FX-REQ-055 DONE)
+- [x] agents/page.tsx SSE task 이벤트 핸들링 + 실시간 UI (FX-REQ-055 DONE)
+- [x] Playwright agent execute E2E — 실행→결과 확인 흐름 (FX-REQ-056 DONE)
+- [x] Playwright conflict resolution E2E — 충돌 감지→해결 흐름 (FX-REQ-056 DONE)
+- [x] API 통합 테스트 추가 — agent-runner + conflict-detector (FX-REQ-056 DONE)
+- [x] wrangler.toml ENVIRONMENT vars 설정 + deploy.yml 환경 분리 (FX-REQ-057 DONE)
+- [x] GitHub Actions 자동 배포 트리거 (PR merge → deploy) (FX-REQ-057 DONE)
+- [x] MCP 1.0 스펙 리뷰 + 프로토콜 설계 문서 (FX-REQ-058 DONE)
+- [x] McpAgentRunner 구현 계획 + 인터페이스 확정 (FX-REQ-058 DONE)
+- [x] typecheck + build + tests 290건 통과 + 18 E2E specs (PDCA 93%)
+
+### Sprint 12 (v0.12.0) — ouroboros 패턴 + Generative UI + MCP + 테스트 ✅
+- [x] ouroboros Ambiguity Score 정량화 모듈 도입 — ax-14-req-interview 강화 (FX-REQ-059 DONE)
+- [x] Socratic 질문법 + 온톨로지 분석 — plan-plus 스킬 강화 (FX-REQ-059 DONE)
+- [x] 3-stage Evaluation 패턴 — bkit PDCA Check 단계 고도화 (FX-REQ-059 DONE)
+- [x] Generative UI Widget Renderer — sandboxed iframe + CSS 변수 주입 (FX-REQ-060 DONE)
+- [x] 에이전트 결과 인터랙티브 렌더링 — Decision Matrix 기반 시각화 (FX-REQ-060 DONE)
+- [x] CopilotKit useComponent 패턴 — 대시보드 동적 시각화 (FX-REQ-060 DONE)
+- [x] MCP SseTransport 구현 — fetch+ReadableStream SSE 파싱 (FX-REQ-061 DONE)
+- [x] McpAgentRunner 구현 — taskType → MCP tool.call() 변환 + 결과 파싱 (FX-REQ-061 DONE)
+- [x] MCP 서버 연결 설정 UI — workspace 페이지 MCP Servers 탭 (FX-REQ-061 DONE)
+- [x] CHANGELOG v0.12.0 + SPEC/CLAUDE.md 갱신 (FX-REQ-062 DONE)
+- [x] 프로덕션 최종 배포 + D1 migration remote + v1.0.0 태그 (FX-REQ-062 DONE)
+- [x] MCP E2E + SSE 헬퍼 + 통합 테스트 (FX-REQ-063 DONE)
+- [x] API 통합 테스트 확대 — MCP runner + 서비스 간 호출 검증 (FX-REQ-063 DONE)
+- [x] typecheck + build + tests 352건 통과 + 20 E2E specs (PDCA ~93%)
+
+### Sprint 13 (v1.1.0) — MCP Sampling/Prompts + 에이전트 자동 PR ✅
+- [x] MCP SamplingHandler — 서버→클라이언트 LLM 호출 위임 (FX-REQ-064 DONE)
+- [x] MCP PromptsClient — prompts/list + prompts/get (FX-REQ-064 DONE)
+- [x] MCP API 4 endpoints + Prompts 브라우저 UI (FX-REQ-064 DONE)
+- [x] PrPipelineService — branch→commit→PR→merge 전체 자동화 (FX-REQ-065 DONE)
+- [x] ReviewerAgent — cross-agent PR 리뷰 (FX-REQ-065 DONE)
+- [x] GitHubService 확장 — createBranch, createPR, mergePR + 5 메서드 (FX-REQ-065 DONE)
+- [x] Auto-merge 7-gate 판정 — SDD + Quality + CI + Security (FX-REQ-065 DONE)
+- [x] SSE agent.pr.* 이벤트 4종 + 대시보드 PR 상태 UI (FX-REQ-065 DONE)
+- [x] D1 migration 0007 — agent_prs + mcp_sampling_log (FX-REQ-064, FX-REQ-065 DONE)
+- [x] CHANGELOG v1.1.0 + version bump (FX-REQ-066 DONE)
+- [x] ~~D1 migration remote 적용 + 프로덕션 배포~~ (Sprint 14 F69에서 일괄 적용)
+- [x] typecheck + build + tests 388건 통과 (PDCA 93%)
+
+### Sprint 14 (v1.2.0) — MCP Resources + 멀티 에이전트 동시 PR + Phase 3 기반 ✅
+- [x] McpResourcesClient — listResources, readResource, subscribeResource (FX-REQ-067 DONE)
+- [x] McpRunner 확장 — onNotification, resources/updated 핸들링 (FX-REQ-067 DONE)
+- [x] MCP API 4 endpoints (resources/list, templates, read, subscribe) (FX-REQ-067 DONE)
+- [x] McpResourcesPanel + ResourceViewer UI (FX-REQ-067 DONE)
+- [x] MergeQueueService — enqueue, detectConflicts, calculateMergeOrder, processNext (FX-REQ-068 DONE)
+- [x] AgentOrchestrator 확장 — executeParallel, executeParallelWithPr (FX-REQ-068 DONE)
+- [x] GitHubService 확장 — getModifiedFiles, updateBranch, getPrStatuses (FX-REQ-068 DONE)
+- [x] Agent API 5 endpoints (parallel, queue) (FX-REQ-068 DONE)
+- [x] D1 migration 0008 — merge_queue + parallel_executions (FX-REQ-068 DONE)
+- [x] MergeQueuePanel + ConflictDiagram + ParallelExecutionForm UI (FX-REQ-068 DONE)
+- [x] D1 migration 0007+0008 remote 적용 + 프로덕션 배포 (FX-REQ-069 DONE)
+- [x] v1.2.0 릴리스 — CHANGELOG + version bump + git tag (FX-REQ-069 DONE)
+- [x] ~~multitenancy.design.md~~ (Sprint 18 F83에서 구현으로 대체) + ~~phase-3-roadmap.md~~ (Sprint 15 F73에서 대체)
+- [x] ~~E2E 테스트 — Merge Queue + MCP Resources~~ (Sprint 19+ 이관)
+- [x] typecheck + build + tests 429건 통과 (PDCA 92%)
+
+### Sprint 15 (v1.3.0) — PlannerAgent + 에이전트 inbox 통신 + git worktree 격리 ✅
+- [x] PlannerAgent 서비스 — 코드베이스 분석 + 계획 수립 6 메서드 (FX-REQ-070 DONE)
+- [x] AgentPlanCard.tsx — 계획 표시 + 수락/수정/거절 UI (FX-REQ-070 DONE, WIP 활용)
+- [x] POST /agents/plan 엔드포인트 3개 + D1 agent_plans 테이블 (FX-REQ-070 DONE)
+- [x] AgentOrchestrator.createPlanAndWait + executePlan (FX-REQ-070 DONE)
+- [x] D1 agent_messages 테이블 — 에이전트 간 비동기 메시지 큐 (FX-REQ-071 DONE)
+- [x] POST/GET /agents/inbox/* API 엔드포인트 3개 (FX-REQ-071 DONE)
+- [x] SSE agent.message.received 이벤트 추가 (FX-REQ-071 DONE)
+- [x] WorktreeManager 서비스 — gitExecutor DI + D1 영속 (FX-REQ-072 DONE)
+- [x] AgentOrchestrator worktree 격리 모드 통합 — executeTaskIsolated (FX-REQ-072 DONE)
+- [x] 제품 포지셔닝 리서치 — Foundry-X 정체성 재정립 + 기존 서비스 연동 범위 확정 (FX-REQ-073 DONE)
+- [x] Discovery-X / AXIS Design System / AI Foundry 자산 분석 + 재활용 계획 (FX-REQ-073 DONE)
+- [x] Sprint 15 최종 스코프 재정의 (FX-REQ-073 결과 반영) (FX-REQ-073 DONE)
+- [x] typecheck + build + tests 307건 통과 (PDCA 92%)
+
+### Sprint 16 (v1.4.0) — PlannerAgent LLM + AgentInboxPanel UI + 배포 ✅
+- [x] PlannerAgent createPlan() Mock→Claude API 실 호출 전환 (FX-REQ-075 DONE)
+- [x] PlannerAgent 전용 시스템 프롬프트 + JSON schema 응답 파싱 (FX-REQ-075 DONE)
+- [x] API 에러 시 Mock 폴백 로직 (FX-REQ-075 DONE)
+- [x] planner-agent.test.ts 확장 — LLM mock + 파싱 성공/실패 (FX-REQ-075 DONE)
+- [x] AgentPlanCard.tsx shared import 전환 (inline 타입 삭제) (FX-REQ-076 DONE)
+- [x] AgentInboxPanel.tsx 신규 — 메시지 목록 + 타입별 렌더링 + ack + SSE (FX-REQ-076 DONE)
+- [x] agents/page.tsx inbox 탭 추가 + AgentPlanCard 통합 (FX-REQ-076 DONE)
+- [x] api-client.ts 확장 — plan/inbox API 함수 6개 (FX-REQ-076 DONE)
+- [x] D1 migration 0009 remote 적용 — 22테이블 확인 (FX-REQ-077 DONE)
+- [x] Workers + Pages 프로덕션 재배포 + smoke test — CI/CD 성공 (FX-REQ-077 DONE)
+- [x] version bump v1.4.0 + SPEC + git tag (FX-REQ-077 DONE)
+- [x] typecheck + build + tests 통과 (313건)
+
+### 단독: F74 프로젝트 소개 페이지 전면 개편
+- [x] 랜딩 페이지 Hero 섹션 — "사람과 AI가 함께 만드는 곳" (FX-REQ-074 DONE)
+- [x] Features 섹션 — 3 Pillars (에이전트 통제/조직 지식/실험-코드) (FX-REQ-074 DONE)
+- [x] Pricing 섹션 삭제 (FX-REQ-074 DONE)
+- [x] Architecture 섹션 신규 — 4-Layer 블루프린트 (FX-REQ-074 DONE)
+- [x] Roadmap 섹션 신규 — Phase 1~4 타임라인 (FX-REQ-074 DONE)
+- [x] BluePrint 섹션 신규 — AX BD팀 생태계 다이어그램 (FX-REQ-074 DONE)
+- [x] Navbar/Footer 업데이트 — v1.3.0 + Ecosystem 링크 (FX-REQ-074 DONE)
+
+### Sprint 17 (v1.5.0) — AI Foundry MCP 연동 + AgentInbox 스레드 뷰 + PlannerAgent Orchestrator 통합 ✅
+- [x] AI Foundry MCP 연동 설계 문서 작성 — 서비스 등록 흐름 + 인증 전략 (FX-REQ-080 DONE)
+- [x] MCP 서버 등록 API 확장 — AI Foundry 전용 프리셋 + 연결 검증 (FX-REQ-080 DONE)
+- [x] PlannerAgent 외부 MCP 호출 경로 — AI Foundry tool.call() 통합 (FX-REQ-080 DONE)
+- [x] AgentInbox 스레드 라우트 — GET /agents/inbox/:parentMessageId/thread (FX-REQ-081 DONE)
+- [x] AgentInboxPanel 스레드 UI — 대화 맥락 그룹핑 + 토글 뷰 (FX-REQ-081 DONE)
+- [x] api-client getInboxThread() 함수 추가 (FX-REQ-081 DONE)
+- [x] createPlanAndWait() 승인 대기 메커니즘 — 폴링 (FX-REQ-082 DONE)
+- [x] executePlan() 라이프사이클 — executing/completed/failed 상태 추적 (FX-REQ-082 DONE)
+- [x] agent_plans 테이블 확장 — execution_* 컬럼 추가 (D1 migration 0010) (FX-REQ-082 DONE)
+- [x] Plan 관리 API 2 endpoints — get/execute (FX-REQ-082 DONE)
+- [x] typecheck + build + tests 313건 통과 (PDCA 98%)
+
+### Sprint 18 (v1.6.0) — 멀티테넌시 기초 + GitHub/Slack 외부 도구 연동 ✅
+- [x] D1 migration 0011: organizations + org_members 테이블 (FX-REQ-083 DONE)
+- [x] D1 migration 0012: org_id 컬럼 (projects, agents, mcp_servers) + GitHub 컬럼 (FX-REQ-083 DONE)
+- [x] tenantGuard 미들웨어 — JWT orgId + DB 멤버십 검증 (FX-REQ-083 DONE)
+- [x] Login/Signup org 자동 할당 + Refresh org 재조회 (FX-REQ-083 DONE)
+- [x] routes/agent + mcp에 org_id 필터 적용 (FX-REQ-083 DONE)
+- [x] GitHubSyncService — syncTaskToIssue + syncIssueToTask + syncPrStatus (FX-REQ-084 DONE)
+- [x] webhook.ts issues + pull_request 이벤트 핸들러 확장 (FX-REQ-084 DONE)
+- [x] GitHub 양방향 동기화 테스트 17건 (FX-REQ-084 DONE)
+- [x] SlackService — sendNotification + handleSlashCommand + handleInteraction (FX-REQ-085 DONE)
+- [x] Slack routes 2개 — /slack/commands + /slack/interactions (FX-REQ-085 DONE)
+- [x] SSE→Slack 브릿지 — 에이전트 이벤트 실시간 전파 (FX-REQ-085 DONE)
+- [x] Slack 테스트 12건 (FX-REQ-085 DONE)
+- [x] typecheck + build + tests 342건 통과 (PDCA 93%)
+- [x] D1 migrations 0011~0012 remote 적용 완료 (FX-REQ-086 DONE, 2026-03-19 00:14:02)
+- [x] Workers 프로덕션 배포 완료 (FX-REQ-086 DONE, Version ae45aab5)
+
+### Sprint 19 (v1.7.0) — AgentInbox 스레드 답장 ✅
+- [x] ThreadReplyForm 컴포넌트 — 답장 입력 폼 + type/subject/payload 필드 (FX-REQ-087 DONE)
+- [x] ThreadDetailView — getInboxThread() 연동 + 스레드 전체 대화 표시 (FX-REQ-087 DONE)
+- [x] AgentInboxPanel 스레드 클릭 → ThreadDetailView 전환 UX (FX-REQ-087 DONE)
+- [x] 답장 알림 SSE 이벤트 — agent.message.thread_reply 전파 (FX-REQ-088 DONE)
+- [x] 스레드 읽음 처리 — ackThread() 일괄 확인 메서드 (FX-REQ-088 DONE)
+- [x] mock-d1 agent_messages 테이블 추가 + 인덱스 (FX-REQ-089 DONE)
+- [x] inbox 라우트 통합 테스트 — 5 endpoints 전체 커버리지 (FX-REQ-089 DONE)
+- [x] Playwright E2E — 스레드 답장 흐름 시나리오 4건 (FX-REQ-089 DONE)
+- [x] typecheck + build + tests 356건 통과 (PDCA 100%)
+
+### 단독: F78 Production 사이트 E2E 테스트 ✅
+- [x] Playwright 프로덕션 config — baseURL: fx.minu.best (FX-REQ-078 DONE)
+- [x] smoke test E2E — health check + 랜딩 페이지 로딩 검증 (FX-REQ-078 DONE)
+- [x] 크리티컬 패스 E2E — 랜딩→대시보드→에이전트→spec-generator 흐름 (FX-REQ-078 DONE)
+- [x] CI 연동 — deploy.yml prod-e2e job 추가, smoke-test 후 Playwright 실행 (FX-REQ-078 DONE)
+
+### 단독: F79 UI/UX 전면 리디자인 — AXIS Design System 연동 ✅
+- [x] AXIS DS 토큰 체계 분석 + Foundry-X tailwind 매핑 (FX-REQ-079 DONE)
+- [x] 랜딩 페이지 AXIS DS 기반 리디자인 (FX-REQ-079 DONE)
+- [x] 대시보드 레이아웃 + 컴포넌트 AXIS DS 전환 (FX-REQ-079 DONE)
+- [x] shadcn/ui → AXIS DS CSS 변수 자동 전환 (FX-REQ-079 DONE — 코드 변경 없이 토큰 매핑)
+
+### 단독: F90 PlannerAgent gatherExternalToolInfo() 프롬프트 연동 ✅
+- [x] gatherExternalToolInfo() 메서드 구현 — mcpRegistry active 서버 도구 수집 (FX-REQ-090 DONE)
+- [x] PLANNER_SYSTEM_PROMPT 확장 — external_tool type + externalTool 스키마 가이드 (FX-REQ-090 DONE)
+- [x] analyzeCodebase() 수정 — 도구 목록 프롬프트 주입 (FX-REQ-090 DONE)
+- [x] 테스트 7건 — mcpRegistry mock + external_tool 파싱 검증 (FX-REQ-090 DONE)
+- [x] typecheck + lint + 기존 테스트 통과 — 363건 전부 pass (FX-REQ-090 DONE)
+
+### 단독: F91 executePlan() repoUrl 실제 리포 URL 연동 ✅
+- [x] executePlan() 시그니처 변경 — options?: { repoUrl?, branch? } (FX-REQ-091 DONE)
+- [x] context.repoUrl에 options.repoUrl 반영 + 폴백 (FX-REQ-091 DONE)
+- [x] POST /plan/:id/execute 라우트에서 repoUrl/projectId 조회 + 전달 (FX-REQ-091 DONE)
+- [x] schemas/plan.ts — executePlanSchema 옵션 추가 (FX-REQ-091 DONE)
+- [x] 테스트 3건 — repoUrl 전달/미전달/branch 검증 (FX-REQ-091 DONE)
+- [x] mock-d1 agent_plans 스키마 실제 마이그레이션 정렬 (FX-REQ-091 DONE)
+- [x] typecheck ✅ + 366 tests 전부 pass (FX-REQ-091 DONE)
+
+### Sprint 22 (v1.8+) — Slack 고도화 (Interactive D1 실연동 + 채널별 알림) ✅
+- [x] D1 migration 0014: slack_notification_configs 테이블 (FX-REQ-094 DONE)
+- [x] SlackService 확장 — 이벤트 타입 8개 + Block Kit 빌더 5개 + eventToCategory() (FX-REQ-094 DONE)
+- [x] SSEManager 카테고리 라우팅 — forwardToSlack 리팩토링 + fallback (FX-REQ-094 DONE)
+- [x] Interactive D1 실 연동 — plan_approve/reject → agent_plans 갱신 + race condition 방어 (FX-REQ-094 DONE)
+- [x] 알림 설정 CRUD 4 endpoints — GET/PUT/DELETE/POST /orgs/:orgId/slack/configs (FX-REQ-094 DONE)
+- [x] Zod 스키마 4개 — Category, Config, Upsert, Test (FX-REQ-094 DONE)
+- [x] 테스트 +32건 — 블록 빌더 5 + 매핑 5 + D1 연동 8 + 라우팅 7 + CRUD 7 (FX-REQ-094 DONE)
+- [x] typecheck ✅ + 471 tests 전부 pass (PDCA 99%)
+
+### Sprint 21 (v1.8.0) — GitHub 양방향 동기화 고도화 ✅
+- [x] PR 자동 리뷰 실 연동 — GitHubSyncService 확장 (FX-REQ-093 DONE)
+- [x] Issue→Task 자동 생성 — webhook issue 이벤트 → agent_tasks INSERT (FX-REQ-093 DONE)
+- [x] typecheck + build + tests 통과 (PDCA 93%)
+
+### Sprint 23 — PlannerAgent 고도화 + 테스트 커버리지 확장 ✅
+- [x] FileContextCollector 서비스 — 파일 컨텍스트 수집 + 관련도 점수 (FX-REQ-095 DONE)
+- [x] planner-prompts 서비스 — 분석 모드별 시스템 프롬프트 분리 (FX-REQ-095 DONE)
+- [x] analyzeCodebase() 리팩토링 — 3단계 분석 파이프라인 (FX-REQ-095 DONE)
+- [x] D1 migration 0015 — agent_plans 분석 메타데이터 컬럼 추가 (FX-REQ-095 DONE)
+- [x] E2E 5개 spec — org-settings + org-members + workspace-nav + tokens + slack-config (FX-REQ-097 DONE)
+- [x] API 보강 12건 — org-invitation-delete + webhook-extended + slack-config edge (FX-REQ-097 DONE)
+- [x] typecheck ✅ + 502 tests 전부 pass (PDCA 92%)
+
+### Sprint 24 (v2.0.0) — Phase 3 마무리: 멀티 프로젝트 + Jira + 모니터링 + 워크플로우 ✅
+- [x] 멀티 프로젝트 대시보드 — ProjectOverviewService + 라우트 3ep + ProjectCard UI (FX-REQ-107 DONE)
+- [x] Webhook 일반화 + Jira 연동 — WebhookRegistry + JiraAdapter + 라우트 5ep (FX-REQ-110 DONE)
+- [x] 모니터링 + 옵저버빌리티 — MonitoringService + AlertRule + 라우트 5ep (FX-REQ-113 DONE)
+- [x] 에이전트 워크플로우 빌더 — WorkflowEngine + 라우트 5ep + React Flow UI (FX-REQ-115 DONE)
+- [x] D1 migration 0016 — 4 tables (projects, jira_configs, alert_rules, workflow_definitions)
+- [x] typecheck ✅ + 535 tests 전부 pass + Workers v2.0.0 배포 (PDCA 95%)
+
+### Sprint 25 — 기술 스택 점검 + AXIS DS UI 전환 ✅
+- [x] 기술 스택 점검 — Discovery-X/AI Foundry/AXIS DS 호환성 매트릭스 작성, Kill→Go (FX-REQ-098 DONE)
+- [x] AXIS DS UI 전환 — shadcn/ui → AXIS DS 11 컴포넌트 전환 + 디자인 토큰 통합 (FX-REQ-104 DONE)
+- [x] typecheck ✅ + PDCA 97%
+
+### Sprint 26 (v2.1.0) — Phase 4 통합: SSO + BFF + iframe + D1 엔티티 ✅
+- [x] 프론트엔드 통합 — iframe + postMessage SSO (FX-REQ-106 DONE)
+- [x] 인증 SSO 통합 — Hub Token + org_services (FX-REQ-108 DONE)
+- [x] API BFF→통합 — Service Bindings + HTTP 폴백 (FX-REQ-109 DONE)
+- [x] D1 스키마 통합 — entity_registry + links (FX-REQ-111 DONE)
+- [x] D1 migration 0017 + typecheck ✅ + PDCA 94%
+
+### Sprint 27 — Phase 3-B 기술 기반 완성 ✅
+- [x] KPI 측정 인프라 — KpiLogger + /analytics 대시보드 + 4 endpoints (FX-REQ-100 DONE)
+- [x] Git↔D1 Reconciliation — ReconciliationService + Cron 6h + 3 endpoints (FX-REQ-099 DONE)
+- [x] 에이전트 hook 자동 수정 — AutoFixService LLM 2-retry + human escalation (FX-REQ-101 DONE)
+- [x] D1 migration 0018 (kpi_events + reconciliation_runs) + typecheck ✅ + PDCA 94%
+
+### Sprint 28 — Phase 3 완결: AutoRebase + Semantic Linting + Plumb 판정 ✅
+- [x] 에이전트 자동 rebase — AutoRebaseService 3-retry + LLM 충돌 해결 (FX-REQ-102 DONE)
+- [x] Semantic Linting — ESLint 커스텀 룰 3종 + hasSuggestions 수정 예시 (FX-REQ-103 DONE)
+- [x] Plumb Track B 판정 — Stay Track A, ADR-001, 재판정 2026-09 (FX-REQ-105 DONE)
+- [x] typecheck ✅ + PDCA 93%
+
+### Sprint 30 (v2.4.0) — 프로덕션 배포 동기화 + Phase 4 Go 판정 + 품질 강화 ✅
+- [x] D1 migration 0018 remote 적용 — Workers v2.2.0 배포 완료 (FX-REQ-123 DONE)
+- [x] Workers v2.2.0 프로덕션 배포 + smoke test (FX-REQ-123 DONE)
+- [x] F106 프론트엔드 통합 개선 — postMessage 6종 + Skeleton + ErrorBoundary (FX-REQ-124 DONE)
+- [x] KPI 추적 대시보드 UI — K7/K8/K9 위젯 + Conditional Go (FX-REQ-125 DONE)
+- [x] Phase 4 Go 판정 문서 작성 — Conditional Go (FX-REQ-125 DONE)
+- [x] Harness Evolution Rules 자동 감지 — 4규칙 + 2ep + SSE (FX-REQ-126 DONE)
+- [x] PRD v5 MVP 체크리스트 갱신 — 6/6 ✅ + codegen 보류 (FX-REQ-127 DONE)
+- [x] Phase 4 통합 경로 E2E — 4시나리오 (FX-REQ-128 DONE)
+- [x] API 에러 응답 표준화 — ErrorResponse 스키마 통일 (FX-REQ-128 DONE)
+- [x] typecheck ✅ + PDCA 93%
+
+### Sprint 29 (v2.3.0) — 실사용자 온보딩 기반: 가이드 UI + 피드백 API + 체크리스트 ✅
+- [x] 온보딩 가이드 UI — /getting-started 페이지 + 기능카드 5종 + FAQ 5종 (FX-REQ-120 DONE)
+- [x] 피드백 수집 시스템 — NPS 설문 API + D1 테이블 + NpsSummaryWidget (FX-REQ-121 DONE)
+- [x] 온보딩 체크리스트 — 사용자별 진행률 + KpiLogger 연동 (FX-REQ-122 DONE)
+- [x] D1 migration 0019 + typecheck ✅ + PDCA 93%
+
+### Sprint 31 (v2.5) — 프로덕션 완전 동기화 + SPEC 정합성 + Match Rate 보강 + 온보딩 킥오프 ✅
+- [x] D1 migration 0018~0019 remote 적용 — 전체 적용 확인 (FX-REQ-129 DONE)
+- [x] Workers v2.4.0 프로덕션 배포 + smoke test — fe2f72a7 (FX-REQ-129 DONE)
+- [x] SPEC.md §1/§2/§3 보정 — v5.9, system-version 2.4.0, 마일스톤 ✅ (FX-REQ-130 DONE)
+- [x] Sprint 29/30 Execution Plan 체크박스 동기화 (FX-REQ-130 DONE)
+- [x] MEMORY.md 보정 — Workers v2.4.0/D1/검증수치/다음작업 (FX-REQ-130 DONE)
+- [x] ServiceContainer FX_NAVIGATE router.push 연결 + serviceName breadcrumb (FX-REQ-131 DONE)
+- [x] E2E 보강 — ErrorResponse + Harness Rules + 온보딩 플로우 + KPI 대시보드 +6 tests (FX-REQ-131 DONE)
+- [x] 온보딩 킥오프 체크리스트 문서 — S1~S5 + Go/Kill 기준 + 지원 체계 (FX-REQ-132 DONE)
+- [x] 로그인/회원가입 UI — /login 페이지 + auth-store + 사이드바 인증 + fetchApi 401 수정 (FX-REQ-133 DONE)
+- [x] typecheck ✅ + PDCA 95%
+
+### Sprint 32 — PRD v5 완전성 점검 + Phase 4→5 전환 로드맵 ✅
+- [x] PRD v5 G1~G12 갭 항목 상태 검증 — 9건 완료, 1건 진행(G10), 2건 수요 대기(G2/G5) (FX-REQ-156 DONE)
+- [x] Phase 3 산출물 완료 검증 — 11/11 항목 ✅ (FX-REQ-156 DONE)
+- [x] Phase 4 산출물 완료 검증 — 11/12 항목 ✅, G2 GitLab P3 수요 대기 (FX-REQ-156 DONE)
+- [x] Phase 5 미착수 F-item Layer 1~4 분류 + 의존성 문서화 (FX-REQ-157 DONE)
+- [x] 온보딩 4주 추적 계획 — K7/K8/K9/K12 측정 방법 + W1~W4 활동 정의 (FX-REQ-157 DONE)
+- [x] Phase 4 최종 Go/Pivot/Kill 판정 기준 수치화 (FX-REQ-157 DONE)
+- [x] SPEC.md §2/§5/§6 Sprint 32 반영
+
+### Sprint 35 — 모델 비용/품질 대시보드 + Sprint 워크플로우 템플릿 ✅
+- [x] D1 migration 0021 — model_execution_metrics 테이블 + 인덱스 4개 (FX-REQ-143 DONE)
+- [x] ModelMetricsService — recordExecution + getModelQuality + getAgentModelMatrix (FX-REQ-143 DONE)
+- [x] GET /tokens/model-quality + GET /tokens/agent-model-matrix endpoints (FX-REQ-143 DONE)
+- [x] Sprint 워크플로우 템플릿 3종 — Standard(10노드) + Fast(6노드) + Review-Heavy(9노드) (FX-REQ-142 DONE)
+- [x] 조건 평가기 3종 — match_rate_met + test_coverage_met + peer_review_approved (FX-REQ-142 DONE)
+- [x] SprintContext 변수 체계 + GET /orgs/:orgId/workflows/sprint-templates (FX-REQ-142 DONE)
+- [x] 테스트 +47 (630 total) + typecheck ✅ + PDCA 92% (1 iteration)
+
+### Sprint 37 — ArchitectAgent + TestAgent ✅
+- [x] architect-agent.ts — ArchitectAgent 서비스 (analyzeArchitecture + reviewDesignDoc + analyzeDependencies) (FX-REQ-138 DONE)
+- [x] architect-prompts.ts — 아키텍처 분석 시스템 프롬프트 3종 (FX-REQ-138 DONE)
+- [x] test-agent.ts — TestAgent 서비스 (generateTests + analyzeCoverage + suggestEdgeCases) (FX-REQ-139 DONE)
+- [x] test-agent-prompts.ts — 테스트 생성 시스템 프롬프트 3종 (FX-REQ-139 DONE)
+- [x] agent.ts routes — 4개 엔드포인트 추가 (architect 2 + test 2) (FX-REQ-138, FX-REQ-139 DONE)
+- [x] agent.ts schemas — Architecture + Test 요청/응답 스키마 (FX-REQ-138, FX-REQ-139 DONE)
+- [x] agent-orchestrator.ts — spec-analysis→ArchitectAgent, test-generation→TestAgent 위임 (FX-REQ-138, FX-REQ-139 DONE)
+- [x] architect-agent.test.ts — 20개 테스트 (FX-REQ-138 DONE)
+- [x] test-agent.test.ts — 28개 테스트 (FX-REQ-139 DONE)
+- [x] typecheck ✅ + lint ✅ + 714 tests ✅ + 기존 회귀 0건 (PDCA 95%)
+
+### Sprint 38 — SecurityAgent + QAAgent ✅
+- [x] security-agent.ts — SecurityAgent 서비스 (scanVulnerabilities + analyzePRDiff + checkOWASPCompliance) (FX-REQ-140 DONE)
+- [x] security-agent-prompts.ts — 보안 분석 시스템 프롬프트 3종 (FX-REQ-140 DONE)
+- [x] qa-agent.ts — QAAgent 서비스 (runBrowserTest + validateAcceptanceCriteria + detectRegressions) (FX-REQ-141 DONE)
+- [x] qa-agent-prompts.ts — QA 테스트 시스템 프롬프트 3종 (FX-REQ-141 DONE)
+- [x] agent.ts routes — 4개 엔드포인트 추가 (security 2 + qa 2) (FX-REQ-140, FX-REQ-141 DONE)
+- [x] agent.ts schemas — Security + QA 요청/응답 스키마 (FX-REQ-140, FX-REQ-141 DONE)
+- [x] agent-orchestrator.ts — security-review→SecurityAgent, qa-testing→QAAgent 위임 (FX-REQ-140, FX-REQ-141 DONE)
+- [x] security-agent.test.ts — 16개 테스트 (FX-REQ-140 DONE)
+- [x] qa-agent.test.ts — 15개 테스트 (FX-REQ-141 DONE)
+- [x] typecheck ✅ + lint ✅ + 745 tests ✅ + 기존 회귀 0건 (PDCA 97%)
+
+### Sprint 39 — Fallback 체인 + 프롬프트 게이트웨이 + 피드백 루프 ✅
+- [x] fallback-chain.ts — FallbackChainService (executeWithFallback + classifyError + recordFailover) (FX-REQ-144 DONE)
+- [x] prompt-gateway.ts — PromptGatewayService (sanitize + abstractCode + 4종 기본규칙) (FX-REQ-149 DONE)
+- [x] agent-feedback-loop.ts — AgentFeedbackLoopService (captureFailure + submitFeedback + applyLearning) (FX-REQ-150 DONE)
+- [x] D1 migration 0023 — fallback_events + prompt_sanitization_rules + agent_feedback 3테이블 (FX-REQ-144, FX-REQ-149, FX-REQ-150 DONE)
+- [x] agent.ts routes — 6개 엔드포인트 추가 (fallback 2 + gateway 2 + feedback 2) (FX-REQ-144, FX-REQ-149, FX-REQ-150 DONE)
+- [x] typecheck ✅ + lint ✅ + 792 tests ✅ + 기존 회귀 0건 (PDCA 93%)
+
+### Sprint 40 — InfraAgent + 에이전트 자기 평가 ✅
+- [x] infra-agent.ts — InfraAgent 서비스 (analyzeInfra + simulateChange + validateMigration) (FX-REQ-145 DONE)
+- [x] infra-agent-prompts.ts — 인프라 분석 시스템 프롬프트 3종 (FX-REQ-145 DONE)
+- [x] agent-self-reflection.ts — AgentSelfReflection (reflect + shouldRetry + enhanceWithReflection 래퍼) (FX-REQ-148 DONE)
+- [x] agent.ts routes — 5개 엔드포인트 추가 (infra 3 + reflection 2) (FX-REQ-145, FX-REQ-148 DONE)
+- [x] agent-orchestrator.ts — infra-analysis→InfraAgent 위임, AgentTaskType 9→10종 (FX-REQ-145 DONE)
+- [x] typecheck ✅ + lint ✅ + 835 tests ✅ + 기존 회귀 0건 (PDCA 91%)
+
+### Sprint 41 — 에이전트 역할 커스터마이징 + 멀티모델 앙상블 투표 ✅
+- [x] custom-role-manager.ts — CustomRoleManager (D1 CRUD + BUILTIN_ROLES 7종 + systemPromptOverride + custom:* 위임) (FX-REQ-146 DONE)
+- [x] ensemble-voting.ts — EnsembleVoting (allSettled 병렬 + 3종 투표 majority/quality-score/weighted) (FX-REQ-147 DONE)
+- [x] D1 migration 0024 — custom_agent_roles 테이블 (FX-REQ-146 DONE)
+- [x] agent.ts routes — 7개 엔드포인트 추가 (custom-roles CRUD 5 + ensemble 2) (FX-REQ-146, FX-REQ-147 DONE)
+- [x] typecheck ✅ + lint ✅ + 877 tests ✅ + 기존 회귀 0건 (PDCA 94%)
+
+### Sprint 42 — 자동화 품질 리포터 + 에이전트 마켓플레이스 (Agent Evolution Track A 완결) ✅
+- [x] automation-quality-reporter.ts — AutomationQualityReporter (5테이블 집계 + 6종 개선규칙 + 스냅샷 캐시) (FX-REQ-151 DONE)
+- [x] agent-marketplace.ts — AgentMarketplace (publish + install + rate + 3 D1 테이블) (FX-REQ-152 DONE)
+- [x] D1 migration 0025 — automation_quality_snapshots 테이블 (FX-REQ-151 DONE)
+- [x] D1 migration 0026 — agent_marketplace_items + agent_marketplace_installs + agent_marketplace_ratings 테이블 (FX-REQ-152 DONE)
+- [x] routes — 9개 엔드포인트 추가 (quality-report 3 + marketplace 6) (FX-REQ-151, FX-REQ-152 DONE)
+- [x] typecheck ✅ + lint ✅ + 925 tests ✅ + 기존 회귀 0건 (PDCA 97%)
+
+### Sprint 44 — KT DS SR 시나리오 구체화 (F116, Phase 5 고객 파일럿 준비) ✅
+- [x] SrClassifier 서비스 — 규칙 기반 5종 SR 유형 자동 분류 (FX-REQ-116 DONE)
+- [x] SrWorkflowMapper 서비스 — 유형별 에이전트 워크플로우 DAG 매핑 (FX-REQ-116 DONE)
+- [x] sr.ts schemas — Zod 스키마 6종 + 응답 타입 2종 (FX-REQ-116 DONE)
+- [x] sr.ts routes — 5개 엔드포인트 (CRUD + 워크플로우 실행) (FX-REQ-116 DONE)
+- [x] D1 migration 0027 — sr_requests + sr_workflow_runs + 인덱스 4개 (FX-REQ-116 DONE)
+- [x] SR 유형 분류 체계 문서 + 데모 시나리오 2종 (FX-REQ-116 DONE)
+- [x] templates/kt-ds-sr/CLAUDE.md 업데이트 (FX-REQ-116 DONE)
+- [x] typecheck ✅ + 953 tests ✅ + 기존 회귀 0건 (PDCA 95%)
+
+### Sprint 45 — KPI 자동 수집 인프라 (Phase 5 온보딩 데이터 기반) ✅
+- [x] useKpiTracker 훅 — Next.js usePathname() + useEffect로 page_view 자동 전송 (FX-REQ-158 DONE)
+- [x] api-client.ts KPI 함수 — getKpiSnapshotTrend() + KpiSnapshot 타입 (FX-REQ-158 DONE)
+- [x] CLI postRun hook — init/status/sync 완료 후 cli_invoke 이벤트 전송 (FX-REQ-159 DONE)
+- [x] kpi_snapshots D1 테이블 — 일별 KPI 집계 스냅샷 (FX-REQ-160 DONE)
+- [x] Cron 집계 로직 — K7(WAU) + K8(에이전트 완료율) + K11(SDD 정합률) 자동 산출 (FX-REQ-160 DONE)
+- [x] KPI 대시보드 실데이터 바인딩 — Phase4Kpi API → UI 연결 (FX-REQ-161 DONE)
+- [x] typecheck ✅ + lint ✅ + 961+131+68 tests ✅ + 기존 회귀 0건 (PDCA 97%)
+
+### Sprint 50 — 팀원 셀프 온보딩 플로우 + 인앱 피드백 위젯 ✅
+- [x] 초대 링크 생성 UI + 복사 버튼 — 관리자 멤버 화면에서 1클릭 URL 생성 (FX-REQ-173 DONE)
+- [x] 비밀번호 설정 페이지 — `/invite/[token]` public route, 토큰 검증 + 비밀번호 입력 (FX-REQ-173 DONE)
+- [x] 초대 수락 자동 로그인 — 비밀번호 설정 완료 → JWT 발급 → /getting-started 리다이렉트 (FX-REQ-173 DONE)
+- [x] 초대 상태 UI 개선 — 멤버 목록에 대기/수락/만료 뱃지 표시 (FX-REQ-173 DONE)
+- [x] 플로팅 피드백 위젯 — `(app)/layout.tsx` 전역 삽입, NPS + 코멘트 (FX-REQ-174 DONE)
+- [x] 피드백 컨텍스트 자동 첨부 — 현재 페이지 경로 + 세션 시간 (FX-REQ-174 DONE)
+- [x] 주간 사용 요약 API — `GET /kpi/weekly-summary` (FX-REQ-174 DONE)
+- [x] 프로덕션 배포 — Sprint 48~51 코드 Workers 반영 (Version 570efd7c, 세션 #104)
+- [x] typecheck ✅ + lint ✅ + tests 통과 + PDCA 100%
 
 ### 미배정 — Phase 3 잔여
 
@@ -1041,12 +1210,12 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F511 | Work Management 품질 보강 — API 에러 핸들링 UI + syncSessions SQL injection 방어 + E2E edge case 보강 (FX-REQ-534, P1) | Sprint 263 | ✅ | PR #516 `a756780a`. Gap 97%. T3=prepared stmt bind, T4=CASE WHEN ORDER BY, G1=에러 UI(useRef stale guard), T1+T2=E2E 6→11건(+5). 선행 핫픽스: PR #514(401 auth), PR #515(sidebar topItems), D1 DROP+재생성(스키마 불일치) |
 | **Phase 36: Work Management Enhancement (프로젝트 관리 체계 개선)** | | | | PRD: `docs/specs/fx-work-mgmt-enhancement/prd-final.md`. 3-AI 검토 R2 76/100, Ambiguity 0.087. "Jira를 만들지 않는다" — Blueprint/Roadmap 독립 + SPEC 경량화 + 기존 데이터 시각화 + TDD |
 | **Phase 36-A: 문서 체계 정비 + 아카이브 (meta-only)** | | | | 코드 변경 0건, master 직접 commit |
-| F512 | 문서 체계 정비 + 아카이브 — A-0 파서 테스트 보강 + BLUEPRINT.md/ROADMAP.md 도입 + SPEC.md 경량화(1377→350줄) + docs/ 아카이브(400→100파일) + F-item 세부 상태 10단계 + Entry/Exit Criteria (FX-REQ-535, P0) | Sprint 264 | 🔧(impl) | A-0 ✅ PR#517, A-1 ✅ BLUEPRINT, A-2 ✅ ROADMAP. A-3~A-8 잔여 |
+| F512 | 문서 체계 정비 + 아카이브 — A-0 파서 테스트 보강 + BLUEPRINT.md/ROADMAP.md 도입 + SPEC.md 경량화(1377→350줄) + docs/ 아카이브(400→100파일) + F-item 세부 상태 10단계 + Entry/Exit Criteria (FX-REQ-535, P0) | Sprint 264 | 🔧 | A-0 ✅ PR#517, A-1 ✅ BLUEPRINT, A-2 ✅ ROADMAP. A-3~A-8 잔여 |
 | **Phase 36-B: 기존 데이터 표면화 — TDD (코드 변경)** | | | | B-0 테스트 보강 선행 → B-1~B-5 Red→Green→Refactor |
-| F513 | Work Management API 테스트 보강 + 확장 — B-0 기존 snapshot/context/classify 테스트 ~15건 + B-1 GET /api/work/velocity + B-2 GET /api/work/phase-progress + B-3 GET /api/work/backlog-health (FX-REQ-536, P0) | Sprint 264 | 📋(plan) | TDD 필수. Hono app.request() + D1 mock. 목표: 30 test cases 이상 |
-| F514 | Work Management 대시보드 확장 — B-4 Pipeline Flow 뷰(Idea→Done 단계별 F-item 수) + B-5 Velocity/Phase Progress 차트 + E2E 테스트 (FX-REQ-537, P1) | Sprint 265 | 📋(groomed) | F513 API 의존. React + Zustand. E2E mock-only CI safe |
+| F513 | Work Management API 테스트 보강 + 확장 — B-0 기존 snapshot/context/classify 테스트 ~15건 + B-1 GET /api/work/velocity + B-2 GET /api/work/phase-progress + B-3 GET /api/work/backlog-health (FX-REQ-536, P0) | Sprint 264 | 📋 | TDD 필수. Hono app.request() + D1 mock. 목표: 30 test cases 이상 |
+| F514 | Work Management 대시보드 확장 — B-4 Pipeline Flow 뷰(Idea→Done 단계별 F-item 수) + B-5 Velocity/Phase Progress 차트 + E2E 테스트 (FX-REQ-537, P1) | Sprint 265 | 📋 | F513 API 의존. React + Zustand. E2E mock-only CI safe |
 | **Phase 36-C: 자동화 연결** | | | | Phase A/B 자동화 스크립트 연결 |
-| F515 | 자동화 연결 — C-1 board-sync-spec 세부 상태 파싱 + C-2 Roadmap 자동 갱신 + C-3 Blueprint 버전 범프 + C-4 아카이브 자동화 + C-5 CHANGELOG 자동 생성 (FX-REQ-538, P1) | Sprint 266 | 📋(groomed) | C-4는 F512 직후 착수 가능 |
+| F515 | 자동화 연결 — C-1 board-sync-spec 세부 상태 파싱 + C-2 Roadmap 자동 갱신 + C-3 Blueprint 버전 범프 + C-4 아카이브 자동화 + C-5 CHANGELOG 자동 생성 (FX-REQ-538, P1) | Sprint 266 | 📋 | C-4는 F512 직후 착수 가능 |
 
 <!-- fx-task-orchestrator-backlog -->
 ### Task Orchestrator Backlog (B/C/X)
@@ -1102,73 +1271,3 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C37 | C | autopilot Gap% 측정 범위 확장 — Step 5b E2E audit 자동 호출 추가 (FX-REQ-532) | — | DONE | sprint-autopilot SKILL.md Step 5b 신설. Playwright 있을 때 `/ax:e2e-audit coverage` 자동 실행, 갭 시 WARN (중단 안 함) |
 <!-- /fx-task-orchestrator-backlog -->
 
-## §6 Sprint 실행 계획 (아카이브)
-
-> Sprint 1~263 실행 계획 (체크리스트) 전체:
-> **[docs/archive/spec-execution-plan-2026-04.md](archive/spec-execution-plan-2026-04.md)**
->
-> 현행 Sprint 계획: [ROADMAP.md](ROADMAP.md) + `docs/01-plan/features/sprint-{N}.plan.md`
-
-## §7 기술 스택
-
-> 기술 스택 상세: `.claude/rules/coding-style.md` + BLUEPRINT.md
-
-모노리포 (pnpm workspace + Turborepo): **cli** (TypeScript + Ink 5) / **api** (Hono + Cloudflare Workers + D1) / **web** (Vite 8 + React 18 + React Router 7) / **shared** (공유 타입)
-
-## §8 Tech Debt
-
-| TD# | 등록일 | 항목 | 영향 |
-|-----|:------:|------|------|
-| ~~TD-01~~ | 2026-03-16 | ~~index.ts에 Commander 설정 미구현 (placeholder)~~ | ~~해소 (Sprint 2 — F6/F7/F8 커맨드 구현)~~ |
-| ~~TD-02~~ | 2026-03-16 | ~~eslint 미설정 (package.json에 lint script 있으나 미설치)~~ | ~~해소 (세션 #10 — F19 eslint flat config)~~ |
-| TD-03 | 2026-04-09 | E2E workflow `timeout-minutes: 15` 상시 초과 — PR #394에서 2회 연속 15m17s timeout 관측. 테스트 suite 증가로 runner 한계 초과 추정 | **F490으로 승격 (FX-REQ-482, P2)** — Playwright shard matrix + timeout 상향. TD는 승격 후에도 해소 시점까지 유지 |
-
-## §9 변경 이력
-
-> 전체 이력: [docs/archive/spec-changelog-archive-2026-04.md](archive/spec-changelog-archive-2026-04.md)
-
-| 버전 | 날짜 | 변경 내용 |
-|------|------|-----------|
-| 5.79 | 2026-04-12 | **S261 ax-plugin source↔cache drift 재발 방지 + C33 eslint cleanup**. (1) Landing/README Sprint 240→261 + Phase 29→33 drift 동기화(#508). (2) C33~C37 5건 PLANNED 등록(lint cleanup/Node 24/git author/sidebar/Gap E2E). (3) **C33 eslint no-explicit-any cleanup(#510)** DONE. (4) S261 세션: ax-plugin infra-selfcheck C9 Plugin Cache Drift 점검 추가([ax-plugin PR #1](https://github.com/KTDS-AXBD/ax-plugin/pull/1) merged `89abf2d`) + SessionStart hook에 `ax-cache-drift-auto.sh` L3 확장 + feedback_ax_plugin_dual_clone.md "Same-HOME source↔cache drift" 섹션 추가. (4b) rsync dogfood 부산물: cache hooks/ 디렉토리가 최초 설치부터 누락돼 있었음을 발견(6일간 미탐지) — C9 체크가 skills+hooks 양쪽을 보도록 설계한 결정이 첫 날부터 작동. `/plugin` 메뉴에서 ax-marketplace 검색 불가 이슈도 발견 — 후속 진단 필요 |
-| 5.78 | 2026-04-12 | **S260 WT worker 계정/모델 정합성 (Part 2)**. **C28 (PR #496, FX-REQ-522)** — `task-start.sh` 2지점 수정. (1) Step 5 `tmux split-window`에 `-e HOME="$HOME"` 추가 — tmux default shell이 login shell로 떠서 HOME을 pwent(`/home/sinclair`)로 리셋하던 현상을 명시 override. Master multi-account HOME(`.claude-work`)이 worker pane으로 상속되어 `$HOME/.claude.json` oauth email = `ktds.axbd@gmail.com`로 정합. (2) Step 5b `CCS_WT_CMD="${CCS_BIN} --model claude-sonnet-4-6"` 신규 변수 + inject `tmux send-keys` 치환 — `feedback_sprint_model.md` "Master=Opus, WT=Sonnet" 원칙 첫 구현. `/model` 명령으로 worker 세션에서 수동 전환도 허용. **statusline-command.sh 정리** (HOME 직접편집, git 비추적): `/home/sinclair/.claude/statusline-account` 삭제(2026-04-03 생성 유물, `sinclairseo` 고정 override) + override 로직(line 71-78) 제거 + 변수명 `github_user` → `claude_account` + 레이아웃 주석 `<claude account>`. 이제 HOME-aware SSOT = `$HOME/.claude.json` oauth.emailAddress. Master pane smoke test: `ktds.axbd  Foundry-X(master)  learning  Opus 4.6 (1M context)` 정상. **Dogfood 부산물 (C27 실전 첫 발동)**: C28 register → pane %28 → worker 실행 → PR 생성 → `--auto --squash` → master merge → daemon cleanup 과정에서 daemon log에 `🧹 C28: pre-evict pane %28 (cwd=.../C28-...)` 기록 — S260 Part 1의 pre-eviction L2 방어선이 의도대로 작동함을 end-to-end 확인. **발견/교훈**: (a) task-daemon 수동 재시작 시 `nohup bash ... & disown`만 쓰면 `/tmp/task-signals/.daemon.pid` 누락 → `task-start.sh` `ensure_daemon`이 "daemon 없음" 판정 → 중복 spawn(PID 944100 + 957770 동시 구동 확인, 즉시 944100 kill 해소). 정식 재시작은 `bash scripts/task/task-daemon.sh --bg`(CLI dispatch에 정의된 유일한 spawn 경로), (b) L2 pre-evict 로그 semantics 미정교 — primary `$PANE_ID`도 매 task cleanup마다 스윕에 걸려 `daemon_pre_evict` 이벤트가 항상 1건씩 찍힘, 회귀 감시 메트릭 "0건 유지" 가정이 부정확. primary 제외 정교화 후속 C-track 후보, (c) tmux `split-window -e HOME=` 플래그는 3.0+ 지원 + `-c`와 병행 가능, (d) `statusline-account` 같은 override 파일은 multi-account 구분을 가리는 유물 — SSOT 원칙 위배. **연계**: S260 Part 1(defense-in-depth 3층)의 후속 완결, Part 2는 예방이 아닌 "정합성 보장" 층 |
-| 5.77 | 2026-04-12 | **S260 tmux pane ↔ WT lifecycle defense-in-depth (Part 1)**. C27 (PR #494, FX-REQ-521) — `task-daemon.sh` `phase_signals` cleanup 블록에 pre-eviction 스윕 추가: `git worktree remove --force` 직전에 `tmux list-panes -a -F '#{pane_id}\t#{pane_current_path}'` 로 `$WT_PATH` 또는 `$WT_PATH/*` 하위 cwd를 가진 모든 pane을 `kill-pane`으로 선행 제거, `log_event daemon_pre_evict` JSONL 기록. 기존 `$PANE_ID` kill(line 127)은 변경 없음, `PRESERVED=true` 분기도 무손상. 매칭은 bash `case "$_pcwd" in "$WT_PATH"\|"$WT_PATH"/*)` — `/` 경계가 리터럴이라 오탐 불가. **HOME scan Phase 4 (git 비추적, 직접 편집)** — `/home/sinclair/scripts/git-orphan-scan.sh`에 `tmux pane zombies` 탐지 phase 추가(+60줄). 3종 조건: ①`pane_current_path` 물리 부재 ②`$CLAUDE_WT_BASE/$PROJECT/*` 하위인데 `git worktree list` 이탈 ③`pane_dead=1` 플래그. quiet 모드 suffix `(tmux zombies: N)`, exit code는 git orphan만 반응(좀비는 환경 상태라 SessionStart hook 놀라게 하지 않음). JSON 출력에 `zombie_panes` 배열 추가. **End-to-end 검증**: C27 자기참조 dogfood 1회 — register → worker 자동 구현 → PR 생성 → `--auto --squash` → master merge(PR #494 +22/-0) → daemon SPEC DONE 원자 갱신 → pane %27 cleanup, 총 ~90초 lifecycle. daemon 재시작(PID 944100)으로 새 로직 실전 발효. **Defense-in-depth 3층 완성**: ①tmux 3.5a 소스 빌드(근본, S257~258) + ②daemon pre-evict(실행 중 방어, S260 Part 2) + ③orphan-scan Phase 4(post-hoc 관찰, S260 Part 1) — 각각 segfault 원인 / 자동화 경로 누수 / 수동 operate 우회 경로를 덮음. 회귀 감시: `grep daemon_pre_evict /tmp/task-signals/event.jsonl`. **발견/교훈**: (a) bash `case` 패턴의 경계문자 리터럴이 `[[ == pat* ]]`보다 안전 — `/foo/bar`가 `/foo/barbados`로 오탐되지 않음, (b) daemon_pre_evict JSONL 이벤트 없이는 회귀 관찰 불가 — 관찰 가능성이 예방의 전제, (c) 34초 lifecycle chore task 패턴 재현 성공 — worker pane 내 전 과정(prompt 실행·edit·commit·task-complete)이 45s heartbeat 간격보다 빠름, (d) scan/daemon scope 분리의 본질은 "변경의 블라스트 반경"(HOME 개인 tool vs repo 운영 인프라). **연계**: S257 tmux 3.4 incident + S258 fx35a 소스 빌드 + S259 task orchestrator 관통 정비의 defense-in-depth 완결 |
-| 5.76 | 2026-04-12 | **S259 Task Orchestrator 관통 정비**. C24 `task-start.sh --reuse-id <ID>` flag (PR #487) — ID forward 함정(allocate_id max+1 무조건) 우회 경로 + `lib.sh lookup_backlog_row()` 정규식 파서 + `warn_reuse_risk()` 정책 함수(PLANNED silent / CLOSED_EMPTY warn+pass / IN_PROGRESS·DONE family FX_REUSE_FORCE 게이트) + 유닛 테스트 6/6. C25 dogfood (PR #489) — `scripts/board/_common.sh board::require_projects()` gh project scope 부족 시 actionable 에러(+172/-6, 34초 lifecycle). PR #490 `fix(task-orchestrator)` — (a) `task-start.sh` Issue 생성 후 `.task-context`에 `ISSUE_URL=` append, (b) `task-complete.sh` PR body에 `Closes #N` 자동 포함(`/pull/` URL 거부 regex로 C25 edge case 방어), (c) `sprint-merge-monitor.sh` step 5b `git branch -D "$branch"` local cleanup 추가(remote `--delete-branch`만으로는 fix/*/task/*/sprint/* local ref 남음). C26 (PR #492) — sprint-merge-monitor line 151 dead `git -C "$wt_path/../.."` 분기 제거(-2/+1). **End-to-end 검증**: C26 실전 dogfood로 `task-start(ISSUE_URL 기록) → task-complete(Closes #491) → daemon merge → GitHub Issue #491 auto-close at 20:18:23Z (merge 1초 뒤)` 완전 확인. **Orphan cleanup 11+2**: S256/S257/S258/S259 OPEN Issue 11건(#461/462/463/464/470/471/475/476/481/483/485/488/491) 전부 close, MERGED 로컬 브랜치 2건(`fix/spec-c16-c17-closed-empty` PR #479, `fix/task-orchestrator-silent-drops-s257b` PR #474) 삭제. orphan-scan 최종 0건. **발견/교훈**: (a) sprint-merge-monitor line 151 `git -C "$wt_path/../.."` 가 항상 fallback에 의존하던 dead code였음, (b) cache `issue_url` 필드가 post-merge에 `pull/N`으로 업데이트되는 edge case 실존 → regex에서 `/issues/` 필터 필수, (c) Learning mode `warn_reuse_risk()` 정책을 사용자 승인으로 결정(안전-우선+force escape), (d) 34초 lifecycle task는 직접 master 커밋보다 task orchestrator 경로가 비용 거의 없음. **연계**: S258 defense-in-depth(context-aware merge 정책 + tmux 3.5a 근본 해소 + C19/C22/C23 PR #482/#484/#486)의 후속 완결 |
-| 5.73 | 2026-04-10 | **F497 S-α MVP ✅ (Phase 31 Task Orchestrator)**. 📋→🔧 (S-α DONE, S-β 잔여). 산출물: `scripts/task/{lib.sh,task-start.sh,task-list.sh}` + `.claude/skills/ax-task/SKILL.md` + `~/.foundry-x/` 인프라 (locks/, task-log.ndjson, tasks-cache.json, wip-overrides.log). PRD §4.1.1 Step 0~9 전체 (flock id-allocator + master-push + push SHA pinning + fx-task-meta commit + tmux split + GitHub Issue 4 label). dogfood C1 task로 end-to-end 검증 (#419 자동 생성/cleanup). 검증 중 발견 2 버그 fix: (a) `slugify` sed 한글 collation 실패 → `LC_ALL=C tr -c 'a-z0-9 \n' '-'` ASCII-safe + Step 0 fail-early(cb2a1e0a) (b) bash `${3:-{}}` 파싱 함정(default `{` + literal `}` → stray `}`) → 명시 if문(6bae6ecb). 마지막 실측 Sprint 240→241, D1 0122→0125, tests 3262→3447 동기화 |
-| 5.72 | 2026-04-09 | **F492 ✅ — Sprint 241 완료 (PR #415 merged, Match 100%, 3436 tests)**. FileUploadZone+AttachedFilesPanel `apiBaseUrl` prop 제거, `BASE_URL` import 통일, fetch 경로 `/api/files/*` → `/files/*` (BASE_URL에 `/api` 포함). E2E 4종 신규 추가(PDF/PPTX/DOCX 성공 + PNG 거부 회귀 방지). 자동 merge pipeline 정상 동작 — review→merge→D1→deploy→cleanup 전체 1회 실행 |
-| 5.71 | 2026-04-09 | **F492 등록 — FileUploadZone API 경로 drift (P1 Bug)**. 세션 #244 사용자 DEBUG 제보(`AI 시대 생산성 향상 가이드.pdf` 업로드 → `POST /api/files/presign` 405). 근본 원인: FileUploadZone이 `apiBaseUrl=""` 기본값 + `${apiBaseUrl}/api/files/presign` 상대경로 → Pages(`fx.minu.best`) 오리진에 붙어 POST 미지원 → 405. api-client 표준(`BASE_URL = VITE_API_URL \|\| "/api"`) 우회. 영향: F441~F443 파일 업로드 파이프라인 전체 무력화. drift 패턴 #243(offering legacy fetcher)와 동일 축. Sprint 241 WT 진행 (FX-REQ-484, P1) |
-| 5.70 | 2026-04-09 | **Phase 29 완결 — F488+F489 ✅**. F488(Sprint 240, PR #405, Match 100%): req-manage `--create-issue` 스마트 기본화 + req-integrity 2카테고리. F489(dogfood, Issue #407): gov-retro Step 7 소급 Issue 등록 루틴(Phase 역순, 배치 10건, ✅ 자동 close). ax-marketplace `72165f8` 3스킬 수정 push 완료. Dogfood 경로 검증: F488 로직으로 F489 Issue 자동 생성 성공 |
-| 5.69 | 2026-04-09 | **F488+F489 등록 — Phase 29 요구사항 거버넌스 자동화** 신설. F488(Sprint 240, P0): `/ax:req-manage new` `--create-issue` 스마트 기본화(β) + req-integrity 구조적공백/실시간drift 2카테고리 분리 리포트. F489(독립, P2): `/ax:gov-retro` 회고 통합 소급 등록 루틴(Phase 역순). 배경: req-integrity drift 근본 원인 치료 — opt-in 구조로는 실시간 drift 재발 불가피, 합산 수치가 실질 개선을 가림 |
-| 5.68 | 2026-04-09 | **req-integrity fix** — F338~F341 📋→✅ 일괄 갱신 (Sprint 153 PR #285, 운영이슈 4건 해소). F112/F117/F118 GitHub Issue #125/#126/#127 reopen (bulk close 오류 복원 — 장기 항목 📋 유지). 보류: F100+ 미등록 Issues 274건(ROI 낮음), Execution Plan REQ 주석 45건(하위 검증 항목 무해), services 카운트(MSA 이후 skill 측정 범위 개선 영역) |
-| 5.67 | 2026-04-09 | **Phase 28 완료 소급 보정** — F484~F487 📋→✅ 일괄 갱신. F484(Sprint 237, PR #390, Match 100%) + F485(Sprint 238, PR #392, Match 100%) + F486(Sprint 238, PR #392, Match 100%) + F487(Sprint 237, PR #390, Match 100%). §1 Phase 문구 Phase 27→28로 갱신, Sprint 범위 148~238로 확장. 마지막 실측 Sprint 230→236, D1 0121→0122 동기화. frontmatter system-version Sprint 148→236, updated 04-07→04-09. 트리거: `/ax:daily-check` + `/ax:req-integrity` 연속 실행으로 drift 감지 |
-| 5.66 | 2026-04-06 | **Phase 18 Offering Pipeline 등록** — F363~F383(FX-REQ-355~375, 21건). Sprint 165~174 (10개). AX BD 형상화 자동화: offering-html/pptx Skill(F363~F367)+Offering Agent(F368)+D1 4테이블+CRUD/Export/Validate API(F369~F373)+Full UI 위자드/에디터/대시보드(F374~F377)+콘텐츠 어댑터+파이프라인(F378~F379)+PPTX(F380)+디자인 토큰 Phase 3(F381)+Prototype 연동(F382)+E2E(F383). 아키텍처: FX-Skill-Agent-Architecture v2.1. PRD: docs/specs/fx-offering-pipeline/prd-final.md |
-| 5.65 | 2026-04-06 | **Phase 17 Self-Evolving Harness v2 등록** — F357~F362(FX-REQ-349~354, 6건). Sprint 161~164. 하네스 자가 발전 루프 완성: 데이터 진단+기준선(F357)+패턴 감지+Rule 생성(F358)+승인 플로우(F359)+O-G-D 범용화(F360)+효과 측정(F361)+운영 지표(F362). Guard Rail 자동 제안(P1)+O-G-D Loop 범용 인터페이스(P1)+활용률 대시보드(P2). req-interview 2/3 AI Pass(82점, Ambiguity 0.155). PRD: docs/specs/fx-harness-evolution/prd-final.md. 전략: docs/specs/self-evolving-harness-strategy.md |
-| 5.80 | 2026-04-12 | **Sprint 264 착수 — F512 A-3~A-8 + F513 B-0~B-3**. SPEC.md 경량화: §6 Sprint 체크리스트 아카이브(1265줄→링크), §2/§9 경량화, §7 압축. F-item SSOT §5 유지. docs/archive/ 3건 생성. 1983→1174줄 감소. F513 TDD: work.service.test.ts(15건) + velocity/phase-progress/backlog-health API |
-
-## §10 버전 정책
-
-### 프로젝트 마일스톤
-- **Sprint N**: 프로젝트 진행 상태 추적 (Sprint 32부터 적용)
-- 이전(Sprint 1~31): v0.1~v2.5 형식 사용 (이력 보존, 소급 수정 안 함)
-
-### 패키지 버전 (Independent SemVer 2.0)
-
-| 패키지 | 현재 버전 | 배포 대상 | 버전 증가 기준 |
-|--------|----------|----------|--------------|
-| packages/cli | 0.5.0 | npm registry | CLI 기능 변경 |
-| packages/api | 0.1.0 | Cloudflare Workers | API endpoint 변경 |
-| packages/web | 0.1.0 | Cloudflare Pages | UI 기능 변경 |
-| packages/shared | 0.1.0 | 내부 전용 | 타입/인터페이스 변경 |
-
-### 0.x 기간 버전 증가 규칙
-
-| 변경 유형 | 버전 증가 | 예시 |
-|----------|----------|------|
-| 하위 비호환 변경 | 0.MINOR.0 | 0.1.0 → 0.2.0 |
-| 새 기능 추가 | 0.minor.PATCH | 0.1.0 → 0.1.1 |
-| 버그 수정 | 0.minor.PATCH | 0.1.1 → 0.1.2 |
-
-### 1.0.0 전환 기준
-
-패키지별 독립 판단. 아래 두 조건 **모두** 충족 시 승격:
-1. 외부 사용자가 프로덕션에서 실제 사용 중
-2. 공개 API 하위 호환성 정책 수립 + API 문서화 완료

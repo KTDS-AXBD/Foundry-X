@@ -232,6 +232,104 @@ export class WorkService {
     };
   }
 
+  // ─── Work Analytics (F513 B-1~B-3) ──────────────────────────────────────────
+
+  async getVelocity() {
+    const items = await this.parseSpecItems();
+    const doneItems = items.filter(i => i.status === "done" && i.sprint);
+
+    const sprintMap = new Map<number, number>();
+    for (const item of doneItems) {
+      const n = parseInt(item.sprint ?? "0", 10);
+      if (n > 0) sprintMap.set(n, (sprintMap.get(n) ?? 0) + 1);
+    }
+
+    const sprints = Array.from(sprintMap.entries())
+      .sort(([a], [b]) => a - b)
+      .map(([sprint, f_items_done]) => ({
+        sprint,
+        f_items_done,
+        week: `${new Date().getFullYear()}-W${String(sprint % 52 || 52).padStart(2, "0")}`,
+      }));
+
+    const counts = sprints.map(s => s.f_items_done);
+    const avg_per_sprint = counts.length > 0
+      ? Math.round((counts.reduce((a, b) => a + b, 0) / counts.length) * 10) / 10
+      : 0;
+
+    let trend: "up" | "down" | "stable" = "stable";
+    if (counts.length >= 2) {
+      const recent = counts.slice(-3).reduce((a, b) => a + b, 0) / Math.min(counts.length, 3);
+      const older = counts.slice(0, -3).reduce((a, b) => a + b, 0) / Math.max(counts.length - 3, 1);
+      if (recent > older * 1.1) trend = "up";
+      else if (recent < older * 0.9) trend = "down";
+    }
+
+    return { sprints, avg_per_sprint, trend, generated_at: new Date().toISOString() };
+  }
+
+  async getPhaseProgress() {
+    const items = await this.parseSpecItems();
+
+    // Group by phase inferred from F-item numbering (every ~30 items = one phase)
+    const phaseMap = new Map<number, { total: number; done: number; in_progress: number }>();
+    const ITEMS_PER_PHASE = 15;
+
+    for (const item of items) {
+      const num = parseInt(item.id.replace("F", ""), 10);
+      const phaseId = Math.max(1, Math.ceil(num / ITEMS_PER_PHASE));
+      const entry = phaseMap.get(phaseId) ?? { total: 0, done: 0, in_progress: 0 };
+      entry.total++;
+      if (item.status === "done") entry.done++;
+      if (item.status === "in_progress") entry.in_progress++;
+      phaseMap.set(phaseId, entry);
+    }
+
+    const phases = Array.from(phaseMap.entries())
+      .sort(([a], [b]) => a - b)
+      .map(([id, data]) => ({
+        id,
+        name: `Phase ${id}`,
+        total: data.total,
+        done: data.done,
+        in_progress: data.in_progress,
+        pct: data.total > 0 ? Math.round((data.done / data.total) * 100) : 0,
+      }));
+
+    const current_phase = phases.length > 0 ? (phases[phases.length - 1]?.id ?? 1) : 1;
+
+    return { phases, current_phase, generated_at: new Date().toISOString() };
+  }
+
+  async getBacklogHealth() {
+    const items = await this.parseSpecItems();
+    const backlogItems = items.filter(i => i.status === "backlog" && !i.sprint);
+
+    const STALE_THRESHOLD = 10;
+    const stale_items = backlogItems
+      .filter(i => {
+        const num = parseInt(i.id.replace("F", ""), 10);
+        return num < (items[items.length - 1] ? parseInt(items[items.length - 1]!.id.replace("F", ""), 10) - STALE_THRESHOLD : 0);
+      })
+      .slice(0, 20)
+      .map(i => ({
+        id: i.id,
+        title: i.title,
+        age_sprints: STALE_THRESHOLD,
+      }));
+
+    const total_backlog = backlogItems.length;
+    const health_score = total_backlog === 0
+      ? 100
+      : Math.max(0, Math.round(100 - (stale_items.length / Math.max(total_backlog, 1)) * 50 - (total_backlog > 20 ? 20 : 0)));
+
+    const warnings: string[] = [];
+    if (total_backlog > 30) warnings.push(`백로그 항목이 ${total_backlog}개로 과다합니다`);
+    if (stale_items.length > 5) warnings.push(`장기 대기 항목 ${stale_items.length}개 검토 필요`);
+
+    return { total_backlog, stale_items, health_score, warnings, generated_at: new Date().toISOString() };
+  }
+
   // ─── Agent Sessions (F510 M4) ────────────────────────────────────────────
 
   async getSessions() {
