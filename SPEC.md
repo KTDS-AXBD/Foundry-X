@@ -61,9 +61,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | ↳ Sprint 266 — Phase 36-C (F515) | ✅ |
 | **Phase 37 Work Lifecycle Platform** (F516~F518) | 📋 Sprint 267~269 |
 | **Phase 38 Dashboard Overhaul** (F519) | 📋 Sprint 270 |
-| **Phase 39 MSA Walking Skeleton** (F520~F523) | 📋 Sprint 271~272 |
-| **Phase 37 Dashboard Overhaul** (F516) | 📋 Sprint 267 |
-| **Phase 38 MSA Walking Skeleton** (F517~F520) | 📋 Sprint 268~269 |
+| **Phase 39 MSA Walking Skeleton** (F520~F523) | ✅/📋 Sprint 268(F520~F521 완료), 271~272 |
 
 ## §4 성공 지표
 
@@ -133,10 +131,10 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F519 | 대시보드 현행화 — (1) 파이프라인 6단계→2단계 축소 (2) 퀵 액션 dead link 제거 (3) 내부 위젯 4개 삭제 (4) ToDo List UI/UX (5) 업무 가이드 Wiki 대체 (FX-REQ-547, P1) | Sprint 270 | 📋(plan) | |
 
 | **Phase 39: MSA Walking Skeleton** | | | | PRD: `docs/specs/fx-msa-roadmap/prd-final.md`. 도메인별 서비스 분리 + API 게이트웨이 + D1 격리 |
-| F520 | API 게이트웨이 Worker — fx-gateway Worker 신규, Service Binding 라우팅, 하위 호환 (FX-REQ-548, P0) | Sprint 271 | 📋(idea) | |
-| F521 | Discovery 도메인 분리 — core/discovery 12 routes + 18 services를 독립 Worker로 추출 (FX-REQ-549, P0) | Sprint 271 | 📋(idea) | |
+| F520 | API 게이트웨이 Worker — fx-gateway Worker 신규, Service Binding 라우팅, 하위 호환 (FX-REQ-548, P0) | Sprint 268 | ✅ | PR #535. packages/fx-gateway/ 생성 |
+| F521 | Discovery 도메인 분리 — core/discovery 12 routes + 18 services를 독립 Worker로 추출 (FX-REQ-549, P0) | Sprint 268 | ✅ | PR #535. packages/fx-discovery/ 생성 |
 | F522 | shared 타입 슬리밍 — 도메인 전용 타입을 각 Worker 내부로 이동, 크로스도메인 계약만 shared 유지 (FX-REQ-550, P0) | Sprint 272 | 📋(idea) | |
-| F523 | D1 스키마 격리 — Discovery 전용 D1 바인딩 분리, 크로스도메인 JOIN 대체 방안 확정 (FX-REQ-551, P0) | Sprint 271 | 📋(idea) | |
+| F523 | D1 스키마 격리 — Discovery 전용 D1 바인딩 분리, 크로스도메인 JOIN 대체 방안 확정 (FX-REQ-551, P0) | Sprint 272 | 📋(idea) | |
 
 <!-- fx-task-orchestrator-backlog -->
 ### Task Orchestrator Backlog (B/C/X)
@@ -195,7 +193,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C40 | C | daemon 3중 감지 dogfood 검증 (FX-REQ-541) | — | DONE | task orchestrator |
 | C41 | C | daemon path2-path3 실전 검증 (FX-REQ-542) | — | PLANNED | task orchestrator |
 | C42 | C | sprint-monitor + task-daemon 통합 — unified-daemon (FX-REQ-543) | — | DONE | task orchestrator |
-| C43 | C | sprint monitor 2중 실행 해소 — bashrc _sprint_ensure_monitor→daemon 교체 + post-merge health check (FX-REQ-545) | — | DONE | bashrc 직접편집 + daemon 코드 |
+| C43 | C | sprint monitor 2중 실행 해소 — bashrc _sprint_ensure_monitor→daemon 교체 + post-merge health check | — | DONE | bashrc 직접편집 + daemon 코드. REQ-545→F517로 재배정 |
 | C43 | C | Changelog 마크다운 렌더링 — 현재 `**볼드**`, `[링크]()` 등이 raw text로 노출됨. react-markdown(이미 설치됨) 적용하여 Added/Fixed 섹션 내 bullet을 구조화 렌더링. 누가: AI. 어떻게: ChangelogTab에 react-markdown 적용 + 섹션별 스타일링 | — | PLANNED | S268 사용자 피드백 |
 | C44 | C | Roadmap Phase 상세 + 미래 계획 표시 — (1) SPEC §3 Phase 테이블을 직접 파싱하는 새 API `GET /api/work/roadmap` 추가 (Phase 이름/상태/Sprint 범위/F-item 목록 포함). (2) ROADMAP.md Short/Mid/Long-term 섹션을 파싱하여 미래 계획 표시. 현재는 phase-progress API의 F-item 번호 추론 방식이라 Phase 2건만 표시됨. 누가: AI. 어떻게: work.service.ts parseRoadmap() + RoadmapTab 개편 | — | PLANNED | S268 사용자 피드백 |
 | C45 | C | Backlog C/B/X-track 파싱 + 작업 분류 UX — (1) parseFItems()가 F-item만 파싱 → C/B/X Backlog 테이블도 파싱하여 backlog-health에 반영. (2) 작업 분류 탭에 "분류 후 어떻게 등록하는지" 안내 + CLI 명령어 복사 버튼. 누가: AI. 어떻게: parseFItems 확장 + ClassifyTab UX 보강 | — | PLANNED | S268 사용자 피드백 |
