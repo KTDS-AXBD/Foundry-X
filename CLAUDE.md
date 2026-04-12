@@ -41,6 +41,21 @@ Phase 1~33 완료 (Sprint 1~261). Phase 32 Work Management 7/7 ✅ (F501~F507) +
 - Workers: `foundry-x-api.ktds-axbd.workers.dev` / Pages: `fx.minu.best`
 - Secrets: `wrangler secret put` — JWT_SECRET, GITHUB_TOKEN, WEBHOOK_SECRET, ANTHROPIC_API_KEY, GOOGLE_*, OPENROUTER_API_KEY
 
+## Skill 사용 가이드 (Layer 0 — 직접 호출 6개)
+
+63개 스킬 중 사용자가 직접 호출하는 메인 진입점. 나머지는 자동 호출됨.
+
+| 상황 | 호출 | 자동 연동 |
+|------|------|----------|
+| 세션 시작 | `/ax:session-start` | 컨텍스트 복원 |
+| Feature 개발 | `/ax:sprint N` | plan→design→**TDD**→verify→gap→report→PR |
+| 비Feature 작업 | `/ax:task start B/C/X` | WT, Issue, verify |
+| 기획부터 시작 | `/ax:req-interview` | PRD, 3-AI 검토, SPEC 등록 |
+| 오늘 뭐 할지 | `/ax:todo` | SPEC 스캔, Sprint 배정 → 즉시 실행 연동 |
+| 세션 종료 | `/ax:session-end` | 커밋, push, 배포 |
+
+> 세밀한 제어가 필요할 때만: `/tdd red`, `/bkit:pdca analyze`, `/ax:code-verify` 등
+
 ## Key References
 
 - 현행 PRD: `docs/specs/FX-SPEC-PRD-V8_foundry-x.md` (v8)
