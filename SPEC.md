@@ -45,19 +45,20 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 > ```
 > **마지막 실측** (Sprint 263): ~10 routes, ~28 services, D1 0126, tests ~3452 (E2E 273)
 
-## §3 마일스톤
+## §3 Phase 진행 현황
 
-> 전체 Phase 마일스톤: [ROADMAP.md](ROADMAP.md)
+> **Milestone = Phase 완료.** v2.5 이후 프로젝트-레벨 SemVer 중단, Phase 완료가 Milestone 역할 수행.  
+> 전체 Phase 계획: [ROADMAP.md](ROADMAP.md) | 용어 정의: [taxonomy.md](docs/specs/fx-work-unit-taxonomy/taxonomy.md)
 
-| 마일스톤 | 상태 |
-|----------|:----:|
+| Phase | 상태 |
+|-------|:----:|
 | Phase 33 Work Observability (F509) | ✅ Sprint 261 |
 | Phase 34 Multi-Agent Sessions (F510) | ✅ Sprint 262 |
 | Phase 35 Quality Hardening (F511) | ✅ Sprint 263 |
 | **Phase 36 Work Management Enhancement** (F512~F515) | 🔧 Sprint 264~266 |
-| Sprint 264 — Phase 36-A(F512) + Phase 36-B 착수(F513) | 🔧 진행 중 |
-| Sprint 265 — Phase 36-B 완성 (F514) | 📋 |
-| Sprint 266 — Phase 36-C (F515) | 📋 |
+| ↳ Sprint 264 — Phase 36-A(F512) + Phase 36-B 착수(F513) | 🔧 진행 중 |
+| ↳ Sprint 265 — Phase 36-B 완성 (F514) | 📋 |
+| ↳ Sprint 266 — Phase 36-C (F515) | 📋 |
 
 ## §4 성공 지표
 
