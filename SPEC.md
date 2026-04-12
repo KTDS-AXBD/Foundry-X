@@ -1,10 +1,10 @@
 ---
 code: FX-SPEC-001
 title: Foundry-X Project Specification
-version: 5.79
+version: 5.80
 status: Active
 category: SPEC
-system-version: Sprint 261
+system-version: Sprint 262
 created: 2026-03-16
 updated: 2026-04-12
 author: Sinclair Seo
@@ -220,7 +220,7 @@ Foundry-X CLI — 사람과 AI 에이전트가 동등한 팀원으로 협업하�
 > ls packages/api/src/db/migrations/*.sql | sort | tail -1  # D1 latest
 > turbo test --output-logs=errors-only    # 테스트 수 (전체 실행)
 > ```
-> **마지막 실측** (Sprint 261, 2026-04-12): ~10 routes, ~41 services (adapters 13 포함), ~14 schemas, D1 0125, tests ~3452 (E2E 268) — Phase 33 F509 fx-work-observability Walking Skeleton으로 packages/api routes/services/schemas 각 +1(`work.ts` + `work.service.ts` + `work.ts` schemas), packages/web e2e +1 spec (`work-management.spec.ts` +5 tests), D1 변동 없음
+> **마지막 실측** (Sprint 262, 2026-04-12): ~10 routes, ~28 services, ~14 schemas, D1 0126, tests ~3452 (E2E 268) — Phase 34 F510 fx-multi-agent-session: D1 0126 agent_sessions + GET/POST sessions + Sessions 탭 + session-collector.sh + work-sessions.test.ts 7건 + E2E sessions 탭 테스트
 
 ## §3 마일스톤
 
