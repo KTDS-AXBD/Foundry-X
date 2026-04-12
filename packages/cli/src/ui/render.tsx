@@ -49,6 +49,7 @@ export async function renderOutput<T extends ViewType>(
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- view registry uses heterogeneous FC types
 function getViewComponent(view: ViewType): React.FC<any> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- view registry uses heterogeneous FC types
   const views: Record<ViewType, React.FC<any>> = {
     status: StatusView,
     init: InitView,
