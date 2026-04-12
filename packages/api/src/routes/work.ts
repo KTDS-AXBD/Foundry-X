@@ -10,6 +10,7 @@ import {
   VelocitySchema,
   PhaseProgressSchema,
   BacklogHealthSchema,
+  ChangelogSchema,
 } from "../schemas/work.js";
 import type { Env } from "../env.js";
 import { WorkService } from "../services/work.service.js";
@@ -197,5 +198,26 @@ const getBacklogHealth = createRoute({
 workRoute.openapi(getBacklogHealth, async (c) => {
   const svc = new WorkService(c.env);
   const data = await svc.getBacklogHealth();
+  return c.json(data);
+});
+
+// ─── GET /api/work/changelog ─────────────────────────────────────────────────
+
+const getChangelog = createRoute({
+  method: "get",
+  path: "/work/changelog",
+  tags: ["Work Observability"],
+  summary: "CHANGELOG.md content from repository",
+  responses: {
+    200: {
+      content: { "application/json": { schema: ChangelogSchema } },
+      description: "Changelog content",
+    },
+  },
+});
+
+workRoute.openapi(getChangelog, async (c) => {
+  const svc = new WorkService(c.env);
+  const data = await svc.getChangelog();
   return c.json(data);
 });

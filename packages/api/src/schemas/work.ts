@@ -141,3 +141,10 @@ export const BacklogHealthSchema = z.object({
   warnings: z.array(z.string()),
   generated_at: z.string(),
 });
+
+// ─── Changelog ──────────────────────────────────────────────────────────────
+
+export const ChangelogSchema = z.object({
+  content: z.string(),
+  generated_at: z.string(),
+});
