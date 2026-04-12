@@ -32,6 +32,14 @@
 - WT 생성: `bash -i -c "sprint N"` 함수만 사용 (wt.exe/git worktree 직접 호출 금지)
 - WT에서 작업 → Master에서 `/ax:sprint merge N`으로 통합
 
+## Claude Squad (cs) 운영 규칙
+- cs 실행 시 `HOME=/home/sinclair` prefix 필수 (multi-account HOME 정합성, C28 패턴)
+- `--autoyes` (-y) 사용 금지 — 자동 커밋/push 방지
+- cs config `auto_yes: false` 유지 확인
+- cs 세션 내부에서도 아래 "필수 금지 사항" 전체 규칙 동일 적용
+- cs 세션 정리: `HOME=/home/sinclair cs reset` (worktree 잔존 방지)
+- sprint WT: `sprint N` 명령으로 생성 → cs가 자동 실행됨 (직접 cs 호출 불필요)
+
 ## 필수 금지 사항
 - `git add .` 절대 금지 — 파일을 개별 지정 (멀티 pane 사고 방지)
 - `git add -A` / `git add --all` 금지 — 동일 이유

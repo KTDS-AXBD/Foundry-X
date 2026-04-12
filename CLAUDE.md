@@ -14,6 +14,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 - **shared** — 공유 타입 (types, web, agent, plugin, sso, methodology, discovery-x, ax-bd, kg)
 
 Plumb: Track A (CLI subprocess 래핑) 유지, Track B (TS 재구현) 대기 중.
+멀티 에이전트: Claude Squad (cs v1.0.17) — 세션 lifecycle 표준 관리. `sprint N` → cs 자동 실행.
 
 ## Development Commands
 
