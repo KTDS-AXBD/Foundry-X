@@ -95,8 +95,9 @@
       "badge": "core",
       "items": [
         { "href": "/agents", "label": "에이전트", "iconKey": "Bot", "visible": true, "sortOrder": 0 },
-        { "href": "/architecture", "label": "아키텍처", "iconKey": "Blocks", "visible": true, "sortOrder": 1 },
-        { "href": "/methodologies", "label": "방법론", "iconKey": "Library", "visible": true, "sortOrder": 2 }
+        { "href": "/work-management", "label": "작업 현황", "iconKey": "Kanban", "visible": true, "sortOrder": 1 },
+        { "href": "/architecture", "label": "아키텍처", "iconKey": "Blocks", "visible": true, "sortOrder": 2 },
+        { "href": "/methodologies", "label": "방법론", "iconKey": "Library", "visible": true, "sortOrder": 3 }
       ]
     }
   ]
