@@ -1,0 +1,27 @@
+name = "fx-gateway"
+account_id = "b6c06059b413892a92f150e5ca496236"
+main = "src/index.ts"
+compatibility_date = "2026-03-17"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+# DISCOVERY_ENABLED = "true"  # fx-discovery Worker 배포 후 활성화
+
+# F517: Service Binding — 기존 API Worker (잔여 도메인)
+[[services]]
+binding = "MAIN_API"
+service = "foundry-x-api"
+
+# F518: Service Binding — Discovery Worker (fx-discovery 배포 후 활성화)
+# [[services]]
+# binding = "DISCOVERY"
+# service = "fx-discovery"
+
+# Local development
+[env.dev]
+name = "fx-gateway-dev"
+
+[[env.dev.services]]
+binding = "MAIN_API"
+service = "foundry-x-api-dev"
