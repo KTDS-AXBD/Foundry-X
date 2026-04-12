@@ -199,6 +199,11 @@ export class StageRunnerService {
       // 결과는 반환하되 DB 저장 실패는 로그만 — 사용자가 편집/재시도 가능
     }
 
+    // stage 상태를 completed로 복귀 (in_progress lock 해제)
+    // — 재실행 시나리오 지원: 피드백 기반 재분석이 가능해야 함
+    // — in_progress stuck 방지: race condition 가드가 영구 잠금이 되지 않도록
+    await stageSvc.updateStage(bizItemId, orgId, stage as never, "completed");
+
     // viability question
     const viabilityQuestion = isV82Stage ? VIABILITY_QUESTIONS[stage as Stage] : null;
     const commitGateQuestions = stage === "2-5" ? [...COMMIT_GATE_QUESTIONS] : null;
