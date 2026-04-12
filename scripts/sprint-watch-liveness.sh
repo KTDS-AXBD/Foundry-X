@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Sprint Watch Liveness — Monitor 프로세스 생존 감시 + 자동 재시작 (max 3회)
 #
+# ⚠️  DEPRECATED (C42, 2026-04-12): sprint-merge-monitor.sh 자체가 deprecated 됨에 따라
+#     이 liveness guard도 더 이상 필요 없습니다. Sprint signal 처리는 task-daemon.sh가
+#     담당하며, task-daemon의 --bg 옵션이 heartbeat 기반 자동 재시작을 포함합니다.
+#     파일은 참조용으로 보존합니다.
+#
 # 호출 주체: sprint-watch once (5분 주기). 독립 실행도 가능.
 #
 # 출력: markdown 테이블 행 (sprint-watch SKILL.md Gist 포맷에 그대로 삽입 가능)

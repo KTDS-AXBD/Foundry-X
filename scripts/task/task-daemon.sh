@@ -33,6 +33,12 @@ SNAPSHOT_DIR="/tmp/task-signals/snapshots"
 FAILURE_LOG="$FX_HOME/watch-failures.ndjson"
 QUEUE_FILE="$FX_HOME/task-queue.ndjson"
 
+# Sprint signal 통합 — sprint-merge-monitor.sh가 담당하던 경로를 daemon에 통합 (C42)
+SPRINT_SIGNAL_DIR="${SPRINT_SIGNAL_DIR:-/tmp/sprint-signals}"
+SPRINT_CI_TIMEOUT="${SPRINT_CI_TIMEOUT:-300}"
+SPRINT_MAX_RETRY=3
+mkdir -p "$SPRINT_SIGNAL_DIR"
+
 TICK=15  # 매 15초마다 전체 사이클
 
 mkdir -p "$FX_HOME" "$SNAPSHOT_DIR" /tmp/task-signals
@@ -601,6 +607,238 @@ SIGEOF
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
+# Phase 5c: Sprint Signal 처리 (sprint-merge-monitor.sh 통합 — C42)
+#
+# /tmp/sprint-signals/ 의 *-*.signal 파일을 스캔하여 STATUS=DONE 인 Sprint를
+# 자동 머지한다. sprint-merge-monitor.sh의 handle_merge 로직을 daemon 루프에 흡수.
+#
+# Signal 형식(sig_get/sig_set — grep 기반, source 아님):
+#   STATUS=DONE | MERGING | MERGED | FAILED
+#   SPRINT_NUM=N
+#   PROJECT=Foundry-X
+#   BRANCH=sprint/N
+#   PR_NUM=123       (없으면 gh pr list로 조회)
+#   GITHUB_REPO=KTDS-AXBD/Foundry-X
+#   PROJECT_ROOT=/path/to/wt
+#   F_ITEMS=F509,F510
+#   MATCH_RATE=97
+#   PANE_ID=%42      (없으면 WT cwd 기반 스윕)
+#
+# Pane 정리:
+#   케이스 B (Master tmux pane): PANE_ID 있고 alive → kill-pane
+#   케이스 A (별도 탭/cs 세션): PANE_ID 없거나 dead  → WT cwd 스윕 kill + cs reset 시도
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Sprint signal에서 key=value 읽기 (source 방식 쓰지 않음)
+sprint_sig_get() {
+  local file="$1" key="$2"
+  grep "^${key}=" "$file" 2>/dev/null | head -1 | cut -d= -f2-
+}
+
+# Sprint signal에서 key=value 덮어쓰기
+sprint_sig_set() {
+  local file="$1" key="$2" val="$3"
+  if grep -q "^${key}=" "$file" 2>/dev/null; then
+    sed -i "s|^${key}=.*|${key}=${val}|" "$file"
+  else
+    echo "${key}=${val}" >> "$file"
+  fi
+}
+
+# Sprint PR 자동승인 (branch protection이 approval 요구 시)
+sprint_auto_approve() {
+  local pr_num="$1" repo="$2"
+  local required
+  required=$(gh api "repos/${repo}/branches/master/protection" \
+    --jq '.required_pull_request_reviews.required_approving_review_count' 2>/dev/null) || required="0"
+  case "$required" in ''|*[!0-9]*) required=0 ;; esac
+  if [ "$required" -gt 0 ]; then
+    local approve_script="${SCRIPT_DIR}/../sprint-auto-approve.sh"
+    if [ -x "$approve_script" ]; then
+      bash "$approve_script" "$pr_num" "$repo" >> "$DAEMON_LOG" 2>&1 || true
+    else
+      gh pr review "$pr_num" --repo "$repo" --approve \
+        --body "Auto-approved by task-daemon (C42 unified)" >> "$DAEMON_LOG" 2>&1 || true
+    fi
+  fi
+}
+
+# Sprint CI 대기 (타임아웃 포함)
+sprint_wait_ci() {
+  local pr_num="$1" repo="$2"
+  timeout --foreground --kill-after=10s "${SPRINT_CI_TIMEOUT}s" \
+    gh pr checks "$pr_num" --repo "$repo" --watch --fail-fast >> "$DAEMON_LOG" 2>&1
+}
+
+# Sprint 완료 후 pane/탭 정리 (케이스 A + B 양쪽 처리)
+#   케이스 B: PANE_ID 있고 alive → kill-pane 직접
+#   케이스 A: PANE_ID 없거나 dead → WT cwd 스윕 + cs reset 시도
+sprint_cleanup_pane() {
+  local sprint_num="$1" wt_path="$2" pane_id="$3"
+  command -v tmux >/dev/null 2>&1 || return 0
+
+  # (deleted) 상태 pane 일괄 정리 (cwd가 존재하지 않는 pane)
+  while IFS=$'\t' read -r _pid _pcwd; do
+    [ -z "$_pid" ] && continue
+    if [ ! -e "$_pcwd" ]; then
+      tmux kill-pane -t "$_pid" 2>/dev/null || true
+      log "🧹 sprint-${sprint_num}: deleted-cwd pane 정리 ${_pid} (cwd=${_pcwd})"
+    fi
+  done < <(tmux list-panes -a -F '#{pane_id}'$'\t''#{pane_current_path}' 2>/dev/null || true)
+
+  # 케이스 B: PANE_ID 있고 alive
+  if [ -n "$pane_id" ] && tmux list-panes -a -F '#{pane_id}' 2>/dev/null | grep -q "^${pane_id}$"; then
+    tmux kill-pane -t "$pane_id" 2>/dev/null || true
+    log "🧹 sprint-${sprint_num}: pane ${pane_id} kill (케이스 B)"
+    return
+  fi
+
+  # 케이스 A: WT cwd 기반 스윕 (PANE_ID 없거나 dead, 별도 탭/cs 세션)
+  if [ -n "$wt_path" ]; then
+    local swept=0
+    while IFS=$'\t' read -r _pid _pcwd; do
+      [ -z "$_pid" ] && continue
+      case "$_pcwd" in
+        "$wt_path"|"$wt_path"/*)
+          tmux kill-pane -t "$_pid" 2>/dev/null || true
+          log "🧹 sprint-${sprint_num}: WT cwd 스윕 pane ${_pid} kill (케이스 A)"
+          swept=$((swept + 1))
+          ;;
+      esac
+    done < <(tmux list-panes -a -F '#{pane_id}'$'\t''#{pane_current_path}' 2>/dev/null || true)
+
+    # cs(Claude Squad) 세션 정리 — cs reset은 HOME 정합성 필요
+    if command -v cs >/dev/null 2>&1; then
+      HOME=/home/sinclair cs reset 2>/dev/null || true
+      log "🧹 sprint-${sprint_num}: cs reset 실행 (케이스 A 정리)"
+    fi
+
+    if [ "$swept" -eq 0 ]; then
+      log "ℹ️  sprint-${sprint_num}: 정리할 pane 없음 (이미 닫힘 또는 별도 Terminal 탭)"
+    fi
+  fi
+}
+
+phase_sprint_signals() {
+  shopt -s nullglob
+  local sig
+  for sig in "$SPRINT_SIGNAL_DIR"/*-*.signal; do
+    [ -f "$sig" ] || continue
+    local status
+    status=$(sprint_sig_get "$sig" "STATUS")
+    [ "$status" = "DONE" ] || continue
+
+    local sprint_num project branch pr_num repo wt_path f_items match_rate pane_id
+    sprint_num=$(sprint_sig_get "$sig" "SPRINT_NUM")
+    project=$(sprint_sig_get "$sig" "PROJECT")
+    branch=$(sprint_sig_get "$sig" "BRANCH")
+    pr_num=$(sprint_sig_get "$sig" "PR_NUM")
+    repo=$(sprint_sig_get "$sig" "GITHUB_REPO")
+    wt_path=$(sprint_sig_get "$sig" "PROJECT_ROOT")
+    f_items=$(sprint_sig_get "$sig" "F_ITEMS")
+    match_rate=$(sprint_sig_get "$sig" "MATCH_RATE")
+    pane_id=$(sprint_sig_get "$sig" "PANE_ID")
+
+    [ -z "$sprint_num" ] && { log "⚠️  sprint signal skip — SPRINT_NUM 없음: $sig"; continue; }
+    [ -z "$repo" ] && { log "⚠️  sprint-${sprint_num} skip — GITHUB_REPO 없음"; continue; }
+
+    sprint_sig_set "$sig" "STATUS" "MERGING"
+    log "🚀 sprint-${sprint_num} — merge 시작 (repo=${repo} branch=${branch})"
+
+    # 1) PR 번호 조회 (없으면 gh pr list)
+    if [ -z "$pr_num" ] && [ -n "$branch" ]; then
+      pr_num=$(gh pr list --repo "$repo" --head "$branch" --json number --jq '.[0].number' 2>/dev/null || true)
+    fi
+    if [ -z "$pr_num" ]; then
+      sprint_sig_set "$sig" "STATUS" "FAILED"
+      sprint_sig_set "$sig" "ERROR_STEP" "pr-lookup"
+      sprint_sig_set "$sig" "ERROR_MSG" "no PR found for ${branch}"
+      log "❌ sprint-${sprint_num} — FAIL: PR 없음"
+      continue
+    fi
+    sprint_sig_set "$sig" "PR_NUM" "$pr_num"
+
+    # 2) 자동승인 (branch protection 있을 때)
+    sprint_auto_approve "$pr_num" "$repo"
+
+    # 3) CI 대기
+    if ! sprint_wait_ci "$pr_num" "$repo"; then
+      sprint_sig_set "$sig" "STATUS" "FAILED"
+      sprint_sig_set "$sig" "ERROR_STEP" "ci-checks"
+      sprint_sig_set "$sig" "ERROR_MSG" "CI failed or timed out"
+      log "❌ sprint-${sprint_num} — FAIL: CI"
+      continue
+    fi
+
+    # 3b) PR 본문 enrich (F_ITEMS + MATCH_RATE 있을 때)
+    local enrich_script="${SCRIPT_DIR}/../board/pr-body-enrich.sh"
+    if [ -f "$enrich_script" ] && [ -n "$f_items" ]; then
+      bash "$enrich_script" "$pr_num" "$sprint_num" "$f_items" "${match_rate:-N/A}" \
+        >> "$DAEMON_LOG" 2>&1 || log "⚠️  sprint-${sprint_num}: pr-body-enrich 실패 (non-fatal)"
+    fi
+
+    # 4) Squash merge (재시도 포함)
+    local merged=0
+    for attempt in $(seq 1 "$SPRINT_MAX_RETRY"); do
+      if gh pr merge "$pr_num" --repo "$repo" --squash --delete-branch >> "$DAEMON_LOG" 2>&1; then
+        merged=1; break
+      fi
+      log "⚠️  sprint-${sprint_num} — merge 시도 ${attempt}회 실패, backoff $((attempt*10))s"
+      sleep $((attempt * 10))
+    done
+    if [ "$merged" -ne 1 ]; then
+      sprint_sig_set "$sig" "STATUS" "FAILED"
+      sprint_sig_set "$sig" "ERROR_STEP" "merge"
+      sprint_sig_set "$sig" "ERROR_MSG" "squash merge failed after ${SPRINT_MAX_RETRY} attempts"
+      log "❌ sprint-${sprint_num} — FAIL: merge"
+      continue
+    fi
+
+    # master pull
+    (cd "$REPO_ROOT" && git pull origin master --ff-only 2>/dev/null) || true
+
+    # 5) WT 제거 + pane/탭 정리
+    if [ -n "$wt_path" ] && [ -d "$wt_path" ]; then
+      # pre-evict: WT cwd 기반 스윕 (remove 전에 처리)
+      sprint_cleanup_pane "$sprint_num" "$wt_path" "$pane_id"
+      (cd "$REPO_ROOT" && git worktree remove "$wt_path" --force 2>/dev/null) || true
+    fi
+
+    # 5b) 로컬 브랜치 삭제 (--delete-branch는 remote만 삭제)
+    if [ -n "$branch" ]; then
+      (cd "$REPO_ROOT" && git branch -D "$branch" 2>/dev/null) || true
+    fi
+
+    # 6) Board 동기화
+    local board_script="${SCRIPT_DIR}/../board/board-on-merge.sh"
+    if [ -f "$board_script" ]; then
+      bash "$board_script" "$pr_num" >> "$DAEMON_LOG" 2>&1 || true
+    fi
+
+    # 6b) Velocity 기록
+    local velocity_script="${SCRIPT_DIR}/../velocity/record-sprint.sh"
+    if [ -f "$velocity_script" ]; then
+      (cd "$(git -C "$REPO_ROOT" rev-parse --show-toplevel 2>/dev/null || echo "$REPO_ROOT")" \
+        && bash "$velocity_script" "$sprint_num") \
+        >> "$DAEMON_LOG" 2>&1 || log "⚠️  sprint-${sprint_num}: velocity record 실패 (non-fatal)"
+    fi
+
+    # 6c) Phase 진행률 갱신
+    local phase_script="${SCRIPT_DIR}/../epic/phase-progress.sh"
+    if [ -f "$phase_script" ] && [ -n "$f_items" ]; then
+      (cd "$(git -C "$REPO_ROOT" rev-parse --show-toplevel 2>/dev/null || echo "$REPO_ROOT")" \
+        && bash "$phase_script") \
+        >> "$DAEMON_LOG" 2>&1 || log "⚠️  sprint-${sprint_num}: phase-progress 실패 (non-fatal)"
+    fi
+
+    # 7) MERGED 완료 표시
+    sprint_sig_set "$sig" "STATUS" "MERGED"
+    sprint_sig_set "$sig" "MERGED_AT" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    log "✅ sprint-${sprint_num} — MERGED PR #${pr_num}"
+  done
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
 # Phase 6: 자가 학습 (실패 로그 → 패턴 보완 제안)
 # ═══════════════════════════════════════════════════════════════════════════
 phase_learn() {
@@ -634,9 +872,10 @@ run_daemon() {
     # heartbeat 갱신 — SessionStart가 stale 여부를 판단하는 기준
     date -u +%Y-%m-%dT%H:%M:%SZ > "$DAEMON_HEARTBEAT"
 
-    phase_signals    # signal 감지 → merge → cleanup
-    phase_watch      # pane 감시 → 권한승인 / 완료감지 / idle 감지
-    phase_queue      # 큐 여유 → 자동 task 시작
+    phase_signals          # task signal 감지 → merge → cleanup
+    phase_sprint_signals   # sprint signal 감지 → CI → merge → cleanup (C42 통합)
+    phase_watch            # pane 감시 → 권한승인 / 완료감지 / idle 감지
+    phase_queue            # 큐 여유 → 자동 task 시작
 
     tick_count=$((tick_count + 1))
 
