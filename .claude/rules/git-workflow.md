@@ -12,7 +12,8 @@
 - **주의**: hook(PreToolUse)는 여전히 적용 — `--no-verify` 여전히 금지
 
 ### Code 변경 → PR + auto-merge (CI 통과 후 자동 머지)
-- **대상**: `packages/**/*.{ts,tsx,js}`, `packages/api/src/db/migrations/*.sql`, `scripts/**/*.sh`, `wrangler.toml`, 빌드 설정, 테스트 코드
+- **대상**: `packages/**/*.{ts,tsx,js}`, `packages/web/content/**/*.md` (빌드 포함 콘텐츠), `packages/api/src/db/migrations/*.sql`, `scripts/**/*.sh`, `wrangler.toml`, `pnpm-lock.yaml`, 빌드 설정, 테스트 코드
+- **경계 사례**: `packages/web/content/*.md`는 Markdown이지만 Vite가 `?raw`로 번들에 포함하므로 code 분류. 루트 `*.md`(README, SPEC 등)와 혼동 금지
 - **절차**: feature 브랜치 → commit+push → `gh pr create` → `gh pr merge <N> --auto --squash`
 - **`--auto`**: CI 통과하면 GitHub이 자동 squash merge 수행, 실패하면 대기 (수동 개입 신호)
 - **전제조건**: repo 설정 `allow_auto_merge: true` (S258에 활성화)
