@@ -125,10 +125,10 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F516 | 대시보드 현행화 — (1) 파이프라인 6단계→2단계(발굴~형상화) 축소 (2) 퀵 액션 dead link 제거 + 현행 기능 반영 (3) 개발 내부 위젯 4개 삭제(Sprint Status/SDD Triangle/Harness Health/Freshness) (4) ToDo List UI/UX 개선 (5) 업무 가이드 삭제 + Wiki 링크 대체 (FX-REQ-544, P1) | Sprint 267 | 📋(plan) | |
 
 | **Phase 38: MSA Walking Skeleton** | | | | PRD: `docs/specs/fx-msa-roadmap/prd-final.md`. 도메인별 서비스 분리 + API 게이트웨이 + D1 격리 |
-| F517 | API 게이트웨이 Worker — fx-gateway Worker 신규, Service Binding 라우팅, 하위 호환 (FX-REQ-545, P0) | Sprint 268 | 📋(idea) | |
-| F518 | Discovery 도메인 분리 — core/discovery 12 routes + 18 services를 독립 Worker로 추출 (FX-REQ-546, P0) | Sprint 268 | 📋(idea) | |
+| F517 | API 게이트웨이 Worker — fx-gateway Worker 신규, Service Binding 라우팅, 하위 호환 (FX-REQ-545, P0) | Sprint 268 | 🔧(design) | |
+| F518 | Discovery 도메인 분리 — core/discovery 12 routes + 18 services를 독립 Worker로 추출 (FX-REQ-546, P0) | Sprint 268 | 🔧(design) | |
 | F519 | shared 타입 슬리밍 — 도메인 전용 타입을 각 Worker 내부로 이동, 크로스도메인 계약만 shared 유지 (FX-REQ-547, P0) | Sprint 269 | 📋(idea) | |
-| F520 | D1 스키마 격리 — Discovery 전용 D1 바인딩 분리, 크로스도메인 JOIN 대체 방안 확정 (FX-REQ-548, P0) | Sprint 268 | 📋(idea) | |
+| F520 | D1 스키마 격리 — Discovery 전용 D1 바인딩 분리, 크로스도메인 JOIN 대체 방안 확정 (FX-REQ-548, P0) | Sprint 268 | 🔧(design) | |
 
 <!-- fx-task-orchestrator-backlog -->
 ### Task Orchestrator Backlog (B/C/X)
