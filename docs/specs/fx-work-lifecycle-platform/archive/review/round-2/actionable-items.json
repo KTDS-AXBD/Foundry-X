@@ -1,0 +1,557 @@
+{
+  "generated": "2026-04-12T09:49:28.655Z",
+  "totalItems": 91,
+  "byType": {
+    "flaw": 3,
+    "gap": 34,
+    "risk": 51
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**문제 정의–해결책 간 “실제 협업 효율/사용성” 연결**이 다소 선언적으로만 기술됨. 예: “비개발자가 개발자에 물어보지 않는다”가 진짜로 구현될 수 있는지, 실제 업무 흐름에서 Pain Point가 반복적으로 해결되는지, 더 구체적인 사용자 시나리오(예: BD팀이 주간레포트를 만들 때, 신규 요청이 실제로 자동으로 모든 체인에 연결되는지) 서술이 부족",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**성공 기준이 기능 구현 중심(KPI)과 실제 사용성/효과(정성 지표)가 혼재**되어 있습니다. 실제 “비개발자가 개발자에게 문의하지 않아도 되는” 수준의 효과를 정성적으로만 측정할 것인지, 정량화할 수 있는 (예: 문의 건수 감소 등) 방안이 추가 필요합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**AI 자동 분류의 한계 및 fallback 체계**가 많이 언급되나, 실제 분류 실패 시 업무 흐름이 어떻게 이어지는지 상세 Process Flow(예: 담당자 할당, 수동 검토)의 서술이 부족합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실제 업무 흐름 기반의 상세 유즈케이스/워크플로우**: “누가, 언제, 어떤 정보를 입력/조회/수정하는지”, 실패/예외/오류 발생 시 실무적으로 어떻게 처리할지 명확한 흐름도(Process Map)가 없습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영/모니터링 및 장애 대응 매뉴얼**: “알림, 장애 시 복구 플로우, 롤백 등”이 언급만 되어 있고, 실제 운영자가 어떤 화면/툴/알림을 보고 무엇을 할지, 운영 책임의 역할 분담이 구체적이지 않습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**데이터 정합성/품질 관리**: 트레이서빌리티(REQ→PR 등) 품질을 “수동 검토/옵트인”으로 보완한다고 했으나, 누락/오입력 시 어떤 주기가, 어떤 인력이, 어떤 방식으로 검수하는지 구체적이지 않습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실제 사용자/조직의 Change Management**: “BD팀/비개발자”의 신기능 도입 교육/온보딩, 파일럿 운영, 피드백 수렴-적용 주기 등이 형식적으로만 언급되었습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**보안 및 민감 정보 관리**: 공개/비공개 정책을 “수립 예정”으로만 해두고, 실제로 어떤 정보가 어디에서 어떻게 노출될 수 있는지, 실무적으로 통제 가능한지(예: 내부/외부 사용자 실수 등)에 대한 사전 점검이 부족합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**SPEC.md를 SSOT로 두고 GitHub API로 자동 갱신**하는 구조의 실현 가능성(동시성, 충돌, 데이터 정합성)이 가장 큰 기술적 리스크입니다. 이 PoC에서 실패한다면, 전체 자동화 체계가 무너집니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**AI 자동화 품질**: 분류 정확도가 낮거나, 외부 API 장애가 빈번하면 업무 흐름이 “수동/반자동”으로 전락, 실제 기대 효과가 반감됩니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**1인 개발/운영 체계의 한계**: 장애, 긴급이슈, 데이터 불일치 등 발생 시 회복탄력성이 매우 떨어집니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**트레이서빌리티 데이터 품질/누락**: PR body, branch naming 등 수동 입력 및 검수에 의존하는 부분이 많아, 실제로 “완전 자동 연결”이 지속적으로 유지될 것인지 회의적입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**문제 정의–해결책 간 “실제 협업 효율/사용성” 연결**이 다소 선언적으로만 기술됨. 예: “비개발자가 개발자에 물어보지 않는다”가 진짜로 구현될 수 있는지, 실제 업무 흐름에서 Pain Point가 반복적으로 해결되는지, 더 구체적인 사용자 시나리오(예: BD팀이 주간레포트를 만들 때, 신규 요청이 실제로 자동으로 모든 체인에 연결되는지) 서술이 부족",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**성공 기준이 기능 구현 중심(KPI)과 실제 사용성/효과(정성 지표)가 혼재**되어 있습니다. 실제 “비개발자가 개발자에게 문의하지 않아도 되는” 수준의 효과를 정성적으로만 측정할 것인지, 정량화할 수 있는 (예: 문의 건수 감소 등) 방안이 추가 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**AI 자동 분류의 한계 및 fallback 체계**가 많이 언급되나, 실제 분류 실패 시 업무 흐름이 어떻게 이어지는지 상세 Process Flow(예: 담당자 할당, 수동 검토)의 서술이 부족합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**SPEC.md 동시성, GitHub API를 통한 파일 쓰기 충돌 처리**는 기술적으로 매우 난이도가 높으며, 기존 경험상 PoC에서 실패할 확률이 높습니다. “PoC 결과에 따라 fallback”이라고만 했지만, 실제 fallback(수동 병합)이 자주 발생하면 자동화의 이점이 사라집니다. 이 과정이 상세히 설계되어 있지 않아, 일정이 대폭 지연될 위",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**AI Agent가 “분류/추천 등 API 호출”만 자동화**라면, 실질 업무 자동화에는 한계가 있습니다. 수동 검토/보정 인력이 사실상 상시 필요하므로, “1인 개발”이라는 리소스 산정이 과소평가입니다. 특히 장애/오류 발생 시, 실시간 대응이 어려울 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**AI 분류 실패/외부 API 장애/동시성 이슈 등 복수 리스크가 동시에 발생할 경우**의 복구/운영 절차가 실제로 얼마나 자동/효율적으로 처리될지 의문입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 업무 흐름 기반의 상세 유즈케이스/워크플로우**: “누가, 언제, 어떤 정보를 입력/조회/수정하는지”, 실패/예외/오류 발생 시 실무적으로 어떻게 처리할지 명확한 흐름도(Process Map)가 없습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/모니터링 및 장애 대응 매뉴얼**: “알림, 장애 시 복구 플로우, 롤백 등”이 언급만 되어 있고, 실제 운영자가 어떤 화면/툴/알림을 보고 무엇을 할지, 운영 책임의 역할 분담이 구체적이지 않습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**데이터 정합성/품질 관리**: 트레이서빌리티(REQ→PR 등) 품질을 “수동 검토/옵트인”으로 보완한다고 했으나, 누락/오입력 시 어떤 주기가, 어떤 인력이, 어떤 방식으로 검수하는지 구체적이지 않습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 사용자/조직의 Change Management**: “BD팀/비개발자”의 신기능 도입 교육/온보딩, 파일럿 운영, 피드백 수렴-적용 주기 등이 형식적으로만 언급되었습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**보안 및 민감 정보 관리**: 공개/비공개 정책을 “수립 예정”으로만 해두고, 실제로 어떤 정보가 어디에서 어떻게 노출될 수 있는지, 실무적으로 통제 가능한지(예: 내부/외부 사용자 실수 등)에 대한 사전 점검이 부족합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**SPEC.md를 SSOT로 두고 GitHub API로 자동 갱신**하는 구조의 실현 가능성(동시성, 충돌, 데이터 정합성)이 가장 큰 기술적 리스크입니다. 이 PoC에서 실패한다면, 전체 자동화 체계가 무너집니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**AI 자동화 품질**: 분류 정확도가 낮거나, 외부 API 장애가 빈번하면 업무 흐름이 “수동/반자동”으로 전락, 실제 기대 효과가 반감됩니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**1인 개발/운영 체계의 한계**: 장애, 긴급이슈, 데이터 불일치 등 발생 시 회복탄력성이 매우 떨어집니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**트레이서빌리티 데이터 품질/누락**: PR body, branch naming 등 수동 입력 및 검수에 의존하는 부분이 많아, 실제로 “완전 자동 연결”이 지속적으로 유지될 것인지 회의적입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**`SPEC.md` 자동 업데이트 동시성 처리 (M1-2a, 오픈이슈 2-1):**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**AI 자동 분류 정확도 (M1-2, 성공 기준):**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**PR body 파싱 기반의 트레이서빌리티 데이터 정합성 (M2-2, 리스크):**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**일정의 현실성 (6.1 일정):**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**고도화된 VSM (Value Stream Management) 지표 및 대시보드:** 현재 \"성공 기준\"에는 기본적인 KPI가 포함되어 있지만, 장기적으로는 Cycle Time, Lead Time, Deployment Frequency, Change Failure Rate 등 VSM의 핵심 지표들을 자동으로 계산하고 시각화하는 대시보드가 큰 가치를 제공",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**보안 및 규제 준수 (Compliance):** End-to-end traceability는 특히 금융, 헬스케어 등 규제가 엄격한 산업에서 감사(audit) 및 규제 준수(compliance) 요구사항을 충족하는 데 매우 중요합니다. \"이 변경이 왜 일어났는지\"에 대한 명확한 역추적은 SOX, SOC2, ISO 27001 등 다양한 규제에 대한 대응력",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**확장 가능한 RBAC (Role-Based Access Control):** 현재는 \"admin/user 2단계 이상의 세밀한 권한 구분은 M3 이후\"로 제외 범위에 있지만, 팀 규모가 커지고 다양한 이해관계자가 참여할수록 세분화된 RBAC는 필수적입니다. 특히 공개 뷰의 \"공개 범위/민감 정보 노출 정책\"과 연결하여, 누가 어떤 정보를 볼 수 있는지에",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**통합된 피드백 루프 (Beyond Marker.io):** Marker.io는 외부 피드백 수집에 유용하지만, 플랫폼 내에서 직접적인 사용자 피드백(예: 기능 제안, 버그 신고)을 받을 수 있는 채널이나, 특정 기능에 대한 \"좋아요/싫어요\" 같은 간단한 평가 기능을 통합한다면, 제품 개선에 더 도움이 될 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**`SPEC.md` 동시 쓰기 충돌 처리 PoC의 성공:** (오픈 이슈 2, 2-1) 이는 \"Git이 진실\" 원칙의 안정성을 담보하는 가장 중요한 기술적 도전 과제입니다. PoC 결과에 따라 중앙 큐, 분산 락, 수동 병합 등 가장 적합하고 안정적인 솔루션이 확정되어야 합니다. PoC 실패 시 자동화 범위 축소 및 수동 병합 체계로 전환하는 계획이 명확",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**AI 자동 분류 정확도 및 데이터 정합성 지속 관리:** (성공 기준, 리스크) AI 분류 정확도 75% 이상 달성 및 유지, 그리고 PR body 파싱에 따른 데이터 누락/오입력을 방지하기 위한 \"수동 보완/옵트인 워크플로우\"가 효과적으로 작동하는지 지속적인 모니터링과 개선이 필요합니다. 초기 사용자 신뢰 구축에 매우 중요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**BD팀/비개발자 대상 UX 테스트 및 피드백 루프:** (성공 기준, 오픈 이슈 6) \"한 번의 클릭/검색으로 체인 전체를 시각적으로 즉시 탐색 가능\"이라는 UX 목표와 80% 이상의 \"매우 쉽다/직관적이다\" 평가를 달성하기 위해, 각 마일스톤별 파일럿 테스트 및 피드백 루프를 통한 개선이 필수적입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**일정 관리의 유연성:** (6.1 일정) 3주라는 일정은 여전히 타이트할 수 있으므로, P0 핵심 기능에 집중하고, 일정 초과 시 과감하게 범위 축소 및 후속 Phase로 이관하는 유연한 접근이 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**`SPEC.md` 자동 업데이트 동시성 처리 (M1-2a, 오픈이슈 2-1):**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**AI 자동 분류 정확도 (M1-2, 성공 기준):**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**PR body 파싱 기반의 트레이서빌리티 데이터 정합성 (M2-2, 리스크):**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**일정의 현실성 (6.1 일정):**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**`SPEC.md` 동시 쓰기 충돌 처리 PoC의 성공:** (오픈 이슈 2, 2-1) 이는 \"Git이 진실\" 원칙의 안정성을 담보하는 가장 중요한 기술적 도전 과제입니다. PoC 결과에 따라 중앙 큐, 분산 락, 수동 병합 등 가장 적합하고 안정적인 솔루션이 확정되어야 합니다. PoC 실패 시 자동화 범위 축소 및 수동 병합 체계로 전환하는 계획이 명확",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**AI 자동 분류 정확도 및 데이터 정합성 지속 관리:** (성공 기준, 리스크) AI 분류 정확도 75% 이상 달성 및 유지, 그리고 PR body 파싱에 따른 데이터 누락/오입력을 방지하기 위한 \"수동 보완/옵트인 워크플로우\"가 효과적으로 작동하는지 지속적인 모니터링과 개선이 필요합니다. 초기 사용자 신뢰 구축에 매우 중요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**BD팀/비개발자 대상 UX 테스트 및 피드백 루프:** (성공 기준, 오픈 이슈 6) \"한 번의 클릭/검색으로 체인 전체를 시각적으로 즉시 탐색 가능\"이라는 UX 목표와 80% 이상의 \"매우 쉽다/직관적이다\" 평가를 달성하기 위해, 각 마일스톤별 파일럿 테스트 및 피드백 루프를 통한 개선이 필수적입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**일정 관리의 유연성:** (6.1 일정) 3주라는 일정은 여전히 타이트할 수 있으므로, P0 핵심 기능에 집중하고, 일정 초과 시 과감하게 범위 축소 및 후속 Phase로 이관하는 유연한 접근이 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**동시성 충돌**: GitHub API를 통한 파일 수정은 본질적으로 병합 충돌 위험이 높음. 다수 사용자 환경에서 `git pull→수정→push` 사이에 다른 변경 발생 가능",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**성능 한계**: 매번 raw 파일 fetch/파싱 → 트레이서빌리티 쿼리 시 실시간 성능 저하 예상",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**제안**: SPEC.md를 \"진실의 원본\"으로 유지하되, D1에 **쓰기 전용 캐시** 구축. 모든 업데이트는 D1→비동기적으로 SPEC.md 동기화(충돌 감지/해결 로직 포함)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "3단계 fallback 체계: AI → regex 규칙 → 수동 검토 큐",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "분류 신뢰도 점수 표시 및 저신뢰 항목 자동 수동 검토 라우팅",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "PR 생성 시 CI 검증(git hook)으로 F번호 필수화",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "branch명 자동 파싱으로 fallback 제공(sprint-xxx-fyyy 패턴)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**SPEC.md 동시성 처리 PoC 완료 및 검증**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**트레이서빌리티 데이터 품질 보장 전략 수립**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**단계적 롤아웃 계획 상세화**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**Phase 1 범위 축소**: M3(Ontology KG)는 후속 Phase로 이동, M1+M2에 집중",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**모니터링 인프라 선구축**: 데이터 불일치 감지, AI 분류 정확도 추적 대시보드 우선 구현",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**수동 우회 경로 보장**: 모든 자동화 실패 시 명확한 수동 처리 절차 제공",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**동시성 충돌**: GitHub API를 통한 파일 수정은 본질적으로 병합 충돌 위험이 높음. 다수 사용자 환경에서 `git pull→수정→push` 사이에 다른 변경 발생 가능",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**성능 한계**: 매번 raw 파일 fetch/파싱 → 트레이서빌리티 쿼리 시 실시간 성능 저하 예상",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**제안**: SPEC.md를 \"진실의 원본\"으로 유지하되, D1에 **쓰기 전용 캐시** 구축. 모든 업데이트는 D1→비동기적으로 SPEC.md 동기화(충돌 감지/해결 로직 포함)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "3단계 fallback 체계: AI → regex 규칙 → 수동 검토 큐",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "분류 신뢰도 점수 표시 및 저신뢰 항목 자동 수동 검토 라우팅",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "PR 생성 시 CI 검증(git hook)으로 F번호 필수화",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "branch명 자동 파싱으로 fallback 제공(sprint-xxx-fyyy 패턴)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**이중 저장소 문제**: SPEC.md(SSOT) + D1(캐시) 간 불일치 발생 시 복구 로직 미흡",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**이벤트 기반 아키텍처 부재**: Backlog 인입→AI 분류→등록→알림이 동기 API 호출 체인으로 설계됨. 한 단계 실패 시 전체 롤백 복잡",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**이점**: 각 단계 독립적 장애 허용, 재시도 큐 구현 용이, 상태 모니터링 용이",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**현실적 대안**: Cloudflare Queues + D1 트랜잭션으로 간소화 구현",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**예시 시나리오**: 사용자가 GitHub에서 직접 Issue 수정 → D1과 불일치 발생 → 감지/해결 로직 필수",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**추가 작업량**: 동기화 상태 모니터링 대시보드 및 수동 조정 인터페이스 필요",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**예상 문제**: Phase 추가, Track 카테고리 변경 등 비즈니스 변화에 스키마 유연성 부족",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**리스크**: 인증 우회로 내부 데이터 노출 가능성",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**시나리오**: BD팀원 2명이 동시에 웹 폼 제출 → AI 분류 완료 → 순차적 SPEC 업데이트 시도 → 두 번째 요청에서 \"파일이 변경됨\" 충돌",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**현재 대응**: \"중앙 큐 PoC\"만 언급, 구체적 설계 없음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**필요 조치**: 쓰기 작업을 위한 분산 락 시스템 설계 또는 오프라인 편집 패턴(충돌 시 병합 UI) 도입",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**근본 원인**: 수동 입력 의존성. 개발자가 PR 생성 시 F번호 생략 가능",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**파급 효과**: 전체 플랫폼의 핵심 가치(역추적) 무력화",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**비용/성능 균형**: Claude Sonnet 호출 비용은 낮지만, latency(1-3초)가 사용자 경저하",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**장애 전파**: Anthropic API 장애 시 전체 Backlog 인입 차단",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**SPEC.md 동시성 처리 PoC 완료 및 검증**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**트레이서빌리티 데이터 품질 보장 전략 수립**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**단계적 롤아웃 계획 상세화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Phase 1 범위 축소**: M3(Ontology KG)는 후속 Phase로 이동, M1+M2에 집중",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**모니터링 인프라 선구축**: 데이터 불일치 감지, AI 분류 정확도 추적 대시보드 우선 구현",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**수동 우회 경로 보장**: 모든 자동화 실패 시 명확한 수동 처리 절차 제공",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}

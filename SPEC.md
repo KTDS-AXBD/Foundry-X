@@ -59,6 +59,9 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | ↳ Sprint 264 — Phase 36-A(F512) + Phase 36-B 착수(F513) | ✅ |
 | ↳ Sprint 265 — Phase 36-B 완성 (F514) | ✅ |
 | ↳ Sprint 266 — Phase 36-C (F515) | ✅ |
+| **Phase 37 Work Lifecycle Platform** (F516~F518) | 📋 Sprint 267~269 |
+| **Phase 38 Dashboard Overhaul** (F519) | 📋 Sprint 270 |
+| **Phase 39 MSA Walking Skeleton** (F520~F523) | 📋 Sprint 271~272 |
 | **Phase 37 Dashboard Overhaul** (F516) | 📋 Sprint 267 |
 | **Phase 38 MSA Walking Skeleton** (F517~F520) | 📋 Sprint 268~269 |
 
@@ -121,14 +124,19 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | **Phase 36-C: 자동화 연결** | | | | Phase A/B 자동화 스크립트 연결 |
 | F515 | 자동화 연결 — C-1 board-sync-spec 세부 상태 파싱 + C-2 Roadmap 자동 갱신 + C-3 Blueprint 버전 범프 + C-4 아카이브 자동화 + C-5 CHANGELOG 자동 생성 (FX-REQ-538, P1) | Sprint 266 | ✅ | PR #529. Gap 95.1%. 5종 스크립트 |
 
-| **Phase 37: Dashboard Overhaul (대시보드 현행화)** | | | | 서비스 범위(발굴~형상화)에 맞춰 대시보드 전면 정리 |
-| F516 | 대시보드 현행화 — (1) 파이프라인 6단계→2단계(발굴~형상화) 축소 (2) 퀵 액션 dead link 제거 + 현행 기능 반영 (3) 개발 내부 위젯 4개 삭제(Sprint Status/SDD Triangle/Harness Health/Freshness) (4) ToDo List UI/UX 개선 (5) 업무 가이드 삭제 + Wiki 링크 대체 (FX-REQ-544, P1) | Sprint 267 | 📋(plan) | |
+| **Phase 37: Work Lifecycle Platform (작업 라이프사이클 플랫폼)** | | | | PRD: `docs/specs/fx-work-lifecycle-platform/prd-final.md`. Backlog 인입→AI 자동분류→트레이서빌리티→Ontology |
+| F516 | Backlog 인입 파이프라인 — 웹 제출 폼 + AI 자동 분류(Track/Priority/중복검사) + SPEC.md 자동 등록 + Marker.io webhook + CLI 경로 유지 + 알림 (FX-REQ-544, P0) | Sprint 267 | 📋(plan) | C46 승격 |
+| F517 | 메타데이터 트레이서빌리티 — REQ↔F-item↔Sprint 연결 D1 테이블 + Sprint↔PR↔Commit GitHub API 파싱 + Changelog 구조화(REQ/PR 메타태깅) + 추적 뷰 (FX-REQ-545, P0) | Sprint 268 | 📋(plan) | C47 승격 |
+| F518 | Work Ontology 기반 연결 — KG 스키마(10노드타입/5엣지타입) + kg_nodes/kg_edges D1 테이블 + SPEC/GitHub→노드 자동생성 + KG 쿼리 API + 공개 Roadmap/Changelog 뷰 (FX-REQ-546, P0) | Sprint 269 | 📋(plan) | C48 승격 |
 
-| **Phase 38: MSA Walking Skeleton** | | | | PRD: `docs/specs/fx-msa-roadmap/prd-final.md`. 도메인별 서비스 분리 + API 게이트웨이 + D1 격리 |
-| F517 | API 게이트웨이 Worker — fx-gateway Worker 신규, Service Binding 라우팅, 하위 호환 (FX-REQ-545, P0) | Sprint 268 | 🔧(design) | |
-| F518 | Discovery 도메인 분리 — core/discovery 12 routes + 18 services를 독립 Worker로 추출 (FX-REQ-546, P0) | Sprint 268 | 🔧(design) | |
-| F519 | shared 타입 슬리밍 — 도메인 전용 타입을 각 Worker 내부로 이동, 크로스도메인 계약만 shared 유지 (FX-REQ-547, P0) | Sprint 269 | 📋(idea) | |
-| F520 | D1 스키마 격리 — Discovery 전용 D1 바인딩 분리, 크로스도메인 JOIN 대체 방안 확정 (FX-REQ-548, P0) | Sprint 268 | 🔧(design) | |
+| **Phase 38: Dashboard Overhaul (대시보드 현행화)** | | | | 서비스 범위(발굴~형상화)에 맞춰 대시보드 전면 정리 |
+| F519 | 대시보드 현행화 — (1) 파이프라인 6단계→2단계 축소 (2) 퀵 액션 dead link 제거 (3) 내부 위젯 4개 삭제 (4) ToDo List UI/UX (5) 업무 가이드 Wiki 대체 (FX-REQ-547, P1) | Sprint 270 | 📋(plan) | |
+
+| **Phase 39: MSA Walking Skeleton** | | | | PRD: `docs/specs/fx-msa-roadmap/prd-final.md`. 도메인별 서비스 분리 + API 게이트웨이 + D1 격리 |
+| F520 | API 게이트웨이 Worker — fx-gateway Worker 신규, Service Binding 라우팅, 하위 호환 (FX-REQ-548, P0) | Sprint 271 | 📋(idea) | |
+| F521 | Discovery 도메인 분리 — core/discovery 12 routes + 18 services를 독립 Worker로 추출 (FX-REQ-549, P0) | Sprint 271 | 📋(idea) | |
+| F522 | shared 타입 슬리밍 — 도메인 전용 타입을 각 Worker 내부로 이동, 크로스도메인 계약만 shared 유지 (FX-REQ-550, P0) | Sprint 272 | 📋(idea) | |
+| F523 | D1 스키마 격리 — Discovery 전용 D1 바인딩 분리, 크로스도메인 JOIN 대체 방안 확정 (FX-REQ-551, P0) | Sprint 271 | 📋(idea) | |
 
 <!-- fx-task-orchestrator-backlog -->
 ### Task Orchestrator Backlog (B/C/X)
@@ -191,9 +199,10 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C43 | C | Changelog 마크다운 렌더링 — 현재 `**볼드**`, `[링크]()` 등이 raw text로 노출됨. react-markdown(이미 설치됨) 적용하여 Added/Fixed 섹션 내 bullet을 구조화 렌더링. 누가: AI. 어떻게: ChangelogTab에 react-markdown 적용 + 섹션별 스타일링 | — | PLANNED | S268 사용자 피드백 |
 | C44 | C | Roadmap Phase 상세 + 미래 계획 표시 — (1) SPEC §3 Phase 테이블을 직접 파싱하는 새 API `GET /api/work/roadmap` 추가 (Phase 이름/상태/Sprint 범위/F-item 목록 포함). (2) ROADMAP.md Short/Mid/Long-term 섹션을 파싱하여 미래 계획 표시. 현재는 phase-progress API의 F-item 번호 추론 방식이라 Phase 2건만 표시됨. 누가: AI. 어떻게: work.service.ts parseRoadmap() + RoadmapTab 개편 | — | PLANNED | S268 사용자 피드백 |
 | C45 | C | Backlog C/B/X-track 파싱 + 작업 분류 UX — (1) parseFItems()가 F-item만 파싱 → C/B/X Backlog 테이블도 파싱하여 backlog-health에 반영. (2) 작업 분류 탭에 "분류 후 어떻게 등록하는지" 안내 + CLI 명령어 복사 버튼. 누가: AI. 어떻게: parseFItems 확장 + ClassifyTab UX 보강 | — | PLANNED | S268 사용자 피드백 |
-| C46 | F | Backlog 인입 파이프라인 설계 — 사용자가 "이런 게 있으면 좋겠다"를 웹에서 직접 제출 → AI가 자동 분석(Track/Priority/중복 검사/유사 REQ 매칭) → Backlog 등록 → AI 피드백("이 요청은 F509와 유사해요, 병합할까요?") → 승인 시 요구사항(REQ)으로 전환. 현재: CLI `task-start.sh`로만 등록 가능, 웹 인입 경로 없음. 누가: 사용자+AI. 어떻게: (1) 웹 제출 폼 (2) AI 분석 API (3) Backlog→REQ 전환 워크플로우 설계 필요 | — | PLANNED | S268 사용자 피드백. F-item 승격 후보 (3+파일, 사용자 관찰 가능) |
-| C47 | F | Changelog 트레이서빌리티 — 단순 나열이 아닌 "요구사항(REQ) → Task(C/F) → 구현(PR/커밋) → 배포" 연결 체인을 시각화. 각 Changelog 항목에서 원본 REQ, 관련 Sprint, PR 링크를 역추적 가능해야 함. 맥락 축적을 위해 Knowledge Graph(Ontology) 도입 검토 — REQ↔F-item↔Sprint↔Phase↔PR 관계를 그래프로 관리하면 "이 변경이 왜 일어났는지" 추적 가능. 누가: AI+사용자. 어떻게: (1) Changelog 항목에 REQ/PR 메타데이터 구조화 (2) KG 스키마 설계 (3) 트레이서빌리티 뷰 구현 | — | PLANNED | S268 사용자 피드백. F-item 승격 후보. Ontology 기반 |
-| C48 | C | Work Management Ontology 기반 맥락 연결 — C46(인입)·C47(트레이서빌리티)의 공통 기반. 작업 라이프사이클 전체를 Ontology로 모델링: Idea→Backlog→REQ→Task(F/C/B/X)→Sprint→Phase→Deploy→Changelog. 기존 KG 인프라(packages/web/src/components/feature/kg/) 재활용. 누가: AI. 어떻게: (1) Work Management 도메인 온톨로지 스키마 정의 (2) SPEC.md 파싱→KG 노드/엣지 자동 생성 (3) 탐색 뷰 | — | PLANNED | S268 사용자 피드백. C46·C47 선행 후 착수 |
+| C46 | F | ~~Backlog 인입 파이프라인 설계~~ — 사용자가 "이런 게 있으면 좋겠다"를 웹에서 직접 제출 → AI가 자동 분석(Track/Priority/중복 검사/유사 REQ 매칭) → Backlog 등록 → AI 피드백("이 요청은 F509와 유사해요, 병합할까요?") → 승인 시 요구사항(REQ)으로 전환. 현재: CLI `task-start.sh`로만 등록 가능, 웹 인입 경로 없음. 누가: 사용자+AI. 어떻게: (1) 웹 제출 폼 (2) AI 분석 API (3) Backlog→REQ 전환 워크플로우 설계 필요 | — | PLANNED | S268 사용자 피드백. F-item 승격 후보 (3+파일, 사용자 관찰 가능) |
+| C47 | F | ~~Changelog 트레이서빌리티~~ — 단순 나열이 아닌 "요구사항(REQ) → Task(C/F) → 구현(PR/커밋) → 배포" 연결 체인을 시각화. 각 Changelog 항목에서 원본 REQ, 관련 Sprint, PR 링크를 역추적 가능해야 함. 맥락 축적을 위해 Knowledge Graph(Ontology) 도입 검토 — REQ↔F-item↔Sprint↔Phase↔PR 관계를 그래프로 관리하면 "이 변경이 왜 일어났는지" 추적 가능. 누가: AI+사용자. 어떻게: (1) Changelog 항목에 REQ/PR 메타데이터 구조화 (2) KG 스키마 설계 (3) 트레이서빌리티 뷰 구현 | — | PLANNED | S268 사용자 피드백. F-item 승격 후보. Ontology 기반 |
+| C48 | C | ~~Work Management Ontology 기반 맥락 연결~~ — C46(인입)·C47(트레이서빌리티)의 공통 기반. 작업 라이프사이클 전체를 Ontology로 모델링: Idea→Backlog→REQ→Task(F/C/B/X)→Sprint→Phase→Deploy→Changelog. 기존 KG 인프라(packages/web/src/components/feature/kg/) 재활용. 누가: AI. 어떻게: (1) Work Management 도메인 온톨로지 스키마 정의 (2) SPEC.md 파싱→KG 노드/엣지 자동 생성 (3) 탐색 뷰 | — | PLANNED | S268 사용자 피드백. C46·C47 선행 후 착수 |
+| C50 | C | req-interview 스코어카드 채점 메커니즘 개선 — PRD 상세화→점수 하락 역설 해소. 현재: 이슈 수 기반(상세할수록 신규 이슈 증가→항목1 0점), AI 리뷰어가 상세 PRD에 더 많은 Conditional 부여. 개선 방향: (1) 이슈 밀도(이슈/자수) 기반으로 전환 (2) severity 가중치 도입(flaw>gap>risk) (3) 라운드 간 이슈 품질 비교(동일 이슈 재발 vs 신규 발견 구분). S266/S268에서 반복 확인된 패턴. 누가: AI. 어떻게: review-api.mjs scorecard 계산 로직 개선 + scorecard.md 해석 문구 보정 | — | PLANNED | S266+S268 교훈. 비긴급 (PRD 품질 자체는 정상) |
 | C49 | C | 작업 현황 탭 데이터 보강 — Kanban에 F-item 5건(DONE)만 표시됨. Phase 30+ Active 섹션의 모든 항목(F493~F515 + C/B/X Backlog)이 올바른 컬럼에 분류되어야 함. 현재: parseFItems의 regex가 Phase 30+ 섹션만 파싱하고 대부분 DONE으로 분류됨. IN_PROGRESS/PLANNED가 0건인 원인 진단 + 수정. 누가: AI. 어떻게: parseFItems 디버깅 + Backlog 섹션 파싱 추가 | — | PLANNED | S268 사용자 피드백 |
 <!-- /fx-task-orchestrator-backlog -->
 

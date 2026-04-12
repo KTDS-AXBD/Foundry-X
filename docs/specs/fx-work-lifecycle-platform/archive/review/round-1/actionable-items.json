@@ -1,0 +1,353 @@
+{
+  "generated": "2026-04-12T09:47:17.003Z",
+  "totalItems": 57,
+  "byType": {
+    "flaw": 2,
+    "gap": 16,
+    "risk": 36
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**To-be 상태**의 성공 시나리오가 '기능적으로 연결된다'에 집중되어 있으나, '실제 협업 효율/품질이 개선된다'는 사용자 관점의 정성적 효과가 빠짐. 예: \"BD팀이 개발자에게 묻지 않고 직접 현황 파악\"이 진짜로 가능해지는지, 사용성 개선이 수치로 드러나는지에 대한 검증 계획 필요.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**End-to-end 트레이서빌리티**가 핵심 가치인데, 이 연결이 \"얼마나 직관적/쉬운가\"에 대한 UX 기준이 빠짐(단순히 API/데이터 연결로만 정의).",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**에러/예외 처리 및 롤백 플랜 누락**: AI 분류 실패, GitHub API 오류, D1 DB 충돌, Marker.io payload 변화 등 현실적인 장애/예외 시나리오와 대응책(재시도, 수동 등록 fallback 등)이 없음.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**사용자 피드백/QA 플로우 부재**: BD팀/비개발자 대상의 실사용성 검증(예: UX 테스트, 파일럿 피드백 수렴 루프 등)이 전혀 설계되어 있지 않음.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**알림/커뮤니케이션 정책 미흡**: \"알림 시스템\"이 단순 등록/변경 알림만 언급되어 있고, 실사용자가 놓치지 않게 정보 흐름을 어떻게 보장할지(예: 메일, 슬랙, in-app notification 등) 구체성 부족.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**접근/권한관리**: 공개/비공개 뷰 분리만 언급. 실제로 Roadmap/Changelog 등 민감 정보 공개 범위에 대한 정책, 혹은 추후 RBAC 확장성에 대한 아키텍처적 고려가 미흡.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트/릴리즈 플랜 미흡**: TDD 언급은 있으나, 실제 QA, 롤아웃(점진 적용/AB 테스트 등), 운영 중 장애 대응에 대한 구체적 플랜 없음.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실제 데이터/시스템 동기화 실패**: 여러 시스템(API, 파일, DB) 간 데이터 불일치, 동기화 실패, 충돌 시 자동/수동 복구 플로우 부재.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**AI 자동화 품질 미달**: AI 분류, 중복 검사 등에서 오분류/누락이 다수 발생할 경우, 오히려 혼란/신뢰도 저하로 이어질 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**사용자 미채택**: BD팀/비개발자 입장에서 사용성이 낮거나, 기존과 다를 바 없다고 느끼면 채널 다양화가 무의미해질 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**공개/비공개 분리 미흡**: Roadmap/Changelog 공개 범위에 대한 정책 미비로 인해 내부 정보 유출 리스크.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영·유지보수 부담**: 혼자 개발/운영할 경우, 장애 발생 시 신속한 대응이 어려움(특히 AI/외부 API 의존성 높음).",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**일정 과소평가:** Sprint 1~3일 × 3개 = \"1주\"로 명시했으나, 실제로는",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**AI Agent 활용**: \"AI Agent 1명\"이 실제로 어느 수준까지 대체 가능한지(단순 API 호출인지, 실제 업무 자동화까지인지) 불명확.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/운용 부담**: PRD에는 운영/모니터링, 장애 대응(예: AI API 호출 실패, D1/GitHub sync 이슈 등)에 대한 고려가 없음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**마이그레이션 리스크:** 기존 SPEC.md 파서/DB 스키마가 바뀔 때, 기존 데이터와의 호환성/rollback 시나리오, 혹은 데이터 이관에 대한 언급 없음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**에러/예외 처리 및 롤백 플랜 누락**: AI 분류 실패, GitHub API 오류, D1 DB 충돌, Marker.io payload 변화 등 현실적인 장애/예외 시나리오와 대응책(재시도, 수동 등록 fallback 등)이 없음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**사용자 피드백/QA 플로우 부재**: BD팀/비개발자 대상의 실사용성 검증(예: UX 테스트, 파일럿 피드백 수렴 루프 등)이 전혀 설계되어 있지 않음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**알림/커뮤니케이션 정책 미흡**: \"알림 시스템\"이 단순 등록/변경 알림만 언급되어 있고, 실사용자가 놓치지 않게 정보 흐름을 어떻게 보장할지(예: 메일, 슬랙, in-app notification 등) 구체성 부족.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**접근/권한관리**: 공개/비공개 뷰 분리만 언급. 실제로 Roadmap/Changelog 등 민감 정보 공개 범위에 대한 정책, 혹은 추후 RBAC 확장성에 대한 아키텍처적 고려가 미흡.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트/릴리즈 플랜 미흡**: TDD 언급은 있으나, 실제 QA, 롤아웃(점진 적용/AB 테스트 등), 운영 중 장애 대응에 대한 구체적 플랜 없음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 데이터/시스템 동기화 실패**: 여러 시스템(API, 파일, DB) 간 데이터 불일치, 동기화 실패, 충돌 시 자동/수동 복구 플로우 부재.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**AI 자동화 품질 미달**: AI 분류, 중복 검사 등에서 오분류/누락이 다수 발생할 경우, 오히려 혼란/신뢰도 저하로 이어질 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**사용자 미채택**: BD팀/비개발자 입장에서 사용성이 낮거나, 기존과 다를 바 없다고 느끼면 채널 다양화가 무의미해질 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**공개/비공개 분리 미흡**: Roadmap/Changelog 공개 범위에 대한 정책 미비로 인해 내부 정보 유출 리스크.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영·유지보수 부담**: 혼자 개발/운영할 경우, 장애 발생 시 신속한 대응이 어려움(특히 AI/외부 API 의존성 높음).",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**일정/범위 현실화**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**예외처리/운영 플랜 추가**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**사용자 피드백 루프 설계**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**접근/권한 정책 구체화**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/테스트/릴리즈 플랜 명확화**:",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**일정 재조정 및 범위 조정:** 현재의 1주라는 개발 일정은 현실적으로 불가능에 가깝습니다. 각 Sprint의 목표 달성 가능성을 재평가하고, 최소 2~3배 이상의 여유를 두어 일정을 재조정해야 합니다. 만약 일정을 늘릴 수 없다면, 각 Sprint의 **핵심 기능 (P0)**만으로 범위를 대폭 축소하여 MVP를 달성하고, 나머지 기능은 후속 Phase",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**AI 정확도 목표 상향:** AI 자동 분류의 최소 정확도 목표를 \"현재 classify regex fallback = ~70%\"보다 높은 수준(예: 75% 이상)으로 설정하고, 이를 달성하기 위한 AI 모델 학습 및 검증 계획을 구체화해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**`SPEC.md` 자동 업데이트 PoC 결과 확인:** Workers에서 GitHub API를 통한 `SPEC.md` 파일 업데이트의 안정성과 충돌 처리 방안에 대한 PoC 결과를 확인하고, 예상치 못한 위험 요소를 최소화해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**일정 재조정 및 범위 조정:** 현재의 1주라는 개발 일정은 현실적으로 불가능에 가깝습니다. 각 Sprint의 목표 달성 가능성을 재평가하고, 최소 2~3배 이상의 여유를 두어 일정을 재조정해야 합니다. 만약 일정을 늘릴 수 없다면, 각 Sprint의 **핵심 기능 (P0)**만으로 범위를 대폭 축소하여 MVP를 달성하고, 나머지 기능은 후속 Phase",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**AI 정확도 목표 상향:** AI 자동 분류의 최소 정확도 목표를 \"현재 classify regex fallback = ~70%\"보다 높은 수준(예: 75% 이상)으로 설정하고, 이를 달성하기 위한 AI 모델 학습 및 검증 계획을 구체화해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**`SPEC.md` 자동 업데이트 PoC 결과 확인:** Workers에서 GitHub API를 통한 `SPEC.md` 파일 업데이트의 안정성과 충돌 처리 방안에 대한 PoC 결과를 확인하고, 예상치 못한 위험 요소를 최소화해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**GitHub API를 통한 SPEC.md 직접 수정**: Workers 환경에서 GitHub API로 파일 수정은 가능하나, **병합 충돌 리스크가 심각함**. 다수의 동시 Backlog 등록 시 충돌이 불가피하며, 이를 해결하기 위한 분산 락 메커니즘은 복잡도가 높음.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**AI 분류 의존도**: Claude Sonnet API의 응답 시간(1-3초)과 가용성이 전체 파이프라인의 병목이 될 수 있음. API 장애 시 fallback 처리(regex)만으로는 비즈니스 연속성 보장 어려움.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**트레이서빌리티 데이터 정합성**: GitHub PR body의 F번호 파싱은 **비정형 데이터 의존** 문제가 큼. 개발자가 PR 생성 시 F번호를 누락하거나 잘못 기입하면 전체 체인이 끊어짐.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**GitHub API를 통한 SPEC.md 직접 수정**: Workers 환경에서 GitHub API로 파일 수정은 가능하나, **병합 충돌 리스크가 심각함**. 다수의 동시 Backlog 등록 시 충돌이 불가피하며, 이를 해결하기 위한 분산 락 메커니즘은 복잡도가 높음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**AI 분류 의존도**: Claude Sonnet API의 응답 시간(1-3초)과 가용성이 전체 파이프라인의 병목이 될 수 있음. API 장애 시 fallback 처리(regex)만으로는 비즈니스 연속성 보장 어려움.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**트레이서빌리티 데이터 정합성**: GitHub PR body의 F번호 파싱은 **비정형 데이터 의존** 문제가 큼. 개발자가 PR 생성 시 F번호를 누락하거나 잘못 기입하면 전체 체인이 끊어짐.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**동시성 제어**: 웹/CLI/Marker.io 3채널 동시 인입 시 SPEC.md 업데이트 경쟁 조건 필수 처리 필요. Git 기반의 낙관적 락만으로는 부족.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**데이터 일관성**: KG 엣지 방향성(양방향 vs 단방향)에 따라 쿼리 복잡도가 기하급수적으로 증가. M3-4의 공개 뷰 성능 보장이 어려움.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**에지 케이스**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**SPEC.md 동시 쓰기 충돌**: 가장 치명적 리스크. 다중 사용자 환경에서 파일 기반 SSOT 유지는 기술적 부채가 큼.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**AI 분류 정확도 의존성**: 60% 정확도 임계값이 너무 낮음. 실제 운영 시 85% 이상 필요하며, 이를 달성하기 위한 학습 데이터 부재.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**트레이서빌리티 데이터 품질**: 수동 입력(PR body)에 의존하는 메타데이터는 신뢰성이 낮아 전체 시스템 가치 훼손 가능성.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Phase 1 (Sprint 267-268)**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Phase 2 (Sprint 269 이후)**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "SPEC.md 동시 쓰기 문제에 대한 기술적 해결안(중앙 큐 또는 Git LFS 활용)이 Sprint 267 시작 전에 확정되어야 함.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "AI 분류 fallback 워크플로우(수동 검토 단계)가 M1-2에 명시적으로 포함되어야 함.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "트레이서빌리티 데이터 수집을 **옵트인(opt-in)** 방식으로 전환하여 데이터 품질 우선 보장.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}
