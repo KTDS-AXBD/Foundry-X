@@ -2,12 +2,21 @@ name: Deploy to Cloudflare
 on:
   push:
     branches: [master]
+    # 메타 전용 커밋(SPEC.md·docs·.claude)은 workflow 트리거 제외
+    # → Sprint autopilot 메타 커밋이 코드 deploy run을 cancel하지 않음
+    paths-ignore:
+      - 'SPEC.md'
+      - 'CHANGELOG.md'
+      - 'docs/**'
+      - '.claude/**'
   workflow_dispatch:
 
-# 동시 실행 방지 — 같은 브랜치 push 중복 시 이전 run 취소
+# cancel-in-progress: false — 2중 방어
+# paths-ignore를 통과한 커밋이라도 진행 중인 deploy run을 취소하지 않음
+# (D1 migration idempotent, Pages/Workers deploy last-write-wins)
 concurrency:
   group: deploy-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   # 변경 경로 감지 — skip/run 판단
