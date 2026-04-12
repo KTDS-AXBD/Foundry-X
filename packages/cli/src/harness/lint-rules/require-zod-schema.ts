@@ -29,6 +29,7 @@ export const requireZodSchema: Rule.RuleModule = {
           node.callee.object.property.name === "req"
         ) {
           // 부모가 이미 schema.parse() 래핑인지 확인
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ESLint AST node.parent is runtime-only, not in Rule.Node type
           const parent = (node as any).parent;
           if (
             parent?.type === "CallExpression" &&
