@@ -4,6 +4,9 @@ import {
   WorkContextSchema,
   ClassifyInputSchema,
   ClassifyOutputSchema,
+  SessionListSchema,
+  SessionSyncInputSchema,
+  SessionSyncOutputSchema,
 } from "../schemas/work.js";
 import type { Env } from "../env.js";
 import { WorkService } from "../services/work.service.js";
@@ -78,5 +81,55 @@ workRoute.openapi(classifyWork, async (c) => {
   const { text } = c.req.valid("json");
   const svc = new WorkService(c.env);
   const result = await svc.classify(text);
+  return c.json(result);
+});
+
+// ─── GET /api/work/sessions (F510 M4) ───────────────────────────────────────
+
+const getSessions = createRoute({
+  method: "get",
+  path: "/work/sessions",
+  tags: ["Work Observability"],
+  summary: "Agent session list collected from local tmux/git state",
+  responses: {
+    200: {
+      content: { "application/json": { schema: SessionListSchema } },
+      description: "Agent sessions",
+    },
+  },
+});
+
+workRoute.openapi(getSessions, async (c) => {
+  const svc = new WorkService(c.env);
+  const data = await svc.getSessions();
+  return c.json(data);
+});
+
+// ─── POST /api/work/sessions/sync (F510 M4) ──────────────────────────────────
+
+const syncSessions = createRoute({
+  method: "post",
+  path: "/work/sessions/sync",
+  tags: ["Work Observability"],
+  summary: "Upsert agent session state from local collector script",
+  request: {
+    body: { content: { "application/json": { schema: SessionSyncInputSchema } } },
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: SessionSyncOutputSchema } },
+      description: "Sync result",
+    },
+    400: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "Invalid input",
+    },
+  },
+});
+
+workRoute.openapi(syncSessions, async (c) => {
+  const body = c.req.valid("json");
+  const svc = new WorkService(c.env);
+  const result = await svc.syncSessions(body);
   return c.json(result);
 });

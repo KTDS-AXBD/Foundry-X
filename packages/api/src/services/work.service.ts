@@ -232,6 +232,106 @@ export class WorkService {
     };
   }
 
+  // ─── Agent Sessions (F510 M4) ────────────────────────────────────────────
+
+  async getSessions() {
+    const result = await this.env.DB.prepare(
+      `SELECT id, name, status, profile, worktree, branch, windows, last_activity, collected_at
+       FROM agent_sessions ORDER BY status ASC, last_activity DESC`
+    ).all<{
+      id: string; name: string; status: string; profile: string;
+      worktree: string | null; branch: string | null; windows: number;
+      last_activity: string | null; collected_at: string;
+    }>();
+
+    const rows = result.results ?? [];
+    const lastSync = rows[0]?.collected_at ?? new Date(0).toISOString();
+
+    // Fetch paired worktrees from dedicated sync table column aggregation
+    const wtResult = await this.env.DB.prepare(
+      `SELECT DISTINCT worktree AS path, branch FROM agent_sessions WHERE worktree IS NOT NULL`
+    ).all<{ path: string; branch: string }>();
+
+    return {
+      sessions: rows.map(r => ({
+        id: r.id,
+        name: r.name,
+        status: r.status as "busy" | "idle" | "done",
+        profile: r.profile as "coder" | "reviewer" | "tester" | "unknown",
+        worktree: r.worktree ?? undefined,
+        branch: r.branch ?? undefined,
+        windows: r.windows,
+        last_activity: r.last_activity ?? undefined,
+        collected_at: r.collected_at,
+      })),
+      worktrees: (wtResult.results ?? []).map(r => ({ path: r.path, branch: r.branch })),
+      last_sync: lastSync,
+    };
+  }
+
+  async syncSessions(input: {
+    sessions: Array<{ name: string; status: string; profile: string; windows: number; last_activity: number }>;
+    worktrees: Array<{ path: string; branch: string }>;
+    collected_at: string;
+  }) {
+    const now = new Date().toISOString();
+
+    // Upsert each session (id = session name, stable identifier)
+    const stmts = input.sessions.map(s => {
+      const lastActivityIso = s.last_activity
+        ? new Date(s.last_activity * 1000).toISOString()
+        : null;
+
+      // Normalise profile to allowed enum values
+      let profile = s.profile;
+      if (!["coder", "reviewer", "tester"].includes(profile)) profile = "unknown";
+
+      // Normalise status
+      let status = s.status;
+      if (!["busy", "idle", "done"].includes(status)) status = "idle";
+
+      return this.env.DB.prepare(
+        `INSERT INTO agent_sessions (id, name, status, profile, windows, last_activity, collected_at, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ON CONFLICT(id) DO UPDATE SET
+           status       = excluded.status,
+           profile      = excluded.profile,
+           windows      = excluded.windows,
+           last_activity= excluded.last_activity,
+           collected_at = excluded.collected_at,
+           updated_at   = excluded.updated_at`
+      ).bind(s.name, s.name, status, profile, s.windows, lastActivityIso, input.collected_at, now, now);
+    });
+
+    if (stmts.length > 0) {
+      await this.env.DB.batch(stmts);
+    }
+
+    // Remove sessions not present in this batch (stale = terminated)
+    const activeNames = input.sessions.map(s => `'${s.name.replace(/'/g, "''")}'`).join(",");
+    let removed = 0;
+    if (activeNames.length > 0) {
+      const del = await this.env.DB.prepare(
+        `DELETE FROM agent_sessions WHERE id NOT IN (${activeNames})`
+      ).run();
+      removed = del.meta.changes ?? 0;
+    } else {
+      // No sessions reported → clear all
+      const del = await this.env.DB.prepare(`DELETE FROM agent_sessions`).run();
+      removed = del.meta.changes ?? 0;
+    }
+
+    // Upsert worktree info into sessions rows where name matches branch suffix
+    for (const wt of input.worktrees) {
+      const branch = wt.branch.replace(/^refs\/heads\//, "");
+      await this.env.DB.prepare(
+        `UPDATE agent_sessions SET worktree = ?, branch = ? WHERE name LIKE ? AND worktree IS NULL`
+      ).bind(wt.path, branch, `%${branch.split("/").pop() ?? ""}%`).run();
+    }
+
+    return { synced: input.sessions.length, removed };
+  }
+
   private classifyWithRegex(text: string) {
     const lower = text.toLowerCase();
 

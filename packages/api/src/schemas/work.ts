@@ -53,6 +53,49 @@ export const ClassifyInputSchema = z.object({
   text: z.string().min(1).max(500),
 });
 
+// ─── Agent Sessions (F510 M4) ──────────────────────────────────────────────
+
+export const AgentSessionSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  status: z.enum(["busy", "idle", "done"]),
+  profile: z.enum(["coder", "reviewer", "tester", "unknown"]),
+  worktree: z.string().optional(),
+  branch: z.string().optional(),
+  windows: z.number(),
+  last_activity: z.string().optional(),
+  collected_at: z.string(),
+});
+
+export const SessionListSchema = z.object({
+  sessions: z.array(AgentSessionSchema),
+  worktrees: z.array(z.object({
+    path: z.string(),
+    branch: z.string(),
+  })),
+  last_sync: z.string(),
+});
+
+export const SessionSyncInputSchema = z.object({
+  sessions: z.array(z.object({
+    name: z.string(),
+    status: z.string(),
+    profile: z.string(),
+    windows: z.number(),
+    last_activity: z.number(),
+  })),
+  worktrees: z.array(z.object({
+    path: z.string(),
+    branch: z.string(),
+  })),
+  collected_at: z.string(),
+});
+
+export const SessionSyncOutputSchema = z.object({
+  synced: z.number(),
+  removed: z.number(),
+});
+
 export const ClassifyOutputSchema = z.object({
   track: z.enum(["F", "B", "C", "X"]),
   priority: z.enum(["P0", "P1", "P2", "P3"]),
