@@ -173,7 +173,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C37 | C | autopilot Gap% 측정 범위 확장 — Step 5b E2E audit 자동 호출 추가 (FX-REQ-532) | — | DONE | sprint-autopilot SKILL.md Step 5b 신설. Playwright 있을 때 `/ax:e2e-audit coverage` 자동 실행, 갭 시 WARN (중단 안 함) |
 | C38 | C | work-unit-taxonomy 용어사전 + 승격기준 + Milestone정리 (FX-REQ-539) | — | DONE | task orchestrator |
 | C39 | C | task-daemon 자동 감지 근본 개선 — 세션 간 지속성 + 완료 감지 다중화 (FX-REQ-540) | — | DONE | task orchestrator |
-| C40 | C | daemon 3중 감지 dogfood 검증 (FX-REQ-541) | — | PLANNED | task orchestrator |
+| C40 | C | daemon 3중 감지 dogfood 검증 (FX-REQ-541) | — | DONE | task orchestrator |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
