@@ -5,6 +5,8 @@ description: |
   Use when: AI 사업 분석, 사업성 검토, feasibility, cost model, moat, pilot, regulation, ecosystem, partner, IR deck, scale playbook, data strategy, build vs buy
   Triggers: ai-biz, AI 사업, 사업 분석, 사업성, feasibility, 원가, cost model
   Do NOT use for: 일반 코드 리뷰, 인프라 설정, 단순 CRUD 구현
+user-invocable: true
+category: business-analysis
 ---
 
 # ai-biz — AI 사업 분석 스킬셋

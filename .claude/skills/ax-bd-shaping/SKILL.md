@@ -4,13 +4,11 @@ description: |
   AX BD 형상화 파이프라인 (Stage 3→4).
   2단계 발굴 산출물을 입력으로 Phase A(입력 점검) → Phase B(req-interview) → Phase C(O-G-D 형상화 루프) → Phase D(교차 검토 + Six Hats) → Phase E(전문가 5종 리뷰) 실행.
   Phase F(HITL 최종 게이트)는 Sprint 112에서 추가.
-triggers:
-  - 형상화
-  - shaping
-  - "3단계"
-  - BD 형상화
-  - PRD 형상화
-  - ax-bd-shaping
+  Use when: 형상화, shaping, 3단계, BD 형상화, PRD 형상화
+  Triggers: ax-bd-shaping, shaping, 형상화, BD shaping
+  Do NOT use for: 2단계 발굴(ax-bd-discovery 사용), 순수 코드 구현, 배포
+user-invocable: true
+category: business-analysis
 ---
 
 # AX BD 형상화 파이프라인
