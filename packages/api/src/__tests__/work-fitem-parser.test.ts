@@ -107,7 +107,7 @@ describe("parseFItems regex — Phase 36 bracket sub-status", () => {
     const items = parseFItems(row);
     expect(items).toHaveLength(1);
     expect(items[0]).toMatchObject({ id: "F512", status: "in_progress" });
-    expect(items[0].statusRaw).toBe("🔧(design)");
+    expect(items[0]!.statusRaw).toBe("🔧(design)");
   });
 
   it("📋(groomed) is captured and parsed correctly", () => {
@@ -115,7 +115,7 @@ describe("parseFItems regex — Phase 36 bracket sub-status", () => {
     const items = parseFItems(row);
     expect(items).toHaveLength(1);
     expect(items[0]).toMatchObject({ id: "F513", status: "backlog", sprint: "264" });
-    expect(items[0].statusRaw).toBe("📋(groomed)");
+    expect(items[0]!.statusRaw).toBe("📋(groomed)");
   });
 
   it("✅(deployed) is captured and parsed correctly", () => {
@@ -123,7 +123,7 @@ describe("parseFItems regex — Phase 36 bracket sub-status", () => {
     const items = parseFItems(row);
     expect(items).toHaveLength(1);
     expect(items[0]).toMatchObject({ id: "F509", status: "done" });
-    expect(items[0].statusRaw).toBe("✅(deployed)");
+    expect(items[0]!.statusRaw).toBe("✅(deployed)");
   });
 
   it("mixed plain + bracket rows", () => {
