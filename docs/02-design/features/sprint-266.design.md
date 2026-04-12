@@ -173,7 +173,18 @@ Usage:
 
 ---
 
-## §6 파일 매핑 (Worker 할당)
+## §6 Gap Analysis 제외 항목
+
+> Gap Analysis 95.1% (39/41 PASS). 아래 2건은 구현 범위에서 의도적으로 제외함.
+
+| 항목 | 사유 |
+|------|------|
+| C-2: `Active Phase` 라인 갱신 | Phase 전환 빈도가 낮음 (Sprint 수십 회 당 1회). SPEC.md grep 파싱 복잡도 대비 효과 낮아 수동 관리로 충분 |
+| C-4: `docs/INDEX.md` 아카이브 링크 추가 | INDEX.md 구조 복잡 (214개 문서, 자동 생성). archive-phase.sh 이동 후 ax-gov-doc 재실행으로 자동 갱신되는 기존 흐름 활용 |
+
+---
+
+## §7 파일 매핑 (Worker 할당)
 
 | 파일 | 작업 | 크기 |
 |------|------|------|
