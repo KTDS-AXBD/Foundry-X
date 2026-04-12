@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **C33** (PR #510): eslint `no-explicit-any` cleanup — 코드 품질 개선
+- **C33~C37** backlog 5건 PLANNED 등록: lint cleanup / Node 24 / git author 분리 / sidebar link / Gap E2E 확장
+- **ax-plugin infra-selfcheck C9**: Plugin Cache Drift 점검 추가 ([ax-plugin PR #1](https://github.com/KTDS-AXBD/ax-plugin/pull/1)) — Same-HOME source(flat) ↔ cache(versioned `ax/<version>/`) drift 감지. skills/ + hooks/ `diff -rq`, FAIL severity, version 자동 탐지
+- **SessionStart hook L3 확장**: `~/scripts/ax-cache-drift-auto.sh` + settings.json 2nd hook entry — 세션 시작 시 ax-plugin cache drift 자동 알림 (git orphan L3와 동일 패턴)
+- **Landing/README drift 동기화** (PR #508): Sprint 240→261, Phase 29→33 수치 일괄 보정
 - **F509** (Sprint 261, PR #503 `e942b87d`, Gap 98%, 실소요 ~3h): **Phase 33 Work Management Observability Walking Skeleton** — Backlog/REQ/Task/Sprint/Epic 4-channel 통합 뷰 + 자연어 분류 파이프라인. M1 `GET /api/work/snapshot`(SPEC.md GitHub raw + commits + PRs 집계), M2 `/work-management` React Router 4컬럼 Kanban + 5s polling, M3 `GET /api/work/context`(recent commits + next_actions), M4 `POST /api/work/classify`(Claude Sonnet LLM + regex fallback). `/ax:req-interview` dogfood로 PRD 생성 (Phase 2 API Review 73/100 Conditional + ChatGPT flaw §5.2.1 수동 보강). PRD: `docs/specs/fx-work-observability/prd-v1.md`, REQ: FX-REQ-526
 - **E2E work-management.spec.ts** (PR #507 `6a9d395e`): `/ax:e2e-audit Sprint 261`로 coverage gap 0건 감지 후 5 tests 신규 작성 — route render, kanban 4 columns, snapshot polling, tab switching, classify flow (PRD §5.2.1 S1). 모든 mock은 `page.route` fulfill (LLM 의존 제거, CI safe). autopilot Gap 98%의 E2E 측정 범위 한계 실증
 - F508: Phase 32 Integration Gap 해소 — ax 스킬 4종(gov-retro, req-manage, session-end, todo)에 Phase 32 스크립트 통합 + sprint-merge-monitor 3훅 (pr-body-enrich/velocity/epic) + CHANGELOG [Phase 32] 롤업 + priority-history F507 backfill + velocity phase 감지 버그 수정 + Sprint 245~248 velocity backfill + board-sync-spec --fix 모드 (Sprint 255 S255)
