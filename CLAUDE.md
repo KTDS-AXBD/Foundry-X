@@ -27,7 +27,8 @@ turbo test / lint / typecheck  # 전체 검증
 ## Current Phase
 
 Phase 1~33 완료 (Sprint 1~261). Phase 32 Work Management 7/7 ✅ (F501~F507) + 32-E (F508) ✅ + **Phase 33 Work Management Observability** ✅ (F509 fx-work-observability Walking Skeleton, Sprint 261, PR #503, Gap 98%). 상세: SPEC.md §5
-- 신규 backlog 대기 (📋 장기 2건: F112, F117)
+- **Phase 34: 멀티 에이전트 세션 표준화** 📋 (F510 fx-multi-agent-session, FX-REQ-533, Sprint 262 예정). PRD: `docs/specs/fx-multi-agent-session/prd-final.md`
+- 장기 backlog 2건: F112, F117
 - 수치: `/ax:daily-check` 또는 SPEC.md §2 (하드코딩 금지)
 
 ## Deployment
