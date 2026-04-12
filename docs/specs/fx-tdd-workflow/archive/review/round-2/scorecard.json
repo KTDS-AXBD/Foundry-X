@@ -1,0 +1,123 @@
+{
+  "round": 2,
+  "timestamp": "2026-04-12T05:01:58.399Z",
+  "total": 42,
+  "verdict": "검토 필수",
+  "emoji": "⚠️",
+  "item1": {
+    "score": 0,
+    "max": 20,
+    "reason": "밀도 5.7/1K자 (이전 2.9, Δ+2.8)",
+    "totalIssues": 49,
+    "prevIssues": 63,
+    "density": 5.7,
+    "prevDensity": 2.9
+  },
+  "item2": {
+    "score": 20,
+    "max": 30,
+    "details": [
+      {
+        "name": "ChatGPT",
+        "verdict": "Conditional",
+        "ratio": 0.5
+      },
+      {
+        "name": "Gemini",
+        "verdict": "Ready",
+        "ratio": 1
+      },
+      {
+        "name": "DeepSeek",
+        "verdict": "Conditional",
+        "ratio": 0.5
+      }
+    ],
+    "readyPercent": 67,
+    "count": 3
+  },
+  "item3": {
+    "score": 11,
+    "max": 30,
+    "details": [
+      {
+        "name": "핵심 문제 정의",
+        "max": 5,
+        "grade": "최소",
+        "matchedKeywords": [],
+        "score": 3
+      },
+      {
+        "name": "사용자/이해관계자",
+        "max": 5,
+        "grade": "최소",
+        "matchedKeywords": [],
+        "score": 3
+      },
+      {
+        "name": "핵심 기능 범위",
+        "max": 5,
+        "grade": "최소",
+        "matchedKeywords": [
+          "phase"
+        ],
+        "score": 3
+      },
+      {
+        "name": "Out-of-scope",
+        "max": 4,
+        "grade": "최소",
+        "matchedKeywords": [
+          "제외",
+          "scope"
+        ],
+        "score": 2
+      },
+      {
+        "name": "KPI/성공 기준",
+        "max": 6,
+        "score": 0,
+        "grade": "없음"
+      },
+      {
+        "name": "MVP 기준",
+        "max": 5,
+        "score": 0,
+        "grade": "없음"
+      }
+    ]
+  },
+  "item4": {
+    "score": 11,
+    "max": 20,
+    "details": [
+      {
+        "name": "사용자 관점",
+        "max": 7,
+        "grade": "최소",
+        "matchedKeywords": [
+          "온보딩"
+        ],
+        "score": 4
+      },
+      {
+        "name": "기술 관점",
+        "max": 7,
+        "grade": "최소",
+        "matchedKeywords": [
+          "api"
+        ],
+        "score": 4
+      },
+      {
+        "name": "비즈니스 관점",
+        "max": 6,
+        "grade": "최소",
+        "matchedKeywords": [
+          "비즈니스"
+        ],
+        "score": 3
+      }
+    ]
+  }
+}

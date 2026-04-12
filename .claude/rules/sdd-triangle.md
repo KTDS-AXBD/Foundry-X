@@ -15,6 +15,11 @@
 - Gap < 90%: pdca-iterator 자동 개선
 - Gap ≥ 90%: 완료 보고서 작성
 
+## TDD 순서 원칙
+- SPEC 등록 → Red(테스트) → Green(구현) → Gap Analysis
+- Spec↔Code↔Test 동기화의 **순서**를 명시: Test가 Code보다 먼저
+- 상세: `.claude/rules/tdd-workflow.md`
+
 ## 동기화 주기
 - 5세션마다 1회 또는 수동 운영(벌크 승인, DB 직접 조작) 후 즉시 점검
 - 수치/상태/리스크/Phase 명칭/REQ 완전성 확인

@@ -1,0 +1,323 @@
+{
+  "generated": "2026-04-12T05:01:58.385Z",
+  "totalItems": 52,
+  "byType": {
+    "flaw": 11,
+    "gap": 6,
+    "risk": 32
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**문제의 우선순위와 영향도**: TDD 커밋 분리 미흡이 실제로 어떤 품질/생산성 문제를 유발했는지, 조직 내에서 얼마나 시급한 pain point인지 근거가 약함. 단순히 \"테스트와 구현이 섞여있다\"가 왜 당장 개선해야 할 문제인지, 구체적 사례(예: QA/리뷰 실패, 버그 재발 등)에 기반한 논거 보강 필요.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**성공기준↔실행 사이 브릿지**: 정량 목표(커밋 분리율 85% 이상 등)는 있으나, 실제로 이 수치가 왜 의미 있는지, 조직/팀의 KPI와 연결되는지 논리적 설득력이 약함. 예를 들어 \"TDD 커밋 분리율이 높으면 어떤 문제가 줄어드는가\"가 명확히 뒷받침되어야 함.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**shared 패키지 전략**: shared에 대해 \"smoke 수준 런타임 테스트를 도입\"한다지만, 그 구체적 기준(어떤 함수/로직에, 어느 수준까지, 누가/어떻게 트리거하는가)이 애매함. 이로 인해 나중에 shared 관련 관리 혼선 가능성 높음.",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실행 책임/Owner 명확화**: 각 Phase(규칙 배포, 첫 적용, 회고, 교육, 예외 승인 등)별 담당자, 책임자, Reviewer 명확화가 부족. \"팀장/PL/Reviewer\" 범용적 언급 대신, 실명 or 롤(예: FE팀 리드, QA팀, DevOps 담당 등) 지정 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실제 적용 PoC/Trial Sprint**: 전사/전체 신규 F-item에 일괄 도입하기 전, 1~2개 팀/아이템에서 Pilot Sprint를 먼저 돌려보고, 문제/저항/자동화 도구/회고 결과를 반영하는 Step이 없음.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**교육/온보딩의 실전화**: 단순 Kick-off 세션, 온보딩 문서 제공만으로는 부족. \"실제 PR 리뷰/코드리뷰에서 Red/Green/Refactor 구분, 예외 승인, 자동화 도구 사용법\" 등 실무 중심의 워크샵/실습 기반 교육 계획이 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트 품질 검증/계량화**: \"커밋 분리율\" 등 형식적 지표 외에, 실제 테스트가 무의미하거나 형식적으로 작성되는(=실질적 가치 없는 assertion) 문제에 대한 방지책 부족. Reviewers가 assertion의 실질적 의미/품질을 검증하는 구체적 체크리스트/가이드 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트 데이터/Mock 관리**: make*() 팩토리 패턴 언급은 있으나, 실질적으로 테스트 데이터/Mock이 복잡해질 경우(특히 E2E/동시성/대규모 시나리오) 관리 체계/자동화 방법에 대한 계획이 부족.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**CI/CD 통합/Fail Fast**: TDD 커밋 분리 미준수 시 CI 단계에서 어떻게 Fail Fast(즉시 PR 차단 등) 또는 Soft Warning(통과는 하되 이슈화) 처리할지 세부 정책 부재. PR linter가 어떤 수준에서 차단하거나, Reviewer가 override할 수 있는지 등의 디테일이 미흡.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**문제의 우선순위와 영향도**: TDD 커밋 분리 미흡이 실제로 어떤 품질/생산성 문제를 유발했는지, 조직 내에서 얼마나 시급한 pain point인지 근거가 약함. 단순히 \"테스트와 구현이 섞여있다\"가 왜 당장 개선해야 할 문제인지, 구체적 사례(예: QA/리뷰 실패, 버그 재발 등)에 기반한 논거 보강 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**성공기준↔실행 사이 브릿지**: 정량 목표(커밋 분리율 85% 이상 등)는 있으나, 실제로 이 수치가 왜 의미 있는지, 조직/팀의 KPI와 연결되는지 논리적 설득력이 약함. 예를 들어 \"TDD 커밋 분리율이 높으면 어떤 문제가 줄어드는가\"가 명확히 뒷받침되어야 함.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**shared 패키지 전략**: shared에 대해 \"smoke 수준 런타임 테스트를 도입\"한다지만, 그 구체적 기준(어떤 함수/로직에, 어느 수준까지, 누가/어떻게 트리거하는가)이 애매함. 이로 인해 나중에 shared 관련 관리 혼선 가능성 높음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**문화적 저항/현장 실행력 저하**: 실무 일정 압박, 신규 입사자/외주/Legacy 병행 상황에서 \"Red-먼저→Green→커밋 분리\"가 실제로 실행/정착되지 않을 위험. (→ 형식적 분리→테스트 품질 저하→팀별 편차 심화)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**자동화 도구 미성숙/운영 오류**: PR linter, TDD Dashboard 등 통제장치가 불안정할 경우, 오히려 개발 효율 저하/혼란 유발.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**shared/특수 영역 관리 혼선**: shared smoke test 도입/제외 기준 불명확→실무 혼선→PR 리뷰/커버리지 통계 왜곡.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**형식적 지표만 추구**: 커밋 분리율/커버리지 등 수치만 맞추고, 실제로는 의미 없는 테스트/커밋이 남발될 위험(=실질적 품질 개선 실패).",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**교육/온보딩 부실**: 문서/FAQ만으로 실전 내재화 미흡→팀별/개발자별 이해 편차.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "flaw",
+      "source": "Gemini",
+      "text": "착수 판단: Ready / Not Ready / Conditional\n\n**착수 판단: Ready**\n\n이 PRD는 TDD 도입이라는 중요한 문화적/기술적 변화를 성공적으로 이끌기 위한 모든 핵심 요소를 매우 상세하고 현실적으로 담고 있습니다. 특히 v2 업데이트를 통해 성공 기준, Change Management, 자동화 지원, 예외 처리, 리스크 관리 ",
+      "severity": "high"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**AI(Claude Code)의 능동적 활용**: 단순히 AI가 코드/테스트를 생성하는 것을 넘어, \"Red→Green→Commit\"과 같은 특정 TDD 사이클 및 커밋 컨벤션을 *실질적으로 유도하고 검증하는* 역할로 Claude Code를 명시적으로 활용하려는 시도가 독특합니다. `/.claude/rules/tdd-workflow.md` 파일 생성, C",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**종합적인 Change Management 전략**: TDD 도입은 단순한 기술 적용을 넘어 개발 문화 변화를 수반합니다. 이 PRD는 교육, 온보딩, 예외 정책, 롤백, 성공 기준, 리스크 관리 등 Change Management에 필요한 거의 모든 요소를 상세하게 포함하고 있어, 단순히 TDD를 '하라'고 지시하는 것이 아니라 '성공적으로 도입하고 안",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**단계적/유연한 적용 범위**: \"필수/권장/선택/면제\" 등급을 명확히 하여 무리한 일괄 적용을 피하고, Hotfix, 레거시 코드 등 예외 상황을 구체적으로 명시한 점은 현실적인 도입 전략으로, 개발자들의 저항을 줄이고 실제 업무 효율을 높이는 데 기여할 것입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**초기 생산성 저하 (가장 큰 장벽)**: TDD는 초기 학습 곡선과 추가적인 테스트 작성 시간으로 인해 생산성 저하를 유발할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**학습 곡선 및 익숙하지 않은 워크플로우**: TDD에 익숙하지 않은 개발자들에게는 새로운 사고방식과 작업 방식이 요구됩니다. 특히 '테스트 먼저'라는 역발상적 접근이 어렵게 느껴질 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**오버헤드 및 형식적인 테스트 작성 우려**: 모든 코드에 TDD를 적용하려는 강박이 생기거나, 'Red-Green-Commit' 규칙을 맞추기 위한 형식적인 테스트를 작성하게 될 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**AI 도구의 의존성 및 신뢰성**: Claude Code의 TDD 코칭 및 검증 기능이 기대만큼 강력하지 않거나, 오작동할 경우 개발자들의 불신을 초래할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "누락된 시장 관점: 시장/경쟁/트렌드 측면에서 고려되지 않은 것은?\n\n이 PRD는 매우 상세하고 포괄적이지만, 시장/경쟁/트렌드 관점에서 몇 가지 추가적으로 고려해볼 만한 사항이 있습니다.\n\n*   **TDD의 다양한 접근 방식 (School of TDD)**: PRD는 'Red-Green-Commit'이라는 고전적인 TDD 사이클을 강조합니다. 하지만 T",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "착수 판단: Ready / Not Ready / Conditional\n\n**착수 판단: Ready**\n\n이 PRD는 TDD 도입이라는 중요한 문화적/기술적 변화를 성공적으로 이끌기 위한 모든 핵심 요소를 매우 상세하고 현실적으로 담고 있습니다. 특히 v2 업데이트를 통해 성공 기준, Change Management, 자동화 지원, 예외 처리, 리스크 관리 ",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Ready",
+      "severity": "info"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**Vitest/Playwright 스택**: 기존 인프라와 호환되므로 기술적 실현 가능함",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**E2E 테스트의 Red Phase 한계**: PRD에서 인정한 대로 Playwright E2E에서 \"구현 zero\"는 사실상 불가능. Route mocking, response stubbing 등은 이미 구현의 일부임. 이는 TDD 원칙의 근본적 훼손 가능성 있음",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**Ink-testing-library 신뢰성**: 터미널 렌더링 테스트의 flaky 특성으로 인해 Red Phase의 실패 검증이 신뢰할 수 없음. \"논리상 실패\" 판단은 주관적 기준이 될 수 있음",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**shared 패키지 테스트 부재**: TypeScript strict mode만으로 런타임 오류 방지 불가능한 점은 정확한 지적. 그러나 \"smoke test 수준\"이라는 모호한 기준은 실효성 의문",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**생산성 저하 리스크**: Red→Green 커밋 분리로 인한 컨텍스트 스위칭 오버헤드가 Sprint velocity에 10% 이상 영향 줄 가능성 높음. 특히 복잡한 비즈니스 로직에서 더 심각",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**테스트 품질 형식화**: 규칙 준수에 집중하여 무의미한 테스트(assertion만 있는) 증가 가능성. 테스트 커버리지 수치는 유지되나 실제 결함 발견율 저하",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**팀 저항과 규칙 유지 실패**: 강제적 규칙에 대한 개발자 저항으로 \"예외\" 사례가 점차 확대될 가능성 높음. PR 리뷰어의 부담 증가로 인한 병목 발생",
+      "severity": "high"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Vitest/Playwright 스택**: 기존 인프라와 호환되므로 기술적 실현 가능함",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**E2E 테스트의 Red Phase 한계**: PRD에서 인정한 대로 Playwright E2E에서 \"구현 zero\"는 사실상 불가능. Route mocking, response stubbing 등은 이미 구현의 일부임. 이는 TDD 원칙의 근본적 훼손 가능성 있음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Ink-testing-library 신뢰성**: 터미널 렌더링 테스트의 flaky 특성으로 인해 Red Phase의 실패 검증이 신뢰할 수 없음. \"논리상 실패\" 판단은 주관적 기준이 될 수 있음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**shared 패키지 테스트 부재**: TypeScript strict mode만으로 런타임 오류 방지 불가능한 점은 정확한 지적. 그러나 \"smoke test 수준\"이라는 모호한 기준은 실효성 의문",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**생산성 저하 리스크**: Red→Green 커밋 분리로 인한 컨텍스트 스위칭 오버헤드가 Sprint velocity에 10% 이상 영향 줄 가능성 높음. 특히 복잡한 비즈니스 로직에서 더 심각",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**테스트 품질 형식화**: 규칙 준수에 집중하여 무의미한 테스트(assertion만 있는) 증가 가능성. 테스트 커버리지 수치는 유지되나 실제 결함 발견율 저하",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**팀 저항과 규칙 유지 실패**: 강제적 규칙에 대한 개발자 저항으로 \"예외\" 사례가 점차 확대될 가능성 높음. PR 리뷰어의 부담 증가로 인한 병목 발생",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**계층별 TDD 적용 수준 명확화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**테스트 계약(Test Contract) 명세화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**자동화 인프라 선행 구축**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**피드백 루프 단축**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Pilot 프로젝트 선정**: 1~2개 F-item에 대해 소규모 팀으로 2주간 시범 적용 후 효과 측정",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**자동화 도구 선구축**: PR Linter, 커밋 규칙 검증, TDD 준수율 리포트 도구를 먼저 구현",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**명확한 롤백 기준 수립**: Story Point 소화량 20% 이상 감소 또는 PR Cycle Time 30% 이상 증가 시 즉시 중단할 명확한 메트릭 정의",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**shared 패키지 테스트 전략 재정의**: \"smoke test\" 대신 핵심 유틸리티에 대한 실제 단위 테스트 필수화 방안 수립",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}

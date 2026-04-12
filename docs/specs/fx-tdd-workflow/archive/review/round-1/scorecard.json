@@ -1,0 +1,115 @@
+{
+  "round": 1,
+  "timestamp": "2026-04-12T04:58:01.151Z",
+  "total": 53,
+  "verdict": "검토 필수",
+  "emoji": "⚠️",
+  "item1": {
+    "score": 20,
+    "max": 20,
+    "reason": "초안 검토 — 스킵(만점)",
+    "skipped": true,
+    "totalIssues": 63,
+    "density": 2.9
+  },
+  "item2": {
+    "score": 20,
+    "max": 30,
+    "details": [
+      {
+        "name": "ChatGPT",
+        "verdict": "Conditional",
+        "ratio": 0.5
+      },
+      {
+        "name": "Gemini",
+        "verdict": "Ready",
+        "ratio": 1
+      },
+      {
+        "name": "DeepSeek",
+        "verdict": "Conditional",
+        "ratio": 0.5
+      }
+    ],
+    "readyPercent": 67,
+    "count": 3
+  },
+  "item3": {
+    "score": 9,
+    "max": 30,
+    "details": [
+      {
+        "name": "핵심 문제 정의",
+        "max": 5,
+        "grade": "최소",
+        "matchedKeywords": [],
+        "score": 3
+      },
+      {
+        "name": "사용자/이해관계자",
+        "max": 5,
+        "grade": "최소",
+        "matchedKeywords": [],
+        "score": 3
+      },
+      {
+        "name": "핵심 기능 범위",
+        "max": 5,
+        "grade": "최소",
+        "matchedKeywords": [
+          "phase"
+        ],
+        "score": 3
+      },
+      {
+        "name": "Out-of-scope",
+        "max": 4,
+        "score": 0,
+        "grade": "없음"
+      },
+      {
+        "name": "KPI/성공 기준",
+        "max": 6,
+        "score": 0,
+        "grade": "없음"
+      },
+      {
+        "name": "MVP 기준",
+        "max": 5,
+        "score": 0,
+        "grade": "없음"
+      }
+    ]
+  },
+  "item4": {
+    "score": 4,
+    "max": 20,
+    "details": [
+      {
+        "name": "사용자 관점",
+        "max": 7,
+        "score": 0,
+        "grade": "없음",
+        "matchedKeywords": []
+      },
+      {
+        "name": "기술 관점",
+        "max": 7,
+        "grade": "최소",
+        "matchedKeywords": [
+          "아키텍처",
+          "api"
+        ],
+        "score": 4
+      },
+      {
+        "name": "비즈니스 관점",
+        "max": 6,
+        "score": 0,
+        "grade": "없음",
+        "matchedKeywords": []
+      }
+    ]
+  }
+}

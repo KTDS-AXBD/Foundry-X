@@ -20,3 +20,11 @@
 ## Test Data
 - 중앙 fixture factory: `test-data.ts` (CLI), `mock-factory.ts` (E2E)
 - 패턴: `make*()` + spread override
+
+## TDD 사이클 (Red-Green-Commit)
+- 신규 F-item 서비스 로직과 E2E 시나리오에 적용
+- 상세 절차: `.claude/rules/tdd-workflow.md` 참조 (SSOT)
+- Claude Code 지시 패턴:
+  - Red: "TDD Red phase — 테스트만 작성, 구현 금지"
+  - 확인: "구현하지 말고 테스트만 실행해서 실패 확인"
+  - Green: "이 테스트를 통과시키는 코드 작성, 테스트 수정 금지"

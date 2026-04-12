@@ -1,0 +1,407 @@
+{
+  "generated": "2026-04-12T04:58:01.149Z",
+  "totalItems": 66,
+  "byType": {
+    "flaw": 12,
+    "gap": 18,
+    "risk": 33
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**문제-해결-성공기준**의 논리 흐름이 비교적 명확합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**단계별 절차**와 **커밋 메시지 컨벤션** 등 실무에 필요한 세부 가이드가 구체적입니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**실제 예시 및 Claude Code 세션 흐름**을 제공하여 추상적이지 않고, 실제 업무 적용을 상정하고 있습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**성공기준이 정량적으로 충분히 명시되어 있지 않습니다.**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**\"생산성 저하 없음\" 등 부정적 영향에 대한 기준선**도 필요합니다(예: 스프린트별 Story Point 소화량 변화폭, PR cycle time 등).",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**실제 현업에서의 예외적 상황(급한 hotfix, legacy 대규모 변경 등)에 대한 예외 처리 기준**이 부족합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**shared 패키지(테스트 0개)의 개선 방안 언급 부족**: 왜 shared는 테스트가 0개인지, 향후 방침은 무엇인지 모호합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**Change Management 및 교육/온보딩 플랜 수립**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**실행 후 검증 체계 추가**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**자동화 지원 도구 설계**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**예외/롤백/Hotfix 정책 명문화**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**적용 범위/우선순위 명확화**",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Change Management/교육/문서화 방안**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**자동화 지원 도구/Fail-safe**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**성과 측정/피드백 루프**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Roll-back/예외 상황 대응**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Stakeholder Alignment**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**팀/조직 단위 저항 및 일관성 붕괴**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**생산성 저하 및 일정 지연**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**커밋/PR 규칙 미준수**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트 품질의 형식화(무의미한 assertion 남발, 과적합 검증 형식화)**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**기존 코드와 신규 코드 사이의 관리 혼란**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Change Management/교육/문서화 방안**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**자동화 지원 도구/Fail-safe**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**성과 측정/피드백 루프**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Roll-back/예외 상황 대응**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Stakeholder Alignment**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**팀/조직 단위 저항 및 일관성 붕괴**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**생산성 저하 및 일정 지연**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**커밋/PR 규칙 미준수**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트 품질의 형식화(무의미한 assertion 남발, 과적합 검증 형식화)**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**기존 코드와 신규 코드 사이의 관리 혼란**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Change Management 및 교육/온보딩 플랜 수립**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실행 후 검증 체계 추가**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**자동화 지원 도구 설계**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**예외/롤백/Hotfix 정책 명문화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**적용 범위/우선순위 명확화**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**매우 상세하고 체계적인 계획**: TDD 사이클 정의부터 AI 연동, Git Workflow, PDCA 통합, 구체적인 코드 예시, 심지어 회고 계획까지, 도입에 필요한 모든 단계와 고려사항이 놀랍도록 상세하게 기술되어 있습니다. 이는 성공적인 도입을 위한 강력한 기반이 됩니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**AI 시대의 TDD 재조명**: AI 코딩 어시스턴트의 등장으로 TDD는 새로운 전성기를 맞고 있습니다. 이 PRD는 이러한 트렌드를 정확히 읽고 AI를 TDD의 촉매제로 활용하려는 전략적 시도입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**내부 환경에 최적화된 접근**: Foundry-X의 특정 기술 스택(WSL, Claude Code, Vitest, Playwright)과 기존 개발 프로세스(PDCA, `.claude/skills`)에 맞춰 커스터마이징된 계획은 외부 솔루션을 획일적으로 적용하는 것보다 훨씬 높은 성공 가능성을 가집니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**점진적 도입 및 피드백 루프**: \"필수\", \"권장\", \"선택\", \"면제\" 등급을 통해 점진적으로 도입하고, 2~3 Sprint 후 회고를 통해 조정하려는 계획은 현실적이고 유연한 접근 방식입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**명확한 문제 인식 및 해결 방안**: \"테스트-먼저 커밋 분리가 규칙화되지 않음\"이라는 핵심 갭을 명확히 인식하고, Red-Green-Commit 사이클을 통해 이를 해결하려는 의지가 뚜렷합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "사용자 관점: 목표 사용자가 실제로 이 솔루션을 받아들일 것 같나요?\n   - 도입 장벽이 있다면?\n\n**사용자 수용 가능성**: **높음 (단, 초기 교육 및 성공 사례 공유가 중요)**\n\n*   **긍정적 요인**:\n    *   **AI 어시스턴트 활용**: 개발자들은 이미 AI 코딩 어시스턴트에 대한 높은 관심을 가지고 있으며, 이를 활용하여 작업 ",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Ready",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**Git Workflow와의 충돌**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**동시성 및 상태 관리 테스트 누락**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**테스트 데이터 관리 복잡도**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**기술 스택 측면**: Vitest + Playwright 조합은 기존 환경과 호환되며 TDD 사이클 자체는 구현 가능",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**주요 제약사항**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**shared 패키지 테스트 부재(0개)**가 치명적 리스크. 타입 의존성만으로는 런타임 오류를 방지할 수 없음. TDD 도입 전 shared에 대한 기본 테스트 프레임워크 구축이 선행되어야 함",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**E2E 테스트의 Red Phase 실현 불가능**: Playwright spec 작성 시 이미 mock/route 설정이 구현 로직을 포함. \"구현 zero\" 원칙 위반",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**컴포넌트 테스트 환경 불안정**: Ink-testing-library + Vitest 조합에서 실제 터미널 렌더링과의 차이로 인해 Red Phase 실패 검증이 신뢰할 수 없음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**규칙 파일 분산 문제**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**PDCA 연동의 구조적 문제**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Git Workflow와의 충돌**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**동시성 및 상태 관리 테스트 누락**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**테스트 데이터 관리 복잡도**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Red Phase의 실패 검증 신뢰성 문제**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**팀 생산성 저하 및 저항 가능성**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**테스트 피라미드 불균형 가속화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**shared 패키지 테스트 프레임워크 구축 완료**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**단계적 롤아웃 전략 수립**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**통합 테스트 아키텍처 개선**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**규칙 통합 및 단순화**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}
