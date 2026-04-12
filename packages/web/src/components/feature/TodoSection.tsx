@@ -23,12 +23,8 @@ import { Badge } from "@/components/ui/badge";
 /* ------------------------------------------------------------------ */
 
 const NEXT_ACTIONS: Record<number, { label: string; href: string }> = {
-  1: { label: "아이디어 등록", href: "/discovery" },
   2: { label: "평가 실행", href: "/discovery?tab=process" },
   3: { label: "사업기획서 작성", href: "/shaping/business-plan" },
-  4: { label: "검증 기록", href: "/validation" },
-  5: { label: "MVP/PoC 추적", href: "/product" },
-  6: { label: "선제안 작성", href: "/gtm/outreach" },
 };
 
 /* ------------------------------------------------------------------ */
@@ -47,12 +43,8 @@ interface BizItemSummary {
 /* ------------------------------------------------------------------ */
 
 const stageColors = [
-  "bg-blue-500",
   "bg-violet-500",
   "bg-amber-500",
-  "bg-green-500",
-  "bg-indigo-500",
-  "bg-rose-500",
 ];
 
 function StageIndicator({ current }: { current: number }) {
@@ -157,8 +149,8 @@ export function TodoSection() {
       {!loading && !error && items.length === 0 && (
         <div className="py-8 text-center text-sm text-muted-foreground">
           진행 중인 사업 아이템이 없어요.{" "}
-          <Link to="/collection/sr" className="text-primary underline">
-            SR 등록
+          <Link to="/discovery/items" className="text-primary underline">
+            발굴 시작
           </Link>
           으로 시작해 보세요.
         </div>
@@ -167,7 +159,7 @@ export function TodoSection() {
       {!loading && !error && items.length > 0 && (
         <div className="space-y-3">
           {items.map((item) => {
-            const next = NEXT_ACTIONS[item.currentStage] ?? NEXT_ACTIONS[1]!;
+            const next = NEXT_ACTIONS[item.currentStage] ?? NEXT_ACTIONS[2]!;
             return (
               <div
                 key={item.bizItemId}

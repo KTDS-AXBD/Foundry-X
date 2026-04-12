@@ -3,12 +3,8 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import {
-  Inbox,
   Search,
   PenTool,
-  CheckCircle,
-  Rocket,
-  TrendingUp,
   X,
   ArrowRight,
   Bot,
@@ -36,18 +32,6 @@ interface StageInfo {
 
 const STAGES: StageInfo[] = [
   {
-    stage: 1,
-    label: "수집",
-    icon: Inbox,
-    color: "text-blue-500 bg-blue-500/10 border-blue-500/20",
-    description:
-      "고객 요청(SR), IR 제안, 외부 채널에서 사업 아이디어를 수집하는 단계예요. 다양한 출처에서 원석을 모으는 것이 목표예요.",
-    agentHelp:
-      "AI가 SR을 자동 분류하고, 유사 아이템을 감지하여 중복 등록을 방지해요.",
-    nextAction: { label: "아이디어 발굴로 이동", href: "/discovery/items" },
-    paths: ["/collection/sr", "/collection/field", "/collection/ideas"],
-  },
-  {
     stage: 2,
     label: "발굴",
     icon: Search,
@@ -57,7 +41,7 @@ const STAGES: StageInfo[] = [
     agentHelp:
       "AI가 시장 분석, 경쟁사 조사, BMC 초안 자동 생성을 도와요. Six Hats 토론으로 다각도 검증도 가능해요.",
     nextAction: { label: "Spec 형상화로 이동", href: "/shaping/prd" },
-    paths: ["/discovery/items", "/ax-bd/ideas", "/ax-bd/bmc", "/discovery/progress"],
+    paths: ["/discovery/items", "/discovery/ideas-bmc", "/discovery/progress"],
   },
   {
     stage: 3,
@@ -68,44 +52,8 @@ const STAGES: StageInfo[] = [
       "검증된 아이디어를 Spec 문서, 사업제안서, Offering Pack으로 구체화하는 단계예요.",
     agentHelp:
       "AI가 NL(자연어) 요구사항을 Spec으로 변환하고, 사업제안서 초안을 자동 생성해요.",
-    nextAction: { label: "파이프라인 검증으로", href: "/validation/pipeline" },
-    paths: ["/shaping/prd", "/shaping/proposal", "/shaping/offering"],
-  },
-  {
-    stage: 4,
-    label: "검증/공유",
-    icon: CheckCircle,
-    color: "text-green-500 bg-green-500/10 border-green-500/20",
-    description:
-      "ORB/PRB 게이트를 통과하고, 산출물을 공유하여 팀과 의사결정자의 승인을 받는 단계예요.",
-    agentHelp:
-      "AI가 게이트 문서 패키지를 자동 수집하고, 산출물 공유 링크를 생성해요.",
-    nextAction: { label: "MVP 제작으로", href: "/product/mvp" },
-    paths: ["/validation/pipeline"],
-  },
-  {
-    stage: 5,
-    label: "제품화",
-    icon: Rocket,
-    color: "text-indigo-500 bg-indigo-500/10 border-indigo-500/20",
-    description:
-      "승인된 아이템의 MVP를 제작하고, PoC 배포를 진행하는 단계예요.",
-    agentHelp:
-      "AI가 MVP 상태를 추적하고, 프로토타입 자동 생성 파이프라인을 지원해요.",
-    nextAction: { label: "GTM 준비로", href: "/gtm/projects" },
-    paths: ["/product/mvp"],
-  },
-  {
-    stage: 6,
-    label: "GTM",
-    icon: TrendingUp,
-    color: "text-rose-500 bg-rose-500/10 border-rose-500/20",
-    description:
-      "완성된 제품을 시장에 출시하고, 프로젝트 현황을 모니터링하는 최종 단계예요.",
-    agentHelp:
-      "AI가 KPI를 자동 수집하고, 프로젝트 건강도를 실시간으로 추적해요.",
-    nextAction: { label: "대시보드로", href: "/dashboard" },
-    paths: ["/gtm/projects"],
+    nextAction: { label: "Offering 작성으로", href: "/shaping/offerings" },
+    paths: ["/shaping/prd", "/shaping/proposal", "/shaping/offering", "/shaping/offerings"],
   },
 ];
 
@@ -214,8 +162,8 @@ export function ResetStageGuides() {
   const [hidden, setHidden] = useState(false);
 
   const reset = () => {
-    for (let i = 1; i <= 6; i++) {
-      localStorage.removeItem(STORAGE_PREFIX + i);
+    for (const stage of STAGES) {
+      localStorage.removeItem(STORAGE_PREFIX + stage.stage);
     }
     setHidden(true);
     setTimeout(() => setHidden(false), 2000);
