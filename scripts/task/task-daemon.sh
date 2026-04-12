@@ -26,7 +26,8 @@ source "$SCRIPT_DIR/lib.sh"
 REPO_ROOT=$(_repo_root)
 PROJECT=$(basename "$REPO_ROOT" 2>/dev/null || _project_name 2>/dev/null || echo "unknown")
 
-DAEMON_PID_FILE="/tmp/task-signals/.daemon.pid"
+DAEMON_PID_FILE="$FX_HOME/daemon.pid"        # /tmp 대신 ~/.foundry-x — 재부팅 후에도 경로 유지
+DAEMON_HEARTBEAT="$FX_HOME/daemon-heartbeat" # 세션 시작 시 stale 감지용
 DAEMON_LOG="/tmp/task-signals/daemon-${PROJECT}.log"
 SNAPSHOT_DIR="/tmp/task-signals/snapshots"
 FAILURE_LOG="$FX_HOME/watch-failures.ndjson"
@@ -34,7 +35,7 @@ QUEUE_FILE="$FX_HOME/task-queue.ndjson"
 
 TICK=15  # 매 15초마다 전체 사이클
 
-mkdir -p "$SNAPSHOT_DIR" /tmp/task-signals
+mkdir -p "$FX_HOME" "$SNAPSHOT_DIR" /tmp/task-signals
 [ -f "$QUEUE_FILE" ] || : > "$QUEUE_FILE"
 [ -f "$FAILURE_LOG" ] || : > "$FAILURE_LOG"
 
@@ -486,7 +487,106 @@ enqueue_retry() {
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
-# Phase 5: 자가 학습 (실패 로그 → 패턴 보완 제안)
+# Phase 5a: Merged PR 스캔 (signal 2차 경로)
+# gh pr list --state merged로 미처리 task PR을 감지 → 합성 signal 생성
+# 호출 주기: 4 tick (~60초)
+# ═══════════════════════════════════════════════════════════════════════════
+phase_merged_prs() {
+  command -v gh >/dev/null 2>&1 || return 0
+
+  local merged_prs
+  merged_prs=$(gh pr list \
+    --repo "KTDS-AXBD/Foundry-X" \
+    --state merged \
+    --limit 30 \
+    --json number,headRefName 2>/dev/null) || return 0
+
+  echo "$merged_prs" \
+    | jq -r '.[] | select(.headRefName | startswith("task/")) | "\(.number)|\(.headRefName)"' 2>/dev/null \
+    | while IFS='|' read -r pr_num branch; do
+        # branch task/C39-slug → C39
+        local task_id
+        task_id=$(echo "$branch" | sed 's|task/||' | grep -oE '^[A-Z][0-9]+' || true)
+        [ -n "$task_id" ] || continue
+
+        local status
+        status=$(jq -r --arg id "$task_id" '.tasks[$id].status // "unknown"' "$FX_CACHE" 2>/dev/null)
+        [ "$status" = "in_progress" ] || continue
+
+        local sig_file="${FX_SIGNAL_DIR}/${PROJECT}-${task_id}.signal"
+        [ -f "$sig_file" ] && continue
+
+        log "🔍 merged PR #${pr_num} (branch=${branch}) — ${task_id} 미처리 감지"
+        local wt_path pane_id task_branch
+        wt_path=$(jq -r --arg id "$task_id" '.tasks[$id].wt // ""' "$FX_CACHE" 2>/dev/null)
+        pane_id=$(jq -r --arg id "$task_id" '.tasks[$id].pane // ""' "$FX_CACHE" 2>/dev/null)
+        task_branch=$(jq -r --arg id "$task_id" '.tasks[$id].branch // ""' "$FX_CACHE" 2>/dev/null)
+
+        write_signal "$task_id" "DONE" \
+          "BRANCH=${task_branch:-$branch}" \
+          "PR_URL=https://github.com/KTDS-AXBD/Foundry-X/pull/${pr_num}" \
+          "COMMIT_COUNT=1" \
+          "WT_PATH=${wt_path}" \
+          "PANE_ID=${pane_id}"
+        log "📡 ${task_id}: merged PR signal 합성 (PR #${pr_num})"
+      done
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Phase 5b: WT orphan 스캔 (signal 3차 경로)
+# remote에서 task/ 브랜치가 사라진 로컬 WT 감지 → PR merge 확인 → 합성 signal
+# 호출 주기: 4 tick (~60초), phase_merged_prs와 2 tick 오프셋
+# ═══════════════════════════════════════════════════════════════════════════
+phase_orphan_wts() {
+  command -v gh >/dev/null 2>&1 || return 0
+
+  local remote_refs
+  remote_refs=$(cd "$REPO_ROOT" && git ls-remote --heads origin 'refs/heads/task/*' 2>/dev/null \
+    | awk '{print $2}' | sed 's|refs/heads/||') || return 0
+
+  cd "$REPO_ROOT" && git worktree list --porcelain 2>/dev/null \
+    | awk '/^worktree /{wt=$2} /^branch /{print wt "|" $2}' \
+    | grep '|refs/heads/task/' \
+    | while IFS='|' read -r wt_path ref; do
+        local branch="${ref#refs/heads/}"
+        printf '%s\n' "$remote_refs" | grep -qxF "$branch" && continue
+
+        local task_id
+        task_id=$(echo "$branch" | sed 's|task/||' | grep -oE '^[A-Z][0-9]+' || true)
+        [ -n "$task_id" ] || continue
+
+        local status
+        status=$(jq -r --arg id "$task_id" '.tasks[$id].status // "unknown"' "$FX_CACHE" 2>/dev/null)
+        [ "$status" = "in_progress" ] || continue
+
+        local sig_file="${FX_SIGNAL_DIR}/${PROJECT}-${task_id}.signal"
+        [ -f "$sig_file" ] && continue
+
+        # remote branch 소멸 → merged PR 확인
+        local pr_num
+        pr_num=$(gh pr list \
+          --repo "KTDS-AXBD/Foundry-X" \
+          --head "$branch" \
+          --state merged \
+          --json number \
+          --jq '.[0].number // ""' 2>/dev/null) || continue
+        [ -n "$pr_num" ] || continue
+
+        log "🔍 WT orphan: ${task_id} (remote branch 소멸 → PR #${pr_num} merged)"
+        local pane_id
+        pane_id=$(jq -r --arg id "$task_id" '.tasks[$id].pane // ""' "$FX_CACHE" 2>/dev/null)
+        write_signal "$task_id" "DONE" \
+          "BRANCH=${branch}" \
+          "PR_URL=https://github.com/KTDS-AXBD/Foundry-X/pull/${pr_num}" \
+          "COMMIT_COUNT=1" \
+          "WT_PATH=${wt_path}" \
+          "PANE_ID=${pane_id}"
+        log "📡 ${task_id}: WT orphan signal 합성 (PR #${pr_num})"
+      done
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Phase 6: 자가 학습 (실패 로그 → 패턴 보완 제안)
 # ═══════════════════════════════════════════════════════════════════════════
 phase_learn() {
   # 매 100 tick (= ~25분)마다 실행
@@ -516,11 +616,23 @@ run_daemon() {
   local tick_count=0
 
   while true; do
+    # heartbeat 갱신 — SessionStart가 stale 여부를 판단하는 기준
+    date -u +%Y-%m-%dT%H:%M:%SZ > "$DAEMON_HEARTBEAT"
+
     phase_signals    # signal 감지 → merge → cleanup
     phase_watch      # pane 감시 → 권한승인 / 완료감지 / idle 감지
     phase_queue      # 큐 여유 → 자동 task 시작
 
     tick_count=$((tick_count + 1))
+
+    # 매 4 tick (~60초): 완료 감지 2차/3차 경로
+    # 오프셋을 두어 같은 tick에 두 gh API 호출이 겹치지 않게 함
+    if [ $((tick_count % 4)) -eq 0 ]; then
+      phase_merged_prs   # merged PR 스캔 → 합성 signal
+    fi
+    if [ $((tick_count % 4)) -eq 2 ]; then
+      phase_orphan_wts   # WT remote branch 소멸 감지 → 합성 signal
+    fi
 
     # 매 100 tick (~25분)마다 학습 + 로그 정리
     if [ $((tick_count % 100)) -eq 0 ]; then
@@ -541,7 +653,13 @@ run_daemon() {
 show_status() {
   echo ""
   if [ -f "$DAEMON_PID_FILE" ] && kill -0 "$(cat "$DAEMON_PID_FILE")" 2>/dev/null; then
-    echo "  task-daemon: ✅ running (PID $(cat "$DAEMON_PID_FILE"))"
+    local hb_info=""
+    if [ -f "$DAEMON_HEARTBEAT" ]; then
+      hb_epoch=$(date -d "$(cat "$DAEMON_HEARTBEAT")" +%s 2>/dev/null || echo 0)
+      hb_age=$(( $(date +%s) - hb_epoch ))
+      hb_info=" | heartbeat ${hb_age}초 전"
+    fi
+    echo "  task-daemon: ✅ running (PID $(cat "$DAEMON_PID_FILE")${hb_info})"
   else
     echo "  task-daemon: ❌ stopped"
   fi
@@ -583,12 +701,21 @@ show_status() {
 # ═══════════════════════════════════════════════════════════════════════════
 case "${1:-}" in
   --bg)
-    # 기존 데몬 종료
+    # PID 살아있으면 heartbeat 확인 후 재시작 여부 결정
     if [ -f "$DAEMON_PID_FILE" ] && kill -0 "$(cat "$DAEMON_PID_FILE")" 2>/dev/null; then
+      if [ -f "$DAEMON_HEARTBEAT" ]; then
+        hb_epoch=$(date -d "$(cat "$DAEMON_HEARTBEAT")" +%s 2>/dev/null || echo 0)
+        age_sec=$(( $(date +%s) - hb_epoch ))
+        if [ "$age_sec" -lt 300 ]; then
+          echo "[task-daemon] ✅ 이미 실행 중 (PID $(cat "$DAEMON_PID_FILE"), heartbeat ${age_sec}초 전)"
+          exit 0
+        fi
+        echo "[task-daemon] ⚠️  heartbeat stale (${age_sec}초) — 재시작"
+      fi
       kill "$(cat "$DAEMON_PID_FILE")" 2>/dev/null || true
       sleep 1
     fi
-    mkdir -p /tmp/task-signals
+    mkdir -p "$FX_HOME" /tmp/task-signals
     nohup bash "$0" > /dev/null 2>&1 &
     echo $! > "$DAEMON_PID_FILE"
     disown
@@ -597,7 +724,7 @@ case "${1:-}" in
   --stop)
     if [ -f "$DAEMON_PID_FILE" ] && kill -0 "$(cat "$DAEMON_PID_FILE")" 2>/dev/null; then
       kill "$(cat "$DAEMON_PID_FILE")"
-      rm -f "$DAEMON_PID_FILE"
+      rm -f "$DAEMON_PID_FILE" "$DAEMON_HEARTBEAT"
       echo "[task-daemon] 중단 완료"
     else
       echo "[task-daemon] 실행 중 아님"
