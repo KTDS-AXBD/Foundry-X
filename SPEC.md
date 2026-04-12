@@ -30,7 +30,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | Sprint 261 | ✅ 완료 — ax-plugin source↔cache drift 방지 + C33 eslint cleanup (PR #508/#510) |
 | Sprint 262 | ✅ 완료 — Phase 35 F511 Work Management 품질 보강 (D1 0126, ~3452 tests, E2E 273) |
 | Sprint 263 | ✅ 완료 — Phase 36-A 착수: SPEC 파서 테스트 A-0 (48건 PR #517) |
-| Sprint 264 | 🔧(impl) 진행 중 — F512 Phase A 정비 (A-3~A-8) + F513 TDD (B-0~B-3) |
+| Sprint 264 | ✅ 완료 — F512 Phase A 정비 (A-0~A-8) + F513 TDD (B-0~B-3) (PR #518) |
 
 | 항목 | 상태 |
 |------|------|
@@ -115,7 +115,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F511 | Work Management 품질 보강 — API 에러 핸들링 UI + syncSessions SQL injection 방어 + E2E edge case 보강 (FX-REQ-534, P1) | Sprint 263 | ✅ | PR #516 `a756780a`. Gap 97%. T3=prepared stmt bind, T4=CASE WHEN ORDER BY, G1=에러 UI(useRef stale guard), T1+T2=E2E 6→11건(+5). 선행 핫픽스: PR #514(401 auth), PR #515(sidebar topItems), D1 DROP+재생성(스키마 불일치) |
 | **Phase 36: Work Management Enhancement (프로젝트 관리 체계 개선)** | | | | PRD: `docs/specs/fx-work-mgmt-enhancement/prd-final.md`. 3-AI 검토 R2 76/100, Ambiguity 0.087. "Jira를 만들지 않는다" — Blueprint/Roadmap 독립 + SPEC 경량화 + 기존 데이터 시각화 + TDD |
 | **Phase 36-A: 문서 체계 정비 + 아카이브 (meta-only)** | | | | 코드 변경 0건, master 직접 commit |
-| F512 | 문서 체계 정비 + 아카이브 — A-0 파서 테스트 보강 + BLUEPRINT.md/ROADMAP.md 도입 + SPEC.md 경량화(1377→350줄) + docs/ 아카이브(400→100파일) + F-item 세부 상태 10단계 + Entry/Exit Criteria (FX-REQ-535, P0) | Sprint 264 | 🔧(impl) | A-0 ✅ PR#517, A-1 ✅ BLUEPRINT, A-2 ✅ ROADMAP. A-3~A-8 잔여 |
+| F512 | 문서 체계 정비 + 아카이브 — A-0 파서 테스트 보강 + BLUEPRINT.md/ROADMAP.md 도입 + SPEC.md 경량화(1377→350줄) + docs/ 아카이브(400→100파일) + F-item 세부 상태 10단계 + Entry/Exit Criteria (FX-REQ-535, P0) | Sprint 264 | ✅ | A-0 ✅ PR#517, A-1 ✅ BLUEPRINT, A-2 ✅ ROADMAP, A-3~A-8 ✅ (경량화+아카이브+괄호표기+process-lifecycle) |
 | **Phase 36-B: 기존 데이터 표면화 — TDD (코드 변경)** | | | | B-0 테스트 보강 선행 → B-1~B-5 Red→Green→Refactor |
 | F513 | Work Management API 테스트 보강 + 확장 — B-0 기존 snapshot/context/classify 테스트 ~15건 + B-1 GET /api/work/velocity + B-2 GET /api/work/phase-progress + B-3 GET /api/work/backlog-health (FX-REQ-536, P0) | Sprint 264 | ✅ | PR #518. TDD Red(24건)→Green. velocity/phase-progress/backlog-health API + Zod 스키마 |
 | F514 | Work Management 대시보드 확장 — B-4 Pipeline Flow 뷰(Idea→Done 단계별 F-item 수) + B-5 Velocity/Phase Progress 차트 + E2E 테스트 (FX-REQ-537, P1) | Sprint 265 | ✅ | PR #524. Pipeline Flow + Velocity + Backlog Health 대시보드 |
