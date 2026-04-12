@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { BASE_URL } from "@/lib/api-client";
+import { fetchApi, postApi } from "@/lib/api-client";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -547,13 +547,7 @@ function ClassifyTab() {
     setError(null);
     setResult(null);
     try {
-      const res = await fetch(`${BASE_URL}/work/classify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: input }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = (await res.json()) as ClassifyResult;
+      const data = await postApi<ClassifyResult>("/work/classify", { text: input });
       setResult(data);
     } catch (e) {
       setError(e instanceof Error ? e.message : "분류 실패");
@@ -660,11 +654,9 @@ export function Component() {
 
   const fetchSnapshot = useCallback(async () => {
     try {
-      const res = await fetch(`${BASE_URL}/work/snapshot`);
-      if (res.ok) {
-        setSnapshot((await res.json()) as WorkSnapshot);
-        setLastUpdate(new Date());
-      }
+      const data = await fetchApi<WorkSnapshot>("/work/snapshot");
+      setSnapshot(data);
+      setLastUpdate(new Date());
     } catch {
       // silently ignore — stale data shows
     }
@@ -672,10 +664,7 @@ export function Component() {
 
   const fetchContext = useCallback(async () => {
     try {
-      const res = await fetch(`${BASE_URL}/work/context`);
-      if (res.ok) {
-        setCtx((await res.json()) as WorkContext);
-      }
+      setCtx(await fetchApi<WorkContext>("/work/context"));
     } catch {
       // ignore
     }
@@ -683,10 +672,7 @@ export function Component() {
 
   const fetchSessions = useCallback(async () => {
     try {
-      const res = await fetch(`${BASE_URL}/work/sessions`);
-      if (res.ok) {
-        setSessions((await res.json()) as SessionList);
-      }
+      setSessions(await fetchApi<SessionList>("/work/sessions"));
     } catch {
       // ignore
     }
