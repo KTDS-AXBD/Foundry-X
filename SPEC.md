@@ -187,6 +187,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C40 | C | daemon 3중 감지 dogfood 검증 (FX-REQ-541) | — | DONE | task orchestrator |
 | C41 | C | daemon path2-path3 실전 검증 (FX-REQ-542) | — | PLANNED | task orchestrator |
 | C42 | C | sprint-monitor + task-daemon 통합 — unified-daemon (FX-REQ-543) | — | DONE | task orchestrator |
+| C43 | C | sprint monitor 2중 실행 해소 — bashrc _sprint_ensure_monitor→daemon 교체 + post-merge health check (FX-REQ-545) | — | DONE | bashrc 직접편집 + daemon 코드 |
 | C43 | C | Changelog 마크다운 렌더링 — 현재 `**볼드**`, `[링크]()` 등이 raw text로 노출됨. react-markdown(이미 설치됨) 적용하여 Added/Fixed 섹션 내 bullet을 구조화 렌더링. 누가: AI. 어떻게: ChangelogTab에 react-markdown 적용 + 섹션별 스타일링 | — | PLANNED | S268 사용자 피드백 |
 | C44 | C | Roadmap Phase 상세 + 미래 계획 표시 — (1) SPEC §3 Phase 테이블을 직접 파싱하는 새 API `GET /api/work/roadmap` 추가 (Phase 이름/상태/Sprint 범위/F-item 목록 포함). (2) ROADMAP.md Short/Mid/Long-term 섹션을 파싱하여 미래 계획 표시. 현재는 phase-progress API의 F-item 번호 추론 방식이라 Phase 2건만 표시됨. 누가: AI. 어떻게: work.service.ts parseRoadmap() + RoadmapTab 개편 | — | PLANNED | S268 사용자 피드백 |
 | C45 | C | Backlog C/B/X-track 파싱 + 작업 분류 UX — (1) parseFItems()가 F-item만 파싱 → C/B/X Backlog 테이블도 파싱하여 backlog-health에 반영. (2) 작업 분류 탭에 "분류 후 어떻게 등록하는지" 안내 + CLI 명령어 복사 버튼. 누가: AI. 어떻게: parseFItems 확장 + ClassifyTab UX 보강 | — | PLANNED | S268 사용자 피드백 |
