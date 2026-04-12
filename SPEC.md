@@ -55,10 +55,10 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | Phase 33 Work Observability (F509) | ✅ Sprint 261 |
 | Phase 34 Multi-Agent Sessions (F510) | ✅ Sprint 262 |
 | Phase 35 Quality Hardening (F511) | ✅ Sprint 263 |
-| **Phase 36 Work Management Enhancement** (F512~F515) | 🔧 Sprint 264~266 |
+| **Phase 36 Work Management Enhancement** (F512~F515) | ✅ Sprint 264~266 |
 | ↳ Sprint 264 — Phase 36-A(F512) + Phase 36-B 착수(F513) | 🔧 진행 중 |
 | ↳ Sprint 265 — Phase 36-B 완성 (F514) | 📋 |
-| ↳ Sprint 266 — Phase 36-C (F515) | 📋 |
+| ↳ Sprint 266 — Phase 36-C (F515) | ✅ |
 
 ## §4 성공 지표
 
@@ -117,7 +117,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F513 | Work Management API 테스트 보강 + 확장 — B-0 기존 snapshot/context/classify 테스트 ~15건 + B-1 GET /api/work/velocity + B-2 GET /api/work/phase-progress + B-3 GET /api/work/backlog-health (FX-REQ-536, P0) | Sprint 264 | ✅ | PR #518. TDD Red(24건)→Green. velocity/phase-progress/backlog-health API + Zod 스키마 |
 | F514 | Work Management 대시보드 확장 — B-4 Pipeline Flow 뷰(Idea→Done 단계별 F-item 수) + B-5 Velocity/Phase Progress 차트 + E2E 테스트 (FX-REQ-537, P1) | Sprint 265 | ✅ | PR #524. Pipeline Flow + Velocity + Backlog Health 대시보드 |
 | **Phase 36-C: 자동화 연결** | | | | Phase A/B 자동화 스크립트 연결 |
-| F515 | 자동화 연결 — C-1 board-sync-spec 세부 상태 파싱 + C-2 Roadmap 자동 갱신 + C-3 Blueprint 버전 범프 + C-4 아카이브 자동화 + C-5 CHANGELOG 자동 생성 (FX-REQ-538, P1) | Sprint 266 | 🔧 | Phase 36 마지막 Sprint |
+| F515 | 자동화 연결 — C-1 board-sync-spec 세부 상태 파싱 + C-2 Roadmap 자동 갱신 + C-3 Blueprint 버전 범프 + C-4 아카이브 자동화 + C-5 CHANGELOG 자동 생성 (FX-REQ-538, P1) | Sprint 266 | ✅ | PR #529. Gap 95.1%. 5종 스크립트 |
 
 <!-- fx-task-orchestrator-backlog -->
 ### Task Orchestrator Backlog (B/C/X)
