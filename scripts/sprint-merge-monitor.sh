@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # scripts/sprint-merge-monitor.sh — F500 Auto Merge Monitor
 #
+# ⚠️  DEPRECATED (C42, 2026-04-12): 이 스크립트의 기능은 scripts/task/task-daemon.sh의
+#     phase_sprint_signals() 함수로 통합되었습니다. 새 daemon이 /tmp/sprint-signals/ 를
+#     동일하게 처리하므로 이 스크립트를 별도로 기동할 필요가 없습니다.
+#     sprint-watch-liveness.sh(liveness guard)도 더 이상 이 프로세스를 감시하지 않습니다.
+#     삭제 전 호환성 유지용으로 파일을 보존합니다.
+#
 # Polls /tmp/sprint-signals/<project>-<N>.signal files every 5s and, when a
 # signal reports STATUS=DONE, drives the merge pipeline:
 #   1) ensure PR exists

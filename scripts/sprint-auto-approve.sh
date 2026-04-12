@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # scripts/sprint-auto-approve.sh — F500 PR self-approve helper
 #
+# ⚠️  DEPRECATED (C42, 2026-04-12): sprint_auto_approve() 함수가
+#     scripts/task/task-daemon.sh에 내장되었습니다. 이 파일은 호환성 유지용으로 보존합니다.
+#     task-daemon의 sprint_auto_approve()가 이 스크립트가 존재할 경우 위임 호출합니다.
+#
 # Usage: sprint-auto-approve.sh <PR_NUMBER> [GITHUB_REPO]
 #
 # Checks branch protection; if approval is required, posts an approval review
