@@ -1,8 +1,8 @@
 import { test, expect } from "./fixtures/auth";
 
 // @service: portal
-// @sprint: 261, 262
-// @tagged-by: F509, F510
+// @sprint: 261, 262, 265
+// @tagged-by: F509, F510, F514
 // @spec: docs/specs/fx-work-observability/prd-v1.md §5.2.1 (End-to-end 시나리오 S1)
 
 // ─── Mock payloads ───────────────────────────────────────────────────────────
@@ -60,6 +60,38 @@ const MOCK_CLASSIFY = {
   method: "llm" as const,
 };
 
+// ─── F514 Mock payloads ───────────────────────────────────────────────────────
+
+const MOCK_VELOCITY = {
+  sprints: [
+    { sprint: 261, f_items_done: 1, week: "2026-W15" },
+    { sprint: 262, f_items_done: 2, week: "2026-W16" },
+    { sprint: 264, f_items_done: 3, week: "2026-W17" },
+  ],
+  avg_per_sprint: 2.0,
+  trend: "up",
+  generated_at: "2026-04-12T11:00:00Z",
+};
+
+const MOCK_PHASE_PROGRESS = {
+  phases: [
+    { id: 33, name: "Phase 33", total: 1, done: 1, in_progress: 0, pct: 100 },
+    { id: 36, name: "Phase 36", total: 4, done: 2, in_progress: 1, pct: 50 },
+  ],
+  current_phase: 36,
+  generated_at: "2026-04-12T11:00:00Z",
+};
+
+const MOCK_BACKLOG_HEALTH = {
+  total_backlog: 5,
+  stale_items: [
+    { id: "F112", title: "장기 백로그 항목 A", age_sprints: 15 },
+  ],
+  health_score: 75,
+  warnings: ["장기 대기 항목 1개 검토 필요"],
+  generated_at: "2026-04-12T11:00:00Z",
+};
+
 // ─── Common setup — mock all /api/work/* endpoints ───────────────────────────
 
 async function mockWorkApi(page: import("@playwright/test").Page) {
@@ -92,6 +124,28 @@ async function mockWorkApi(page: import("@playwright/test").Page) {
       body: JSON.stringify(MOCK_CLASSIFY),
     });
   });
+  // F514 — analytics endpoints
+  await page.route("**/api/work/velocity", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(MOCK_VELOCITY),
+    }),
+  );
+  await page.route("**/api/work/phase-progress", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(MOCK_PHASE_PROGRESS),
+    }),
+  );
+  await page.route("**/api/work/backlog-health", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(MOCK_BACKLOG_HEALTH),
+    }),
+  );
 }
 
 // ─── Tests ───────────────────────────────────────────────────────────────────
@@ -251,6 +305,71 @@ test.describe("Work Management (F509 Walking Skeleton)", () => {
     // 5초 polling이므로 6초 대기 후 2회 이상 호출 확인
     await page.waitForTimeout(6000);
     expect(callCount).toBeGreaterThanOrEqual(2);
+  });
+
+  // ─── F514 Dashboard Extensions ───────────────────────────────────────────
+
+  test("pipeline tab — renders stage counts from snapshot and backlog health (F514 B-4)", async ({ authenticatedPage: page }) => {
+    await mockWorkApi(page);
+    await page.goto("/work-management");
+
+    await page.getByRole("button", { name: "Pipeline" }).click();
+
+    // stage labels
+    await expect(page.getByText("Backlog", { exact: true })).toBeVisible();
+    await expect(page.getByText("Planned", { exact: true })).toBeVisible();
+    await expect(page.getByText("In Progress", { exact: true })).toBeVisible();
+    // health score from MOCK_BACKLOG_HEALTH
+    await expect(page.getByText(/75/).first()).toBeVisible();
+  });
+
+  test("pipeline tab — shows backlog health score and stale item warning (F514 B-4)", async ({ authenticatedPage: page }) => {
+    await mockWorkApi(page);
+    await page.goto("/work-management");
+
+    await page.getByRole("button", { name: "Pipeline" }).click();
+
+    // health score label
+    await expect(page.getByText(/Health Score/i)).toBeVisible();
+    // stale item from MOCK_BACKLOG_HEALTH
+    await expect(page.getByText(/F112/)).toBeVisible();
+  });
+
+  test("velocity tab — renders sprint bars and average (F514 B-5)", async ({ authenticatedPage: page }) => {
+    await mockWorkApi(page);
+    await page.goto("/work-management");
+
+    await page.getByRole("button", { name: "Velocity" }).click();
+
+    // avg and trend
+    await expect(page.getByText(/Avg/).first()).toBeVisible();
+    // sprint data from MOCK_VELOCITY
+    await expect(page.getByText(/Sprint 261/)).toBeVisible();
+    await expect(page.getByText(/Sprint 264/)).toBeVisible();
+  });
+
+  test("velocity tab — shows trend badge and phase progress (F514 B-5)", async ({ authenticatedPage: page }) => {
+    await mockWorkApi(page);
+    await page.goto("/work-management");
+
+    await page.getByRole("button", { name: "Velocity" }).click();
+
+    // trend from MOCK_VELOCITY (trend: "up")
+    await expect(page.getByText(/↑|UP|up/i).first()).toBeVisible();
+    // phase progress from MOCK_PHASE_PROGRESS
+    await expect(page.getByText(/Phase 36/)).toBeVisible();
+  });
+
+  test("backlog tab — shows total count and health score (F514 B-5)", async ({ authenticatedPage: page }) => {
+    await mockWorkApi(page);
+    await page.goto("/work-management");
+
+    await page.getByRole("button", { name: "Backlog" }).click();
+
+    // total_backlog: 5 from MOCK_BACKLOG_HEALTH
+    await expect(page.getByText(/5/).first()).toBeVisible();
+    // warning from MOCK_BACKLOG_HEALTH
+    await expect(page.getByText(/장기 대기 항목/)).toBeVisible();
   });
 
   test("classify flow — PRD §5.2.1 S1 step 2 (자연어 → track/priority/title)", async ({ authenticatedPage: page }) => {
