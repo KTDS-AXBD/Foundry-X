@@ -193,15 +193,14 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C40 | C | daemon 3중 감지 dogfood 검증 (FX-REQ-541) | — | DONE | task orchestrator |
 | C41 | C | daemon path2-path3 실전 검증 (FX-REQ-542) | — | PLANNED | task orchestrator |
 | C42 | C | sprint-monitor + task-daemon 통합 — unified-daemon (FX-REQ-543) | — | DONE | task orchestrator |
-| C43 | C | sprint monitor 2중 실행 해소 — bashrc _sprint_ensure_monitor→daemon 교체 + post-merge health check | — | DONE | bashrc 직접편집 + daemon 코드. REQ-545→F517로 재배정 |
-| C43 | C | Changelog 마크다운 렌더링 — 현재 `**볼드**`, `[링크]()` 등이 raw text로 노출됨. react-markdown(이미 설치됨) 적용하여 Added/Fixed 섹션 내 bullet을 구조화 렌더링. 누가: AI. 어떻게: ChangelogTab에 react-markdown 적용 + 섹션별 스타일링 | — | PLANNED | S268 사용자 피드백 |
-| C44 | C | Roadmap Phase 상세 + 미래 계획 표시 — (1) SPEC §3 Phase 테이블을 직접 파싱하는 새 API `GET /api/work/roadmap` 추가 (Phase 이름/상태/Sprint 범위/F-item 목록 포함). (2) ROADMAP.md Short/Mid/Long-term 섹션을 파싱하여 미래 계획 표시. 현재는 phase-progress API의 F-item 번호 추론 방식이라 Phase 2건만 표시됨. 누가: AI. 어떻게: work.service.ts parseRoadmap() + RoadmapTab 개편 | — | PLANNED | S268 사용자 피드백 |
-| C45 | C | Backlog C/B/X-track 파싱 + 작업 분류 UX — (1) parseFItems()가 F-item만 파싱 → C/B/X Backlog 테이블도 파싱하여 backlog-health에 반영. (2) 작업 분류 탭에 "분류 후 어떻게 등록하는지" 안내 + CLI 명령어 복사 버튼. 누가: AI. 어떻게: parseFItems 확장 + ClassifyTab UX 보강 | — | PLANNED | S268 사용자 피드백 |
-| C46 | F | ~~Backlog 인입 파이프라인 설계~~ — 사용자가 "이런 게 있으면 좋겠다"를 웹에서 직접 제출 → AI가 자동 분석(Track/Priority/중복 검사/유사 REQ 매칭) → Backlog 등록 → AI 피드백("이 요청은 F509와 유사해요, 병합할까요?") → 승인 시 요구사항(REQ)으로 전환. 현재: CLI `task-start.sh`로만 등록 가능, 웹 인입 경로 없음. 누가: 사용자+AI. 어떻게: (1) 웹 제출 폼 (2) AI 분석 API (3) Backlog→REQ 전환 워크플로우 설계 필요 | — | PLANNED | S268 사용자 피드백. F-item 승격 후보 (3+파일, 사용자 관찰 가능) |
-| C47 | F | ~~Changelog 트레이서빌리티~~ — 단순 나열이 아닌 "요구사항(REQ) → Task(C/F) → 구현(PR/커밋) → 배포" 연결 체인을 시각화. 각 Changelog 항목에서 원본 REQ, 관련 Sprint, PR 링크를 역추적 가능해야 함. 맥락 축적을 위해 Knowledge Graph(Ontology) 도입 검토 — REQ↔F-item↔Sprint↔Phase↔PR 관계를 그래프로 관리하면 "이 변경이 왜 일어났는지" 추적 가능. 누가: AI+사용자. 어떻게: (1) Changelog 항목에 REQ/PR 메타데이터 구조화 (2) KG 스키마 설계 (3) 트레이서빌리티 뷰 구현 | — | PLANNED | S268 사용자 피드백. F-item 승격 후보. Ontology 기반 |
-| C48 | C | ~~Work Management Ontology 기반 맥락 연결~~ — C46(인입)·C47(트레이서빌리티)의 공통 기반. 작업 라이프사이클 전체를 Ontology로 모델링: Idea→Backlog→REQ→Task(F/C/B/X)→Sprint→Phase→Deploy→Changelog. 기존 KG 인프라(packages/web/src/components/feature/kg/) 재활용. 누가: AI. 어떻게: (1) Work Management 도메인 온톨로지 스키마 정의 (2) SPEC.md 파싱→KG 노드/엣지 자동 생성 (3) 탐색 뷰 | — | PLANNED | S268 사용자 피드백. C46·C47 선행 후 착수 |
-| C50 | C | req-interview 스코어카드 채점 메커니즘 개선 — PRD 상세화→점수 하락 역설 해소. 현재: 이슈 수 기반(상세할수록 신규 이슈 증가→항목1 0점), AI 리뷰어가 상세 PRD에 더 많은 Conditional 부여. 개선 방향: (1) 이슈 밀도(이슈/자수) 기반으로 전환 (2) severity 가중치 도입(flaw>gap>risk) (3) 라운드 간 이슈 품질 비교(동일 이슈 재발 vs 신규 발견 구분). S266/S268에서 반복 확인된 패턴. 누가: AI. 어떻게: review-api.mjs scorecard 계산 로직 개선 + scorecard.md 해석 문구 보정 | — | PLANNED | S266+S268 교훈. 비긴급 (PRD 품질 자체는 정상) |
-| C49 | C | 작업 현황 탭 데이터 보강 — Kanban에 F-item 5건(DONE)만 표시됨. Phase 30+ Active 섹션의 모든 항목(F493~F515 + C/B/X Backlog)이 올바른 컬럼에 분류되어야 함. 현재: parseFItems의 regex가 Phase 30+ 섹션만 파싱하고 대부분 DONE으로 분류됨. IN_PROGRESS/PLANNED가 0건인 원인 진단 + 수정. 누가: AI. 어떻게: parseFItems 디버깅 + Backlog 섹션 파싱 추가 | — | PLANNED | S268 사용자 피드백 |
+| C43 | C | sprint monitor 2중 실행 해소 — bashrc _sprint_ensure_monitor→daemon 교체 + post-merge health check | — | DONE | S267. bashrc 직접편집 + daemon 코드 |
+| C44 | C | Changelog 마크다운 렌더링 + Roadmap 미래 계획 — react-markdown 적용, GET /api/work/roadmap 추가, SPEC §3 직접 파싱으로 Phase 데이터 개선 | — | DONE | S268 PR #534. 구 C43(중복 ID) + C44 통합 |
+| C45 | C | Backlog C/B/X-track 파싱 + 작업 분류 UX — parseBacklogItems() 추가, ClassifyTab "사용 방법" 안내 | — | DONE | S268 PR #534 |
+| C46 | F | ~~Backlog 인입 파이프라인~~ → F516 승격 | — | → F516 | S268. Phase 37 Sprint 267 |
+| C47 | F | ~~Changelog 트레이서빌리티~~ → F517 승격 | — | → F517 | S268. Phase 37 Sprint 268 |
+| C48 | C | ~~Work Management Ontology~~ → F518 승격 | — | → F518 | S268. Phase 37 Sprint 269 |
+| C49 | C | 작업 현황 Kanban 데이터 보강 — parseSpecItems F+Backlog 통합 반환, fetchSpecText 캐시 | — | DONE | S268 PR #534 |
+| C50 | C | req-interview 스코어카드 채점 메커니즘 개선 — 이슈 밀도 기반 전환, severity 가중치, 라운드 간 품질 비교 | — | PLANNED | S266+S268 교훈. 비긴급 |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
