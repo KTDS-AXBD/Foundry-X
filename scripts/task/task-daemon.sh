@@ -51,11 +51,9 @@ log() { echo "[$(date +%H:%M:%S)] $*" >> "$DAEMON_LOG"; }
 # Phase 1: Signal 처리 (기존 task-monitor.sh 역할)
 # ═══════════════════════════════════════════════════════════════════════════
 phase_signals() {
-  local signals
-  signals=$(ls "${FX_SIGNAL_DIR}/${PROJECT}-"*.signal 2>/dev/null || true)
-  [ -z "$signals" ] && return 0
-
-  for sig_file in $signals; do
+  local sig_file
+  for sig_file in "${FX_SIGNAL_DIR}/${PROJECT}-"*.signal; do
+    [ -f "$sig_file" ] || continue
     local TASK_ID="" STATUS="" BRANCH="" PR_URL="" COMMIT_COUNT="" WT_PATH="" PANE_ID="" TIMESTAMP=""
     source "$sig_file"
 
@@ -559,7 +557,7 @@ phase_orphan_wts() {
   remote_refs=$(cd "$REPO_ROOT" && git ls-remote --heads origin 'refs/heads/task/*' 2>/dev/null \
     | awk '{print $2}' | sed 's|refs/heads/||') || return 0
 
-  cd "$REPO_ROOT" && git worktree list --porcelain 2>/dev/null \
+  git -C "$REPO_ROOT" worktree list --porcelain 2>/dev/null \
     | awk '/^worktree /{wt=$2} /^branch /{print wt "|" $2}' \
     | grep '|refs/heads/task/' \
     | while IFS='|' read -r wt_path ref; do
@@ -603,7 +601,7 @@ WT_PATH=${wt_path}
 PANE_ID=${pane_id}
 SIGEOF
         log "📡 ${task_id}: WT orphan signal 합성 (PR #${pr_num})"
-      done
+      done || true  # grep no-match returns 1 — pipefail 방어 (S267)
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -720,6 +718,8 @@ sprint_cleanup_pane() {
 }
 
 phase_sprint_signals() {
+  local _prev_nullglob=false
+  shopt -q nullglob && _prev_nullglob=true
   shopt -s nullglob
   local sig
   for sig in "$SPRINT_SIGNAL_DIR"/*-*.signal; do
@@ -836,6 +836,8 @@ phase_sprint_signals() {
     sprint_sig_set "$sig" "MERGED_AT" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     log "✅ sprint-${sprint_num} — MERGED PR #${pr_num}"
   done
+  # nullglob 복원 — 누출 시 phase_signals의 ls glob이 빈 확장되어 cwd listing → source crash (S267)
+  "$_prev_nullglob" || shopt -u nullglob
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -872,20 +874,21 @@ run_daemon() {
     # heartbeat 갱신 — SessionStart가 stale 여부를 판단하는 기준
     date -u +%Y-%m-%dT%H:%M:%SZ > "$DAEMON_HEARTBEAT"
 
-    phase_signals          # task signal 감지 → merge → cleanup
-    phase_sprint_signals   # sprint signal 감지 → CI → merge → cleanup (C42 통합)
-    phase_watch            # pane 감시 → 권한승인 / 완료감지 / idle 감지
-    phase_queue            # 큐 여유 → 자동 task 시작
+    # 각 phase는 개별 실패해도 daemon loop 전체를 죽이지 않��록 방어 (S267)
+    phase_signals          || log "⚠️  phase_signals 에러"
+    phase_sprint_signals   || log "⚠️  phase_sprint_signals 에러"
+    phase_watch            || log "⚠️  phase_watch 에러"
+    phase_queue            || log "⚠️  phase_queue 에러"
 
     tick_count=$((tick_count + 1))
 
     # 매 4 tick (~60초): 완료 감지 2차/3차 경로
     # 오프셋을 두어 같은 tick에 두 gh API 호출이 겹치지 않게 함
     if [ $((tick_count % 4)) -eq 0 ]; then
-      phase_merged_prs   # merged PR 스캔 → 합성 signal
+      phase_merged_prs     || log "⚠️  phase_merged_prs 에러"
     fi
     if [ $((tick_count % 4)) -eq 2 ]; then
-      phase_orphan_wts   # WT remote branch 소멸 감지 → 합성 signal
+      phase_orphan_wts     || log "⚠️  phase_orphan_wts 에러"
     fi
 
     # 매 100 tick (~25분)마다 학습 + 로그 정리
