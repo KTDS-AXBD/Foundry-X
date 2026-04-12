@@ -175,6 +175,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C39 | C | task-daemon 자동 감지 근본 개선 — 세션 간 지속성 + 완료 감지 다중화 (FX-REQ-540) | — | DONE | task orchestrator |
 | C40 | C | daemon 3중 감지 dogfood 검증 (FX-REQ-541) | — | DONE | task orchestrator |
 | C41 | C | daemon path2-path3 실전 검증 (FX-REQ-542) | — | PLANNED | task orchestrator |
+| C42 | C | sprint-monitor + task-daemon 통합 — unified-daemon (FX-REQ-543) | — | PLANNED | task orchestrator |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
