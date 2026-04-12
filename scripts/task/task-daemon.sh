@@ -831,7 +831,16 @@ phase_sprint_signals() {
         >> "$DAEMON_LOG" 2>&1 || log "⚠️  sprint-${sprint_num}: phase-progress 실패 (non-fatal)"
     fi
 
-    # 7) MERGED 완료 표시
+    # 7) Post-merge 검증 (구 sprint-merge-monitor.sh 기능 통합, C43)
+    # deploy 자체는 CI/CD(deploy.yml on master push)가 자동 처리 — 여기서는 health check만
+    local api_base="https://foundry-x-api.ktds-axbd.workers.dev"
+    local web_base="https://fx.minu.best"
+    local api_status web_status
+    api_status=$(curl -s -o /dev/null -w "%{http_code}" "${api_base}/api/health" 2>/dev/null || echo "000")
+    web_status=$(curl -s -o /dev/null -w "%{http_code}" "${web_base}" 2>/dev/null || echo "000")
+    log "🏥 post-merge health — API:${api_status} Web:${web_status}"
+
+    # 8) MERGED 완료 표시
     sprint_sig_set "$sig" "STATUS" "MERGED"
     sprint_sig_set "$sig" "MERGED_AT" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     log "✅ sprint-${sprint_num} — MERGED PR #${pr_num}"
