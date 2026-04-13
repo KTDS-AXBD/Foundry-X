@@ -69,9 +69,9 @@ function getSectionOrder(section: string): number {
    ═══════════════════════════════════════════════ */
 
 const SITE_META_FALLBACK = {
-  sprint: "Sprint 283",
-  phase: "Phase 41",
-  phaseTitle: "HyperFX Agent Stack",
+  sprint: "Sprint 286",
+  phase: "Phase 42",
+  phaseTitle: "HyperFX Deep Integration",
   tagline: "사업기회 발굴부터 데모까지, AI가 자동화하는 BD 플랫폼",
 } as const;
 
@@ -79,7 +79,7 @@ const STATS_FALLBACK = [
   { value: "2", label: "BD 파이프라인" },
   { value: "10+", label: "AI 에이전트" },
   { value: "63", label: "자동화 스킬" },
-  { value: "283", label: "Sprints" },
+  { value: "286", label: "Sprints" },
 ];
 
 // Build-time content from TinaCMS-managed Markdown
