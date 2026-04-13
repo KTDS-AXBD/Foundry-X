@@ -129,22 +129,19 @@ test.describe("F447 — 파이프라인 스테퍼 표시", () => {
     // 파이프라인 진행률 헤딩
     await expect(page.getByText("파이프라인 진행률")).toBeVisible();
 
-    // 4단계 라벨 표시
+    // F495: 2단계만 표시 (Offering/MVP 제거)
     await expect(page.getByText("발굴").first()).toBeVisible();
     await expect(page.getByText("형상화").first()).toBeVisible();
-    await expect(page.getByText("Offering").first()).toBeVisible();
-    await expect(page.getByText("MVP").first()).toBeVisible();
 
-    // 현재 단계 (발굴) — blue 스타일의 원 (1번)
+    // 현재 단계 (발굴) — blue 스타일의 원
     const stepperArea = page.locator(".rounded-lg.border.bg-card").filter({ hasText: "파이프라인 진행률" });
-    // 현재 단계 노드에 ring-blue-200 클래스 확인
-    await expect(stepperArea.locator(".ring-blue-200")).toBeAttached();
+    await expect(stepperArea.locator(".ring-blue-100")).toBeAttached();
 
     // 진입 날짜 표시
     await expect(stepperArea.getByText(/3월/)).toBeVisible();
   });
 
-  test("FORMALIZATION 단계 — 발굴 완료(체크), 형상화 현재, 나머지 미래", async ({ authenticatedPage: page }) => {
+  test("FORMALIZATION 단계 — 발굴 완료(체크), 형상화 현재", async ({ authenticatedPage: page }) => {
     await setupPipelineMocks(page, { pipelineDetail: MOCK_PIPELINE_FORMALIZATION });
     await page.goto("/discovery/items/biz-1");
     await expect(page.getByText("AI 문서 자동화").first()).toBeVisible({ timeout: 10000 });
@@ -155,20 +152,20 @@ test.describe("F447 — 파이프라인 스테퍼 표시", () => {
     await expect(stepperArea.locator(".bg-green-500").first()).toBeAttached();
 
     // 형상화 단계 현재 — blue ring
-    await expect(stepperArea.locator(".ring-blue-200")).toBeAttached();
+    await expect(stepperArea.locator(".ring-blue-100")).toBeAttached();
 
-    // 완료 구간 연결선 (bg-green-400)
-    await expect(stepperArea.locator(".bg-green-400").first()).toBeAttached();
+    // 완료 구간 연결선 (bg-green-500)
+    await expect(stepperArea.locator(".bg-green-500").first()).toBeAttached();
   });
 
-  test("OFFERING 단계 — 발굴+형상화 완료, Offering 현재", async ({ authenticatedPage: page }) => {
+  test.skip("OFFERING 단계 — F495: Offering/MVP 단계 제거됨 (2단계로 축소)", async ({ authenticatedPage: page }) => {
     await setupPipelineMocks(page, { pipelineDetail: MOCK_PIPELINE_OFFERING });
     await page.goto("/discovery/items/biz-1");
     await expect(page.getByText("AI 문서 자동화").first()).toBeVisible({ timeout: 10000 });
 
     const stepperArea = page.locator(".rounded-lg.border.bg-card").filter({ hasText: "파이프라인 진행률" });
 
-    // 2개 완료 단계 (bg-green-500 노드 2개)
+    // F495: 2단계만 표시되므로 완료 노드는 최대 2개
     const greenNodes = stepperArea.locator(".bg-green-500");
     await expect(greenNodes).toHaveCount(2);
 

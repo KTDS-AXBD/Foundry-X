@@ -146,7 +146,7 @@ test.describe("Getting Started Wizard", () => {
     await page.getByRole("button", { name: "다음" }).click();
 
     // 에러 메시지 표시 + Step 2에 머무름
-    await expect(page.getByText(/실패|에러|Error|API 400|등록에 실패/i)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/실패|에러|Error|API 400|등록에 실패|Invalid request/i)).toBeVisible({ timeout: 5000 });
     await expect(page.getByText(/Step 2 \/ 4/)).toBeVisible();
   });
 });

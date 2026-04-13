@@ -22,8 +22,8 @@ test.describe("Tokens Page", () => {
         body: JSON.stringify({
           totalCost: 1.5,
           period: "2026-03",
-          byModel: { "claude-3": 1.0, "gpt-4": 0.5 },
-          byAgent: { reviewer: 0.8, planner: 0.7 },
+          byModel: { "claude-3": { tokens: 100000, cost: 1.0 }, "gpt-4": { tokens: 50000, cost: 0.5 } },
+          byAgent: { reviewer: { tokens: 80000, cost: 0.8 }, planner: { tokens: 70000, cost: 0.7 } },
         }),
       });
     });

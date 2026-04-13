@@ -154,7 +154,7 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     );
     await page.goto("/discovery/report");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByRole("heading", { name: "평가 결과서" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "발굴 평가결과서" })).toBeVisible();
   });
 
   // F434: 1/4/5/6단계 라우트 제거로 인한 의도적 skip

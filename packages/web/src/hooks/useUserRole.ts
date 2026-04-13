@@ -18,7 +18,7 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
 
 export function useUserRole(): UserRoleInfo {
   return useMemo(() => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("token");
     if (!token) return { role: "member" as const, isAdmin: false };
 
     const payload = decodeJwtPayload(token);

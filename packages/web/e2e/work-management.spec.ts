@@ -72,10 +72,9 @@ const MOCK_TRACE_CHAIN = {
   type: "req",
   label: "FX-REQ-544",
   f_items: [
-    { id: "F516", title: "Backlog 인입 파이프라인", status: "done", sprint: 273, req_code: "FX-REQ-544" },
+    { id: "F516", title: "Backlog 인입 파이프라인", status: "done", sprint: "273", req_code: "FX-REQ-544", prs: [{ number: 538, title: "feat: F516 Backlog 인입", url: "https://github.com/test/foo/pull/538", state: "merged", commits: [] }] },
   ],
   sprints: [{ number: 273, branch: "sprint/273" }],
-  prs: [{ number: 538, title: "feat: F516 Backlog 인입", url: "https://github.com/test/foo/pull/538", state: "merged" }],
   commits: [],
 };
 
