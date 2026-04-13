@@ -480,3 +480,20 @@ export type {
   ConversationStrategy,
   ConversationManagerOptions,
 } from './agent-runtime.js';
+
+// F529: Agent Streaming (L1) 타입
+export type {
+  AgentStreamEventType,
+  AgentStreamEvent,
+  AgentStreamEventPayload,
+  RunStartedPayload,
+  RoundStartPayload,
+  TextDeltaPayload,
+  ToolCallPayload,
+  ToolResultPayload,
+  RoundEndPayload,
+  RunCompletedPayload,
+  RunFailedPayload,
+  AgentRunMetricSummary,
+  AgentStreamRequest,
+} from './agent-streaming.js';

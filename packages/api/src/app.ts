@@ -43,12 +43,12 @@ import {
   offeringValidateRoute, offeringMetricsRoute, offeringPrototypeRoute,
   designTokensRoute, contentAdapterRoute, bdpRoute, methodologyRoute,
   businessPlanRoute, businessPlanExportRoute,
-  // agent (13 routes)
+  // agent (13 routes + F529 streaming)
   agentRoute, agentAdaptersRoute, agentDefinitionRoute,
   orchestrationRoute, executionEventsRoute, taskStateRoute,
   commandRegistryRoute, contextPassthroughRoute, workflowRoute,
   capturedEngineRoute, derivedEngineRoute, skillRegistryRoute,
-  skillMetricsRoute,
+  skillMetricsRoute, streamingRoute,
   // harness (22 routes)
   harnessRoute, governanceRoute, guardRailRoute, auditRoute,
   backupRestoreRoute, ogdGenericRoute, ogdQualityRoute,
@@ -230,6 +230,7 @@ app.route("/api", freshnessRoute);
 app.route("/api", wikiRoute);
 app.route("/api", requirementsRoute);
 app.route("/api", agentRoute);
+app.route("/api", streamingRoute);
 app.route("/api", tokenRoute);
 app.route("/api", specRoute);
 app.route("/api", mcpRoute);

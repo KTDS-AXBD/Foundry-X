@@ -17,3 +17,7 @@ export { skillMetricsRoute } from "./routes/skill-metrics.js";
 
 // F528: L3 Orchestration
 export * from "./orchestration/index.js";
+
+// F529: L1 Streaming
+export { streamingRoute } from "./routes/streaming.js";
+export * from "./streaming/index.js";
