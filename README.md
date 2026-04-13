@@ -21,10 +21,10 @@ Foundry-X가 이를 읽고 분석하고 동기화를 강제해요.
 | Phase | 41 (Sprint 283) |
 | Sprints | 283 완료 |
 | API Routes | ~11 |
-| API Services | ~31 |
+| API Services | ~30 |
 | API Schemas | ~14 |
 | Tests | ~3,452 + E2E 273 |
-| D1 Migrations | 142 (latest: 0131) |
+| D1 Migrations | 144 (latest: 0133) |
 <!-- README_SYNC_END -->
 
 ## 주요 기능
