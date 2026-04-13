@@ -58,6 +58,17 @@ Phase 1~36 완료 (Sprint 1~268). 상세: SPEC.md §5
 
 > 세밀한 제어가 필요할 때만: `/tdd red`, `/bkit:pdca analyze`, `/ax:code-verify` 등
 
+### Project Skills (`.claude/skills/`)
+
+| 스킬 | 용도 |
+|------|------|
+| `/tdd` | TDD Red→Green→Refactor 사이클 오케스트레이터 |
+| `/gstack` | Headless browser QA 테스트 + dogfooding |
+| `/ai-biz` | AI 사업 분석 11종 서브스킬 |
+| `/ax-bd-discovery` | AX BD 2단계 발굴 프로세스 |
+| `/ax-bd-shaping` | AX BD 형상화 파이프라인 (Stage 3→4) |
+| `/npm-release` | CLI npm 배포 자동화 |
+
 ## Key References
 
 - 현행 PRD: `docs/specs/FX-SPEC-PRD-V8_foundry-x.md` (v8)
