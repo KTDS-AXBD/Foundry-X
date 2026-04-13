@@ -1,75 +1,78 @@
 ---
 code: FX-DOC-ROADMAP
 title: Foundry-X Roadmap
-version: 1.263
+version: 1.277
 status: Active
 created: 2026-04-12
-updated: 2026-04-12
+updated: 2026-04-13
 author: Sinclair Seo
 ---
 
-# Foundry-X Roadmap v1.263
+# Foundry-X Roadmap v1.277
 
 > 현재 위치, 단기/중기/장기 계획. Sprint 완료 시 갱신.
 
 ## 1. Current Position
 
-- **Active Phase**: 36 — Work Management Enhancement
-- **Last Sprint**: 263 (F511 Work Management 품질 보강, PR #516)
-- **Next Sprint**: 264 (F513 API 테스트 보강 + 확장, TDD)
+- **Last Phase**: 39 — MSA Walking Skeleton ✅
+- **Last Sprint**: 277 (F522+F523 shared 슬리밍 + D1 격리, PR #544, Gap 97%)
+- **Active Work**: 없음 — Phase 40 기획 필요
+- **Metrics**: ~11 routes, ~30 services, ~14 schemas, D1 0131, tests ~3452 (E2E 273)
 
-## 2. Short-term (Phase 36, ~6 Sprint)
+## 2. Completed Phases (Sprint 263~277)
 
-### Phase 36-A: 문서 체계 정비 + 아카이브 (즉시, meta-only)
+### Phase 36: Work Management Enhancement ✅
 
-| 항목 | 작업 | 상태 |
-|------|------|:----:|
-| A-0 | 파서 호환성 테스트 48건 | ✅ PR #517 |
-| A-1 | BLUEPRINT.md v1.36 | ✅ |
-| A-2 | ROADMAP.md v1.263 | ✅ (이 문서) |
-| A-3 | SPEC.md 경량화 (1,377→350줄) | 📋 |
-| A-4 | SPEC.md §6 아카이브 | 📋 |
-| A-5 | SPEC.md §2 아카이브 | 📋 |
-| A-6 | docs/ 산출물 아카이브 (Phase 30 이전) | 📋 |
-| A-7 | F-item 세부 상태 10단계 적용 | 📋 |
-| A-8 | Entry/Exit Criteria → .claude/rules/ | 📋 |
+| 단계 | 내용 | Sprint | 상태 |
+|------|------|:------:|:----:|
+| A-0 | 파서 호환성 테스트 48건 | 263 | ✅ PR #517 |
+| A-1~A-8 | 문서 체계 정비 + rules 승격 | 264 | ✅ PR #518 |
+| B-0~B-3 | F513 TDD + API 3종 | 264 | ✅ PR #518 |
+| B-4~B-5 | F514 대시보드 확장 | 265 | ✅ PR #524 |
+| C-1~C-5 | F515 자동화 연결 5종 | 266 | ✅ PR #529 |
 
-### Phase 36-B: 기존 데이터 표면화 — TDD (Sprint 264~265)
+### Phase 37: Work Lifecycle Platform ✅
 
-| Sprint | F-item | 작업 |
-|:------:|--------|------|
-| 264 | F513 | B-0 기존 테스트 보강 (~15건) + B-1~B-3 API 3종 (velocity/phase-progress/backlog-health) |
-| 265 | F514 | B-4 Pipeline Flow 뷰 + B-5 Velocity/Phase Progress 차트 + E2E |
+| Sprint | F-item | 내용 | 상태 |
+|:------:|--------|------|:----:|
+| 273 | F516 | Backlog 인입 파이프라인 + SSE 실시간 | ✅ PR #538 |
+| 274 | F517 | 메타데이터 트레이서빌리티 | ✅ PR #539, Gap 100% |
+| 275 | F518 | Work Ontology KG | ✅ PR #541, Gap 91% |
 
-### Phase 36-C: 자동화 연결 (Sprint 266)
+### Phase 38: Dashboard Overhaul ✅
 
-| Sprint | F-item | 작업 |
-|:------:|--------|------|
-| 266 | F515 | board-sync-spec 파서 + Roadmap/Blueprint 자동갱신 + 아카이브 자동화 + CHANGELOG 생성 |
+| Sprint | F-item | 내용 | 상태 |
+|:------:|--------|------|:----:|
+| 276 | F519 | 대시보드 현행화 — 파이프라인 축소, 위젯 정리, ToDo UX | ✅ PR #543, Match 100% |
 
-### 의존관계
+### Phase 39: MSA Walking Skeleton ✅
 
-```
-A-0 ✅ → A-1 ✅ → A-2 ✅ → A-3~A-8 → Phase B → Phase C
-                                  └── C-4 (A 직후 가능)
-```
+| Sprint | F-item | 내용 | 상태 |
+|:------:|--------|------|:----:|
+| 268 | F520 | API 게이트웨이 Worker (fx-gateway) | ✅ PR #535 |
+| 268 | F521 | Discovery 도메인 분리 (fx-discovery) | ✅ PR #535 |
+| 277 | F522 | shared 타입 슬리밍 | ✅ PR #544 |
+| 277 | F523 | D1 스키마 격리 | ✅ PR #544, Gap 97% |
 
-## 3. Mid-term (Phase 37~38, 방향성)
+## 3. Next Phase Candidates (Phase 40)
 
-현재 구체화되지 않은 후보. Phase 36 완료 후 PRD 작성 예정.
+Phase 39까지 완료. 아래 후보 중 PRD 작성 후 착수 결정.
 
-| 후보 | 방향 | 의존 |
-|------|------|------|
-| 웹 대시보드 관리 기능 | F-item 상태 전이, Sprint 배정을 웹에서 직접 수행 | Phase 36-B API 의존 |
-| 에이전트 자율 운영 강화 | autopilot Gap% E2E 측정 확장, 자동 아카이브 | Phase 36-C 의존 |
-| GIVC Ontology 2차 | KG 탐색기 고도화, 이벤트 연쇄 시나리오 확장 | 독립 |
+| 후보 | 방향 | 의존 | 규모 |
+|------|------|------|:----:|
+| **A. 웹 관리 기능** | F-item 상태 전이, Sprint 배정을 웹 UI에서 직접 수행. SPEC.md CLI 의존 탈피 | Phase 36-B API 완료 ✅ | 중 |
+| **B. 에이전트 자율 운영 강화** | autopilot Gap% E2E 확장, 자동 아카이브, Sprint 자율 선택 | Phase 36-C 완료 ✅ | 중 |
+| **C. GIVC Ontology 2차** | KG 탐색기 고도화, 이벤트 연쇄 시나리오, KOAMI PoC 연결 | 독립 | 대 |
+| **D. MSA 2차 — 도메인 확장** | core API의 다음 도메인(Work Management 등)을 독립 Worker로 분리 | Phase 39 완료 ✅ | 대 |
+
+> 후보 선정 → `/ax:req-interview`로 PRD 작성 → F-item 등록 → Sprint 배정
 
 ## 4. Long-term Backlog
 
 | F-item | 내용 | 등록 시점 | 상태 |
 |--------|------|----------|:----:|
-| F112 | (수요 대기) | Phase 2 | 📋 |
-| F117 | (수요 대기) | Phase 2 | 📋 |
+| F112 | GitLab API 지원 (수요 대기) | Phase 2 | 📋 DEFER |
+| F117 | 외부 파일럿 (수요 대기) | Phase 2 | 📋 DEFER |
 
 > 분기 1회 Backlog Grooming: 3 Phase 이상 미착수 항목 → 승격/보류/폐기 판단
 
@@ -78,7 +81,7 @@ A-0 ✅ → A-1 ✅ → A-2 ✅ → A-3~A-8 → Phase B → Phase C
 | 이벤트 | 주기 | 액션 |
 |--------|------|------|
 | Sprint 완료 | ~1~2일 | §1 Current Position 갱신 |
-| Phase 완료 | ~1~2주 | §2↔§3 시프트 + 버전 범프 |
+| Phase 완료 | ~1~2주 | §2 완료 기록 + §3 후보 갱신 |
 | Backlog Grooming | 분기 1회 | §4 장기 백로그 승격/폐기 |
 
 ---
@@ -87,4 +90,5 @@ A-0 ✅ → A-1 ✅ → A-2 ✅ → A-3~A-8 → Phase B → Phase C
 
 | 버전 | 날짜 | 변경 |
 |------|------|------|
+| 1.277 | 2026-04-13 | Phase 36~39 완료 반영, Phase 40 후보 4건 구체화 |
 | 1.263 | 2026-04-12 | 초판. Sprint 263 완료, Phase 36 착수 시점 |
