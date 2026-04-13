@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Phase 41 회고: HyperFX Agent Stack (Sprint 280~283)
+
+#### 지표 변화
+| 지표 | Phase 39 완료 | Phase 41 완료 | 변화 |
+|------|:------------:|:------------:|:----:|
+| F-items | F523 | F530 | +7 (Phase 40+41) |
+| D1 Migrations | 0131 | 0133 | +2 |
+| 코드 추가 (Phase 41) | — | +7,640줄 | 4 Sprint |
+| 파일 추가 (Phase 41) | — | 76파일 | 4 PRs |
+| Sprint 평균 Match Rate | — | 97% | 일관 |
+
+#### 잘된 점
+- **Full Auto 한 세션 완주**: req-interview(6 Phase) → pipeline 분석 → Sprint 4개 순차 Full Auto → session-end까지 단일 세션에서 완주. PRD부터 프로덕션 배포까지의 자동화 성숙도가 높아짐
+- **Pipeline 가능 여부 사전 판정**: 의존성/변경 영역/D1 3기준으로 병렬 불가를 사전에 판정하여 merge conflict 없는 깔끔한 순차 실행
+- **Walking Skeleton 효과**: 4개 레이어를 최소 구현으로 전체 구조를 한 번에 완성 — 이후 Deep Integration에서 점진적 확장 가능
+
+#### 개선점
+- **stale Monitor 생명주기 문제**: S272의 persistent Monitor가 세션을 넘어 살아있어 Sprint 278~280 이벤트까지 캐치 → 노이즈. C51로 근본 원인 분석 + ax-plugin 스킬 수정 완료
+- **merge-monitor CI 타이밍**: 4개 Sprint 모두 auto-merge가 merge-monitor보다 먼저 완료되어 FAIL로 판정됨 — 매번 수동 확인 필요. merge-monitor가 `state=MERGED`를 먼저 체크하도록 개선 필요 (후속 C-track)
+
+#### 결정 검증
+- ✅ **순차 실행 판정**: 병렬 불가 판정이 올바른 결정 — 4개 Sprint 모두 conflict 0건
+- ✅ **Walking Skeleton 접근**: 4-Layer 전체를 최소 구현한 것이 효과적 — 각 레이어가 독립적으로 테스트 가능한 상태
+- ⚠️ **merge-monitor 의존**: auto-merge 환경에서 merge-monitor의 CI 체크 로직이 불필요한 복잡도 추가 — 단순화 검토 필요
+
+#### 다음 방향
+- **Deep Integration**: Walking Skeleton → 실제 발굴 파이프라인 연동 (Graph 실행 E2E)
+- **스트리밍 E2E**: WebSocket/SSE 실제 에이전트 이벤트 연동 테스트
+- **MetaAgent 실전**: 6축 메트릭 실 데이터 수집 + 개선 제안 품질 검증
+- **merge-monitor 개선**: auto-merge 환경에서 state=MERGED 우선 체크 로직
+
 ### Added
 - **Phase 41 HyperFX Agent Stack** (Sprint 280~283, PR #549/#552/#553/#555, +7644줄): 4-Layer Agent Stack Walking Skeleton — F527 Agent Runtime(defineTool, AgentSpec YAML, 7 agent migration), F528 Graph Orchestration(GraphEngine, Agents-as-Tools, Steering, 발굴 9단계 Graph), F529 Agent Streaming(SSE, D1 metrics, Web dashboard), F530 Meta Layer(DiagnosticCollector 6축, MetaAgent, Human Approval UI)
 - **Phase 40 Agent Autonomy** (Sprint 278~279, PR #548/#550): F524 E2E 시나리오 자동 추출, F525 Gap-E2E 통합 점수, F526 autopilot Verify E2E 통합
