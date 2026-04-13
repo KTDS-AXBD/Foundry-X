@@ -28,9 +28,11 @@ turbo test / lint / typecheck  # 전체 검증
 ## Current Phase
 
 Phase 1~36 완료 (Sprint 1~268). 상세: SPEC.md §5
-- **Phase 37: Work Lifecycle Platform** 📋 (F516~F518, Sprint 273~275). PRD: `docs/specs/fx-work-lifecycle-platform/prd-final.md`
+- **Phase 37: Work Lifecycle Platform** ✅ (F516~F518, Sprint 273~275). PRD: `docs/specs/fx-work-lifecycle-platform/prd-final.md`
 - **Phase 38: Dashboard Overhaul** ✅ (F519, Sprint 276 PR #543)
 - **Phase 39: MSA Walking Skeleton** ✅ (F520~F523). F520/F521 Sprint 268, F522/F523 Sprint 277 PR #544. PRD: `docs/specs/fx-msa-roadmap/prd-final.md`
+- **Phase 40: Agent Autonomy** ✅ (F524~F526, Sprint 278~279)
+- **Phase 41: HyperFX Agent Stack** ✅ (F527~F530, Sprint 280~283). PRD: `docs/specs/fx-hyperfx-agent-stack/prd-final.md`
 - 장기 backlog 2건: F112, F117
 - 수치: `/ax:daily-check` 또는 SPEC.md §2 (하드코딩 금지)
 
