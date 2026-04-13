@@ -11,6 +11,8 @@ import {
   PhaseProgressSchema,
   BacklogHealthSchema,
   ChangelogSchema,
+  WorkSubmitInputSchema,
+  WorkSubmitOutputSchema,
 } from "../schemas/work.js";
 import type { Env } from "../env.js";
 import { WorkService } from "../services/work.service.js";
@@ -220,4 +222,86 @@ workRoute.openapi(getChangelog, async (c) => {
   const svc = new WorkService(c.env);
   const data = await svc.getChangelog();
   return c.json(data);
+});
+
+// ─── POST /api/work/submit (F516) ────────────────────────────────────────────
+
+const submitWork = createRoute({
+  method: "post",
+  path: "/work/submit",
+  tags: ["Work Lifecycle"],
+  summary: "F516 — Backlog 인입 파이프라인: 분류 + D1 저장 + GitHub Issue + SPEC.md",
+  request: {
+    body: { content: { "application/json": { schema: WorkSubmitInputSchema } } },
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: WorkSubmitOutputSchema } },
+      description: "등록 결과",
+    },
+    400: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "입력 오류",
+    },
+    409: {
+      content: { "application/json": { schema: z.object({ error: z.string(), id: z.string() }) } },
+      description: "중복 제출 (idempotency_key 충돌)",
+    },
+  },
+});
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+workRoute.openapi(submitWork, async (c): Promise<any> => {
+  const input = c.req.valid("json");
+
+  if (!input.title || input.title.trim().length === 0) {
+    return c.json({ error: "title is required" }, 400);
+  }
+
+  const svc = new WorkService(c.env);
+  const result = await svc.submitBacklog({
+    title: input.title.trim(),
+    description: input.description,
+    source: input.source,
+    idempotency_key: input.idempotency_key,
+  });
+
+  if (result.conflict) {
+    return c.json({ error: "Duplicate submission", id: result.id }, 409);
+  }
+
+  return c.json({
+    id: result.id,
+    track: result.track as "F" | "B" | "C" | "X",
+    priority: result.priority as "P0" | "P1" | "P2" | "P3",
+    title: result.title,
+    classify_method: result.classify_method as "llm" | "regex",
+    github_issue_number: result.github_issue_number,
+    spec_row_added: result.spec_row_added,
+    status: result.status,
+  });
+});
+
+// ─── GET /api/work/stream (F516 SSE) ─────────────────────────────────────────
+
+workRoute.get("/work/stream", (c) => {
+  const stream = new ReadableStream({
+    start(controller) {
+      const encoder = new TextEncoder();
+      // 초기 연결 이벤트
+      controller.enqueue(encoder.encode("event: connected\ndata: {}\n\n"));
+      // Cloudflare Workers에서는 long-lived SSE를 Durable Objects 없이 유지하기 어려움
+      // 여기선 연결 확인용 단일 이벤트 후 스트림 유지
+      // 실제 push는 클라이언트 재연결 + polling 조합으로 처리
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+      "X-Accel-Buffering": "no",
+    },
+  });
 });

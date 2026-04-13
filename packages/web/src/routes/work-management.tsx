@@ -747,7 +747,7 @@ function ChangelogTab() {
   );
 }
 
-type Tab = "kanban" | "context" | "classify" | "sessions" | "pipeline" | "velocity" | "backlog" | "roadmap" | "changelog";
+type Tab = "kanban" | "context" | "classify" | "sessions" | "pipeline" | "velocity" | "backlog" | "roadmap" | "changelog" | "submit";
 
 export function Component() {
   const [tab, setTab] = useState<Tab>("kanban");
@@ -784,8 +784,39 @@ export function Component() {
   useEffect(() => {
     fetchSnapshot();
     fetchAnalytics();
-    const id = setInterval(fetchSnapshot, 5000);
-    return () => clearInterval(id);
+    // F516: SSE 연결 성공 시 polling interval 30초로 증가, 실패 시 5초 유지
+    let pollingInterval = 5000;
+    let pollingTimer: ReturnType<typeof setInterval> | null = null;
+
+    const startPolling = (interval: number) => {
+      if (pollingTimer) clearInterval(pollingTimer);
+      pollingTimer = setInterval(fetchSnapshot, interval);
+    };
+
+    startPolling(pollingInterval);
+
+    let es: EventSource | null = null;
+    try {
+      es = new EventSource("/api/work/stream");
+      es.addEventListener("connected", () => {
+        pollingInterval = 30000;
+        startPolling(pollingInterval);
+      });
+      es.addEventListener("work:backlog-updated", () => fetchSnapshot());
+      es.addEventListener("work:snapshot-refresh", () => fetchSnapshot());
+      es.onerror = () => {
+        // SSE 연결 실패 시 5초 polling 복원
+        pollingInterval = 5000;
+        startPolling(pollingInterval);
+      };
+    } catch {
+      // EventSource 미지원 환경 — polling 유지
+    }
+
+    return () => {
+      if (pollingTimer) clearInterval(pollingTimer);
+      if (es) es.close();
+    };
   }, [fetchSnapshot, fetchAnalytics]);
 
   const tabs: { key: Tab; label: string }[] = [
@@ -794,6 +825,7 @@ export function Component() {
     { key: "backlog",   label: "Backlog" },
     { key: "changelog", label: "Changelog" },
     { key: "classify",  label: "작업 분류" },
+    { key: "submit",    label: "아이디어 제출" },
   ];
 
   return (
@@ -882,6 +914,120 @@ export function Component() {
       {tab === "backlog"   && <BacklogHealthTab health={backlogHealth} />}
       {tab === "changelog" && <ChangelogTab />}
       {tab === "classify"  && <ClassifyTab />}
+      {tab === "submit"    && <SubmitTab />}
+    </div>
+  );
+}
+
+// ─── F516: SubmitTab ──────────────────────────────────────────────────────────
+
+interface SubmitResult {
+  id: string;
+  track: string;
+  priority: string;
+  title: string;
+  classify_method: string;
+  github_issue_number?: number;
+  spec_row_added: boolean;
+  status: string;
+}
+
+function SubmitTab() {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<SubmitResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    if (!title.trim()) return;
+    setSubmitting(true);
+    setError(null);
+    setResult(null);
+    try {
+      const res = await postApi<SubmitResult>("/work/submit", {
+        title: title.trim(),
+        description: description.trim() || undefined,
+        source: "web",
+      });
+      setResult(res);
+      setTitle("");
+      setDescription("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "제출 실패");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div style={{ padding: "24px", maxWidth: "600px" }}>
+      <h3 style={{ marginBottom: "16px", fontSize: "16px", fontWeight: 600 }}>아이디어 / 피드백 제출</h3>
+      <p style={{ marginBottom: "16px", fontSize: "13px", color: "#666" }}>
+        새로운 아이디어나 버그를 제출하면 AI가 자동으로 분류하고 Backlog에 등록해요.
+      </p>
+
+      <div style={{ marginBottom: "12px" }}>
+        <label style={{ display: "block", marginBottom: "4px", fontSize: "13px", fontWeight: 500 }}>제목 *</label>
+        <input
+          type="text"
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          placeholder="예: 웹에서 바로 아이디어를 제출할 수 없어요"
+          style={{ width: "100%", padding: "8px 12px", border: "1px solid #ddd", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+          disabled={submitting}
+        />
+      </div>
+
+      <div style={{ marginBottom: "16px" }}>
+        <label style={{ display: "block", marginBottom: "4px", fontSize: "13px", fontWeight: 500 }}>상세 설명 (선택)</label>
+        <textarea
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          placeholder="어떤 문제인지, 어떤 기능을 원하는지 설명해 주세요"
+          rows={4}
+          style={{ width: "100%", padding: "8px 12px", border: "1px solid #ddd", borderRadius: "6px", fontSize: "14px", resize: "vertical", boxSizing: "border-box" }}
+          disabled={submitting}
+        />
+      </div>
+
+      <button
+        onClick={handleSubmit}
+        disabled={submitting || !title.trim()}
+        style={{
+          padding: "8px 20px",
+          background: submitting || !title.trim() ? "#ccc" : "#2563eb",
+          color: "#fff",
+          border: "none",
+          borderRadius: "6px",
+          cursor: submitting || !title.trim() ? "default" : "pointer",
+          fontSize: "14px",
+          fontWeight: 500,
+        }}
+      >
+        {submitting ? "처리 중..." : "제출하기"}
+      </button>
+
+      {result && (
+        <div style={{ marginTop: "16px", padding: "16px", background: "#f0fdf4", border: "1px solid #86efac", borderRadius: "8px" }}>
+          <div style={{ fontWeight: 600, marginBottom: "8px", color: "#166534" }}>등록 완료</div>
+          <div style={{ fontSize: "13px", display: "grid", gap: "4px" }}>
+            <div>ID: <code>{result.id}</code></div>
+            <div>Track: <strong>{result.track}</strong> / Priority: <strong>{result.priority}</strong></div>
+            <div>분류 방식: {result.classify_method === "llm" ? "AI 분류" : "규칙 기반 분류"}</div>
+            {result.github_issue_number && (
+              <div>GitHub Issue: <strong>#{result.github_issue_number}</strong></div>
+            )}
+            <div>SPEC.md: {result.spec_row_added ? "자동 등록됨" : "수동 등록 필요"}</div>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div style={{ marginTop: "16px", padding: "12px", background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "8px", color: "#991b1b", fontSize: "13px" }}>
+          {error}
+        </div>
+      )}
     </div>
   );
 }
