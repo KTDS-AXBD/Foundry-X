@@ -26,7 +26,8 @@ sessions_raw=$(tmux list-sessions -F '#{session_name}|#{session_activity}|#{sess
 
 # ── 2. git worktree 목록 수집 ─────────────────────────────────────────────
 
-REPO_DIR="${FOUNDRY_REPO_DIR:-$HOME/work/axbd/Foundry-X}"
+# HOME 독립적 절대 경로 — C28 HOME 오염 대응 (S271)
+REPO_DIR="${FOUNDRY_REPO_DIR:-/home/sinclair/work/axbd/Foundry-X}"
 worktrees_raw=$(git -C "$REPO_DIR" worktree list --porcelain 2>/dev/null \
   | awk '/^worktree /{wt=$2} /^branch /{br=$2; print wt"|"br}' || true)
 

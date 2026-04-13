@@ -134,7 +134,8 @@ if [ -z "$SLUG" ]; then
   exit 2
 fi
 
-WT_BASE="${CLAUDE_WT_BASE:-$HOME/work/worktrees}"
+# HOME 독립적 절대 경로 — C28 HOME 오염 대응 (S271)
+WT_BASE="${CLAUDE_WT_BASE:-/home/sinclair/work/worktrees}"
 PROJECT=$(basename "$REPO_ROOT")
 
 # ─── Step 1: ID allocator + SPEC register (under flock) ──────────────────────
