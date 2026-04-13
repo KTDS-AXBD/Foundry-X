@@ -46,7 +46,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 > ```
 > wc -l SPEC.md && find packages/api/src/db/migrations/*.sql | sort | tail -1
 > ```
-> **마지막 실측** (Sprint 275, 2026-04-13): ~10 routes, ~30 services, ~14 schemas, D1 0130, 10 packages, tests ~3452 (E2E 273) — F517 🔧 Sprint 274, F518 🔧 Sprint 275 진행
+> **마지막 실측** (Sprint 275, 2026-04-13): ~11 routes, ~31 services, ~14 schemas, D1 0131, 10 packages, tests ~3452 (E2E 273) — Phase 37 F516~F518 ✅ 완료
 
 ## §3 Phase 진행 현황
 
