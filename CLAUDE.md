@@ -33,7 +33,7 @@ Phase 1~36 완료 (Sprint 1~268). 상세: SPEC.md §5
 - **Phase 39: MSA Walking Skeleton** ✅ (F520~F523). F520/F521 Sprint 268, F522/F523 Sprint 277 PR #544. PRD: `docs/specs/fx-msa-roadmap/prd-final.md`
 - **Phase 40: Agent Autonomy** ✅ (F524~F526, Sprint 278~279)
 - **Phase 41: HyperFX Agent Stack** ✅ (F527~F530, Sprint 280~283). PRD: `docs/specs/fx-hyperfx-agent-stack/prd-final.md`
-- **Phase 42: HyperFX Deep Integration** 📋 (F531~F533, Sprint 284~286). 발굴 Graph 실행 연동 + 스트리밍 E2E + MetaAgent 실전 검증
+- **Phase 42: HyperFX Deep Integration** ✅ (F531~F533, Sprint 284~286). 발굴 Graph 실행 연동 + 스트리밍 E2E + MetaAgent 실전 검증
 - 장기 backlog 2건: F112, F117
 - 수치: `/ax:daily-check` 또는 SPEC.md §2 (하드코딩 금지)
 
