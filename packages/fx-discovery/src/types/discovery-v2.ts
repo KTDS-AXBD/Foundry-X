@@ -1,7 +1,5 @@
 /**
  * Sprint 154: F342 Discovery UI/UX v2 — 공유 타입 정의
- * @deprecated F522 (Sprint 277): 권위 소스가 packages/fx-discovery/src/types/discovery-v2.ts로 이동.
- *             shared 파일은 하위 호환용 re-export 유지 (T3). T4 전환 시 삭제 예정.
  */
 
 export interface PersonaWeights {

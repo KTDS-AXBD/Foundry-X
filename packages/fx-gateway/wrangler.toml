@@ -6,17 +6,16 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 ENVIRONMENT = "production"
-# DISCOVERY_ENABLED = "true"  # fx-discovery Worker 배포 후 활성화
 
 # F517: Service Binding — 기존 API Worker (잔여 도메인)
 [[services]]
 binding = "MAIN_API"
 service = "foundry-x-api"
 
-# F518: Service Binding — Discovery Worker (fx-discovery 배포 후 활성화)
-# [[services]]
-# binding = "DISCOVERY"
-# service = "fx-discovery"
+# F523: Service Binding — Discovery Worker (활성화, 하드와이어)
+[[services]]
+binding = "DISCOVERY"
+service = "fx-discovery"
 
 # Local development
 [env.dev]
@@ -25,3 +24,7 @@ name = "fx-gateway-dev"
 [[env.dev.services]]
 binding = "MAIN_API"
 service = "foundry-x-api-dev"
+
+[[env.dev.services]]
+binding = "DISCOVERY"
+service = "fx-discovery-dev"

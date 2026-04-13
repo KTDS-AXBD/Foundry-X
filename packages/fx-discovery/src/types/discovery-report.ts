@@ -1,7 +1,5 @@
 /**
  * Sprint 156: F346+F347 — 발굴 완료 리포트 타입
- * @deprecated F522 (Sprint 277): 권위 소스가 packages/fx-discovery/src/types/discovery-report.ts로 이동.
- *             shared 파일은 하위 호환용 re-export 유지 (T3). T4 전환 시 삭제 예정.
  */
 
 /** 탭 2-1: 레퍼런스 분석 */

@@ -26,6 +26,7 @@ jobs:
       api: ${{ steps.filter.outputs.api }}
       web: ${{ steps.filter.outputs.web }}
       code: ${{ steps.filter.outputs.code }}
+      msa: ${{ steps.filter.outputs.msa }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v4
@@ -44,6 +45,9 @@ jobs:
             web:
               - 'packages/web/**'
               - 'packages/shared/**'
+            msa:
+              - 'packages/fx-gateway/**'
+              - 'packages/fx-discovery/**'
 
   # 코드 변경 시에만 test 실행 (SPEC.md, scripts, docs 변경은 skip)
   test:
@@ -137,11 +141,38 @@ jobs:
           command: pages deploy dist --project-name=foundry-x-web --commit-dirty=true --commit-message="deploy"
           packageManager: pnpm
 
+  # Production deploy — MSA Workers (fx-discovery + fx-gateway)
+  deploy-msa:
+    if: |
+      always() &&
+      (needs.changes.outputs.msa == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
+    needs: [test, changes]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Deploy fx-discovery Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: packages/fx-discovery
+      - name: Deploy fx-gateway Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: packages/fx-gateway
+
   smoke-test:
     if: |
       always() &&
       !contains(needs.*.result, 'failure')
-    needs: [deploy-api, deploy-web]
+    needs: [deploy-api, deploy-web, deploy-msa]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
