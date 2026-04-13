@@ -29,7 +29,8 @@ OrchestrationLoop graphMode → DiscoveryGraphService 실행
 
 변경:
 - `makeStageHandler(stage)` stub → 실제 `StageRunnerService.runStage()` 호출
-- 함수 시그니처: `createDiscoveryGraph(runner: AgentRunner, db: D1Database): GraphDefinition`
+- `makeStubHandler()` fallback — runner/db 미제공 시 F528 backward compat 유지
+- 함수 시그니처: `createDiscoveryGraph(runner?: AgentRunner, db?: D1Database): GraphDefinition` (optional params)
 - 각 핸들러에서 `GraphNodeInput.data`에서 `{ bizItemId, orgId, discoveryType }` 추출
 - coordinator 핸들러: 입력 데이터 검증 + 로그
 - stage 핸들러: `StageRunnerService.runStage()` 호출 → 결과를 `GraphNodeOutput.data`에 포함
@@ -77,11 +78,18 @@ export class DiscoveryGraphService {
     return engine.run(input, this.sessionId, this.apiKey, this.db);
   }
 
-  /** 특정 단계부터 재개 */
+  /** 특정 단계부터 재개 — BFS로 reachable nodes 탐색 후 서브그래프 구성 */
   async runFrom(stage: string, input: GraphStageInput): Promise<GraphRunResult> {
-    // entryPoint를 해당 stage 노드로 변경하여 실행
+    const reachable = findReachableNodes(graph, stage); // BFS 헬퍼
+    // reachable nodes만으로 서브그래프 구성 → engine.run()
   }
+
+  /** 내부: Definition에서 GraphEngine 구성 */
+  private buildEngine(graph: GraphDefinition): GraphEngine { ... }
 }
+
+/** BFS로 entryPoint에서 도달 가능한 노드 집합 반환 */
+function findReachableNodes(graph: GraphDefinition, entryPoint: string): Set<string> { ... }
 ```
 
 ### 2-3. `StageRunnerService.confirmStage()` Graph 분기
@@ -104,8 +112,9 @@ async confirmStage(
 
 **파일**: `packages/api/src/core/agent/services/orchestration-loop.ts`
 
-`LoopStartParams`에 `graphDiscovery?: GraphStageInput` 추가:
-- 설정 시 루프 전체를 `DiscoveryGraphService.runAll()` 경로로 분기
+`LoopStartParamsExtended extends LoopStartParams`로 확장:
+- `graphDiscovery?: GraphStageInput` — 설정 시 루프 전체를 `DiscoveryGraphService.runAll()` 경로로 분기
+- `graphRunner?: AgentRunner`, `graphApiKey?: string` — Graph 실행 시 필요한 추가 파라미터
 - 기존 retry/adversarial/fix 모드는 유지
 
 ## §3 타입 변경

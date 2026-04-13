@@ -72,6 +72,7 @@ F533 MetaAgent Full Loop Integration
 ```
 Agent Meta Dashboard
   ✓ 진단 폼 렌더링 확인
+  ✓ 세션 ID 없으면 진단 실행 버튼 비활성화 (UX 방어)
   ✓ 진단 실행 → 6축 결과 표시
   ✓ 승인 버튼 클릭 → 상태 approved로 변경
   ✓ 거부 폼 → 사유 입력 → rejected 상태
@@ -83,7 +84,7 @@ Agent Meta Dashboard
 | 파일 | 작업 |
 |------|------|
 | `packages/api/src/db/migrations/0134_proposal_applied_at.sql` | applied_at 컬럼 추가 |
-| `packages/api/src/core/agent/services/proposal-apply.ts` | ProposalApplyService (신규) |
+| `packages/api/src/core/agent/services/proposal-apply.ts` | ProposalApplyService (신규) + 커스텀 Error 3종 (`AlreadyAppliedError`, `NotApprovedError`, `ProposalNotFoundError`) |
 | `packages/api/src/core/agent/routes/meta.ts` | POST /meta/proposals/:id/apply 추가 |
 | `packages/api/src/__tests__/integration/meta-agent-full-loop.test.ts` | Integration 테스트 (신규) |
 | `packages/web/e2e/meta-agent.spec.ts` | E2E 테스트 (신규) |
