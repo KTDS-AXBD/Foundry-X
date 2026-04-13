@@ -747,7 +747,7 @@ function ChangelogTab() {
   );
 }
 
-type Tab = "kanban" | "context" | "classify" | "sessions" | "pipeline" | "velocity" | "backlog" | "roadmap" | "changelog" | "submit";
+type Tab = "kanban" | "context" | "classify" | "sessions" | "pipeline" | "velocity" | "backlog" | "roadmap" | "changelog" | "submit" | "trace";
 
 export function Component() {
   const [tab, setTab] = useState<Tab>("kanban");
@@ -826,6 +826,7 @@ export function Component() {
     { key: "changelog", label: "Changelog" },
     { key: "classify",  label: "작업 분류" },
     { key: "submit",    label: "아이디어 제출" },
+    { key: "trace",     label: "추적" },
   ];
 
   return (
@@ -915,6 +916,7 @@ export function Component() {
       {tab === "changelog" && <ChangelogTab />}
       {tab === "classify"  && <ClassifyTab />}
       {tab === "submit"    && <SubmitTab />}
+      {tab === "trace"     && <TraceTab />}
     </div>
   );
 }
@@ -930,6 +932,235 @@ interface SubmitResult {
   github_issue_number?: number;
   spec_row_added: boolean;
   status: string;
+}
+
+// ─── F517: TraceTab ───────────────────────────────────────────────────────────
+
+interface TracePr {
+  number: number;
+  title: string;
+  url: string;
+  state: string;
+  commits: string[];
+}
+
+interface TraceFItem {
+  id: string;
+  title: string;
+  status: string;
+  sprint?: string;
+  req_code?: string;
+  prs: TracePr[];
+}
+
+interface TraceChain {
+  id: string;
+  type: "req" | "f_item";
+  f_items: TraceFItem[];
+}
+
+function TraceTab() {
+  const [query, setQuery] = useState("");
+  const [result, setResult] = useState<TraceChain | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMsg, setSyncMsg] = useState<string | null>(null);
+
+  const search = useCallback(async () => {
+    if (!query.trim()) return;
+    setLoading(true);
+    setError(null);
+    setResult(null);
+    try {
+      const res = await fetchApi<TraceChain>(`/work/trace?id=${encodeURIComponent(query.trim())}`);
+      setResult(res);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "조회 실패");
+    } finally {
+      setLoading(false);
+    }
+  }, [query]);
+
+  const sync = useCallback(async () => {
+    setSyncing(true);
+    setSyncMsg(null);
+    try {
+      const res = await postApi<{ synced: { spec: number; prs: number } }>("/work/trace/sync", {});
+      setSyncMsg(`동기화 완료 — SPEC: ${res.synced.spec}건, PR: ${res.synced.prs}건`);
+    } catch (e) {
+      setSyncMsg(e instanceof Error ? e.message : "동기화 실패");
+    } finally {
+      setSyncing(false);
+    }
+  }, []);
+
+  const statusColor = (s: string) => {
+    if (s === "done") return T.status.done;
+    if (s === "in_progress") return T.status.active;
+    if (s === "rejected") return T.status.error;
+    return T.text.muted;
+  };
+
+  return (
+    <div>
+      {/* Search bar */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 20, alignItems: "center" }}>
+        <input
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && void search()}
+          placeholder="FX-REQ-545 또는 F517"
+          style={{
+            flex: 1,
+            padding: "10px 14px",
+            background: T.bg.card,
+            border: `1px solid ${T.border.subtle}`,
+            borderRadius: 8,
+            color: T.text.primary,
+            fontSize: 13,
+            fontFamily: T.mono,
+            outline: "none",
+          }}
+        />
+        <button
+          onClick={() => void search()}
+          disabled={loading}
+          style={{
+            padding: "10px 18px",
+            background: T.bg.card,
+            border: `1px solid ${T.border.accent}`,
+            borderRadius: 8,
+            color: T.border.accent,
+            fontSize: 13,
+            cursor: loading ? "not-allowed" : "pointer",
+            fontFamily: T.font,
+          }}
+        >
+          {loading ? "조회 중…" : "조회"}
+        </button>
+        <button
+          onClick={() => void sync()}
+          disabled={syncing}
+          style={{
+            padding: "10px 14px",
+            background: "transparent",
+            border: `1px solid ${T.border.subtle}`,
+            borderRadius: 8,
+            color: T.text.muted,
+            fontSize: 12,
+            cursor: syncing ? "not-allowed" : "pointer",
+            fontFamily: T.font,
+          }}
+        >
+          {syncing ? "동기화 중…" : "동기화"}
+        </button>
+      </div>
+
+      {syncMsg && (
+        <div style={{ fontSize: 12, color: T.text.muted, marginBottom: 16, fontFamily: T.mono }}>
+          {syncMsg}
+        </div>
+      )}
+
+      {error && (
+        <div style={{ color: T.status.error, fontSize: 13, marginBottom: 16 }}>{error}</div>
+      )}
+
+      {result && (
+        <div>
+          {/* Chain header */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            marginBottom: 20,
+            padding: "12px 16px",
+            background: T.bg.surface,
+            borderRadius: 8,
+            border: `1px solid ${T.border.subtle}`,
+          }}>
+            <span style={{ fontSize: 13, fontFamily: T.mono, color: T.border.accent }}>{result.id}</span>
+            <span style={{ fontSize: 11, color: T.text.muted }}>
+              {result.type === "req" ? "REQ" : "F-item"} · {result.f_items.length}건
+            </span>
+          </div>
+
+          {/* F-items */}
+          {result.f_items.map(fi => (
+            <div
+              key={fi.id}
+              style={{
+                marginBottom: 16,
+                padding: "14px 16px",
+                background: T.bg.card,
+                borderRadius: 8,
+                border: `1px solid ${T.border.subtle}`,
+              }}
+            >
+              {/* F-item header */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: fi.prs.length > 0 ? 12 : 0 }}>
+                <span style={{ fontSize: 12, fontFamily: T.mono, color: T.border.accent }}>{fi.id}</span>
+                {fi.sprint && (
+                  <span style={{ fontSize: 11, color: T.text.muted }}>Sprint {fi.sprint}</span>
+                )}
+                {fi.req_code && (
+                  <span style={{ fontSize: 11, color: T.text.secondary, fontFamily: T.mono }}>{fi.req_code}</span>
+                )}
+                <span style={{ fontSize: 11, color: statusColor(fi.status), marginLeft: "auto" }}>
+                  {fi.status}
+                </span>
+              </div>
+              <div style={{ fontSize: 13, color: T.text.secondary, marginBottom: fi.prs.length > 0 ? 10 : 0 }}>
+                {fi.title}
+              </div>
+
+              {/* PRs */}
+              {fi.prs.map(pr => (
+                <div
+                  key={pr.number}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "8px 12px",
+                    background: T.bg.surface,
+                    borderRadius: 6,
+                    marginTop: 6,
+                  }}
+                >
+                  <span style={{ fontSize: 11, color: T.text.muted, fontFamily: T.mono }}>
+                    #{pr.number}
+                  </span>
+                  <a
+                    href={pr.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontSize: 12, color: T.border.accent, textDecoration: "none", flex: 1 }}
+                  >
+                    {pr.title}
+                  </a>
+                  <span style={{
+                    fontSize: 10,
+                    color: pr.state === "open" ? T.status.active : T.text.muted,
+                    fontFamily: T.mono,
+                  }}>
+                    {pr.state}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!result && !loading && !error && (
+        <div style={{ textAlign: "center", padding: "48px 0", color: T.text.muted, fontSize: 13 }}>
+          REQ 코드(FX-REQ-NNN) 또는 F-item 번호(FNNN)로 추적 체인을 조회하세요
+        </div>
+      )}
+    </div>
+  );
 }
 
 function SubmitTab() {

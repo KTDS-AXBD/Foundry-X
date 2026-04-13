@@ -13,9 +13,12 @@ import {
   ChangelogSchema,
   WorkSubmitInputSchema,
   WorkSubmitOutputSchema,
+  TraceChainSchema,
+  TraceSyncOutputSchema,
 } from "../schemas/work.js";
 import type { Env } from "../env.js";
 import { WorkService } from "../services/work.service.js";
+import { TraceabilityService } from "../services/traceability.service.js";
 
 export const workRoute = new OpenAPIHono<{ Bindings: Env }>();
 
@@ -279,6 +282,65 @@ workRoute.openapi(submitWork, async (c): Promise<any> => {
     github_issue_number: result.github_issue_number,
     spec_row_added: result.spec_row_added,
     status: result.status,
+  });
+});
+
+// ─── F517: 메타데이터 트레이서빌리티 ─────────────────────────────────────────
+
+const getTrace = createRoute({
+  method: "get",
+  path: "/work/trace",
+  tags: ["Work Traceability"],
+  summary: "REQ/F-item → Sprint → PR → Commit 체인 조회",
+  request: {
+    query: z.object({
+      id: z.string().describe("FX-REQ-NNN 또는 FNNN"),
+    }),
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: TraceChainSchema } },
+      description: "TraceChain",
+    },
+    404: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "Not found",
+    },
+  },
+});
+
+workRoute.openapi(getTrace, async (c) => {
+  const { id } = c.req.valid("query");
+  const svc = new TraceabilityService(c.env);
+  const chain = await svc.getTraceChain(id);
+  if (!chain) return c.json({ error: `Not found: ${id}` }, 404);
+  return c.json(chain);
+});
+
+const postTraceSync = createRoute({
+  method: "post",
+  path: "/work/trace/sync",
+  tags: ["Work Traceability"],
+  summary: "SPEC.md + GitHub API → D1 동기화",
+  responses: {
+    200: {
+      content: { "application/json": { schema: TraceSyncOutputSchema } },
+      description: "Sync result",
+    },
+  },
+});
+
+workRoute.openapi(postTraceSync, async (c) => {
+  const svc = new TraceabilityService(c.env);
+  const [specResult, githubResult] = await Promise.allSettled([
+    svc.syncFromSpec(),
+    svc.syncFromGitHub(),
+  ]);
+  return c.json({
+    synced: {
+      spec: specResult.status === "fulfilled" ? specResult.value.synced : 0,
+      prs: githubResult.status === "fulfilled" ? githubResult.value.synced : 0,
+    },
   });
 });
 

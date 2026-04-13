@@ -992,6 +992,34 @@ export class MockD1Database {
       );
       CREATE UNIQUE INDEX IF NOT EXISTS idx_backlog_items_idempotency
         ON backlog_items(idempotency_key) WHERE idempotency_key IS NOT NULL;
+
+      -- F517: spec_traceability
+      CREATE TABLE IF NOT EXISTS spec_traceability (
+        id        TEXT PRIMARY KEY,
+        req_code  TEXT,
+        sprint    TEXT,
+        title     TEXT NOT NULL,
+        status    TEXT NOT NULL DEFAULT 'backlog',
+        synced_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX IF NOT EXISTS idx_spec_trace_req    ON spec_traceability(req_code);
+      CREATE INDEX IF NOT EXISTS idx_spec_trace_sprint ON spec_traceability(sprint);
+
+      -- F517: sprint_pr_links
+      CREATE TABLE IF NOT EXISTS sprint_pr_links (
+        id          TEXT    PRIMARY KEY,
+        sprint_num  TEXT    NOT NULL,
+        pr_number   INTEGER NOT NULL,
+        f_items     TEXT    NOT NULL DEFAULT '[]',
+        branch      TEXT,
+        pr_title    TEXT,
+        pr_url      TEXT,
+        pr_state    TEXT    NOT NULL DEFAULT 'open',
+        commit_shas TEXT    NOT NULL DEFAULT '[]',
+        synced_at   TEXT    NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX IF NOT EXISTS idx_spr_links_sprint ON sprint_pr_links(sprint_num);
+      CREATE INDEX IF NOT EXISTS idx_spr_links_pr     ON sprint_pr_links(pr_number);
     `);
     this.db.prepare("INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)").run("org_test", "Test Org", "test");
   }
