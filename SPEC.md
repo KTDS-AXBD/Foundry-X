@@ -59,7 +59,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | ↳ Sprint 264 — Phase 36-A(F512) + Phase 36-B 착수(F513) | ✅ |
 | ↳ Sprint 265 — Phase 36-B 완성 (F514) | ✅ |
 | ↳ Sprint 266 — Phase 36-C (F515) | ✅ |
-| **Phase 37 Work Lifecycle Platform** (F516~F518) | 📋 Sprint 267~269 |
+| **Phase 37 Work Lifecycle Platform** (F516~F518) | 📋 Sprint 273~275 |
 | **Phase 38 Dashboard Overhaul** (F519) | 📋 Sprint 270 |
 | **Phase 39 MSA Walking Skeleton** (F520~F523) | ✅/📋 Sprint 268(F520~F521 완료), 271~272 |
 
@@ -123,9 +123,9 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F515 | 자동화 연결 — C-1 board-sync-spec 세부 상태 파싱 + C-2 Roadmap 자동 갱신 + C-3 Blueprint 버전 범프 + C-4 아카이브 자동화 + C-5 CHANGELOG 자동 생성 (FX-REQ-538, P1) | Sprint 266 | ✅ | PR #529. Gap 95.1%. 5종 스크립트 |
 
 | **Phase 37: Work Lifecycle Platform (작업 라이프사이클 플랫폼)** | | | | PRD: `docs/specs/fx-work-lifecycle-platform/prd-final.md`. Backlog 인입→AI 자동분류→트레이서빌리티→Ontology |
-| F516 | Backlog 인입 파이프라인 + 실시간 동기화 — (1) 웹 제출 폼 + AI 자동 분류/등록/알림 (2) GitHub Webhook→D1 캐시→SSE 실시간 파이프라인 (3) CLI task-start/session-end→API 직접 POST (4) 웹 SSE 수신으로 5초 polling 대체 (5) Marker.io webhook 연동. 지연 7~8초→1~2초 (FX-REQ-544, P0) | Sprint 267 | 📋(plan) | C46 승격 + 실시간 동기화 통합 |
-| F517 | 메타데이터 트레이서빌리티 — REQ↔F-item↔Sprint 연결 D1 테이블 + Sprint↔PR↔Commit GitHub API 파싱 + Changelog 구조화(REQ/PR 메타태깅) + 추적 뷰 (FX-REQ-545, P0) | Sprint 268 | 📋(plan) | C47 승격 |
-| F518 | Work Ontology 기반 연결 — KG 스키마(10노드타입/5엣지타입) + kg_nodes/kg_edges D1 테이블 + SPEC/GitHub→노드 자동생성 + KG 쿼리 API + 공개 Roadmap/Changelog 뷰 (FX-REQ-546, P0) | Sprint 269 | 📋(plan) | C48 승격 |
+| F516 | Backlog 인입 파이프라인 + 실시간 동기화 — (1) 웹 제출 폼 + AI 자동 분류/등록/알림 (2) GitHub Webhook→D1 캐시→SSE 실시간 파이프라인 (3) CLI task-start/session-end→API 직접 POST (4) 웹 SSE 수신으로 5초 polling 대체 (5) Marker.io webhook 연동. 지연 7~8초→1~2초 (FX-REQ-544, P0) | Sprint 273 | 📋(plan) | C46 승격 + 실시간 동기화 통합 |
+| F517 | 메타데이터 트레이서빌리티 — REQ↔F-item↔Sprint 연결 D1 테이블 + Sprint↔PR↔Commit GitHub API 파싱 + Changelog 구조화(REQ/PR 메타태깅) + 추적 뷰 (FX-REQ-545, P0) | Sprint 274 | 📋(plan) | C47 승격 |
+| F518 | Work Ontology 기반 연결 — KG 스키마(10노드타입/5엣지타입) + kg_nodes/kg_edges D1 테이블 + SPEC/GitHub→노드 자동생성 + KG 쿼리 API + 공개 Roadmap/Changelog 뷰 (FX-REQ-546, P0) | Sprint 275 | 📋(plan) | C48 승격 |
 
 | **Phase 38: Dashboard Overhaul (대시보드 현행화)** | | | | 서비스 범위(발굴~형상화)에 맞춰 대시보드 전면 정리 |
 | F519 | 대시보드 현행화 — (1) 파이프라인 6단계→2단계 축소 (2) 퀵 액션 dead link 제거 (3) 내부 위젯 4개 삭제 (4) ToDo List UI/UX (5) 업무 가이드 Wiki 대체 (FX-REQ-547, P1) | Sprint 270 | 📋(plan) | |

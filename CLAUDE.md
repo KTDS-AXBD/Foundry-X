@@ -28,7 +28,7 @@ turbo test / lint / typecheck  # 전체 검증
 ## Current Phase
 
 Phase 1~36 완료 (Sprint 1~268). 상세: SPEC.md §5
-- **Phase 37: Work Lifecycle Platform** 📋 (F516~F518, Sprint 267~269). PRD: `docs/specs/fx-work-lifecycle-platform/prd-final.md`
+- **Phase 37: Work Lifecycle Platform** 📋 (F516~F518, Sprint 273~275). PRD: `docs/specs/fx-work-lifecycle-platform/prd-final.md`
 - **Phase 38: Dashboard Overhaul** 📋 (F519, Sprint 270)
 - **Phase 39: MSA Walking Skeleton** ✅/📋 (F520~F523). F520/F521 ✅ Sprint 268 PR #535. PRD: `docs/specs/fx-msa-roadmap/prd-final.md`
 - 장기 backlog 2건: F112, F117
