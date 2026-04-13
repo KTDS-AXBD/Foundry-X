@@ -4,7 +4,7 @@ title: Foundry-X Project Specification
 version: 5.80
 status: Active
 category: SPEC
-system-version: Sprint 270
+system-version: Sprint 274
 created: 2026-03-16
 updated: 2026-04-13
 author: Sinclair Seo
@@ -44,7 +44,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 > ```
 > wc -l SPEC.md && find packages/api/src/db/migrations/*.sql | sort | tail -1
 > ```
-> **마지막 실측** (Sprint 270, 2026-04-13): ~10 routes, ~29 services, ~14 schemas, D1 0127, 10 packages, tests ~3452 (E2E 273) — Phase 39 MSA Walking Skeleton F520/F521 ✅ (fx-gateway + fx-discovery 신규)
+> **마지막 실측** (Sprint 274, 2026-04-13): ~10 routes, ~29 services, ~14 schemas, D1 0128, 10 packages, tests ~3452 (E2E 273) — F516 ✅ Sprint 273, F517 🔧 Sprint 274 진행
 
 ## §3 Phase 진행 현황
 
