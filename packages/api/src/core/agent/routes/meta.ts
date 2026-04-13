@@ -1,4 +1,4 @@
-// ─── F530: Meta Layer 라우트 — Human Approval API (Sprint 283) ───
+// ─── F530/F533: Meta Layer 라우트 — Human Approval API + Proposal Apply (Sprint 283/286) ───
 
 import { Hono } from "hono";
 import { z } from "zod";
@@ -6,6 +6,7 @@ import type { Env } from "../../../env.js";
 import { MetaApprovalService, NotFoundError } from "../services/meta-approval.js";
 import { DiagnosticCollector } from "../services/diagnostic-collector.js";
 import { MetaAgent } from "../services/meta-agent.js";
+import { ProposalApplyService, AlreadyAppliedError, NotApprovedError, ProposalNotFoundError } from "../services/proposal-apply.js";
 
 export const metaRoute = new Hono<{ Bindings: Env }>();
 
@@ -66,6 +67,28 @@ metaRoute.post("/meta/proposals/:id/approve", async (c) => {
   } catch (err) {
     if (err instanceof NotFoundError) {
       return c.json({ error: err.message }, 404);
+    }
+    throw err;
+  }
+});
+
+// POST /api/meta/proposals/:id/apply
+metaRoute.post("/meta/proposals/:id/apply", async (c) => {
+  const { id } = c.req.param();
+  const svc = new ProposalApplyService(c.env.DB);
+
+  try {
+    const proposal = await svc.apply(id);
+    return c.json({ proposal });
+  } catch (err) {
+    if (err instanceof ProposalNotFoundError) {
+      return c.json({ error: err.message }, 404);
+    }
+    if (err instanceof NotApprovedError) {
+      return c.json({ error: err.message }, 422);
+    }
+    if (err instanceof AlreadyAppliedError) {
+      return c.json({ error: err.message }, 409);
     }
     throw err;
   }
