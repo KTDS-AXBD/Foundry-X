@@ -37,6 +37,8 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | Sprint 276 | ✅ 완료 — F519 대시보드 현행화 (PR #543, +327/-5, Match 100%) |
 | Sprint 277 | ✅ 완료 — F522+F523 shared 슬리밍 + D1 격리 (PR #544, +858/-38, 17 files) |
 | Sprint 278 | ✅ 완료 — F524+F525 E2E 자동 추출 + Gap-E2E 통합 점수 (PR #548, +1093/-0, TDD 18/18, Composite 97%) |
+| Sprint 279 | ✅ 완료 — F526 autopilot Verify E2E 통합 (PR #550, +532/-0, 6 files) |
+| Sprint 280 | ✅ 완료 — F527 Agent Runtime L2 (PR #549, +1858/-0, 18 files, Match 97%) |
 
 | 항목 | 상태 |
 |------|------|
@@ -68,7 +70,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | **Phase 37 Work Lifecycle Platform** (F516~F518) | ✅ Sprint 273~275 |
 | **Phase 38 Dashboard Overhaul** (F519) | ✅ Sprint 276 |
 | **Phase 39 MSA Walking Skeleton** (F520~F523) | ✅ Sprint 268(F520~F521), 277(F522~F523) |
-| **Phase 40 Agent Autonomy** (F524~F526) | 🔧 Sprint 278 ✅, 279 📋 |
+| **Phase 40 Agent Autonomy** (F524~F526) | ✅ Sprint 278~279 |
 | **Phase 41 HyperFX Agent Stack** (F527~F530) | 📋 Sprint 280~283 |
 
 ## §4 성공 지표
@@ -147,7 +149,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | **Phase 40: Agent Autonomy — E2E 자동화 + Gap 통합** | | | | PRD: `docs/specs/fx-agent-autonomy/prd-final.md`. E2E 자동 생성 + Gap-E2E 통합 품질 점수 |
 | F524 | E2E 시나리오 자동 추출 — Design 문서 §4+§5에서 Playwright spec 자동 생성, 템플릿+NLP 파싱 (FX-REQ-552, P0) | Sprint 278 | ✅ | PR #548. e2e-extractor.ts, TDD 9/9, Gap 95% |
 | F525 | Gap-E2E 통합 점수 — Gap Analysis에 E2E PASS/FAIL 포함, Gap×0.6+E2E×0.4 가중 평균 (FX-REQ-553, P0) | Sprint 278 | ✅ | PR #548. gap-scorer.ts, TDD 9/9, Composite 97% |
-| F526 | autopilot Verify E2E 통합 — sprint-autopilot Step 5~6에 E2E 생성+실행 자동 삽입 (FX-REQ-554, P0) | Sprint 279 | 🔧 | PRD M3 |
+| F526 | autopilot Verify E2E 통합 — sprint-autopilot Step 5~6에 E2E 생성+실행 자동 삽입 (FX-REQ-554, P0) | Sprint 279 | ✅ | PR #550. +532, 6 files |
 | **Phase 41: HyperFX Agent Stack — 4-Layer 에이전트 재구조화** | | | | PRD: `docs/specs/fx-hyperfx-agent-stack/prd-final.md`. Walking Skeleton 접근 — 선언적 에이전트 + Graph 오케스트레이션 + 실시간 스트리밍 + 자기개선 |
 | F527 | Agent Runtime (L2) — defineTool() 유틸리티 + AgentSpec YAML 스키마 + AgentRuntime 실행 엔진 + Hooks + TokenTracker + ToolRegistry + 기존 7 에이전트 YAML 마이그레이션 (FX-REQ-555, P0) | Sprint 280 | ✅ | PR #549, +1858, TDD, Match 97% |
 | F528 | Graph Orchestration (L3) — GraphEngine(GraphBuilder API + 조건부 라우팅 + 병렬 실행) + Agents-as-Tools + SteeringHandler + ConversationManager + OrchestrationLoop 래핑 + AX BD 발굴 9단계 Graph 정의 (FX-REQ-556, P0) | Sprint 281 | 🔧 | PRD M2 |
