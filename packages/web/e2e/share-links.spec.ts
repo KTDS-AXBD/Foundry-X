@@ -40,7 +40,7 @@ test.describe("Share Links (F233)", () => {
     expect(listData.body).toHaveLength(1);
   });
 
-  test("공유 다이얼로그 UI — 파이프라인에서 아이템 표시", async ({ authenticatedPage: page }) => {
+  test.skip("공유 다이얼로그 UI — F434: /validation/pipeline 제거됨", async ({ authenticatedPage: page }) => {
     await page.route("**/api/pipeline/kanban*", (route) =>
       route.fulfill({
         json: [{

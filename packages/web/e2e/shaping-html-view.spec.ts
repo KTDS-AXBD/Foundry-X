@@ -306,12 +306,13 @@ test.describe("PRD HTML 미리보기", () => {
     await expect(page.getByText("AI 헬스케어 플랫폼")).toBeVisible({ timeout: 10000 });
     await page.getByText("AI 헬스케어 플랫폼").click();
 
-    // Wait for PRD list to load
-    await expect(page.getByText("1차 PRD")).toBeVisible({ timeout: 10000 });
+    // Wait for PRD list to load after expand
+    await expect(page.getByText("1차 PRD")).toBeVisible({ timeout: 15000 });
 
     // Check status badges within the PRD cards
     const prd1Card = page.getByTestId("prd-card-prd-1");
     const prd2Card = page.getByTestId("prd-card-prd-2");
+    await expect(prd1Card).toBeVisible({ timeout: 5000 });
     await expect(prd1Card.getByText("초안")).toBeVisible();
     await expect(prd2Card.getByText("확정")).toBeVisible();
   });

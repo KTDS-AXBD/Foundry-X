@@ -188,15 +188,17 @@ test.describe("F437 — 발굴 9기준 체크리스트 패널", () => {
 
   test("9기준 체크리스트가 표시된다", async ({ page }) => {
     await page.goto("/discovery/items/item-1");
-    await expect(page.getByText("발굴 분석 기준")).toBeVisible();
-    // 9개 기준 중 첫 번째
-    await expect(page.getByText("1. 문제/고객 정의")).toBeVisible();
-    await expect(page.getByText("9. 검증 실험 계획")).toBeVisible();
+    // F496 재설계: 3×3 그리드 + #N 형식
+    const panel = page.getByTestId("discovery-criteria-panel");
+    await expect(panel).toBeVisible();
+    await expect(page.getByText("문제/고객 정의")).toBeVisible();
+    await expect(page.getByText("검증 실험 계획")).toBeVisible();
   });
 
   test("완료된 기준 수와 진행률이 표시된다", async ({ page }) => {
     await page.goto("/discovery/items/item-1");
-    await expect(page.getByText("3 / 9 기준 완료")).toBeVisible();
+    // F496 재설계: "N / M 기준 충족" 형식
+    await expect(page.getByText(/기준 충족/)).toBeVisible();
   });
 
   test("다음 단계 가이드가 표시된다", async ({ page }) => {

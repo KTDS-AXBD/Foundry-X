@@ -395,7 +395,7 @@ export function makeFeedbackQueueItem(overrides?: Record<string, unknown>) {
     github_issue_url: "https://github.com/KTDS-AXBD/Foundry-X/issues/386",
     title: "[Marker.io] API409 error occurred!",
     body: "Screenshot from Marker.io widget",
-    labels: "visual-feedback",
+    labels: '["visual-feedback"]',
     screenshot_url: null,
     status: "pending",
     agent_pr_url: null,

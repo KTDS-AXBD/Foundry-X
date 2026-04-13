@@ -22,7 +22,8 @@ test.describe("SSE Lifecycle — Agents Page", () => {
   });
 
   test("에이전트 카드 상태 배지 표시", async ({ authenticatedPage: page }) => {
-    // Mock agents list with status
+    // Override auth fixture's agents mock
+    await page.unroute("**/api/agents");
     await page.route("**/api/agents", (route) => {
       if (route.request().method() === "GET") {
         return route.fulfill({
