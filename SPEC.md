@@ -32,6 +32,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | Sprint 263 | ✅ 완료 — Phase 36-A 착수: SPEC 파서 테스트 A-0 (48건 PR #517) |
 | Sprint 264 | ✅ 완료 — F512 Phase A 정비 (A-0~A-8) + F513 TDD (B-0~B-3) (PR #518) |
 | Sprint 273 | ✅ 완료 — F516 Backlog 인입 파이프라인 + 실시간 동기화 (PR #538, +1166/-5, D1 0128) |
+| Sprint 274 | ✅ 완료 — F517 메타데이터 트레이서빌리티 (PR #539, +1317/-1, D1 0129+0130, Gap 100%) |
 
 | 항목 | 상태 |
 |------|------|
@@ -125,7 +126,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 
 | **Phase 37: Work Lifecycle Platform (작업 라이프사이클 플랫폼)** | | | | PRD: `docs/specs/fx-work-lifecycle-platform/prd-final.md`. Backlog 인입→AI 자동분류→트레이서빌리티→Ontology |
 | F516 | Backlog 인입 파이프라인 + 실시간 동기화 — (1) 웹 제출 폼 + AI 자동 분류/등록/알림 (2) GitHub Webhook→D1 캐시→SSE 실시간 파이프라인 (3) CLI task-start/session-end→API 직접 POST (4) 웹 SSE 수신으로 5초 polling 대체 (5) Marker.io webhook 연동. 지연 7~8초→1~2초 (FX-REQ-544, P0) | Sprint 273 | ✅ | PR #538. +1166/-5, 12 files. D1 0128, TDD 32 tests, SSE 실시간 |
-| F517 | 메타데이터 트레이서빌리티 — REQ↔F-item↔Sprint 연결 D1 테이블 + Sprint↔PR↔Commit GitHub API 파싱 + Changelog 구조화(REQ/PR 메타태깅) + 추적 뷰 (FX-REQ-545, P0) | Sprint 274 | 🔧(design) | C47 승격 |
+| F517 | 메타데이터 트레이서빌리티 — REQ↔F-item↔Sprint 연결 D1 테이블 + Sprint↔PR↔Commit GitHub API 파싱 + Changelog 구조화(REQ/PR 메타태깅) + 추적 뷰 (FX-REQ-545, P0) | Sprint 274 | ✅ | PR #539. +1317/-1, 11 files. D1 0129+0130, TDD 19 tests, Gap 100% |
 | F518 | Work Ontology 기반 연결 — KG 스키마(10노드타입/5엣지타입) + kg_nodes/kg_edges D1 테이블 + SPEC/GitHub→노드 자동생성 + KG 쿼리 API + 공개 Roadmap/Changelog 뷰 (FX-REQ-546, P0) | Sprint 275 | 📋(plan) | C48 승격 |
 
 | **Phase 38: Dashboard Overhaul (대시보드 현행화)** | | | | 서비스 범위(발굴~형상화)에 맞춰 대시보드 전면 정리 |
