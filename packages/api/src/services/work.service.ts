@@ -471,4 +471,134 @@ export class WorkService {
       method: "regex" as const,
     };
   }
+
+  // ─── F516: Backlog 인입 파이프라인 ──────────────────────────────────────
+
+  async submitBacklog(input: {
+    title: string;
+    description?: string;
+    source: "web" | "cli" | "marker";
+    idempotency_key?: string;
+  }) {
+    // 1. 중복 체크 (idempotency_key)
+    if (input.idempotency_key) {
+      const existing = await this.env.DB
+        .prepare("SELECT id FROM backlog_items WHERE idempotency_key = ?")
+        .bind(input.idempotency_key)
+        .first<{ id: string }>();
+      if (existing) {
+        return { conflict: true, id: existing.id };
+      }
+    }
+
+    // 2. 분류
+    const classified = await this.classify(input.title + (input.description ? ` ${input.description}` : ""));
+
+    // 3. D1 INSERT
+    const id = `bli-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    await this.env.DB
+      .prepare(`
+        INSERT INTO backlog_items (id, org_id, title, description, track, priority, source, classify_method, status, idempotency_key)
+        VALUES (?, 'org_default', ?, ?, ?, ?, ?, ?, 'classified', ?)
+      `)
+      .bind(
+        id,
+        classified.title,
+        input.description ?? null,
+        classified.track,
+        classified.priority,
+        input.source,
+        classified.method,
+        input.idempotency_key ?? null,
+      )
+      .run();
+
+    // 4. GitHub Issue 생성 (soft fail)
+    let github_issue_number: number | undefined;
+    try {
+      github_issue_number = await this.createGithubIssue(classified.title, classified.track, classified.priority);
+    } catch {
+      // soft fail — 이슈 없이도 계속
+    }
+
+    // 5. SPEC.md 행 추가 (soft fail)
+    const spec_row_added = await this.updateSpecMd({ id, title: classified.title, track: classified.track, priority: classified.priority });
+
+    // 6. D1 상태 갱신
+    await this.env.DB
+      .prepare("UPDATE backlog_items SET github_issue_number = ?, spec_row_added = ?, status = 'registered', updated_at = datetime('now') WHERE id = ?")
+      .bind(github_issue_number ?? null, spec_row_added ? 1 : 0, id)
+      .run();
+
+    return {
+      conflict: false,
+      id,
+      track: classified.track,
+      priority: classified.priority,
+      title: classified.title,
+      classify_method: classified.method,
+      github_issue_number,
+      spec_row_added,
+      status: "registered",
+    };
+  }
+
+  private async createGithubIssue(title: string, track: string, priority: string): Promise<number> {
+    const repo = this.env.GITHUB_REPO || "KTDS-AXBD/Foundry-X";
+    const res = await fetch(`https://api.github.com/repos/${repo}/issues`, {
+      method: "POST",
+      headers: {
+        Authorization: `token ${this.env.GITHUB_TOKEN}`,
+        "Content-Type": "application/json",
+        "User-Agent": "Foundry-X",
+      },
+      body: JSON.stringify({
+        title: `[Backlog] ${title}`,
+        labels: [`track-${track}`, `priority-${priority}`],
+      }),
+    });
+    if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+    const data = await res.json() as { number: number };
+    return data.number;
+  }
+
+  private async updateSpecMd(item: { id: string; title: string; track: string; priority: string }): Promise<boolean> {
+    try {
+      const repo = this.env.GITHUB_REPO || "KTDS-AXBD/Foundry-X";
+      const apiUrl = `https://api.github.com/repos/${repo}/contents/SPEC.md`;
+      const headers = {
+        Authorization: `token ${this.env.GITHUB_TOKEN}`,
+        "User-Agent": "Foundry-X",
+        "Content-Type": "application/json",
+      };
+
+      // 현재 SPEC.md 가져오기
+      const getRes = await fetch(apiUrl, { headers });
+      if (!getRes.ok) return false;
+      const fileData = await getRes.json() as { content: string; sha: string };
+
+      // base64 디코드 → 행 추가 → base64 인코드
+      const content = atob(fileData.content.replace(/\n/g, ""));
+      const newRow = `| ${item.id} | ${item.title} (${item.track}, ${item.priority}) | — | 📋(idea) | 웹 자동 인입 |`;
+      const markerComment = "<!-- fx-task-orchestrator-backlog -->";
+      const updated = content.includes(markerComment)
+        ? content.replace(markerComment, `${newRow}\n${markerComment}`)
+        : content + `\n${newRow}`;
+      const encoded = btoa(updated);
+
+      // GitHub API PUT
+      const putRes = await fetch(apiUrl, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({
+          message: `chore: auto-add backlog item ${item.id} via web submit`,
+          content: encoded,
+          sha: fileData.sha,
+        }),
+      });
+      return putRes.ok;
+    } catch {
+      return false;
+    }
+  }
 }

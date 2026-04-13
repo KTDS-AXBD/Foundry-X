@@ -148,3 +148,23 @@ export const ChangelogSchema = z.object({
   content: z.string(),
   generated_at: z.string(),
 });
+
+// ─── F516: Backlog 인입 파이프라인 ──────────────────────────────────────────
+
+export const WorkSubmitInputSchema = z.object({
+  title: z.string().min(1).max(200),
+  description: z.string().optional(),
+  source: z.enum(["web", "cli", "marker"]).default("web"),
+  idempotency_key: z.string().optional(),
+});
+
+export const WorkSubmitOutputSchema = z.object({
+  id: z.string(),
+  track: z.enum(["F", "B", "C", "X"]),
+  priority: z.enum(["P0", "P1", "P2", "P3"]),
+  title: z.string(),
+  classify_method: z.enum(["llm", "regex"]),
+  github_issue_number: z.number().optional(),
+  spec_row_added: z.boolean(),
+  status: z.string(),
+});
