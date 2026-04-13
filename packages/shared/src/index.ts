@@ -466,4 +466,17 @@ export type {
   AnthropicMessage,
   AnthropicContent,
   AnthropicToolDef,
+  // F528: L3 Orchestration 타입
+  GraphNodeHandler,
+  GraphNode,
+  GraphEdge,
+  GraphDefinition,
+  GraphNodeInput,
+  GraphNodeOutput,
+  GraphExecutionContext,
+  GraphRunResult,
+  SteeringAction,
+  SteeringResult,
+  ConversationStrategy,
+  ConversationManagerOptions,
 } from './agent-runtime.js';
