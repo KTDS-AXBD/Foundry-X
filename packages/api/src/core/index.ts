@@ -32,7 +32,7 @@ export {
   orchestrationRoute, executionEventsRoute, taskStateRoute,
   commandRegistryRoute, contextPassthroughRoute, workflowRoute,
   capturedEngineRoute, derivedEngineRoute, skillRegistryRoute,
-  skillMetricsRoute, streamingRoute,
+  skillMetricsRoute, streamingRoute, metaRoute,
 } from "./agent/index.js";
 
 // Harness/SDD/Governance — 22 routes
