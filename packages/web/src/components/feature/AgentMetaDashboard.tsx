@@ -52,7 +52,7 @@ function ProposalCard({
 }: {
   proposal: ImprovementProposal;
   onApprove: (id: string) => void;
-  onReject: (id: string) => void;
+  onReject: (id: string, reason: string) => void;
 }) {
   const [rejectReason, setRejectReason] = useState("");
   const [showRejectForm, setShowRejectForm] = useState(false);
@@ -103,7 +103,7 @@ function ProposalCard({
                 style={{ flex: 1, padding: "4px 8px", border: "1px solid #d1d5db", borderRadius: 4, fontSize: 13 }}
               />
               <button
-                onClick={() => { if (rejectReason.trim()) { onReject(proposal.id); } }}
+                onClick={() => { if (rejectReason.trim()) { onReject(proposal.id, rejectReason); } }}
                 disabled={!rejectReason.trim()}
                 style={{ background: "#dc2626", color: "#fff", border: "none", padding: "6px 12px", borderRadius: 6, cursor: "pointer", fontSize: 13 }}
               >
@@ -178,9 +178,7 @@ export function AgentMetaDashboard() {
     }
   }, []);
 
-  const handleReject = useCallback(async (id: string) => {
-    const reason = prompt("거부 사유를 입력하세요:");
-    if (!reason?.trim()) return;
+  const handleReject = useCallback(async (id: string, reason: string) => {
     const res = await fetch(`${BASE_URL}/meta/proposals/${id}/reject`, {
       method: "POST",
       headers: {
