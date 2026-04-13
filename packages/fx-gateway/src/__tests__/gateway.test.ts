@@ -1,6 +1,6 @@
 /**
- * F517: Gateway routing tests (TDD Red Phase)
- * FX-REQ-545 — fx-gateway Worker, Service Binding 라우팅
+ * F523: Gateway DISCOVERY routing (TDD — 하드와이어 방식)
+ * FX-REQ-545/551 — DISCOVERY_ENABLED 스위치 제거, DISCOVERY 직접 바인딩
  */
 import { describe, it, expect, vi } from "vitest";
 import app from "../app.js";
@@ -20,42 +20,46 @@ const makeDiscoveryMock = (status = 200, body = '{"domain":"discovery"}') => ({
   })),
 }) as unknown as Fetcher;
 
-describe("F517: Gateway routing", () => {
-  it("routes /api/discovery/* to DISCOVERY binding when DISCOVERY_ENABLED=true", async () => {
+describe("F523: Gateway DISCOVERY routing (hardwired)", () => {
+  it("/api/discovery/* → DISCOVERY Service Binding으로 전달한다", async () => {
     const discovery = makeDiscoveryMock();
     const mainApi = makeMainApiMock();
-    const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery, DISCOVERY_ENABLED: "true" };
+    const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery };
 
-    const res = await app.request("/api/discovery/health", {}, env);
+    const res = await app.request("/api/discovery/items", {}, env);
 
     expect(discovery.fetch).toHaveBeenCalledTimes(1);
     expect(mainApi.fetch).not.toHaveBeenCalled();
     expect(res.status).toBe(200);
   });
 
-  it("falls back to MAIN_API when DISCOVERY_ENABLED is unset", async () => {
+  it("/api/discovery/health → DISCOVERY로 전달한다", async () => {
+    const discovery = makeDiscoveryMock();
     const mainApi = makeMainApiMock();
-    const env: GatewayEnv = { MAIN_API: mainApi };
+    const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery };
 
-    const res = await app.request("/api/discovery/items", {}, env);
+    await app.request("/api/discovery/health", {}, env);
 
-    expect(mainApi.fetch).toHaveBeenCalledTimes(1);
-    expect(res.status).toBe(200);
+    expect(discovery.fetch).toHaveBeenCalledTimes(1);
+    expect(mainApi.fetch).not.toHaveBeenCalled();
   });
 
-  it("routes /api/biz-items to MAIN_API", async () => {
+  it("/api/biz-items → MAIN_API로 전달한다", async () => {
+    const discovery = makeDiscoveryMock();
     const mainApi = makeMainApiMock();
-    const env: GatewayEnv = { MAIN_API: mainApi };
+    const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery };
 
     const res = await app.request("/api/biz-items", {}, env);
 
     expect(mainApi.fetch).toHaveBeenCalledTimes(1);
+    expect(discovery.fetch).not.toHaveBeenCalled();
     expect(res.status).toBe(200);
   });
 
-  it("passes through request headers to downstream", async () => {
+  it("헤더가 downstream Worker로 그대로 전달된다", async () => {
     const mainApi = makeMainApiMock();
-    const env: GatewayEnv = { MAIN_API: mainApi };
+    const discovery = makeDiscoveryMock();
+    const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery };
 
     await app.request(
       "/api/health",
