@@ -78,7 +78,7 @@ test.describe("F533 Agent Meta Dashboard", () => {
   });
 
   test("진단 폼이 렌더링된다", async ({ authenticatedPage: page }) => {
-    await page.goto("/agents/meta");
+    await page.goto("/agent-meta");
     await expect(page.getByText("Agent Meta Layer")).toBeVisible({ timeout: 10000 });
     await expect(page.getByPlaceholder("Session ID")).toBeVisible();
     await expect(page.getByPlaceholder("Agent ID")).toBeVisible();
@@ -86,12 +86,12 @@ test.describe("F533 Agent Meta Dashboard", () => {
   });
 
   test("세션 ID 없으면 진단 실행 버튼 비활성화", async ({ authenticatedPage: page }) => {
-    await page.goto("/agents/meta");
+    await page.goto("/agent-meta");
     await expect(page.getByRole("button", { name: /진단 실행/ })).toBeDisabled({ timeout: 10000 });
   });
 
   test("진단 실행 → 6축 결과 표시", async ({ authenticatedPage: page }) => {
-    await page.goto("/agents/meta");
+    await page.goto("/agent-meta");
     await expect(page.getByPlaceholder("Session ID")).toBeVisible({ timeout: 10000 });
 
     // 세션 ID 입력
@@ -118,7 +118,7 @@ test.describe("F533 Agent Meta Dashboard", () => {
       return route.continue();
     });
 
-    await page.goto("/agents/meta");
+    await page.goto("/agent-meta");
     await expect(page.getByPlaceholder("Session ID")).toBeVisible({ timeout: 10000 });
 
     await page.getByPlaceholder("Session ID").fill("e2e-session-001");
@@ -147,7 +147,7 @@ test.describe("F533 Agent Meta Dashboard", () => {
       return route.continue();
     });
 
-    await page.goto("/agents/meta");
+    await page.goto("/agent-meta");
     await expect(page.getByPlaceholder("Session ID")).toBeVisible({ timeout: 10000 });
 
     await page.getByPlaceholder("Session ID").fill("e2e-session-001");
@@ -167,21 +167,22 @@ test.describe("F533 Agent Meta Dashboard", () => {
   });
 
   test("필터 탭 — 전체/대기중/승인/거부 전환", async ({ authenticatedPage: page }) => {
-    await page.goto("/agents/meta");
+    await page.goto("/agent-meta");
     await expect(page.getByPlaceholder("Session ID")).toBeVisible({ timeout: 10000 });
 
     await page.getByPlaceholder("Session ID").fill("e2e-session-001");
     await page.getByRole("button", { name: /진단 실행/ }).click();
-    await expect(page.getByText("개선 제안")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: /개선 제안/ })).toBeVisible({ timeout: 10000 });
 
-    // 필터 버튼들 존재 확인
-    await expect(page.getByRole("button", { name: "전체" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "대기중" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "승인" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "거부" })).toBeVisible();
+    // 필터 버튼들 존재 확인 — heading 근처 필터 영역 한정 (proposal "✓ 승인"/"✕ 거부" 버튼과 구분)
+    const filterSection = page.getByRole("heading", { name: /개선 제안/ }).locator("..");
+    await expect(filterSection.getByRole("button", { name: "전체" })).toBeVisible();
+    await expect(filterSection.getByRole("button", { name: "대기중" })).toBeVisible();
+    await expect(filterSection.getByRole("button", { name: /^승인$/ })).toBeVisible();
+    await expect(filterSection.getByRole("button", { name: /^거부$/ })).toBeVisible();
 
     // 승인 필터 클릭 → 빈 목록 (모든 proposal이 pending)
-    await page.getByRole("button", { name: "승인" }).click();
+    await filterSection.getByRole("button", { name: /^승인$/ }).click();
     await expect(page.getByText("해당 상태의 제안이 없어요.")).toBeVisible({ timeout: 3000 });
   });
 });
