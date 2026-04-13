@@ -69,6 +69,7 @@ import { specLibraryRoute } from "./routes/spec-library.js";
 import { helpAgentRoute } from "./routes/help-agent.js";
 import { eventStatusRoute } from "./routes/event-status.js";
 import { workRoute } from "./routes/work.js";
+import { workPublicRoute } from "./routes/work-public.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -172,6 +173,9 @@ app.route("/api", ideaPortalWebhookRoute);
 
 // KPI track (public — 인증 선택적, 비로그인 사용자도 page_view 기록 가능)
 app.route("/api", kpiRoute);
+
+// F518: Work KG public routes (인증 불필요 — Roadmap/Changelog/KG 공개 조회)
+app.route("/api", workPublicRoute);
 
 // Org routes — auth middleware applied internally, tenantGuard selective per-route
 app.use("/api/orgs", authMiddleware);
