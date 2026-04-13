@@ -143,8 +143,8 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F523 | D1 스키마 격리 — Discovery 전용 D1 바인딩 분리, 크로스도메인 JOIN 대체 방안 확정 (FX-REQ-551, P0) | Sprint 277 | ✅ | PR #544. F522와 통합, Option B(re-export) 유지 |
 
 | **Phase 40: Agent Autonomy — E2E 자동화 + Gap 통합** | | | | PRD: `docs/specs/fx-agent-autonomy/prd-final.md`. E2E 자동 생성 + Gap-E2E 통합 품질 점수 |
-| F524 | E2E 시나리오 자동 추출 — Design 문서 §4+§5에서 Playwright spec 자동 생성, 템플릿+NLP 파싱 (FX-REQ-552, P0) | Sprint 278 | 📋 | PRD M1 |
-| F525 | Gap-E2E 통합 점수 — Gap Analysis에 E2E PASS/FAIL 포함, Gap×0.6+E2E×0.4 가중 평균 (FX-REQ-553, P0) | Sprint 278 | 📋 | PRD M2 |
+| F524 | E2E 시나리오 자동 추출 — Design 문서 §4+§5에서 Playwright spec 자동 생성, 템플릿+NLP 파싱 (FX-REQ-552, P0) | Sprint 278 | 🔧 | PRD M1 |
+| F525 | Gap-E2E 통합 점수 — Gap Analysis에 E2E PASS/FAIL 포함, Gap×0.6+E2E×0.4 가중 평균 (FX-REQ-553, P0) | Sprint 278 | 🔧 | PRD M2 |
 | F526 | autopilot Verify E2E 통합 — sprint-autopilot Step 5~6에 E2E 생성+실행 자동 삽입 (FX-REQ-554, P0) | Sprint 279 | 📋 | PRD M3 |
 
 <!-- fx-task-orchestrator-backlog -->
