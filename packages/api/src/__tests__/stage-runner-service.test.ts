@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
 import { StageRunnerService } from "../core/discovery/services/stage-runner-service.js";
 
@@ -295,6 +295,49 @@ describe("StageRunnerService (F485+F486)", () => {
 
       expect(results).toHaveLength(1);
       expect((results[0] as any).stage).toBe("DISCOVERY");
+    });
+  });
+
+  // ─── F531: confirmStage graphMode 분기 ───
+  describe("F531: confirmStage — graphMode 옵션", () => {
+    it("graphMode=true + go 결정 시 DiscoveryGraphService.runFrom()으로 다음 노드 실행됨", async () => {
+      const { DiscoveryGraphService } = await import(
+        "../core/discovery/services/discovery-graph-service.js"
+      );
+      const runFromSpy = vi.fn().mockResolvedValue({ nodeOutputs: {}, totalExecutions: 1 });
+      vi.spyOn(DiscoveryGraphService.prototype, "runFrom").mockImplementation(runFromSpy);
+
+      await service.confirmStage("biz1", "org1", "2-1", "go", undefined, {
+        graphMode: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        runner: mockRunner as any,
+        sessionId: "session-test",
+        apiKey: "key-test",
+      });
+
+      // DiscoveryGraphService.runFrom("2-2", ...) 호출 확인
+      expect(runFromSpy).toHaveBeenCalledOnce();
+      const [calledStage] = runFromSpy.mock.calls[0] as [string, unknown];
+      expect(calledStage).toBe("2-2");
+    });
+
+    it("graphMode=true + stop 결정 시 다음 노드 실행 안 됨", async () => {
+      const { DiscoveryGraphService } = await import(
+        "../core/discovery/services/discovery-graph-service.js"
+      );
+      const runFromSpy = vi.fn();
+      vi.spyOn(DiscoveryGraphService.prototype, "runFrom").mockImplementation(runFromSpy);
+
+      const result = await service.confirmStage("biz1", "org1", "2-1", "stop", undefined, {
+        graphMode: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        runner: mockRunner as any,
+        sessionId: "session-test",
+        apiKey: "key-test",
+      });
+
+      expect(runFromSpy).not.toHaveBeenCalled();
+      expect(result.nextStage).toBeNull();
     });
   });
 });
