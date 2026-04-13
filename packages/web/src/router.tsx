@@ -26,6 +26,9 @@ export const router = createBrowserRouter([
   },
   { path: "login", lazy: () => import("@/routes/login"), hydrateFallbackElement: <Spinner /> },
   { path: "invite", lazy: () => import("@/routes/invite"), hydrateFallbackElement: <Spinner /> },
+  // F518: 공개 라우트 (인증 불필요)
+  { path: "roadmap", lazy: () => import("@/routes/roadmap"), hydrateFallbackElement: <Spinner /> },
+  { path: "changelog", lazy: () => import("@/routes/changelog"), hydrateFallbackElement: <Spinner /> },
   {
     element: <ProtectedRoute />,
     hydrateFallbackElement: <Spinner />,

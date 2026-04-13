@@ -15,10 +15,12 @@ import {
   WorkSubmitOutputSchema,
   TraceChainSchema,
   TraceSyncOutputSchema,
+  KgSyncOutputSchema,
 } from "../schemas/work.js";
 import type { Env } from "../env.js";
 import { WorkService } from "../services/work.service.js";
 import { TraceabilityService } from "../services/traceability.service.js";
+import { WorkKGService } from "../services/work-kg.service.js";
 
 export const workRoute = new OpenAPIHono<{ Bindings: Env }>();
 
@@ -364,6 +366,47 @@ workRoute.get("/work/stream", (c) => {
       "Cache-Control": "no-cache",
       "Connection": "keep-alive",
       "X-Accel-Buffering": "no",
+    },
+  });
+});
+
+// ─── F518: KG Sync (인증 필요, workRoute에 등록) ──────────────────────────────
+
+const postKgSync = createRoute({
+  method: "post",
+  path: "/work/kg/sync",
+  tags: ["Work KG"],
+  summary: "SPEC.md + sprint_pr_links → Work KG D1 동기화",
+  responses: {
+    200: {
+      content: { "application/json": { schema: KgSyncOutputSchema } },
+      description: "KG sync result",
+    },
+  },
+});
+
+workRoute.openapi(postKgSync, async (c) => {
+  const kgSvc = new WorkKGService(c.env);
+  // SPEC.md 텍스트 가져오기 (github raw)
+  const repo = c.env.GITHUB_REPO || "KTDS-AXBD/Foundry-X";
+  const specText = await fetch(`https://raw.githubusercontent.com/${repo}/master/SPEC.md`, {
+    headers: c.env.GITHUB_TOKEN ? { Authorization: `token ${c.env.GITHUB_TOKEN}` } : {},
+  }).then(r => r.ok ? r.text() : "").catch(() => "");
+
+  const [specResult, githubResult] = await Promise.allSettled([
+    kgSvc.syncFromSpec(specText),
+    kgSvc.syncFromGitHub(),
+  ]);
+
+  const specNodes = specResult.status === "fulfilled" ? specResult.value.nodes_upserted : 0;
+  const specEdges = specResult.status === "fulfilled" ? specResult.value.edges_upserted : 0;
+  const ghNodes = githubResult.status === "fulfilled" ? githubResult.value.nodes_upserted : 0;
+  const ghEdges = githubResult.status === "fulfilled" ? githubResult.value.edges_upserted : 0;
+
+  return c.json({
+    synced: {
+      nodes: specNodes + ghNodes,
+      edges: specEdges + ghEdges,
     },
   });
 });

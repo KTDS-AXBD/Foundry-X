@@ -219,3 +219,32 @@ export const WorkSubmitOutputSchema = z.object({
   spec_row_added: z.boolean(),
   status: z.string(),
 });
+
+// ─── F518: Work KG 스키마 ──────────────────────────────────────────────────
+
+export const KgNodeSchema = z.object({
+  id: z.string(),
+  node_type: z.string(),
+  label: z.string(),
+  metadata: z.record(z.unknown()),
+});
+
+export const KgEdgeSchema = z.object({
+  id: z.string(),
+  source_id: z.string(),
+  target_id: z.string(),
+  edge_type: z.string(),
+});
+
+export const KgGraphSchema = z.object({
+  root_id: z.string(),
+  nodes: z.array(KgNodeSchema),
+  edges: z.array(KgEdgeSchema),
+});
+
+export const KgSyncOutputSchema = z.object({
+  synced: z.object({
+    nodes: z.number(),
+    edges: z.number(),
+  }),
+});
