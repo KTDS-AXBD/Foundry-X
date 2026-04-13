@@ -1,8 +1,8 @@
 import { test, expect } from "./fixtures/auth";
 
 // @service: portal
-// @sprint: 267
-// @tagged-by: F516
+// @sprint: 267, 276
+// @tagged-by: F516, F519
 
 test.describe("Dashboard", () => {
   test("sidebar navigation is visible", async ({ authenticatedPage: page }) => {
@@ -52,5 +52,13 @@ test.describe("Dashboard", () => {
     // 퀵 액션 영역의 링크들이 유효한 라우트를 가리키는지
     const quickActions = page.locator("text=퀵 액션").locator("..");
     await expect(quickActions).toBeAttached();
+  });
+
+  // F519: ToDo List — stage 2 NEXT_ACTION href 검증
+  test("todo list section is visible on dashboard", async ({ authenticatedPage: page }) => {
+    await page.goto("/dashboard");
+
+    const todoSection = page.locator("text=ToDo List").locator("..");
+    await expect(todoSection).toBeAttached();
   });
 });
