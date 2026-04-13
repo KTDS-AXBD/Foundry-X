@@ -153,7 +153,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | **Phase 41: HyperFX Agent Stack — 4-Layer 에이전트 재구조화** | | | | PRD: `docs/specs/fx-hyperfx-agent-stack/prd-final.md`. Walking Skeleton 접근 — 선언적 에이전트 + Graph 오케스트레이션 + 실시간 스트리밍 + 자기개선 |
 | F527 | Agent Runtime (L2) — defineTool() 유틸리티 + AgentSpec YAML 스키마 + AgentRuntime 실행 엔진 + Hooks + TokenTracker + ToolRegistry + 기존 7 에이전트 YAML 마이그레이션 (FX-REQ-555, P0) | Sprint 280 | ✅ | PR #549, +1858, TDD, Match 97% |
 | F528 | Graph Orchestration (L3) — GraphEngine(GraphBuilder API + 조건부 라우팅 + 병렬 실행) + Agents-as-Tools + SteeringHandler + ConversationManager + OrchestrationLoop 래핑 + AX BD 발굴 9단계 Graph 정의 (FX-REQ-556, P0) | Sprint 281 | ✅ | PR #552, +1919, TDD 5, Match 97% |
-| F529 | Agent Streaming (L1) — WebSocket 에이전트 이벤트 스트리밍 + SSE 폴백 + D1 메트릭 저장 + Web 실시간 대시보드 (FX-REQ-557, P0) | Sprint 282 | 📋(idea) | PRD M3 |
+| F529 | Agent Streaming (L1) — WebSocket 에이전트 이벤트 스트리밍 + SSE 폴백 + D1 메트릭 저장 + Web 실시간 대시보드 (FX-REQ-557, P0) | Sprint 282 | 🔧 | PRD M3 |
 | F530 | Meta Layer (L4) — DiagnosticCollector 6축 메트릭 수집 + MetaAgent 진단→개선 제안 + Human Approval UI (FX-REQ-558, P1) | Sprint 283 | 📋(idea) | PRD M4 |
 
 <!-- fx-task-orchestrator-backlog -->
