@@ -42,7 +42,7 @@ describe("F528 AgentsAsTools", () => {
 
     const result = await tool.execute(
       { message: "write a function" },
-      { agentId: "test", sessionId: "sess-1", apiKey: "key-1" }
+      { agentId: "test", sessionId: "sess-1" } as never,
     );
 
     expect(runtime.run).toHaveBeenCalledOnce();

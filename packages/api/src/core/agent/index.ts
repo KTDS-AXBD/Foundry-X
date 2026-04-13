@@ -14,3 +14,6 @@ export { capturedEngineRoute } from "./routes/captured-engine.js";
 export { derivedEngineRoute } from "./routes/derived-engine.js";
 export { skillRegistryRoute } from "./routes/skill-registry.js";
 export { skillMetricsRoute } from "./routes/skill-metrics.js";
+
+// F528: L3 Orchestration
+export * from "./orchestration/index.js";

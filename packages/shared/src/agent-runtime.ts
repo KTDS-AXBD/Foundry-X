@@ -119,3 +119,74 @@ export interface AnthropicToolDef {
   description: string;
   input_schema: Record<string, unknown>;
 }
+
+// ─── F528: L3 Orchestration 타입 ───
+
+export type GraphNodeHandler = (
+  input: GraphNodeInput,
+  ctx: GraphExecutionContext,
+) => Promise<GraphNodeOutput>;
+
+export interface GraphNode {
+  id: string;
+  handler: GraphNodeHandler;
+  agentId?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface GraphEdge {
+  from: string;
+  to: string;
+  condition?: (output: GraphNodeOutput, ctx: GraphExecutionContext) => boolean;
+}
+
+export interface GraphDefinition {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  entryPoint: string;
+  maxExecutions?: number;
+}
+
+export interface GraphNodeInput {
+  nodeId: string;
+  data: unknown;
+  executionId: string;
+}
+
+export interface GraphNodeOutput {
+  nodeId: string;
+  data: unknown;
+  metadata?: Record<string, unknown>;
+}
+
+export interface GraphExecutionContext {
+  executionId: string;
+  sessionId: string;
+  apiKey: string;
+  db?: unknown;
+  nodeOutputs: Map<string, GraphNodeOutput>;
+  executionCount: Map<string, number>;
+}
+
+export interface GraphRunResult {
+  executionId: string;
+  finalOutput: GraphNodeOutput;
+  nodeOutputs: Record<string, GraphNodeOutput>;
+  totalExecutions: number;
+  durationMs: number;
+}
+
+export type SteeringAction = "proceed" | "guide" | "interrupt";
+
+export interface SteeringResult {
+  action: SteeringAction;
+  message?: string;
+}
+
+export type ConversationStrategy = "sliding-window" | "summarizing";
+
+export interface ConversationManagerOptions {
+  strategy: ConversationStrategy;
+  maxMessages?: number;
+  summaryModel?: string;
+}
