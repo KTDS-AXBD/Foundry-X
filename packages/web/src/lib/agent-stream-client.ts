@@ -33,7 +33,9 @@ export async function runAgentStream(
       signal,
     });
   } catch (err) {
-    onError?.(err instanceof Error ? err : new Error(String(err)));
+    if ((err as Error).name !== "AbortError") {
+      onError?.(err instanceof Error ? err : new Error(String(err)));
+    }
     return;
   }
 
