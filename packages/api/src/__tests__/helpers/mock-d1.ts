@@ -1020,6 +1020,27 @@ export class MockD1Database {
       );
       CREATE INDEX IF NOT EXISTS idx_spr_links_sprint ON sprint_pr_links(sprint_num);
       CREATE INDEX IF NOT EXISTS idx_spr_links_pr     ON sprint_pr_links(pr_number);
+
+      -- F518: Work Lifecycle KG 테이블
+      CREATE TABLE IF NOT EXISTS work_kg_nodes (
+        id        TEXT PRIMARY KEY,
+        node_type TEXT NOT NULL,
+        label     TEXT NOT NULL,
+        metadata  TEXT NOT NULL DEFAULT '{}',
+        synced_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX IF NOT EXISTS idx_wkg_nodes_type  ON work_kg_nodes(node_type);
+      CREATE INDEX IF NOT EXISTS idx_wkg_nodes_label ON work_kg_nodes(label);
+
+      CREATE TABLE IF NOT EXISTS work_kg_edges (
+        id        TEXT PRIMARY KEY,
+        source_id TEXT NOT NULL,
+        target_id TEXT NOT NULL,
+        edge_type TEXT NOT NULL,
+        synced_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX IF NOT EXISTS idx_wkg_edges_source ON work_kg_edges(source_id);
+      CREATE INDEX IF NOT EXISTS idx_wkg_edges_target ON work_kg_edges(target_id);
     `);
     this.db.prepare("INSERT OR IGNORE INTO organizations (id, name, slug) VALUES (?, ?, ?)").run("org_test", "Test Org", "test");
   }
