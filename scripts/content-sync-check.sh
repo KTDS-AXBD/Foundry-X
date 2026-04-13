@@ -30,14 +30,21 @@ SPRINT=$(echo "$SPEC_LINE" | grep -oP 'Sprint \K\d+' | head -1)
 # CLAUDE.md에는 "Phase 37: Work Lifecycle Platform" 형태로 현재 Phase가 기재됨
 CLAUDE_MD="CLAUDE.md"
 if [ -f "$CLAUDE_MD" ]; then
-  # "Phase NN:" 패턴 중 "완료" 키워드가 없는 첫 번째 = 현재 진행 Phase
-  PHASE_LINE=$(grep -P '^\- \*\*Phase \d+' "$CLAUDE_MD" | grep -v '완료' | head -1 || true)
+  # "Phase NN:" 패턴 중 ✅ 없는 첫 번째 = 진행 중 Phase (없으면 가장 높은 번호 = 최신 완료)
+  PHASE_LINE=$(grep -P '^\- \*\*Phase \d+' "$CLAUDE_MD" | grep -v '✅' | head -1 || true)
+  if [ -z "$PHASE_LINE" ]; then
+    # 모두 완료된 경우: 가장 높은 Phase 번호 선택
+    PHASE_LINE=$(grep -P '^\- \*\*Phase \d+' "$CLAUDE_MD" | tail -1 || true)
+  fi
   PHASE_NUM=$(echo "$PHASE_LINE" | grep -oP 'Phase \K\d+' || true)
   PHASE_TITLE=$(echo "$PHASE_LINE" | sed -E 's/.*Phase [0-9]+[: ]+//' | sed -E 's/\*\*.*$//' | xargs || true)
 fi
-# fallback: CLAUDE.md에서 못 찾으면 SPEC §3에서 가장 높은 📋/🔧 Phase 사용
+# fallback: CLAUDE.md에서 못 찾으면 SPEC §3에서 가장 높은 ✅ Phase 사용
 if [ -z "$PHASE_NUM" ]; then
-  PHASE_NUM=$(grep -P 'Phase \d+.*[📋🔧]' "$SPEC" | grep -oP 'Phase \K\d+' | sort -n | tail -1)
+  PHASE_NUM=$(grep -P 'Phase \d+.*✅' "$SPEC" | grep -oP 'Phase \K\d+' | sort -n | tail -1)
+  if [ -z "$PHASE_NUM" ]; then
+    PHASE_NUM=$(grep -P 'Phase \d+.*[📋🔧]' "$SPEC" | grep -oP 'Phase \K\d+' | sort -n | tail -1)
+  fi
   PHASE_TITLE=""
 fi
 
