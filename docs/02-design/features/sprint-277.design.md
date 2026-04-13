@@ -49,20 +49,17 @@ fx-discovery 배포가 완료되면 즉시 트래픽 수신.
 | `discovery-v2.ts` | `discovery-v2.ts` | 115 |
 | `methodology.ts` | `methodology.ts` | 28 |
 
-### 하위 호환 전략 (T3)
+### 하위 호환 전략 (T3) — Sprint 277 구현 방식
 
-`packages/shared/src/index.ts`의 기존 export 블록은 **그대로 유지**하되,
-import 경로를 `./discovery-report.js` → `@foundry-x/fx-discovery/types`로 전환.
+Sprint 277에서는 T3를 보수적으로 구현한다:
+- shared 원본 3파일은 **삭제하지 않고** `@deprecated` 주석만 추가
+- shared/src/index.ts re-export 경로는 기존 로컬 파일(`./discovery-report.js` 등) **그대로 유지**
 
-```typescript
-// packages/shared/src/index.ts — 변경 후
-// re-export via fx-discovery (F522: Sprint 277)
-export type { ... } from '@foundry-x/fx-discovery/types/discovery-report.js';
-export type { ... } from '@foundry-x/fx-discovery/types/discovery-v2.js';
-export type { ... } from '@foundry-x/fx-discovery/types/methodology.js';
-```
+**근거**: workspace 패키지 간 직접 re-export(`@foundry-x/fx-discovery/types/*.js`)는
+fx-discovery의 package.json exports 필드 정비 후(T4, P1) 안전하게 전환 가능.
+지금 경로를 변경하면 빌드 순서 오류 위험이 있어 Sprint 278로 연기.
 
-> **주의**: fx-discovery 패키지 exports 필드에 `./types/*` 경로 추가 필수.
+> **T4 전환 목표(Sprint 278)**: shared/src/index.ts가 fx-discovery를 참조하도록 re-export 경로 변경 후 shared 원본 3파일 삭제.
 
 ### Shaping 타입 서브폴더 (T2, P1)
 
@@ -115,9 +112,9 @@ interface BizItem {
 | 파일 | 변경 내용 | F-item |
 |------|-----------|--------|
 | `packages/shared/src/index.ts` | re-export 경로 변경 (fx-discovery 참조) | F522 |
-| `packages/shared/src/discovery-report.ts` | 삭제 (이동 후) | F522 |
-| `packages/shared/src/discovery-v2.ts` | 삭제 (이동 후) | F522 |
-| `packages/shared/src/methodology.ts` | 삭제 (이동 후) | F522 |
+| `packages/shared/src/discovery-report.ts` | `@deprecated` 주석 추가, T4 시점 삭제 예정 | F522 |
+| `packages/shared/src/discovery-v2.ts` | `@deprecated` 주석 추가, T4 시점 삭제 예정 | F522 |
+| `packages/shared/src/methodology.ts` | `@deprecated` 주석 추가, T4 시점 삭제 예정 | F522 |
 | `packages/fx-discovery/src/app.ts` | items 라우트 마운트 | F523 |
 | `packages/fx-discovery/package.json` | exports 필드 `./types/*` 추가 | F522 |
 | `packages/fx-gateway/wrangler.toml` | DISCOVERY binding 활성화 | F523 |
@@ -162,9 +159,9 @@ describe('fx-gateway DISCOVERY routing', () => {
 
 ## 8. 성공 기준 검증 매핑
 
-| Plan §8 기준 | 검증 방법 |
-|-------------|----------|
-| shared 파일 24 → 21개 이하 | `ls packages/shared/src/*.ts \| wc -l` |
+| Plan §8 기준 | 검증 방법 | Sprint 277 상태 |
+|-------------|----------|----------------|
+| shared 파일 24 → 21개 이하 | `ls packages/shared/src/*.ts \| wc -l` | **Sprint 278로 연기** (T4 직접 삭제는 re-export 정비 후) |
 | fx-discovery `/api/discovery/items` 응답 | vitest + health check |
 | fx-gateway Discovery binding 라우팅 | vitest mock fetch |
 | deploy.yml fx-gateway + fx-discovery job | CI 파이프라인 확인 |
