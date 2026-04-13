@@ -1,4 +1,5 @@
 import type { Env } from "../env.js";
+import { SSEManager } from "./sse-manager.js";
 
 interface WorkItem {
   id: string;
@@ -529,6 +530,17 @@ export class WorkService {
       .prepare("UPDATE backlog_items SET github_issue_number = ?, spec_row_added = ?, status = 'registered', updated_at = datetime('now') WHERE id = ?")
       .bind(github_issue_number ?? null, spec_row_added ? 1 : 0, id)
       .run();
+
+    // 7. SSE broadcast (soft fail)
+    try {
+      const sseManager = new SSEManager(this.env.DB);
+      sseManager.pushEvent({
+        event: "work:backlog-updated",
+        data: { id, track: classified.track, priority: classified.priority, title: classified.title, source: input.source },
+      });
+    } catch {
+      // SSE 실패는 응답에 영향 없음
+    }
 
     return {
       conflict: false,

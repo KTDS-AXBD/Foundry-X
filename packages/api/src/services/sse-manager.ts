@@ -86,6 +86,15 @@ export interface QueueRebaseData {
   files: string[];
 }
 
+// ─── F516: Backlog 인입 파이프라인 이벤트 ────────────────────────────────────
+export interface BacklogUpdatedData {
+  id: string;
+  track: string;
+  priority: string;
+  title: string;
+  source: string;
+}
+
 export type SSEEvent =
   | { event: "activity"; data: { agentId: string; status: string; currentTask?: string; progress?: number; timestamp: string } }
   | { event: "status"; data: { agentId: string; previousStatus: string; newStatus: string; result?: string; timestamp: string } }
@@ -111,7 +120,9 @@ export type SSEEvent =
   | { event: "agent.plan.completed"; data: { planId: string; completedAt: string; tokensUsed: number; duration: number } }
   | { event: "agent.plan.failed"; data: { planId: string; failedAt: string; error: string } }
   | { event: "reconciliation.completed"; data: { runId: string; tenantId: string; driftCount: number; fixedCount: number; skippedCount: number; completedAt: string } }
-  | { event: "agent.hook.escalated"; data: { taskId: string; hookType: string; error: string; attempts: number; escalatedAt: string } };
+  | { event: "agent.hook.escalated"; data: { taskId: string; hookType: string; error: string; attempts: number; escalatedAt: string } }
+  | { event: "work:backlog-updated"; data: BacklogUpdatedData }
+  | { event: "work:snapshot-refresh"; data: { ref: string } };
 
 const DEDUP_TTL_MS = 60_000;
 

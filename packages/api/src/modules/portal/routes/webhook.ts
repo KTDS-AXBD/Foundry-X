@@ -8,6 +8,7 @@ import { LLMService } from "../../../services/llm.js";
 import { ReviewerAgent } from "../../../core/agent/services/reviewer-agent.js";
 import { GitHubReviewService, parseFoundryCommand, ReviewCooldownError, HELP_COMMENT, formatStatusComment } from "../services/github-review.js";
 import { FeedbackQueueService } from "../services/feedback-queue-service.js";
+import { SSEManager } from "../../../services/sse-manager.js";
 import type { Env } from "../../../env.js";
 
 export const webhookRoute = new OpenAPIHono<{ Bindings: Env }>();
@@ -160,7 +161,7 @@ webhookRoute.openapi(gitWebhookRoute, async (c) => {
     }
   }
 
-  // ─── Push event (existing behavior) ───
+  // ─── Push event (existing behavior + F516 SSE broadcast) ───
   if (payload.ref !== "refs/heads/master") {
     return c.json({ message: "Skipped: not master branch" });
   }
@@ -174,6 +175,14 @@ webhookRoute.openapi(gitWebhookRoute, async (c) => {
 
   const wikiSync = new WikiSyncService(github, c.env.DB);
   const result = await wikiSync.pullFromGit(modifiedFiles);
+
+  // F516: push 이벤트 → SSE broadcast (soft fail)
+  try {
+    const sseManager = new SSEManager(c.env.DB);
+    sseManager.pushEvent({ event: "work:snapshot-refresh", data: { ref: payload.ref as string } });
+  } catch {
+    // SSE 실패는 응답에 영향 없음
+  }
 
   return c.json(result);
 });
