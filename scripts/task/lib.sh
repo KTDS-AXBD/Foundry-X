@@ -6,7 +6,8 @@
 
 set -euo pipefail
 
-FX_HOME="${FX_HOME:-$HOME/.foundry-x}"
+# HOME 독립적 절대 경로 — C28 재발 방지 (Claude Code HOME=~/.claude-work 오염 대응, S271)
+FX_HOME="${FX_HOME:-/home/sinclair/.foundry-x}"
 FX_LOCK_DIR="$FX_HOME/locks"
 FX_LOG="$FX_HOME/task-log.ndjson"
 FX_CACHE="$FX_HOME/tasks-cache.json"
