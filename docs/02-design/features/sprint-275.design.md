@@ -108,7 +108,7 @@ export interface KgGraph {
 export interface KgSyncResult {
   nodes_upserted: number;
   edges_upserted: number;
-  source: "spec" | "github" | "both";
+  // source 필드 제거 — 구현에서 불필요하다고 판단 (역동기화)
 }
 
 export class WorkKGService {
@@ -298,7 +298,7 @@ test("/api/work/public/kg/trace는 인증 없이 KG 결과를 반환한다", asy
 |---|------|------|------|
 | 1 | `packages/api/src/db/migrations/0131_work_kg.sql` | 신규 | work_kg 테이블 |
 | 2 | `packages/api/src/services/work-kg.service.ts` | 신규 | KG 빌드/탐색 |
-| 3 | `packages/api/src/services/__tests__/work-kg.service.test.ts` | 신규 | TDD Red |
+| 3 | `packages/api/src/__tests__/work-kg.service.test.ts` | 신규 | TDD Red (18 tests — Design 11건 초과 달성) |
 | 4 | `packages/api/src/routes/work-public.ts` | 신규 | 공개 API 라우터 |
 | 5 | `packages/api/src/routes/work.ts` | 수정 | KG sync 엔드포인트 추가 |
 | 6 | `packages/api/src/app.ts` | 수정 | workPublicRoute 등록 (auth 이전) |
