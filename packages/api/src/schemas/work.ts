@@ -149,6 +149,57 @@ export const ChangelogSchema = z.object({
   generated_at: z.string(),
 });
 
+// ─── F517: 메타데이터 트레이서빌리티 ─────────────────────────────────────────
+
+export const TracePrSchema = z.object({
+  number: z.number(),
+  title: z.string(),
+  url: z.string(),
+  state: z.string(),
+  commits: z.array(z.string()),
+});
+
+export const TraceFItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  status: z.string(),
+  sprint: z.string().optional(),
+  req_code: z.string().optional(),
+  prs: z.array(TracePrSchema),
+});
+
+export const TraceChainSchema = z.object({
+  id: z.string(),
+  type: z.enum(["req", "f_item"]),
+  f_items: z.array(TraceFItemSchema),
+});
+
+export const TraceSyncOutputSchema = z.object({
+  synced: z.object({
+    spec: z.number(),
+    prs: z.number(),
+  }),
+});
+
+export const ChangelogItemSchema = z.object({
+  f_item: z.string().optional(),
+  text: z.string(),
+  req_code: z.string().optional(),
+  sprint: z.string().optional(),
+  pr_number: z.number().optional(),
+});
+
+export const ChangelogEntrySchema = z.object({
+  phase: z.string(),
+  title: z.string(),
+  items: z.array(ChangelogItemSchema),
+});
+
+export const StructuredChangelogSchema = z.object({
+  entries: z.array(ChangelogEntrySchema),
+  generated_at: z.string(),
+});
+
 // ─── F516: Backlog 인입 파이프라인 ──────────────────────────────────────────
 
 export const WorkSubmitInputSchema = z.object({
