@@ -67,6 +67,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | **Phase 37 Work Lifecycle Platform** (F516~F518) | ✅ Sprint 273~275 |
 | **Phase 38 Dashboard Overhaul** (F519) | ✅ Sprint 276 |
 | **Phase 39 MSA Walking Skeleton** (F520~F523) | ✅ Sprint 268(F520~F521), 277(F522~F523) |
+| **Phase 40 Agent Autonomy** (F524~F526) | 📋 Sprint 278~279 |
 
 ## §4 성공 지표
 
@@ -140,6 +141,11 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F521 | Discovery 도메인 분리 — core/discovery 12 routes + 18 services를 독립 Worker로 추출 (FX-REQ-549, P0) | Sprint 268 | ✅ | PR #535. packages/fx-discovery/ 생성 |
 | F522 | shared 타입 슬리밍 — 도메인 전용 타입을 각 Worker 내부로 이동, 크로스도메인 계약만 shared 유지 (FX-REQ-550, P0) | Sprint 277 | ✅ | PR #544. fx-discovery 타입 이동, shared re-export 유지 |
 | F523 | D1 스키마 격리 — Discovery 전용 D1 바인딩 분리, 크로스도메인 JOIN 대체 방안 확정 (FX-REQ-551, P0) | Sprint 277 | ✅ | PR #544. F522와 통합, Option B(re-export) 유지 |
+
+| **Phase 40: Agent Autonomy — E2E 자동화 + Gap 통합** | | | | PRD: `docs/specs/fx-agent-autonomy/prd-final.md`. E2E 자동 생성 + Gap-E2E 통합 품질 점수 |
+| F524 | E2E 시나리오 자동 추출 — Design 문서 §4+§5에서 Playwright spec 자동 생성, 템플릿+NLP 파싱 (FX-REQ-552, P0) | Sprint 278 | 📋 | PRD M1 |
+| F525 | Gap-E2E 통합 점수 — Gap Analysis에 E2E PASS/FAIL 포함, Gap×0.6+E2E×0.4 가중 평균 (FX-REQ-553, P0) | Sprint 278 | 📋 | PRD M2 |
+| F526 | autopilot Verify E2E 통합 — sprint-autopilot Step 5~6에 E2E 생성+실행 자동 삽입 (FX-REQ-554, P0) | Sprint 279 | 📋 | PRD M3 |
 
 <!-- fx-task-orchestrator-backlog -->
 ### Task Orchestrator Backlog (B/C/X)

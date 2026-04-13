@@ -1,0 +1,437 @@
+{
+  "generated": "2026-04-13T10:12:25.491Z",
+  "totalItems": 71,
+  "byType": {
+    "flaw": 4,
+    "gap": 19,
+    "risk": 45
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**Design 문서의 비정형성**이 전체 흐름의 약한 고리입니다. 문제 정의에서 포맷 다양성과 정보 부족을 언급했지만, 해결책(자동 파싱)에서 “70% 신뢰도 PoC”가 실패할 경우의 fallback(예: 수동 템플릿 표준화, 하이브리드 접근 등) 플랜이 뚜렷하지 않습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**품질 점수 가중치(0.6:0.4)**는 실증적 근거가 약합니다. 설문 계획은 있으나, 실제 왜 0.6:0.4가 적정한지에 대한 논리가 부족합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**E2E assertion depth** 평가 기준이 추상적입니다. “smoke/functional 구분”은 있지만, 구체적인 예시나 산정 방식(예: 어떤 액션·어설션 개수를 기준삼는지)이 부족합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**실패/중단 조건**의 일부(예: 파싱 신뢰도 60% 미만)는 매우 주관적이므로, 객관적 수치 산출 및 재도전 전략(예: 파싱 실패 시 수동 개입 범위 확대 등)이 더 명확히 필요합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Design 문서의 비정형성**이 전체 흐름의 약한 고리입니다. 문제 정의에서 포맷 다양성과 정보 부족을 언급했지만, 해결책(자동 파싱)에서 “70% 신뢰도 PoC”가 실패할 경우의 fallback(예: 수동 템플릿 표준화, 하이브리드 접근 등) 플랜이 뚜렷하지 않습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**품질 점수 가중치(0.6:0.4)**는 실증적 근거가 약합니다. 설문 계획은 있으나, 실제 왜 0.6:0.4가 적정한지에 대한 논리가 부족합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**E2E assertion depth** 평가 기준이 추상적입니다. “smoke/functional 구분”은 있지만, 구체적인 예시나 산정 방식(예: 어떤 액션·어설션 개수를 기준삼는지)이 부족합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실패/중단 조건**의 일부(예: 파싱 신뢰도 60% 미만)는 매우 주관적이므로, 객관적 수치 산출 및 재도전 전략(예: 파싱 실패 시 수동 개입 범위 확대 등)이 더 명확히 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실패 시 fallback 전략:** 자동 파싱/생성 실패 시 human-in-the-loop(수동 전환), 혹은 템플릿 강제 적용 등 단계적 fallback 플랜이 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트 신뢰성 검증 절차:** flaky 판단 기준(3회 반복 실행 등)은 있으나, 실제 flaky root cause 분석/조치 프로세스(예: flaky 원인이 환경/데이터/코드 중 어디에 있는지 분류, 자동화 한계에 대한 명확한 안내 등)가 부족합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영/모니터링 플로우:** 자동 생성 E2E 전체 상태(성공률, flaky 현황, 실패 사유 등)를 실시간으로 집계/모니터링하고, 운영자가 쉽게 개입/판단할 수 있는 대시보드 또는 리포팅 체계가 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**롤백/재생성 프로세스 상세화:** 실패 시 “커밋 보류” 및 “수동 개입”만 제시됐으나, 구체적으로 어떤 트리거/알림/커밋 정책을 적용하는지, 히스토리 관리 방식 등은 미흡합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**외부 의존성/환경 차이:** Playwright 등 E2E 도구의 버전/환경 차이, WSL2와 production 환경(실제 배포 환경) 간 차이에 대한 고려가 부족합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**보안/비용 측면:** 내부 도구라 하더라도, E2E 자동화에 따른 보안 리스크(PHI/PII 데이터 노출, 외부 API 접근 등)나 리소스(테스트 환경 비용 등) 문제도 고려돼야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Design 문서 파싱 신뢰도:** 비정형 문서에서 자동으로 “실행 가능한 E2E 시나리오”를 높은 신뢰도로 추출하기 매우 어렵습니다. 신뢰도가 미달하면 전체 시스템의 자동화 효과가 급격히 감소합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**자동 생성 E2E의 품질:** assertion depth가 낮거나, 실제 동작을 과소 검증하면 ‘자동화’의 의미가 크게 퇴색됩니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**flaky test 관리 미흡:** 자동 생성 테스트에서 flaky가 많이 발생할 경우, 운영자는 자동화된 결과 자체를 신뢰하지 않게 됩니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**1인 개발 체계의 한계:** 자동화 실패→수동 개입 빈도 증가→운영자 리소스 부족→기능 누락/품질 저하의 악순환이 우려됩니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실행 환경 통제:** 테스트 데이터/환경이 완전히 격리되지 않으면, flaky test와 디버깅 어려움이 상당히 누적될 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Design 문서의 비정형성**이 전체 흐름의 약한 고리입니다. 문제 정의에서 포맷 다양성과 정보 부족을 언급했지만, 해결책(자동 파싱)에서 “70% 신뢰도 PoC”가 실패할 경우의 fallback(예: 수동 템플릿 표준화, 하이브리드 접근 등) 플랜이 뚜렷하지 않습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**품질 점수 가중치(0.6:0.4)**는 실증적 근거가 약합니다. 설문 계획은 있으나, 실제 왜 0.6:0.4가 적정한지에 대한 논리가 부족합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**E2E assertion depth** 평가 기준이 추상적입니다. “smoke/functional 구분”은 있지만, 구체적인 예시나 산정 방식(예: 어떤 액션·어설션 개수를 기준삼는지)이 부족합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실패/중단 조건**의 일부(예: 파싱 신뢰도 60% 미만)는 매우 주관적이므로, 객관적 수치 산출 및 재도전 전략(예: 파싱 실패 시 수동 개입 범위 확대 등)이 더 명확히 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Design 문서 파싱 난도:** 실제로 비정형 자연어에서 E2E 테스트 시나리오(“사용자 액션/예상결과”)를 정확히 추출하는 것은 현 시점 AI/NLP 기술로도 PoC 이상은 어렵습니다. 실패 시 fallback 플랜(수동 표준화, 템플릿 강제 등) 없이는 1~2 Sprint 내 달성은 비현실적일 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**자동 생성 E2E의 flaky 관리:** flaky test 자동 감지·분석 및 롤백/재생성 자동화는 실제로 구현 복잡도가 매우 높고, 1인 개발이 동시에 품질까지 담보하긴 어렵습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Assertion depth 보장:** 기능별 “기본(smkoke)”과 “주요(functional)”을 자동 분류하고, 각각에 맞는 assertion을 자동 생성하는 로직 개발은 예상보다 복잡할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트 환경/데이터 리셋:** 단순 스냅샷/초기화로 커버되지 않는 DB/스토리지/외부 의존성 등이 있을 수 있으므로, 환경 통제 범위의 한계가 실제로 발생할 가능성이 높습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**1인 개발 체계:** 자동화 실패 시 수동 개입이 폭증할 수 있는데, 이를 감당할 수 있는지에 대한 현실적 검토가 부족합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실패 시 fallback 전략:** 자동 파싱/생성 실패 시 human-in-the-loop(수동 전환), 혹은 템플릿 강제 적용 등 단계적 fallback 플랜이 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트 신뢰성 검증 절차:** flaky 판단 기준(3회 반복 실행 등)은 있으나, 실제 flaky root cause 분석/조치 프로세스(예: flaky 원인이 환경/데이터/코드 중 어디에 있는지 분류, 자동화 한계에 대한 명확한 안내 등)가 부족합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/모니터링 플로우:** 자동 생성 E2E 전체 상태(성공률, flaky 현황, 실패 사유 등)를 실시간으로 집계/모니터링하고, 운영자가 쉽게 개입/판단할 수 있는 대시보드 또는 리포팅 체계가 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**롤백/재생성 프로세스 상세화:** 실패 시 “커밋 보류” 및 “수동 개입”만 제시됐으나, 구체적으로 어떤 트리거/알림/커밋 정책을 적용하는지, 히스토리 관리 방식 등은 미흡합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**외부 의존성/환경 차이:** Playwright 등 E2E 도구의 버전/환경 차이, WSL2와 production 환경(실제 배포 환경) 간 차이에 대한 고려가 부족합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**보안/비용 측면:** 내부 도구라 하더라도, E2E 자동화에 따른 보안 리스크(PHI/PII 데이터 노출, 외부 API 접근 등)나 리소스(테스트 환경 비용 등) 문제도 고려돼야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Design 문서 파싱 신뢰도:** 비정형 문서에서 자동으로 “실행 가능한 E2E 시나리오”를 높은 신뢰도로 추출하기 매우 어렵습니다. 신뢰도가 미달하면 전체 시스템의 자동화 효과가 급격히 감소합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**자동 생성 E2E의 품질:** assertion depth가 낮거나, 실제 동작을 과소 검증하면 ‘자동화’의 의미가 크게 퇴색됩니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**flaky test 관리 미흡:** 자동 생성 테스트에서 flaky가 많이 발생할 경우, 운영자는 자동화된 결과 자체를 신뢰하지 않게 됩니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**1인 개발 체계의 한계:** 자동화 실패→수동 개입 빈도 증가→운영자 리소스 부족→기능 누락/품질 저하의 악순환이 우려됩니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실행 환경 통제:** 테스트 데이터/환경이 완전히 격리되지 않으면, flaky test와 디버깅 어려움이 상당히 누적될 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "착수 판단\n\n**결론:**  \n**착수 판단: Conditional**\n\n**조건:**  \n- (1) **Design 문서 파싱 PoC 신뢰도 70% 이상**을 Sprint 278 초기에 반드시 검증할 것. 미달 시, fallback(수동 템플릿 표준화, 파싱 불가 구간 수동 작성 등) 플랜을 사전 제시해야 함.\n- (2) **자동 생성 E2E assert",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**Design-Driven E2E Generation:** Design 문서, 특히 기능 명세(§4)와 파일 매핑(§5)에서 E2E 시나리오를 직접 추출한다는 점이 독특합니다. 이는 \"설계-코드-테스트\" 간의 일관성을 AI 에이전트가 스스로 확보하려는 시도입니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**AI 에이전트 자율성 및 피드백 루프 완성:** Sprint autopilot이 생성한 Feature에 대해 스스로 E2E를 생성하고, 그 결과를 Gap Analysis에 통합하여 \"코드 구조 일치 + 실제 동작 검증\"을 하나의 품질 점수로 보장하는 것은 AI 에이전트의 자율적인 개발 프로세스를 한 단계 끌어올리는 중요한 진전입니다. 이는 AI 에이전트",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**내부 개발 프로세스 최적화:** 외부 시장에 판매되는 제품이라기보다는 Foundry-X라는 특정 AI 에이전트 기반 개발 환경을 위한 내부 도구라는 점에서, 해당 환경에 특화된 최적화와 통합이 가능합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "사실 확인\n\nPRD에 포함된 가정이나 수치 중 검증이 필요한 것들은 다음과 같습니다.\n\n*   **Gap Analysis Match Rate 90%+ 기준:** 이 수치가 \"코드 구조 일치\"만을 나타낸다는 점은 명확합니다. 하지만 이 90%+라는 기준이 현재 프로젝트의 품질 관리 측면에서 충분히 유효한지, 혹은 실제 프로덕션에서 발생하는 문제점들과의 상관관",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "사용자 관점\n\n**목표 사용자가 실제로 이 솔루션을 받아들일 것 같나요?**\n**네, 매우 긍정적으로 받아들일 가능성이 높습니다.**\n주 사용자(AI 에이전트 운영자/개발자)의 주요 니즈가 \"Sprint 완료 시 E2E까지 자동 완료, 수동 개입 최소화, 실패 원인 쉽게 추적, 롤백/재실행 플로우 필요\"로 명확하게 정의되어 있고, 본 PRD의 핵심 기능과 ",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "착수 판단\n\n**착수 판단: Ready**\n\nPRD는 매우 상세하고 잘 작성되었습니다. 핵심 문제 정의가 명확하고, 시장 트렌드에 대한 이해도가 높으며, 목표와 기능 범위, 성공 기준, 제약 조건 등이 구체적입니다. 특히 1차 반영을 통해 시장/트렌드 배경, Shift-Left, DevOps, AI-Driven 개발 트렌드 명시, AI 에이전트 자율성 및 ",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Ready",
+      "severity": "info"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**기술 스택**: Playwright, Vitest, Hono 등의 스택은 E2E 및 API 테스트에 적합합니다. 특히 Playwright는 크로스 브라우저 테스트 및 자동화에 강점이 있으므로 선택이 적절합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**병목 가능성**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Design 문서 파싱**: 문서 포맷이 Phase마다 다르다는 점이 주요 병목입니다. NLP와 템플릿 기반 파싱을 병행하더라도 신뢰도 70% 이상을 달성하기는 쉽지 않을 수 있습니다. 특히 멀티모달(텍스트+이미지) 문서의 경우 파싱이 더 복잡해질 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**동시성 관리**: Verify 단계에서 E2E 생성 및 실행을 동시에 처리할 경우, 리소스 경쟁 및 실행 시간 증가가 우려됩니다. 큐 기반 처리와 실행 시간 제한을 적용하더라도, 대규모 프로젝트에서는 성능 저하가 발생할 가능성이 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Flaky Test 관리**: 자동 생성된 E2E 테스트가 flaky할 경우, 이를 감지하고 관리하는 프로세스가 복잡할 수 있습니다. 특히 테스트 환경 및 데이터 리셋이 제대로 이루어지지 않으면 flaky 테스트가 다발할 가능성이 높습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**현재 아키텍처**: 로컬 실행 기반으로 설계되어 있어 빠른 피드백 루프를 제공하지만, CI/CD 파이프라인과의 연동이 고려되지 않았습니다. 이는 향후 확장성에 제약이 될 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**대안 아키텍처**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**CI/CD 연동 고려**: GitHub Actions 등의 CI/CD 파이프라인과의 연동을 초기 설계 단계부터 고려하는 것이 좋습니다. 이를 통해 로컬-클라우드 실행 전환을 원활히 할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**테스트 환경 격리**: 테스트 컨테이너 및 데이터베이스 스냅샷을 활용하여 테스트 간 간섭을 최소화하는 방안을 강화할 필요가 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**과소평가된 난이도**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Design 문서 파싱**: 문서 포맷의 다양성과 멀티모달 요소를 고려할 때, 파싱 모듈의 개발 및 유지보수가 예상보다 복잡할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Flaky Test 관리**: flaky 테스트를 감지하고 관리하는 로직은 구현 복잡도가 높습니다. 특히 테스트 환경과 데이터의 일관성을 유지하는 것이 어려울 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**동시성 및 리소스 경쟁**: Verify 단계에서의 동시성 문제는 예상보다 복잡할 수 있으며, 큐 기반 처리와 실행 시간 제한이 충분하지 않을 가능성이 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**가장 큰 우려 요인**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Design 문서 파싱 신뢰도**: 문서 포맷의 다양성과 멀티모달 요소로 인해 파싱 모듈의 신뢰도가 낮을 경우, 전체 시스템의 실패로 이어질 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Flaky Test 다발**: flaky 테스트가 다발할 경우, 테스트 결과의 신뢰성이 떨어지고 개발자의 생산성이 저하될 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**동시성 문제**: Verify 단계에서의 동시성 문제로 인해 실행 시간이 길어지거나 리소스 경쟁이 발생할 경우, 개발 속도가 저하될 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**착수 판단: Conditional**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Design 문서 파싱 PoC 성공**: Design 문서 파싱의 신뢰도가 70% 이상임을 PoC로 검증해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Flaky Test 관리 전략 확립**: flaky 테스트를 효과적으로 관리할 수 있는 전략을 마련해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**동시성 문제 해결 방안**: Verify 단계에서의 동시성 문제를 해결할 수 있는 방안을 마련해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**착수 판단: Conditional**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}
