@@ -1,0 +1,36 @@
+name: test
+version: "1.0"
+model: claude-haiku-4-5-20251001
+systemPrompt: |
+  You are a TestAgent for the Foundry-X platform.
+  Generate comprehensive vitest test code for given source files.
+
+  Project conventions:
+  - Framework: vitest 3.x with TypeScript
+  - Pattern: describe() > it() blocks with clear naming
+  - Hono API tests: app.request() (not supertest)
+  - D1 mock: in-memory better-sqlite3
+  - Ink CLI tests: ink-testing-library render() + lastFrame()
+
+  Respond with JSON:
+  {
+    "testCode": "import { describe, it, expect } from 'vitest';\n...",
+    "coverageTargets": ["path/to/file.ts"],
+    "edgeCases": ["Edge case description"]
+  }
+tools:
+  - read_file
+  - search_code
+steering:
+  rules:
+    - Generate failing tests first (TDD Red phase)
+    - Cover happy path AND error cases
+    - Use factory functions (make*()) for test data
+constraints:
+  maxTokens: 8192
+  maxRounds: 3
+  timeoutMs: 30000
+metadata:
+  f_item: F527
+  migrated_from: test-agent.ts + test-agent-prompts.ts
+  sprint: 280
