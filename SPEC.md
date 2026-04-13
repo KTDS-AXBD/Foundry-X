@@ -63,7 +63,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | ↳ Sprint 265 — Phase 36-B 완성 (F514) | ✅ |
 | ↳ Sprint 266 — Phase 36-C (F515) | ✅ |
 | **Phase 37 Work Lifecycle Platform** (F516~F518) | ✅ Sprint 273~275 |
-| **Phase 38 Dashboard Overhaul** (F519) | 📋 Sprint 270 |
+| **Phase 38 Dashboard Overhaul** (F519) | 📋 Sprint 276 |
 | **Phase 39 MSA Walking Skeleton** (F520~F523) | ✅/📋 Sprint 268(F520~F521 완료), 271~272 |
 
 ## §4 성공 지표
@@ -131,7 +131,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F518 | Work Ontology 기반 연결 — KG 스키마(10노드타입/5엣지타입) + kg_nodes/kg_edges D1 테이블 + SPEC/GitHub→노드 자동생성 + KG 쿼리 API + 공개 Roadmap/Changelog 뷰 (FX-REQ-546, P0) | Sprint 275 | ✅ | PR #541. D1 0131, TDD 18 tests, Gap 91%. 공개 /roadmap + /changelog |
 
 | **Phase 38: Dashboard Overhaul (대시보드 현행화)** | | | | 서비스 범위(발굴~형상화)에 맞춰 대시보드 전면 정리 |
-| F519 | 대시보드 현행화 — (1) 파이프라인 6단계→2단계 축소 (2) 퀵 액션 dead link 제거 (3) 내부 위젯 4개 삭제 (4) ToDo List UI/UX (5) 업무 가이드 Wiki 대체 (FX-REQ-547, P1) | Sprint 270 | 📋(plan) | |
+| F519 | 대시보드 현행화 — (1) 파이프라인 6단계→2단계 축소 (2) 퀵 액션 dead link 제거 (3) 내부 위젯 4개 삭제 (4) ToDo List UI/UX (5) 업무 가이드 Wiki 대체 (FX-REQ-547, P1) | Sprint 276 | 📋(plan) | |
 
 | **Phase 39: MSA Walking Skeleton** | | | | PRD: `docs/specs/fx-msa-roadmap/prd-final.md`. 도메인별 서비스 분리 + API 게이트웨이 + D1 격리 |
 | F520 | API 게이트웨이 Worker — fx-gateway Worker 신규, Service Binding 라우팅, 하위 호환 (FX-REQ-548, P0) | Sprint 268 | ✅ | PR #535. packages/fx-gateway/ 생성 |
@@ -194,7 +194,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C38 | C | work-unit-taxonomy 용어사전 + 승격기준 + Milestone정리 (FX-REQ-539) | — | DONE | task orchestrator |
 | C39 | C | task-daemon 자동 감지 근본 개선 — 세션 간 지속성 + 완료 감지 다중화 (FX-REQ-540) | — | DONE | task orchestrator |
 | C40 | C | daemon 3중 감지 dogfood 검증 (FX-REQ-541) | — | DONE | task orchestrator |
-| C41 | C | daemon path2-path3 실전 검증 (FX-REQ-542) | — | PLANNED | task orchestrator |
+| C41 | C | daemon path2-path3 실전 검증 (FX-REQ-542) | — | DONE | S265 실전 검증 완료. Issue #527 close |
 | C42 | C | sprint-monitor + task-daemon 통합 — unified-daemon (FX-REQ-543) | — | DONE | task orchestrator |
 | C43 | C | sprint monitor 2중 실행 해소 — bashrc _sprint_ensure_monitor→daemon 교체 + post-merge health check | — | DONE | S267. bashrc 직접편집 + daemon 코드 |
 | C44 | C | Changelog 마크다운 렌더링 + Roadmap 미래 계획 — react-markdown 적용, GET /api/work/roadmap 추가, SPEC §3 직접 파싱으로 Phase 데이터 개선 | — | DONE | S268 PR #534. 구 C43(중복 ID) + C44 통합 |
