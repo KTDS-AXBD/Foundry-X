@@ -4,7 +4,7 @@ title: Sprint 277 Design — F522 shared 슬리밍 + F523 D1 스키마 격리
 sprint: 277
 f_items: [F522, F523]
 req: FX-REQ-550, FX-REQ-551
-status: draft
+status: done
 created: 2026-04-13
 ---
 
@@ -79,8 +79,8 @@ Response: { items: BizItem[], total: number }
 ```typescript
 interface BizItem {
   id: string;
-  name: string;
-  category: string;
+  title: string;    // 역동기화: Design 초안 name→title (DB 실제 컬럼)
+  source: string;   // 역동기화: Design 초안 category→source (DB 실제 컬럼)
   status: string;
   created_at: string;
 }
@@ -130,7 +130,8 @@ interface BizItem {
 describe('GET /api/discovery/items', () => {
   it('빈 DB에서 빈 배열 반환')        // { items: [], total: 0 }
   it('limit/offset 파라미터 적용')    // limit=5 → items.length <= 5
-  it('응답 스키마 일치')              // id, name, category, status, created_at
+  it('응답 스키마 일치')              // id, title, source, status, created_at (역동기화)
+  it('비숫자 파라미터 400 반환')      // 구현 추가분 (역동기화)
 })
 ```
 
@@ -140,6 +141,8 @@ describe('GET /api/discovery/items', () => {
 describe('fx-gateway DISCOVERY routing', () => {
   it('/api/discovery/* → DISCOVERY Service Binding으로 전달')
   it('/api/other/* → MAIN_API로 전달')
+  it('/api/discovery/health → DISCOVERY로 전달')   // 구현 추가분 (역동기화)
+  it('요청 헤더가 Service Binding에 전달')          // 구현 추가분 (역동기화)
 })
 ```
 
