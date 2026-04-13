@@ -64,7 +64,8 @@ const MOCK_AI_RESULT = {
 };
 
 describe("F531: createDiscoveryGraph — 실제 핸들러 연동", () => {
-  let db: D1Database;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let db: any;
   let runner: AgentRunner;
 
   beforeEach(async () => {
@@ -73,7 +74,7 @@ describe("F531: createDiscoveryGraph — 실제 핸들러 연동", () => {
     await execFn(SCHEMA);
     await execFn(EXTRA_SCHEMA);
     await execFn(SEED);
-    db = mockD1;
+    db = mockD1 as unknown as D1Database;
 
     runner = {
       type: "direct" as const,

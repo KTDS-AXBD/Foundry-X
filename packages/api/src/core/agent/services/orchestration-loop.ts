@@ -1,4 +1,5 @@
 // ─── F335: OrchestrationLoop — 3모드 피드백 루프 엔진 (Sprint 150) ───
+// ─── F531: graphDiscovery 분기 추가 ───
 
 import {
   TaskState,
@@ -16,6 +17,18 @@ import { TaskStateService } from "./task-state-service.js";
 import { FeedbackLoopContextManager } from "../../../modules/portal/services/feedback-loop-context.js";
 import { EventBus } from "../../../services/event-bus.js";
 import { TransitionGuard } from "../../harness/services/transition-guard.js";
+import type { AgentRunner } from "./agent-runner.js";
+import type { GraphStageInput } from "../../discovery/services/discovery-graph-service.js";
+
+/** F531: graphDiscovery 모드를 포함한 확장 파라미터 */
+export interface LoopStartParamsExtended extends LoopStartParams {
+  /** GraphEngine 기반 발굴 파이프라인 실행 입력 — 설정 시 graph 분기 */
+  graphDiscovery?: GraphStageInput;
+  /** graphDiscovery 모드에서 사용할 AgentRunner */
+  graphRunner?: AgentRunner;
+  /** graphDiscovery 모드에서 사용할 API key */
+  graphApiKey?: string;
+}
 
 export class OrchestrationLoop {
   private contextManager: FeedbackLoopContextManager;
@@ -36,7 +49,23 @@ export class OrchestrationLoop {
    * 3. 모드별 라운드 반복 (최대 maxRounds)
    * 4. 수렴 시 exitTarget으로 전이, 미수렴 시 FAILED
    */
-  async run(params: LoopStartParams): Promise<LoopOutcome> {
+  async run(params: LoopStartParams | LoopStartParamsExtended): Promise<LoopOutcome> {
+    // F531: graphDiscovery 분기 — DiscoveryGraphService.runAll() 실행
+    const extended = params as LoopStartParamsExtended;
+    if (extended.graphDiscovery && extended.graphRunner && extended.graphApiKey) {
+      const { DiscoveryGraphService } = await import(
+        "../../discovery/services/discovery-graph-service.js"
+      );
+      const graphSvc = new DiscoveryGraphService(
+        extended.graphRunner,
+        this.db,
+        params.taskId,
+        extended.graphApiKey,
+      );
+      await graphSvc.runAll(extended.graphDiscovery);
+      return { status: "resolved", exitState: TaskState.CODE_GENERATING, rounds: 1, finalScore: 1 };
+    }
+
     // 1. 현재 상태 검증
     const taskState = await this.taskStateService.getState(params.taskId, params.tenantId);
     if (!taskState) {

@@ -55,7 +55,8 @@ const SEED = `
 `;
 
 describe("F531: DiscoveryGraphService", () => {
-  let db: D1Database;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let db: any;
   let runner: AgentRunner;
   let service: DiscoveryGraphService;
 
@@ -65,7 +66,7 @@ describe("F531: DiscoveryGraphService", () => {
     await execFn(SCHEMA);
     await execFn(EXTRA_SCHEMA);
     await execFn(SEED);
-    db = mockD1;
+    db = mockD1 as unknown as D1Database;
 
     runner = {
       type: "direct" as const,
@@ -107,9 +108,10 @@ describe("F531: DiscoveryGraphService", () => {
     });
 
     // stage-2-1 결과가 bd_artifacts에 저장되었는지 확인
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const artifact = await db.prepare(
       "SELECT id, skill_id FROM bd_artifacts WHERE biz_item_id = ? AND stage_id = ?",
-    ).bind("biz1", "2-1").first<{ id: string; skill_id: string }>();
+    ).bind("biz1", "2-1").first() as { id: string; skill_id: string } | null;
 
     expect(artifact).not.toBeNull();
     expect(artifact?.skill_id).toBe("discovery-2-1");

@@ -309,7 +309,8 @@ describe("StageRunnerService (F485+F486)", () => {
 
       await service.confirmStage("biz1", "org1", "2-1", "go", undefined, {
         graphMode: true,
-        runner: mockRunner,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        runner: mockRunner as any,
         sessionId: "session-test",
         apiKey: "key-test",
       });
@@ -329,7 +330,8 @@ describe("StageRunnerService (F485+F486)", () => {
 
       const result = await service.confirmStage("biz1", "org1", "2-1", "stop", undefined, {
         graphMode: true,
-        runner: mockRunner,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        runner: mockRunner as any,
         sessionId: "session-test",
         apiKey: "key-test",
       });

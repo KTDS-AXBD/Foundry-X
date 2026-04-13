@@ -149,13 +149,18 @@ export class DiscoveryCriteriaService {
     const now = new Date().toISOString();
     const completedAt = data.status === "completed" ? now : null;
 
+    // UPSERT: 행이 없으면 생성, 있으면 갱신 (criteria가 사전 초기화 없이도 동작)
     await this.db
       .prepare(
-        `UPDATE biz_discovery_criteria
-         SET status = ?, evidence = COALESCE(?, evidence), completed_at = ?, updated_at = ?
-         WHERE biz_item_id = ? AND criterion_id = ?`,
+        `INSERT INTO biz_discovery_criteria (id, biz_item_id, criterion_id, status, evidence, completed_at, updated_at)
+         VALUES (lower(hex(randomblob(16))), ?, ?, ?, ?, ?, ?)
+         ON CONFLICT(biz_item_id, criterion_id)
+         DO UPDATE SET status = excluded.status,
+                       evidence = COALESCE(excluded.evidence, evidence),
+                       completed_at = excluded.completed_at,
+                       updated_at = excluded.updated_at`,
       )
-      .bind(data.status, data.evidence ?? null, completedAt, now, bizItemId, criterionId)
+      .bind(bizItemId, criterionId, data.status, data.evidence ?? null, completedAt, now)
       .run();
 
     const row = await this.db

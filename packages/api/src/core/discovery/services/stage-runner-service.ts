@@ -9,6 +9,16 @@ import type { DiscoveryType, Intensity, Stage } from "./analysis-path-v82.js";
 import { ANALYSIS_PATH_MAP, STAGE_NAMES, VIABILITY_QUESTIONS, COMMIT_GATE_QUESTIONS } from "./analysis-path-v82.js";
 import { DiscoveryStageService } from "./discovery-stage-service.js";
 import { DiscoveryCriteriaService } from "./discovery-criteria.js";
+import type { DiscoveryGraphService } from "./discovery-graph-service.js";
+
+/** F531: confirmStage graphMode 옵션 */
+export interface ConfirmStageOptions {
+  /** true이면 다음 단계를 GraphEngine으로 실행 */
+  graphMode?: boolean;
+  runner?: AgentRunner;
+  sessionId?: string;
+  apiKey?: string;
+}
 
 export interface StageRunResult {
   stage: string;
@@ -225,6 +235,7 @@ export class StageRunnerService {
     stage: string,
     viabilityAnswer: "go" | "pivot" | "stop",
     feedback?: string,
+    options?: ConfirmStageOptions,
   ): Promise<StageConfirmResult> {
     // D1 batch로 stage 완료 + viability checkpoint를 원자적으로 처리
     const now = new Date().toISOString().replace("T", " ").slice(0, 19);
@@ -308,6 +319,18 @@ export class StageRunnerService {
     // 다음 단계 결정
     const idx = STAGE_ORDER.indexOf(stage);
     const nextStage = idx >= 0 && idx < STAGE_ORDER.length - 1 ? (STAGE_ORDER[idx + 1] ?? null) : null;
+
+    // F531: graphMode=true이면 다음 단계를 GraphEngine으로 실행
+    if (options?.graphMode && nextStage && options.runner && options.sessionId && options.apiKey) {
+      const { DiscoveryGraphService } = await import("./discovery-graph-service.js");
+      const graphSvc: DiscoveryGraphService = new DiscoveryGraphService(
+        options.runner,
+        this.db,
+        options.sessionId,
+        options.apiKey,
+      );
+      await graphSvc.runFrom(nextStage, { bizItemId, orgId });
+    }
 
     return { ok: true, nextStage };
   }
