@@ -497,3 +497,13 @@ export type {
   AgentRunMetricSummary,
   AgentStreamRequest,
 } from './agent-streaming.js';
+
+// F530: Meta Layer (L4) 타입 (Sprint 283)
+export type {
+  DiagnosticAxis,
+  AxisScore,
+  DiagnosticReport,
+  ProposalType,
+  ProposalStatus,
+  ImprovementProposal,
+} from './agent-meta.js';
