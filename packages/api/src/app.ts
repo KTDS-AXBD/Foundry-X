@@ -48,7 +48,7 @@ import {
   orchestrationRoute, executionEventsRoute, taskStateRoute,
   commandRegistryRoute, contextPassthroughRoute, workflowRoute,
   capturedEngineRoute, derivedEngineRoute, skillRegistryRoute,
-  skillMetricsRoute, streamingRoute,
+  skillMetricsRoute, streamingRoute, metaRoute,
   // harness (22 routes)
   harnessRoute, governanceRoute, guardRailRoute, auditRoute,
   backupRestoreRoute, ogdGenericRoute, ogdQualityRoute,
@@ -231,6 +231,7 @@ app.route("/api", wikiRoute);
 app.route("/api", requirementsRoute);
 app.route("/api", agentRoute);
 app.route("/api", streamingRoute);
+app.route("/api", metaRoute);
 app.route("/api", tokenRoute);
 app.route("/api", specRoute);
 app.route("/api", mcpRoute);

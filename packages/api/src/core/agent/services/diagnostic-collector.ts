@@ -1,14 +1,156 @@
 // ─── F530: DiagnosticCollector — 6축 메트릭 수집 (Sprint 283) ───
-// TDD Red stub — Green Phase에서 구현 채움
 
 import type { D1Database } from "@cloudflare/workers-types";
-import type { DiagnosticReport } from "@foundry-x/shared";
+import type { DiagnosticReport, AxisScore, DiagnosticAxis } from "@foundry-x/shared";
+
+interface AgentRunRow {
+  rounds: number;
+  stop_reason: string | null;
+  input_tokens: number;
+  output_tokens: number;
+  duration_ms: number | null;
+}
+
+// 기준값: 라운드당 토큰 수 500이면 Cost=50점 (초과할수록 감점)
+const COST_BASELINE_TOKENS_PER_ROUND = 500;
+
+function clamp(v: number): number {
+  return Math.max(0, Math.min(100, Math.round(v)));
+}
 
 /** 6축 메트릭 수집기. agent_run_metrics D1 테이블에서 데이터를 읽어 DiagnosticReport를 생성한다. */
 export class DiagnosticCollector {
   constructor(private readonly db: D1Database) {}
 
-  async collect(_sessionId: string, _agentId: string): Promise<DiagnosticReport> {
-    throw new Error("Not implemented");
+  async collect(sessionId: string, agentId: string): Promise<DiagnosticReport> {
+    const rows = await this.fetchRows(sessionId, agentId);
+    const scores = this.computeScores(rows);
+    const overallScore = Math.round(
+      scores.reduce((s, a) => s + a.score, 0) / scores.length,
+    );
+
+    return {
+      sessionId,
+      agentId,
+      collectedAt: new Date().toISOString(),
+      scores,
+      overallScore,
+    };
+  }
+
+  private async fetchRows(sessionId: string, agentId: string): Promise<AgentRunRow[]> {
+    const result = await this.db
+      .prepare(
+        `SELECT rounds, stop_reason, input_tokens, output_tokens, duration_ms
+         FROM agent_run_metrics
+         WHERE session_id = ? AND agent_id = ?
+         ORDER BY created_at DESC
+         LIMIT 20`,
+      )
+      .bind(sessionId, agentId)
+      .all<AgentRunRow>();
+
+    return result.results ?? [];
+  }
+
+  private computeScores(rows: AgentRunRow[]): AxisScore[] {
+    const axes: DiagnosticAxis[] = [
+      "ToolEffectiveness",
+      "Memory",
+      "Planning",
+      "Verification",
+      "Cost",
+      "Convergence",
+    ];
+
+    return axes.map((axis) => this.computeAxis(axis, rows));
+  }
+
+  private computeAxis(axis: DiagnosticAxis, rows: AgentRunRow[]): AxisScore {
+    if (rows.length === 0) {
+      return { axis, score: 50, rawValue: 0, unit: "N/A", trend: "stable" };
+    }
+
+    switch (axis) {
+      case "ToolEffectiveness":
+        return this.toolEffectiveness(rows);
+      case "Memory":
+        return this.memory(rows);
+      case "Planning":
+        return this.planning(rows);
+      case "Verification":
+        return this.verification(rows);
+      case "Cost":
+        return this.cost(rows);
+      case "Convergence":
+        return this.convergence(rows);
+    }
+  }
+
+  /** ToolEffectiveness: end_turn 비율 (도구 사용 후 결론 도달률 추정) */
+  private toolEffectiveness(rows: AgentRunRow[]): AxisScore {
+    const endTurnCount = rows.filter((r) => r.stop_reason === "end_turn").length;
+    const rawValue = endTurnCount / rows.length;
+    const score = clamp(rawValue * 100);
+    return { axis: "ToolEffectiveness", score, rawValue, unit: "ratio", trend: "stable" };
+  }
+
+  /** Memory: 라운드당 입력 토큰이 낮을수록 좋음 */
+  private memory(rows: AgentRunRow[]): AxisScore {
+    const tokensPerRound = rows.map((r) =>
+      r.rounds > 0 ? r.input_tokens / r.rounds : r.input_tokens,
+    );
+    const avgTokensPerRound =
+      tokensPerRound.reduce((s, v) => s + v, 0) / tokensPerRound.length;
+
+    // 500 tokens/round = 50점. 초과할수록 감점.
+    const rawValue = avgTokensPerRound;
+    const score = clamp(100 - (avgTokensPerRound / COST_BASELINE_TOKENS_PER_ROUND) * 50);
+    const trend: "up" | "down" | "stable" =
+      avgTokensPerRound < COST_BASELINE_TOKENS_PER_ROUND ? "up" : "down";
+
+    return { axis: "Memory", score, rawValue, unit: "tokens/round", trend };
+  }
+
+  /** Planning: 라운드 수가 적을수록 좋음 (복잡도 대비 효율) */
+  private planning(rows: AgentRunRow[]): AxisScore {
+    const avgRounds = rows.reduce((s, r) => s + r.rounds, 0) / rows.length;
+    const idealRounds = 3;
+    const rawValue = avgRounds;
+    const score = clamp((idealRounds / Math.max(avgRounds, 1)) * 80);
+    return { axis: "Planning", score, rawValue, unit: "rounds", trend: "stable" };
+  }
+
+  /** Verification: self-reflection 데이터 없으면 중립값 50 반환 */
+  private verification(_rows: AgentRunRow[]): AxisScore {
+    // AgentSelfReflection 점수는 별도 테이블에 없으므로 중립값 사용
+    return {
+      axis: "Verification",
+      score: 50,
+      rawValue: 50,
+      unit: "score",
+      trend: "stable",
+    };
+  }
+
+  /** Cost: 라운드당 총 토큰 수가 낮을수록 좋음 */
+  private cost(rows: AgentRunRow[]): AxisScore {
+    const totalTokensPerRound = rows.map((r) =>
+      r.rounds > 0
+        ? (r.input_tokens + r.output_tokens) / r.rounds
+        : r.input_tokens + r.output_tokens,
+    );
+    const avg = totalTokensPerRound.reduce((s, v) => s + v, 0) / totalTokensPerRound.length;
+    const rawValue = avg;
+    const score = clamp(100 - (avg / COST_BASELINE_TOKENS_PER_ROUND) * 50);
+    return { axis: "Cost", score, rawValue, unit: "tokens/round", trend: "stable" };
+  }
+
+  /** Convergence: end_turn으로 종료된 비율 */
+  private convergence(rows: AgentRunRow[]): AxisScore {
+    const endTurnCount = rows.filter((r) => r.stop_reason === "end_turn").length;
+    const rawValue = endTurnCount / rows.length;
+    const score = clamp(rawValue * 100);
+    return { axis: "Convergence", score, rawValue, unit: "ratio", trend: "stable" };
   }
 }

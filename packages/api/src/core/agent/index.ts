@@ -21,3 +21,6 @@ export * from "./orchestration/index.js";
 // F529: L1 Streaming
 export { streamingRoute } from "./routes/streaming.js";
 export * from "./streaming/index.js";
+
+// F530: L4 Meta Layer
+export { metaRoute } from "./routes/meta.js";
