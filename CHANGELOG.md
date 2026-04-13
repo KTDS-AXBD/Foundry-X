@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Sprint 277 MSA Phase 2** (PR #544, Gap 97%): F522 shared 타입 슬리밍(Discovery 전용 3파일 fx-discovery 이동) + F523 D1 격리(fx-discovery items GET 라우트 이관, fx-gateway DISCOVERY binding 하드와이어, deploy.yml MSA job, D1 접근 규약 문서)
+- **Sprint 276 Dashboard Overhaul** (PR #543): F519 대시보드 현행화 — 파이프라인 6→2단계, 퀵 액션 정리, 위젯 삭제, ToDo UX
 - **Sprint 268 MSA Walking Skeleton** (PR #535): `packages/fx-gateway/` API 게이트웨이 Worker + `packages/fx-discovery/` Discovery 독립 Worker 생성 (F520/F521 ✅, Gap 100%). PRD: `docs/specs/fx-msa-roadmap/prd-final.md` (3-AI R2 검토, Ambiguity 0.150)
 - **S268** (PR #532, #534): /work-management 대시보드 대폭 개선 — Roadmap 탭(Phase 타임라인 + ROADMAP.md 미래 계획), Changelog 탭(react-markdown 렌더링), 불필요 탭 4개 제거(Context Resume/Sessions/Pipeline/Velocity), AXIS 디자인 토큰 적용, 탭 한글화, `GET /api/work/changelog` + `GET /api/work/roadmap` 엔드포인트
 - **C44/C45/C49** (PR #534): Backlog C/B/X-track 파싱(`parseBacklogItems`), 작업 분류 사용법 안내, `getPhaseProgress` SPEC §3 직접 파싱, `fetchSpecText` 캐시

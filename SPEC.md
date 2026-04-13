@@ -4,7 +4,7 @@ title: Foundry-X Project Specification
 version: 5.80
 status: Active
 category: SPEC
-system-version: Sprint 275
+system-version: Sprint 277
 created: 2026-03-16
 updated: 2026-04-13
 author: Sinclair Seo
@@ -48,7 +48,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 > ```
 > wc -l SPEC.md && find packages/api/src/db/migrations/*.sql | sort | tail -1
 > ```
-> **마지막 실측** (Sprint 275, 2026-04-13): ~11 routes, ~31 services, ~14 schemas, D1 0131, 10 packages, tests ~3452 (E2E 273) — Phase 37 F516~F518 ✅ 완료
+> **마지막 실측** (Sprint 277, 2026-04-13): ~11 routes, ~30 services, ~14 schemas, D1 0131, 10 packages, tests ~3452 (E2E 273) — Phase 38+39 완료 (F519/F522/F523 ✅)
 
 ## §3 Phase 진행 현황
 
