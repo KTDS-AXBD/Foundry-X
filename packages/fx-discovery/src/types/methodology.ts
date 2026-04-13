@@ -1,8 +1,4 @@
-/**
- * Sprint 59 F191: 방법론 모듈 공유 타입
- * @deprecated F522 (Sprint 277): 권위 소스가 packages/fx-discovery/src/types/methodology.ts로 이동.
- *             shared 파일은 하위 호환용 re-export 유지 (T3). T4 전환 시 삭제 예정.
- */
+/** Sprint 59 F191: 방법론 모듈 공유 타입 */
 
 export interface MethodologyModuleSummary {
   id: string;
