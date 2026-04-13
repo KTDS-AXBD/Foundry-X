@@ -221,6 +221,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C48 | C | ~~Work Management Ontology~~ → F518 승격 | — | → F518 | S268. Phase 37 Sprint 269 |
 | C49 | C | 작업 현황 Kanban 데이터 보강 — parseSpecItems F+Backlog 통합 반환, fetchSpecText 캐시 | — | DONE | S268 PR #534 |
 | C50 | C | req-interview 스코어카드 채점 메커니즘 개선 — severity 가중치(flaw×3+gap+risk) + 라운드 간 품질 비교 + breakdown 표시 | — | DONE | S273. ax-plugin `4005237` |
+| C51 | C | Monitor lifecycle 관리 — sprint skill done/merge에 Monitor stop 추가 + signal에 MONITOR_TASK_ID 기록 + session-start stale 감지 (FX-REQ-559) | — | PLANNED | task orchestrator |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
