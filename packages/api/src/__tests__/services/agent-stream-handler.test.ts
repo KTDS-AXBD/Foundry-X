@@ -67,7 +67,7 @@ describe("F529 AgentStreamHandler", () => {
       const hooks = handler.createHooks(ctrl);
 
       await hooks.afterModel!(
-        { messages: [], systemPrompt: "", model: "claude-sonnet-4-5", tools: undefined },
+        { messages: [], systemPrompt: "", model: "claude-sonnet-4-5" },
         {
           content: [{ type: "text", text: "Hello world" }],
           usage: { inputTokens: 10, outputTokens: 5 },
@@ -89,7 +89,7 @@ describe("F529 AgentStreamHandler", () => {
       const hooks = handler.createHooks(ctrl);
 
       await hooks.afterModel!(
-        { messages: [], systemPrompt: "", model: "claude-sonnet-4-5", tools: undefined },
+        { messages: [], systemPrompt: "", model: "claude-sonnet-4-5" },
         {
           content: [],
           usage: { inputTokens: 5, outputTokens: 0 },
@@ -110,15 +110,15 @@ describe("F529 AgentStreamHandler", () => {
 
       await hooks.beforeTool!({
         toolName: "read_file",
-        input: { path: "/tmp/test.txt" },
-        agentId: "planner",
-        sessionId: "sess-004",
+        toolInput: { path: "/tmp/test.txt" },
+        toolUseId: "tu-001",
       });
 
       const emitted = events();
       const toolCall = emitted.find((e) => e.type === "tool_call");
       expect(toolCall).toBeDefined();
       expect((toolCall!.payload as { toolName: string }).toolName).toBe("read_file");
+      // ToolCallContext.toolInput 이 payload로 전달됨
     });
 
     it("afterTool → tool_result 이벤트를 enqueue한다", async () => {
@@ -129,8 +129,8 @@ describe("F529 AgentStreamHandler", () => {
       const hooks = handler.createHooks(ctrl);
 
       await hooks.afterTool!(
-        { toolName: "read_file", input: {}, agentId: "planner", sessionId: "sess-005" },
-        { output: "file contents here", success: true },
+        { toolName: "read_file", toolInput: {}, toolUseId: "tu-001" },
+        { content: "file contents here" },
       );
 
       const emitted = events();

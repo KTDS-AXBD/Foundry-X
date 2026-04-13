@@ -26,13 +26,13 @@ export {
   businessPlanRoute, businessPlanExportRoute,
 } from "./offering/index.js";
 
-// Agent/Orchestration — 13 routes
+// Agent/Orchestration — 13 routes + F529 streaming
 export {
   agentRoute, agentAdaptersRoute, agentDefinitionRoute,
   orchestrationRoute, executionEventsRoute, taskStateRoute,
   commandRegistryRoute, contextPassthroughRoute, workflowRoute,
   capturedEngineRoute, derivedEngineRoute, skillRegistryRoute,
-  skillMetricsRoute,
+  skillMetricsRoute, streamingRoute,
 } from "./agent/index.js";
 
 // Harness/SDD/Governance — 22 routes
