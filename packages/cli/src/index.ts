@@ -3,6 +3,7 @@ import { Command } from 'commander';
 import { initCommand } from './commands/init.js';
 import { syncCommand } from './commands/sync.js';
 import { statusCommand } from './commands/status.js';
+import { e2eVerifyCommand } from './commands/e2e-verify.js';
 
 const program = new Command();
 
@@ -14,5 +15,6 @@ program
 program.addCommand(initCommand());
 program.addCommand(syncCommand());
 program.addCommand(statusCommand());
+program.addCommand(e2eVerifyCommand());
 
 program.parse();
