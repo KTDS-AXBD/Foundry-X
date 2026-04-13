@@ -9,6 +9,7 @@ import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
 import { createAgentRunner, createRoutedRunner } from "../../agent/services/agent-runner.js";
 import { StageRunnerService } from "../services/stage-runner-service.js";
+import { DiscoveryGraphService } from "../services/discovery-graph-service.js";
 import type { DiscoveryType } from "../services/analysis-path-v82.js";
 
 const StageRunSchema = z.object({
@@ -166,5 +167,50 @@ discoveryStageRunnerRoute.post("/biz-items/:id/discovery-stage/:stage/confirm", 
   } catch (e) {
     const message = e instanceof Error ? e.message : "Stage confirm failed";
     return c.json({ error: "STAGE_CONFIRM_FAILED", message }, 500);
+  }
+});
+
+// ─── POST /biz-items/:id/discovery-graph/run-all ─── (Phase 42 dogfood)
+// F531 DiscoveryGraphService.runAll() — 9-stage Graph 파이프라인 전체 실행
+const GraphRunAllSchema = z.object({
+  discoveryType: z.string().optional(),
+  feedback: z.string().optional(),
+});
+
+discoveryStageRunnerRoute.post("/biz-items/:id/discovery-graph/run-all", async (c) => {
+  const bizItemId = c.req.param("id");
+  const orgId = c.get("orgId");
+
+  const item = await c.env.DB
+    .prepare("SELECT id FROM biz_items WHERE id = ? AND org_id = ?")
+    .bind(bizItemId, orgId)
+    .first();
+
+  if (!item) {
+    return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+  }
+
+  const body = await c.req.json().catch(() => ({}));
+  const parsed = GraphRunAllSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+  }
+
+  const runner = createAgentRunner(c.env);
+  const sessionId = `graph-dogfood-${bizItemId}-${Date.now()}`;
+  const apiKey = c.env.ANTHROPIC_API_KEY ?? "";
+  const service = new DiscoveryGraphService(runner, c.env.DB, sessionId, apiKey);
+
+  try {
+    const result = await service.runAll({
+      bizItemId,
+      orgId,
+      discoveryType: parsed.data.discoveryType as DiscoveryType | undefined,
+      feedback: parsed.data.feedback,
+    });
+    return c.json({ sessionId, result });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Graph run failed";
+    return c.json({ error: "GRAPH_RUN_FAILED", message, sessionId }, 500);
   }
 });
