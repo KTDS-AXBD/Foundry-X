@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * F323 — 대시보드 ToDo List
- * 아이템별 현재 6단계 위치 + 다음 할 일 + 의사결정 대기
+ * F323/F519 — 대시보드 ToDo List
+ * 아이템별 현재 2단계(발굴/형상화) 위치 + 다음 할 일 + 의사결정 대기
  */
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -23,7 +23,7 @@ import { Badge } from "@/components/ui/badge";
 /* ------------------------------------------------------------------ */
 
 const NEXT_ACTIONS: Record<number, { label: string; href: string }> = {
-  2: { label: "평가 실행", href: "/discovery?tab=process" },
+  2: { label: "평가 실행", href: "/discovery/items" },
   3: { label: "사업기획서 작성", href: "/shaping/business-plan" },
 };
 
