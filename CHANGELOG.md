@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Phase 41 HyperFX Agent Stack** (Sprint 280~283, PR #549/#552/#553/#555, +7644줄): 4-Layer Agent Stack Walking Skeleton — F527 Agent Runtime(defineTool, AgentSpec YAML, 7 agent migration), F528 Graph Orchestration(GraphEngine, Agents-as-Tools, Steering, 발굴 9단계 Graph), F529 Agent Streaming(SSE, D1 metrics, Web dashboard), F530 Meta Layer(DiagnosticCollector 6축, MetaAgent, Human Approval UI)
+- **Phase 40 Agent Autonomy** (Sprint 278~279, PR #548/#550): F524 E2E 시나리오 자동 추출, F525 Gap-E2E 통합 점수, F526 autopilot Verify E2E 통합
 - **Sprint 277 MSA Phase 2** (PR #544, Gap 97%): F522 shared 타입 슬리밍(Discovery 전용 3파일 fx-discovery 이동) + F523 D1 격리(fx-discovery items GET 라우트 이관, fx-gateway DISCOVERY binding 하드와이어, deploy.yml MSA job, D1 접근 규약 문서)
 - **Sprint 276 Dashboard Overhaul** (PR #543): F519 대시보드 현행화 — 파이프라인 6→2단계, 퀵 액션 정리, 위젯 삭제, ToDo UX
 - **Sprint 268 MSA Walking Skeleton** (PR #535): `packages/fx-gateway/` API 게이트웨이 Worker + `packages/fx-discovery/` Discovery 독립 Worker 생성 (F520/F521 ✅, Gap 100%). PRD: `docs/specs/fx-msa-roadmap/prd-final.md` (3-AI R2 검토, Ambiguity 0.150)

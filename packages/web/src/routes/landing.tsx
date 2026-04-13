@@ -69,9 +69,9 @@ function getSectionOrder(section: string): number {
    ═══════════════════════════════════════════════ */
 
 const SITE_META_FALLBACK = {
-  sprint: "Sprint 277",
-  phase: "Phase 39",
-  phaseTitle: "MSA Walking Skeleton",
+  sprint: "Sprint 283",
+  phase: "Phase 41",
+  phaseTitle: "HyperFX Agent Stack",
   tagline: "사업기회 발굴부터 데모까지, AI가 자동화하는 BD 플랫폼",
 } as const;
 
