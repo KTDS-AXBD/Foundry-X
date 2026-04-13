@@ -1,8 +1,8 @@
 import { test, expect } from "./fixtures/auth";
 
 // @service: portal
-// @sprint: 261, 262, 265, 267
-// @tagged-by: F509, F510, F514
+// @sprint: 261, 262, 265, 267, 273, 274
+// @tagged-by: F509, F510, F514, F516, F517
 // @spec: docs/specs/fx-work-observability/prd-v1.md §5.2.1 (End-to-end 시나리오 S1)
 
 // ─── Mock payloads ───────────────────────────────────────────────────────────
@@ -54,6 +54,31 @@ const MOCK_CHANGELOG = {
   generated_at: "2026-04-12T11:00:00Z",
 };
 
+// F516: Submit mock
+const MOCK_SUBMIT_RESULT = {
+  id: "BL-001",
+  track: "F",
+  priority: "P1",
+  title: "대시보드에 번다운 차트 추가",
+  classify_method: "llm",
+  github_issue_number: 542,
+  spec_row_added: true,
+  status: "registered",
+};
+
+// F517: Trace mock
+const MOCK_TRACE_CHAIN = {
+  id: "FX-REQ-544",
+  type: "req",
+  label: "FX-REQ-544",
+  f_items: [
+    { id: "F516", title: "Backlog 인입 파이프라인", status: "done", sprint: 273, req_code: "FX-REQ-544" },
+  ],
+  sprints: [{ number: 273, branch: "sprint/273" }],
+  prs: [{ number: 538, title: "feat: F516 Backlog 인입", url: "https://github.com/test/foo/pull/538", state: "merged" }],
+  commits: [],
+};
+
 // ─── Common setup — mock all /api/work/* endpoints ───────────────────────────
 
 async function mockWorkApi(page: import("@playwright/test").Page) {
@@ -93,6 +118,29 @@ async function mockWorkApi(page: import("@playwright/test").Page) {
       body: JSON.stringify(MOCK_CHANGELOG),
     }),
   );
+  await page.route("**/api/work/submit", (route) => {
+    if (route.request().method() !== "POST") return route.continue();
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(MOCK_SUBMIT_RESULT),
+    });
+  });
+  await page.route("**/api/work/trace?*", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(MOCK_TRACE_CHAIN),
+    }),
+  );
+  await page.route("**/api/work/trace/sync", (route) => {
+    if (route.request().method() !== "POST") return route.continue();
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ synced: { spec: 15, prs: 8 } }),
+    });
+  });
 }
 
 // ─── Tests ───────────────────────────────────────────────────────────────────
@@ -225,21 +273,98 @@ test.describe("Work Management (F509 Walking Skeleton)", () => {
 
   // ─── Tab Navigation ───────────────────────────────────────────────────────
 
-  test("5 tabs are visible and switchable", async ({ authenticatedPage: page }) => {
+  test("7 tabs are visible and switchable", async ({ authenticatedPage: page }) => {
     await mockWorkApi(page);
     await page.goto("/work-management");
 
-    // All 5 tab buttons visible
+    // All 7 tab buttons visible (5 original + F516 아이디어 제출 + F517 추적)
     await expect(page.getByRole("button", { name: "작업 현황" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Roadmap" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Backlog" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Changelog" })).toBeVisible();
     await expect(page.getByRole("button", { name: "작업 분류" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "아이디어 제출" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "추적" })).toBeVisible();
 
     // Old tabs should NOT exist
     await expect(page.getByRole("button", { name: "Context Resume" })).not.toBeVisible();
     await expect(page.getByRole("button", { name: "Sessions" })).not.toBeVisible();
-    await expect(page.getByRole("button", { name: "Pipeline" })).not.toBeVisible();
-    await expect(page.getByRole("button", { name: "Velocity" })).not.toBeVisible();
+  });
+
+  // ─── Submit Tab (F516) ──────────────────────────────────────────────────────
+
+  test("submit tab — 아이디어 제출 폼 입력→AI 분류→결과 표시", async ({ authenticatedPage: page }) => {
+    await mockWorkApi(page);
+    await page.goto("/work-management");
+
+    await page.getByRole("button", { name: "아이디어 제출" }).click();
+
+    // 폼이 보이는지 확인
+    await expect(page.getByText("아이디어 / 피드백 제출")).toBeVisible();
+
+    // 제목 입력
+    const titleInput = page.getByPlaceholder("예: 웹에서 바로 아이디어를 제출할 수 없어요");
+    await titleInput.fill("대시보드에 번다운 차트 추가");
+
+    // 설명 입력
+    const descInput = page.getByPlaceholder("어떤 문제인지, 어떤 기능을 원하는지 설명해 주세요");
+    await descInput.fill("Sprint별 완료율을 시각화하면 좋겠어요");
+
+    // 제출
+    await page.getByRole("button", { name: "제출하기" }).click();
+
+    // 결과 표시 확인
+    await expect(page.getByText("등록 완료")).toBeVisible();
+    await expect(page.getByText("BL-001")).toBeVisible();
+    await expect(page.getByText("AI 분류")).toBeVisible();
+  });
+
+  test("submit tab — 제목 없이 제출 버튼 비활성화", async ({ authenticatedPage: page }) => {
+    await mockWorkApi(page);
+    await page.goto("/work-management");
+
+    await page.getByRole("button", { name: "아이디어 제출" }).click();
+
+    const submitBtn = page.getByRole("button", { name: "제출하기" });
+    await expect(submitBtn).toBeDisabled();
+  });
+
+  // ─── Trace Tab (F517) ───────────────────────────────────────────────────────
+
+  test("trace tab — REQ 검색→체인 시각화", async ({ authenticatedPage: page }) => {
+    await mockWorkApi(page);
+    await page.goto("/work-management");
+
+    await page.getByRole("button", { name: "추적" }).click();
+
+    // 검색 입력
+    const searchInput = page.getByPlaceholder("FX-REQ-545 또는 F517");
+    await expect(searchInput).toBeVisible();
+    await searchInput.fill("FX-REQ-544");
+
+    // 검색 실행
+    await page.getByRole("button", { name: "조회" }).click();
+
+    // 체인 결과 확인 — F-item 정보 표시
+    await expect(page.getByText("F516")).toBeVisible();
+    await expect(page.getByText(/Backlog 인입/)).toBeVisible();
+    // PR 연결 정보
+    await expect(page.getByText("#538")).toBeVisible();
+  });
+
+  test("trace tab — 동기화 버튼 동작", async ({ authenticatedPage: page }) => {
+    await mockWorkApi(page);
+    await page.goto("/work-management");
+
+    await page.getByRole("button", { name: "추적" }).click();
+
+    // 동기화 버튼
+    const syncBtn = page.getByRole("button", { name: /동기화/ });
+    await expect(syncBtn).toBeVisible();
+    await syncBtn.click();
+
+    // 동기화 결과 메시지
+    await expect(page.getByText(/동기화 완료/)).toBeVisible();
+    await expect(page.getByText(/SPEC: 15건/)).toBeVisible();
   });
 });

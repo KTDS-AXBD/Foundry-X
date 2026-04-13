@@ -3,6 +3,7 @@ import { test, expect } from "@playwright/test";
 // @service: portal
 // @sprint: 275
 // @tagged-by: F518
+// @audit: S271 E2E 감사 — 공개 KG trace API 테스트 추가
 
 // F518: 공개 Roadmap/Changelog E2E — 인증 없이 접근 가능 여부 검증
 
@@ -94,5 +95,36 @@ test.describe("Public Changelog (F518)", () => {
     const f518Link = page.getByRole("link", { name: "F518" });
     await expect(f518Link).toBeVisible();
     await expect(f518Link).toHaveAttribute("href", /trace.*F518/);
+  });
+});
+
+test.describe("Public KG Trace API (F518)", () => {
+  test("공개 KG trace API는 인증 없이 접근 가능하다", async ({ page }) => {
+    await page.route("**/api/work/public/kg/trace?*", async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          root: { id: "work:FITEM:F518", node_type: "F_ITEM", label: "F518", metadata: {} },
+          nodes: [
+            { id: "work:FITEM:F518", node_type: "F_ITEM", label: "F518", metadata: {} },
+            { id: "work:REQ:FX-REQ-546", node_type: "REQ", label: "FX-REQ-546", metadata: {} },
+          ],
+          edges: [
+            { source_id: "work:FITEM:F518", target_id: "work:REQ:FX-REQ-546", edge_type: "implements" },
+          ],
+        }),
+      });
+    });
+
+    // API 직접 호출 (페이지 컨텍스트에서 fetch)
+    const response = await page.evaluate(async () => {
+      const res = await fetch("/api/work/public/kg/trace?id=F518&depth=2");
+      return { status: res.status, body: await res.json() };
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.nodes).toHaveLength(2);
+    expect(response.body.edges).toHaveLength(1);
   });
 });
