@@ -72,6 +72,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | **Phase 39 MSA Walking Skeleton** (F520~F523) | ✅ Sprint 268(F520~F521), 277(F522~F523) |
 | **Phase 40 Agent Autonomy** (F524~F526) | ✅ Sprint 278~279 |
 | **Phase 41 HyperFX Agent Stack** (F527~F530) | ✅ Sprint 280~283 |
+| **Phase 42 HyperFX Deep Integration** (F531~F533) | 📋 Sprint 284~286 |
 
 ## §4 성공 지표
 
@@ -155,6 +156,11 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F528 | Graph Orchestration (L3) — GraphEngine(GraphBuilder API + 조건부 라우팅 + 병렬 실행) + Agents-as-Tools + SteeringHandler + ConversationManager + OrchestrationLoop 래핑 + AX BD 발굴 9단계 Graph 정의 (FX-REQ-556, P0) | Sprint 281 | ✅ | PR #552, +1919, TDD 5, Match 97% |
 | F529 | Agent Streaming (L1) — WebSocket 에이전트 이벤트 스트리밍 + SSE 폴백 + D1 메트릭 저장 + Web 실시간 대시보드 (FX-REQ-557, P0) | Sprint 282 | ✅ | PR #553, +2112, TDD 2, D1 0132 |
 | F530 | Meta Layer (L4) — DiagnosticCollector 6축 메트릭 수집 + MetaAgent 진단→개선 제안 + Human Approval UI (FX-REQ-558, P1) | Sprint 283 | ✅ | PR #555, +1755, TDD 3, D1 0133 |
+
+| **Phase 42: HyperFX Deep Integration — Walking Skeleton → 실 데이터 연동** | | | | Phase 41 골격에 실 비즈니스 로직 연결 — 발굴 Graph 실행, 스트리밍 E2E, MetaAgent 실전 검증 |
+| F531 | 발굴 Graph 실행 연동 — createDiscoveryGraph()를 stage-runner-service와 연결하여 9단계 발굴 파이프라인이 GraphEngine으로 실행되도록 통합. 기존 OrchestrationLoop 실행 경로에 Graph 분기 추가 + confirmStage→GraphEngine 노드 실행 위임 + 실제 LLM 호출 연결 + 단계별 결과 D1 저장 (FX-REQ-561, P0) | Sprint 284 | 📋(idea) | |
+| F532 | 에이전트 스트리밍 E2E — WebSocket/SSE 스트리밍 레이어의 end-to-end 검증. Agent 실행→이벤트 발행→WebSocket 전달→Web 대시보드 렌더링 전 구간 통합 테스트 + Playwright E2E + 연결 끊김/재접속 복원력 테스트 (FX-REQ-562, P0) | Sprint 285 | 📋(idea) | |
+| F533 | MetaAgent 실전 검증 — DiagnosticCollector로 실제 에이전트 실행 메트릭 수집 + MetaAgent가 진단→개선안 생성→Human Approval→반영까지 full loop 검증. 테스트 시나리오: 발굴 Graph 1회 실행 후 MetaAgent 자동 진단 (FX-REQ-563, P1) | Sprint 286 | 📋(idea) | |
 
 <!-- fx-task-orchestrator-backlog -->
 ### Task Orchestrator Backlog (B/C/X)
