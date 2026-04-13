@@ -1,10 +1,6 @@
 ---
 name: ai-biz
-description: |
-  AI 사업 분석 11종 서브스킬 — 원가모델, 타당성, 규제, 생태계, 파트너, 파일럿, 해자, IR덱, 스케일, 데이터전략, Build-vs-Buy.
-  Use when: AI 사업 분석, 사업성 검토, feasibility, cost model, moat, pilot, regulation, ecosystem, partner, IR deck, scale playbook, data strategy, build vs buy
-  Triggers: ai-biz, AI 사업, 사업 분석, 사업성, feasibility, 원가, cost model
-  Do NOT use for: 일반 코드 리뷰, 인프라 설정, 단순 CRUD 구현
+description: "AI 사업 분석 11종 서브스킬 — 원가모델, 타당성, 규제, 생태계, 파트너, 파일럿, 해자, IR덱, 스케일, 데이터전략, Build-vs-Buy. Use when: AI 사업 분석, 사업성 검토, feasibility, cost model, moat, pilot. Triggers: ai-biz, AI 사업, 사업 분석"
 user-invocable: true
 category: business-analysis
 ---

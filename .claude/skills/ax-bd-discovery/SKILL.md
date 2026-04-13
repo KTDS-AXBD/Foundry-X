@@ -1,10 +1,6 @@
 ---
 name: ax-bd-discovery
-description: |
-  AX BD 2단계 발굴 프로세스 오케스트레이터 (v8.2) — 5유형(I/M/P/T/S) 분류, 11단계 분석(2-0~2-10), 사업성 체크포인트 7단계 + Commit Gate, 68스킬 통합 가이드.
-  Use when: 사업 발굴, 아이템 분석, Discovery, 2단계 발굴, 사업성 검토
-  Triggers: discovery, 발굴, 사업 아이템, BD 분석, 2-0, ax-bd, business discovery
-  Do NOT use for: 이미 형상화(3단계) 진입한 아이템, 순수 기술 PoC, 단일 프레임워크 분석(개별 ai-biz 스킬 사용)
+description: "AX BD 2단계 발굴 프로세스 오케스트레이터 (v8.2) — 5유형 분류, 11단계 분석, 사업성 체크포인트 7단계 + Commit Gate. Use when: 사업 발굴, 아이템 분석, Discovery, 2단계 발굴. Triggers: discovery, 발굴, BD 분석"
 user-invocable: true
 category: requirements-planning
 argument-hint: "start [아이템명] | 2-N | status | summary"

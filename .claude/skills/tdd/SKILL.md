@@ -1,11 +1,6 @@
 ---
 name: tdd
-description: |
-  TDD 자동화 — Red→Green→Refactor 사이클 오케스트레이터.
-  소스 파일을 분석하여 실패 테스트 작성 → 최소 구현 → 리팩토링을 자동화.
-  Use when: TDD, 테스트 먼저, test first, red green refactor
-  Triggers: tdd, TDD, test driven, 테스트 주도, red green refactor
-  Do NOT use for: E2E 테스트, 기존 테스트 수정, 테스트 삭제
+description: "TDD 자동화 — Red→Green→Refactor 사이클 오케스트레이터. Use when: TDD, 테스트 먼저, test first, red green refactor. Triggers: tdd, TDD, test driven, 테스트 주도"
 user-invocable: true
 category: development
 argument-hint: "{파일경로} | red {파일} | green {파일} | refactor {파일} | check {파일}"
