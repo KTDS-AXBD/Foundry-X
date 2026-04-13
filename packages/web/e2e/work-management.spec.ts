@@ -344,11 +344,11 @@ test.describe("Work Management (F509 Walking Skeleton)", () => {
     // 검색 실행
     await page.getByRole("button", { name: "조회" }).click();
 
-    // 체인 결과 확인 — F-item 정보 표시
-    await expect(page.getByText("F516")).toBeVisible();
-    await expect(page.getByText(/Backlog 인입/)).toBeVisible();
+    // 체인 결과 확인 — F-item ID (PR 제목에도 F516 포함되므로 exact match)
+    await expect(page.getByText("F516", { exact: true })).toBeVisible();
+    await expect(page.getByText("Backlog 인입 파이프라인")).toBeVisible();
     // PR 연결 정보
-    await expect(page.getByText("#538")).toBeVisible();
+    await expect(page.getByText("#538", { exact: true })).toBeVisible();
   });
 
   test("trace tab — 동기화 버튼 동작", async ({ authenticatedPage: page }) => {
