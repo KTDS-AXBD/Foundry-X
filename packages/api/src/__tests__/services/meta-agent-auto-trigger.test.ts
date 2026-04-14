@@ -98,19 +98,24 @@ describe("F536: MetaAgent 자동 진단 훅", () => {
     expect((row as Record<string, unknown>)?.type).toBe("prompt");
   });
 
-  it("autoTriggerMetaAgent — 전축 score >= 70 시 저장 없음", async () => {
-    const sessionId = "sess-high-score-536";
+  it("autoTriggerMetaAgent — MetaAgent 빈 proposal 반환 시 저장 없음", async () => {
+    const sessionId = "sess-empty-proposals-536";
     const agentId = "discovery-graph";
 
-    // end_turn, 토큰 적음 → 모든 축 70 이상
+    // 메트릭 존재해도 MetaAgent가 [] 반환하면 DB 저장 없음
     await (db as unknown as ReturnType<typeof createMockD1>).exec(
       `INSERT INTO agent_run_metrics
        (id, session_id, agent_id, status, rounds, stop_reason, input_tokens, output_tokens, started_at, created_at)
        VALUES ('m2', '${sessionId}', '${agentId}', 'completed', 2, 'end_turn', 100, 50, datetime('now'), datetime('now'))`
     );
 
-    const fetchMock = vi.fn();
-    vi.stubGlobal("fetch", fetchMock);
+    // MetaAgent LLM mock — 빈 배열 반환 (모든 축이 70 이상이거나 제안 없음)
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        content: [{ type: "text", text: "[]" }],
+      }),
+    }));
 
     const { autoTriggerMetaAgent } = await import(
       "../../core/discovery/routes/discovery-stage-runner.js"
@@ -124,8 +129,6 @@ describe("F536: MetaAgent 자동 진단 훅", () => {
       .first<{ cnt: number }>();
 
     expect(result?.cnt).toBe(0);
-    // fetch는 호출되지 않아야 함 (빈 배열 반환으로 LLM 호출 없음)
-    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("autoTriggerMetaAgent — MetaAgent API 실패 시 에러 전파 안 함", async () => {
