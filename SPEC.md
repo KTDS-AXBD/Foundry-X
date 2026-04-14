@@ -4,7 +4,7 @@ title: Foundry-X Project Specification
 version: 5.80
 status: Active
 category: SPEC
-system-version: Sprint 286
+system-version: Sprint 289
 created: 2026-03-16
 updated: 2026-04-14
 author: Sinclair Seo
