@@ -12,6 +12,7 @@ import { StageRunnerService } from "../services/stage-runner-service.js";
 import { DiscoveryGraphService } from "../services/discovery-graph-service.js";
 import { DiagnosticCollector } from "../../agent/services/diagnostic-collector.js";
 import type { DiscoveryType } from "../services/analysis-path-v82.js";
+import { GraphSessionService } from "../services/graph-session-service.js";
 
 const StageRunSchema = z.object({
   feedback: z.string().optional(),
@@ -171,11 +172,12 @@ discoveryStageRunnerRoute.post("/biz-items/:id/discovery-stage/:stage/confirm", 
   }
 });
 
-// ─── POST /biz-items/:id/discovery-graph/run-all ─── (Phase 42 dogfood)
-// F531 DiscoveryGraphService.runAll() — 9-stage Graph 파이프라인 전체 실행
+// ─── F535: POST /biz-items/:id/discovery-graph/run-all (정식 API) ───
+// Graph 실행 정식 API — sessionId D1 저장 + 조회 지원
 const GraphRunAllSchema = z.object({
   discoveryType: z.string().optional(),
   feedback: z.string().optional(),
+  graphMode: z.boolean().optional(),
 });
 
 discoveryStageRunnerRoute.post("/biz-items/:id/discovery-graph/run-all", async (c) => {
@@ -197,21 +199,57 @@ discoveryStageRunnerRoute.post("/biz-items/:id/discovery-graph/run-all", async (
     return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
   }
 
+  const sessionId = `graph-${bizItemId}-${Date.now()}`;
+  const sessionService = new GraphSessionService(c.env.DB);
+  await sessionService.createSession(bizItemId, orgId, sessionId, parsed.data.discoveryType);
+
   const runner = createAgentRunner(c.env);
-  const sessionId = `graph-dogfood-${bizItemId}-${Date.now()}`;
   const apiKey = c.env.ANTHROPIC_API_KEY ?? "";
-  const service = new DiscoveryGraphService(runner, c.env.DB, sessionId, apiKey);
+  const graphService = new DiscoveryGraphService(runner, c.env.DB, sessionId, apiKey);
 
   try {
-    const result = await service.runAll({
+    const result = await graphService.runAll({
       bizItemId,
       orgId,
       discoveryType: parsed.data.discoveryType as DiscoveryType | undefined,
       feedback: parsed.data.feedback,
     });
-    return c.json({ sessionId, result });
+    await sessionService.updateStatus(sessionId, "completed");
+    return c.json({ sessionId, status: "completed", result });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Graph run failed";
-    return c.json({ error: "GRAPH_RUN_FAILED", message, sessionId }, 500);
+    await sessionService.updateStatus(sessionId, "failed", message);
+    return c.json({ error: "GRAPH_RUN_FAILED", message, sessionId, status: "failed" }, 500);
   }
+});
+
+// ─── F535: GET /biz-items/:id/discovery-graph/sessions ───
+// graph_sessions 목록 조회 (최신순)
+discoveryStageRunnerRoute.get("/biz-items/:id/discovery-graph/sessions", async (c) => {
+  const bizItemId = c.req.param("id");
+  const orgId = c.get("orgId");
+
+  const item = await c.env.DB
+    .prepare("SELECT id FROM biz_items WHERE id = ? AND org_id = ?")
+    .bind(bizItemId, orgId)
+    .first();
+
+  if (!item) {
+    return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
+  }
+
+  const sessionService = new GraphSessionService(c.env.DB);
+  const sessions = await sessionService.listSessions(bizItemId, orgId);
+  const latest = sessions[0] ?? null;
+
+  return c.json({
+    sessions: sessions.map((s) => ({
+      id: s.id,
+      status: s.status,
+      startedAt: s.startedAt,
+      completedAt: s.completedAt,
+      errorMsg: s.errorMsg,
+    })),
+    latestSessionId: latest?.id ?? null,
+  });
 });

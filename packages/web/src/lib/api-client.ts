@@ -1491,6 +1491,38 @@ export async function confirmDiscoveryStage(
   return postApi(`/biz-items/${bizItemId}/discovery-stage/${stage}/confirm`, { viabilityAnswer, feedback });
 }
 
+// ─── F535: Graph 실행 정식 API + 세션 조회 ───
+
+export interface GraphRunResponse {
+  sessionId: string;
+  status: "completed" | "failed";
+  result?: unknown;
+}
+
+export interface GraphSession {
+  id: string;
+  status: "running" | "completed" | "failed";
+  startedAt: string;
+  completedAt: string | null;
+  errorMsg: string | null;
+}
+
+export interface GraphSessionsResponse {
+  sessions: GraphSession[];
+  latestSessionId: string | null;
+}
+
+export async function runDiscoveryGraph(
+  bizItemId: string,
+  options?: { discoveryType?: string; feedback?: string; graphMode?: boolean },
+): Promise<GraphRunResponse> {
+  return postApi(`/biz-items/${bizItemId}/discovery-graph/run-all`, options ?? {});
+}
+
+export async function getGraphSessions(bizItemId: string): Promise<GraphSessionsResponse> {
+  return fetchApi(`/biz-items/${bizItemId}/discovery-graph/sessions`);
+}
+
 // ─── Sprint 238: F485 단계별 결과 조회 API ───
 
 export interface StageResultResponse {
