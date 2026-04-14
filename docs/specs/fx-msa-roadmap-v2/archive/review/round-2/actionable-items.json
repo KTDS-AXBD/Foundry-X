@@ -1,0 +1,311 @@
+{
+  "generated": "2026-04-14T00:36:55.760Z",
+  "totalItems": 50,
+  "byType": {
+    "flaw": 12,
+    "gap": 9,
+    "risk": 26
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**핵심 가정(A1 등)이 실제 현실에서 성립되는지 실증적 검토가 부족**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**비즈니스/기술적 목표의 우선순위가 불분명**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**실제 서비스 분리(물리적 MSA)와 디렉터리 분리(논리적 분리) 간 괴리**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**실제 서비스 분리(물리적 분리)로의 마이그레이션 로드맵**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**도메인 간 공유/협업 영역 정책 불명확**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**테스트 자동화, 코드 품질 보장 체계 미흡**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**릴리즈/배포/Hotfix 구체적 프로세스**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**관계자 커뮤니케이션/합의 절차의 구체성**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**AI 에이전트 기반 병렬 개발의 신뢰성 부족**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**ESLint 커스텀 룰의 적용 한계 및 운영 부담**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**SKU 경계 테이블(도메인 경계) 합의 지연**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**논리 분리와 실제 서비스 분리 괴리**",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실제 서비스 분리(물리적 분리)로의 마이그레이션 로드맵**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**도메인 간 공유/협업 영역 정책 불명확**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트 자동화, 코드 품질 보장 체계 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**릴리즈/배포/Hotfix 구체적 프로세스**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**관계자 커뮤니케이션/합의 절차의 구체성**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**핵심 가정(A1 등)이 실제 현실에서 성립되는지 실증적 검토가 부족**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**비즈니스/기술적 목표의 우선순위가 불분명**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 서비스 분리(물리적 MSA)와 디렉터리 분리(논리적 분리) 간 괴리**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**AI 에이전트 기반 병렬 개발의 신뢰성 부족**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**ESLint 커스텀 룰의 적용 한계 및 운영 부담**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**SKU 경계 테이블(도메인 경계) 합의 지연**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**논리 분리와 실제 서비스 분리 괴리**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**A. 신규 F-item이 “실제로” 기존 모놀리식 코드와 강하게 결합되어 있지 않다는 점을 PoC 수준에서라도 검증해야 함.**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**B. ESLint 커스텀 룰의 PoC 및 적용 범위(신규/기존 구분, false positive 최소화)가 Sprint 1주차 내 실제로 검증되어야 함.**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**C. SKU 경계 테이블의 W+3 초안이 관련 이해관계자(본부장, 서비스 오너 등)로부터 최소한 “합의된 초안” 수준의 승인/피드백을 받아야 함.**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**D. AI 에이전트의 병렬 Sprint 적용 범위는 초반 1~2 Sprint에서 제한적으로 실험(예: 단일 도메인, 제한된 기능에만 적용) 후 단계적 확대 필요.**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**AI 에이전트의 학습 및 적용 능력 검증**: AI 에이전트(Claude, autopilot)가 MSA 원칙과 ESLint 룰을 정확히 이해하고, 코드 생성 및 수정 과정에서 이를 일관되게 준수할 수 있는지에 대한 철저한 PoC 및 초기 Sprint 결과 검증이 필수적입니다. \"0건의 병렬 충돌\" 목표는 매우 도전적이므로, 초기에는 충돌 발생 시 신속한",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**초기 개발 속도 저해 리스크 (R1) 관리**: 새로운 패턴과 엄격한 룰 적용으로 인한 초기 개발 속도 저하를 최소화하기 위한 R1 완화 전략(warn 수준 fallback, 학습 시간 할당)이 계획대로 실행되어야 합니다. 특히 W+2 F534 적용 시점의 생산성 지표를 면밀히 모니터링해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**SKU 경계 테이블 합의 (M4)**: W+4까지 SKU 경계 테이블 확정이 매우 중요합니다. 이는 향후 서비스 분리의 근간이 되므로, 핵심 이해관계자들과의 조기 커뮤니케이션과 합의된 최소 버전을 확정하는 노력이 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**ESLint 커스텀 룰의 안정적 구현 (R8)**: W+1 내에 ESLint 커스텀 룰의 PoC를 성공적으로 완료하고, 신규 파일에만 정확히 적용되도록 구현하여 기존 코드에 false positive를 발생시키지 않도록 해야 합니다. 룰의 완성도가 낮으면 개발자 생산성에 심각한 영향을 미칠 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**AI 에이전트의 학습 및 적용 능력 검증**: AI 에이전트(Claude, autopilot)가 MSA 원칙과 ESLint 룰을 정확히 이해하고, 코드 생성 및 수정 과정에서 이를 일관되게 준수할 수 있는지에 대한 철저한 PoC 및 초기 Sprint 결과 검증이 필수적입니다. \"0건의 병렬 충돌\" 목표는 매우 도전적이므로, 초기에는 충돌 발생 시 신속한",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**초기 개발 속도 저해 리스크 (R1) 관리**: 새로운 패턴과 엄격한 룰 적용으로 인한 초기 개발 속도 저하를 최소화하기 위한 R1 완화 전략(warn 수준 fallback, 학습 시간 할당)이 계획대로 실행되어야 합니다. 특히 W+2 F534 적용 시점의 생산성 지표를 면밀히 모니터링해야 합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**SKU 경계 테이블 합의 (M4)**: W+4까지 SKU 경계 테이블 확정이 매우 중요합니다. 이는 향후 서비스 분리의 근간이 되므로, 핵심 이해관계자들과의 조기 커뮤니케이션과 합의된 최소 버전을 확정하는 노력이 필요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**ESLint 커스텀 룰의 안정적 구현 (R8)**: W+1 내에 ESLint 커스텀 룰의 PoC를 성공적으로 완료하고, 신규 파일에만 정확히 적용되도록 구현하여 기존 코드에 false positive를 발생시키지 않도록 해야 합니다. 룰의 완성도가 낮으면 개발자 생산성에 심각한 영향을 미칠 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**가짜 모듈화(Fake Modularity) 위험**: 물리적 분리 없이 디렉토리만 분리하면 실제 MSA 복잡성(네트워크 지연, 분산 트랜잭션, 독립 배포)을 검증할 수 없음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**D1 단일 데이터베이스 제약**: 테이블 prefix만으로는 데이터 격리 불가. 향후 실제 분리 시 데이터 마이그레이션 복잡도가 높아짐",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Cloudflare Workers 제한**: 단일 Worker 크기 제한(1MB)을 고려할 때, 모놀리스가 계속 커지면 빌드 실패 가능성",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**계층형 아키텍처의 한계**: `core/{domain}/services/` 구조는 DDD의 애그리게이트 경계와 다를 수 있음. 비즈니스 로직이 서비스 계층에 집중되면 도메인 모델이 약화될 위험",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**API Gateway 역할 미비**: `fx-gateway`가 프로덕션 트래픽을 처리하지 않아 실제 MSA 환경에서의 라우팅, 로드 밸런싱, 회로 차단기 검증 불가",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**공유 라이브러리 관리 부재**: `types.ts`만 허용하는 접근은 제한적. 공통 유틸리티, 인증, 로깅 등 횡단 관심사에 대한 전략이 명확하지 않음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Nx 또는 Turborepo 도입**: 모노레포 도구를 활용하면 실제 서비스 경계를 더 명확히 정의 가능",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Contract-first 접근**: OpenAPI 스펙을 먼저 정의하고 코드 생성하는 방식이 도메인 간 결합도 감소에 더 효과적",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**가짜 모듈화로 인한 기술 부채 증가** (R10)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**ESLint 룰의 유지보수성 악화** (R11)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**AI 에이전트의 제한된 이해도** (R4)",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}

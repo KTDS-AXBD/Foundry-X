@@ -239,6 +239,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C50 | C | req-interview 스코어카드 채점 메커니즘 개선 — severity 가중치(flaw×3+gap+risk) + 라운드 간 품질 비교 + breakdown 표시 | — | DONE | S273. ax-plugin `4005237` |
 | C51 | C | Monitor lifecycle 관리 — sprint skill done/merge에 Monitor stop 추가 + signal에 MONITOR_TASK_ID 기록 + session-start stale 감지 (FX-REQ-559) | — | DONE | ax-plugin eab6d00 |
 | C52 | C | 콘텐츠 drift 해소 — landing/footer/README Sprint-Phase 수치 갱신 (FX-REQ-560) | — | DONE | task orchestrator |
+| C53 | C | MSA 원칙 하드닝 (W+1~W+7) — 신규 F-item 경계 ESLint 룰 2종(`no-cross-domain-import`, `no-direct-route-register`) + Hono sub-app 패턴 + SKU 경계 테이블 + CLAUDE.md 원칙 섹션 추가. PRD: `docs/specs/fx-msa-roadmap-v2/prd-final.md` (FX-REQ-567) | — | 📋 | req-interview R1=82/R2=70 Conditional, v2→final. 기존 api 리팩토링 금지, 신규(F534+)에만 적용 |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)

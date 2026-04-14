@@ -1,0 +1,191 @@
+{
+  "generated": "2026-04-14T00:32:46.451Z",
+  "totalItems": 30,
+  "byType": {
+    "flaw": 6,
+    "gap": 4,
+    "risk": 17
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**결함/개선 포인트**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**비즈니스 성과와의 연결 약함**:",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**\"AI 에이전트\" 관련 성공 기준 불명확**:",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Rollback/Hotfix 플랜 부재**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트 전략 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Change Management 및 커뮤니케이션**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**모니터링 및 후속 검증 플랜 부족**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**과소평가/개선 포인트**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**ESLint 커스텀 룰 구현 난이도**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**AI 에이전트 이해도/적용성**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**SKU 경계 테이블 확정 난이도**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**가장 큰 우려**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**ESLint/CI 룰이 실제 업무 흐름을 막거나, false positive로 인해 Sprint 딜레이가 폭발적으로 발생할 가능성**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**SKU 경계 확정 지연이 구조 설계 자체의 근간을 흔들 수 있음**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**AI 에이전트의 실제 적용 한계**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**신규 도메인 간 실제 의존성 발생 시 우회/해결 전략 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**ESLint 커스텀 룰의 PoC(Proof of Concept) 완성과 \"신규 파일에만 적용\"이 실제 PR 흐름에서 정확히 동작함을 확인할 것**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**SKU 경계 테이블 초안이 조직 내 이해관계자(실제 서비스 오너/PM/아키텍트)와 합의된 최소 버전으로 확정될 것**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**(권장) 신규 구조 적용에 따른 서비스/기능 regression risk에 대한 최소한의 smoke test 플랜 수립**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "사실 확인 (Assumptions & Verification)\n\nPRD에 포함된 주요 가정과 검증이 필요한 사항들은 다음과 같습니다.\n\n*   **\"기존 api 코드는 건드리지 않고\" 신규 F-item에만 적용 가능성:**\n    *   **가정:** 신규 F-item (F534~F536)이 기존 모놀리식 코드의 핵심 로직과 강한 결합 없이 독립적인 도메인",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "사용자 관점 (User Adoption)\n\n*   **Sinclair (개발자/오케스트레이터):**\n    *   **수용 가능성:** 높음. PRD 작성자이자 실행자로서 이 솔루션의 필요성을 가장 잘 이해하고 있으며, \"Sprint 병렬성, 경계 판단 자동화\"라는 주요 니즈가 해결됩니다. ESLint 룰을 통한 자동화된 가이드라인은 개발 과정의 모호성을 ",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**계층형 아키텍처의 한계**: `core/{domain}/services/` 구조는 도메인 내에서도 계층형 아키텍처를 유도할 수 있습니다. 이는 도메인 주도 설계(DDD)의 애그리게이트 경계와 다를 수 있으며, 향후 서비스 분리 시 내부 리팩토링이 필요할 수 있습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**공유 타입(contract)의 관리 부재**: `types.ts`만 예외로 허용하면, 도메인 간 공유해야 할 복합 타입(예: 공통 DTO)이 증가할 경우 타입 중복이나 순환 의존성 위험이 있습니다. 명시적인 `shared/contracts/` 레이어 도입이 더 안전합니다.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "DeepSeek",
+      "text": "**API Gateway의 역할 미비**: `fx-gateway`가 프로덕션 트래픽을 처리하지 않는 현재 상태에서는, 실제 MSA 환경에서의 라우팅, 로드 밸런싱, 회로 차단기(circuit breaker) 검증이 이루어지지 않습니다.",
+      "severity": "high"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**R1 (개발 속도 저하)가 실제로 발생할 가능성 높음**: 신규 도메인 구조 설계, sub-app 구성, 타입 정의에 초기 Sprint당 1-2일 추가 부하가 예상됩니다. 특히 AI 에이전트가 새로운 패턴을 학습하는 동안 생산성이 일시적으로 하락할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**가짜 모듈화(Fake Modularity) 위험**: 단일 코드베이스 내 디렉토리 분리만으로는 실제 서비스 분리의 어려움(네트워크 지연, 분산 트랜잭션, 독립 배포)이 가려집니다. 이는 향후 분리 시 예상치 못한 복잡성을 드러낼 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**ESLint 룰의 유지보수 부담**: 커스텀 룰은 코드베이스 진화에 따라 지속적으로 수정해야 합니다. 룰이 너무 엄격하면 생산성을 저해하고, 너무 느슨하면 목적을 상실할 수 있습니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}
