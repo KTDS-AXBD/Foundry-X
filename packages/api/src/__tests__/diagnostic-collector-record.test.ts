@@ -44,15 +44,16 @@ describe("DiagnosticCollector.record() — F534", () => {
 
     await collector.record("sess-1", "discovery-stage-runner", result, 456);
 
-    const row = (db as any)
-      .prepare("SELECT * FROM agent_run_metrics WHERE session_id = 'sess-1'")
-      .get();
+    const row = await db
+      .prepare("SELECT * FROM agent_run_metrics WHERE session_id = ?")
+      .bind("sess-1")
+      .first<Record<string, unknown>>();
     expect(row).toBeDefined();
-    expect(row.status).toBe("completed");
-    expect(row.input_tokens).toBe(123);
-    expect(row.duration_ms).toBe(456);
-    expect(row.agent_id).toBe("discovery-stage-runner");
-    expect(row.stop_reason).toBe("end_turn");
+    expect(row!.status).toBe("completed");
+    expect(row!.input_tokens).toBe(123);
+    expect(row!.duration_ms).toBe(456);
+    expect(row!.agent_id).toBe("discovery-stage-runner");
+    expect(row!.stop_reason).toBe("end_turn");
   });
 
   it("partial 결과도 completed로 처리한다", async () => {
@@ -66,10 +67,11 @@ describe("DiagnosticCollector.record() — F534", () => {
 
     await collector.record("sess-partial", "agent-x", result, 200);
 
-    const row = (db as any)
-      .prepare("SELECT status FROM agent_run_metrics WHERE session_id = 'sess-partial'")
-      .get();
-    expect(row.status).toBe("completed");
+    const row = await db
+      .prepare("SELECT status FROM agent_run_metrics WHERE session_id = ?")
+      .bind("sess-partial")
+      .first<{ status: string }>();
+    expect(row!.status).toBe("completed");
   });
 
   it("실패 결과를 status=failed, error_msg 포함으로 INSERT한다", async () => {
@@ -83,11 +85,12 @@ describe("DiagnosticCollector.record() — F534", () => {
 
     await collector.record("sess-fail", "agent-1", result, 100);
 
-    const row = (db as any)
-      .prepare("SELECT * FROM agent_run_metrics WHERE session_id = 'sess-fail'")
-      .get();
-    expect(row.status).toBe("failed");
-    expect(row.error_msg).toBe("API timeout");
+    const row = await db
+      .prepare("SELECT status, error_msg FROM agent_run_metrics WHERE session_id = ?")
+      .bind("sess-fail")
+      .first<{ status: string; error_msg: string }>();
+    expect(row!.status).toBe("failed");
+    expect(row!.error_msg).toBe("API timeout");
   });
 
   it("record() 후 collect()가 rawValue > 0인 축을 반환한다", async () => {
@@ -120,9 +123,10 @@ describe("DiagnosticCollector.record() — F534", () => {
     await collector.record("sess-multi", "agent-1", result, 50);
     await collector.record("sess-multi", "agent-1", result, 50);
 
-    const rows = (db as any)
-      .prepare("SELECT COUNT(*) as cnt FROM agent_run_metrics WHERE session_id = 'sess-multi'")
-      .get();
-    expect(rows.cnt).toBe(2);
+    const { results } = await db
+      .prepare("SELECT id FROM agent_run_metrics WHERE session_id = ?")
+      .bind("sess-multi")
+      .all();
+    expect(results.length).toBe(2);
   });
 });

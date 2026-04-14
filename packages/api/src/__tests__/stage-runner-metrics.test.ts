@@ -84,11 +84,9 @@ describe("StageRunnerService 메트릭 기록 — F534", () => {
     (db as any).exec(SCHEMA);
     (db as any).exec(SEED);
     for (let i = 1; i <= 9; i++) {
-      (db as any)
-        .prepare(
-          "INSERT OR IGNORE INTO biz_discovery_criteria (id, biz_item_id, criterion_id, status, updated_at) VALUES (?, 'biz1', ?, 'pending', '2026-01-01')",
-        )
-        .run(`c${i}`, i);
+      (db as any).exec(
+        `INSERT OR IGNORE INTO biz_discovery_criteria (id, biz_item_id, criterion_id, status, updated_at) VALUES ('c${i}', 'biz1', ${i}, 'pending', '2026-01-01')`,
+      );
     }
   });
 
@@ -102,10 +100,11 @@ describe("StageRunnerService 메트릭 기록 — F534", () => {
 
     await service.runStage("biz1", "org1", "2-1", "I");
 
-    const row = (db as any)
-      .prepare("SELECT COUNT(*) as cnt FROM agent_run_metrics")
-      .get();
-    expect(row.cnt).toBeGreaterThanOrEqual(1);
+    const { results } = await db
+      .prepare("SELECT id FROM agent_run_metrics")
+      .bind()
+      .all();
+    expect(results.length).toBeGreaterThanOrEqual(1);
   });
 
   it("DiagnosticCollector 미주입 시 기존 동작 유지 (에러 없이 실행)", async () => {
@@ -129,10 +128,11 @@ describe("StageRunnerService 메트릭 기록 — F534", () => {
 
     await service.runStage("biz1", "org1", "2-1", "I");
 
-    const row = (db as any)
+    const row = await db
       .prepare("SELECT agent_id FROM agent_run_metrics LIMIT 1")
-      .get();
-    expect(row.agent_id).toBe("discovery-stage-runner");
+      .bind()
+      .first<{ agent_id: string }>();
+    expect(row!.agent_id).toBe("discovery-stage-runner");
   });
 
   it("runner 실패 시에도 메트릭이 기록된다 (status=failed)", async () => {
@@ -156,9 +156,10 @@ describe("StageRunnerService 메트릭 기록 — F534", () => {
 
     await service.runStage("biz1", "org1", "2-1", "I");
 
-    const row = (db as any)
+    const row = await db
       .prepare("SELECT status FROM agent_run_metrics LIMIT 1")
-      .get();
-    expect(row.status).toBe("failed");
+      .bind()
+      .first<{ status: string }>();
+    expect(row!.status).toBe("failed");
   });
 });
