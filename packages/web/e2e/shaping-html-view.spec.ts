@@ -314,7 +314,7 @@ test.describe("PRD HTML 미리보기", () => {
     const prd2Card = page.getByTestId("prd-card-prd-2");
     await expect(prd1Card).toBeVisible({ timeout: 5000 });
     await expect(prd1Card.getByText("초안")).toBeVisible();
-    await expect(prd2Card.getByText("확정")).toBeVisible();
+    await expect(prd2Card.getByText("확정", { exact: true })).toBeVisible();
   });
 
   test("검색 필터가 동작해요", async ({ authenticatedPage: page }) => {

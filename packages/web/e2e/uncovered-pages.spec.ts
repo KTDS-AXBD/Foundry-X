@@ -62,7 +62,7 @@ test.describe("미커버 페이지 렌더링 검증", () => {
     );
 
     await page.goto("/wiki");
-    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.locator("main").first()).toBeVisible({ timeout: 10000 });
   });
 
   test("discovery-progress 페이지 렌더링", async ({ authenticatedPage: page }) => {
