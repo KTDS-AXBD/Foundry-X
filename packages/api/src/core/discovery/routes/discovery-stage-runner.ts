@@ -25,9 +25,13 @@ export async function autoTriggerMetaAgent(
   db: D1Database,
   sessionId: string,
   apiKey: string,
+  bizItemId?: string,
 ): Promise<void> {
   const collector = new DiagnosticCollector(db);
-  const report = await collector.collect(sessionId, "discovery-graph");
+  // F537: bizItemId 제공 시 biz_item 기반 집계. 아니면 legacy collect.
+  const report = bizItemId
+    ? await collector.collectByBizItem(bizItemId, sessionId)
+    : await collector.collect(sessionId, "discovery-graph");
 
   const metaAgent = new MetaAgent({ apiKey });
   let proposals;
@@ -256,8 +260,8 @@ discoveryStageRunnerRoute.post("/biz-items/:id/discovery-graph/run-all", async (
       feedback: parsed.data.feedback,
     });
     await sessionService.updateStatus(sessionId, "completed");
-    // F536: MetaAgent 자동 진단 훅 — fire-and-forget (응답 블로킹 없음)
-    void autoTriggerMetaAgent(c.env.DB, sessionId, apiKey).catch((e) =>
+    // F536+F537: MetaAgent 자동 진단 훅 — bizItemId 기반 집계 (fire-and-forget)
+    void autoTriggerMetaAgent(c.env.DB, sessionId, apiKey, bizItemId).catch((e) =>
       console.error("[F536] MetaAgent auto-trigger failed:", e)
     );
     return c.json({ sessionId, status: "completed", result });
