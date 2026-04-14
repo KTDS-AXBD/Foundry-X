@@ -272,3 +272,52 @@ describe("F533 MetaAgent Full Loop Integration", () => {
     expect(applyRes.status).toBe(404);
   });
 });
+
+// ─── F544: auto-trigger 경로 integration ─────────────────────────────────────
+describe("F544: autoTriggerMetaAgent integration — auto 경로 proposals 저장", () => {
+  let db: D1Database;
+
+  beforeEach(async () => {
+    setupFetchMock();
+    const mockDb = createMockD1();
+    await mockDb.exec(DDL_METRICS);
+    await mockDb.exec(DDL_PROPOSALS);
+    await mockDb.exec(DDL_MARKETPLACE);
+    await mockDb.exec(DDL_COMPARISONS);
+    db = mockDb as unknown as D1Database;
+  });
+
+  it("stage-runner 패턴 메트릭 존재 시 autoTriggerMetaAgent → proposals > 0 + rubric_score NOT NULL", async () => {
+    const bizItemId = "biz-item-integration-f544";
+    const sessionId = `graph-${bizItemId}-9999`;
+
+    // stage-runner 패턴으로 메트릭 삽입 (Graph 실행 시뮬레이션)
+    await db.prepare(
+      `INSERT INTO agent_run_metrics
+       (id, session_id, agent_id, status, rounds, stop_reason, input_tokens, output_tokens, started_at, created_at)
+       VALUES (?, ?, 'discovery-stage-runner', 'completed', 12, 'end_turn', 80000, 0, datetime('now'), datetime('now'))`
+    ).bind("int-1", `stage-2-1-${bizItemId}`).run();
+
+    const { autoTriggerMetaAgent } = await import(
+      "../../core/discovery/routes/discovery-stage-runner.js"
+    );
+
+    await autoTriggerMetaAgent(db, sessionId, "test-key", bizItemId, "claude-sonnet-4-6");
+
+    const result = await db
+      .prepare("SELECT COUNT(*) as cnt FROM agent_improvement_proposals WHERE session_id = ?")
+      .bind(sessionId)
+      .first<{ cnt: number }>();
+
+    // K1: proposals ≥ 1건 저장 확인
+    expect(result?.cnt).toBeGreaterThan(0);
+
+    const rubricRow = await db
+      .prepare("SELECT rubric_score FROM agent_improvement_proposals WHERE session_id = ? LIMIT 1")
+      .bind(sessionId)
+      .first<{ rubric_score: number | null }>();
+
+    // K2: rubric_score 저장 확인 (manual 경로와 동일)
+    expect(rubricRow?.rubric_score).not.toBeNull();
+  });
+});
