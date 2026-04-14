@@ -258,6 +258,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C59 | C | Phase 44: CI/CD 분리 — deploy.yml paths-filter 적용, 도메인별 선택적 배포. F540/F541과 병행 | — | 📋(idea) | Idea. Phase 44 중반 예상 |
 | C60 | C | Phase 44: 서비스 간 통신 계약 표준 — Worker 간 Service Binding 인터페이스 + 에러 핸들링 표준 문서화 | — | 📋(idea) | Idea. Phase 44 후반 문서 작업 |
 | C61 | C | task-daemon post-merge 강화 (FX-REQ-570) | — | DONE | task orchestrator |
+| C62 | C | task-list stale display 조사 (FX-REQ-572) | — | PLANNED | task orchestrator |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
