@@ -17,7 +17,12 @@ if [ "${1:-}" = "--json" ]; then
   exit 0
 fi
 
-count=$(jq -r '.tasks | length' "$FX_CACHE")
+# Terminal statuses: never show in active table.
+# These accumulate in cache (daemon merge-detection writes them without removing).
+TERMINAL_STATUSES='["done","merged","needs_manual_review","cancelled","aborted","rejected","empty_rejected","failed_setup"]'
+
+count=$(jq -r --argjson ts "$TERMINAL_STATUSES" \
+  '[.tasks[] | select(.status as $s | $ts | index($s) == null)] | length' "$FX_CACHE")
 if [ "$count" -eq 0 ]; then
   echo "[fx-task] no active tasks. /ax:task start <F|B|C|X> \"title\" 으로 시작."
   exit 0
@@ -49,8 +54,15 @@ printf "%-6s %-4s %-4s %-32s %-8s %-6s %s\n" "------" "----" "----" "-----------
 
 now_epoch=$(date +%s)
 
-jq -r '.tasks | to_entries[] | [.key, .value.track, .value.status, .value.branch, .value.started_at, .value.pane, .value.wt] | @tsv' "$FX_CACHE" \
-| while IFS=$'\t' read -r id track status branch started pane wt; do
+# Use \x01 (SOH) as separator — tab is IFS whitespace and collapses consecutive delimiters,
+# causing field shift when track="" (empty string produces \t\t in @tsv).
+jq -r --argjson ts "$TERMINAL_STATUSES" \
+  '.tasks | to_entries[]
+   | select(.value.status as $s | $ts | index($s) == null)
+   | [.key, (.value.track // ""), (.value.status // ""), (.value.branch // ""),
+      (.value.started_at // ""), (.value.pane // ""), (.value.wt // "")]
+   | join("\u0001")' "$FX_CACHE" \
+| while IFS=$'\x01' read -r id track status branch started pane wt; do
   start_epoch=$(date -d "$started" +%s 2>/dev/null || echo "$now_epoch")
   age_sec=$(( now_epoch - start_epoch ))
   age=$(printf "%02d:%02d" $((age_sec/3600)) $(((age_sec%3600)/60)))
@@ -82,6 +94,14 @@ jq -r '.tasks | to_entries[] | [.key, .value.track, .value.status, .value.branch
 
   printf "%-6s %-4s %-4s %-32s %-8s %-6s %s\n" "$id" "$track" "$emoji" "$br_short" "$age" "$hb" "${pane:-—}"
 done
+
+# Show archived (terminal-status) task count — informational, not cluttering main table
+archived_count=$(jq -r --argjson ts "$TERMINAL_STATUSES" \
+  '[.tasks[] | select(.status as $s | $ts | index($s) != null)] | length' "$FX_CACHE")
+if [ "$archived_count" -gt 0 ]; then
+  echo ""
+  echo "[fx-task] 📦 $archived_count archived task(s) (done/merged/cancelled) — hidden from table"
+fi
 
 # Check for pending signals
 sig_count=$(read_signals | wc -l)
