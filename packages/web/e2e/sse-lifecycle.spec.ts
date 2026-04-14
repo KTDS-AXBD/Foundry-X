@@ -50,8 +50,8 @@ test.describe("SSE Lifecycle — Agents Page", () => {
 
     await page.goto("/agents");
 
-    // Agent name and status badge should render
-    await expect(page.getByText("TestAgent")).toBeVisible({ timeout: 10000 });
+    // Agent name and status badge should render (use heading role to avoid strict-mode violation with tab button)
+    await expect(page.getByRole("heading", { name: "TestAgent" })).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("idle")).toBeVisible();
   });
 });
