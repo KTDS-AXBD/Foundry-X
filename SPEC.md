@@ -57,7 +57,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 > ```
 > wc -l SPEC.md && find packages/api/src/db/migrations/*.sql | sort | tail -1
 > ```
-> **마지막 실측** (Sprint 289, 2026-04-14): ~11 routes, ~30 services, ~14 schemas, D1 0135, 10 packages, tests ~3452 (E2E 273) — Phase 43 완료 (F534~F536 HyperFX Activation ✅)
+> **마지막 실측** (Sprint 289, 2026-04-14): ~11 routes, ~31 services, ~14 schemas, D1 0135, 10 packages, tests ~3452 (E2E 273) — Phase 43 완료 (F534~F536 HyperFX Activation ✅) + F542 PRD Final 등록 (📋plan)
 
 ## §3 Phase 진행 현황
 
