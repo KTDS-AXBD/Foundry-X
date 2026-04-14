@@ -85,6 +85,22 @@ phase_signals() {
       MERGED=true
     fi
 
+    # B-fix (C61): PR_URL=none + commits 있음 → branch 기반 PR API 재조회
+    # squash merge는 `git branch --merged` 에 안 잡히므로 PR API가 권위 소스.
+    # 재현 사례: C55 — gh pr create 실패로 signal에 PR_URL=none이 기록됐으나
+    # 실제 PR은 세션 재기동 9시간 전에 squash merged 완료 상태였음.
+    if [ "$MERGED" = false ] && [ "${COMMIT_COUNT:-0}" -gt 0 ] && \
+       [ "${PR_URL:-none}" = "none" ] && [ -n "$BRANCH" ] && \
+       command -v gh >/dev/null 2>&1; then
+      local BRANCH_PR_STATE
+      BRANCH_PR_STATE=$(gh pr view "$BRANCH" --repo "KTDS-AXBD/Foundry-X" \
+        --json state --jq '.state' 2>/dev/null || echo "UNKNOWN")
+      if [ "$BRANCH_PR_STATE" = "MERGED" ]; then
+        log "🔍 ${TASK_ID}: PR_URL=none + COMMIT_COUNT=${COMMIT_COUNT} — branch ${BRANCH} API 재조회 → MERGED (C61)"
+        MERGED=true
+      fi
+    fi
+
     # master pull
     if [ "$MERGED" = true ]; then
       (cd "$REPO_ROOT" && git pull origin master --ff-only 2>/dev/null) || true
@@ -529,11 +545,14 @@ phase_merged_prs() {
         # write_signal은 _project_name()으로 프로젝트명을 결정하는데,
         # daemon은 nohup 백그라운드라 cwd가 달라 "."을 반환할 수 있음.
         # daemon의 $PROJECT 변수를 직접 사용하여 signal 파일 작성.
+        # A-fix (C61): timestamp를 heredoc 밖에서 pre-compute — pipe subshell 내부의
+        # $() heredoc 치환이 리터럴로 저장되는 엣지 케이스 방어.
         local _sig="${FX_SIGNAL_DIR}/${PROJECT}-${task_id}.signal"
+        local _ts; _ts="$(date -Iseconds)"
         cat > "$_sig" <<SIGEOF
 TASK_ID=$task_id
 STATUS=DONE
-TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+TIMESTAMP=$_ts
 PROJECT=$PROJECT
 BRANCH=${task_branch:-$branch}
 PR_URL=https://github.com/KTDS-AXBD/Foundry-X/pull/${pr_num}
@@ -589,10 +608,12 @@ phase_orphan_wts() {
         local pane_id
         pane_id=$(jq -r --arg id "$task_id" '.tasks[$id].pane // ""' "$FX_CACHE" 2>/dev/null)
         local _sig="${FX_SIGNAL_DIR}/${PROJECT}-${task_id}.signal"
+        # A-fix (C61): pre-compute timestamp (pipe subshell $() heredoc 방어)
+        local _ts; _ts="$(date -Iseconds)"
         cat > "$_sig" <<SIGEOF
 TASK_ID=$task_id
 STATUS=DONE
-TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+TIMESTAMP=$_ts
 PROJECT=$PROJECT
 BRANCH=${branch}
 PR_URL=https://github.com/KTDS-AXBD/Foundry-X/pull/${pr_num}
@@ -1002,6 +1023,10 @@ case "${1:-}" in
   __debug-recover)
     # 단위 테스트 진입점 — phase_recover 직접 호출 (FX-REQ-517 / C23)
     phase_recover "${2:?task_id required}" "${3:?wt_path required}"
+    ;;
+  __debug-phase-signals)
+    # 단위 테스트 진입점 — phase_signals 직접 호출 (C61 B-fix 검증)
+    phase_signals
     ;;
   --enqueue)
     # 편의 기능: 큐 추가
