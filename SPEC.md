@@ -57,7 +57,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 > ```
 > wc -l SPEC.md && find packages/api/src/db/migrations/*.sql | sort | tail -1
 > ```
-> **마지막 실측** (Sprint 290, 2026-04-14): ~11 routes, ~31 services, ~14 schemas, D1 0137, 10 packages, tests ~3473 (E2E 273) — Phase 43 완료 (F534~F537 HyperFX Activation ✅) + Phase 44 착수 (F542 MetaAgent 프롬프트 품질 ✅ Dogfood P2 PASS 6 proposals)
+> **마지막 실측** (Sprint 293, 2026-04-15): ~11 routes, ~30 services, ~14 schemas, D1 0137, 10 packages — Phase 43 완료 + Phase 44 진행 (F542/F543/F544 ✅ S290~S292, F538 ✅ 부분 S293 — 3/10 Discovery routes fx-discovery 이전 + 배포 파이프라인 5건 해소)
 
 ## §3 Phase 진행 현황
 
