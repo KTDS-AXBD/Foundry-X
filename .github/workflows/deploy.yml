@@ -157,16 +157,18 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # wrangler-action v3 default로 npm install 돌려 workspace:* 미지원 오류 발생.
+      # pnpm으로 이미 설치된 node_modules 재사용 위해 raw wrangler deploy.
       - name: Deploy fx-discovery Worker
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: packages/fx-discovery
+        working-directory: packages/fx-discovery
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: pnpm exec wrangler deploy
       - name: Deploy fx-gateway Worker
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: packages/fx-gateway
+        working-directory: packages/fx-gateway
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: pnpm exec wrangler deploy
 
   smoke-test:
     if: |
