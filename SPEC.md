@@ -257,7 +257,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C58 | C | Phase 44: Service Binding latency 벤치마크 — k6로 p99 측정 + 결과에 따른 Go/No-Go 판정. F538/F539 전 선행 필수 | — | 📋(idea) | Idea. Phase 44 첫 작업 후보 (gating). |
 | C59 | C | Phase 44: CI/CD 분리 — deploy.yml paths-filter 적용, 도메인별 선택적 배포. F540/F541과 병행 | — | 📋(idea) | Idea. Phase 44 중반 예상 |
 | C60 | C | Phase 44: 서비스 간 통신 계약 표준 — Worker 간 Service Binding 인터페이스 + 에러 핸들링 표준 문서화 | — | 📋(idea) | Idea. Phase 44 후반 문서 작업 |
-| C61 | C | task-daemon post-merge 강화 (FX-REQ-570) | — | PLANNED | task orchestrator |
+| C61 | C | task-daemon post-merge 강화 (FX-REQ-570) | — | DONE | task orchestrator |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
