@@ -1,12 +1,12 @@
 // core/ — Foundry-X 핵심 도메인 (Phase 20-A: F397, Sprint 184)
 // 5개 도메인: Discovery(S1-S2), Shaping(S3), Offering, Agent, Harness
 
-// Discovery (S1-S2 발굴) — 12 routes
+// Discovery (S1-S2 발굴) — 9 routes (discoveryRoute/Report/Reports → fx-discovery F538)
 export {
   axBdDiscoveryRoute, axBdArtifactsRoute,
   bizItemsRoute,
-  discoveryRoute, discoveryPipelineRoute, discoveryReportRoute,
-  discoveryReportsRoute, discoveryStagesRoute, discoveryShapePipelineRoute,
+  discoveryPipelineRoute,
+  discoveryStagesRoute, discoveryShapePipelineRoute,
   discoveryStageRunnerRoute,
 } from "./discovery/index.js";
 

@@ -12,7 +12,13 @@
     "sourceMap": true,
     "outDir": "dist",
     "rootDir": "src",
-    "types": ["@cloudflare/workers-types"]
+    "types": ["@cloudflare/workers-types"],
+    "paths": {
+      "@foundry-x/shared": ["../shared/src/index.ts"]
+    }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "references": [
+    { "path": "../shared" }
+  ]
 }

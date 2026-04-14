@@ -508,3 +508,12 @@ export type {
   ImprovementProposal,
   ModelComparison,
 } from './agent-meta.js';
+
+// F538: Discovery 도메인 공용 계약 타입 (cross-domain contract)
+export type {
+  ExecuteSkillInput,
+  ArtifactListQuery,
+  BdArtifact,
+  SkillExecutionResult,
+  TriggerShapingInput,
+} from './discovery-contract.js';

@@ -1,9 +1,16 @@
 import { Hono } from "hono";
 import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
+import { z } from "zod";
 import { BdSkillExecutor } from "../services/bd-skill-executor.js";
 import { getSupportedSkillIds } from "../services/bd-skill-prompts.js";
-import { executeSkillSchema } from "../../discovery/schemas/bd-artifact.js";
+
+// F538: executeSkillSchema — shaping 도메인 전용 (discovery 도메인 cross-import 제거)
+const executeSkillSchema = z.object({
+  bizItemId: z.string().min(1),
+  stageId: z.string().regex(/^2-(?:10|[0-9])$/, "stageId must be 2-0 ~ 2-10"),
+  inputText: z.string().min(1).max(10000),
+});
 
 export const axBdSkillsRoute = new Hono<{
   Bindings: Env;

@@ -28,11 +28,11 @@ import {
   // collection (5 routes) — F401, Sprint 188
   axBdIdeasRoute, collectionRoute, ideaPortalWebhookRoute,
   irProposalsRoute, axBdInsightsRoute,
-  // discovery (12 routes)
+  // discovery (9 routes — discoveryRoute/discoveryReportRoute/discoveryReportsRoute → fx-discovery F538)
   axBdDiscoveryRoute, axBdArtifactsRoute,
   bizItemsRoute,
-  discoveryRoute, discoveryPipelineRoute, discoveryReportRoute,
-  discoveryReportsRoute, discoveryStagesRoute, discoveryShapePipelineRoute, discoveryStageRunnerRoute,
+  discoveryPipelineRoute,
+  discoveryStagesRoute, discoveryShapePipelineRoute, discoveryStageRunnerRoute,
   // shaping (14 routes)
   shapingRoute, axBdBmcRoute, axBdAgentRoute, axBdCommentsRoute,
   axBdHistoryRoute, axBdLinksRoute, axBdViabilityRoute,
@@ -275,8 +275,7 @@ app.route("/api", discoveryStageRunnerRoute);
 // Sprint 57: Collection — 수집 채널 통합 (auth + tenant required)
 app.route("/api", collectionRoute);
 
-// Sprint 56: Discovery 진행률 대시보드 (auth + tenant required)
-app.route("/api", discoveryRoute);
+// Sprint 56: discoveryRoute → fx-discovery (F538)
 
 // Sprint 59: Methodology registry + router (auth + tenant required)
 app.route("/api", methodologyRoute);
@@ -392,12 +391,11 @@ app.route("/api", agentAdaptersRoute);
 // Sprint 154: Discovery UI/UX v2 (F342)
 app.route("/api", personaConfigsRoute);
 app.route("/api", personaEvalsRoute);
-app.route("/api", discoveryReportsRoute);
+// discoveryReportsRoute → fx-discovery (F538)
 app.route("/api", teamReviewsRoute);
 // Sprint 155: 멀티 페르소나 평가 (F344, F345, Phase 15)
 app.route("/api", axBdPersonaEvalRoute);
-// Sprint 156: Discovery Report (F346, Phase 15)
-app.route("/api", discoveryReportRoute);
+// Sprint 156: discoveryReportRoute → fx-discovery (F538)
 // Sprint 159: Prototype Auto-Gen (F353, F354, Phase 16)
 app.route("/api", prototypeJobsRoute);
 app.route("/api", prototypeUsageRoute);

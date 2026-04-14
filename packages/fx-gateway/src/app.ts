@@ -1,4 +1,5 @@
 // fx-gateway app (F523: FX-REQ-551 — DISCOVERY 하드와이어 활성화)
+// F538: ax-bd/discovery-report* 라우트도 fx-discovery로 이전
 import { Hono } from "hono";
 import type { GatewayEnv } from "./env.js";
 
@@ -6,6 +7,14 @@ const app = new Hono<{ Bindings: GatewayEnv }>();
 
 // /api/discovery/* → fx-discovery Worker (Service Binding 직접 연결)
 app.all("/api/discovery/*", async (c) => {
+  return c.env.DISCOVERY.fetch(c.req.raw);
+});
+
+// F538: /api/ax-bd/discovery-report(s)/* → fx-discovery
+app.all("/api/ax-bd/discovery-reports/*", async (c) => {
+  return c.env.DISCOVERY.fetch(c.req.raw);
+});
+app.all("/api/ax-bd/discovery-report/*", async (c) => {
   return c.env.DISCOVERY.fetch(c.req.raw);
 });
 
