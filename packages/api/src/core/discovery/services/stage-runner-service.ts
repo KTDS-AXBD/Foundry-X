@@ -10,6 +10,7 @@ import { ANALYSIS_PATH_MAP, STAGE_NAMES, VIABILITY_QUESTIONS, COMMIT_GATE_QUESTI
 import { DiscoveryStageService } from "./discovery-stage-service.js";
 import { DiscoveryCriteriaService } from "./discovery-criteria.js";
 import type { DiscoveryGraphService } from "./discovery-graph-service.js";
+import type { DiagnosticCollector } from "../../agent/services/diagnostic-collector.js";
 
 /** F531: confirmStage graphMode 옵션 */
 export interface ConfirmStageOptions {
@@ -99,6 +100,7 @@ export class StageRunnerService {
   constructor(
     private db: D1Database,
     private runner: AgentRunner,
+    private diagnostics?: DiagnosticCollector,  // F534: 메트릭 훅 (optional — 기존 호출 호환)
   ) {}
 
   async runStage(
@@ -157,7 +159,13 @@ export class StageRunnerService {
     const MAX_RETRIES = 1;
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
+        const execStart = Date.now();
         const aiResult = await this.runner.execute(request);
+        const execDuration = Date.now() - execStart;
+        // F534: 비스트리밍 실행 경로 메트릭 기록
+        if (this.diagnostics) {
+          await this.diagnostics.record(request.taskId, "discovery-stage-runner", aiResult, execDuration);
+        }
         if (aiResult.status === "failed") {
           const errMsg = aiResult.output?.analysis ?? "AI runner failed";
           const isTimeout = errMsg.includes("timed out") || errMsg.includes("timeout");

@@ -1,5 +1,6 @@
 // ─── F335: OrchestrationLoop — 3모드 피드백 루프 엔진 (Sprint 150) ───
 // ─── F531: graphDiscovery 분기 추가 ───
+// ─── F534: DiagnosticCollector 훅 삽입 ───
 
 import {
   TaskState,
@@ -19,6 +20,7 @@ import { EventBus } from "../../../services/event-bus.js";
 import { TransitionGuard } from "../../harness/services/transition-guard.js";
 import type { AgentRunner } from "./agent-runner.js";
 import type { GraphStageInput } from "../../discovery/services/discovery-graph-service.js";
+import type { DiagnosticCollector } from "./diagnostic-collector.js";
 
 /** F531: graphDiscovery 모드를 포함한 확장 파라미터 */
 export interface LoopStartParamsExtended extends LoopStartParams {
@@ -37,6 +39,7 @@ export class OrchestrationLoop {
     private taskStateService: TaskStateService,
     private eventBus: EventBus,
     private db: D1Database,
+    private diagnostics?: DiagnosticCollector,  // F534: 메트릭 훅 (optional)
   ) {
     this.contextManager = new FeedbackLoopContextManager(db);
   }
@@ -62,7 +65,11 @@ export class OrchestrationLoop {
         params.taskId,
         extended.graphApiKey,
       );
-      await graphSvc.runAll(extended.graphDiscovery);
+      const graphResult = await graphSvc.runAll(extended.graphDiscovery);
+      // F534: Graph 실행 결과 메트릭 기록
+      if (this.diagnostics) {
+        await this.diagnostics.recordGraphResult(params.taskId, graphResult);
+      }
       return { status: "resolved", exitState: TaskState.CODE_GENERATING, rounds: 1, finalScore: 1 };
     }
 

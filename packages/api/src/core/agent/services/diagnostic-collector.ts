@@ -1,7 +1,10 @@
 // ─── F530: DiagnosticCollector — 6축 메트릭 수집 (Sprint 283) ───
+// ─── F534: record() 훅 삽입 — 비스트리밍 실행 경로 메트릭 기록 (Sprint 287) ───
 
+import { randomUUID } from "node:crypto";
 import type { D1Database } from "@cloudflare/workers-types";
-import type { DiagnosticReport, AxisScore, DiagnosticAxis } from "@foundry-x/shared";
+import type { DiagnosticReport, AxisScore, DiagnosticAxis, GraphRunResult } from "@foundry-x/shared";
+import type { AgentExecutionResult } from "./execution-types.js";
 
 interface AgentRunRow {
   rounds: number;
@@ -21,6 +24,55 @@ function clamp(v: number): number {
 /** 6축 메트릭 수집기. agent_run_metrics D1 테이블에서 데이터를 읽어 DiagnosticReport를 생성한다. */
 export class DiagnosticCollector {
   constructor(private readonly db: D1Database) {}
+
+  /**
+   * F534: 비스트리밍 LLM 실행 결과를 agent_run_metrics에 기록한다.
+   * AgentStreamHandler를 거치지 않는 Discovery 단계 실행 경로(StageRunnerService 등)에서 호출.
+   */
+  async record(
+    sessionId: string,
+    agentId: string,
+    result: AgentExecutionResult,
+    durationMs: number,
+  ): Promise<void> {
+    const id = randomUUID();
+    const now = new Date().toISOString();
+    const isSuccess = result.status !== "failed";
+    const status = isSuccess ? "completed" : "failed";
+    const stopReason = isSuccess ? "end_turn" : "error";
+    const errorMsg = !isSuccess ? (result.output?.analysis ?? null) : null;
+
+    await this.db
+      .prepare(
+        `INSERT INTO agent_run_metrics
+           (id, session_id, agent_id, status, input_tokens, output_tokens,
+            cache_read_tokens, rounds, stop_reason, duration_ms, error_msg,
+            started_at, finished_at, created_at)
+         VALUES (?, ?, ?, ?, ?, 0, 0, 1, ?, ?, ?, ?, ?, ?)`,
+      )
+      .bind(id, sessionId, agentId, status, result.tokensUsed, stopReason, durationMs, errorMsg, now, now, now)
+      .run();
+  }
+
+  /**
+   * F534: Graph 전체 파이프라인 실행 결과를 agent_run_metrics에 summary 행으로 기록한다.
+   * OrchestrationLoop의 graphDiscovery 분기에서 호출.
+   */
+  async recordGraphResult(sessionId: string, result: GraphRunResult): Promise<void> {
+    const id = randomUUID();
+    const now = new Date().toISOString();
+
+    await this.db
+      .prepare(
+        `INSERT INTO agent_run_metrics
+           (id, session_id, agent_id, status, input_tokens, output_tokens,
+            cache_read_tokens, rounds, stop_reason, duration_ms, error_msg,
+            started_at, finished_at, created_at)
+         VALUES (?, ?, 'discovery-graph', 'completed', 0, 0, 0, ?, 'end_turn', ?, NULL, ?, ?, ?)`,
+      )
+      .bind(id, sessionId, result.totalExecutions, result.durationMs, now, now, now)
+      .run();
+  }
 
   async collect(sessionId: string, agentId: string): Promise<DiagnosticReport> {
     const rows = await this.fetchRows(sessionId, agentId);
