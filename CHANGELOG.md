@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Phase 42+43 통합 회고: HyperFX Deep Integration + Activation (Sprint 284~289)
+
+> **Dogfood-driven 개발 교과서 사례** — 5회 반복 dogfood로 2개 숨은 버그 발견+해소
+
+#### 지표 변화
+| 지표 | Phase 41 완료 | Phase 43 완료 | 변화 |
+|------|:------------:|:------------:|:----:|
+| F-items | F530 | F536 + F537 hotfix | +6 F + 2 hotfix |
+| D1 Migrations | 0133 | 0135 | +2 (0134 proposal_applied_at, 0135 graph_sessions) |
+| 코드 추가 (Phase 42+43) | — | +8,344줄 | 91 files |
+| PR 수 | — | 17개 (#558~#573) | Phase 42 4개, Phase 43 5개 + hotfix 5개 + dogfood 3개 |
+| Sprint 평균 Match Rate | 97% | 96% (Phase 42) | 유지 |
+| prod agent_run_metrics | 0 | 27 | F534+F537 실증 |
+
+#### 잘된 점
+- **Dogfood-driven 검증 도입**: Phase 42 완료 직후 실 데이터(KOAMI)로 prod D1 실측 → "agent_run_metrics 0건"이라는 숨은 갭을 즉시 발견. 설계 문서 + TDD + Gap Analysis 96% 모두 통과했지만 prod 실측 없이는 찾을 수 없던 결함
+- **5회 반복 검증 + hotfix 2회**: 1차(갭 발견) → 3차(F534 hotfix PR#565로 훅 활성화) → 5차(F537 hotfix PR#573으로 session_id 정합성) — 각 라운드마다 새 계층의 버그 발견
+- **autopilot 완주**: Sprint 284~289 6개 Sprint 모두 Full Auto 완주 (Plan→Design→TDD→Implement→Verify→PR)
+- **임시 API 스캐폴딩**: PR #563 임시 dogfood API로 차단 해소 후 F535에서 정식 API로 대체 — 단계적 전환
+
+#### 개선점
+- **"Optional 파라미터 함정"**: F534가 `diagnostics?: DiagnosticCollector`를 optional로 만들었지만 실제 호출 사이트는 모두 미주입 → TDD도 통과 → prod에서 0건. **autopilot이 "주입 사이트 검증" 단계를 놓치는 패턴** — Design 체크리스트에 명시 필요
+- **"식별자 불일치 함정"**: F536 autoTrigger가 graph sessionId로 collect하지만 stage-runner는 다른 session_id 사용 → silent 0건. **계층 간 식별자 계약 검증** 부재
+- **In-memory mock의 맹점**: Phase 42 E2E 9/9, F534 TDD 8/8, F536 TDD 10/10 — 모두 PASS. 하지만 계층 연결 오류는 mock 테스트로 감지 불가
+- **JWT 만료 중 재시작 필요**: dogfood 4회째에서 JWT 만료 → 사용자에게 새 JWT 요청 → 진행 재개. API 실행이 30분 이상 걸리는 경우 빈번
+
+#### 결정 검증
+- ✅ **Dogfood-first 전환**: 이번 세션이 "prod 실측 = 가장 값싼 디버거" 원칙의 실증. 이후 Phase 완료 직후 1회 dogfood를 Phase Exit Criteria에 포함 권장
+- ✅ **hotfix 즉시 적용**: F534/F536 갭 발견 직후 3~5분 내에 hotfix PR 작성/merge — 컨텍스트 유지된 빠른 수정
+- ⚠️ **"Walking Skeleton 완성 = 완료" 착각**: Phase 41이 "완성"이라 선언했지만 실제로 데이터가 흐르지 않았음 — "Smoke Reality" 체크가 Exit Criteria에 없었음
+- ⚠️ **MetaAgent 프롬프트 품질**: 구조적 갭 해소 후에도 proposals 빈 배열 반환 — Phase 44에서 별도 해소 필요
+
+#### 다음 방향
+- **Phase 44 후보 — MetaAgent 프롬프트 품질**: score < 70인 축에 대해 실제 proposal 생성하도록 프롬프트 강화
+- **Design Exit Criteria 개선**: "주입 사이트 전수 검증" + "계층 간 식별자 계약 검증" 체크리스트 추가
+- **Phase Exit Criteria에 Smoke Reality 1회 필수**: prod D1 실측 1회 후 Phase 완료 선언
+
 ### Phase 41 회고: HyperFX Agent Stack (Sprint 280~283)
 
 #### 지표 변화
@@ -39,6 +76,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **merge-monitor 개선**: auto-merge 환경에서 state=MERGED 우선 체크 로직
 
 ### Added
+- **Phase 43 HyperFX Activation** (Sprint 287~289, PR #564/#569/#571, +1,879줄): Plumbing → Real Data Flow — F534 DiagnosticCollector 실행 경로 훅 삽입 (PR #565 hotfix로 주입 사이트 활성화), F535 Graph 실행 정식 API + UI (D1 0135 graph_sessions + DiscoveryGraphPanel), F536 MetaAgent 자동 진단 훅 (fire-and-forget auto-trigger)
+- **Phase 43 F537 hotfix** (PR #573): MetaAgent auto-trigger session_id 불일치 해소 — `collectByBizItem()` 메서드 추가 (LIKE `stage-%-{bizItemId}` 패턴). Dogfood 5차 검증에서 발견
+- **Phase 42 HyperFX Deep Integration** (Sprint 284~286, PR #558/#559/#560, +2,454줄, Gap 96%, E2E 9/9): Walking Skeleton → 실 데이터 연동 — F531 발굴 Graph 실행 연동(DiscoveryGraphService.runAll, 41 tests, Gap 95%), F532 에이전트 스트리밍 E2E(Playwright + TDD), F533 MetaAgent 실전 검증(proposal-apply full loop, D1 0134 applied_at)
+- **Phase 42+43 Dogfood** (PR #563 임시 API + `scripts/dogfood-graph.sh`): KOAMI(bi-koami-001) 실 데이터로 5회 반복 검증 — agent_run_metrics 0→27건 확증, MetaAgent 6축 점수 실측(overallScore 58)
 - **Phase 41 HyperFX Agent Stack** (Sprint 280~283, PR #549/#552/#553/#555, +7644줄): 4-Layer Agent Stack Walking Skeleton — F527 Agent Runtime(defineTool, AgentSpec YAML, 7 agent migration), F528 Graph Orchestration(GraphEngine, Agents-as-Tools, Steering, 발굴 9단계 Graph), F529 Agent Streaming(SSE, D1 metrics, Web dashboard), F530 Meta Layer(DiagnosticCollector 6축, MetaAgent, Human Approval UI)
 - **Phase 40 Agent Autonomy** (Sprint 278~279, PR #548/#550): F524 E2E 시나리오 자동 추출, F525 Gap-E2E 통합 점수, F526 autopilot Verify E2E 통합
 - **Sprint 277 MSA Phase 2** (PR #544, Gap 97%): F522 shared 타입 슬리밍(Discovery 전용 3파일 fx-discovery 이동) + F523 D1 격리(fx-discovery items GET 라우트 이관, fx-gateway DISCOVERY binding 하드와이어, deploy.yml MSA job, D1 접근 규약 문서)
