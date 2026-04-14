@@ -34,7 +34,8 @@ Phase 1~36 완료 (Sprint 1~268). 상세: SPEC.md §5
 - **Phase 40: Agent Autonomy** ✅ (F524~F526, Sprint 278~279)
 - **Phase 41: HyperFX Agent Stack** ✅ (F527~F530, Sprint 280~283). PRD: `docs/specs/fx-hyperfx-agent-stack/prd-final.md`
 - **Phase 42: HyperFX Deep Integration** ✅ (F531~F533, Sprint 284~286). 발굴 Graph 실행 연동 + 스트리밍 E2E + MetaAgent 실전 검증
-- **Phase 43: HyperFX Activation** ✅ (F534~F536, Sprint 287~289). Dogfood(KOAMI, S276)에서 확증된 3개 갭 해소 — DiagnosticCollector 훅 / Graph 정식 API+UI / MetaAgent 자동 진단
+- **Phase 43: HyperFX Activation** ✅ (F534~F537, Sprint 287~289). Dogfood(KOAMI, S276)에서 확증된 3개 갭 해소 — DiagnosticCollector 훅 / Graph 정식 API+UI / MetaAgent 자동 진단
+- **Phase 44: MSA 2차 분리 + Agent 품질 튜닝** 🔧 (F538~F542). F542 ✅ Sprint 290 (MetaAgent 프롬프트 강화 + Sonnet 4.6 + A/B + Rubric, Dogfood P2 PASS 6 proposals), F538~F541 📋 W+6+ 구체화. 관찰: C65 F536 auto-trigger 저장 누락
 - 장기 backlog 2건: F112, F117
 - 수치: `/ax:daily-check` 또는 SPEC.md §2 (하드코딩 금지)
 
