@@ -4,6 +4,7 @@ import { GraphEngine } from "../graph-engine.js";
 import type { GraphDefinition, GraphNodeInput, GraphNodeOutput, GraphExecutionContext } from "@foundry-x/shared";
 import type { AgentRunner } from "../../services/agent-runner.js";
 import { StageRunnerService } from "../../../discovery/services/stage-runner-service.js";
+import { DiagnosticCollector } from "../../services/diagnostic-collector.js";
 import type { DiscoveryType } from "../../../discovery/services/analysis-path-v82.js";
 
 /** F528 backward compat: runner/db 없을 때 stub 핸들러 */
@@ -35,7 +36,8 @@ function makeStageHandler(
 ) {
   return async (input: GraphNodeInput, _ctx: GraphExecutionContext): Promise<GraphNodeOutput> => {
     const stageInput = input.data as GraphStageInput;
-    const svc = new StageRunnerService(db, runner);
+    const collector = new DiagnosticCollector(db);
+    const svc = new StageRunnerService(db, runner, collector);
 
     const result = await svc.runStage(
       stageInput.bizItemId,

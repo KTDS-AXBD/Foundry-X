@@ -10,6 +10,7 @@ import type { TenantVariables } from "../../../middleware/tenant.js";
 import { createAgentRunner, createRoutedRunner } from "../../agent/services/agent-runner.js";
 import { StageRunnerService } from "../services/stage-runner-service.js";
 import { DiscoveryGraphService } from "../services/discovery-graph-service.js";
+import { DiagnosticCollector } from "../../agent/services/diagnostic-collector.js";
 import type { DiscoveryType } from "../services/analysis-path-v82.js";
 
 const StageRunSchema = z.object({
@@ -47,7 +48,7 @@ discoveryStageRunnerRoute.get("/biz-items/:id/discovery-stage/:stage/result", as
   }
 
   const runner = createAgentRunner(c.env);
-  const service = new StageRunnerService(c.env.DB, runner);
+  const service = new StageRunnerService(c.env.DB, runner, new DiagnosticCollector(c.env.DB));
 
   const result = await service.getStageResult(bizItemId, orgId, stage);
   if (!result) {
@@ -79,7 +80,7 @@ discoveryStageRunnerRoute.patch("/biz-items/:id/discovery-stage/:stage/result", 
   }
 
   const runner = createAgentRunner(c.env);
-  const service = new StageRunnerService(c.env.DB, runner);
+  const service = new StageRunnerService(c.env.DB, runner, new DiagnosticCollector(c.env.DB));
 
   const updated = await service.updateStageResult(bizItemId, orgId, stage, parsed.data);
   if (!updated) {
@@ -110,7 +111,7 @@ discoveryStageRunnerRoute.post("/biz-items/:id/discovery-stage/:stage/run", asyn
   const feedback = parsed.success ? parsed.data.feedback : undefined;
 
   const runner = await createRoutedRunner(c.env, "discovery-analysis", c.env.DB);
-  const service = new StageRunnerService(c.env.DB, runner);
+  const service = new StageRunnerService(c.env.DB, runner, new DiagnosticCollector(c.env.DB));
 
   try {
     const result = await service.runStage(
@@ -153,7 +154,7 @@ discoveryStageRunnerRoute.post("/biz-items/:id/discovery-stage/:stage/confirm", 
   }
 
   const runner = createAgentRunner(c.env);
-  const service = new StageRunnerService(c.env.DB, runner);
+  const service = new StageRunnerService(c.env.DB, runner, new DiagnosticCollector(c.env.DB));
 
   try {
     const result = await service.confirmStage(
