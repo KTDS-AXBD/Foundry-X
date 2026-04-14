@@ -105,7 +105,7 @@ interface BizItem {
 | `packages/fx-discovery/src/routes/items.ts` | GET /api/discovery/items | F523 |
 | `packages/fx-discovery/src/services/biz-item.service.ts` | biz_items 조회 | F523 |
 | `packages/fx-discovery/src/__tests__/items.test.ts` | TDD Red → Green | F523 |
-| `docs/02-design/d1-access-policy.md` | D1 접근 규약 문서 | F523 |
+| `docs/02-design/features/d1-access-policy.md` | D1 접근 규약 문서 | F523 |
 
 ### 수정 파일
 
@@ -158,7 +158,7 @@ describe('fx-gateway DISCOVERY routing', () => {
 | `fx-discovery` | `biz_items`, `discovery_items`, `discovery_reports`, `discovery_v2_items`, `biz_evaluation_reports` | READ (이번 Sprint) |
 | `fx-gateway` | 없음 | — (proxy only) |
 
-규약 상세: `docs/02-design/d1-access-policy.md`
+규약 상세: `docs/02-design/features/d1-access-policy.md`
 
 ## 8. 성공 기준 검증 매핑
 
@@ -169,4 +169,4 @@ describe('fx-gateway DISCOVERY routing', () => {
 | fx-gateway Discovery binding 라우팅 | vitest mock fetch |
 | deploy.yml fx-gateway + fx-discovery job | CI 파이프라인 확인 |
 | 기존 api/web 테스트 PASS | `pnpm turbo test` |
-| D1 접근 규약 문서 | `docs/02-design/d1-access-policy.md` 존재 |
+| D1 접근 규약 문서 | `docs/02-design/features/d1-access-policy.md` 존재 |

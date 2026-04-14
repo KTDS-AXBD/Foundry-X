@@ -78,7 +78,7 @@ gap_rate: 97
 | ID | Requirement | Status | Notes |
 |----|-------------|--------|-------|
 | D1 | Option B(공유 DB) 명시 | ✅ Complete | Design 문서 + wrangler.toml 주석 |
-| D2 | D1 접근 규약 문서 | ✅ Complete | docs/02-design/d1-access-policy.md 신규 |
+| D2 | D1 접근 규약 문서 | ✅ Complete | docs/02-design/features/d1-access-policy.md 신규 |
 | D3 | fx-discovery 실제 라우트 | ✅ Complete | GET /api/discovery/items 이관 |
 | D4 | fx-gateway Service Binding | ✅ Complete | DISCOVERY binding 활성화, DISCOVERY_ENABLED 제거 |
 | D5 | deploy.yml MSA job | ✅ Complete | fx-gateway + fx-discovery deploy job 추가 |
@@ -94,7 +94,7 @@ gap_rate: 97
 | BizItem 서비스 | packages/fx-discovery/src/services/biz-item.service.ts | ✅ | ~80줄 |
 | TDD 테스트 (items) | packages/fx-discovery/src/__tests__/items.test.ts | ✅ | 4/4 PASS |
 | TDD 테스트 (gateway) | packages/fx-gateway/src/__tests__/gateway.test.ts | ✅ | 4/4 PASS |
-| D1 접근 규약 문서 | docs/02-design/d1-access-policy.md | ✅ | 신규 |
+| D1 접근 규약 문서 | docs/02-design/features/d1-access-policy.md | ✅ | 신규 |
 | Deploy job | .github/workflows/deploy.yml | ✅ | MSA section |
 
 ---
@@ -151,7 +151,7 @@ gap_rate: 97
 ### 6.2 D1 공유 DB 명시 (F523)
 
 - **Option B 확정**: 현 팀 규모(1명)에서 D1 별도 생성 비용이 더 크므로, 이번은 공유 DB 유지
-- **문서화**: Design §2 + docs/02-design/d1-access-policy.md에 테이블별 접근 규약 명시
+- **문서화**: Design §2 + docs/02-design/features/d1-access-policy.md에 테이블별 접근 규약 명시
 - **향후 전환 경로**: F560~ 팀 확장 시점에 Option A(별도 DB)로 전환 가능하도록 설계 보존
 
 ### 6.3 fx-discovery 실제 라우트 (F523)
@@ -220,7 +220,7 @@ gap_rate: 97
 ### 8.3 What to Try Next
 
 1. **Sprint 278: package.json exports 정비 선행** — T4 직접 import 전환 + shared 원본 3파일 삭제로 슬리밍 완료
-2. **D1 별도 생성 준비 (F560~)** — 팀 규모 확장 시점에 docs/02-design/d1-access-policy.md를 토대로 마이그레이션 계획 수립
+2. **D1 별도 생성 준비 (F560~)** — 팀 규모 확장 시점에 docs/02-design/features/d1-access-policy.md를 토대로 마이그레이션 계획 수립
 3. **fx-shaping Worker 사전 설계** — Shaping 타입 2파일이 shared/shaping/ 예약 중이므로, 다음 MSA Worker(F524~) 착수 시 같은 패턴 적용
 
 ---
@@ -308,7 +308,7 @@ fx-gateway (GATEWAY)
 - F522: fx-discovery/src/types/ — discovery-report.ts, discovery-v2.ts, methodology.ts (393줄 이동)
 - F523: fx-discovery/src/routes/items.ts — GET /api/discovery/items 라우트
 - F523: fx-discovery/src/services/biz-item.service.ts — biz_items 조회 서비스
-- F523: docs/02-design/d1-access-policy.md — D1 접근 규약 문서
+- F523: docs/02-design/features/d1-access-policy.md — D1 접근 규약 문서
 - F523: deploy.yml MSA job — fx-gateway + fx-discovery 배포
 - F523: fx-discovery/src/__tests__/items.test.ts — 4개 테스트 케이스
 - F523: fx-gateway/src/__tests__/gateway.test.ts — 4개 라우팅 테스트
