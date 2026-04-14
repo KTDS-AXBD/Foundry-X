@@ -90,6 +90,38 @@ export class DiagnosticCollector {
     };
   }
 
+  /**
+   * F537: biz_item_id 기반 집계 진단 — Graph 실행 전체를 하나로 묶어 조회.
+   * stage-runner가 기록하는 session_id 패턴: `stage-{stage}-{bizItemId}`
+   * autoTriggerMetaAgent에서 graph sessionId가 아닌 bizItemId로 수집.
+   */
+  async collectByBizItem(bizItemId: string, reportSessionId: string): Promise<DiagnosticReport> {
+    const rows = await this.db
+      .prepare(
+        `SELECT rounds, stop_reason, input_tokens, output_tokens, duration_ms
+         FROM agent_run_metrics
+         WHERE session_id LIKE ? AND agent_id = 'discovery-stage-runner'
+         ORDER BY created_at DESC
+         LIMIT 20`,
+      )
+      .bind(`stage-%-${bizItemId}`)
+      .all<AgentRunRow>();
+
+    const fetched = rows.results ?? [];
+    const scores = this.computeScores(fetched);
+    const overallScore = Math.round(
+      scores.reduce((s, a) => s + a.score, 0) / scores.length,
+    );
+
+    return {
+      sessionId: reportSessionId,
+      agentId: "discovery-stage-runner",
+      collectedAt: new Date().toISOString(),
+      scores,
+      overallScore,
+    };
+  }
+
   private async fetchRows(sessionId: string, agentId: string): Promise<AgentRunRow[]> {
     const result = await this.db
       .prepare(
