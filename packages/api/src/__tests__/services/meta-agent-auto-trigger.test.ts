@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS agent_improvement_proposals (
   yaml_diff        TEXT NOT NULL DEFAULT '',
   status           TEXT NOT NULL DEFAULT 'pending',
   rejection_reason TEXT,
+  rubric_score     INTEGER,
   applied_at       TEXT,
   created_at       TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at       TEXT NOT NULL DEFAULT (datetime('now'))

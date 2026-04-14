@@ -19,6 +19,7 @@ interface ProposalRow {
   yaml_diff: string;
   status: string;
   rejection_reason: string | null;
+  rubric_score: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -34,6 +35,7 @@ function toProposal(row: ProposalRow): ImprovementProposal {
     yamlDiff: row.yaml_diff,
     status: row.status as ProposalStatus,
     rejectionReason: row.rejection_reason ?? undefined,
+    rubricScore: row.rubric_score ?? undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -108,8 +110,8 @@ export class MetaApprovalService {
     await this.db
       .prepare(
         `INSERT INTO agent_improvement_proposals
-         (id, session_id, agent_id, type, title, reasoning, yaml_diff, status, rejection_reason, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         (id, session_id, agent_id, type, title, reasoning, yaml_diff, status, rejection_reason, rubric_score, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(
         proposal.id,
@@ -121,6 +123,7 @@ export class MetaApprovalService {
         proposal.yamlDiff,
         proposal.status,
         proposal.rejectionReason ?? null,
+        proposal.rubricScore ?? null,
         now,
         now,
       )

@@ -1,4 +1,5 @@
 // ─── F530/F533: Meta Layer 라우트 — Human Approval API + Proposal Apply (Sprint 283/286) ───
+// ─── F542: META_AGENT_MODEL 지원 + A/B 비교 저장 + rubric 자동 채점 (Sprint 290) ───
 
 import { Hono } from "hono";
 import { z } from "zod";
@@ -7,6 +8,8 @@ import { MetaApprovalService, NotFoundError } from "../services/meta-approval.js
 import { DiagnosticCollector } from "../services/diagnostic-collector.js";
 import { MetaAgent } from "../services/meta-agent.js";
 import { ProposalApplyService, AlreadyAppliedError, NotApprovedError, ProposalNotFoundError } from "../services/proposal-apply.js";
+import { ModelComparisonService } from "../services/model-comparisons.js";
+import { ProposalRubric } from "../services/proposal-rubric.js";
 
 export const metaRoute = new Hono<{ Bindings: Env }>();
 
@@ -30,6 +33,7 @@ const DiagnoseSchema = z.object({
 const RejectSchema = z.object({ reason: z.string().min(1) });
 
 // POST /api/meta/diagnose
+// F542: META_AGENT_MODEL env var로 모델 선택, A/B 비교 저장, rubric 자동 채점
 metaRoute.post("/meta/diagnose", async (c) => {
     const body = await c.req.json().catch(() => null);
     const parsed = DiagnoseSchema.safeParse(body);
@@ -43,18 +47,61 @@ metaRoute.post("/meta/diagnose", async (c) => {
     let proposals: Awaited<ReturnType<MetaAgent["diagnose"]>> = [];
 
     if (apiKey) {
-      const metaAgent = new MetaAgent({ apiKey });
+      // F542 M2: META_AGENT_MODEL env var 지원 ("both" → A/B 비교 실행)
+      const modelFlag = c.env.META_AGENT_MODEL ?? "claude-sonnet-4-6";
+      const runAbTest = modelFlag === "both" || modelFlag === "ab";
+
+      const primaryModel = runAbTest ? "claude-sonnet-4-6" : modelFlag;
+      const metaAgent = new MetaAgent({ apiKey, model: primaryModel });
       proposals = await metaAgent.diagnose(report);
 
-      const svc = new MetaApprovalService(c.env.DB);
+      // F542 M4: rubric 자동 채점 후 DB 저장
+      const rubric = new ProposalRubric();
+      const approveSvc = new MetaApprovalService(c.env.DB);
       for (const p of proposals) {
-        await svc.save(p);
+        const rubricScore = rubric.score(p);
+        await approveSvc.save({ ...p, rubricScore });
+      }
+
+      // F542 M3: A/B 비교 — 주 모델 결과 저장
+      const reportId = `${report.sessionId}:${report.collectedAt}`;
+      const compSvc = new ModelComparisonService(c.env.DB);
+      const rawProposals = await metaAgent.diagnoseRaw(report);
+      await compSvc.save({
+        sessionId: report.sessionId,
+        reportId,
+        model: primaryModel,
+        promptVersion: metaAgent.promptVersion,
+        proposalsJson: JSON.stringify(rawProposals),
+        proposalCount: rawProposals.length,
+      });
+
+      // F542 M3: A/B 비교 — Haiku 실행 (both 모드만)
+      if (runAbTest) {
+        const haikuAgent = new MetaAgent({ apiKey, model: "claude-haiku-4-5-20251001" });
+        const haikuRaw = await haikuAgent.diagnoseRaw(report).catch(() => []);
+        await compSvc.save({
+          sessionId: report.sessionId,
+          reportId,
+          model: "claude-haiku-4-5-20251001",
+          promptVersion: haikuAgent.promptVersion,
+          proposalsJson: JSON.stringify(haikuRaw),
+          proposalCount: haikuRaw.length,
+        });
       }
     }
 
     return c.json({ report, proposals });
   },
 );
+
+// GET /api/meta/comparisons/:reportId — F542 M3
+metaRoute.get("/meta/comparisons/:reportId", async (c) => {
+  const { reportId } = c.req.param();
+  const svc = new ModelComparisonService(c.env.DB);
+  const comparisons = await svc.findByReportId(reportId);
+  return c.json({ comparisons });
+});
 
 // POST /api/meta/proposals/:id/approve
 metaRoute.post("/meta/proposals/:id/approve", async (c) => {
