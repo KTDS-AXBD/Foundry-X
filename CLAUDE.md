@@ -73,6 +73,37 @@ Phase 1~36 완료 (Sprint 1~268). 상세: SPEC.md §5
 | `/ax-bd-shaping` | AX BD 형상화 파이프라인 (Stage 3→4) |
 | `/npm-release` | CLI npm 배포 자동화 |
 
+## MSA 원칙 (Phase 43+)
+
+> PRD: `docs/specs/fx-msa-roadmap-v2/prd-final.md` · ESLint 룰: `packages/api/src/eslint-rules/`
+
+### 핵심 규칙 (F534 이후 모든 신규 코드 적용)
+
+1. **`core/{domain}/` 전용** — 신규 파일은 `packages/api/src/core/{domain}/` 하위에만 추가. `routes/`, `services/` 루트 직접 추가 금지.
+2. **도메인 간 import 금지** — `core/agent/*`에서 `core/discovery/*` 내부 import 차단. 예외: 상대방 도메인의 `types.ts`(contract) 파일만 허용.
+3. **Hono sub-app 패턴** — `core/{domain}/routes/index.ts`에서 sub-app 구성 후, `app.ts`에는 `app.route('/api/{domain}', subApp)` 1줄만 등록.
+
+### 자동 강제 (PR CI)
+- `foundry-x-api/no-cross-domain-import` — 도메인 경계 위반 `error`
+- `foundry-x-api/no-direct-route-register` — app.ts 직접 등록 `error`
+
+### 예시
+
+```typescript
+// ❌ 금지: core/ontology/routes/extract.ts에서 discovery 내부 직접 import
+import { discoveryService } from '../../discovery/services/discovery.service.js';
+
+// ✅ 허용: types.ts (contract) import
+import type { DiscoveryResult } from '../../discovery/types.js';
+
+// ❌ 금지: app.ts 직접 등록
+app.post('/api/ontology/extract', handler);
+
+// ✅ 필수: sub-app mount
+import { ontologyApp } from './core/ontology/routes/index.js';
+app.route('/api/ontology', ontologyApp);
+```
+
 ## Key References
 
 - 현행 PRD: `docs/specs/FX-SPEC-PRD-V8_foundry-x.md` (v8)

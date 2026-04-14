@@ -14,7 +14,7 @@
     "db:seed:local": "wrangler d1 execute foundry-x-db --local --file=src/db/seed.sql",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "lint": "echo 'API lint: eslint config pending (Sprint 7)'"
+    "lint": "eslint src/eslint-rules/ --max-warnings 0"
   },
   "dependencies": {
     "@foundry-x/harness-kit": "workspace:*",
@@ -39,6 +39,9 @@
     "tsx": "^4.0.0",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0",
-    "wrangler": "^4.78.0"
+    "wrangler": "^4.78.0",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.3",
+    "typescript-eslint": "^8.57.0"
   }
 }
