@@ -200,7 +200,11 @@ phase_signals() {
     elif [ "$MERGED" = false ]; then
       FINAL_STATUS="done_pending_merge"
     fi
-    cache_upsert_task "$TASK_ID" "$FINAL_STATUS" "" "" "" "$BRANCH" "${PR_URL:-}"
+    # Preserve track from existing cache entry — daemon updates don't know the track
+    # and passing "" caused IFS tab-collapse field shift in task-list.sh (C62).
+    local existing_track
+    existing_track=$(jq -r --arg id "$TASK_ID" '.tasks[$id].track // ""' "$FX_CACHE" 2>/dev/null || echo "")
+    cache_upsert_task "$TASK_ID" "$FINAL_STATUS" "$existing_track" "" "" "$BRANCH" "${PR_URL:-}"
     log_event "$TASK_ID" "daemon_processed" "$(jq -nc --arg s "$FINAL_STATUS" '{status:$s}')"
     rm -f "$sig_file"
     log "✅ ${TASK_ID} → ${FINAL_STATUS}"
