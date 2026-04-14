@@ -47,6 +47,7 @@ import AttachedFilesPanel from "@/components/feature/discovery/AttachedFilesPane
 import PrdFromBpPanel from "@/components/feature/discovery/PrdFromBpPanel";
 import PrdInterviewPanel from "@/components/feature/discovery/PrdInterviewPanel";
 import EvaluationReportViewer from "@/components/feature/discovery/EvaluationReportViewer";
+import { DiscoveryGraphPanel } from "@/components/feature/discovery/DiscoveryGraphPanel";
 
 const TYPE_LABELS: Record<string, string> = {
   I: "아이디어형", M: "시장·타겟형", P: "고객문제형", T: "기술형", S: "서비스형",
@@ -300,6 +301,12 @@ export function Component() {
               }}
               onAllComplete={loadData}
             />
+          </div>
+
+          {/* F535: Graph 모드 실행 패널 */}
+          <div>
+            <h2 className="text-sm font-semibold mb-3">Graph 모드</h2>
+            <DiscoveryGraphPanel bizItemId={item.id} />
           </div>
 
           {/* F437 9기준 체크리스트 */}
