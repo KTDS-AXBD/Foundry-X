@@ -1,10 +1,10 @@
 ---
 code: FX-SPEC-001
 title: Foundry-X Project Specification
-version: 5.80
+version: 5.81
 status: Active
 category: SPEC
-system-version: Sprint 289
+system-version: Sprint 291
 created: 2026-03-16
 updated: 2026-04-14
 author: Sinclair Seo
@@ -80,7 +80,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | **Phase 41 HyperFX Agent Stack** (F527~F530) | ✅ Sprint 280~283 |
 | **Phase 42 HyperFX Deep Integration** (F531~F533) | ✅ Sprint 284~286 |
 | **Phase 43 HyperFX Activation** (F534~F537) | ✅ Sprint 287~289 + F537 hotfix |
-| **Phase 44 MSA 2차 분리 + Agent 품질 튜닝** (F538~F542) | 🔧 착수 — F542 ✅ Sprint 290 (Dogfood P2 PASS), F538~F541 📋 W+6+ 구체화 |
+| **Phase 44 MSA 2차 분리 + Agent 품질 튜닝** (F538~F543) | 🔧 착수 — F542 ✅ Sprint 290 (Dogfood P2 PASS), F543 📋(plan) Sprint 291 (gating 벤치마크, C58 승격), F538~F541 📋 W+6+ 구체화 |
 
 ## §4 성공 지표
 
@@ -180,6 +180,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F539 | fx-gateway 프로덕션 배포 + URL 전환 — fx-gateway를 실제 프로덕션에 배포 + Web/CLI URL 전환(`VITE_API_URL` + CLI base URL) + 롤백 스위치. 전제: F538 완료 + latency Go 판정 | — | 📋(idea) | Idea. W+6+ 구체화. REQ 미배정 |
 | F540 | Shaping 도메인 분리 — fx-shaping Worker 신규 생성, 14 routes / 23 services → 독립 Worker. Discovery 다음 파이프라인 단계. 전제: F538+F539 완료 | — | 📋(idea) | Idea. Phase 44 후반 예상. REQ 미배정 |
 | F541 | Offering 도메인 분리 — fx-offering Worker 신규 생성, 12 routes / 23 services → 독립 Worker. Shaping 다음 단계. 전제: F540 완료 | — | 📋(idea) | Idea. Phase 44 후반 예상. REQ 미배정 |
+| F543 | Phase 44 gating — Service Binding latency 벤치마크 (C58 승격). fx-gateway → fx-discovery 호출 경로를 k6로 p99 측정 + Go/No-Go 판정 리포트. 기준: p99 < 100ms (가칭, 벤치마크 결과로 확정). Go 판정 시 F538 착수, No-Go 시 PRD 재설계 필요. 산출: `benchmarks/phase-44-latency/` 스크립트 + `docs/04-report/phase-44-latency-decision.md` 판정 리포트. 전제: Phase 39 Walking Skeleton (fx-gateway F520 + fx-discovery F521) (FX-REQ-573, P0) | Sprint 291 | 📋(plan) | C58 승격. id-allocator가 F543 번호 재배정 가능 |
 | F542 | **MetaAgent 프롬프트 품질 개선 + 모델 전환 실험** — Phase 43 Dogfood에서 agent_improvement_proposals=0건 원인 해소. (a) `meta-agent.agent.yaml` systemPrompt 강화 — rawValue=0/low-signal 입력 명시적 지침 + few-shot 2~3건 + 출력 형식 재검증, (b) Haiku 4.5 → Sonnet 4.6 A/B 실험 — config flag `META_AGENT_MODEL` 런타임 전환(기본값 **Sonnet 4.6**) + 동일 DiagnosticReport에 대한 두 모델 결과 비교 기록, (c) proposals 품질 rubric 점수화(재현성/실행가능성/근거명시), (d) Apply 경로 E2E 검증, (e) 2차 Dogfood 6축 score 방향성 이동 실측. Dogfood P2(실측 산출물 ≠ 0건) 체크리스트 PASS 필수. MVP: K1≥1건+K3=100%. 5회 반복 후 중단 룰. R6(rawValue=0 근본원인) 발견 시 F543 분리. 전제: Phase 43 F537 hotfix 완료(✅) (FX-REQ-571, P1) | Sprint 290 | ✅ | PR #579 (`a4d2734e`, +669/-32), TDD 21 tests, D1 0136+0137. **Dogfood P2 PASS** (S290, bi-koami-001/graph-…1776147547955): proposals 6건 실측 + rubric_score=100 6/6, types 5×graph+1×prompt. MVP K1≥1✅. Observed: auto-trigger(F536) 호출 경로는 proposals 저장 안 됐으나 manual `/api/meta/diagnose`는 정상 저장 → C65 분리 |
 
 <!-- fx-task-orchestrator-backlog -->
@@ -254,7 +255,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C55 | C | git-aware ESLint 신규파일 검증 (FX-REQ-569) | — | DONE | PR #570. scripts/lint-new-files.sh + .github/workflows/msa-lint.yml — `git diff --diff-filter=AM origin/master...HEAD`로 PR 신규/수정 파일만 lint. 통합 검증 3종 통과 (skip/detect/block). PRD Open Issue #1 해결 |
 | C56 | C | Phase 44: D1 격리 실행 (옵션 B) — 도메인별 테이블 접근 ESLint 룰 + migration 분리 태깅 (C54 확장). 근거: msa-transition-diagnosis §3.2 | — | 📋(idea) | Idea. W+6+ 구체화. F538과 병행 가능. id-allocator가 실제 번호 재배정 가능 |
 | C57 | C | Phase 44: shared 슬리밍 — Discovery 전용 타입을 fx-discovery 내부로 이동, shared 27→15 파일. F538 의존 | — | 📋(idea) | Idea. W+6+ 구체화 |
-| C58 | C | Phase 44: Service Binding latency 벤치마크 — k6로 p99 측정 + 결과에 따른 Go/No-Go 판정. F538/F539 전 선행 필수 | — | 📋(idea) | Idea. Phase 44 첫 작업 후보 (gating). |
+| C58 | C | Phase 44: Service Binding latency 벤치마크 — k6로 p99 측정 + 결과에 따른 Go/No-Go 판정. F538/F539 전 선행 필수 | — | → **F543 실행** | 승격 (Sprint 291, 2026-04-14). WT 필요 + 3파일+ 예상으로 task-promotion 기준 4 충족. id-allocator가 F번호 재배정 가능 (C20→C22 선례 동일 ID forward) |
 | C59 | C | Phase 44: CI/CD 분리 — deploy.yml paths-filter 적용, 도메인별 선택적 배포. F540/F541과 병행 | — | 📋(idea) | Idea. Phase 44 중반 예상 |
 | C60 | C | Phase 44: 서비스 간 통신 계약 표준 — Worker 간 Service Binding 인터페이스 + 에러 핸들링 표준 문서화 | — | 📋(idea) | Idea. Phase 44 후반 문서 작업 |
 | C61 | C | task-daemon post-merge 강화 (FX-REQ-570) | — | DONE | task orchestrator |
