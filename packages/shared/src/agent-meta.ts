@@ -37,6 +37,19 @@ export interface ImprovementProposal {
   yamlDiff: string;
   status: ProposalStatus;
   rejectionReason?: string;
+  rubricScore?: number;  // F542 M4: 자동 rubric 채점 (0~100)
   createdAt: string;
   updatedAt: string;
+}
+
+/** F542 M3: A/B 모델 비교 결과 */
+export interface ModelComparison {
+  id: string;
+  sessionId: string;
+  reportId: string;      // sessionId + ':' + collectedAt
+  model: string;
+  promptVersion: string;
+  proposalsJson: string; // JSON 직렬화된 RawProposal[]
+  proposalCount: number;
+  createdAt: string;
 }

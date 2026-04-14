@@ -506,4 +506,5 @@ export type {
   ProposalType,
   ProposalStatus,
   ImprovementProposal,
+  ModelComparison,
 } from './agent-meta.js';

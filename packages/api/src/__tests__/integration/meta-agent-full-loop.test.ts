@@ -36,9 +36,23 @@ CREATE TABLE IF NOT EXISTS agent_improvement_proposals (
   yaml_diff TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'pending',
   rejection_reason TEXT,
+  rubric_score INTEGER,
   applied_at TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+`;
+
+const DDL_COMPARISONS = `
+CREATE TABLE IF NOT EXISTS agent_model_comparisons (
+  id TEXT PRIMARY KEY,
+  session_id TEXT NOT NULL,
+  report_id TEXT NOT NULL,
+  model TEXT NOT NULL,
+  prompt_version TEXT NOT NULL DEFAULT '1.0',
+  proposals_json TEXT NOT NULL DEFAULT '[]',
+  proposal_count INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
 );
 `;
 
@@ -134,6 +148,7 @@ describe("F533 MetaAgent Full Loop Integration", () => {
     await mockDb.exec(DDL_METRICS);
     await mockDb.exec(DDL_PROPOSALS);
     await mockDb.exec(DDL_MARKETPLACE);
+    await mockDb.exec(DDL_COMPARISONS);
 
     await mockDb
       .prepare(

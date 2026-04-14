@@ -95,6 +95,31 @@ describe("F530 MetaAgent", () => {
     }
   });
 
+  // F542 M2: META_AGENT_MODEL 환경변수 반영 테스트
+  it("model 파라미터가 지정되면 해당 모델로 API를 호출한다", async () => {
+    const sonnetAgent = new MetaAgent({ apiKey: "test-key", model: "claude-sonnet-4-6" });
+    const report = makeLowScoreReport();
+    await sonnetAgent.diagnose(report);
+
+    const fetchMock = fetch as ReturnType<typeof vi.fn>;
+    const calls = fetchMock.mock.calls;
+    const lastCall = calls[calls.length - 1] as [string, { body: string }];
+    const body = JSON.parse(lastCall[1].body) as { model: string };
+    expect(body.model).toBe("claude-sonnet-4-6");
+  });
+
+  it("model 파라미터 없으면 기본값 Sonnet 4.6을 사용한다", async () => {
+    const defaultAgent = new MetaAgent({ apiKey: "test-key" });
+    const report = makeLowScoreReport();
+    await defaultAgent.diagnose(report);
+
+    const fetchMock = fetch as ReturnType<typeof vi.fn>;
+    const calls = fetchMock.mock.calls;
+    const lastCall = calls[calls.length - 1] as [string, { body: string }];
+    const body = JSON.parse(lastCall[1].body) as { model: string };
+    expect(body.model).toBe("claude-sonnet-4-6");
+  });
+
   it("모든 축 점수가 높으면 (>80) 제안이 0개일 수 있다", async () => {
     const highReport: DiagnosticReport = {
       sessionId: "sess-high",

@@ -32,4 +32,6 @@ export type Env = {
   DEFAULT_SHARED_ORG_ID?: string;
   // Marker.io project ID — /ax-bd/prototypes/:id/html 응답에 피드백 위젯 주입 시 사용
   MARKER_PROJECT_ID?: string;
+  // F542 Sprint 290: MetaAgent 모델 전환 (haiku-4-5|sonnet-4-6|both)
+  META_AGENT_MODEL?: string;
 };
