@@ -235,12 +235,16 @@ write_signal() {
   local task_id="$1" status="$2"
   shift 2
   local project; project=$(_project_name 2>/dev/null || echo "unknown")
+  # Pre-compute timestamp in a variable — avoids $() expansion inside heredoc body,
+  # which can silently store the literal string when called from certain subshell
+  # contexts (C61 A-fix; confirmed in phase_merged_prs / phase_orphan_wts pipe paths).
+  local ts; ts="$(date -Iseconds)"
   mkdir -p "$FX_SIGNAL_DIR"
   local sig_file="${FX_SIGNAL_DIR}/${project}-${task_id}.signal"
   cat > "$sig_file" <<EOF
 TASK_ID=$task_id
 STATUS=$status
-TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+TIMESTAMP=$ts
 PROJECT=$project
 EOF
   # Append any extra key=value pairs

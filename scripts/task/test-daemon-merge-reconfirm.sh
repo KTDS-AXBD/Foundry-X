@@ -57,7 +57,12 @@ mkdir -p "$FAKE_BIN"
 cat > "$FAKE_BIN/gh" << 'GHEOF'
 #!/usr/bin/env bash
 if [[ "$*" == *"pr view"* ]] && [[ "$*" == *"--json state"* ]]; then
-  printf '{"state":"MERGED","mergedAt":"2026-04-14T01:21:41Z"}'
+  # Simulate gh pr view --json state --jq '.state'
+  if [[ "$*" == *"--jq"* ]]; then
+    echo "MERGED"
+  else
+    printf '{"state":"MERGED","mergedAt":"2026-04-14T01:21:41Z"}'
+  fi
   exit 0
 fi
 echo "[]"
