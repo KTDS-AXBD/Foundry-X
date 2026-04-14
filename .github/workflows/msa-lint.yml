@@ -1,0 +1,33 @@
+name: MSA Lint (PR only)
+
+# PR에서 packages/api/src/core/ 파일 변경 시에만 신규/수정 파일 MSA 룰 검사
+# 기존 230건 위반 unchanged 파일은 자동 skip (git diff --diff-filter=AM)
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'packages/api/src/core/**/*.ts'
+
+jobs:
+  msa-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # origin/master...HEAD diff 계산에 전체 이력 필요
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build ESLint rules plugin
+        run: pnpm --filter @foundry-x/api build
+
+      - name: MSA lint — 신규/수정 파일만
+        run: bash scripts/lint-new-files.sh origin/master
