@@ -44,6 +44,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | Sprint 286 | ✅ 완료 — F533 MetaAgent 실전 검증 (PR #560, +868, D1 0134, TDD+E2E) |
 | Sprint 287 | ✅ 완료 — F534 DiagnosticCollector 훅 삽입 (PR #564+#565 hotfix, 실증: agent_run_metrics 0→9건) |
 | Sprint 288 | ✅ 완료 — F535 Graph 실행 정식 API + UI (PR #569, +705, D1 0135) |
+| Sprint 289 | ✅ 완료 — F536 MetaAgent 자동 진단 훅 (PR #571, +496, TDD 189줄) |
 
 | 항목 | 상태 |
 |------|------|
@@ -78,7 +79,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | **Phase 40 Agent Autonomy** (F524~F526) | ✅ Sprint 278~279 |
 | **Phase 41 HyperFX Agent Stack** (F527~F530) | ✅ Sprint 280~283 |
 | **Phase 42 HyperFX Deep Integration** (F531~F533) | ✅ Sprint 284~286 |
-| **Phase 43 HyperFX Activation** (F534~F536) | 🔧 Sprint 287~289 (F534~F535 ✅) |
+| **Phase 43 HyperFX Activation** (F534~F536) | ✅ Sprint 287~289 |
 
 ## §4 성공 지표
 
@@ -171,7 +172,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | **Phase 43: HyperFX Activation — Plumbing → Real Data Flow** | | | | Dogfood(S276, KOAMI)에서 확증된 3개 갭 해소 — 메트릭/Graph 트리거/자가개선 루프를 실제 데이터 흐름에 연결 |
 | F534 | DiagnosticCollector 실행 경로 훅 삽입 — StageRunnerService.runStage() 및 OrchestrationLoop 실행 경로에 `DiagnosticCollector.record()` 호출 추가. 각 LLM 호출마다 tokens/duration/success/tool_use 등 메트릭을 agent_run_metrics에 기록. Dogfood 확증: 9-stage Graph 실행 성공에도 0건 기록 (session graph-dogfood-bi-koami-001-1776125192189) (FX-REQ-564, P0) | Sprint 287 | ✅ | PR #564, +678, TDD 2 files |
 | F535 | Graph 실행 정식 API + UI — `POST /biz-items/:id/discovery-graph/run-all` 정식 API(PR #563 임시 버전 대체) + 웹 UI 'Graph 모드 실행' 버튼 + stage별 진행률 표시 + sessionId 저장/조회. 현재 `confirmStage(graphMode=true)` 옵션이 API 미노출 (FX-REQ-565, P1) | Sprint 288 | ✅ | PR #569, +705, D1 0135 graph_sessions |
-| F536 | MetaAgent 자동 진단 훅 — Graph/Agent 실행 완료 시점에 MetaAgent.diagnose() 자동 트리거 (hook 기반) → 경계 점수 미달 시 proposal 생성. Dogfood 확증: 현재 모든 6축 score=50, rawValue=0 (입력 데이터 부재) (FX-REQ-566, P1) | Sprint 289 | 📋(idea) | F534 의존 |
+| F536 | MetaAgent 자동 진단 훅 — Graph/Agent 실행 완료 시점에 MetaAgent.diagnose() 자동 트리거 (hook 기반) → 경계 점수 미달 시 proposal 생성. Dogfood 확증: 현재 모든 6축 score=50, rawValue=0 (입력 데이터 부재) (FX-REQ-566, P1) | Sprint 289 | ✅ | PR #571, +496, TDD 189줄 |
 
 <!-- fx-task-orchestrator-backlog -->
 ### Task Orchestrator Backlog (B/C/X)
