@@ -26,6 +26,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Build shared (dependency of api)
+        run: pnpm --filter @foundry-x/shared build
+
       - name: Build ESLint rules plugin
         run: pnpm --filter @foundry-x/api build
 
