@@ -79,7 +79,8 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | **Phase 40 Agent Autonomy** (F524~F526) | ✅ Sprint 278~279 |
 | **Phase 41 HyperFX Agent Stack** (F527~F530) | ✅ Sprint 280~283 |
 | **Phase 42 HyperFX Deep Integration** (F531~F533) | ✅ Sprint 284~286 |
-| **Phase 43 HyperFX Activation** (F534~F536) | ✅ Sprint 287~289 |
+| **Phase 43 HyperFX Activation** (F534~F537) | ✅ Sprint 287~289 + F537 hotfix |
+| **Phase 44 MSA 2차 분리** (F538~F541 Idea) | 📋 W+8+ 예정, W+6+ 구체화 |
 
 ## §4 성공 지표
 
@@ -173,6 +174,12 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F534 | DiagnosticCollector 실행 경로 훅 삽입 — StageRunnerService.runStage() 및 OrchestrationLoop 실행 경로에 `DiagnosticCollector.record()` 호출 추가. 각 LLM 호출마다 tokens/duration/success/tool_use 등 메트릭을 agent_run_metrics에 기록. Dogfood 확증: 9-stage Graph 실행 성공에도 0건 기록 (session graph-dogfood-bi-koami-001-1776125192189) (FX-REQ-564, P0) | Sprint 287 | ✅ | PR #564, +678, TDD 2 files |
 | F535 | Graph 실행 정식 API + UI — `POST /biz-items/:id/discovery-graph/run-all` 정식 API(PR #563 임시 버전 대체) + 웹 UI 'Graph 모드 실행' 버튼 + stage별 진행률 표시 + sessionId 저장/조회. 현재 `confirmStage(graphMode=true)` 옵션이 API 미노출 (FX-REQ-565, P1) | Sprint 288 | ✅ | PR #569, +705, D1 0135 graph_sessions |
 | F536 | MetaAgent 자동 진단 훅 — Graph/Agent 실행 완료 시점에 MetaAgent.diagnose() 자동 트리거 (hook 기반) → 경계 점수 미달 시 proposal 생성. Dogfood 확증: 현재 모든 6축 score=50, rawValue=0 (입력 데이터 부재) (FX-REQ-566, P1) | Sprint 289 | ✅ | PR #571, +496, TDD 189줄 |
+| F537 | **hotfix** MetaAgent auto-trigger session_id 불일치 해소 — F536 autoTriggerMetaAgent가 graph sessionId(`graph-*`)로 collect했으나 stage-runner는 `stage-{stage}-{bizItemId}` 패턴으로 기록해 매칭 실패. Dogfood 3차(graph-bi-koami-001-1776130774847)에서 agent_run_metrics 9→18 정상 수집 확인했으나 agent_improvement_proposals 0건 발견. 수정: `DiagnosticCollector.collectByBizItem()` 추가(LIKE `stage-%-{bizItemId}`) + autoTriggerMetaAgent에 bizItemId 인자 (FX-REQ 미배정, post-merge hotfix) | — | ✅ | PR #573 MERGED (`3ca8285e`). pane %3 Sprint 288 세션에서 작업 완료 |
+| **Phase 44: MSA 2차 분리 — Discovery 완전 분리 + 도메인 Worker 확장** | | | | 근거: `docs/specs/fx-msa-roadmap/msa-transition-diagnosis.md` §3.2~§3.3. W+8+ 범위 (fx-msa-roadmap-v2 PRD §4.3에서 out-of-scope 선언). W+5 GTM 종료 후 재평가, W+6+에 REQ/Sprint/상세 범위 확정. 현재는 Idea 단계만 등록 |
+| F538 | Discovery 완전 분리 — fx-discovery Worker에 12 routes / 18 services 전체 이전 + `packages/api`에서 제거. Walking Skeleton(Phase 39) 구조를 프로덕션 수준으로 완성. 전제: latency 벤치마크(C58) Go 판정 | — | 📋(idea) | Idea. W+6+ 구체화. REQ 미배정. id-allocator가 최종 번호 재배정 가능 |
+| F539 | fx-gateway 프로덕션 배포 + URL 전환 — fx-gateway를 실제 프로덕션에 배포 + Web/CLI URL 전환(`VITE_API_URL` + CLI base URL) + 롤백 스위치. 전제: F538 완료 + latency Go 판정 | — | 📋(idea) | Idea. W+6+ 구체화. REQ 미배정 |
+| F540 | Shaping 도메인 분리 — fx-shaping Worker 신규 생성, 14 routes / 23 services → 독립 Worker. Discovery 다음 파이프라인 단계. 전제: F538+F539 완료 | — | 📋(idea) | Idea. Phase 44 후반 예상. REQ 미배정 |
+| F541 | Offering 도메인 분리 — fx-offering Worker 신규 생성, 12 routes / 23 services → 독립 Worker. Shaping 다음 단계. 전제: F540 완료 | — | 📋(idea) | Idea. Phase 44 후반 예상. REQ 미배정 |
 
 <!-- fx-task-orchestrator-backlog -->
 ### Task Orchestrator Backlog (B/C/X)
@@ -244,6 +251,11 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C53 | C | MSA 원칙 하드닝 (W+1~W+7) — PRD: `docs/specs/fx-msa-roadmap-v2/prd-final.md` (FX-REQ-567) | — | → **C54+C55 실행** | id-allocator가 C54 발급 (C20→C22 선례 동일 ID forward). req-interview R1=82/R2=70 Conditional, v2→final |
 | C54 | C | MSA 원칙 ESLint 룰 구현 (FX-REQ-568) | — | DONE | PR #567. no-cross-domain-import + no-direct-route-register 룰 2종 + CLAUDE.md 원칙 섹션 + SKU 경계 테이블 + eslint.config.js 연입. 기존 230건 위반은 C55로 분리 |
 | C55 | C | git-aware ESLint 신규파일 검증 (FX-REQ-569) | — | DONE | PR #570. scripts/lint-new-files.sh + .github/workflows/msa-lint.yml — `git diff --diff-filter=AM origin/master...HEAD`로 PR 신규/수정 파일만 lint. 통합 검증 3종 통과 (skip/detect/block). PRD Open Issue #1 해결 |
+| C56 | C | Phase 44: D1 격리 실행 (옵션 B) — 도메인별 테이블 접근 ESLint 룰 + migration 분리 태깅 (C54 확장). 근거: msa-transition-diagnosis §3.2 | — | 📋(idea) | Idea. W+6+ 구체화. F538과 병행 가능. id-allocator가 실제 번호 재배정 가능 |
+| C57 | C | Phase 44: shared 슬리밍 — Discovery 전용 타입을 fx-discovery 내부로 이동, shared 27→15 파일. F538 의존 | — | 📋(idea) | Idea. W+6+ 구체화 |
+| C58 | C | Phase 44: Service Binding latency 벤치마크 — k6로 p99 측정 + 결과에 따른 Go/No-Go 판정. F538/F539 전 선행 필수 | — | 📋(idea) | Idea. Phase 44 첫 작업 후보 (gating). |
+| C59 | C | Phase 44: CI/CD 분리 — deploy.yml paths-filter 적용, 도메인별 선택적 배포. F540/F541과 병행 | — | 📋(idea) | Idea. Phase 44 중반 예상 |
+| C60 | C | Phase 44: 서비스 간 통신 계약 표준 — Worker 간 Service Binding 인터페이스 + 에러 핸들링 표준 문서화 | — | 📋(idea) | Idea. Phase 44 후반 문서 작업 |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
