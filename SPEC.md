@@ -259,6 +259,8 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C60 | C | Phase 44: 서비스 간 통신 계약 표준 — Worker 간 Service Binding 인터페이스 + 에러 핸들링 표준 문서화 | — | 📋(idea) | Idea. Phase 44 후반 문서 작업 |
 | C61 | C | task-daemon post-merge 강화 (FX-REQ-570) | — | DONE | task orchestrator |
 | C62 | C | task-list stale display 조사 (FX-REQ-572) | — | DONE | task orchestrator |
+| C63 | C | msa-lint workflow shared 선빌드 — `pnpm --filter @foundry-x/api build` 실행 시 `@foundry-x/shared` 모듈 미빌드로 tsc 실패. F536/F537/F542 3연속 동일 실패 관찰. `.github/workflows/msa-lint.yml`에 `pnpm --filter @foundry-x/shared build` 선행 단계 추가 | — | 📋 | 3회 관찰 후 등록 (Sprint 289~290). non-required라 merge 차단 아니지만 signal 오염 원인 |
+| C64 | C | task-daemon signal FAILED 오판 수정 — PR-only non-required 체크(msa-lint)의 FAILURE를 `STATUS=FAILED`로 예단하여 Sprint MERGED 상태임에도 Master에 FAILED 신호. PR `state=MERGED` 또는 deploy.yml conclusion을 우선 판정하도록 `scripts/task/task-daemon.sh` 시그널 판정 로직 보정. Sprint 290에서 첫 관찰 | — | 📋 | C63과 병행. daemon 로직 핵심 이슈 |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
