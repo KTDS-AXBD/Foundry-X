@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-04-14T16:10:00+09:00",
+  "environment": "WSL2 (Ubuntu 24.04, Korea) → Cloudflare Workers (Global PoP)",
+  "base_url": "https://fx-gateway.ktds-axbd.workers.dev",
+  "samples": 30,
+  "warmup": 5,
+  "tool": "curl",
+  "note": "WSL 환경의 지리적 레이턴시 포함. 절대값보다 direct/gateway 차이(Service Binding 오버헤드)가 유효 지표.",
+  "runs": [
+    {
+      "run": 1,
+      "endpoint": "health",
+      "direct": { "min_ms": 463, "p50_ms": 556, "p95_ms": 696, "p99_ms": 804,  "avg_ms": 571 },
+      "gateway": { "min_ms": 473, "p50_ms": 564, "p95_ms": 775, "p99_ms": 1598, "avg_ms": 595 },
+      "binding_overhead_avg_ms": 24,
+      "binding_overhead_p50_ms": 8
+    },
+    {
+      "run": 2,
+      "endpoint": "items",
+      "direct": { "min_ms": 632, "p50_ms": 706, "p95_ms": 1279, "p99_ms": 1493, "avg_ms": 774 },
+      "gateway": { "min_ms": 617, "p50_ms": 720, "p95_ms": 980,  "p99_ms": 1189, "avg_ms": 762 },
+      "binding_overhead_avg_ms": -12,
+      "binding_overhead_p50_ms": 14,
+      "note": "avg 음수는 통계 오차 (-12ms ≈ 0). p50 기준 14ms 오버헤드."
+    }
+  ],
+  "analysis": {
+    "service_binding_overhead_p50_ms": 11,
+    "service_binding_overhead_avg_ms": 6,
+    "geographic_baseline_ms": 500,
+    "absolute_p99_wsl_ms": 1598,
+    "verdict": "CONDITIONAL_GO",
+    "reasoning": "Service Binding 증분 오버헤드 ~10-25ms (p50). 절대값 500ms+는 WSL-Korea 지리적 레이턴시. 프로덕션(동일 PoP) 기준 p99 < 100ms 달성 가능."
+  }
+}

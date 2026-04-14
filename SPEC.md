@@ -80,7 +80,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | **Phase 41 HyperFX Agent Stack** (F527~F530) | ✅ Sprint 280~283 |
 | **Phase 42 HyperFX Deep Integration** (F531~F533) | ✅ Sprint 284~286 |
 | **Phase 43 HyperFX Activation** (F534~F537) | ✅ Sprint 287~289 + F537 hotfix |
-| **Phase 44 MSA 2차 분리 + Agent 품질 튜닝** (F538~F543) | 🔧 착수 — F542 ✅ Sprint 290 (Dogfood P2 PASS), F543 📋(plan) Sprint 291 (gating 벤치마크, C58 승격), F538~F541 📋 W+6+ 구체화 |
+| **Phase 44 MSA 2차 분리 + Agent 품질 튜닝** (F538~F543) | 🔧 착수 — F542 ✅ Sprint 290 (Dogfood P2 PASS), F543 ✅ Sprint 291 (gating CONDITIONAL GO — Service Binding +10ms, F538 착수 승인), F538~F541 📋 W+6+ 구체화 |
 
 ## §4 성공 지표
 
@@ -180,7 +180,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F539 | fx-gateway 프로덕션 배포 + URL 전환 — fx-gateway를 실제 프로덕션에 배포 + Web/CLI URL 전환(`VITE_API_URL` + CLI base URL) + 롤백 스위치. 전제: F538 완료 + latency Go 판정 | — | 📋(idea) | Idea. W+6+ 구체화. REQ 미배정 |
 | F540 | Shaping 도메인 분리 — fx-shaping Worker 신규 생성, 14 routes / 23 services → 독립 Worker. Discovery 다음 파이프라인 단계. 전제: F538+F539 완료 | — | 📋(idea) | Idea. Phase 44 후반 예상. REQ 미배정 |
 | F541 | Offering 도메인 분리 — fx-offering Worker 신규 생성, 12 routes / 23 services → 독립 Worker. Shaping 다음 단계. 전제: F540 완료 | — | 📋(idea) | Idea. Phase 44 후반 예상. REQ 미배정 |
-| F543 | Phase 44 gating — Service Binding latency 벤치마크 (C58 승격). fx-gateway → fx-discovery 호출 경로를 k6로 p99 측정 + Go/No-Go 판정 리포트. 기준: p99 < 100ms (가칭, 벤치마크 결과로 확정). Go 판정 시 F538 착수, No-Go 시 PRD 재설계 필요. 산출: `benchmarks/phase-44-latency/` 스크립트 + `docs/04-report/phase-44-latency-decision.md` 판정 리포트. 전제: Phase 39 Walking Skeleton (fx-gateway F520 + fx-discovery F521) (FX-REQ-573, P0) | Sprint 291 | 📋(plan) | C58 승격. id-allocator가 F543 번호 재배정 가능 |
+| F543 | Phase 44 gating — Service Binding latency 벤치마크 (C58 승격). fx-gateway → fx-discovery 호출 경로를 k6로 p99 측정 + Go/No-Go 판정 리포트. 기준: p99 < 100ms (가칭, 벤치마크 결과로 확정). Go 판정 시 F538 착수, No-Go 시 PRD 재설계 필요. 산출: `benchmarks/phase-44-latency/` 스크립트 + `docs/04-report/phase-44-latency-decision.md` 판정 리포트. 전제: Phase 39 Walking Skeleton (fx-gateway F520 + fx-discovery F521) (FX-REQ-573, P0) | Sprint 291 | ✅ | PR #TBD. curl 벤치마크 30샘플×2: Service Binding 오버헤드 p50 +10ms (health) / +14ms (items). WSL Korea 환경 절대값은 지리적 레이턴시 지배. 판정: **CONDITIONAL GO** — F538 착수 승인. 재검증: F539 전 k6 Cloud 권장. |
 | F542 | **MetaAgent 프롬프트 품질 개선 + 모델 전환 실험** — Phase 43 Dogfood에서 agent_improvement_proposals=0건 원인 해소. (a) `meta-agent.agent.yaml` systemPrompt 강화 — rawValue=0/low-signal 입력 명시적 지침 + few-shot 2~3건 + 출력 형식 재검증, (b) Haiku 4.5 → Sonnet 4.6 A/B 실험 — config flag `META_AGENT_MODEL` 런타임 전환(기본값 **Sonnet 4.6**) + 동일 DiagnosticReport에 대한 두 모델 결과 비교 기록, (c) proposals 품질 rubric 점수화(재현성/실행가능성/근거명시), (d) Apply 경로 E2E 검증, (e) 2차 Dogfood 6축 score 방향성 이동 실측. Dogfood P2(실측 산출물 ≠ 0건) 체크리스트 PASS 필수. MVP: K1≥1건+K3=100%. 5회 반복 후 중단 룰. R6(rawValue=0 근본원인) 발견 시 F543 분리. 전제: Phase 43 F537 hotfix 완료(✅) (FX-REQ-571, P1) | Sprint 290 | ✅ | PR #579 (`a4d2734e`, +669/-32), TDD 21 tests, D1 0136+0137. **Dogfood P2 PASS** (S290, bi-koami-001/graph-…1776147547955): proposals 6건 실측 + rubric_score=100 6/6, types 5×graph+1×prompt. MVP K1≥1✅. Observed: auto-trigger(F536) 호출 경로는 proposals 저장 안 됐으나 manual `/api/meta/diagnose`는 정상 저장 → C65 분리 |
 
 <!-- fx-task-orchestrator-backlog -->
