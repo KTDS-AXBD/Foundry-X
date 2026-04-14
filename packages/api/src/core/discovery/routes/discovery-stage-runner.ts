@@ -11,8 +11,49 @@ import { createAgentRunner, createRoutedRunner } from "../../agent/services/agen
 import { StageRunnerService } from "../services/stage-runner-service.js";
 import { DiscoveryGraphService } from "../services/discovery-graph-service.js";
 import { DiagnosticCollector } from "../../agent/services/diagnostic-collector.js";
+import { MetaAgent } from "../../agent/services/meta-agent.js";
+import { MetaApprovalService } from "../../agent/services/meta-approval.js";
 import type { DiscoveryType } from "../services/analysis-path-v82.js";
 import { GraphSessionService } from "../services/graph-session-service.js";
+
+/**
+ * F536: MetaAgent 자동 진단 훅 — Graph 실행 완료 후 자동 호출.
+ * DiagnosticReport를 수집하여 score < 70 축에 대한 ImprovementProposal을 저장한다.
+ * 에러 발생 시 조용히 처리 (fire-and-forget 호출처에서 .catch 처리).
+ */
+export async function autoTriggerMetaAgent(
+  db: D1Database,
+  sessionId: string,
+  apiKey: string,
+): Promise<void> {
+  const collector = new DiagnosticCollector(db);
+  const report = await collector.collect(sessionId, "discovery-graph");
+
+  const metaAgent = new MetaAgent({ apiKey });
+  let proposals;
+  try {
+    proposals = await metaAgent.diagnose(report);
+  } catch (e) {
+    console.error("[F536] MetaAgent.diagnose failed:", e);
+    return;
+  }
+
+  if (proposals.length === 0) return;
+
+  const approvalService = new MetaApprovalService(db);
+  for (const proposal of proposals) {
+    await approvalService.save({
+      id: proposal.id,
+      sessionId: proposal.sessionId,
+      agentId: proposal.agentId,
+      type: proposal.type,
+      title: proposal.title,
+      reasoning: proposal.reasoning,
+      yamlDiff: proposal.yamlDiff,
+      status: "pending",
+    });
+  }
+}
 
 const StageRunSchema = z.object({
   feedback: z.string().optional(),
@@ -215,6 +256,10 @@ discoveryStageRunnerRoute.post("/biz-items/:id/discovery-graph/run-all", async (
       feedback: parsed.data.feedback,
     });
     await sessionService.updateStatus(sessionId, "completed");
+    // F536: MetaAgent 자동 진단 훅 — fire-and-forget (응답 블로킹 없음)
+    void autoTriggerMetaAgent(c.env.DB, sessionId, apiKey).catch((e) =>
+      console.error("[F536] MetaAgent auto-trigger failed:", e)
+    );
     return c.json({ sessionId, status: "completed", result });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Graph run failed";

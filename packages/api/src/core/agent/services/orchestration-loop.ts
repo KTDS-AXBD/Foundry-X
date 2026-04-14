@@ -1,6 +1,7 @@
 // ─── F335: OrchestrationLoop — 3모드 피드백 루프 엔진 (Sprint 150) ───
 // ─── F531: graphDiscovery 분기 추가 ───
 // ─── F534: DiagnosticCollector 훅 삽입 ───
+// ─── F536: MetaAgentHook — 실행 완료 후 자동 진단 트리거 ───
 
 import {
   TaskState,
@@ -22,6 +23,11 @@ import type { AgentRunner } from "./agent-runner.js";
 import type { GraphStageInput } from "../../discovery/services/discovery-graph-service.js";
 import type { DiagnosticCollector } from "./diagnostic-collector.js";
 
+/** F536: MetaAgent 자동 진단 훅 인터페이스 */
+export interface MetaAgentHook {
+  trigger(sessionId: string, agentId: string): Promise<void>;
+}
+
 /** F531: graphDiscovery 모드를 포함한 확장 파라미터 */
 export interface LoopStartParamsExtended extends LoopStartParams {
   /** GraphEngine 기반 발굴 파이프라인 실행 입력 — 설정 시 graph 분기 */
@@ -40,6 +46,7 @@ export class OrchestrationLoop {
     private eventBus: EventBus,
     private db: D1Database,
     private diagnostics?: DiagnosticCollector,  // F534: 메트릭 훅 (optional)
+    private metaHook?: MetaAgentHook,           // F536: MetaAgent 자동 진단 훅 (optional)
   ) {
     this.contextManager = new FeedbackLoopContextManager(db);
   }
@@ -69,6 +76,12 @@ export class OrchestrationLoop {
       // F534: Graph 실행 결과 메트릭 기록
       if (this.diagnostics) {
         await this.diagnostics.recordGraphResult(params.taskId, graphResult);
+      }
+      // F536: MetaAgent 자동 진단 훅 — fire-and-forget
+      if (this.metaHook) {
+        void this.metaHook.trigger(params.taskId, "discovery-graph").catch((e) =>
+          console.error("[F536] MetaAgentHook trigger failed:", e)
+        );
       }
       return { status: "resolved", exitState: TaskState.CODE_GENERATING, rounds: 1, finalScore: 1 };
     }
