@@ -366,45 +366,5 @@ describe("OrchestrationLoop", () => {
     expect(events).toContain("loop_resolved");
   });
 
-  // ─── F531: OrchestrationLoop graphDiscovery 분기 ───
-  describe("F531: graphDiscovery 모드", () => {
-    it("LoopStartParams에 graphDiscovery가 있으면 DiscoveryGraphService.runAll()로 분기됨", async () => {
-      const { DiscoveryGraphService } = await import(
-        "../core/discovery/services/discovery-graph-service.js"
-      );
-      const runAllSpy = vi.fn().mockResolvedValue({
-        executionId: "exec-1",
-        finalOutput: { nodeId: "stage-2-8", data: {} },
-        nodeOutputs: {},
-        totalExecutions: 10,
-        durationMs: 100,
-      });
-      vi.spyOn(DiscoveryGraphService.prototype, "runAll").mockImplementation(runAllSpy);
-
-      const outcome = await loop.run({
-        taskId: "task-99",
-        tenantId: TENANT,
-        loopMode: "retry",
-        agents: [],
-        graphDiscovery: {
-          bizItemId: "biz-test",
-          orgId: "org-test",
-          discoveryType: "I",
-        },
-        graphRunner: {
-          type: "direct" as const,
-          execute: vi.fn(),
-        } as never,
-        graphApiKey: "api-key-test",
-      });
-
-      expect(runAllSpy).toHaveBeenCalledOnce();
-      expect(runAllSpy).toHaveBeenCalledWith({
-        bizItemId: "biz-test",
-        orgId: "org-test",
-        discoveryType: "I",
-      });
-      expect(outcome.status).toBe("resolved");
-    });
-  });
+  // F538: F531 graphDiscovery 분기 제거 (dead code — production orchestration.ts 미사용)
 });

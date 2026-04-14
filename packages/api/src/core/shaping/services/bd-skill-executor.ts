@@ -8,8 +8,7 @@ import { PromptGatewayService } from "../../agent/services/prompt-gateway.js";
 import { BdArtifactService } from "./bd-artifact-service.js";
 import { getSkillPrompt } from "./bd-skill-prompts.js";
 import { SkillMetricsService } from "../../agent/services/skill-metrics.js";
-import type { ExecuteSkillInput } from "../../discovery/schemas/bd-artifact.js";
-import type { SkillExecutionResult } from "../../discovery/schemas/bd-artifact.js";
+import type { ExecuteSkillInput, SkillExecutionResult } from "@foundry-x/shared";
 
 const MODEL = "claude-haiku-4-5-20250714";
 

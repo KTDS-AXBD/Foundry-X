@@ -1,7 +1,7 @@
 // ─── F335: OrchestrationLoop — 3모드 피드백 루프 엔진 (Sprint 150) ───
-// ─── F531: graphDiscovery 분기 추가 ───
 // ─── F534: DiagnosticCollector 훅 삽입 ───
 // ─── F536: MetaAgentHook — 실행 완료 후 자동 진단 트리거 ───
+// ─── F538: graphDiscovery 분기 제거 (dead code — production orchestration.ts 미사용) ───
 
 import {
   TaskState,
@@ -19,8 +19,6 @@ import { TaskStateService } from "./task-state-service.js";
 import { FeedbackLoopContextManager } from "../../../modules/portal/services/feedback-loop-context.js";
 import { EventBus } from "../../../services/event-bus.js";
 import { TransitionGuard } from "../../harness/services/transition-guard.js";
-import type { AgentRunner } from "./agent-runner.js";
-import type { GraphStageInput } from "../../discovery/services/discovery-graph-service.js";
 import type { DiagnosticCollector } from "./diagnostic-collector.js";
 
 /** F536: MetaAgent 자동 진단 훅 인터페이스 */
@@ -28,15 +26,8 @@ export interface MetaAgentHook {
   trigger(sessionId: string, agentId: string): Promise<void>;
 }
 
-/** F531: graphDiscovery 모드를 포함한 확장 파라미터 */
-export interface LoopStartParamsExtended extends LoopStartParams {
-  /** GraphEngine 기반 발굴 파이프라인 실행 입력 — 설정 시 graph 분기 */
-  graphDiscovery?: GraphStageInput;
-  /** graphDiscovery 모드에서 사용할 AgentRunner */
-  graphRunner?: AgentRunner;
-  /** graphDiscovery 모드에서 사용할 API key */
-  graphApiKey?: string;
-}
+/** F538: LoopStartParamsExtended — graphDiscovery 필드 제거 (dead code 정리) */
+export type LoopStartParamsExtended = LoopStartParams;
 
 export class OrchestrationLoop {
   private contextManager: FeedbackLoopContextManager;
@@ -60,32 +51,6 @@ export class OrchestrationLoop {
    * 4. 수렴 시 exitTarget으로 전이, 미수렴 시 FAILED
    */
   async run(params: LoopStartParams | LoopStartParamsExtended): Promise<LoopOutcome> {
-    // F531: graphDiscovery 분기 — DiscoveryGraphService.runAll() 실행
-    const extended = params as LoopStartParamsExtended;
-    if (extended.graphDiscovery && extended.graphRunner && extended.graphApiKey) {
-      const { DiscoveryGraphService } = await import(
-        "../../discovery/services/discovery-graph-service.js"
-      );
-      const graphSvc = new DiscoveryGraphService(
-        extended.graphRunner,
-        this.db,
-        params.taskId,
-        extended.graphApiKey,
-      );
-      const graphResult = await graphSvc.runAll(extended.graphDiscovery);
-      // F534: Graph 실행 결과 메트릭 기록
-      if (this.diagnostics) {
-        await this.diagnostics.recordGraphResult(params.taskId, graphResult);
-      }
-      // F536: MetaAgent 자동 진단 훅 — fire-and-forget
-      if (this.metaHook) {
-        void this.metaHook.trigger(params.taskId, "discovery-graph").catch((e) =>
-          console.error("[F536] MetaAgentHook trigger failed:", e)
-        );
-      }
-      return { status: "resolved", exitState: TaskState.CODE_GENERATING, rounds: 1, finalScore: 1 };
-    }
-
     // 1. 현재 상태 검증
     const taskState = await this.taskStateService.getState(params.taskId, params.tenantId);
     if (!taskState) {

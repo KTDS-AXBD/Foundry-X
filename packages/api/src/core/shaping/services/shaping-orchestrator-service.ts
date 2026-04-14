@@ -5,7 +5,7 @@
  */
 import { ShapingService } from "./shaping-service.js";
 import { PipelineStateMachine } from "../../../modules/launch/services/pipeline-state-machine.js";
-import type { TriggerShapingInput } from "../../discovery/schemas/discovery-pipeline.js";
+import type { TriggerShapingInput } from "@foundry-x/shared";
 
 const SHAPING_PHASES = ["A", "B", "C", "D", "E", "F"] as const;
 
@@ -50,7 +50,7 @@ export class ShapingOrchestratorService {
     const shapingRun = await this.shapingService.createRun(orgId, {
       discoveryPrdId: bizItemId,
       mode: options.mode,
-      maxIterations: options.maxIterations,
+      maxIterations: options.maxIterations ?? 3,
       tokenLimit: 500000,
     });
 

@@ -2,7 +2,7 @@
  * F261: BD 산출물 CRUD + 버전 관리 서비스
  */
 
-import type { BdArtifact, ArtifactListQuery } from "../../discovery/schemas/bd-artifact.js";
+import type { BdArtifact, ArtifactListQuery } from "@foundry-x/shared";
 
 interface ArtifactRow {
   id: string;
@@ -114,7 +114,7 @@ export class BdArtifactService {
     }
 
     const where = conditions.join(" AND ");
-    const offset = (query.page - 1) * query.limit;
+    const offset = ((query.page ?? 1) - 1) * (query.limit ?? 20);
 
     const countResult = await this.db
       .prepare(`SELECT COUNT(*) as cnt FROM bd_artifacts WHERE ${where}`)
@@ -126,7 +126,7 @@ export class BdArtifactService {
       .prepare(
         `SELECT * FROM bd_artifacts WHERE ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
       )
-      .bind(...params, query.limit, offset)
+      .bind(...params, query.limit ?? 20, offset)
       .all<ArtifactRow>();
 
     return {
