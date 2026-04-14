@@ -653,9 +653,10 @@ SIGEOF
 # ═══════════════════════════════════════════════════════════════════════════
 
 # Sprint signal에서 key=value 읽기 (source 방식 쓰지 않음)
+# key 미존재 시 빈 문자열 반환 (set -e + pipefail 환경에서 assignment abort 방지)
 sprint_sig_get() {
   local file="$1" key="$2"
-  grep "^${key}=" "$file" 2>/dev/null | head -1 | cut -d= -f2-
+  { grep "^${key}=" "$file" 2>/dev/null | head -1 | cut -d= -f2-; } || true
 }
 
 # Sprint signal에서 key=value 덮어쓰기
@@ -691,6 +692,16 @@ sprint_wait_ci() {
   local pr_num="$1" repo="$2"
   timeout --foreground --kill-after=10s "${SPRINT_CI_TIMEOUT}s" \
     gh pr checks "$pr_num" --repo "$repo" --watch --fail-fast >> "$DAEMON_LOG" 2>&1
+}
+
+# C64 hotfix: PR 현재 state 조회 (MERGED/OPEN/CLOSED)
+# gh 실패 시 UNKNOWN 반환 → 호출자가 OPEN과 동일하게 취급
+sprint_pr_state() {
+  local pr_num="$1" repo="$2"
+  local state
+  state=$(gh pr view "$pr_num" --repo "$repo" --json state --jq '.state' 2>/dev/null) || state=""
+  [ -z "$state" ] && state="UNKNOWN"
+  echo "$state"
 }
 
 # Sprint 완료 후 pane/탭 정리 (케이스 A + B 양쪽 처리)
@@ -783,40 +794,58 @@ phase_sprint_signals() {
     fi
     sprint_sig_set "$sig" "PR_NUM" "$pr_num"
 
-    # 2) 자동승인 (branch protection 있을 때)
-    sprint_auto_approve "$pr_num" "$repo"
+    # 2) PR state 선체크 (C64 hotfix) — autopilot이 --auto --squash로 이미 merge한 케이스 감지
+    local pr_state
+    pr_state=$(sprint_pr_state "$pr_num" "$repo")
+    local merged=0
+    if [ "$pr_state" = "MERGED" ]; then
+      log "ℹ️  sprint-${sprint_num} — PR #${pr_num} already MERGED (auto-merge 감지), skip CI wait + merge"
+      merged=1
+    else
+      # 3) 자동승인 (branch protection 있을 때)
+      sprint_auto_approve "$pr_num" "$repo"
 
-    # 3) CI 대기
-    if ! sprint_wait_ci "$pr_num" "$repo"; then
-      sprint_sig_set "$sig" "STATUS" "FAILED"
-      sprint_sig_set "$sig" "ERROR_STEP" "ci-checks"
-      sprint_sig_set "$sig" "ERROR_MSG" "CI failed or timed out"
-      log "❌ sprint-${sprint_num} — FAIL: CI"
-      continue
+      # 4) CI 대기
+      if ! sprint_wait_ci "$pr_num" "$repo"; then
+        # C64 hotfix: CI non-zero 후 PR state 재확인 (post-merge deploy.yml 초회 실패 또는 non-required check FAILURE)
+        local pr_state_after
+        pr_state_after=$(sprint_pr_state "$pr_num" "$repo")
+        if [ "$pr_state_after" = "MERGED" ]; then
+          log "ℹ️  sprint-${sprint_num} — CI non-zero but PR state=MERGED (post-merge deploy 실패 또는 non-required check), treat as merged"
+          merged=1
+        else
+          sprint_sig_set "$sig" "STATUS" "FAILED"
+          sprint_sig_set "$sig" "ERROR_STEP" "ci-checks"
+          sprint_sig_set "$sig" "ERROR_MSG" "CI failed or timed out (PR state=${pr_state_after})"
+          log "❌ sprint-${sprint_num} — FAIL: CI (PR state=${pr_state_after})"
+          continue
+        fi
+      fi
     fi
 
-    # 3b) PR 본문 enrich (F_ITEMS + MATCH_RATE 있을 때)
+    # 5) PR 본문 enrich (F_ITEMS + MATCH_RATE 있을 때) — MERGED/unmerged 모두 실행
     local enrich_script="${SCRIPT_DIR}/../board/pr-body-enrich.sh"
     if [ -f "$enrich_script" ] && [ -n "$f_items" ]; then
       bash "$enrich_script" "$pr_num" "$sprint_num" "$f_items" "${match_rate:-N/A}" \
         >> "$DAEMON_LOG" 2>&1 || log "⚠️  sprint-${sprint_num}: pr-body-enrich 실패 (non-fatal)"
     fi
 
-    # 4) Squash merge (재시도 포함)
-    local merged=0
-    for attempt in $(seq 1 "$SPRINT_MAX_RETRY"); do
-      if gh pr merge "$pr_num" --repo "$repo" --squash --delete-branch >> "$DAEMON_LOG" 2>&1; then
-        merged=1; break
-      fi
-      log "⚠️  sprint-${sprint_num} — merge 시도 ${attempt}회 실패, backoff $((attempt*10))s"
-      sleep $((attempt * 10))
-    done
+    # 6) Squash merge (재시도 포함) — 이미 MERGED면 skip
     if [ "$merged" -ne 1 ]; then
-      sprint_sig_set "$sig" "STATUS" "FAILED"
-      sprint_sig_set "$sig" "ERROR_STEP" "merge"
-      sprint_sig_set "$sig" "ERROR_MSG" "squash merge failed after ${SPRINT_MAX_RETRY} attempts"
-      log "❌ sprint-${sprint_num} — FAIL: merge"
-      continue
+      for attempt in $(seq 1 "$SPRINT_MAX_RETRY"); do
+        if gh pr merge "$pr_num" --repo "$repo" --squash --delete-branch >> "$DAEMON_LOG" 2>&1; then
+          merged=1; break
+        fi
+        log "⚠️  sprint-${sprint_num} — merge 시도 ${attempt}회 실패, backoff $((attempt*10))s"
+        sleep $((attempt * 10))
+      done
+      if [ "$merged" -ne 1 ]; then
+        sprint_sig_set "$sig" "STATUS" "FAILED"
+        sprint_sig_set "$sig" "ERROR_STEP" "merge"
+        sprint_sig_set "$sig" "ERROR_MSG" "squash merge failed after ${SPRINT_MAX_RETRY} attempts"
+        log "❌ sprint-${sprint_num} — FAIL: merge"
+        continue
+      fi
     fi
 
     # master pull
@@ -1031,6 +1060,10 @@ case "${1:-}" in
   __debug-phase-signals)
     # 단위 테스트 진입점 — phase_signals 직접 호출 (C61 B-fix 검증)
     phase_signals
+    ;;
+  __debug-phase-sprint-signals)
+    # 단위 테스트 진입점 — phase_sprint_signals 직접 호출 (C64 hotfix 검증)
+    phase_sprint_signals
     ;;
   --enqueue)
     # 편의 기능: 큐 추가
