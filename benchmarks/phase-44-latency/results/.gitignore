@@ -1,0 +1,2 @@
+# Large raw k6 JSONL output — too large for git
+*.jsonl
