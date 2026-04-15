@@ -58,24 +58,18 @@ packages/fx-shaping/
     │   ├── ax-bd-progress.ts
     │   ├── persona-configs.ts
     │   └── persona-evals.ts
-    ├── schemas/        (16개 — core/shaping/schemas/* 복사)
-    │   ├── shaping.ts
-    │   ├── bmc.schema.ts
-    │   ├── bmc-comment.schema.ts
-    │   ├── bmc-history.schema.ts
-    │   ├── bmc-insight.schema.ts
-    │   ├── bmc-agent.schema.ts
-    │   ├── bd-progress.schema.ts
-    │   ├── commit-gate.schema.ts
-    │   ├── hitl-section.schema.ts
-    │   ├── idea-bmc-link.schema.ts
-    │   ├── persona-config-schema.ts
-    │   ├── persona-config.ts
-    │   ├── persona-eval-schema.ts
-    │   ├── persona-eval.ts
-    │   └── viability-checkpoint.schema.ts
+    ├── schemas/        (15개 — core/shaping/schemas/* 복사)
+    │   └── [모든 schema 파일 동일]
     ├── services/       (22개 — core/shaping/services/* 복사)
     │   └── [모든 service 파일 동일]
+    ├── agent/services/ (6개 — 내재화된 AI 의존 서비스)
+    │   └── agent-runner, claude-api-runner, execution-types, model-router, openrouter-runner, prompt-gateway, prompt-utils, skill-metrics
+    ├── harness/        (7개 — prototype 관련 services/schemas)
+    │   ├── services/: prototype-service, tech-review-service, prototype-review-service, prototype-job-service, audit-logger
+    │   └── schemas/: prototype-ext, prototype-build, prototype-job
+    ├── launch/services/ (2개 — poc-env-service, pipeline-state-machine)
+    ├── collection/services/ (1개 — idea-service, shaping이 BMC 연결에 사용)
+    └── discovery/schemas/ (1개 — discovery-pipeline type contract)
     └── __tests__/
         ├── health.test.ts
         └── shaping-routes.test.ts
@@ -141,9 +135,9 @@ export interface ShapingEnv {
 
 ## §7 Cross-domain Import 검증 (D1 체크리스트)
 
-- shaping → discovery: 없음 (shaping-review-service.ts 주석만)
 - shaping → offering: 없음
 - shaping → shared: BdArtifact, ArtifactListQuery, ExecuteSkillInput, SkillExecutionResult, TriggerShapingInput (허용 — contract)
+- shaping → discovery: `discovery/schemas/discovery-pipeline.ts` 포팅 (pipeline-state-machine이 DiscoveryPipelineStatus 타입 참조 — type contract 허용)
 
 ## §8 msa-lint 확인 사항
 
