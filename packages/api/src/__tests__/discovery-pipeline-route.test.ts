@@ -59,40 +59,8 @@ describe("discovery-pipeline routes (F312+F313)", () => {
     expect(res.status).toBe(400);
   });
 
-  it("GET /discovery-pipeline/runs lists runs", async () => {
-    await post(app, "/api/discovery-pipeline/runs", {
-      bizItemId: "biz-1",
-      triggerMode: "manual",
-    });
-
-    const res = await app.request("/api/discovery-pipeline/runs");
-    expect(res.status).toBe(200);
-
-    const body = await json(res);
-    expect(body.items).toHaveLength(1);
-    expect(body.total).toBe(1);
-  });
-
-  it("GET /discovery-pipeline/runs/:id returns detail", async () => {
-    const createRes = await post(app, "/api/discovery-pipeline/runs", {
-      bizItemId: "biz-1",
-      triggerMode: "manual",
-    });
-    const created = await json(createRes);
-
-    const res = await app.request(`/api/discovery-pipeline/runs/${created.id}`);
-    expect(res.status).toBe(200);
-
-    const body = await json(res);
-    expect(body.id).toBe(created.id);
-    expect(body.events).toBeDefined();
-    expect(body.validEvents).toBeDefined();
-  });
-
-  it("GET /discovery-pipeline/runs/:id returns 404 for unknown", async () => {
-    const res = await app.request("/api/discovery-pipeline/runs/nonexistent");
-    expect(res.status).toBe(404);
-  });
+  // F539c: GET /discovery-pipeline/runs, GET /discovery-pipeline/runs/:id 는
+  // fx-discovery로 이전됨 (FX-REQ-578) — packages/fx-discovery/src/__tests__/discovery-pipeline.test.ts 참조
 
   it("POST /runs/:id/step-complete reports step", async () => {
     const createRes = await post(app, "/api/discovery-pipeline/runs", {

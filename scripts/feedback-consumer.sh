@@ -3,7 +3,7 @@
 # Usage: ./scripts/feedback-consumer.sh [--once] [--interval 60]
 #
 # Environment variables:
-#   API_BASE       — Workers API URL (default: https://foundry-x-api.ktds-axbd.workers.dev)
+#   API_BASE       — Workers API URL (default: https://fx-gateway.ktds-axbd.workers.dev)
 #   WEBHOOK_SECRET — X-Webhook-Secret 헤더 인증 (JWT 불필요)
 #   REPO_DIR       — Foundry-X 리포 경로 (default: pwd)
 #
@@ -13,7 +13,7 @@
 set -euo pipefail
 
 INTERVAL="${INTERVAL:-60}"
-API_BASE="${API_BASE:-https://foundry-x-api.ktds-axbd.workers.dev}"
+API_BASE="${API_BASE:-https://fx-gateway.ktds-axbd.workers.dev}"
 REPO_DIR="${REPO_DIR:-$(pwd)}"
 ONCE=false
 

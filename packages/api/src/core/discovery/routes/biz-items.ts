@@ -93,35 +93,8 @@ bizItemsRoute.get("/biz-items/summary", async (c) => {
   return c.json({ items });
 });
 
-// ─── POST /biz-items — 사업 아이템 등록 ───
-
-bizItemsRoute.post("/biz-items", async (c) => {
-  const body = await c.req.json();
-  const parsed = CreateBizItemSchema.safeParse(body);
-  if (!parsed.success) {
-    return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
-  }
-
-  const orgId = c.get("orgId");
-  const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? "";
-  const service = new BizItemService(c.env.DB);
-  const item = await service.create(orgId, userId, parsed.data);
-
-  return c.json(item, 201);
-});
-
-// ─── GET /biz-items — 목록 조회 (org 필터) ───
-
-bizItemsRoute.get("/biz-items", async (c) => {
-  const orgId = c.get("orgId");
-  const status = c.req.query("status") || undefined;
-  const source = c.req.query("source") || undefined;
-
-  const service = new BizItemService(c.env.DB);
-  const items = await service.list(orgId, { status, source });
-
-  return c.json({ items });
-});
+// ─── POST /biz-items — 사업 아이템 등록 (F539c: fx-gateway → fx-discovery로 이전) ───
+// ─── GET /biz-items — 목록 조회 (F539c: fx-gateway → fx-discovery로 이전) ───
 
 // ─── GET /biz-items/portfolio-list — 전체 포트폴리오 목록 + coverage (F459, Sprint 224) ───
 // 주의: /biz-items/:id 라우트보다 먼저 등록 필수 (정적 경로 우선)
@@ -162,21 +135,7 @@ bizItemsRoute.get("/biz-items/by-artifact", async (c) => {
   }
 });
 
-// ─── GET /biz-items/:id — 상세 조회 ───
-
-bizItemsRoute.get("/biz-items/:id", async (c) => {
-  const orgId = c.get("orgId");
-  const id = c.req.param("id");
-
-  const service = new BizItemService(c.env.DB);
-  const item = await service.getById(orgId, id);
-
-  if (!item) {
-    return c.json({ error: "BIZ_ITEM_NOT_FOUND" }, 404);
-  }
-
-  return c.json(item);
-});
+// ─── GET /biz-items/:id — 상세 조회 (F539c: fx-gateway → fx-discovery로 이전) ───
 
 // ─── GET /biz-items/:id/shaping-artifacts — 형상화 아티팩트 존재 여부 (S229 P1) ───
 

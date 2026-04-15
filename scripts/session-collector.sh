@@ -10,7 +10,7 @@
 
 set -euo pipefail
 
-API_URL="${FOUNDRY_API_URL:-https://foundry-x-api.ktds-axbd.workers.dev}"
+API_URL="${FOUNDRY_API_URL:-https://fx-gateway.ktds-axbd.workers.dev}"
 API_TOKEN="${FOUNDRY_API_TOKEN:-}"
 
 if [ -z "$API_TOKEN" ]; then

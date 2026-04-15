@@ -29,6 +29,34 @@ app.all("/api/ax-bd/discovery-report/*", async (c) => {
   return c.env.DISCOVERY.fetch(c.req.raw);
 });
 
+// F539c Group B: discovery-stages (/:id/discovery-progress, /:id/discovery-stage)
+// 주의: /:id/discovery-* 패턴을 /:id 단순 패턴보다 먼저 등록
+app.get("/api/biz-items/:id/discovery-progress", async (c) => {
+  return c.env.DISCOVERY.fetch(c.req.raw);
+});
+app.post("/api/biz-items/:id/discovery-stage", async (c) => {
+  return c.env.DISCOVERY.fetch(c.req.raw);
+});
+
+// F539c Group A: biz-items 3 라우트
+app.get("/api/biz-items", async (c) => {
+  return c.env.DISCOVERY.fetch(c.req.raw);
+});
+app.post("/api/biz-items", async (c) => {
+  return c.env.DISCOVERY.fetch(c.req.raw);
+});
+app.get("/api/biz-items/:id", async (c) => {
+  return c.env.DISCOVERY.fetch(c.req.raw);
+});
+
+// F539c Group B: discovery-pipeline GET 2 라우트
+app.get("/api/discovery-pipeline/runs", async (c) => {
+  return c.env.DISCOVERY.fetch(c.req.raw);
+});
+app.get("/api/discovery-pipeline/runs/:id", async (c) => {
+  return c.env.DISCOVERY.fetch(c.req.raw);
+});
+
 // 그 외 모든 /api/* 요청은 MAIN_API로
 app.all("/api/*", async (c) => {
   return c.env.MAIN_API.fetch(c.req.raw);

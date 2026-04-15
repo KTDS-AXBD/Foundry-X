@@ -79,6 +79,11 @@ function seedDb(sql: string) {
   (env.DB as any).prepare(sql).run();
 }
 
+// F539c: POST /api/biz-items가 fx-discovery로 이전됨 → 직접 DB 삽입으로 대체
+function seedBizItem(id: string, title: string) {
+  seedDb(`INSERT OR IGNORE INTO biz_items (id, org_id, title, source, status, created_by, created_at, updated_at) VALUES ('${id}', 'org_test', '${title}', 'field', 'draft', 'test-user', datetime('now'), datetime('now'))`);
+}
+
 const BIZ_TABLES_SQL = `
   CREATE TABLE IF NOT EXISTS biz_items (
     id TEXT PRIMARY KEY,
@@ -138,32 +143,12 @@ describe("BizItems Routes", () => {
     authHeader = await createAuthHeaders();
   });
 
-  // ─── POST /api/biz-items ───
-
-  it("POST /api/biz-items: creates a new biz item", async () => {
-    const res = await req("POST", "/api/biz-items", {
-      headers: authHeader,
-      body: { title: "AI 프로세스 마이닝", description: "업무 자동 분석", source: "field" },
-    });
-
-    expect(res.status).toBe(201);
-    const data = (await res.json()) as any;
-    expect(data.title).toBe("AI 프로세스 마이닝");
-    expect(data.status).toBe("draft");
-    expect(data.orgId).toBe("org_test");
-    expect(data.classification).toBeNull();
-  });
-
-  it("POST /api/biz-items: validates required fields", async () => {
-    const res = await req("POST", "/api/biz-items", {
-      headers: authHeader,
-      body: { description: "no title" },
-    });
-
-    expect(res.status).toBe(400);
-  });
+  // ─── POST /api/biz-items: F539c 이전 (fx-discovery에서 테스트) ───
+  // POST /api/biz-items, GET /api/biz-items, GET /api/biz-items/:id 는
+  // fx-discovery로 이전됨 (FX-REQ-578) — packages/fx-discovery/src/__tests__/biz-items.test.ts 참조
 
   it("POST /api/biz-items: unauthorized returns 401", async () => {
+    // auth middleware는 라우트 핸들러 이전에 실행 → 404가 아닌 401 반환
     const res = await req("POST", "/api/biz-items", {
       body: { title: "Unauthorized Item" },
     });
@@ -171,64 +156,12 @@ describe("BizItems Routes", () => {
     expect(res.status).toBe(401);
   });
 
-  // ─── GET /api/biz-items ───
-
-  it("GET /api/biz-items: returns item list for org", async () => {
-    // Create 2 items
-    await req("POST", "/api/biz-items", { headers: authHeader, body: { title: "Item 1" } });
-    await req("POST", "/api/biz-items", { headers: authHeader, body: { title: "Item 2" } });
-
-    const res = await req("GET", "/api/biz-items", { headers: authHeader });
-
-    expect(res.status).toBe(200);
-    const data = (await res.json()) as any;
-    expect(data.items).toHaveLength(2);
-  });
-
-  it("GET /api/biz-items: filters by status", async () => {
-    await req("POST", "/api/biz-items", { headers: authHeader, body: { title: "Draft Item" } });
-
-    const res = await req("GET", "/api/biz-items?status=draft", { headers: authHeader });
-
-    expect(res.status).toBe(200);
-    const data = (await res.json()) as any;
-    expect(data.items.length).toBeGreaterThanOrEqual(1);
-    expect(data.items.every((i: any) => i.status === "draft")).toBe(true);
-  });
-
-  // ─── GET /api/biz-items/:id ───
-
-  it("GET /api/biz-items/:id: returns item detail", async () => {
-    const createRes = await req("POST", "/api/biz-items", {
-      headers: authHeader,
-      body: { title: "Detail Item" },
-    });
-    const { id } = (await createRes.json()) as any;
-
-    const res = await req("GET", `/api/biz-items/${id}`, { headers: authHeader });
-
-    expect(res.status).toBe(200);
-    const data = (await res.json()) as any;
-    expect(data.id).toBe(id);
-    expect(data.title).toBe("Detail Item");
-  });
-
-  it("GET /api/biz-items/:id: returns 404 for non-existent", async () => {
-    const res = await req("GET", "/api/biz-items/nonexistent", { headers: authHeader });
-
-    expect(res.status).toBe(404);
-    const data = (await res.json()) as any;
-    expect(data.error).toBe("BIZ_ITEM_NOT_FOUND");
-  });
-
   // ─── POST /api/biz-items/:id/classify ───
 
   it("POST /api/biz-items/:id/classify: classifies item", async () => {
-    const createRes = await req("POST", "/api/biz-items", {
-      headers: authHeader,
-      body: { title: "XX사 플랫폼 전환" },
-    });
-    const { id } = (await createRes.json()) as any;
+    // F539c: POST /api/biz-items 이전됨 → 직접 DB 삽입
+    const id = "classify-test-1";
+    seedBizItem(id, "XX사 플랫폼 전환");
 
     const res = await req("POST", `/api/biz-items/${id}/classify`, {
       headers: authHeader,
@@ -253,11 +186,9 @@ describe("BizItems Routes", () => {
   });
 
   it("POST /api/biz-items/:id/classify: idempotent — returns cached result on re-classify", async () => {
-    const createRes = await req("POST", "/api/biz-items", {
-      headers: authHeader,
-      body: { title: "Already Classified" },
-    });
-    const { id } = (await createRes.json()) as any;
+    // F539c: POST /api/biz-items 이전됨 → 직접 DB 삽입
+    const id = "classify-idempotent-1";
+    seedBizItem(id, "Already Classified");
 
     // First classify
     const first = await req("POST", `/api/biz-items/${id}/classify`, { headers: authHeader, body: {} });
@@ -275,12 +206,9 @@ describe("BizItems Routes", () => {
   // ─── POST /api/biz-items/:id/evaluate ───
 
   it("POST /api/biz-items/:id/evaluate: evaluates classified item", async () => {
-    // Create + classify
-    const createRes = await req("POST", "/api/biz-items", {
-      headers: authHeader,
-      body: { title: "Evaluate Me" },
-    });
-    const { id } = (await createRes.json()) as any;
+    // F539c: POST /api/biz-items 이전됨 → 직접 DB 삽입 후 classify
+    const id = "evaluate-test-1";
+    seedBizItem(id, "Evaluate Me");
     await req("POST", `/api/biz-items/${id}/classify`, { headers: authHeader, body: {} });
 
     // Evaluate
@@ -297,11 +225,9 @@ describe("BizItems Routes", () => {
   });
 
   it("POST /api/biz-items/:id/evaluate: returns 400 if not classified", async () => {
-    const createRes = await req("POST", "/api/biz-items", {
-      headers: authHeader,
-      body: { title: "Not Classified" },
-    });
-    const { id } = (await createRes.json()) as any;
+    // F539c: POST /api/biz-items 이전됨 → 직접 DB 삽입
+    const id = "evaluate-unclassified-1";
+    seedBizItem(id, "Not Classified");
 
     const res = await req("POST", `/api/biz-items/${id}/evaluate`, {
       headers: authHeader,
@@ -316,12 +242,9 @@ describe("BizItems Routes", () => {
   // ─── GET /api/biz-items/:id/evaluation ───
 
   it("GET /api/biz-items/:id/evaluation: returns evaluation result", async () => {
-    // Create + classify + evaluate
-    const createRes = await req("POST", "/api/biz-items", {
-      headers: authHeader,
-      body: { title: "Full Flow" },
-    });
-    const { id } = (await createRes.json()) as any;
+    // F539c: POST /api/biz-items 이전됨 → 직접 DB 삽입 후 classify+evaluate
+    const id = "evaluation-full-1";
+    seedBizItem(id, "Full Flow");
     await req("POST", `/api/biz-items/${id}/classify`, { headers: authHeader, body: {} });
     await req("POST", `/api/biz-items/${id}/evaluate`, { headers: authHeader, body: {} });
 
@@ -335,11 +258,9 @@ describe("BizItems Routes", () => {
   });
 
   it("GET /api/biz-items/:id/evaluation: returns 404 if no evaluation", async () => {
-    const createRes = await req("POST", "/api/biz-items", {
-      headers: authHeader,
-      body: { title: "No Eval" },
-    });
-    const { id } = (await createRes.json()) as any;
+    // F539c: POST /api/biz-items 이전됨 → 직접 DB 삽입
+    const id = "evaluation-empty-1";
+    seedBizItem(id, "No Eval");
 
     const res = await req("GET", `/api/biz-items/${id}/evaluation`, { headers: authHeader });
 

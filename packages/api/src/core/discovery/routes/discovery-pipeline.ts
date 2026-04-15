@@ -9,7 +9,6 @@ import { DiscoveryPipelineService } from "../services/discovery-pipeline-service
 import { ShapingOrchestratorService } from "../../shaping/services/shaping-orchestrator-service.js";
 import {
   createPipelineRunSchema,
-  listPipelineRunsSchema,
   stepCompleteSchema,
   stepFailedSchema,
   stepActionSchema,
@@ -48,28 +47,8 @@ discoveryPipelineRoute.post("/discovery-pipeline/runs", async (c) => {
   return c.json(detail, 201);
 });
 
-// 2) GET /discovery-pipeline/runs — 목록 조회
-discoveryPipelineRoute.get("/discovery-pipeline/runs", async (c) => {
-  const parsed = listPipelineRunsSchema.safeParse(c.req.query());
-  if (!parsed.success) {
-    return c.json({ error: "Invalid query", details: parsed.error.flatten() }, 400);
-  }
-
-  const svc = new DiscoveryPipelineService(c.env.DB);
-  const result = await svc.listRuns(c.get("orgId"), parsed.data);
-  return c.json(result);
-});
-
-// 3) GET /discovery-pipeline/runs/:id — 상세 조회
-discoveryPipelineRoute.get("/discovery-pipeline/runs/:id", async (c) => {
-  const svc = new DiscoveryPipelineService(c.env.DB);
-  const detail = await svc.getRun(c.req.param("id"), c.get("orgId"));
-
-  if (!detail) {
-    return c.json({ error: "Pipeline run not found" }, 404);
-  }
-  return c.json(detail);
-});
+// 2) GET /discovery-pipeline/runs — F539c: fx-gateway → fx-discovery로 이전
+// GET /discovery-pipeline/runs/:id — F539c: fx-gateway → fx-discovery로 이전
 
 // 4) POST /discovery-pipeline/runs/:id/step-complete — 단계 완료 보고
 discoveryPipelineRoute.post("/discovery-pipeline/runs/:id/step-complete", async (c) => {

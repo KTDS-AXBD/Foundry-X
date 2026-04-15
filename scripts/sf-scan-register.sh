@@ -3,12 +3,12 @@
 # Usage: ./scripts/sf-scan-register.sh [--api-url URL] [--token TOKEN]
 #
 # 환경변수:
-#   FOUNDRY_X_API_URL — API 기본 URL (기본: https://foundry-x-api.ktds-axbd.workers.dev/api)
+#   FOUNDRY_X_API_URL — API 기본 URL (기본: https://fx-gateway.ktds-axbd.workers.dev/api)
 #   FOUNDRY_X_TOKEN   — 인증 JWT 토큰
 
 set -euo pipefail
 
-API_URL="${FOUNDRY_X_API_URL:-https://foundry-x-api.ktds-axbd.workers.dev/api}"
+API_URL="${FOUNDRY_X_API_URL:-https://fx-gateway.ktds-axbd.workers.dev/api}"
 TOKEN="${FOUNDRY_X_TOKEN:-}"
 
 # Parse arguments
