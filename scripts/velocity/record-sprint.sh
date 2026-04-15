@@ -22,11 +22,29 @@ read_ctx() {
   (grep "^${key}=" "$CTX" 2>/dev/null || true) | cut -d= -f2- | head -1
 }
 
+# Signal 파일에서 key=value 읽기 — .sprint-context 부재 시 fallback
+SIGNAL_DIR="${SIGNAL_DIR:-/tmp/sprint-signals}"
+SIGNAL_FILE=""
+for candidate in "${SIGNAL_DIR}"/*-"${SPRINT_NUM}".signal; do
+  [ -f "$candidate" ] && SIGNAL_FILE="$candidate" && break
+done
+
+read_signal() {
+  local key="$1"
+  [ -f "$SIGNAL_FILE" ] || { echo ""; return; }
+  (grep "^${key}=" "$SIGNAL_FILE" 2>/dev/null || true) | cut -d= -f2- | head -1
+}
+
 F_ITEMS=$(read_ctx F_ITEMS)
+[ -z "$F_ITEMS" ] && F_ITEMS=$(read_signal F_ITEMS)
 MATCH_RATE=$(read_ctx MATCH_RATE)
+[ -z "$MATCH_RATE" ] && MATCH_RATE=$(read_signal MATCH_RATE)
 TEST_RESULT=$(read_ctx TEST_RESULT)
+[ -z "$TEST_RESULT" ] && TEST_RESULT=$(read_signal TEST_RESULT)
 [ -z "$TEST_RESULT" ] && TEST_RESULT="unknown"
 CREATED=$(read_ctx CREATED)
+# Signal의 TIMESTAMP(session-end 실행 시각)을 CREATED fallback으로 사용
+[ -z "$CREATED" ] && CREATED=$(read_signal TIMESTAMP)
 [ -z "$CREATED" ] && CREATED=$(date -Iseconds)
 
 # duration_minutes: Sprint 브랜치 첫 커밋 ~ 마지막 커밋 간 경과
