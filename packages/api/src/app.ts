@@ -216,6 +216,11 @@ app.use("/api/feedback-queue/*", async (c, next) => {
 });
 app.route("/api", feedbackQueueRoute);
 
+// F546 Sprint 298 hotfix: fx-decode-bridge public 접근 — 대표 보고 데모용
+// `/api/decode/*`는 authMiddleware 이전에 mount하여 공개 read-only 접근 허용.
+// 읽기 전용 + Decode-X로 단방향 프록시라 CSRF/변조 리스크 낮음.
+app.route("/api", decodeBridgeRoute);
+
 // Protected API routes — JWT required + tenant isolation
 app.use("/api/*", authMiddleware);
 app.use("/api/*", tenantGuard);
@@ -427,8 +432,7 @@ app.route("/api", billingRoute);
 // Sprint 213: 파일 업로드 + 문서 파싱 (F441, F442)
 app.route("/api", filesRoute);
 
-// Sprint 298: fx-ai-foundry-os Decode-X 연동 (F546)
-app.route("/api", decodeBridgeRoute);
+// Sprint 298: fx-ai-foundry-os Decode-X 연동 (F546) — public mount는 line 220 이전으로 이동됨
 
 // Sprint 261: Work Observability Walking Skeleton (F509)
 app.route("/api", workRoute);
