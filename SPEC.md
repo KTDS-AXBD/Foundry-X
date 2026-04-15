@@ -57,7 +57,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 > ```
 > wc -l SPEC.md && find packages/api/src/db/migrations/*.sql | sort | tail -1
 > ```
-> **마지막 실측** (Sprint 293, 2026-04-15): ~11 routes, ~30 services, ~14 schemas, D1 0137, 10 packages — Phase 43 완료 + Phase 44 진행 (F542/F543/F544 ✅ S290~S292, F538 ✅ 부분 S293 — 3/10 Discovery routes fx-discovery 이전 + 배포 파이프라인 5건 해소)
+> **마지막 실측** (Sprint 297, 2026-04-15): ~11 routes, ~31 services, ~14 schemas, D1 0137, 11 packages — Phase 43 완료 + Phase 44 대부분 (F538 ✅부분, F539a/b/c ✅, F540 ✅부분 S297 fx-shaping 분리, F542/F543/F544 ✅). fx-gateway + fx-discovery + fx-shaping 3 MSA Workers live. F541 Offering 잔여
 
 ## §3 Phase 진행 현황
 
