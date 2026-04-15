@@ -33,11 +33,7 @@ import {
   bizItemsRoute,
   discoveryPipelineRoute,
   discoveryStagesRoute, discoveryShapePipelineRoute, discoveryStageRunnerRoute,
-  // shaping (14 routes)
-  shapingRoute, axBdBmcRoute, axBdAgentRoute, axBdCommentsRoute,
-  axBdHistoryRoute, axBdLinksRoute, axBdViabilityRoute,
-  axBdPrototypesRoute, axBdSkillsRoute, axBdPersonaEvalRoute,
-  axBdProgressRoute, personaConfigsRoute, personaEvalsRoute,
+  // shaping — F540: 전체 fx-shaping Worker로 이전 (routes 제거됨)
   // offering (12 routes — Sprint 216: businessPlanExportRoute 추가)
   offeringsRoute, offeringSectionsRoute, offeringExportRoute,
   offeringValidateRoute, offeringMetricsRoute, offeringPrototypeRoute,
@@ -280,17 +276,13 @@ app.route("/api", collectionRoute);
 // Sprint 59: Methodology registry + router (auth + tenant required)
 app.route("/api", methodologyRoute);
 
-// Sprint 61: AX BD Ideation — BMC + Ideas (auth + tenant required)
-app.route("/api", axBdBmcRoute);
+// Sprint 61: AX BD Ideation — Ideas (auth + tenant required)
+// axBdBmcRoute → F540: fx-shaping
 app.route("/api", axBdIdeasRoute);
 
-// Sprint 62: BMCAgent + Version History (auth + tenant required)
-app.route("/api", axBdAgentRoute);
-app.route("/api", axBdHistoryRoute);
+// Sprint 62: BMCAgent + Version History → F540: fx-shaping으로 이전
 
-// Sprint 64: AX BD — 아이디어-BMC 연결 + BMC 댓글 (auth + tenant required)
-app.route("/api", axBdLinksRoute);
-app.route("/api", axBdCommentsRoute);
+// Sprint 64: AX BD — 아이디어-BMC 연결 + BMC 댓글 → F540: fx-shaping으로 이전
 
 // Sprint 65: AX BD — 인사이트 + 평가관리 (auth + tenant required)
 app.route("/api", axBdInsightsRoute);
@@ -299,11 +291,9 @@ app.route("/api", axBdEvaluationsRoute);
 // Sprint 66: Discovery-X API 인터페이스 계약 (auth + tenant required)
 app.route("/api", axBdDiscoveryRoute);
 
-// Sprint 67: F209 AI Foundry 흡수 — Prototype + PoC + TechReview (auth + tenant required)
-app.route("/api", axBdPrototypesRoute);
+// Sprint 67: F209 AI Foundry 흡수 — Prototype + PoC + TechReview → F540: fx-shaping으로 이전
 
-// Sprint 69: F213 사업성 체크포인트 + Commit Gate (auth + tenant required)
-app.route("/api", axBdViabilityRoute);
+// Sprint 69: F213 사업성 체크포인트 + Commit Gate → F540: fx-shaping으로 이전
 
 // Sprint 76: F221 Agent-as-Code + F223 Doc Sharding (auth + tenant required)
 app.route("/api", agentDefinitionRoute);
@@ -338,11 +328,9 @@ app.route("/api", adminRoute);
 // Sprint 88: Org shared data + NPS (F253, F254)
 app.route("/api", orgSharedRoute);
 app.route("/api", npsRoute);
-// Sprint 90: BD 스킬 실행 + 산출물 (F260, F261)
-app.route("/api", axBdSkillsRoute);
+// Sprint 90: BD 스킬 실행 → F540: fx-shaping 이전 / 산출물 (F261)
 app.route("/api", axBdArtifactsRoute);
-// Sprint 91: BD 프로세스 진행 추적 (F262)
-app.route("/api", axBdProgressRoute);
+// Sprint 91: BD 프로세스 진행 추적 → F540: fx-shaping 이전 / KG (F262)
 app.route("/api", axBdKgRoute);
 // Sprint 95: Help Agent 챗봇 (F264)
 app.route("/api", helpAgentRoute);
@@ -358,8 +346,7 @@ app.route("/api", derivedEngineRoute);
 app.route("/api", capturedEngineRoute);
 // Sprint 107: BD ROI 벤치마크 (F278)
 app.route("/api", roiBenchmarkRoute);
-// Sprint 112: BD 형상화 Phase F (F286, F287)
-app.route("/api", shapingRoute);
+// Sprint 112: BD 형상화 Phase F → F540: fx-shaping으로 이전
 // Sprint 116: 2-tier 검증 + 미팅 관리 (F294, F295)
 app.route("/api", validationTierRoute);
 app.route("/api", validationMeetingsRoute);
@@ -388,13 +375,10 @@ app.route("/api", orchestrationRoute);
 // Sprint 151: Agent Adapter Registry (F336, Phase 14)
 app.route("/api", agentAdaptersRoute);
 
-// Sprint 154: Discovery UI/UX v2 (F342)
-app.route("/api", personaConfigsRoute);
-app.route("/api", personaEvalsRoute);
+// Sprint 154: Discovery UI/UX v2 (F342) — personaConfigsRoute/personaEvalsRoute → F540: fx-shaping
 // discoveryReportsRoute → fx-discovery (F538)
 app.route("/api", teamReviewsRoute);
-// Sprint 155: 멀티 페르소나 평가 (F344, F345, Phase 15)
-app.route("/api", axBdPersonaEvalRoute);
+// Sprint 155: 멀티 페르소나 평가 → F540: fx-shaping으로 이전
 // Sprint 156: discoveryReportRoute → fx-discovery (F538)
 // Sprint 159: Prototype Auto-Gen (F353, F354, Phase 16)
 app.route("/api", prototypeJobsRoute);

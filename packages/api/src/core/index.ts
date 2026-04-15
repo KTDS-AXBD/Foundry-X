@@ -10,13 +10,7 @@ export {
   discoveryStageRunnerRoute,
 } from "./discovery/index.js";
 
-// Shaping (S3 형상화) — 14 routes
-export {
-  shapingRoute, axBdBmcRoute, axBdAgentRoute, axBdCommentsRoute,
-  axBdHistoryRoute, axBdLinksRoute, axBdViabilityRoute,
-  axBdPrototypesRoute, axBdSkillsRoute, axBdPersonaEvalRoute,
-  axBdProgressRoute, personaConfigsRoute, personaEvalsRoute,
-} from "./shaping/index.js";
+// Shaping — F540: fx-shaping Worker로 이전 (exports 제거됨)
 
 // Offering Pipeline — 12 routes (Sprint 216: businessPlanExportRoute 추가)
 export {

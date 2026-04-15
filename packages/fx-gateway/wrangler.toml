@@ -17,6 +17,11 @@ service = "foundry-x-api"
 binding = "DISCOVERY"
 service = "fx-discovery"
 
+# F540: Service Binding — Shaping Worker
+[[services]]
+binding = "SHAPING"
+service = "fx-shaping"
+
 # Local development
 [env.dev]
 name = "fx-gateway-dev"
@@ -28,3 +33,7 @@ service = "foundry-x-api-dev"
 [[env.dev.services]]
 binding = "DISCOVERY"
 service = "fx-discovery-dev"
+
+[[env.dev.services]]
+binding = "SHAPING"
+service = "fx-shaping-dev"

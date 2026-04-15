@@ -4,4 +4,6 @@ export interface GatewayEnv {
   MAIN_API: Fetcher;
   /** Service Binding — fx-discovery Worker (F523: 활성화 완료) */
   DISCOVERY: Fetcher;
+  /** Service Binding — fx-shaping Worker (F540: Shaping 도메인 분리) */
+  SHAPING: Fetcher;
 }
