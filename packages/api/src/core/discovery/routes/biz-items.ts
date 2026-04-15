@@ -58,6 +58,9 @@ import { DiscoveryStageService } from "../services/discovery-stage-service.js";
 export const bizItemsRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 
 // ─── GET /biz-items/summary — 대시보드 ToDo 요약 (F323) ───
+// NOTE: Hotfix(2026-04-16)로 동일 핸들러를 packages/fx-discovery/src/routes/biz-items.ts 로 이전.
+// fx-gateway가 `/api/biz-items/:id` 패턴을 DISCOVERY로 라우팅하므로 이 코드는 현재 호출되지 않는 dead code.
+// Sprint 299 이후 cleanup 대상 (F541 Offering 분리 완료 후 packages/api 슬리밍과 함께).
 
 const STAGE_TO_NUMBER: Record<string, number> = {
   REGISTERED: 1,
