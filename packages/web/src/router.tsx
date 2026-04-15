@@ -29,6 +29,11 @@ export const router = createBrowserRouter([
   // F518: 공개 라우트 (인증 불필요)
   { path: "roadmap", lazy: () => import("@/routes/roadmap"), hydrateFallbackElement: <Spinner /> },
   { path: "changelog", lazy: () => import("@/routes/changelog"), hydrateFallbackElement: <Spinner /> },
+  // F545~F549: AI Foundry OS — 공개 (대표 보고 데모, 인증 불필요)
+  { path: "ai-foundry-os", lazy: () => import("@/routes/ai-foundry-os/index"), hydrateFallbackElement: <Spinner /> },
+  { path: "ai-foundry-os/demo/lpon", lazy: () => import("@/routes/ai-foundry-os/demo/lpon"), hydrateFallbackElement: <Spinner /> },
+  { path: "ai-foundry-os/harness", lazy: () => import("@/routes/ai-foundry-os/harness"), hydrateFallbackElement: <Spinner /> },
+  { path: "ai-foundry-os/ontology", lazy: () => import("@/routes/ai-foundry-os/ontology"), hydrateFallbackElement: <Spinner /> },
   {
     element: <ProtectedRoute />,
     hydrateFallbackElement: <Spinner />,

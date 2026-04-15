@@ -25,6 +25,8 @@ import {
 import {
   // files (1 route) — F441+F442, Sprint 213
   filesRoute,
+  // decode-bridge (8 routes) — F546, Sprint 298
+  decodeBridgeRoute,
   // collection (5 routes) — F401, Sprint 188
   axBdIdeasRoute, collectionRoute, ideaPortalWebhookRoute,
   irProposalsRoute, axBdInsightsRoute,
@@ -424,6 +426,9 @@ app.route("/api", billingRoute);
 
 // Sprint 213: 파일 업로드 + 문서 파싱 (F441, F442)
 app.route("/api", filesRoute);
+
+// Sprint 298: fx-ai-foundry-os Decode-X 연동 (F546)
+app.route("/api", decodeBridgeRoute);
 
 // Sprint 261: Work Observability Walking Skeleton (F509)
 app.route("/api", workRoute);
