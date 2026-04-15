@@ -5,7 +5,22 @@
 **날짜:** 2026-04-15
 **작성자:** AX BD팀 (Sinclair)
 **상태:** ✅ 착수 준비 완료 (Score 85/100, 2026-04-15)
-**참조:** `docs/specs/AI_Foundry_OS_DeepDive_v0.3.html`, Decode-X 레포 (https://github.com/KTDS-AXBD/Decode-X)
+**참조:** `docs/specs/AI_Foundry_OS_DeepDive_v0.3.html`, **Recon-X 레포** (https://github.com/KTDS-AXBD/Decode-X — 내부 리네이밍: Decode-X → Recon-X, "AI Foundry"는 상위 포털명으로 승격)
+
+---
+
+## 0. 착수 전 선행 확보 (Sinclair 직접, H+2 마감)
+
+> 2026-04-15 Recon-X 레포 스캔 결과 확정된 정보를 기반으로 한 체크리스트.
+
+- [ ] `wrangler whoami` 실행 — Recon-X와 Foundry-X 계정 동일 여부 확인 (ktds-axbd가 같으면 Service Binding 가능, 다르면 fetch+secret 경로)
+- [ ] Recon-X 레포 clone 후 `cd services/svc-extraction && wrangler deployments list` — prod URL 실측 (예: `svc-extraction.ktds-axbd.workers.dev`)
+- [ ] `wrangler secret list` (svc-extraction 경로) — `INTERNAL_API_SECRET` 존재 확인. 값이 Foundry-X `.dev.vars`에 미리 주입 필요 (서비스 바인딩 없을 경우)
+- [ ] svc-mcp-server 엔드포인트 확인 — port 8712 / prod URL. MCP 프로토콜(stdio 또는 SSE) 파악
+- [ ] Recon-X `docs/AI_Foundry_PRD_TDS_v0.7.4.docx` + `docs/AI_Foundry_Identity.md` 접근 — 용어 최신화(Decode-X → Recon-X 반영 범위 확인)
+- [ ] 파일럿 도메인 확인: 퇴직연금 **+ 온누리상품권** 둘 중 Type 1 데모용 1개 선정 (현재 PRD는 퇴직연금 고정)
+
+**해소 시간:** H+2 (2026-04-15 17:00). 미해소 시 F546 mock-only 경로로 축소 + F549 Neo4j mock 데이터 사용.
 
 ---
 
