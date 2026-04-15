@@ -1,0 +1,41 @@
+name = "fx-shaping"
+account_id = "b6c06059b413892a92f150e5ca496236"
+main = "src/index.ts"
+compatibility_date = "2026-03-17"
+compatibility_flags = ["nodejs_compat"]
+
+# F540: D1 바인딩 (동일 DB 공유, Phase 44에서 독립 DB로 전환 예정)
+[[d1_databases]]
+binding = "DB"
+database_name = "foundry-x-db"
+database_id = "6338688e-b050-4835-98a2-7101f9215c76"
+
+# F540: KV — rate limiting (ax-bd-agent, ax-bd-persona-eval)
+[[kv_namespaces]]
+binding = "CACHE"
+id = "030b30d47a98485ea3af95b3347163d6"
+
+# F540: R2 — prototype HTML 서빙 (ax-bd-prototypes)
+[[r2_buckets]]
+binding = "FILES_BUCKET"
+bucket_name = "foundry-x-files"
+
+[vars]
+ENVIRONMENT = "production"
+
+# Local development
+[env.dev]
+name = "fx-shaping-dev"
+
+[[env.dev.d1_databases]]
+binding = "DB"
+database_name = "foundry-x-db"
+database_id = "6338688e-b050-4835-98a2-7101f9215c76"
+
+[[env.dev.kv_namespaces]]
+binding = "CACHE"
+id = "030b30d47a98485ea3af95b3347163d6"
+
+[[env.dev.r2_buckets]]
+binding = "FILES_BUCKET"
+bucket_name = "foundry-x-files-dev"

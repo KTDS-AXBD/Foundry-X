@@ -1,6 +1,7 @@
 // fx-gateway app (F523: FX-REQ-551 — DISCOVERY 하드와이어 활성화)
 // F538: ax-bd/discovery-report* 라우트도 fx-discovery로 이전
 // F539b: CORS 미들웨어 추가 — 브라우저 직접 접점 (FX-REQ-577)
+// F540: ax-bd/*, shaping/* → fx-shaping Worker
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import type { GatewayEnv } from "./env.js";
@@ -55,6 +56,25 @@ app.get("/api/discovery-pipeline/runs", async (c) => {
 });
 app.get("/api/discovery-pipeline/runs/:id", async (c) => {
   return c.env.DISCOVERY.fetch(c.req.raw);
+});
+
+// F540: /api/shaping/* → fx-shaping Worker
+app.all("/api/shaping/*", async (c) => {
+  return c.env.SHAPING.fetch(c.req.raw);
+});
+
+// F540: /api/ax-bd/* → fx-shaping Worker
+// 주의: /api/ax-bd/discovery-report* 는 위에서 DISCOVERY로 먼저 처리됨
+app.all("/api/ax-bd/*", async (c) => {
+  return c.env.SHAPING.fetch(c.req.raw);
+});
+
+// F540: /api/ideas/:id/bmc — shaping이 소유 (BMC 생성 연동)
+app.all("/api/ideas/:id/bmc", async (c) => {
+  return c.env.SHAPING.fetch(c.req.raw);
+});
+app.all("/api/ideas/:id/bmc/*", async (c) => {
+  return c.env.SHAPING.fetch(c.req.raw);
 });
 
 // 그 외 모든 /api/* 요청은 MAIN_API로
