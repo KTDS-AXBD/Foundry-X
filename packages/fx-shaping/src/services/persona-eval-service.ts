@@ -238,7 +238,7 @@ async function evaluateWithClaude(
   config: PersonaConfigInput,
   briefing: string,
   apiKey: string,
-  itemId: string,
+  _itemId: string,
 ): Promise<{ scores: Record<string, number>; verdict: string; summary: string | null; concerns: string[] }> {
   const persona = BIZ_PERSONAS.find((p) => p.id === config.personaId);
   if (!persona) {

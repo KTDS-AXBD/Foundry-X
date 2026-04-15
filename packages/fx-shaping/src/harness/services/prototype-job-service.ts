@@ -1,6 +1,6 @@
 // ─── F353: Prototype Job Service (Sprint 159) ───
 
-import { JOB_STATUSES } from "../schemas/prototype-job.js";
+import type { JOB_STATUSES } from "../schemas/prototype-job.js";
 
 type JobStatus = (typeof JOB_STATUSES)[number];
 

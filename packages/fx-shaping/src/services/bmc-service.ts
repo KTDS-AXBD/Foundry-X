@@ -194,7 +194,7 @@ export class BmcService {
     return (result.meta?.changes ?? 0) > 0;
   }
 
-  async stage(orgId: string, id: string, userId: string): Promise<{ staged: true; bmcId: string } | null> {
+  async stage(orgId: string, id: string, _userId: string): Promise<{ staged: true; bmcId: string } | null> {
     const existing = await this.getById(orgId, id);
     if (!existing) return null;
 

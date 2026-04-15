@@ -91,7 +91,7 @@ export class BmcInsightService {
     } catch (err: unknown) {
       clearTimeout(timeout);
       if (err instanceof Error && err.name === "AbortError") {
-        throw new Error("LLM_TIMEOUT");
+        throw new Error("LLM_TIMEOUT", { cause: err });
       }
       throw err;
     }

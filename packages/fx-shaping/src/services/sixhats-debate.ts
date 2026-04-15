@@ -204,7 +204,7 @@ export class SixHatsDebateService {
     const lines = blueHatContent.split("\n");
     const issues: string[] = [];
     for (const line of lines) {
-      const trimmed = line.replace(/^[\s\-\*\d.]+/, "").trim();
+      const trimmed = line.replace(/^[\s\-*\d.]+/, "").trim();
       if (trimmed.length > 10 && trimmed.length < 500) {
         issues.push(trimmed);
       }
