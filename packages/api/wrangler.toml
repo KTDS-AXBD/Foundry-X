@@ -63,6 +63,17 @@ crons = ["0 */6 * * *"]
 ## binding = "AIF_WORKER"
 ## service = "ai-foundry-svc-gateway"
 
+# F546 Sprint 298: fx-decode-bridge — Decode-X Service Bindings
+# svc-extraction (구조 추출 엔진) + svc-ontology (Neo4j KG)
+# 동일 계정(ktds-axbd) 확인 완료 (2026-04-16)
+[[services]]
+binding = "SVC_EXTRACTION"
+service = "svc-extraction"
+
+[[services]]
+binding = "SVC_ONTOLOGY"
+service = "svc-ontology"
+
 # F441: R2 File Storage (Sprint 213)
 [[r2_buckets]]
 binding = "FILES_BUCKET"

@@ -51,3 +51,6 @@ export {
 
 // Files: 업로드 + 파싱 (2 routes) — F441+F442, Sprint 213
 export { filesRoute } from "./files/index.js";
+
+// Decode-Bridge: fx-ai-foundry-os Decode-X 연동 (8 routes) — F546, Sprint 298
+export { decodeBridgeRoute } from "./decode-bridge/routes/index.js";

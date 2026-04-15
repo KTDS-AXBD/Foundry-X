@@ -34,4 +34,10 @@ export type Env = {
   MARKER_PROJECT_ID?: string;
   // F542 Sprint 290: MetaAgent 모델 전환 (haiku-4-5|sonnet-4-6|both)
   META_AGENT_MODEL?: string;
+  // F546 Sprint 298: fx-decode-bridge — Decode-X (svc-extraction/svc-ontology) 연동
+  SVC_EXTRACTION?: Fetcher;
+  SVC_ONTOLOGY?: Fetcher;
+  DECODE_X_INTERNAL_SECRET?: string;
+  DECODE_X_EXTRACTION_URL?: string;
+  DECODE_X_ONTOLOGY_URL?: string;
 };
