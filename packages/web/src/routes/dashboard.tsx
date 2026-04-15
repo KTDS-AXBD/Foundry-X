@@ -85,6 +85,8 @@ function ProcessPipeline({ stats }: { stats: PipelineStats | null }) {
             <div key={stage.stage} className="flex items-center">
               <Link
                 to={stage.paths[0]}
+                aria-label={`${stage.label} 단계 진행 중 (${count}건)`}
+                title={`${stage.label} 단계 진행 중 (${count}건)`}
                 className="group flex flex-col items-center rounded-lg p-2 transition-colors hover:bg-muted"
               >
                 <div
@@ -93,10 +95,10 @@ function ProcessPipeline({ stats }: { stats: PipelineStats | null }) {
                     stageColors[i],
                   )}
                 >
-                  {count}
+                  {count}건
                 </div>
                 <span className="mt-1.5 text-[11px] font-medium text-muted-foreground group-hover:text-foreground">
-                  {stage.stage}. {stage.label}
+                  {stage.stage}단계 · {stage.label}
                 </span>
               </Link>
               {i < STAGES.length - 1 && (
