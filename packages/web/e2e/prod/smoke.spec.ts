@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 const API_URL =
   process.env.PROD_API_URL ||
-  "https://foundry-x-api.ktds-axbd.workers.dev";
+  "https://fx-gateway.ktds-axbd.workers.dev";
 
 test.describe("Production Smoke", () => {
   /**

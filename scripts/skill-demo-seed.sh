@@ -3,7 +3,7 @@
 # Usage: ./scripts/skill-demo-seed.sh [API_URL] [TOKEN]
 set -euo pipefail
 
-API_URL="${1:-https://foundry-x-api.ktds-axbd.workers.dev/api}"
+API_URL="${1:-https://fx-gateway.ktds-axbd.workers.dev/api}"
 TOKEN="${2:-${FOUNDRY_X_TOKEN:-}}"
 
 if [ -z "$TOKEN" ]; then

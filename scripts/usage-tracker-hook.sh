@@ -6,11 +6,11 @@
 #   { "type": "command", "event": "PostToolUse", "command": "./scripts/usage-tracker-hook.sh", "matcher": { "tool_name": "Skill" } }
 #
 # 환경변수:
-#   FOUNDRY_X_API_URL — API 베이스 URL (기본: https://foundry-x-api.ktds-axbd.workers.dev/api)
+#   FOUNDRY_X_API_URL — API 베이스 URL (기본: https://fx-gateway.ktds-axbd.workers.dev/api)
 #   FOUNDRY_X_TOKEN   — JWT Bearer 토큰 (없으면 조용히 무시)
 set -euo pipefail
 
-API_URL="${FOUNDRY_X_API_URL:-https://foundry-x-api.ktds-axbd.workers.dev/api}"
+API_URL="${FOUNDRY_X_API_URL:-https://fx-gateway.ktds-axbd.workers.dev/api}"
 TOKEN="${FOUNDRY_X_TOKEN:-}"
 
 # stdin에서 hook 데이터 읽기 (JSON)

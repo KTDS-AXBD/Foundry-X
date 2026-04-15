@@ -45,15 +45,16 @@ describe("F523: Gateway DISCOVERY routing (hardwired)", () => {
     expect(mainApi.fetch).not.toHaveBeenCalled();
   });
 
-  it("/api/biz-items → MAIN_API로 전달한다", async () => {
+  // F539c: /api/biz-items → DISCOVERY로 변경됨
+  it("/api/biz-items → DISCOVERY Service Binding으로 전달한다", async () => {
     const discovery = makeDiscoveryMock();
     const mainApi = makeMainApiMock();
     const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery };
 
     const res = await app.request("/api/biz-items", {}, env);
 
-    expect(mainApi.fetch).toHaveBeenCalledTimes(1);
-    expect(discovery.fetch).not.toHaveBeenCalled();
+    expect(discovery.fetch).toHaveBeenCalledTimes(1);
+    expect(mainApi.fetch).not.toHaveBeenCalled();
     expect(res.status).toBe(200);
   });
 

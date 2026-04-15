@@ -887,7 +887,7 @@ phase_sprint_signals() {
 
     # 7) Post-merge 검증 (구 sprint-merge-monitor.sh 기능 통합, C43)
     # deploy 자체는 CI/CD(deploy.yml on master push)가 자동 처리 — 여기서는 health check만
-    local api_base="https://foundry-x-api.ktds-axbd.workers.dev"
+    local api_base="https://fx-gateway.ktds-axbd.workers.dev"
     local web_base="https://fx.minu.best"
     local api_status web_status
     api_status=$(curl -s -o /dev/null -w "%{http_code}" "${api_base}/api/health" 2>/dev/null || echo "000")
