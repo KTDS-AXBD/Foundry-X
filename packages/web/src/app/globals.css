@@ -43,6 +43,38 @@
     --discovery-amber-bg: #fef3c7;
     --discovery-red-bg: #fee2e2;
     --discovery-purple-bg: #f3e8ff;
+
+    /* ── AI Foundry OS (light) ── */
+    --fos-surface-abyss: #FFFFFF;
+    --fos-surface-hull: #F9FAFB;
+    --fos-surface-panel: #FFFFFF;
+    --fos-surface-panel-hi: #F3F4F6;
+    --fos-surface-inset: #F9FAFB;
+    --fos-border-default: rgba(17, 24, 39, 0.10);
+    --fos-border-strong: rgba(17, 24, 39, 0.18);
+    --fos-border-subtle: #E5E7EB;
+    --fos-text-primary: #111827;
+    --fos-text-secondary: #4B5563;
+    --fos-text-muted: #6B7280;
+    --fos-text-dim: #9CA3AF;
+    --fos-text-accent: #2563EB;
+    --fos-accent-input: #b8860b;
+    --fos-accent-input-soft: #fdf6e3;
+    --fos-accent-input-text: #92670a;
+    --fos-accent-control: #16A34A;
+    --fos-accent-control-soft: #F0FDF4;
+    --fos-accent-control-text: #15803D;
+    --fos-accent-takeaway: #DC2626;
+    --fos-accent-takeaway-soft: #FEF2F2;
+    --fos-accent-takeaway-text: #B91C1C;
+    --fos-status-ok: #16A34A;
+    --fos-status-warn: #CA8A04;
+    --fos-status-info: #2563EB;
+    --fos-status-error: #DC2626;
+    --fos-scanline-opacity: 0;
+    --fos-gradient-control: rgba(22, 163, 74, 0.04);
+    --fos-gradient-input: rgba(184, 134, 11, 0.03);
+    --fos-gradient-takeaway: rgba(220, 38, 38, 0.03);
 }
 
 /* Discovery 단계별 색상 매핑 (data-step 선택자) */
@@ -53,6 +85,38 @@
 [data-step="2-9"] { --step-color: var(--discovery-purple); --step-bg: var(--discovery-purple-bg); }
 
 .dark {
+    /* ── AI Foundry OS (dark) ── */
+    --fos-surface-abyss: #05080d;
+    --fos-surface-hull: #0a1018;
+    --fos-surface-panel: #0e1620;
+    --fos-surface-panel-hi: #131d2a;
+    --fos-surface-inset: #0a131f;
+    --fos-border-default: rgba(230, 234, 246, 0.08);
+    --fos-border-strong: rgba(230, 234, 246, 0.14);
+    --fos-border-subtle: #1a2d47;
+    --fos-text-primary: #e7ecf5;
+    --fos-text-secondary: #a1adc4;
+    --fos-text-muted: #6b7a95;
+    --fos-text-dim: #495569;
+    --fos-text-accent: #60a5fa;
+    --fos-accent-input: #d4a54c;
+    --fos-accent-input-soft: #2a200e;
+    --fos-accent-input-text: #e8c679;
+    --fos-accent-control: #3fb08a;
+    --fos-accent-control-soft: #0f2720;
+    --fos-accent-control-text: #6fd7b1;
+    --fos-accent-takeaway: #e25c5c;
+    --fos-accent-takeaway-soft: #2a1012;
+    --fos-accent-takeaway-text: #ff8585;
+    --fos-status-ok: #34d399;
+    --fos-status-warn: #f59e0b;
+    --fos-status-info: #60a5fa;
+    --fos-status-error: #f87171;
+    --fos-scanline-opacity: 1;
+    --fos-gradient-control: rgba(63, 176, 138, 0.04);
+    --fos-gradient-input: rgba(212, 165, 76, 0.03);
+    --fos-gradient-takeaway: rgba(226, 92, 92, 0.03);
+
     --sidebar: oklch(0.205 0 0);
     --sidebar-foreground: oklch(0.985 0 0);
     --sidebar-primary: oklch(0.488 0.243 264.376);
