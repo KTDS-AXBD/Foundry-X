@@ -13,7 +13,7 @@ const T = {
   font: { body: fonts.body, mono: fonts.mono },
   bg: { page: fos.surface.abyss, card: fos.surface.panel, hull: fos.surface.hull, inset: fos.surface.inset },
   border: { subtle: fos.border.subtle, default: fos.border.default },
-  text: { primary: fos.text.primary, secondary: fos.text.secondary, muted: fos.text.muted, accent: fos.text.accent },
+  text: { primary: fos.text.primary, secondary: fos.text.secondary, muted: fos.text.muted, dim: fos.text.dim, accent: fos.text.accent },
   status: { ok: fos.status.ok, warn: fos.status.warn, info: fos.status.info },
 } as const;
 
@@ -48,28 +48,63 @@ function AnimatedNum({ value, suffix = "" }: { value: number; suffix?: string })
   return <span ref={ref}>{display}{suffix}</span>;
 }
 
-// ── Score Bar ────────────────────────────────────────────────────────
-function ScoreBar({ value, label, color }: { value: number; label: string; color: string }) {
+// ── Score Item (with description + details) ─────────────────────────
+interface ScoreItemData {
+  value: number; label: string; color: string;
+  desc: string; details: string[];
+}
+
+function ScoreItem({ item }: { item: ScoreItemData }) {
+  const [expanded, setExpanded] = useState(false);
   const [width, setWidth] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const observer = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { setWidth(value); observer.disconnect(); }
+      if (e.isIntersecting) { setWidth(item.value); observer.disconnect(); }
     }, { threshold: 0.2 });
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
-  }, [value]);
+  }, [item.value]);
+  const grade = item.value >= 90 ? "A" : item.value >= 80 ? "B" : item.value >= 70 ? "C" : "D";
+  const gradeColor = grade === "A" ? T.status.ok : grade === "B" ? T.status.info : T.status.warn;
   return (
-    <div ref={ref} style={{ marginBottom: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, alignItems: "baseline" }}>
-        <span style={{ fontSize: 13, color: T.text.secondary, fontWeight: 450 }}>{label}</span>
-        <span style={{ fontSize: 14, fontWeight: 700, color, fontVariantNumeric: "tabular-nums" }}>{value}점</span>
+    <div ref={ref} style={{
+      background: T.bg.inset, border: `1px solid ${T.border.subtle}`,
+      borderRadius: 10, padding: "14px 16px", marginBottom: 10,
+      cursor: "pointer", transition: "border-color 0.2s",
+    }} onClick={() => setExpanded(!expanded)}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+        <span style={{
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+          width: 28, height: 28, borderRadius: 6, fontSize: 12, fontWeight: 800,
+          background: `${gradeColor}18`, color: gradeColor, flexShrink: 0,
+        }}>{grade}</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <span style={{ fontSize: 13, color: T.text.primary, fontWeight: 600 }}>{item.label}</span>
+            <span style={{ fontSize: 14, fontWeight: 700, color: item.color, fontVariantNumeric: "tabular-nums" }}>{item.value}점</span>
+          </div>
+          <div style={{ background: fos.border.default, borderRadius: 4, height: 4, overflow: "hidden", marginTop: 6 }}>
+            <div style={{
+              width: `${width}%`, background: `linear-gradient(90deg, ${item.color}cc, ${item.color})`,
+              height: "100%", borderRadius: 4, transition: "width 0.8s cubic-bezier(0.22,1,0.36,1)",
+            }} />
+          </div>
+        </div>
       </div>
-      <div style={{ background: fos.border.default, borderRadius: 6, height: 6, overflow: "hidden" }}>
-        <div style={{
-          width: `${width}%`, background: `linear-gradient(90deg, ${color}cc, ${color})`,
-          height: "100%", borderRadius: 6, transition: "width 0.8s cubic-bezier(0.22,1,0.36,1)",
-        }} />
+      <p style={{ margin: 0, fontSize: 11.5, color: T.text.muted, lineHeight: 1.5 }}>{item.desc}</p>
+      {expanded && (
+        <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${T.border.subtle}` }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: T.text.muted, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>분석 근거</div>
+          {item.details.map((d, i) => (
+            <div key={i} style={{ fontSize: 11.5, color: T.text.secondary, lineHeight: 1.6, paddingLeft: 12, borderLeft: `2px solid ${item.color}30`, marginBottom: 4 }}>
+              {d}
+            </div>
+          ))}
+        </div>
+      )}
+      <div style={{ fontSize: 10, color: T.text.dim, marginTop: 6, textAlign: "right" }}>
+        {expanded ? "▲ 접기" : "▼ 분석 근거 보기"}
       </div>
     </div>
   );
@@ -373,53 +408,113 @@ export function Component() {
         <div style={{ ...cardStyle, borderTop: "none", borderRadius: "0 0 12px 12px", marginBottom: 32 }}>
           {activeTab === "scoring" && (
             <div>
-              <h3 style={{ margin: "0 0 20px", fontSize: 13, color: T.text.muted, fontWeight: 500 }}>Scoring Pass — AI-Ready 6기준 점수</h3>
-              <ScoreBar value={score} label="종합 AI-Ready Score" color={T.status.ok} />
-              <ScoreBar value={92} label="코드 구조 명확성" color={T.status.ok} />
-              <ScoreBar value={85} label="테스트 커버리지" color={T.status.ok} />
-              <ScoreBar value={78} label="도메인 규칙 추출도" color={T.status.warn} />
-              <ScoreBar value={95} label="데이터 모델 완성도" color={T.status.ok} />
-              <ScoreBar value={88} label="API 스펙 명확성" color={T.status.ok} />
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 16 }}>
+                <h3 style={{ margin: 0, fontSize: 13, color: T.text.muted, fontWeight: 500 }}>Scoring Pass — AI-Ready 6기준 점수</h3>
+                <span style={{ fontSize: 11, color: T.text.dim }}>항목 클릭 → 분석 근거 확인</span>
+              </div>
+              {/* 종합 점수 카드 */}
+              <div style={{
+                background: `linear-gradient(135deg, var(--fos-accent-control-soft), ${T.bg.inset})`,
+                border: `1px solid ${T.border.subtle}`, borderRadius: 12,
+                padding: "16px 20px", marginBottom: 16, display: "flex", alignItems: "center", gap: 16,
+              }}>
+                <div style={{ fontSize: 32, fontWeight: 800, color: T.status.ok, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>
+                  <AnimatedNum value={score} suffix="점" />
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: T.text.primary }}>종합 AI-Ready Score</div>
+                  <div style={{ fontSize: 11.5, color: T.text.muted, marginTop: 2 }}>6개 기준의 가중 평균. 80점 이상이면 반제품화 대상으로 분류</div>
+                </div>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                {([
+                  { value: 92, label: "코드 구조 명확성", color: T.status.ok,
+                    desc: "AST 파싱으로 함수/모듈 분리도, 순환 의존성, 네이밍 일관성을 측정",
+                    details: ["함수 단위 분리도 96% (평균 함수 길이 23줄)", "순환 의존성 0건 — 단방향 호출 구조", "네이밍 일관성: camelCase 100%, JSDoc 커버리지 42%"] },
+                  { value: 85, label: "테스트 커버리지", color: T.status.ok,
+                    desc: "기존 테스트 파일의 라인/브랜치 커버리지 + assertion 품질 분석",
+                    details: ["3개 테스트 파일, 24개 테스트 케이스", "라인 커버리지 85%, 브랜치 커버리지 78%", "assertion 밀도: 테스트당 평균 3.2개 (양호)"] },
+                  { value: 78, label: "도메인 규칙 추출도", color: T.status.warn,
+                    desc: "코드 내 조건문/분기에서 비즈니스 룰(BL)로 변환 가능한 패턴 비율",
+                    details: ["총 47개 BL 추출 (condition→When, criteria→If, outcome→Then)", "명시적 조건문에서 추출: 39건 (83%)", "암묵적 규칙(타임아웃, 재시도 등): 8건 — 수동 보완 필요"] },
+                  { value: 95, label: "데이터 모델 완성도", color: T.status.ok,
+                    desc: "DB 스키마 역추출 정확도 — 테이블/컬럼/관계/제약조건 일치율",
+                    details: ["14개 테이블, 96개 컬럼 자동 역추출", "FK 관계 11건 중 10건 정확 매핑 (91%)", "NOT NULL/DEFAULT 제약조건 100% 보존"] },
+                  { value: 88, label: "API 스펙 명확성", color: T.status.ok,
+                    desc: "라우트/파라미터/응답 스키마 추출 비율 + RESTful 패턴 준수도",
+                    details: ["4개 API 엔드포인트 자동 추출 (POST 4건)", "요청 파라미터 100%, 응답 스키마 75% 추출", "에러 코드 4종 (E404/E409/E422/E502) 자동 분류"] },
+                ] as ScoreItemData[]).map((item) => (
+                  <ScoreItem key={item.label} item={item} />
+                ))}
+              </div>
             </div>
           )}
 
           {activeTab === "diagnosis" && (
             <div>
-              <h3 style={{ margin: "0 0 20px", fontSize: 13, color: T.text.muted, fontWeight: 500 }}>Diagnosis Pass — 갭 및 개선 제안</h3>
+              <h3 style={{ margin: "0 0 6px", fontSize: 13, color: T.text.muted, fontWeight: 500 }}>Diagnosis Pass — 갭 및 개선 제안</h3>
+              <p style={{ margin: "0 0 16px", fontSize: 11.5, color: T.text.dim, lineHeight: 1.5 }}>
+                Spec ↔ Code 간 불일치, 누락된 비즈니스 규칙, 테스트 미흡 영역을 자동 진단합니다.
+                각 항목의 <strong style={{ color: T.text.muted }}>신뢰도</strong>는 LLM 분석의 확신 수준이에요.
+              </p>
               {(() => {
                 const findingsData = (findings as Record<string, unknown>)?.data as Record<string, unknown[]> | undefined;
                 const items = findingsData?.findings ?? (findings as Record<string, unknown[]>)?.findings;
                 const list = (items as Record<string, string | number>[] | undefined) ?? [
-                  { category: "Process", severity: "info", message: "취소신청 → 잔액확인 → 취소처리 3단계 플로우 정상 식별", confidence: 0.95, finding: "" },
-                  { category: "Rule", severity: "warning", message: "취소불가조건 정의 존재하나 구체적 조건값 미명시", confidence: 0.78, finding: "" },
-                  { category: "Data", severity: "info", message: "환불계좌 검증 로직 포함 — 외부 금융API 연동 필요", confidence: 0.91, finding: "" },
+                  { category: "Process", severity: "info", message: "취소신청 → 잔액확인 → 취소처리 3단계 플로우 정상 식별", confidence: 0.95, finding: "", evidence: "코드 내 3단계 분기 로직 확인 (cancel.ts L45-L120)", recommendation: "현재 구조 유지 권장" },
+                  { category: "Rule", severity: "warning", message: "취소불가조건 정의 존재하나 구체적 조건값 미명시 (예: 사용 후 30일 초과)", confidence: 0.78, finding: "", evidence: "BL-016~024 중 취소 가능 기간이 하드코딩(7일)", recommendation: "설정 가능한 파라미터로 외부화 권장" },
+                  { category: "Data", severity: "info", message: "환불계좌 검증 로직 포함 — 외부 금융API 연동 필요", confidence: 0.91, finding: "", evidence: "domain/cancel.ts 내 verifyRefundAccount() 호출부 확인", recommendation: "프로덕션 전환 시 실제 금융API 연동 테스트 필수" },
                 ];
-                return list.map((f, i) => {
-                  const msg = String(f.message || f.finding || "");
-                  const sev = String(f.severity ?? "info");
-                  const cat = String(f.category ?? f.type ?? "");
-                  const conf = Number(f.confidence ?? 0.9);
-                  const color = sev === "warning" ? T.status.warn : sev === "critical" ? "#f87171" : T.status.info;
-                  return (
-                    <div key={i} style={{
-                      background: T.bg.inset, border: `1px solid ${color}20`, borderLeft: `3px solid ${color}`,
-                      borderRadius: 8, padding: 16, marginBottom: 10,
-                    }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, color, textTransform: "uppercase", letterSpacing: 0.5 }}>{cat}</span>
-                        <span style={{ fontSize: 11, color: T.text.muted, fontVariantNumeric: "tabular-nums" }}>신뢰도 {Math.round(conf * 100)}%</span>
-                      </div>
-                      <p style={{ margin: 0, fontSize: 13, color: T.text.secondary, lineHeight: 1.6 }}>{msg}</p>
-                    </div>
-                  );
-                });
+                const sevLabel: Record<string, string> = { info: "정보", warning: "주의", critical: "위험" };
+                const catLabel: Record<string, string> = { Process: "프로세스 흐름", Rule: "비즈니스 규칙", Data: "데이터/연동", missing: "누락", inconsistency: "불일치" };
+                return (
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                    {list.map((f, i) => {
+                      const msg = String(f.message || f.finding || "");
+                      const sev = String(f.severity ?? "info");
+                      const cat = String(f.category ?? f.type ?? "");
+                      const conf = Number(f.confidence ?? 0.9);
+                      const evidence = String(f.evidence ?? "");
+                      const recommendation = String(f.recommendation ?? "");
+                      const color = sev === "warning" ? T.status.warn : sev === "critical" ? "#f87171" : T.status.info;
+                      return (
+                        <div key={i} style={{
+                          background: T.bg.inset, border: `1px solid ${color}20`, borderLeft: `3px solid ${color}`,
+                          borderRadius: 10, padding: 16,
+                        }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                              <span style={{ fontSize: 10, fontWeight: 700, color, background: `${color}15`, padding: "2px 8px", borderRadius: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>{sevLabel[sev] ?? sev}</span>
+                              <span style={{ fontSize: 11, color: T.text.muted }}>{catLabel[cat] ?? cat}</span>
+                            </div>
+                            <span style={{ fontSize: 11, color: T.text.dim, fontVariantNumeric: "tabular-nums" }}>{Math.round(conf * 100)}%</span>
+                          </div>
+                          <p style={{ margin: "0 0 8px", fontSize: 12.5, color: T.text.secondary, lineHeight: 1.6, fontWeight: 500 }}>{msg}</p>
+                          {evidence && (
+                            <div style={{ fontSize: 11, color: T.text.dim, lineHeight: 1.5, fontFamily: T.font.mono, background: fos.border.default, borderRadius: 4, padding: "4px 8px", marginBottom: 4 }}>
+                              📍 {evidence}
+                            </div>
+                          )}
+                          {recommendation && (
+                            <div style={{ fontSize: 11, color: T.status.info, marginTop: 4 }}>
+                              💡 {recommendation}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
               })()}
             </div>
           )}
 
           {activeTab === "comparison" && (
             <div>
-              <h3 style={{ margin: "0 0 20px", fontSize: 13, color: T.text.muted, fontWeight: 500 }}>Comparison Pass — Spec ↔ Code 정합성</h3>
+              <h3 style={{ margin: "0 0 6px", fontSize: 13, color: T.text.muted, fontWeight: 500 }}>Comparison Pass — Spec ↔ Code 정합성</h3>
+              <p style={{ margin: "0 0 16px", fontSize: 11.5, color: T.text.dim, lineHeight: 1.5 }}>
+                추출된 Spec 문서와 실제 구현 코드를 교차 비교하여, 명세가 코드에 반영된 비율과 누락 지점을 식별합니다.
+              </p>
               {(() => {
                 const comp = (comparison as Record<string, Record<string, unknown>>)?.comparison ?? {
                   specCoverage: 0.87, codeAlignmentScore: 0.92, testCoverage: 0.85,
