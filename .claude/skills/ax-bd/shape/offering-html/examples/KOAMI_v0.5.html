@@ -10,30 +10,42 @@
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --black: #111;
-    --gray-900: #222;
-    --gray-700: #444;
-    --gray-600: #666;
-    --gray-400: #999;
-    --gray-300: #ccc;
-    --gray-200: #e5e5e5;
-    --gray-100: #f0f0f0;
-    --gray-50: #f8f9fa;
-    --white: #fff;
-    --accent: #2563eb;
-    --red: #dc2626;
-    --orange: #ea580c;
-    --green: #16a34a;
-    --amber: #d97706;
+    /* ── AXIS Design System Token Mapping (v0.4) ── */
+    --black: #111827;       /* axis-gray-900 */
+    --gray-900: #111827;
+    --gray-800: #1F2937;
+    --gray-700: #374151;
+    --gray-600: #4B5563;
+    --gray-500: #6B7280;
+    --gray-400: #9CA3AF;
+    --gray-300: #D1D5DB;
+    --gray-200: #E5E7EB;
+    --gray-100: #F3F4F6;
+    --gray-50: #F9FAFB;
+    --white: #FFFFFF;
+    --accent: #2563EB;      /* axis-blue-600 */
+    --red: #DC2626;
+    --orange: #EA580C;
+    --green: #16A34A;
+    --amber: #A16207;
+    --yellow: #FACC15;
+    /* Foundry-X tokens */
+    --fx-font-family: 'Pretendard', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+    --fx-lineHeight-body: 1.7;
+    --fx-tracking-tight: -0.02em;
+    --fx-tracking-wide: 0.08em;
+    --fx-shadow-hover: 0 8px 20px rgba(0,0,0,0.06);
+    --fx-transition-fast: 0.2s ease;
+    --fx-transition-slow: 0.7s ease;
   }
 
   html { scroll-behavior: smooth; }
 
   body {
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: var(--fx-font-family);
     color: var(--black);
     background: var(--white);
-    line-height: 1.7;
+    line-height: var(--fx-lineHeight-body);
     -webkit-font-smoothing: antialiased;
   }
 
