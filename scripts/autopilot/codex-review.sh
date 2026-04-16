@@ -161,18 +161,42 @@ $pr_diff
 ---
 Please review this Sprint PR and output JSON only."
 
-  # Codex 실행
+  # Codex 실행 (--json = JSONL 이벤트 스트림, 응답은 item.completed.item.text에 있음)
   log "Codex 호출 중..."
-  local codex_output=""
-  codex_output=$(echo "$prompt" | timeout 120 codex exec --no-git --json 2>/dev/null || echo "")
+  local raw_output=""
+  raw_output=$(echo "$prompt" | timeout 120 codex exec --json 2>/dev/null || echo "")
 
-  if [ -z "$codex_output" ]; then
+  if [ -z "$raw_output" ]; then
     log "⚠️  Codex 응답 없음 — degraded 모드"
     write_degraded_json "codex_empty_response"
     return 0
   fi
 
-  # JSON 검증
+  # JSONL에서 item.completed 이벤트의 .item.text 추출
+  local codex_output=""
+  codex_output=$(echo "$raw_output" | python3 -c "
+import sys, json
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    try:
+        evt = json.loads(line)
+        if evt.get('type') == 'item.completed':
+            text = evt.get('item', {}).get('text', '')
+            if text:
+                print(text)
+                break
+    except json.JSONDecodeError:
+        continue
+" 2>/dev/null || echo "")
+
+  if [ -z "$codex_output" ]; then
+    log "⚠️  Codex JSONL에서 응답 추출 실패 — degraded 모드"
+    write_degraded_json "codex_parse_failed"
+    return 0
+  fi
+
+  # JSON 검증 (codex 응답 text가 유효한 JSON인지)
   if ! echo "$codex_output" | python3 -c "import json,sys; json.load(sys.stdin)" 2>/dev/null; then
     log "⚠️  Codex 응답이 유효한 JSON 아님 — degraded 모드"
     write_degraded_json "codex_invalid_json"
