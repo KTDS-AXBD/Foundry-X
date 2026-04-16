@@ -15,6 +15,8 @@ import {
   getAnalysisFindings,
   getAnalysisComparison,
   triggerAnalysis,
+  getOrgSpec,
+  getSkillSpec,
 } from "../services/decode-client.js";
 import { LPON_HARNESS_METRICS } from "../data/lpon-mock.js";
 
@@ -76,6 +78,20 @@ decodeBridgeRoute.get("/decode/harness/metrics", async (c) => {
     // Table may not exist — use mock
   }
   return c.json({ ...LPON_HARNESS_METRICS, concreteness });
+});
+
+// ── Skill Spec (svc-skill) ────────────────────────────────────────────
+
+decodeBridgeRoute.get("/decode/org-spec/:orgId/:type", async (c) => {
+  const { orgId, type } = c.req.param();
+  const data = await getOrgSpec(c.env, orgId, type);
+  return c.json(data);
+});
+
+decodeBridgeRoute.get("/decode/skills/:skillId/spec/:type", async (c) => {
+  const { skillId, type } = c.req.param();
+  const data = await getSkillSpec(c.env, skillId, type);
+  return c.json(data);
 });
 
 // ── LPON Export / Download (F547) ─────────────────────────────────────

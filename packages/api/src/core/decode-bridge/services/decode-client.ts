@@ -93,6 +93,32 @@ export async function getAnalysisComparison(env: Env, documentId: string): Promi
   return LPON_MOCK_COMPARISON;
 }
 
+export async function getOrgSpec(env: Env, orgId: string, type: string): Promise<unknown> {
+  const secret = (env as unknown as Record<string, string>).DECODE_X_INTERNAL_SECRET ?? "";
+  const res = await callService(
+    (env as unknown as Record<string, Fetcher>).SVC_SKILL,
+    (env as unknown as Record<string, string>).DECODE_X_SKILL_URL,
+    `/admin/org-spec/${orgId}/${type}`,
+    "GET",
+    makeInternalHeaders(secret),
+  );
+  if (res?.ok) return res.json();
+  return { success: false, error: { code: "NOT_FOUND", message: `org-spec not available for ${orgId}/${type}` } };
+}
+
+export async function getSkillSpec(env: Env, skillId: string, type: string): Promise<unknown> {
+  const secret = (env as unknown as Record<string, string>).DECODE_X_INTERNAL_SECRET ?? "";
+  const res = await callService(
+    (env as unknown as Record<string, Fetcher>).SVC_SKILL,
+    (env as unknown as Record<string, string>).DECODE_X_SKILL_URL,
+    `/skills/${skillId}/spec/${type}`,
+    "GET",
+    makeInternalHeaders(secret),
+  );
+  if (res?.ok) return res.json();
+  return { success: false, error: { code: "NOT_FOUND", message: `skill-spec not available for ${skillId}/${type}` } };
+}
+
 export async function triggerAnalysis(
   env: Env,
   payload: { documentId: string; orgId: string },

@@ -74,6 +74,10 @@ service = "svc-extraction"
 binding = "SVC_ONTOLOGY"
 service = "svc-ontology"
 
+[[services]]
+binding = "SVC_SKILL"
+service = "svc-skill"
+
 # F441: R2 File Storage (Sprint 213)
 [[r2_buckets]]
 binding = "FILES_BUCKET"
