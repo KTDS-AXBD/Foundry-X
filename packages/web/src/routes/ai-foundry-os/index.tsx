@@ -39,7 +39,6 @@ function GlobalStyle() {
       @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css');
 
       *, *::before, *::after { box-sizing: border-box; }
-      html, body, #root { margin: 0; padding: 0; background: ${ink.abyss}; }
       body {
         font-family: ${body};
         font-feature-settings: "ss01", "ss02", "cv01", "cv02";
@@ -48,17 +47,18 @@ function GlobalStyle() {
 
       .fos-root {
         background:
-          radial-gradient(ellipse 1200px 600px at 50% -10%, rgba(63, 176, 138, 0.04), transparent 60%),
-          radial-gradient(ellipse 900px 500px at 90% 30%, rgba(212, 165, 76, 0.03), transparent 60%),
-          radial-gradient(ellipse 800px 400px at 10% 70%, rgba(226, 92, 92, 0.03), transparent 60%),
-          ${ink.abyss};
-        color: ${ink.text};
+          radial-gradient(ellipse 1200px 600px at 50% -10%, var(--fos-gradient-control), transparent 60%),
+          radial-gradient(ellipse 900px 500px at 90% 30%, var(--fos-gradient-input), transparent 60%),
+          radial-gradient(ellipse 800px 400px at 10% 70%, var(--fos-gradient-takeaway), transparent 60%),
+          var(--fos-surface-abyss);
+        color: var(--fos-text-primary);
         min-height: 100vh;
         overflow-x: hidden;
       }
       .fos-root::before {
         content: "";
         position: fixed; inset: 0; pointer-events: none; z-index: 0;
+        opacity: var(--fos-scanline-opacity);
         background-image:
           repeating-linear-gradient(
             0deg,
@@ -81,7 +81,7 @@ function GlobalStyle() {
       }
 
       .fos-nav-item { cursor: pointer; transition: color 140ms, border-color 140ms; }
-      .fos-nav-item:hover { color: ${ink.text}; }
+      .fos-nav-item:hover { color: var(--fos-text-primary); }
 
       .fos-section-card {
         cursor: pointer;

@@ -1,6 +1,6 @@
-// AI Foundry OS — Unified Design Tokens
-// AXIS Design System dark mode aligned (@axis-ds/tokens v1.1.1)
-// Source: ink/glint (index.tsx) + T (harness/ontology/lpon) 통합
+// AI Foundry OS — Theme-aware Design Tokens
+// CSS custom properties defined in globals.css (:root + .dark)
+// AXIS Design System aligned (@axis-ds/tokens v1.1.1)
 
 // ─── Font Stacks ───────────────────────────────────────────────────
 export const fonts = {
@@ -9,59 +9,64 @@ export const fonts = {
   mono: "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace",
 } as const;
 
-// ─── Surface / Background ──────────────────────────────────────────
-// Custom deep-dark palette (AXIS gray-950 #030712 기반 확장)
+// ─── CSS Variable References ───────────────────────────────────────
+// These resolve at runtime based on the active theme (.dark / :root)
 const surface = {
-  abyss: "#05080d",      // 최심부 배경
-  hull: "#0a1018",       // 외곽 배경
-  panel: "#0e1620",      // 카드/패널
-  panelHi: "#131d2a",    // 카드 hover/강조
-  inset: "#0a131f",      // 인셋 영역 (harness/ontology)
+  abyss: "var(--fos-surface-abyss)",
+  hull: "var(--fos-surface-hull)",
+  panel: "var(--fos-surface-panel)",
+  panelHi: "var(--fos-surface-panel-hi)",
+  inset: "var(--fos-surface-inset)",
 } as const;
 
-// ─── Border ────────────────────────────────────────────────────────
 const border = {
-  default: "rgba(230, 234, 246, 0.08)",
-  strong: "rgba(230, 234, 246, 0.14)",
-  subtle: "#1a2d47",     // harness/ontology 패널 경계
+  default: "var(--fos-border-default)",
+  strong: "var(--fos-border-strong)",
+  subtle: "var(--fos-border-subtle)",
 } as const;
 
-// ─── Text ──────────────────────────────────────────────────────────
-// AXIS dark mode 매핑: primary=#F3F4F6, secondary=#9CA3AF, tertiary=#6B7280
 const text = {
-  primary: "#e7ecf5",    // ≈ axis-gray-100 (dark mode text-primary)
-  secondary: "#a1adc4",  // ≈ axis-gray-400 (dark mode text-secondary)
-  muted: "#6b7a95",      // ≈ axis-gray-500 (dark mode text-tertiary)
-  dim: "#495569",        // axis-gray-600
-  accent: "#60a5fa",     // axis-blue-400
+  primary: "var(--fos-text-primary)",
+  secondary: "var(--fos-text-secondary)",
+  muted: "var(--fos-text-muted)",
+  dim: "var(--fos-text-dim)",
+  accent: "var(--fos-text-accent)",
 } as const;
 
-// ─── Accent (3-Plane) ──────────────────────────────────────────────
-// Input(gold) / Control(green) / Takeaway(red) — Foundry OS 전용
 const accent = {
-  input: { accent: "#d4a54c", soft: "#2a200e", text: "#e8c679" },
-  control: { accent: "#3fb08a", soft: "#0f2720", text: "#6fd7b1" },
-  takeaway: { accent: "#e25c5c", soft: "#2a1012", text: "#ff8585" },
+  input: {
+    accent: "var(--fos-accent-input)",
+    soft: "var(--fos-accent-input-soft)",
+    text: "var(--fos-accent-input-text)",
+  },
+  control: {
+    accent: "var(--fos-accent-control)",
+    soft: "var(--fos-accent-control-soft)",
+    text: "var(--fos-accent-control-text)",
+  },
+  takeaway: {
+    accent: "var(--fos-accent-takeaway)",
+    soft: "var(--fos-accent-takeaway-soft)",
+    text: "var(--fos-accent-takeaway-text)",
+  },
 } as const;
 
-// ─── Status ────────────────────────────────────────────────────────
-// AXIS semantic colors 직접 사용
 const status = {
-  ok: "#34d399",         // axis-green-400
-  warn: "#f59e0b",       // axis-yellow-500
-  info: "#60a5fa",       // axis-blue-400
-  error: "#f87171",      // axis-red-400
+  ok: "var(--fos-status-ok)",
+  warn: "var(--fos-status-warn)",
+  info: "var(--fos-status-info)",
+  error: "var(--fos-status-error)",
 } as const;
 
-// ─── Node Colors (Ontology KG) ─────────────────────────────────────
+// ─── Node Colors (Ontology KG) — semantic, theme-independent ──────
 export const NODE_COLORS: Record<string, string> = {
-  SubProcess: "#3b82f6",     // axis-blue-500
-  Method: "#8b5cf6",         // axis-purple-500
-  Condition: "#f59e0b",      // axis-yellow-500
-  Actor: "#34d399",          // axis-green-400
-  Requirement: "#f87171",    // axis-red-400
+  SubProcess: "#3b82f6",       // axis-blue-500
+  Method: "#8b5cf6",           // axis-purple-500
+  Condition: "#f59e0b",        // axis-yellow-500
+  Actor: "#34d399",            // axis-green-400
+  Requirement: "#f87171",      // axis-red-400
   DiagnosisFinding: "#ec4899", // axis-pink-500
-  default: "#6b7280",       // axis-gray-500
+  default: "#6b7280",         // axis-gray-500
 };
 
 // ─── Composed Export ───────────────────────────────────────────────
