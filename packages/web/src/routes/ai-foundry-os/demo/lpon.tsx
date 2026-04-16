@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 const BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 import { fos, fonts } from "../tokens";
+import { DemoNav } from "../demo-nav";
 
 // ── Design Tokens (AXIS-aligned) ─────────────────────────────────────
 const T = {
@@ -252,6 +253,7 @@ export function Component() {
 
   return (
     <div style={{ fontFamily: T.font.body, background: T.bg.page, minHeight: "100vh", color: T.text.primary }}>
+      <DemoNav />
 
       {/* ── Header ──────────────────────────────────────────────── */}
       <div style={{ background: T.bg.hull, borderBottom: `1px solid ${T.border.subtle}` }}>

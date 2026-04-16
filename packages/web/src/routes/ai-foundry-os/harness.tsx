@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 const BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 import { fos, fonts } from "./tokens";
+import { DemoNav } from "./demo-nav";
 
 const T = {
   font: fonts.body,
@@ -97,6 +98,7 @@ export function Component() {
 
   return (
     <div style={{ fontFamily: T.font, background: T.bg.page, minHeight: "100vh", color: T.text.primary }}>
+      <DemoNav />
       {/* Header */}
       <div style={{ background: T.bg.card, borderBottom: `1px solid ${T.border.subtle}`, padding: "20px 40px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>

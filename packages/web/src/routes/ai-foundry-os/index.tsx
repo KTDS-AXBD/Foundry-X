@@ -8,6 +8,7 @@ import type { PlaneType, SubSectionType } from "../../data/deepdive-content";
 
 // ─── Design Tokens (AXIS dark mode aligned) ───────────────────────
 import { fos, fonts, type PlaneId, type Glint } from "./tokens";
+import { DemoNav } from "./demo-nav";
 
 const { display, body, mono } = fonts;
 
@@ -1261,6 +1262,7 @@ export function Component() {
 
   return (
     <div className="fos-root">
+      <DemoNav />
       <GlobalStyle />
       <Masthead />
       <Hero onEnterDemo={() => navigate("/ai-foundry-os/demo/lpon")} />
