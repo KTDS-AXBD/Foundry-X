@@ -286,7 +286,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | B3 | B | Dashboard 파이프라인 원 안 숫자 모호성 해소 (FX-REQ-586) | — | DONE | task orchestrator |
 | B4 | B | **Ontology 그래프 의미 명확화** — 리허설 D-1 dogfood에서 발견: F549 KG XAI 뷰어가 force simulation 기반 배치로 12노드가 중앙 밀집 + 의미 전달 부족. 범위: (a) `packages/web/src/routes/ai-foundry-os/ontology.tsx` force simulation 제거 → 타입별 Swimlane 5열 레이아웃(① 누가/② 어디서/③ 어떻게/④ 판단/⑤ 남겨야), (b) 엣지 라벨 항상 표시, (c) 3가지 경로 토글(성공/불가/부분 취소) + 기본 하이라이트, (d) 내러티브 패널 + 5-tile 통계. 우선순위 P1 (대표 보고 리허설 4/17). | — | DONE | 변경: 1 file(+235/-182). typecheck PASS. PR TBD (fix/ontology-swimlane-layout). Reality: fx.minu.best/ai-foundry-os/ontology 배포 후 dogfood 재검증 필요 |
 | C69 | C | **본부장 시연 준비 (fx-boss-demo)** — 4/17 오전 대표 보고 연계 15분 시연. 온누리상품권 LPON Spec(Decode-X) 기반 "전자화폐상품권 플랫폼" 신규 시나리오 발굴→형상화→Prototype 시연. 사전 생성 + 라이브(`bun test`) 혼합. PRD: `docs/specs/fx-boss-demo/prd-final.md`. 준비: 슬라이드 5장 + 시나리오 사전 생성 + Q&A 15개 + 리허설 | — | 🔧(impl) | S305. 기존 자산: F545~F549 데모 페이지 + Decode-X working-version |
-| C70 | C | wiki: AI Foundry OS 경험자산화+3대자산 등록 (FX-REQ-592) | — | PLANNED | task orchestrator |
+| C70 | C | wiki: AI Foundry OS 경험자산화+3대자산 등록 (FX-REQ-592) | — | DONE | task orchestrator |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
