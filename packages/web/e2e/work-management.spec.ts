@@ -366,4 +366,91 @@ test.describe("Work Management (F509 Walking Skeleton)", () => {
     await expect(page.getByText(/동기화 완료/)).toBeVisible();
     await expect(page.getByText(/SPEC: 15건/)).toBeVisible();
   });
+
+  // ─── F552: AI 검증 탭 (Sprint 303) ──────────────────────────────────────────
+
+  test("8 tabs visible including AI 검증", async ({ authenticatedPage: page }) => {
+    await mockWorkApi(page);
+    await page.goto("/work-management");
+
+    await expect(page.getByRole("button", { name: "작업 현황" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Roadmap" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Backlog" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Changelog" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "작업 분류" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "아이디어 제출" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "추적" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "AI 검증" })).toBeVisible();
+  });
+
+  test("AI 검증 tab — empty state shows guidance message", async ({ authenticatedPage: page }) => {
+    await mockWorkApi(page);
+    // Mock empty stats
+    await page.route("**/api/verification/dual-reviews/stats", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          total: 0,
+          concordance_rate: 0,
+          block_rate: 0,
+          degraded_rate: 0,
+          block_reasons: [],
+          recent_reviews: [],
+        }),
+      }),
+    );
+    await page.goto("/work-management");
+
+    await page.getByRole("button", { name: "AI 검증" }).click();
+
+    // Empty state guidance
+    await expect(page.getByText(/아직 Dual AI Review 데이터가 없어요/)).toBeVisible();
+    await expect(page.getByText(/Sprint autopilot Phase 5c/)).toBeVisible();
+  });
+
+  test("AI 검증 tab — renders summary cards and review table with data", async ({ authenticatedPage: page }) => {
+    await mockWorkApi(page);
+    // Mock stats with data
+    await page.route("**/api/verification/dual-reviews/stats", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          total: 4,
+          concordance_rate: 75,
+          block_rate: 25,
+          degraded_rate: 25,
+          block_reasons: [
+            { reason: "Missing null check", count: 3 },
+            { reason: "SQL injection risk", count: 1 },
+          ],
+          recent_reviews: [
+            { sprint_id: 303, claude_verdict: "PASS", codex_verdict: "PASS", decision: "PASS", divergence_score: 0.0, degraded: false, created_at: "2026-04-16T12:00:00Z" },
+            { sprint_id: 302, claude_verdict: "PASS", codex_verdict: "BLOCK", decision: "BLOCK", divergence_score: 0.6, degraded: false, created_at: "2026-04-16T11:00:00Z" },
+            { sprint_id: 301, claude_verdict: null, codex_verdict: "PASS-degraded", decision: "PASS-degraded", divergence_score: 0.0, degraded: true, created_at: "2026-04-16T10:00:00Z" },
+          ],
+        }),
+      }),
+    );
+    await page.goto("/work-management");
+
+    await page.getByRole("button", { name: "AI 검증" }).click();
+
+    // Summary cards
+    await expect(page.getByText("총 리뷰")).toBeVisible();
+    await expect(page.getByText("75%")).toBeVisible();   // concordance_rate
+    await expect(page.getByText("25%").first()).toBeVisible(); // block_rate or degraded_rate
+
+    // Review table header
+    await expect(page.getByText("최근 Sprint 리뷰")).toBeVisible();
+
+    // Sprint rows
+    await expect(page.getByText("#303")).toBeVisible();
+    await expect(page.getByText("#302")).toBeVisible();
+
+    // BLOCK reasons section
+    await expect(page.getByText("BLOCK 사유 Top 5")).toBeVisible();
+    await expect(page.getByText("Missing null check")).toBeVisible();
+  });
 });
