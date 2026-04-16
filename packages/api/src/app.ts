@@ -68,6 +68,7 @@ import { helpAgentRoute } from "./routes/help-agent.js";
 import { eventStatusRoute } from "./routes/event-status.js";
 import { workRoute } from "./routes/work.js";
 import { workPublicRoute } from "./routes/work-public.js";
+import { verificationRoute } from "./core/verification/routes/index.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -433,6 +434,9 @@ app.route("/api", billingRoute);
 app.route("/api", filesRoute);
 
 // Sprint 298: fx-ai-foundry-os Decode-X 연동 (F546) — public mount는 line 220 이전으로 이동됨
+
+// Sprint 303: Dual AI Review (F552)
+app.route("/api", verificationRoute);
 
 // Sprint 261: Work Observability Walking Skeleton (F509)
 app.route("/api", workRoute);

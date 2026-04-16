@@ -116,7 +116,7 @@ describe("F552 DualReviewService", () => {
       await svc.insert(makeSample({ sprint_id: 302 }));
       const rows = await svc.list();
       expect(rows.length).toBe(3);
-      expect(rows[0].sprint_id).toBe(302);
+      expect(rows[0]!.sprint_id).toBe(302);
     });
 
     it("respects limit parameter", async () => {

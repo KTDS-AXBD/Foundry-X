@@ -2,13 +2,13 @@
 
 export interface DualReviewInsert {
   sprint_id: number;
-  claude_verdict: string | null;
+  claude_verdict?: string | null;
   codex_verdict: string;
   codex_json: string;
   divergence_score: number;
   decision: string;
   degraded: boolean;
-  degraded_reason: string | null;
+  degraded_reason?: string | null;
   model: string;
 }
 

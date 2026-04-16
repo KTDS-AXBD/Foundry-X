@@ -69,7 +69,8 @@ describe("F552 Verification Routes", () => {
         body: JSON.stringify(SAMPLE_BODY),
       });
       expect(res.status).toBe(201);
-      const json = await res.json();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const json = await res.json() as any;
       expect(json).toHaveProperty("id");
       expect(json.id).toBeGreaterThan(0);
     });
@@ -98,7 +99,8 @@ describe("F552 Verification Routes", () => {
     it("returns 200 with empty array initially", async () => {
       const res = await app.request("/api/verification/dual-reviews");
       expect(res.status).toBe(200);
-      const json = await res.json();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const json = await res.json() as any;
       expect(json).toHaveProperty("reviews");
       expect(json.reviews).toEqual([]);
     });
@@ -111,7 +113,8 @@ describe("F552 Verification Routes", () => {
       });
       const res = await app.request("/api/verification/dual-reviews");
       expect(res.status).toBe(200);
-      const json = await res.json();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const json = await res.json() as any;
       expect(json.reviews.length).toBe(1);
       expect(json.reviews[0].sprint_id).toBe(303);
     });
@@ -128,7 +131,8 @@ describe("F552 Verification Routes", () => {
         body: JSON.stringify({ ...SAMPLE_BODY, sprint_id: 304 }),
       });
       const res = await app.request("/api/verification/dual-reviews?limit=1");
-      const json = await res.json();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const json = await res.json() as any;
       expect(json.reviews.length).toBe(1);
     });
   });
@@ -137,7 +141,8 @@ describe("F552 Verification Routes", () => {
     it("returns 200 with stats structure", async () => {
       const res = await app.request("/api/verification/dual-reviews/stats");
       expect(res.status).toBe(200);
-      const json = await res.json();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const json = await res.json() as any;
       expect(json).toHaveProperty("total");
       expect(json).toHaveProperty("concordance_rate");
       expect(json).toHaveProperty("block_rate");
@@ -163,7 +168,8 @@ describe("F552 Verification Routes", () => {
         }),
       });
       const res = await app.request("/api/verification/dual-reviews/stats");
-      const json = await res.json();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const json = await res.json() as any;
       expect(json.total).toBe(2);
       expect(json.block_rate).toBe(50);
     });

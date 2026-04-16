@@ -747,7 +747,7 @@ function ChangelogTab() {
   );
 }
 
-type Tab = "kanban" | "context" | "classify" | "sessions" | "pipeline" | "velocity" | "backlog" | "roadmap" | "changelog" | "submit" | "trace";
+type Tab = "kanban" | "context" | "classify" | "sessions" | "pipeline" | "velocity" | "backlog" | "roadmap" | "changelog" | "submit" | "trace" | "ai-review";
 
 export function Component() {
   const [tab, setTab] = useState<Tab>("kanban");
@@ -827,6 +827,7 @@ export function Component() {
     { key: "classify",  label: "작업 분류" },
     { key: "submit",    label: "아이디어 제출" },
     { key: "trace",     label: "추적" },
+    { key: "ai-review", label: "AI 검증" },
   ];
 
   return (
@@ -917,6 +918,185 @@ export function Component() {
       {tab === "classify"  && <ClassifyTab />}
       {tab === "submit"    && <SubmitTab />}
       {tab === "trace"     && <TraceTab />}
+      {tab === "ai-review" && <DualAiReviewTab />}
+    </div>
+  );
+}
+
+// ─── F552: DualAiReviewTab ───────────────────────────────────────────────────
+
+interface DualReviewStatsData {
+  total: number;
+  concordance_rate: number;
+  block_rate: number;
+  degraded_rate: number;
+  block_reasons: Array<{ reason: string; count: number }>;
+  recent_reviews: Array<{
+    sprint_id: number;
+    claude_verdict: string | null;
+    codex_verdict: string;
+    decision: string;
+    divergence_score: number;
+    degraded: boolean;
+    created_at: string;
+  }>;
+}
+
+function DualAiReviewTab() {
+  const [stats, setStats] = useState<DualReviewStatsData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const data = await fetchApi<DualReviewStatsData>("/verification/dual-reviews/stats");
+        if (mounted) setStats(data);
+      } catch {
+        // ignore
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  if (loading) {
+    return <div style={{ padding: 24, color: T.text.muted }}>로딩 중...</div>;
+  }
+
+  if (!stats || stats.total === 0) {
+    return (
+      <div style={{
+        padding: 32, textAlign: "center", color: T.text.secondary,
+        background: T.bg.card, borderRadius: 12, border: `1px solid ${T.border.subtle}`,
+      }}>
+        <div style={{ fontSize: 32, marginBottom: 12 }}>🤖</div>
+        <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 8 }}>
+          아직 Dual AI Review 데이터가 없어요
+        </div>
+        <div style={{ fontSize: 13, color: T.text.muted }}>
+          Sprint autopilot Phase 5c에서 Codex 리뷰가 실행되면 여기에 표시돼요.
+        </div>
+      </div>
+    );
+  }
+
+  const verdictColor = (v: string | null) => {
+    if (!v) return T.text.muted;
+    if (v === "PASS" || v === "PASS-degraded") return T.status.done;
+    if (v === "BLOCK") return "#ef4444";
+    if (v === "WARN") return T.status.warning;
+    return T.text.secondary;
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {/* Summary Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+        {[
+          { label: "총 리뷰", value: stats.total, color: T.text.accent },
+          { label: "일치율", value: `${stats.concordance_rate}%`, color: T.status.done },
+          { label: "BLOCK율", value: `${stats.block_rate}%`, color: "#ef4444" },
+          { label: "Degraded율", value: `${stats.degraded_rate}%`, color: T.status.warning },
+        ].map((card) => (
+          <div key={card.label} style={{
+            background: T.bg.card, borderRadius: 10,
+            border: `1px solid ${T.border.subtle}`, padding: "16px 18px",
+          }}>
+            <div style={{ fontSize: 11, color: T.text.muted, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              {card.label}
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 700, color: card.color, fontFamily: T.mono }}>
+              {card.value}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Review Table */}
+      <div style={{
+        background: T.bg.card, borderRadius: 12, border: `1px solid ${T.border.subtle}`,
+        overflow: "hidden",
+      }}>
+        <div style={{ padding: "14px 18px", borderBottom: `1px solid ${T.border.subtle}` }}>
+          <span style={{ fontSize: 14, fontWeight: 700 }}>최근 Sprint 리뷰</span>
+        </div>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+          <thead>
+            <tr style={{ background: T.bg.inset }}>
+              {["Sprint", "Claude", "Codex", "Decision", "Divergence", "Date"].map((h) => (
+                <th key={h} style={{
+                  padding: "10px 14px", textAlign: "left", fontWeight: 600,
+                  color: T.text.secondary, fontSize: 11, textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                }}>
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {stats.recent_reviews.map((r) => (
+              <tr key={`${r.sprint_id}-${r.created_at}`} style={{ borderBottom: `1px solid ${T.border.subtle}` }}>
+                <td style={{ padding: "10px 14px", fontFamily: T.mono, fontWeight: 600 }}>
+                  #{r.sprint_id}
+                </td>
+                <td style={{ padding: "10px 14px", color: verdictColor(r.claude_verdict), fontWeight: 600 }}>
+                  {r.claude_verdict ?? "—"}
+                </td>
+                <td style={{ padding: "10px 14px", color: verdictColor(r.codex_verdict), fontWeight: 600 }}>
+                  {r.codex_verdict}{r.degraded ? " ⚡" : ""}
+                </td>
+                <td style={{ padding: "10px 14px", color: verdictColor(r.decision), fontWeight: 700 }}>
+                  {r.decision}
+                </td>
+                <td style={{ padding: "10px 14px", fontFamily: T.mono }}>
+                  {r.divergence_score.toFixed(2)}
+                </td>
+                <td style={{ padding: "10px 14px", color: T.text.muted, fontSize: 12 }}>
+                  {r.created_at.slice(0, 10)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Block Reasons */}
+      {stats.block_reasons.length > 0 && (
+        <div style={{
+          background: T.bg.card, borderRadius: 12, border: `1px solid ${T.border.subtle}`,
+          padding: 18,
+        }}>
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>BLOCK 사유 Top 5</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {stats.block_reasons.map((br) => (
+              <div key={br.reason} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{
+                  flex: 1, background: T.bg.inset, borderRadius: 6, height: 24,
+                  position: "relative", overflow: "hidden",
+                }}>
+                  <div style={{
+                    position: "absolute", left: 0, top: 0, bottom: 0,
+                    width: `${Math.min(100, (br.count / (stats.block_reasons[0]?.count || 1)) * 100)}%`,
+                    background: "rgba(239, 68, 68, 0.3)", borderRadius: 6,
+                  }} />
+                  <span style={{
+                    position: "relative", padding: "0 10px", fontSize: 12,
+                    lineHeight: "24px", color: T.text.secondary,
+                  }}>
+                    {br.reason}
+                  </span>
+                </div>
+                <span style={{ fontFamily: T.mono, fontSize: 13, fontWeight: 600, color: "#ef4444", minWidth: 30 }}>
+                  {br.count}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
