@@ -67,6 +67,52 @@ else
   fail "T6: 스크립트 없어 degraded 확인 불가"
 fi
 
+# === F554 추가 테스트 (Sprint 302 hotfix — Phase 5c 배선 검증) ===
+echo ""
+echo "=== F554 autopilot Phase 5c 배선 테스트 ==="
+
+SKILL_FILE=""
+# cache symlink 경로 (실제 실행 경로)
+for f in ~/.claude/plugins/cache/ax-marketplace/ax/*/skills/sprint-autopilot/SKILL.md; do
+  [ -f "$f" ] && SKILL_FILE="$f" && break
+done
+# fallback: marketplace source
+[ -z "$SKILL_FILE" ] && SKILL_FILE="$HOME/.claude/plugins/marketplaces/ax-marketplace/skills/sprint-autopilot/SKILL.md"
+
+# T7: sprint-autopilot SKILL.md에 codex-review.sh 참조 존재
+if [ -f "$SKILL_FILE" ] && grep -q 'codex-review.sh' "$SKILL_FILE" 2>/dev/null; then
+  ok "T7: sprint-autopilot SKILL.md에 codex-review.sh 참조 존재"
+else
+  fail "T7: sprint-autopilot SKILL.md에 codex-review.sh 참조 없음 (Dead Code)"
+fi
+
+# T8: BLOCK verdict 처리 로직 존재
+if [ -f "$SKILL_FILE" ] && grep -q 'BLOCK' "$SKILL_FILE" 2>/dev/null; then
+  ok "T8: BLOCK verdict 처리 로직 존재"
+else
+  fail "T8: BLOCK verdict 처리 없음"
+fi
+
+# T9: Step 5c 또는 Codex Cross-Review 섹션 존재
+if [ -f "$SKILL_FILE" ] && grep -qE 'Step 5c|Codex Cross-Review|5c.*Codex' "$SKILL_FILE" 2>/dev/null; then
+  ok "T9: Codex Cross-Review(5c) 섹션 존재"
+else
+  fail "T9: Codex Cross-Review 섹션 없음 (Sprint 302 배선 미완)"
+fi
+
+# T10: sprint-302 dogfood JSON — mock 실행으로 생성 가능성 검증
+if [ -x "$SCRIPT" ]; then
+  REVIEW_302="$REPO_ROOT/.claude/reviews/sprint-302"
+  MOCK_CODEX=1 SPRINT_NUM=302 "$SCRIPT" --sprint 302 2>/dev/null || true
+  if [ -f "$REVIEW_302/codex-review.json" ]; then
+    ok "T10: .claude/reviews/sprint-302/codex-review.json 생성 가능"
+  else
+    fail "T10: sprint-302 리뷰 JSON 생성 실패"
+  fi
+else
+  fail "T10: 스크립트 없어 sprint-302 JSON 생성 불가"
+fi
+
 echo ""
 echo "결과: PASS=$PASS FAIL=$FAIL"
 if [ "$FAIL" -gt 0 ]; then

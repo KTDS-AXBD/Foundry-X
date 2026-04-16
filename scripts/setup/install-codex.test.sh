@@ -62,6 +62,34 @@ else
   fail "T7: codex-setup.md 없음"
 fi
 
+# === F554 추가 테스트 (Sprint 302 hotfix) ===
+echo ""
+echo "=== F554 install-codex 추가 테스트 (user-level prefix) ==="
+
+# T8: user-level npm prefix 설정 포함 (EACCES 방지)
+if grep -q 'npm-global\|npm config set prefix' "$REPO_ROOT/scripts/setup/install-codex.sh" 2>/dev/null; then
+  ok "T8: user-level npm prefix 설정 포함"
+else
+  fail "T8: user-level npm prefix 미설정 (EACCES 발생 가능)"
+fi
+
+# T9: sudo 명령 실행 없음 (주석·문자열 제외, 실제 sudo 명령 호출 탐지)
+# 패턴: 줄 앞 또는 공백 후 sudo가 명령으로 오는 경우 (예: "sudo npm", "  sudo install")
+if grep -v '^[[:space:]]*#' "$REPO_ROOT/scripts/setup/install-codex.sh" 2>/dev/null | \
+   grep -qP '(?<!["\x27])\bsudo\b(?=\s+[a-z])'; then
+  fail "T9: sudo 명령 실행 발견 (user prefix 방식과 불일치)"
+else
+  ok "T9: sudo 명령 실행 없음 (user prefix 방식)"
+fi
+
+# T10: --dry-run 실행 시 prefix 관련 출력 확인
+DRY_OUT=$(bash "$REPO_ROOT/scripts/setup/install-codex.sh" --dry-run 2>&1 || true)
+if echo "$DRY_OUT" | grep -qi 'prefix\|npm-global\|dry.run'; then
+  ok "T10: --dry-run 실행 시 prefix/dry-run 메시지 출력"
+else
+  fail "T10: --dry-run 출력에 prefix 정보 없음"
+fi
+
 echo ""
 echo "결과: PASS=$PASS FAIL=$FAIL"
 if [ "$FAIL" -gt 0 ]; then
