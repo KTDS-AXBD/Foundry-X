@@ -11,52 +11,77 @@
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    /* Color: Text */
-    --black: #111;
-    --gray-900: #222;
-    --gray-700: #444;
-    --gray-600: #666;
-    --gray-400: #999;
-    --gray-300: #ccc;
-    --gray-200: #e5e5e5;
-    --gray-100: #f0f0f0;
-    --gray-50: #f8f9fa;
-    --white: #fff;
+    /* ── AXIS Design System Token Mapping (v0.4) ── */
+    /* Gray Scale — @axis-ds/tokens v1.1.1 */
+    --black: #111827;       /* axis-gray-900 */
+    --gray-900: #111827;    /* axis-gray-900 */
+    --gray-800: #1F2937;    /* axis-gray-800 */
+    --gray-700: #374151;    /* axis-gray-700 */
+    --gray-600: #4B5563;    /* axis-gray-600 */
+    --gray-500: #6B7280;    /* axis-gray-500 */
+    --gray-400: #9CA3AF;    /* axis-gray-400 */
+    --gray-300: #D1D5DB;    /* axis-gray-300 */
+    --gray-200: #E5E7EB;    /* axis-gray-200 */
+    --gray-100: #F3F4F6;    /* axis-gray-100 */
+    --gray-50: #F9FAFB;     /* axis-gray-50 */
+    --white: #FFFFFF;
 
-    /* Color: Data Visualization Only */
-    --red: #dc2626;
-    --orange: #ea580c;
-    --green: #16a34a;
-    --amber: #d97706;
+    /* Color: Data Visualization — AXIS aligned */
+    --red: #DC2626;         /* axis-red-600 */
+    --orange: #EA580C;      /* axis-orange-600 */
+    --green: #16A34A;       /* axis-green-600 */
+    --amber: #A16207;       /* axis-yellow-700 */
+    --yellow: #FACC15;      /* axis-yellow-400 */
 
     /* Layout */
     --max-width: 1200px;
     --nav-height: 56px;
     --card-radius: 16px;
     --card-radius-sm: 12px;
+
+    /* ── Foundry-X Custom Tokens ── */
+    --fx-font-family: 'Pretendard', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+    --fx-font-size-subsection: 1.375rem;
+    --fx-lineHeight-body: 1.7;
+    --fx-tracking-tightest: -0.04em;
+    --fx-tracking-tight: -0.02em;
+    --fx-tracking-slight: -0.01em;
+    --fx-tracking-wide: 0.08em;
+    --fx-tracking-widest: 0.12em;
+    --fx-shadow-subtle: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    --fx-shadow-hover: 0 8px 20px rgba(0,0,0,0.06);
+    --fx-transition-fast: 0.2s ease;
+    --fx-transition-normal: 0.3s ease;
+    --fx-transition-slow: 0.7s ease;
+    --fx-radius-sm: 0.25rem;
+    --fx-radius-md: 0.5rem;
+    --fx-radius-lg: 0.75rem;
+    --fx-radius-xl: 1rem;
+    --fx-radius-2xl: 1.25rem;
+    --fx-radius-full: 9999px;
   }
 
   html { scroll-behavior: smooth; }
 
   body {
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: var(--fx-font-family);
     color: var(--black);
     background: var(--white);
-    line-height: 1.7;
+    line-height: var(--fx-lineHeight-body);
     -webkit-font-smoothing: antialiased;
   }
 
   /* ===== TYPOGRAPHY ===== */
   .section-label {
-    font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--gray-400); margin-bottom: 12px;
+    font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: var(--fx-tracking-wide);
+    color: var(--gray-500); margin-bottom: 12px;
   }
   .section-title {
-    font-size: 36px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.3;
+    font-size: 36px; font-weight: 800; letter-spacing: var(--fx-tracking-tight); line-height: 1.3;
     margin-bottom: 20px; color: var(--black);
   }
   .section-sub {
-    font-size: 17px; color: var(--gray-600); line-height: 1.7; max-width: 680px;
+    font-size: 17px; color: var(--gray-600); line-height: var(--fx-lineHeight-body); max-width: 680px;
   }
 
   /* ===== LAYOUT ===== */
@@ -74,7 +99,7 @@
   /* ===== FADE-IN ANIMATION ===== */
   .fade-in {
     opacity: 0; transform: translateY(30px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
+    transition: opacity var(--fx-transition-slow), transform var(--fx-transition-slow);
   }
   .fade-in.visible { opacity: 1; transform: translateY(0); }
 
@@ -108,7 +133,7 @@
     background: var(--gray-50);
     font-size: 12px;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--fx-tracking-wide);
   }
 
   /* ===== BADGE ===== */
@@ -119,10 +144,10 @@
     padding: 3px 10px;
     border-radius: 6px;
   }
-  .badge.green { background: #f0fdf4; color: var(--green); }
-  .badge.red { background: #fef2f2; color: var(--red); }
-  .badge.orange { background: #fff7ed; color: var(--orange); }
-  .badge.amber { background: #fffbeb; color: var(--amber); }
+  .badge.green { background: #F0FDF4; color: var(--green); }   /* axis-green-50 */
+  .badge.red { background: #FEF2F2; color: var(--red); }     /* axis-red-50 */
+  .badge.orange { background: #FFF7ED; color: var(--orange); }/* axis-orange-50 */
+  .badge.amber { background: #FEFCE8; color: var(--amber); }  /* axis-yellow-50 */
   .badge.black { background: var(--black); color: var(--white); }
   .badge.gray { background: var(--gray-100); color: var(--gray-600); }
 
@@ -131,6 +156,11 @@
     section { padding: 80px 20px 60px; }
     .section-title { font-size: 28px; }
     nav ul { display: none; }
+  }
+
+  @media (max-width: 600px) {
+    section { padding: 60px 16px 40px; }
+    .section-title { font-size: 24px; }
   }
 </style>
 </head>
