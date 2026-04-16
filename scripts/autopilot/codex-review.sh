@@ -110,7 +110,16 @@ main() {
     return 0
   fi
 
-  # OpenAI 키 확인
+  # OpenAI 키 확인 — 환경변수 우선, ~/.codex/auth.json fallback
+  if [ -z "${OPENAI_API_KEY:-}" ]; then
+    if [ -f "$HOME/.codex/auth.json" ]; then
+      OPENAI_API_KEY=$(python3 -c "import json; print(json.load(open('$HOME/.codex/auth.json')).get('OPENAI_API_KEY',''))" 2>/dev/null || echo "")
+      if [ -n "$OPENAI_API_KEY" ]; then
+        export OPENAI_API_KEY
+        log "🔑 ~/.codex/auth.json에서 API 키 로드"
+      fi
+    fi
+  fi
   if [ -z "${OPENAI_API_KEY:-}" ]; then
     log "⚠️  OPENAI_API_KEY 미설정 — degraded 모드"
     write_degraded_json "openai_key_missing"
