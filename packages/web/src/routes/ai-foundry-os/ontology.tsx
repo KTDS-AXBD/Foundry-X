@@ -150,7 +150,17 @@ export function Component() {
   useEffect(() => {
     fetch(`${BASE_URL}/decode/ontology/graph`)
       .then(r => r.json())
-      .then(d => setGraphData(d as GraphData))
+      .then(d => {
+        // API may return { success, data: { nodes, links } } or { nodes, edges } directly
+        const raw = (d as Record<string, unknown>).data ?? d;
+        const g = raw as GraphData;
+        // If real data is empty, use fallback mock
+        if (!g.nodes?.length) {
+          setGraphData(FALLBACK_DATA);
+        } else {
+          setGraphData(g);
+        }
+      })
       .catch(() => setGraphData(FALLBACK_DATA))
       .finally(() => setLoading(false));
   }, []);
