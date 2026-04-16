@@ -6,22 +6,14 @@ import { useNavigate } from "react-router-dom";
 
 const BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
-const T = {
-  font: "'Plus Jakarta Sans Variable', system-ui, sans-serif",
-  bg: { page: "#080c14", card: "#0d1a2e", inset: "#0a131f" },
-  border: { subtle: "#1a2d47" },
-  text: { primary: "#e8edf5", secondary: "#8b9cc0", muted: "#4e6085" },
-} as const;
+import { fos, fonts, NODE_COLORS } from "./tokens";
 
-const NODE_COLORS: Record<string, string> = {
-  SubProcess: "#3b82f6",
-  Method: "#8b5cf6",
-  Condition: "#f59e0b",
-  Actor: "#34d399",
-  Requirement: "#f87171",
-  DiagnosisFinding: "#ec4899",
-  default: "#6b7280",
-};
+const T = {
+  font: fonts.body,
+  bg: { page: fos.surface.abyss, card: fos.surface.panel, inset: fos.surface.inset },
+  border: { subtle: fos.border.subtle },
+  text: { primary: fos.text.primary, secondary: fos.text.secondary, muted: fos.text.muted },
+} as const;
 
 const NODE_RADIUS: Record<string, number> = {
   Actor: 22, SubProcess: 20, Method: 16,
