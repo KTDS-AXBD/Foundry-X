@@ -65,7 +65,7 @@ function ScoreBar({ value, label, color }: { value: number; label: string; color
         <span style={{ fontSize: 13, color: T.text.secondary, fontWeight: 450 }}>{label}</span>
         <span style={{ fontSize: 14, fontWeight: 700, color, fontVariantNumeric: "tabular-nums" }}>{value}점</span>
       </div>
-      <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 6, height: 6, overflow: "hidden" }}>
+      <div style={{ background: fos.border.default, borderRadius: 6, height: 6, overflow: "hidden" }}>
         <div style={{
           width: `${width}%`, background: `linear-gradient(90deg, ${color}cc, ${color})`,
           height: "100%", borderRadius: 6, transition: "width 0.8s cubic-bezier(0.22,1,0.36,1)",
@@ -94,7 +94,7 @@ function TreeItem({ name, indent = 0, isDir = false, highlight = false }: { name
     <div style={{
       paddingLeft: indent * 20 + 12, paddingTop: 4, paddingBottom: 4, fontSize: 12.5,
       fontFamily: T.font.mono, color: highlight ? T.status.ok : T.text.secondary,
-      background: highlight ? "rgba(0,230,118,0.04)" : "transparent",
+      background: highlight ? "var(--fos-gradient-control)" : "transparent",
       borderRadius: 4,
     }}>
       <span style={{ color: T.text.muted, marginRight: 8, fontSize: 11 }}>{isDir ? "📁" : "📄"}</span>
@@ -125,10 +125,10 @@ function SectionHeader({ badge, title, sub }: { badge: string; title: string; su
   return (
     <div style={{ marginBottom: 20 }}>
       <span style={{
-        display: "inline-block", background: "rgba(0,230,118,0.08)", color: T.status.ok,
+        display: "inline-block", background: "var(--fos-accent-control-soft)", color: T.status.ok,
         padding: "3px 12px", borderRadius: 12, fontSize: 10, fontWeight: 700,
         letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10,
-        border: "1px solid rgba(0,230,118,0.15)",
+        border: "1px solid var(--fos-accent-control)",
       }}>{badge}</span>
       <h2 style={{ margin: "8px 0 0", fontSize: 18, fontWeight: 700, color: T.text.primary }}>{title}</h2>
       {sub && <p style={{ margin: "4px 0 0", fontSize: 13, color: T.text.muted }}>{sub}</p>}
@@ -167,13 +167,13 @@ function CodeBlock({ code }: { code: string }) {
   const lines = code.split("\n");
   return (
     <div style={{
-      background: "#0d1117", border: "1px solid rgba(255,255,255,0.06)",
+      background: fos.surface.inset, border: `1px solid ${fos.border.default}`,
       borderRadius: 10, overflow: "hidden", fontSize: 12, fontFamily: T.font.mono,
       lineHeight: 1.7,
     }}>
       <div style={{
         display: "flex", alignItems: "center", gap: 8, padding: "8px 14px",
-        background: "rgba(255,255,255,0.03)", borderBottom: "1px solid rgba(255,255,255,0.06)",
+        background: "rgba(255,255,255,0.03)", borderBottom: "1px solid var(--fos-border-default)",
       }}>
         <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#ff5f57" }} />
         <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#febc2e" }} />
@@ -193,7 +193,7 @@ function CodeBlock({ code }: { code: string }) {
           else if (hasKeyword) color = "#ff7b72";
           return (
             <div key={i} style={{
-              display: "flex", background: isBL ? "rgba(0,230,118,0.04)" : "transparent",
+              display: "flex", background: isBL ? "var(--fos-gradient-control)" : "transparent",
             }}>
               <span style={{
                 width: 40, textAlign: "right", paddingRight: 12, color: "#484f58",
@@ -492,7 +492,7 @@ export function Component() {
             <TreeItem name="migrations/" indent={0} isDir />
             <TreeItem name="0001_init.sql" indent={1} />
             <TreeItem name="package.json" indent={0} />
-            <div style={{ marginTop: 10, padding: "8px 12px", background: "rgba(0,230,118,0.04)", borderRadius: 6, fontSize: 11, color: T.text.muted }}>
+            <div style={{ marginTop: 10, padding: "8px 12px", background: "var(--fos-gradient-control)", borderRadius: 6, fontSize: 11, color: T.text.muted }}>
               도메인 <span style={{ color: T.status.ok, fontWeight: 700 }}>738</span>줄 · 라우트 <span style={{ color: T.status.ok, fontWeight: 700 }}>239</span>줄 · 테스트 <span style={{ color: T.status.ok, fontWeight: 700 }}>518</span>줄
             </div>
           </div>

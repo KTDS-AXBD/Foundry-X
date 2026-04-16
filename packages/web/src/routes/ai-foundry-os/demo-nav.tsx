@@ -1,5 +1,7 @@
-// AI Foundry OS — 공통 시연 네비게이션 바
+// AI Foundry OS — 공통 시연 네비게이션 바 + 테마 토글
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTheme } from "@axis-ds/theme";
+import { useEffect, useState } from "react";
 import { fos, fonts } from "./tokens";
 
 const NAV_ITEMS = [
@@ -13,7 +15,12 @@ const NAV_ITEMS = [
 export function DemoNav() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const current = location.pathname;
+  const isDark = resolvedTheme === "dark";
 
   return (
     <nav style={{
@@ -21,9 +28,10 @@ export function DemoNav() {
       background: fos.surface.hull, borderBottom: `1px solid ${fos.border.subtle}`,
       padding: "0 32px", height: 42, fontFamily: fonts.body,
       position: "sticky", top: 0, zIndex: 50,
+      transition: "background 0.3s, border-color 0.3s",
     }}>
       <span style={{
-        fontSize: 11, fontWeight: 700, color: fos.text.muted,
+        fontSize: 11, fontWeight: 700, color: fos.text.dim,
         letterSpacing: 1, textTransform: "uppercase", marginRight: 16,
       }}>DEMO</span>
 
@@ -33,23 +41,22 @@ export function DemoNav() {
           : current.startsWith(item.path);
         const isExternal = "external" in item;
 
+        const baseStyle: React.CSSProperties = {
+          display: "flex", alignItems: "center", gap: 5,
+          padding: "6px 14px", borderRadius: 6, fontSize: 12,
+          cursor: "pointer", transition: "all 0.15s",
+          border: "none", fontFamily: "inherit", textDecoration: "none",
+          fontWeight: isActive ? 700 : 500,
+          background: isActive ? "var(--fos-accent-control-soft)" : "transparent",
+          color: isActive ? fos.status.ok : fos.text.muted,
+        };
+
         if (isExternal) {
           return (
-            <a
-              key={item.path}
-              href={item.path}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "flex", alignItems: "center", gap: 5,
-                padding: "6px 14px", borderRadius: 6, fontSize: 12, fontWeight: 500,
-                textDecoration: "none", cursor: "pointer", transition: "all 0.15s",
-                background: "transparent",
-                color: fos.text.muted,
-                border: "none",
-              }}
-              onMouseEnter={e => { (e.currentTarget).style.background = "rgba(255,255,255,0.04)"; }}
-              onMouseLeave={e => { (e.currentTarget).style.background = "transparent"; }}
+            <a key={item.path} href={item.path} target="_blank" rel="noopener noreferrer"
+              style={baseStyle}
+              onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = fos.surface.panelHi; }}
+              onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
             >
               <span style={{ fontSize: 13 }}>{item.icon}</span>
               {item.label}
@@ -59,26 +66,38 @@ export function DemoNav() {
         }
 
         return (
-          <button
-            key={item.path}
-            onClick={() => navigate(item.path)}
-            style={{
-              display: "flex", alignItems: "center", gap: 5,
-              padding: "6px 14px", borderRadius: 6, fontSize: 12, fontWeight: isActive ? 700 : 500,
-              cursor: "pointer", transition: "all 0.15s", border: "none",
-              fontFamily: "inherit",
-              background: isActive ? "rgba(0,230,118,0.08)" : "transparent",
-              color: isActive ? fos.status.ok : fos.text.muted,
-              borderBottom: isActive ? "none" : "none",
-            }}
-            onMouseEnter={e => { if (!isActive) (e.currentTarget).style.background = "rgba(255,255,255,0.04)"; }}
-            onMouseLeave={e => { if (!isActive) (e.currentTarget).style.background = "transparent"; }}
+          <button key={item.path} onClick={() => navigate(item.path)}
+            style={baseStyle}
+            onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = fos.surface.panelHi; }}
+            onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
           >
             <span style={{ fontSize: 13 }}>{item.icon}</span>
             {item.label}
           </button>
         );
       })}
+
+      {/* Theme Toggle */}
+      <div style={{ marginLeft: "auto" }}>
+        {mounted && (
+          <button
+            onClick={() => setTheme(isDark ? "light" : "dark")}
+            title="테마 전환 (라이트/다크)"
+            style={{
+              display: "flex", alignItems: "center", gap: 6,
+              background: fos.surface.panelHi, border: `1px solid ${fos.border.subtle}`,
+              borderRadius: 20, padding: "4px 12px", cursor: "pointer",
+              fontSize: 11, color: fos.text.muted, fontFamily: "inherit",
+              transition: "all 0.3s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = fos.border.strong; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = fos.border.subtle; }}
+          >
+            <span style={{ fontSize: 14 }}>{isDark ? "◑" : "◐"}</span>
+            {isDark ? "Dark" : "Light"}
+          </button>
+        )}
+      </div>
     </nav>
   );
 }

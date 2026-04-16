@@ -188,7 +188,7 @@ export function Component() {
             <button onClick={() => navigate("/ai-foundry-os")} style={{ background: "transparent", border: `1px solid ${T.border.subtle}`, color: T.text.muted, borderRadius: 6, padding: "4px 12px", fontSize: 12, cursor: "pointer" }}>
               ← AI Foundry OS
             </button>
-            <span style={{ background: "#14532d", color: "#4ade80", border: "1px solid #4ade8040", borderRadius: 12, padding: "2px 10px", fontSize: 11 }}>Presentation Plane</span>
+            <span style={{ background: "var(--fos-accent-control-soft)", color: "var(--fos-accent-control-text)", border: "1px solid var(--fos-accent-control)", borderRadius: 12, padding: "2px 10px", fontSize: 11 }}>Presentation Plane</span>
           </div>
           <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 700 }}>🕸 KG XAI 뷰어</h1>
           <p style={{ margin: 0, fontSize: 13, color: T.text.secondary }}>
@@ -259,7 +259,7 @@ export function Component() {
                   const isInPath = pathEdgeSet.has(key);
                   const isAll = pathMode === "all";
                   const dimmed = !isAll && !isInPath;
-                  const strokeColor = isInPath ? activePathColor : "#1e3a5f";
+                  const strokeColor = isInPath ? activePathColor : "var(--fos-border-subtle)";
                   const midX = ((src.x ?? 0) + (tgt.x ?? 0)) / 2;
                   const midY = ((src.y ?? 0) + (tgt.y ?? 0)) / 2;
                   return (
