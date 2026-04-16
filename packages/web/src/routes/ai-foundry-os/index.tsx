@@ -6,36 +6,30 @@ import { useNavigate } from "react-router-dom";
 import { DEEPDIVE } from "../../data/deepdive-content";
 import type { PlaneType, SubSectionType } from "../../data/deepdive-content";
 
-// ─── Design Tokens ─────────────────────────────────────────────────
-const display = "'Fraunces', 'Noto Serif KR', ui-serif, Georgia, serif";
-const body = "'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif";
-const mono = "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace";
+// ─── Design Tokens (AXIS dark mode aligned) ───────────────────────
+import { fos, fonts, type PlaneId, type Glint } from "./tokens";
 
+const { display, body, mono } = fonts;
+
+// Compatibility aliases — ink/glint → fos
 const ink = {
-  abyss: "#05080d",
-  hull: "#0a1018",
-  panel: "#0e1620",
-  panelHi: "#131d2a",
-  hairline: "rgba(230, 234, 246, 0.08)",
-  hairlineStrong: "rgba(230, 234, 246, 0.14)",
-  text: "#e7ecf5",
-  textSoft: "#a1adc4",
-  textMute: "#6b7a95",
-  textDim: "#495569",
-};
-
-const glint = {
-  input: { accent: "#d4a54c", soft: "#2a200e", text: "#e8c679" },
-  control: { accent: "#3fb08a", soft: "#0f2720", text: "#6fd7b1" },
-  takeaway: { accent: "#e25c5c", soft: "#2a1012", text: "#ff8585" },
+  abyss: fos.surface.abyss,
+  hull: fos.surface.hull,
+  panel: fos.surface.panel,
+  panelHi: fos.surface.panelHi,
+  hairline: fos.border.default,
+  hairlineStrong: fos.border.strong,
+  text: fos.text.primary,
+  textSoft: fos.text.secondary,
+  textMute: fos.text.muted,
+  textDim: fos.text.dim,
 } as const;
 
-type PlaneId = keyof typeof glint;
-interface Glint {
-  accent: string;
-  soft: string;
-  text: string;
-}
+const glint = {
+  input: { accent: fos.accent.input.accent, soft: fos.accent.input.soft, text: fos.accent.input.text },
+  control: { accent: fos.accent.control.accent, soft: fos.accent.control.soft, text: fos.accent.control.text },
+  takeaway: { accent: fos.accent.takeaway.accent, soft: fos.accent.takeaway.soft, text: fos.accent.takeaway.text },
+} as const;
 
 // ─── Global Styles ─────────────────────────────────────────────────
 function GlobalStyle() {
