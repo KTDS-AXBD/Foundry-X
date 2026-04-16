@@ -73,3 +73,4 @@ packages/web/playwright-report/
 
 # F507 priority-history flock files (S255 교훈)
 docs/priority-history/.*.lock
+.claude/reviews/
