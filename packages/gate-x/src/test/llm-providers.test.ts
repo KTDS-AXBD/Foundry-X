@@ -15,7 +15,7 @@ describe('LLM Providers', () => {
     it('should call Anthropic API and parse response', async () => {
       const mockResponse = {
         content: [{ type: 'text', text: 'Anthropic response text' }],
-        model: 'claude-sonnet-4-5',
+        model: 'claude-sonnet-4-6',
         usage: { input_tokens: 10, output_tokens: 20 },
       };
 
@@ -31,7 +31,7 @@ describe('LLM Providers', () => {
       );
 
       expect(result.provider).toBe('anthropic');
-      expect(result.model).toBe('claude-sonnet-4-5');
+      expect(result.model).toBe('claude-sonnet-4-6');
       expect(result.text).toBe('Anthropic response text');
       expect(result.usage).toEqual({ inputTokens: 10, outputTokens: 20 });
 

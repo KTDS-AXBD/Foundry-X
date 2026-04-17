@@ -24,7 +24,7 @@ export const DEFAULT_MODEL_MAP: Record<AgentTaskType, string> = {
   "policy-evaluation": "anthropic/claude-haiku-4-5",
   "skill-query": "anthropic/claude-haiku-4-5",
   "ontology-lookup": "anthropic/claude-haiku-4-5",
-  "security-review": "anthropic/claude-sonnet-4-5-20250514",
+  "security-review": "anthropic/claude-sonnet-4-6",
   "qa-testing": "anthropic/claude-haiku-4-5",
   "infra-analysis": "anthropic/claude-sonnet-4",
   "bmc-generation": "anthropic/claude-sonnet-4-6",

@@ -32,7 +32,7 @@ export interface McpSamplingResponse {
 }
 
 const DEFAULT_CONFIG: SamplingSecurityConfig = {
-  allowedModels: ["claude-haiku-4-5-20250714"],
+  allowedModels: ["claude-haiku-4-5-20251001"],
   maxTokensPerRequest: 4096,
   maxRequestsPerMinute: 10,
 };

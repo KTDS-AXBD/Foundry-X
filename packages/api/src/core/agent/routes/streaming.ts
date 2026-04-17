@@ -61,7 +61,7 @@ streamingRoute.openapi(AgentRunStreamRoute, async (c) => {
   // AgentSpec 기본 스펙 (YAML 파일 로딩은 Workers 환경에서 정적 import 필요 — 후속 확장)
   const spec = {
     name: body.agentId,
-    model: "claude-sonnet-4-5-20251022",
+    model: "claude-sonnet-4-6",
     systemPrompt: `You are a helpful agent named ${body.agentId}. Answer clearly and concisely.`,
     tools: [] as string[],
     constraints: { maxRounds: 5, maxTokens: 2048 },
@@ -168,7 +168,7 @@ streamingRoute.get("/agents/stream/ws", async (c) => {
 
     const spec = {
       name: body.agentId,
-      model: "claude-sonnet-4-5-20251022",
+      model: "claude-sonnet-4-6",
       systemPrompt: `You are a helpful agent named ${body.agentId}.`,
       tools: [] as string[],
       constraints: { maxRounds: 5, maxTokens: 2048 },

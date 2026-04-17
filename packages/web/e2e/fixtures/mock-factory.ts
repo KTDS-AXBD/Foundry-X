@@ -157,7 +157,7 @@ export function makeArtifact(overrides?: Record<string, unknown>) {
     version: 1,
     inputText: "AI 헬스케어 타당성 분석 요청",
     outputText: "## 분석 결과\n\n시장 규모 1조원",
-    model: "claude-sonnet-4-5-20250514",
+    model: "claude-sonnet-4-6",
     tokensUsed: 1500,
     durationMs: 3200,
     status: "completed",
@@ -212,7 +212,7 @@ export function makePersonaEval(overrides?: Record<string, unknown>) {
     summary: "전략적 적합성이 높고 시장 잠재력이 우수함",
     concerns: null,
     condition: null,
-    evalMetadata: { model: "claude-sonnet-4-5-20250514", durationMs: 2500, costUsd: 0.03 },
+    evalMetadata: { model: "claude-sonnet-4-6", durationMs: 2500, costUsd: 0.03 },
     createdAt: "2026-01-01T00:00:00Z",
     ...overrides,
   };

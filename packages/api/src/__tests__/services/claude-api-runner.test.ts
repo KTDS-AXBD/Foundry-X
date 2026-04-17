@@ -56,7 +56,7 @@ describe("ClaudeApiRunner", () => {
     expect(result.output.reviewComments).toHaveLength(1);
     expect(result.output.reviewComments![0]!.file).toBe("src/index.ts");
     expect(result.tokensUsed).toBe(150);
-    expect(result.model).toBe("claude-haiku-4-5-20250714");
+    expect(result.model).toBe("claude-haiku-4-5-20251001");
     expect(result.duration).toBeGreaterThanOrEqual(0);
   });
 
@@ -136,7 +136,7 @@ describe("ClaudeApiRunner", () => {
     expect(options.headers["x-api-key"]).toBe("test-api-key");
 
     const body = JSON.parse(options.body);
-    expect(body.model).toBe("claude-haiku-4-5-20250714");
+    expect(body.model).toBe("claude-haiku-4-5-20251001");
     expect(body.system).toBe(TASK_SYSTEM_PROMPTS["spec-analysis"]);
   });
 

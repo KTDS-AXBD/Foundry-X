@@ -10,7 +10,7 @@ const TABLES = `
     id TEXT PRIMARY KEY, org_id TEXT NOT NULL, biz_item_id TEXT NOT NULL,
     skill_id TEXT NOT NULL, stage_id TEXT NOT NULL, version INTEGER NOT NULL DEFAULT 1,
     input_text TEXT NOT NULL, output_text TEXT,
-    model TEXT NOT NULL DEFAULT 'claude-haiku-4-5-20250714',
+    model TEXT NOT NULL DEFAULT 'claude-haiku-4-5-20251001',
     tokens_used INTEGER DEFAULT 0, duration_ms INTEGER DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'pending', created_by TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -46,7 +46,7 @@ function seed(db: any) {
     INSERT INTO organizations (id, name, slug) VALUES ('org1', 'Test Org', 'test-org');
     INSERT INTO users (id, email, name, created_at, updated_at) VALUES ('user1', 'test@test.com', 'Test User', '2026-01-01', '2026-01-01');
     INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, version, input_text, output_text, status, created_by, tokens_used, duration_ms, model)
-      VALUES ('art1', 'org1', 'biz1', 'ai-biz:ecosystem-map', '2-1', 1, 'input1', '## Result', 'completed', 'user1', 300, 2500, 'claude-haiku-4-5-20250714');
+      VALUES ('art1', 'org1', 'biz1', 'ai-biz:ecosystem-map', '2-1', 1, 'input1', '## Result', 'completed', 'user1', 300, 2500, 'claude-haiku-4-5-20251001');
   `);
 }
 

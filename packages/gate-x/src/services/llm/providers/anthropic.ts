@@ -8,7 +8,7 @@ export class AnthropicProvider implements LLMProvider {
       throw new Error('ANTHROPIC_API_KEY not set');
     }
 
-    const model = 'claude-sonnet-4-5';
+    const model = 'claude-sonnet-4-6';
     const body: Record<string, unknown> = {
       model,
       max_tokens: req.maxTokens ?? 1024,

@@ -15,7 +15,7 @@ const ARTIFACTS_TABLE = `
     version INTEGER NOT NULL DEFAULT 1,
     input_text TEXT NOT NULL,
     output_text TEXT,
-    model TEXT NOT NULL DEFAULT 'claude-haiku-4-5-20250714',
+    model TEXT NOT NULL DEFAULT 'claude-haiku-4-5-20251001',
     tokens_used INTEGER DEFAULT 0,
     duration_ms INTEGER DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'pending',
@@ -56,7 +56,7 @@ describe("BdArtifactService", () => {
       stageId: "2-1",
       version: 1,
       inputText: "Analyze AI chatbot ecosystem",
-      model: "claude-haiku-4-5-20250714",
+      model: "claude-haiku-4-5-20251001",
       createdBy: "user1",
     });
 
@@ -75,7 +75,7 @@ describe("BdArtifactService", () => {
       stageId: "2-3",
       version: 1,
       inputText: "Moat analysis for chatbot",
-      model: "claude-haiku-4-5-20250714",
+      model: "claude-haiku-4-5-20251001",
       createdBy: "user1",
     });
 
@@ -96,7 +96,7 @@ describe("BdArtifactService", () => {
       stageId: "2-1",
       version: 1,
       inputText: "input a",
-      model: "claude-haiku-4-5-20250714",
+      model: "claude-haiku-4-5-20251001",
       createdBy: "user1",
     });
     await service.create({
@@ -107,7 +107,7 @@ describe("BdArtifactService", () => {
       stageId: "2-6",
       version: 1,
       inputText: "input b",
-      model: "claude-haiku-4-5-20250714",
+      model: "claude-haiku-4-5-20251001",
       createdBy: "user1",
     });
 
@@ -132,7 +132,7 @@ describe("BdArtifactService", () => {
       stageId: "2-1",
       version: 1,
       inputText: "v1 input",
-      model: "claude-haiku-4-5-20250714",
+      model: "claude-haiku-4-5-20251001",
       createdBy: "user1",
     });
 
@@ -150,7 +150,7 @@ describe("BdArtifactService", () => {
         stageId: "2-4",
         version: v,
         inputText: `version ${v} input`,
-        model: "claude-haiku-4-5-20250714",
+        model: "claude-haiku-4-5-20251001",
         createdBy: "user1",
       });
     }
@@ -170,7 +170,7 @@ describe("BdArtifactService", () => {
       stageId: "2-1",
       version: 1,
       inputText: "test",
-      model: "claude-haiku-4-5-20250714",
+      model: "claude-haiku-4-5-20251001",
       createdBy: "user1",
     });
 
@@ -196,7 +196,7 @@ describe("BdArtifactService", () => {
       stageId: "2-6",
       version: 1,
       inputText: "test",
-      model: "claude-haiku-4-5-20250714",
+      model: "claude-haiku-4-5-20251001",
       createdBy: "user1",
     });
 
@@ -215,7 +215,7 @@ describe("BdArtifactService", () => {
         stageId: "2-1",
         version: 1,
         inputText: `input ${i}`,
-        model: "claude-haiku-4-5-20250714",
+        model: "claude-haiku-4-5-20251001",
         createdBy: "user1",
       });
     }

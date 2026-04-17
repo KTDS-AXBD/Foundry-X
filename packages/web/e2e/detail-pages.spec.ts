@@ -221,7 +221,7 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
         json: {
           id: "job-1", orgId: "org-1", prdTitle: "AI 문서 자동화",
           status: "completed", builderType: "nextjs", pagesUrl: null,
-          costUsd: 0.05, modelUsed: "claude-sonnet-4-20250514", fallbackUsed: false,
+          costUsd: 0.05, modelUsed: "claude-sonnet-4-6", fallbackUsed: false,
           retryCount: 0, qualityScore: 85, ogdRounds: 2,
           createdAt: Date.now(), updatedAt: Date.now(),
           startedAt: Date.now(), prdContent: "# PRD", buildLog: "",

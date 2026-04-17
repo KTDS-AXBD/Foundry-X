@@ -15,7 +15,7 @@ const TABLES = `
     version INTEGER NOT NULL DEFAULT 1,
     input_text TEXT NOT NULL,
     output_text TEXT,
-    model TEXT NOT NULL DEFAULT 'claude-haiku-4-5-20250714',
+    model TEXT NOT NULL DEFAULT 'claude-haiku-4-5-20251001',
     tokens_used INTEGER DEFAULT 0,
     duration_ms INTEGER DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'pending',
@@ -204,7 +204,7 @@ describe("BdSkillExecutor", () => {
     });
 
     const callBody = JSON.parse(fetchMock.mock.calls[0]![1].body);
-    expect(callBody.model).toBe("claude-haiku-4-5-20250714");
+    expect(callBody.model).toBe("claude-haiku-4-5-20251001");
     expect(callBody.max_tokens).toBe(4096);
   });
 });

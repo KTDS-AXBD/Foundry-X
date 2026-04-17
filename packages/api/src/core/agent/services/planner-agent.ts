@@ -216,7 +216,7 @@ export class PlannerAgent {
     const externalTools = await this.gatherExternalToolInfo();
     const systemPrompt = getPlannerPrompt(taskType);
     const userPrompt = this.buildPromptWithFileContext(taskType, context, fileResult, externalTools);
-    const selectedModel = model ?? this.deps.model ?? "claude-sonnet-4-5-20250514";
+    const selectedModel = model ?? this.deps.model ?? "claude-sonnet-4-6";
     const llmResult = await this.callLlmWithRetry(userPrompt, systemPrompt, selectedModel);
 
     if (!llmResult) {

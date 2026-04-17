@@ -13,7 +13,7 @@ describe('callLLM registry', () => {
   it('should return response from the first provider on success', async () => {
     const mockResponse = {
       content: [{ type: 'text', text: 'Anthropic answer' }],
-      model: 'claude-sonnet-4-5',
+      model: 'claude-sonnet-4-6',
       usage: { input_tokens: 10, output_tokens: 5 },
     };
 
