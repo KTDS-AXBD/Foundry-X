@@ -17,7 +17,7 @@ F543 CONDITIONAL GO 판정의 조건 A2를 해소하기 위한 재측정 플랜.
 
 ## §1 배경
 
-F543 Sprint 291 측정(`docs/04-report/phase-44-latency-decision.md`)은 WSL Korea → Cloudflare 글로벌 PoP 간 지리 RTT가 절대값을 지배하여 p99 기준 800~1600ms로 나타났다. Service Binding 증분 p50 +10~14ms는 합리적이나, **서울 PoP 직접 연결 또는 CF 내부 기준 p99 < 100ms**는 미증명 상태로 CONDITIONAL GO 유지 중.
+F543 Sprint 291 측정(`docs/04-report/features/phase-44-latency-decision.md`)은 WSL Korea → Cloudflare 글로벌 PoP 간 지리 RTT가 절대값을 지배하여 p99 기준 800~1600ms로 나타났다. Service Binding 증분 p50 +10~14ms는 합리적이나, **서울 PoP 직접 연결 또는 CF 내부 기준 p99 < 100ms**는 미증명 상태로 CONDITIONAL GO 유지 중.
 
 F539는 실제 프로덕션 트래픽을 fx-gateway → fx-discovery 경로로 전환하므로, 이 시점에 p99 SLO를 확정적으로 증빙해야 한다.
 

@@ -80,7 +80,7 @@ F539 완료 후 F540(Shaping 도메인 분리) / F541(Offering 도메인 분리)
 |----|---------|-----|
 | F539a-1 | k6 Cloud Seoul 리전에서 4 엔드포인트(E1~E4) 측정 | `benchmarks/phase-44-latency/k6-items.js` 재실행, Grafana report 링크 확보 |
 | F539a-2 | 부하 프로파일: 30s ramp-up → 2m×20 VU → 30s×50 VU spike → 1m recover → 30s ramp-down | k6 Cloud run 완료 로그 |
-| F539a-3 | Go/No-Go 판정 리포트 작성 (`docs/04-report/phase-44-f539a-k6-cloud.md`) | 증분 p99 수치 + 판정 기록 |
+| F539a-3 | Go/No-Go 판정 리포트 작성 (`docs/04-report/features/phase-44-f539a-k6-cloud.md`) | 증분 p99 수치 + 판정 기록 |
 | F539a-4 | 판정 결과를 F543 비고에 역동기화 | SPEC.md F543 수치 추가 |
 
 **Go 기준 (Service Binding 증분 p99 = E2 - E1)**:
@@ -98,7 +98,7 @@ F539 완료 후 F540(Shaping 도메인 분리) / F541(Offering 도메인 분리)
 | F539b-2 | deploy-msa path filter에 fx-gateway 경로 포함 검증 | `.github/workflows/deploy.yml` diff + dry-run |
 | F539b-3 | fx-gateway package.json에 wrangler devDependency 추가 (또는 상대경로 확정) | `pnpm --filter @foundry-x/fx-gateway deploy` 로컬 성공 |
 | F539b-4 | `VITE_API_URL`을 fx-gateway URL로 전환 (Web + CLI) | CF Pages env 변경 + CLI config 기본값 변경 |
-| F539b-5 | 롤백 스위치 문서화 + 리허설 1회 | `docs/04-report/phase-44-f539b-rollback-drill.md` — 롤백 후 복구 증거 |
+| F539b-5 | 롤백 스위치 문서화 + 리허설 1회 | `docs/04-report/features/phase-44-f539b-rollback-drill.md` — 롤백 후 복구 증거 |
 | F539b-6 | Smoke Reality: KOAMI Graph 1회 실행 성공 + proposals ≥ 1건 | session_id + proposals count 로그 |
 
 ### 4.3 F539c — 7 라우트 Service Binding 이전 (FX-REQ-578) — Must Have
@@ -111,7 +111,7 @@ F539 완료 후 F540(Shaping 도메인 분리) / F541(Offering 도메인 분리)
 | F539c-2 | **PR 2 (Group B)**: discoveryPipeline/stages 4 라우트를 Service Binding 호출로 구성 | PR merge + KOAMI Smoke |
 | F539c-3 | packages/api 해당 7 라우트 + 관련 test 파편 삭제 | `grep -rn "api/bizItems\|api/discoveryPipeline\|api/stages" packages/api/src/` = 0 |
 | F539c-4 | ESLint `no-cross-domain-import` 룰 확장 (bizItems를 discovery 도메인으로 고정) | 룰 설정 + 자가 PR 통과 |
-| F539c-5 | Phase 44 회고(`docs/04-report/phase-44-f539-retrospective.md`) | Smoke Reality P1~P4 체크리스트 기록 |
+| F539c-5 | Phase 44 회고(`docs/04-report/features/phase-44-f539-retrospective.md`) | Smoke Reality P1~P4 체크리스트 기록 |
 
 ---
 
@@ -249,7 +249,7 @@ Sprint 293 F538 배포 연쇄 장애 5건을 F539에서 재발 방지:
 
 - `docs/specs/fx-msa-roadmap-v2/prd-final.md` — MSA 로드맵 v2 (SSOT)
 - `docs/specs/fx-msa-roadmap-v2/f543-a2-k6-cloud-plan.md` — k6 Cloud 측정 플랜 DRAFT
-- `docs/04-report/phase-44-latency-decision.md` — F543 Sprint 291 벤치마크
+- `docs/04-report/features/phase-44-latency-decision.md` — F543 Sprint 291 벤치마크
 - `docs/04-report/sprint-293-f538-discovery-split.md` (가칭) — F538 교훈
 - MEMORY `feedback_msa_deploy_pipeline_gaps.md` — 선제 체크리스트 5항목
 - SPEC.md §5 F538 비고 — 배포 파이프라인 5건 요약

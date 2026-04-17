@@ -93,7 +93,7 @@ Language: 한국어 우선, 필요 시 영어
 | P1 | Dogfood 1회 이상 | 본 Sprint 300 PR이 Phase 5b를 거침 |
 | P2 | 실측 산출물 | `.claude/reviews/sprint-300/codex-review.json` 존재 + verdict 필드 비어있지 않음 |
 | P3 | 6축 메트릭 | K2 BLOCK hit rate 측정 시작 (4주 관측 F553에서 종결) |
-| P4 | 회고 | `docs/04-report/phase-46-sprint-300.md` — 첫 Codex 응답 후기 + 문제점 |
+| P4 | 회고 | `docs/04-report/features/phase-46-sprint-300.md` — 첫 Codex 응답 후기 + 문제점 |
 
 ## 7. 리스크 + 완화
 

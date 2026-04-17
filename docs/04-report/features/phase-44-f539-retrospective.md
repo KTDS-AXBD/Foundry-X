@@ -39,7 +39,7 @@ status: COMPLETE
 
 - fx-gateway Worker에 CORS 미들웨어(hono/cors) 추가
 - `VITE_API_URL` → `https://fx-gateway.ktds-axbd.workers.dev/api` 전환 (Web .env.production)
-- 롤백 드릴 1회 완료 (`docs/04-report/phase-44-f539b-rollback-drill.md`)
+- 롤백 드릴 1회 완료 (`docs/04-report/features/phase-44-f539b-rollback-drill.md`)
 - 선제 체크리스트 4/5 PASS
 
 ### 1.3 F539c (Sprint 296, PR #597)
@@ -96,7 +96,7 @@ status: COMPLETE
 
 ### D3. Retrospective 누락 (F539c)
 
-**계획** (PRD §4.3 F539c-5): `docs/04-report/phase-44-f539-retrospective.md` 작성
+**계획** (PRD §4.3 F539c-5): `docs/04-report/features/phase-44-f539-retrospective.md` 작성
 
 **실제**: PR #597에 포함되지 않음
 
@@ -193,8 +193,8 @@ status: COMPLETE
 ## 6. 관련 문서
 
 - `docs/specs/fx-gateway-cutover/prd-final.md` — PRD (Round 1 95/100 Ready)
-- `docs/04-report/phase-44-f539a-k6-cloud.md` — k6 판정 리포트
-- `docs/04-report/phase-44-f539b-rollback-drill.md` — 롤백 드릴
-- `docs/04-report/phase-44-latency-decision.md` — F543 Sprint 291 벤치마크
+- `docs/04-report/features/phase-44-f539a-k6-cloud.md` — k6 판정 리포트
+- `docs/04-report/features/phase-44-f539b-rollback-drill.md` — 롤백 드릴
+- `docs/04-report/features/phase-44-latency-decision.md` — F543 Sprint 291 벤치마크
 - MEMORY `feedback_msa_deploy_pipeline_gaps.md` — 5항목 체크리스트
 - SPEC.md §5 F539a/b/c, F543, F538

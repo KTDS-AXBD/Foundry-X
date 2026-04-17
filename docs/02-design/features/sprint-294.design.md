@@ -96,7 +96,7 @@ k6 Cloud 계정/token 없으면 `K6_CLOUD_TOKEN` 없이 `k6 run` (로컬) 실행
 | 파일 | 역할 | D1 확인 |
 |------|------|---------|
 | `benchmarks/phase-44-latency/k6-cloud.js` | 4 엔드포인트 부하 스크립트 | 코드 없음 (순수 스크립트) |
-| `docs/04-report/phase-44-f539a-k6-cloud.md` | Go/No-Go 판정 리포트 | 문서 |
+| `docs/04-report/features/phase-44-f539a-k6-cloud.md` | Go/No-Go 판정 리포트 | 문서 |
 
 ### 수정 파일
 
@@ -130,7 +130,7 @@ else:  # > 150ms
   후속 = "F539b/c 중단. 개선 Sprint 별도 착수. SPEC.md Phase 44 재계획 필요"
 ```
 
-## §7. 리포트 구조 (`docs/04-report/phase-44-f539a-k6-cloud.md`)
+## §7. 리포트 구조 (`docs/04-report/features/phase-44-f539a-k6-cloud.md`)
 
 ```markdown
 # F539a — k6 Cloud 재측정 Go/No-Go 리포트

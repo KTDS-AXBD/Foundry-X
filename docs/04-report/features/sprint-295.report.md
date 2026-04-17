@@ -23,7 +23,7 @@ CORS 미들웨어 추가로 브라우저 접점 준비 완료.
 | CORS 미들웨어 추가 | ✅ `packages/fx-gateway/src/app.ts` — hono/cors, fx.minu.best/pages.dev/localhost:3000 |
 | TDD 테스트 (F539b) | ✅ 8/8 PASS (F523 4개 + F539b CORS/Auth 4개) |
 | VITE_API_URL 전환 | ✅ `packages/web/.env.production` + `.env.example` |
-| 롤백 문서 | ✅ `docs/04-report/phase-44-f539b-rollback-drill.md` |
+| 롤백 문서 | ✅ `docs/04-report/features/phase-44-f539b-rollback-drill.md` |
 | Gap Analysis | ✅ Match Rate 100% |
 
 ## 커밋 이력
