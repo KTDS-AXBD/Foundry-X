@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- F555 LLM 모델 ID 현행화 + 중앙 상수화 (PR #617, #618) — 구버전 모델 ID 최신화(haiku-20250714→20251001, sonnet-4-5→4-6) + shared/model-defaults.ts 중앙 상수 도입 + undated alias 전환. 97파일, typecheck+3747 tests PASS
+
 ### Phase 42+43 통합 회고: HyperFX Deep Integration + Activation (Sprint 284~289)
 
 > **Dogfood-driven 개발 교과서 사례** — 5회 반복 dogfood로 2개 숨은 버그 발견+해소
