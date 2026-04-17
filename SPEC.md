@@ -196,7 +196,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F552 | **Dual AI Review D1 테이블 + `/work-management` 대시보드 위젯** (FX-REQ-589, P1) | Sprint 303 | ✅ | PR #608 merge. D1 0138 dual_ai_reviews. core/verification/ 도메인 (3 routes, 1 service). work-management "AI 검증" 탭. TDD 20/20 GREEN. save-dual-review.sh autopilot 배선. Deploy D1 timeout→re-run SUCCESS |
 | F553 | **4주 관측 회고 + 회귀율 리포트 + 모델 튜닝** (FX-REQ-590, P1) | Sprint 307 | 📋(idea) | F552 merge 후 4주 관측 데이터 기반 |
 | F554 | **Phase 46 hotfix — Codex 실설치 + autopilot Phase 5b 훅 배선 + dogfood Smoke Reality** (FX-REQ-591, P0) | Sprint 302 | ✅ | PR #607 merge. Match 100%. 인프라 배선 완료(install-codex.sh + Phase 5c + codex-review.json mock PASS + 회고). 잔여: 실 API 호출은 OPENAI_API_KEY 설정 후 자동 활성화(mock→real 전환, codex-review.sh L107 분기) |
-| F555 | **LLM 모델 ID 현행화** — 프로덕션 코드·테스트·스키마의 구버전 Claude 모델 ID를 최신으로 일괄 갱신. haiku-4-5-20250714→20251001, sonnet-4-5→sonnet-4-6, sonnet-4-20250514→sonnet-4-6 등. D1 DEFAULT 값, Zod enum, model-router, fixture 전수 변경 (FX-REQ-593, P1) | Sprint 308 | 📋(plan) | 60+ 파일, 사용자 관찰 불가 내부 개선이나 3파일+ 기준 충족 |
+| F555 | **LLM 모델 ID 현행화 + 중앙 상수화** — (1) 구버전 모델 ID 최신화(haiku-20250714→20251001, sonnet-4-5→4-6). (2) shared/model-defaults.ts 중앙 상수(MODEL_SONNET/MODEL_HAIKU) + undated alias 전환. 다음 모델 업그레이드 시 1파일만 수정 (FX-REQ-593, P1) | Sprint 308 | ✅ | PR #617(47파일 모델 ID 갱신) + PR #618(50파일 상수 추출+undated alias). typecheck+3747 tests PASS |
 
 <!-- fx-task-orchestrator-backlog -->
 ### Task Orchestrator Backlog (B/C/X)
