@@ -4,6 +4,7 @@
 import { BIZ_PERSONAS } from "./biz-persona-prompts.js";
 import { DEMO_EVAL_DATA, getDemoFinalResult } from "./persona-eval-demo.js";
 import type { PersonaConfigInput } from "../schemas/persona-config.js";
+import { MODEL_SONNET } from "@foundry-x/shared";
 
 function generateId(): string {
   const bytes = new Uint8Array(16);
@@ -285,7 +286,7 @@ ${Object.entries(config.weights).map(([k, v]) => `- ${k}: ${v}`).join("\n")}
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-6",
+      model: MODEL_SONNET,
       max_tokens: 1024,
       system: systemPrompt,
       messages: [{ role: "user", content: userPrompt }],

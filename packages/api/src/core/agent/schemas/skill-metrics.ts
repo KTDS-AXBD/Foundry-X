@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MODEL_SONNET } from "@foundry-x/shared";
 
 export const skillMetricsQuerySchema = z.object({
   days: z.coerce.number().int().min(1).max(365).optional().default(30),
@@ -22,7 +23,7 @@ export const recordSkillExecutionSchema = z.object({
   version: z.coerce.number().int().min(1).optional().default(1),
   bizItemId: z.string().optional(),
   artifactId: z.string().optional(),
-  model: z.string().min(1).max(100).default("claude-sonnet-4-6"),
+  model: z.string().min(1).max(100).default(MODEL_SONNET),
   status: z.enum(["completed", "failed", "timeout", "cancelled"]),
   inputTokens: z.coerce.number().int().min(0).default(0),
   outputTokens: z.coerce.number().int().min(0).default(0),

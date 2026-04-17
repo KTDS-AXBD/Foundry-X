@@ -3,10 +3,11 @@
 
 import { randomUUID } from "node:crypto";
 import type { DiagnosticReport, ImprovementProposal, ProposalType } from "@foundry-x/shared";
+import { MODEL_SONNET } from "@foundry-x/shared";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 // F542: 기본값을 Sonnet 4.6으로 변경 (Haiku 역량 한계 해소)
-const DEFAULT_MODEL = "claude-sonnet-4-6";
+const DEFAULT_MODEL = MODEL_SONNET;
 const THRESHOLD_SCORE = 70;
 
 // F542 M1: 강화된 systemPrompt — few-shot 2건 + rawValue=0 처리 지침

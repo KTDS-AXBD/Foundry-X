@@ -5,6 +5,7 @@ import type {
   GuardRailProposal,
   GenerateRulesResult,
 } from "@foundry-x/shared";
+import { MODEL_HAIKU } from "@foundry-x/shared";
 
 interface AnthropicMessage {
   role: "user" | "assistant";
@@ -17,7 +18,7 @@ interface AnthropicResponse {
 }
 
 export class RuleGeneratorService {
-  private model = "claude-haiku-4-5-20251001";
+  private model = MODEL_HAIKU;
 
   constructor(
     private db: D1Database,

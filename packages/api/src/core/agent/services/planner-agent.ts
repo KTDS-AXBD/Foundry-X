@@ -3,6 +3,7 @@ import type {
   AgentPlanStatus,
   ProposedStep,
 } from "@foundry-x/shared";
+import { MODEL_SONNET } from "@foundry-x/shared";
 import type { AgentTaskType, AgentExecutionRequest } from "./execution-types.js";
 import type { SSEManager } from "../../../services/sse-manager.js";
 import type { GitHubService } from "../../../modules/portal/services/github.js";
@@ -216,7 +217,7 @@ export class PlannerAgent {
     const externalTools = await this.gatherExternalToolInfo();
     const systemPrompt = getPlannerPrompt(taskType);
     const userPrompt = this.buildPromptWithFileContext(taskType, context, fileResult, externalTools);
-    const selectedModel = model ?? this.deps.model ?? "claude-sonnet-4-6";
+    const selectedModel = model ?? this.deps.model ?? MODEL_SONNET;
     const llmResult = await this.callLlmWithRetry(userPrompt, systemPrompt, selectedModel);
 
     if (!llmResult) {

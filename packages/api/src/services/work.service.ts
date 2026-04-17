@@ -1,5 +1,6 @@
 import type { Env } from "../env.js";
 import { SSEManager } from "./sse-manager.js";
+import { MODEL_SONNET } from "@foundry-x/shared";
 
 interface WorkItem {
   id: string;
@@ -204,7 +205,7 @@ export class WorkService {
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
+        model: MODEL_SONNET,
         max_tokens: 256,
         messages: [
           {

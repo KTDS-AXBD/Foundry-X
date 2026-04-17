@@ -11,7 +11,7 @@ const TABLES = `
     id TEXT PRIMARY KEY, org_id TEXT NOT NULL, biz_item_id TEXT NOT NULL,
     skill_id TEXT NOT NULL, stage_id TEXT NOT NULL, version INTEGER NOT NULL DEFAULT 1,
     input_text TEXT NOT NULL, output_text TEXT,
-    model TEXT NOT NULL DEFAULT 'claude-haiku-4-5-20251001',
+    model TEXT NOT NULL DEFAULT 'claude-haiku-4-5',
     tokens_used INTEGER DEFAULT 0, duration_ms INTEGER DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'pending', created_by TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -40,11 +40,11 @@ function seedArtifacts(db: any) {
     INSERT INTO biz_items (id, org_id, title, description, source, status, created_by, created_at, updated_at)
       VALUES ('biz1', 'org1', 'AI Chatbot', 'desc', 'discovery', 'draft', 'user1', '2026-01-01', '2026-01-01');
     INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, version, input_text, output_text, status, created_by, created_at, tokens_used, duration_ms, model)
-      VALUES ('art1', 'org1', 'biz1', 'ai-biz:ecosystem-map', '2-1', 1, 'input1', '## Ecosystem\nResult', 'completed', 'user1', '2026-03-31T10:00:00Z', 300, 2500, 'claude-haiku-4-5-20251001');
+      VALUES ('art1', 'org1', 'biz1', 'ai-biz:ecosystem-map', '2-1', 1, 'input1', '## Ecosystem\nResult', 'completed', 'user1', '2026-03-31T10:00:00Z', 300, 2500, 'claude-haiku-4-5');
     INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, version, input_text, output_text, status, created_by, created_at, tokens_used, duration_ms, model)
-      VALUES ('art2', 'org1', 'biz1', 'ai-biz:ecosystem-map', '2-1', 2, 'input2', '## Ecosystem v2\nUpdated', 'completed', 'user1', '2026-03-31T11:00:00Z', 350, 2800, 'claude-haiku-4-5-20251001');
+      VALUES ('art2', 'org1', 'biz1', 'ai-biz:ecosystem-map', '2-1', 2, 'input2', '## Ecosystem v2\nUpdated', 'completed', 'user1', '2026-03-31T11:00:00Z', 350, 2800, 'claude-haiku-4-5');
     INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, version, input_text, output_text, status, created_by, created_at, tokens_used, duration_ms, model)
-      VALUES ('art3', 'org1', 'biz1', 'pm:persona', '2-6', 1, 'persona input', '## Persona\nProfile', 'completed', 'user1', '2026-03-31T12:00:00Z', 200, 1500, 'claude-haiku-4-5-20251001');
+      VALUES ('art3', 'org1', 'biz1', 'pm:persona', '2-6', 1, 'persona input', '## Persona\nProfile', 'completed', 'user1', '2026-03-31T12:00:00Z', 200, 1500, 'claude-haiku-4-5');
   `);
 }
 

@@ -248,7 +248,7 @@ describe("F536: MetaAgent 자동 진단 훅", () => {
           type: "prompt",
           title: "F544 rubric test",
           reasoning: "Cost score is very low because input tokens are too high",
-          yamlDiff: "- model: claude-opus-4-6\n+ model: claude-haiku-4-5-20251001",
+          yamlDiff: "- model: claude-opus-4-6\n+ model: claude-haiku-4-5",
         }]) }],
         stop_reason: "end_turn",
         usage: { input_tokens: 100, output_tokens: 50 },
@@ -305,9 +305,9 @@ describe("F536: MetaAgent 자동 진단 훅", () => {
       "../../core/discovery/routes/discovery-stage-runner.js"
     );
 
-    await autoTriggerMetaAgent(db, sessionId, "test-api-key", bizItemId, "claude-haiku-4-5-20251001");
+    await autoTriggerMetaAgent(db, sessionId, "test-api-key", bizItemId, "claude-haiku-4-5");
 
     // F544: metaAgentModel 파라미터가 실제 fetch 호출 model에 반영돼야 함
-    expect(capturedModel).toBe("claude-haiku-4-5-20251001");
+    expect(capturedModel).toBe("claude-haiku-4-5");
   });
 });

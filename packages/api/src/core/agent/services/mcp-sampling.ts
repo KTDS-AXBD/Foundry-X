@@ -5,6 +5,7 @@
  */
 import type { LLMService } from "../../../services/llm.js";
 import type { McpSamplingMessage } from "@foundry-x/shared";
+import { MODEL_HAIKU } from "@foundry-x/shared";
 
 export interface SamplingSecurityConfig {
   allowedModels: string[];
@@ -32,7 +33,7 @@ export interface McpSamplingResponse {
 }
 
 const DEFAULT_CONFIG: SamplingSecurityConfig = {
-  allowedModels: ["claude-haiku-4-5-20251001"],
+  allowedModels: [MODEL_HAIKU],
   maxTokensPerRequest: 4096,
   maxRequestsPerMinute: 10,
 };

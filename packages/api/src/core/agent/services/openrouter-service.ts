@@ -3,10 +3,12 @@ export interface ChatMessage {
   content: string;
 }
 
+import { OR_MODEL_SONNET } from "@foundry-x/shared";
+
 export class OpenRouterService {
   constructor(
     private apiKey: string,
-    private model: string = "anthropic/claude-sonnet-4-6",
+    private model: string = OR_MODEL_SONNET,
   ) {}
 
   async streamChat(

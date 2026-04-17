@@ -55,7 +55,7 @@ describe("F528 ConversationManager", () => {
     const manager = new ConversationManager({
       strategy: "summarizing",
       maxMessages: 2,
-      summaryModel: "claude-haiku-4-5-20251001",
+      summaryModel: "claude-haiku-4-5",
     });
     const messages = makeMessages(6); // 6개 메시지
 

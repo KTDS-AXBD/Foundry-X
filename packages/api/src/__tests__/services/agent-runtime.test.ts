@@ -188,7 +188,7 @@ describe("F527 Agent Runtime (L2)", () => {
     it("유효한 YAML을 AgentSpec으로 파싱한다", () => {
       const yaml = `
 name: planner
-model: claude-haiku-4-5-20251001
+model: claude-haiku-4-5
 systemPrompt: You are a planning agent
 tools:
   - read_file
@@ -200,7 +200,7 @@ constraints:
 
       const spec = parseAgentSpec(yaml);
       expect(spec.name).toBe("planner");
-      expect(spec.model).toBe("claude-haiku-4-5-20251001");
+      expect(spec.model).toBe("claude-haiku-4-5");
       expect(spec.systemPrompt).toBe("You are a planning agent");
       expect(spec.tools).toEqual(["read_file", "search_code"]);
       expect(spec.constraints?.maxTokens).toBe(4096);
@@ -210,7 +210,7 @@ constraints:
     it("systemPrompt 없는 YAML은 에러를 던진다", () => {
       const yaml = `
 name: planner
-model: claude-haiku-4-5-20251001
+model: claude-haiku-4-5
 `.trim();
 
       expect(() => parseAgentSpec(yaml)).toThrow();
@@ -242,7 +242,7 @@ systemPrompt: You are a planning agent
 
     const makeSpec = (overrides = {}) => ({
       name: "test",
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-4-5",
       systemPrompt: "You are a test agent",
       tools: [],
       constraints: { maxRounds: 5 },

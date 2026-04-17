@@ -3,6 +3,7 @@
  * Sprint 238: F485 결과 저장 + F486 criteria 자동 갱신
  * 2-1~2-8, 2-10 단계별 AI 분석 실행 + HITL 확인 로직
  */
+import { MODEL_HAIKU } from "@foundry-x/shared";
 import type { AgentRunner } from "../../agent/services/agent-runner.js";
 import type { AgentExecutionRequest } from "../../agent/services/execution-types.js";
 import type { DiscoveryType, Intensity, Stage } from "./analysis-path-v82.js";
@@ -210,8 +211,8 @@ export class StageRunnerService {
     try {
       await this.db.prepare(
         `INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, version, input_text, output_text, model, status, created_by, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'claude-haiku-4-5-20251001', 'completed', 'system', datetime('now'))`,
-      ).bind(artifactId, orgId, bizItemId, `discovery-${stage}`, stage, nextVersion, prompt, JSON.stringify(analysisResult)).run();
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'completed', 'system', datetime('now'))`,
+      ).bind(artifactId, orgId, bizItemId, `discovery-${stage}`, stage, nextVersion, prompt, JSON.stringify(analysisResult), MODEL_HAIKU).run();
     } catch (e) {
       console.error(`[stage-runner] bd_artifacts INSERT failed:`, e instanceof Error ? e.message : String(e));
       // 결과는 반환하되 DB 저장 실패는 로그만 — 사용자가 편집/재시도 가능

@@ -9,8 +9,9 @@ import { BdArtifactService } from "./bd-artifact-service.js";
 import { getSkillPrompt } from "./bd-skill-prompts.js";
 import { SkillMetricsService } from "../agent/services/skill-metrics.js";
 import type { ExecuteSkillInput, SkillExecutionResult } from "@foundry-x/shared";
+import { MODEL_HAIKU } from "@foundry-x/shared";
 
-const MODEL = "claude-haiku-4-5-20251001";
+const MODEL = MODEL_HAIKU;
 
 export class BdSkillExecutor {
   private gateway: PromptGatewayService;
