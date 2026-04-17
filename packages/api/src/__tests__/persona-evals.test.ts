@@ -35,7 +35,7 @@ describe("PersonaEvalService", () => {
       summary: "전략적으로 적합한 아이템",
       concern: null,
       condition: null,
-      evalModel: "claude-sonnet-4-5-20250514",
+      evalModel: "claude-sonnet-4-6",
     });
 
     expect(result.persona_id).toBe("strategy");

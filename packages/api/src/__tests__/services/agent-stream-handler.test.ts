@@ -67,7 +67,7 @@ describe("F529 AgentStreamHandler", () => {
       const hooks = handler.createHooks(ctrl);
 
       await hooks.afterModel!(
-        { messages: [], systemPrompt: "", model: "claude-sonnet-4-5" },
+        { messages: [], systemPrompt: "", model: "claude-sonnet-4-6" },
         {
           content: [{ type: "text", text: "Hello world" }],
           usage: { inputTokens: 10, outputTokens: 5 },
@@ -89,7 +89,7 @@ describe("F529 AgentStreamHandler", () => {
       const hooks = handler.createHooks(ctrl);
 
       await hooks.afterModel!(
-        { messages: [], systemPrompt: "", model: "claude-sonnet-4-5" },
+        { messages: [], systemPrompt: "", model: "claude-sonnet-4-6" },
         {
           content: [],
           usage: { inputTokens: 5, outputTokens: 0 },

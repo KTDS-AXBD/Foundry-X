@@ -30,7 +30,7 @@ const mockGenerateResult: TestGenerationResponse = {
     { function: "add", case: "negative numbers", category: "boundary" },
   ],
   tokensUsed: 500,
-  model: "claude-sonnet-4-20250514",
+  model: "claude-sonnet-4-6",
   duration: 3200,
 };
 
@@ -44,7 +44,7 @@ const mockCoverageResult: CoverageGapResponse = {
   ],
   overallCoverage: 65,
   tokensUsed: 300,
-  model: "claude-sonnet-4-20250514",
+  model: "claude-sonnet-4-6",
 };
 
 describe("TestAgentPanel", () => {

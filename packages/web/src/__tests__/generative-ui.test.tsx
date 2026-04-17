@@ -142,7 +142,7 @@ describe("AgentTaskResult", () => {
     status: "success",
     output: {},
     tokensUsed: 150,
-    model: "claude-haiku-4-5-20250714",
+    model: "claude-haiku-4-5-20251001",
     duration: 2500,
   };
 

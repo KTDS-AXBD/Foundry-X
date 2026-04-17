@@ -53,7 +53,7 @@ describe("McpSamplingHandler", () => {
 
   it("enforces per-server rate limiting", async () => {
     const fastHandler = new McpSamplingHandler(llm, db, {
-      allowedModels: ["claude-haiku-4-5-20250714"],
+      allowedModels: ["claude-haiku-4-5-20251001"],
       maxTokensPerRequest: 4096,
       maxRequestsPerMinute: 2,
     });

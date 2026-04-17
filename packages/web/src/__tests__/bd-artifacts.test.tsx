@@ -56,7 +56,7 @@ describe("SkillExecutionForm", () => {
       skillId: "ai-biz:ecosystem-map",
       version: 1,
       outputText: "## Ecosystem Map\nResult...",
-      model: "claude-haiku-4-5-20250714",
+      model: "claude-haiku-4-5-20251001",
       tokensUsed: 300,
       durationMs: 2500,
       status: "completed",

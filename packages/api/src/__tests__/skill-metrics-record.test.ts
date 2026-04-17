@@ -53,7 +53,7 @@ describe("POST /api/skills/metrics/record (F305)", () => {
           skillId: "ax-session-start",
           status: "completed",
           durationMs: 5000,
-          model: "claude-sonnet-4-20250514",
+          model: "claude-sonnet-4-6",
           inputTokens: 1000,
           outputTokens: 2000,
           costUsd: 0.015,

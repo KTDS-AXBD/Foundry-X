@@ -210,7 +210,7 @@ export class StageRunnerService {
     try {
       await this.db.prepare(
         `INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, version, input_text, output_text, model, status, created_by, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'claude-haiku-4-5-20250714', 'completed', 'system', datetime('now'))`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'claude-haiku-4-5-20251001', 'completed', 'system', datetime('now'))`,
       ).bind(artifactId, orgId, bizItemId, `discovery-${stage}`, stage, nextVersion, prompt, JSON.stringify(analysisResult)).run();
     } catch (e) {
       console.error(`[stage-runner] bd_artifacts INSERT failed:`, e instanceof Error ? e.message : String(e));

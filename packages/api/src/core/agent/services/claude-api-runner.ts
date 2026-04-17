@@ -13,7 +13,7 @@ export class ClaudeApiRunner implements AgentRunner {
 
   constructor(
     private apiKey: string,
-    private model: string = "claude-haiku-4-5-20250714",
+    private model: string = "claude-haiku-4-5-20251001",
   ) {}
 
   async execute(request: AgentExecutionRequest): Promise<AgentExecutionResult> {

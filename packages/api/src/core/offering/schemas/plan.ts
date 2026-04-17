@@ -16,7 +16,7 @@ export const createPlanSchema = z.object({
     spec: z.string().optional(),
     fileContents: z.record(z.string(), z.string()).optional(),
   }),
-  model: z.enum(["claude-sonnet-4-5-20250514", "claude-haiku-4-5-20250714"]).optional(),
+  model: z.enum(["claude-sonnet-4-6", "claude-haiku-4-5-20251001"]).optional(),
 });
 
 export const rejectPlanSchema = z.object({

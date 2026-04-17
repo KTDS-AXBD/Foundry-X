@@ -156,7 +156,7 @@ describe("F532 — AgentStreamHandler 이벤트 순서", () => {
 
     const mockSpec = {
       name: "test-agent",
-      model: "claude-sonnet-4-5-20251022",
+      model: "claude-sonnet-4-6",
       systemPrompt: "test",
       tools: [] as string[],
     };

@@ -86,7 +86,7 @@ test.describe("BD 데모 워크쓰루", () => {
     const artifact = {
       ...SEED_ARTIFACTS[0],
       inputText: "헬스케어 AI 시장 조사",
-      model: "claude-haiku-4-5-20250714",
+      model: "claude-haiku-4-5-20251001",
       orgId: "org-demo",
       createdBy: "user-demo",
     };
