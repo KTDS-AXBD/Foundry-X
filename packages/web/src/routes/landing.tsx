@@ -69,7 +69,7 @@ function getSectionOrder(section: string): number {
    ═══════════════════════════════════════════════ */
 
 const SITE_META_FALLBACK = {
-  sprint: "Sprint 303",
+  sprint: "Sprint 308",
   phase: "Phase 46",
   phaseTitle: "Dual-AI Verification",
   tagline: "사업기회 발굴부터 데모까지, AI가 자동화하는 BD 플랫폼",
