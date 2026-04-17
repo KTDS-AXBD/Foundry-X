@@ -10,6 +10,7 @@ import { MetaAgent } from "../services/meta-agent.js";
 import { ProposalApplyService, AlreadyAppliedError, NotApprovedError, ProposalNotFoundError } from "../services/proposal-apply.js";
 import { ModelComparisonService } from "../services/model-comparisons.js";
 import { ProposalRubric } from "../services/proposal-rubric.js";
+import { MODEL_SONNET, MODEL_HAIKU } from "@foundry-x/shared";
 
 export const metaRoute = new Hono<{ Bindings: Env }>();
 
@@ -48,10 +49,10 @@ metaRoute.post("/meta/diagnose", async (c) => {
 
     if (apiKey) {
       // F542 M2: META_AGENT_MODEL env var 지원 ("both" → A/B 비교 실행)
-      const modelFlag = c.env.META_AGENT_MODEL ?? "claude-sonnet-4-6";
+      const modelFlag = c.env.META_AGENT_MODEL ?? MODEL_SONNET;
       const runAbTest = modelFlag === "both" || modelFlag === "ab";
 
-      const primaryModel = runAbTest ? "claude-sonnet-4-6" : modelFlag;
+      const primaryModel = runAbTest ? MODEL_SONNET : modelFlag;
       const metaAgent = new MetaAgent({ apiKey, model: primaryModel });
       proposals = await metaAgent.diagnose(report);
 
@@ -78,12 +79,12 @@ metaRoute.post("/meta/diagnose", async (c) => {
 
       // F542 M3: A/B 비교 — Haiku 실행 (both 모드만)
       if (runAbTest) {
-        const haikuAgent = new MetaAgent({ apiKey, model: "claude-haiku-4-5-20251001" });
+        const haikuAgent = new MetaAgent({ apiKey, model: MODEL_HAIKU });
         const haikuRaw = await haikuAgent.diagnoseRaw(report).catch(() => []);
         await compSvc.save({
           sessionId: report.sessionId,
           reportId,
-          model: "claude-haiku-4-5-20251001",
+          model: MODEL_HAIKU,
           promptVersion: haikuAgent.promptVersion,
           proposalsJson: JSON.stringify(haikuRaw),
           proposalCount: haikuRaw.length,

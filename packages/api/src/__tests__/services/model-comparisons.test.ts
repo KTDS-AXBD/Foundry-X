@@ -68,13 +68,13 @@ describe("F542 ModelComparisonService", () => {
   it("동일 report_id로 저장된 비교 결과를 조회한다", async () => {
     const reportId = "sess-test:2026-04-14T10:00:00.000Z";
     await svc.save(makeComparison({ reportId, model: "claude-sonnet-4-6" }));
-    await svc.save(makeComparison({ reportId, model: "claude-haiku-4-5-20251001" }));
+    await svc.save(makeComparison({ reportId, model: "claude-haiku-4-5" }));
 
     const results = await svc.findByReportId(reportId);
     expect(results.length).toBe(2);
     const models = results.map((r) => r.model);
     expect(models).toContain("claude-sonnet-4-6");
-    expect(models).toContain("claude-haiku-4-5-20251001");
+    expect(models).toContain("claude-haiku-4-5");
   });
 
   it("다른 report_id의 결과를 반환하지 않는다", async () => {

@@ -1,5 +1,6 @@
 // ─── F528: F-L3-6 ConversationManager ───
 import type { AnthropicMessage, ConversationManagerOptions } from "@foundry-x/shared";
+import { MODEL_HAIKU } from "@foundry-x/shared";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const DEFAULT_MAX_MESSAGES = 20;
@@ -45,7 +46,7 @@ export class ConversationManager {
   }
 
   private async callSummaryLLM(messages: AnthropicMessage[], apiKey: string): Promise<string> {
-    const model = this.opts.summaryModel ?? "claude-haiku-4-5-20251001";
+    const model = this.opts.summaryModel ?? MODEL_HAIKU;
     const summaryPrompt = "Please summarize the key points of this conversation in 2-3 sentences.";
 
     const response = await fetch(ANTHROPIC_API_URL, {

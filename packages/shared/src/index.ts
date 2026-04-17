@@ -509,6 +509,14 @@ export type {
   ModelComparison,
 } from './agent-meta.js';
 
+// F555: Central model ID constants
+export {
+  MODEL_SONNET,
+  MODEL_HAIKU,
+  OR_MODEL_SONNET,
+  OR_MODEL_HAIKU,
+} from './model-defaults.js';
+
 // F538: Discovery 도메인 공용 계약 타입 (cross-domain contract)
 export type {
   ExecuteSkillInput,

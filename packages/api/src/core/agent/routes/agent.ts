@@ -23,6 +23,7 @@ import {
   RateMarketplaceItemSchema,
 } from "../schemas/agent.js";
 import type { AgentProfile, AgentActivity, PrReviewResult } from "@foundry-x/shared";
+import { MODEL_HAIKU } from "@foundry-x/shared";
 import type { AgentRunnerInfo, AgentTaskType } from "../services/execution-types.js";
 import { createAgentRunner } from "../services/agent-runner.js";
 import { getDb } from "../../../db/index.js";
@@ -410,7 +411,7 @@ agentRoute.openapi(getRunners, async (c) => {
     {
       type: "claude-api",
       available: !!c.env.ANTHROPIC_API_KEY,
-      model: "claude-haiku-4-5-20251001",
+      model: MODEL_HAIKU,
       description: "Anthropic Claude API — 코드 리뷰, 생성, 분석",
     },
     {

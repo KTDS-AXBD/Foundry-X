@@ -8,6 +8,7 @@ import type {
   AgentExecutionResult,
 } from "./execution-types.js";
 import { OpenRouterRunner } from "./openrouter-runner.js";
+import { OR_MODEL_HAIKU } from "@foundry-x/shared";
 
 // ─── Types ───
 
@@ -260,7 +261,7 @@ export class EnsembleVoting {
     results: ModelResult[],
     config: EnsembleConfig,
   ): Promise<ModelResult[]> {
-    const evalModel = config.evaluationModel ?? "anthropic/claude-haiku-4-5";
+    const evalModel = config.evaluationModel ?? OR_MODEL_HAIKU;
     const evalRunner = new OpenRouterRunner(this.apiKey, evalModel);
 
     const evalSettled = await Promise.allSettled(

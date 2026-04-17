@@ -6,6 +6,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import type { Env } from "../../../env.js";
+import { MODEL_SONNET } from "@foundry-x/shared";
 import type { TenantVariables } from "../../../middleware/tenant.js";
 import { createAgentRunner, createRoutedRunner } from "../../agent/services/agent-runner.js";
 import { StageRunnerService } from "../services/stage-runner-service.js";
@@ -42,8 +43,8 @@ export async function autoTriggerMetaAgent(
     overallScore: report.overallScore,
   });
 
-  // F544: metaAgentModel 파라미터로 모델 통일 (default: claude-sonnet-4-6)
-  const model = metaAgentModel ?? "claude-sonnet-4-6";
+  // F544: metaAgentModel 파라미터로 모델 통일
+  const model = metaAgentModel ?? MODEL_SONNET;
   const metaAgent = new MetaAgent({ apiKey, model });
   let proposals;
   try {

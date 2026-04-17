@@ -2,6 +2,7 @@
  * F136: 태스크별 모델 라우팅 — D1 규칙 기반 자동 모델 선택
  */
 import type { AgentTaskType, AgentRunnerType } from "./execution-types.js";
+import { OR_MODEL_SONNET, OR_MODEL_HAIKU } from "@foundry-x/shared";
 
 export interface RoutingRule {
   id: string;
@@ -20,17 +21,17 @@ export const DEFAULT_MODEL_MAP: Record<AgentTaskType, string> = {
   "code-review": "anthropic/claude-sonnet-4",
   "code-generation": "anthropic/claude-sonnet-4",
   "spec-analysis": "anthropic/claude-opus-4",
-  "test-generation": "anthropic/claude-haiku-4-5",
-  "policy-evaluation": "anthropic/claude-haiku-4-5",
-  "skill-query": "anthropic/claude-haiku-4-5",
-  "ontology-lookup": "anthropic/claude-haiku-4-5",
-  "security-review": "anthropic/claude-sonnet-4-6",
-  "qa-testing": "anthropic/claude-haiku-4-5",
+  "test-generation": OR_MODEL_HAIKU,
+  "policy-evaluation": OR_MODEL_HAIKU,
+  "skill-query": OR_MODEL_HAIKU,
+  "ontology-lookup": OR_MODEL_HAIKU,
+  "security-review": OR_MODEL_SONNET,
+  "qa-testing": OR_MODEL_HAIKU,
   "infra-analysis": "anthropic/claude-sonnet-4",
-  "bmc-generation": "anthropic/claude-sonnet-4-6",
-  "bmc-insight": "anthropic/claude-sonnet-4-6",
-  "market-summary": "anthropic/claude-sonnet-4-6",
-  "discovery-analysis": "anthropic/claude-haiku-4-5",
+  "bmc-generation": OR_MODEL_SONNET,
+  "bmc-insight": OR_MODEL_SONNET,
+  "market-summary": OR_MODEL_SONNET,
+  "discovery-analysis": OR_MODEL_HAIKU,
 };
 
 interface D1RoutingRow {

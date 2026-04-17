@@ -4,6 +4,7 @@ import type {
 } from "./execution-types.js";
 import type { AgentRunner } from "./agent-runner.js";
 import { TASK_SYSTEM_PROMPTS, buildUserPrompt, getSystemPrompt } from "./prompt-utils.js";
+import { MODEL_HAIKU } from "@foundry-x/shared";
 
 // Re-export for backward compatibility (tests import from this module)
 export { UIHINT_INSTRUCTION, TASK_SYSTEM_PROMPTS, DEFAULT_LAYOUT_MAP, buildUserPrompt } from "./prompt-utils.js";
@@ -13,7 +14,7 @@ export class ClaudeApiRunner implements AgentRunner {
 
   constructor(
     private apiKey: string,
-    private model: string = "claude-haiku-4-5-20251001",
+    private model: string = MODEL_HAIKU,
   ) {}
 
   async execute(request: AgentExecutionRequest): Promise<AgentExecutionResult> {

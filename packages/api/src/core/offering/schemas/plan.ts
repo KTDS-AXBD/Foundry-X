@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MODEL_SONNET, MODEL_HAIKU } from "@foundry-x/shared";
 
 export const createPlanSchema = z.object({
   agentId: z.string().min(1),
@@ -16,7 +17,7 @@ export const createPlanSchema = z.object({
     spec: z.string().optional(),
     fileContents: z.record(z.string(), z.string()).optional(),
   }),
-  model: z.enum(["claude-sonnet-4-6", "claude-haiku-4-5-20251001"]).optional(),
+  model: z.enum([MODEL_SONNET, MODEL_HAIKU]).optional(),
 });
 
 export const rejectPlanSchema = z.object({

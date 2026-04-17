@@ -32,7 +32,7 @@ const SCHEMA = `
   CREATE TABLE IF NOT EXISTS bd_artifacts (
     id TEXT PRIMARY KEY, org_id TEXT NOT NULL, biz_item_id TEXT NOT NULL,
     skill_id TEXT NOT NULL, stage_id TEXT NOT NULL, version INTEGER NOT NULL DEFAULT 1,
-    input_text TEXT NOT NULL, output_text TEXT, model TEXT NOT NULL DEFAULT 'claude-haiku-4-5-20251001',
+    input_text TEXT NOT NULL, output_text TEXT, model TEXT NOT NULL DEFAULT 'claude-haiku-4-5',
     tokens_used INTEGER DEFAULT 0, duration_ms INTEGER DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'pending', created_by TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))

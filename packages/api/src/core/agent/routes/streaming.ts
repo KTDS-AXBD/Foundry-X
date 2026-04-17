@@ -9,6 +9,7 @@ import { AgentMetricsService } from "../streaming/agent-metrics-service.js";
 import { ToolRegistry } from "../runtime/tool-registry.js";
 import { TokenTracker } from "../runtime/token-tracker.js";
 import { AgentRuntime } from "../runtime/agent-runtime.js";
+import { MODEL_SONNET } from "@foundry-x/shared";
 
 export const streamingRoute = new OpenAPIHono<{ Bindings: Env }>();
 
@@ -168,7 +169,7 @@ streamingRoute.get("/agents/stream/ws", async (c) => {
 
     const spec = {
       name: body.agentId,
-      model: "claude-sonnet-4-6",
+      model: MODEL_SONNET,
       systemPrompt: `You are a helpful agent named ${body.agentId}.`,
       tools: [] as string[],
       constraints: { maxRounds: 5, maxTokens: 2048 },

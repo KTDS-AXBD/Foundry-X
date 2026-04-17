@@ -27,7 +27,7 @@ function makeRunner(overrides?: Partial<AgentExecutionResult>): AgentRunner {
     status: "success",
     output: { analysis: "All good" },
     tokensUsed: 100,
-    model: "claude-haiku-4-5-20251001",
+    model: "claude-haiku-4-5",
     duration: 500,
     ...overrides,
   };
@@ -79,7 +79,7 @@ describe("resultToAgentResult", () => {
       status: "success",
       output: { analysis: "Good code" },
       tokensUsed: 50,
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-4-5",
       duration: 200,
     };
     const agentResult = resultToAgentResult(result);
@@ -120,7 +120,7 @@ describe("resultToAgentResult", () => {
         ],
       },
       tokensUsed: 80,
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-4-5",
       duration: 150,
     };
     const agentResult = resultToAgentResult(result);

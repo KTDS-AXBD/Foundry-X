@@ -15,7 +15,7 @@ const TABLES = `
     id TEXT PRIMARY KEY, org_id TEXT NOT NULL, biz_item_id TEXT NOT NULL,
     skill_id TEXT NOT NULL, stage_id TEXT NOT NULL, version INTEGER NOT NULL DEFAULT 1,
     input_text TEXT NOT NULL, output_text TEXT,
-    model TEXT NOT NULL DEFAULT 'claude-haiku-4-5-20251001',
+    model TEXT NOT NULL DEFAULT 'claude-haiku-4-5',
     tokens_used INTEGER DEFAULT 0, duration_ms INTEGER DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'pending', created_by TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -41,17 +41,17 @@ function seedDemoData(db: any) {
 
     -- 산출물 (헬스케어AI 기준 3건)
     INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, version, input_text, output_text, status, created_by, created_at, tokens_used, duration_ms, model)
-      VALUES ('art-h1', 'org-demo', 'biz-health', 'ai-biz:market-scan', '2-1', 1, '헬스케어 AI 시장 조사', '## 시장 조사 결과\n\n### 시장 규모\n- 글로벌 헬스케어 AI 시장: **187억 달러** (2026)\n- 연평균 성장률: **38.4%**\n\n### 주요 플레이어\n| 기업 | 분야 | 점유율 |\n|------|------|--------|\n| Google Health | 영상 분석 | 15% |\n| IBM Watson | 진단 보조 | 12% |', 'completed', 'user-demo', '2026-03-15T10:00:00Z', 500, 3000, 'claude-haiku-4-5-20251001');
+      VALUES ('art-h1', 'org-demo', 'biz-health', 'ai-biz:market-scan', '2-1', 1, '헬스케어 AI 시장 조사', '## 시장 조사 결과\n\n### 시장 규모\n- 글로벌 헬스케어 AI 시장: **187억 달러** (2026)\n- 연평균 성장률: **38.4%**\n\n### 주요 플레이어\n| 기업 | 분야 | 점유율 |\n|------|------|--------|\n| Google Health | 영상 분석 | 15% |\n| IBM Watson | 진단 보조 | 12% |', 'completed', 'user-demo', '2026-03-15T10:00:00Z', 500, 3000, 'claude-haiku-4-5');
     INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, version, input_text, output_text, status, created_by, created_at, tokens_used, duration_ms, model)
-      VALUES ('art-h2', 'org-demo', 'biz-health', 'ai-biz:ecosystem-map', '2-2', 1, '헬스케어 AI 생태계 분석', '## 생태계 맵\n\n- **공급자**: 의료 영상 장비 제조사\n- **경쟁자**: Aidoc, Zebra Medical\n- **규제**: FDA 510(k), CE 마킹', 'completed', 'user-demo', '2026-03-16T10:00:00Z', 400, 2500, 'claude-haiku-4-5-20251001');
+      VALUES ('art-h2', 'org-demo', 'biz-health', 'ai-biz:ecosystem-map', '2-2', 1, '헬스케어 AI 생태계 분석', '## 생태계 맵\n\n- **공급자**: 의료 영상 장비 제조사\n- **경쟁자**: Aidoc, Zebra Medical\n- **규제**: FDA 510(k), CE 마킹', 'completed', 'user-demo', '2026-03-16T10:00:00Z', 400, 2500, 'claude-haiku-4-5');
     INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, version, input_text, output_text, status, created_by, created_at, tokens_used, duration_ms, model)
-      VALUES ('art-h3', 'org-demo', 'biz-health', 'pm:persona', '2-6', 1, '헬스케어 AI 사용자 페르소나', '## 페르소나: 김영수 교수\n\n- **직업**: 영상의학과 전문의\n- **Pain Point**: 하루 100+ 케이스 판독 피로\n- **Goal**: AI 보조로 판독 시간 50% 단축', 'completed', 'user-demo', '2026-03-17T10:00:00Z', 300, 2000, 'claude-haiku-4-5-20251001');
+      VALUES ('art-h3', 'org-demo', 'biz-health', 'pm:persona', '2-6', 1, '헬스케어 AI 사용자 페르소나', '## 페르소나: 김영수 교수\n\n- **직업**: 영상의학과 전문의\n- **Pain Point**: 하루 100+ 케이스 판독 피로\n- **Goal**: AI 보조로 판독 시간 50% 단축', 'completed', 'user-demo', '2026-03-17T10:00:00Z', 300, 2000, 'claude-haiku-4-5');
 
     -- 산출물 (GIVC 기준 2건)
     INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, version, input_text, output_text, status, created_by, created_at, tokens_used, duration_ms, model)
-      VALUES ('art-g1', 'org-demo', 'biz-givc', 'ai-biz:market-scan', '2-1', 1, 'GIVC 시장 조사', '## GIVC 시장 분석\n\n차량 커넥티드 시장 규모 **450억 달러**', 'completed', 'user-demo', '2026-03-15T11:00:00Z', 450, 2800, 'claude-haiku-4-5-20251001');
+      VALUES ('art-g1', 'org-demo', 'biz-givc', 'ai-biz:market-scan', '2-1', 1, 'GIVC 시장 조사', '## GIVC 시장 분석\n\n차량 커넥티드 시장 규모 **450억 달러**', 'completed', 'user-demo', '2026-03-15T11:00:00Z', 450, 2800, 'claude-haiku-4-5');
     INSERT INTO bd_artifacts (id, org_id, biz_item_id, skill_id, stage_id, version, input_text, output_text, status, created_by, created_at, tokens_used, duration_ms, model)
-      VALUES ('art-g2', 'org-demo', 'biz-givc', 'ai-biz:feasibility-study', '2-3', 1, 'GIVC 사업성 분석', '## 사업성 분석\n\n**결론**: Go 판정\n- TAM: 450억$\n- SAM: 50억$', 'completed', 'user-demo', '2026-03-16T11:00:00Z', 350, 2200, 'claude-haiku-4-5-20251001');
+      VALUES ('art-g2', 'org-demo', 'biz-givc', 'ai-biz:feasibility-study', '2-3', 1, 'GIVC 사업성 분석', '## 사업성 분석\n\n**결론**: Go 판정\n- TAM: 450억$\n- SAM: 50억$', 'completed', 'user-demo', '2026-03-16T11:00:00Z', 350, 2200, 'claude-haiku-4-5');
 
   `);
 }

@@ -23,7 +23,7 @@ function makeMockRunner(): AgentRunner {
       status: "success",
       output: { analysis: "Code looks good" },
       tokensUsed: 150,
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-4-5",
       duration: 300,
     }),
     isAvailable: vi.fn().mockResolvedValue(true),
@@ -60,7 +60,7 @@ describe("Claude API Adapter", () => {
       status: "failed",
       output: { analysis: "API error" },
       tokensUsed: 0,
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-4-5",
       duration: 100,
     });
 
