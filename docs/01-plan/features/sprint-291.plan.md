@@ -53,7 +53,7 @@ fx-gateway → fx-discovery Service Binding 호출 경로의 p99 레이턴시를
 | `benchmarks/phase-44-latency/k6-items.js` | k6 스크립트 — items 엔드포인트 |
 | `benchmarks/phase-44-latency/run.sh` | 벤치마크 실행 + JSON 결과 저장 |
 | `benchmarks/phase-44-latency/curl-bench.sh` | curl 대안 스크립트 (k6 미설치 시) |
-| `docs/04-report/phase-44-latency-decision.md` | Go/No-Go 판정 리포트 (실측값 포함) |
+| `docs/04-report/features/phase-44-latency-decision.md` | Go/No-Go 판정 리포트 (실측값 포함) |
 
 ## §6 TDD 적용 여부
 
@@ -64,5 +64,5 @@ fx-gateway → fx-discovery Service Binding 호출 경로의 p99 레이턴시를
 
 - [ ] k6 또는 curl 기반 벤치마크 스크립트 실행 가능
 - [ ] 실측 p99 값 도출 (최소 100 sample 이상)
-- [ ] Go/No-Go 판정 리포트 작성 (`docs/04-report/phase-44-latency-decision.md`)
+- [ ] Go/No-Go 판정 리포트 작성 (`docs/04-report/features/phase-44-latency-decision.md`)
 - [ ] SPEC.md F543 상태 → `✅`

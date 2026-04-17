@@ -69,7 +69,7 @@ Authorization 헤더는 자동으로 포함된다. 추가 코드 불필요.
 | `packages/fx-gateway/src/__tests__/gateway.test.ts` | CORS + Auth 헤더 전달 테스트 추가 | TDD Red→Green |
 | `packages/web/.env.production` | VITE_API_URL 값 변경 | URL 전환 |
 | `packages/web/.env.example` | VITE_API_URL 값 변경 | URL 전환 |
-| `docs/04-report/phase-44-f539b-rollback-drill.md` | 신규 생성 | 롤백 절차 + 리허설 기록 |
+| `docs/04-report/features/phase-44-f539b-rollback-drill.md` | 신규 생성 | 롤백 절차 + 리허설 기록 |
 
 ### 영향 없는 파일 (변경 불필요)
 

@@ -30,7 +30,7 @@ status: DONE
 | `benchmarks/phase-44-latency/run.sh` | k6 실행 래퍼 + 결과 저장 |
 | `benchmarks/phase-44-latency/curl-bench.sh` | curl 대안 (k6 미설치 환경) |
 | `benchmarks/phase-44-latency/README.md` | 실행 가이드 |
-| `docs/04-report/phase-44-latency-decision.md` | **Go/No-Go 판정 리포트** |
+| `docs/04-report/features/phase-44-latency-decision.md` | **Go/No-Go 판정 리포트** |
 
 ### 실측 결과 (WSL Korea → Cloudflare Workers)
 

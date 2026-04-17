@@ -77,7 +77,7 @@ F539b 이월 2건(CLI URL 전환 + KOAMI Smoke Reality)을 흡수한다.
 | # | 작업 | 파일 |
 |---|------|------|
 | T17 | ESLint no-cross-domain-import 룰 확장 (bizItems → discovery 도메인 고정) | packages/api/src/eslint-rules/index.ts |
-| T18 | Phase 44 f539 회고 작성 (Smoke Reality P1~P4) | docs/04-report/phase-44-f539-retrospective.md |
+| T18 | Phase 44 f539 회고 작성 (Smoke Reality P1~P4) | docs/04-report/features/phase-44-f539-retrospective.md |
 
 ## 7 라우트 목록 (패턴)
 

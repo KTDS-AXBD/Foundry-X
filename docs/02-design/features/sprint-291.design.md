@@ -33,7 +33,7 @@ author: Sinclair Seo
 | `benchmarks/phase-44-latency/run.sh` | bash | k6 실행 → JSON 결과 저장 → p99 추출 |
 | `benchmarks/phase-44-latency/curl-bench.sh` | bash | curl 기반 대안 벤치마크 (100회 반복, p99 계산) |
 | `benchmarks/phase-44-latency/README.md` | docs | 실행 방법 + 임계값 설명 |
-| `docs/04-report/phase-44-latency-decision.md` | report | Go/No-Go 판정 리포트 (실측값 채움) |
+| `docs/04-report/features/phase-44-latency-decision.md` | report | Go/No-Go 판정 리포트 (실측값 채움) |
 
 ## §3 k6 스크립트 설계
 

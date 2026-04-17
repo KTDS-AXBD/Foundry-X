@@ -100,7 +100,7 @@ composite_score: 97
 
 ### 🔍 Check (Gap Analysis)
 
-**문서**: `docs/03-analysis/sprint-281.analysis.md`
+**문서**: `docs/03-analysis/features/sprint-281.analysis.md`
 
 | 평가 항목 | 점수 | 상태 |
 |---------|:----:|:-----:|
@@ -381,6 +381,6 @@ GraphEngine run() 시간복잡도:
 
 - **Plan**: `/docs/01-plan/features/sprint-281.plan.md`
 - **Design**: `/docs/02-design/features/sprint-281.design.md`
-- **Analysis**: `/docs/03-analysis/sprint-281.analysis.md`
+- **Analysis**: `/docs/03-analysis/features/sprint-281.analysis.md`
 - **PR**: https://github.com/KTDS-AXBD/Foundry-X/pull/551
 - **Next Feature**: F529 Agent Wiring (Sprint 282~)

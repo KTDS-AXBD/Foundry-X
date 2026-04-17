@@ -15,7 +15,7 @@
 #   0 — 모든 체크 PASS
 #   1 — 하나 이상 FAIL
 #
-# Reference: docs/04-report/phase-44-f539-retrospective.md §L2, Sprint 293 F538 교훈
+# Reference: docs/04-report/features/phase-44-f539-retrospective.md §L2, Sprint 293 F538 교훈
 
 set -u
 set -o pipefail
@@ -203,7 +203,7 @@ check_fx_gateway_smoke() {
 main() {
   echo "════════════════════════════════════════════════════════════"
   echo "  MSA Deploy Preflight (C69)"
-  echo "  Ref: docs/04-report/phase-44-f539-retrospective.md §L2"
+  echo "  Ref: docs/04-report/features/phase-44-f539-retrospective.md §L2"
   echo "════════════════════════════════════════════════════════════"
 
   local packages
