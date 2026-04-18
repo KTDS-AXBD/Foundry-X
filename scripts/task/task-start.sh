@@ -375,7 +375,11 @@ if [ -n "$PANE_ID" ]; then
   # S260 C28: WT worker는 토큰 비용 절감 위해 Sonnet 강제.
   # feedback_sprint_model.md "Master=Opus, WT=Sonnet" 원칙의 구현.
   # 사용자는 worker 세션에서 /model 명령으로 수동 변경 가능.
-  CCS_WT_CMD="${CCS_BIN} --model claude-sonnet-4-6"
+  # S300 (2026-04-18): minor 버전 하드코딩 → `sonnet` alias로 교체.
+  # Claude Code CLI가 Sonnet 현행 최신 버전을 자동 선택하므로
+  # Anthropic release 시 별도 수정 없이 자동 추종. 특정 minor 버전
+  # 고정이 필요한 경우에만 --model claude-sonnet-4-N 복원.
+  CCS_WT_CMD="${CCS_BIN} --model sonnet"
 
   cat > "$INJECT_SCRIPT" << INJECT_EOF
 #!/usr/bin/env bash

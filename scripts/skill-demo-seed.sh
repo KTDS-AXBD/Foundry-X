@@ -42,7 +42,7 @@ for skill in cost-model feasibility-study market-sizing competitor-analysis valu
         \"skillId\": \"${skill}\",
         \"status\": \"completed\",
         \"durationMs\": ${DURATION},
-        \"model\": \"claude-sonnet-4-20250514\",
+        \"model\": \"claude-sonnet-4-6\",
         \"inputTokens\": $((RANDOM % 2000 + 500)),
         \"outputTokens\": $((RANDOM % 3000 + 1000)),
         \"costUsd\": 0.$(printf '%02d' $((RANDOM % 10 + 1)))
