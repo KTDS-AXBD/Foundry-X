@@ -372,3 +372,18 @@ app.all('/api/*', async (c) => {
 - 완전한 이벤트 드리븐/비동기 메시징 구조(Phase 2 이후) 및 도메인 간 eventual consistency 구현은 본 PRD에서는 제외.
 
 ---
+
+## Appendix. 후속 PRD 링크 (2026-04-19 추가)
+
+본 PRD는 Phase 39 Walking Skeleton 범위(Gateway + Discovery 1 Worker)까지의 "걸을 수 있는지" 증명에 초점을 맞추었다. 이후 Phase 44 MSA 2차 분리(F538~F544)를 통해 fx-shaping/fx-offering까지 Worker 4 체계로 확장되었으나, 대규모 restructuring에서 **11개 구조적 미비점**(partial 이관, D1 공유, shared contract 부재, E2E 공백, CLI 미전환, KOAMI P2 deferred, SPEC drift, 6 도메인 로드맵 부재, multi-hop latency 미평가, EventBus PoC 부재, harness-kit 표준화 미완)이 누적되었다.
+
+이 미비점은 별도의 **후속 PRD**로 분리하여 Phase 45 "MSA 3rd Separation & Hardening"에서 해소한다:
+
+- **후속 PRD**: [`docs/specs/fx-msa-followup/prd-final.md`](../fx-msa-followup/prd-final.md) (v1.1 Final, 2026-04-19 승격)
+- **Phase 45 F-items**: F560~F572 (13개, FX-REQ-603~615, Sprint 311~318) — [`SPEC.md §5`](../../../SPEC.md) 참조
+- **MVP 3종**: F560 Discovery 완전 이관 / F561 D1 Option A PoC / F564 CLI Strangler 완결
+- **검토 근거**: 3-AI req-interview 3 round (63→68→76 Conditional 수용), `docs/specs/fx-msa-followup/archive/review/round-{1,2,3}/`
+
+따라서 본 PRD (fx-msa-roadmap v2)는 Phase 39/44의 완결된 명세로 **freeze** 상태이며, Phase 45 이후 변경은 후속 PRD에서 관리한다.
+
+---
