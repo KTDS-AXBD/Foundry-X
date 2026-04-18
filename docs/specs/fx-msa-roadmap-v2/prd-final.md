@@ -308,3 +308,74 @@ app.route('/api/ontology', ontologyApp);
 | 1 | ESLint 커스텀 룰 구현 상세 (AST 패턴) 및 PoC(Proof of Concept) 완료, 신규 파일에만 적용 확인 | Sinclair | W+1 |
 <!-- CHANGED: contract 형태 허용 범위 이슈에 shared/contracts/ 레이어 검토 추가 -->
 | 2 | `types.ts` 외 contract 형태 허용 범위 (e.g. `interfaces/`, `contracts/`, `shared/contracts/` 도입 검토)
+---
+
+## 10. Phase 45 MSA 도메인 분리 로드맵 (Sprint 311~318) — F566
+
+> **버전 업데이트**: 2026-04-19 (Sprint 311 F566, FX-REQ-609)
+> Phase 45는 Phase 44에서 Walking Skeleton + 부분 이관으로 끝난 6개 도메인의 **완전 분리**를 목표로 한다.
+
+### 10.1 Sprint 배치 계획
+
+| Sprint | F-item | 도메인 | 목표 | MVP 등급 |
+|--------|--------|--------|------|----------|
+| 311 | F560 | Discovery 완전 이관 | 4개 잔여 파일 이전, KOAMI P2 Smoke | M1 |
+| 311 | F566 | MSA Roadmap v2 | 본 문서 §10 게시 | — |
+| 312 | F561 | D1 Option A PoC | foundry-x-discovery-db 분리, 롤백 리허설 | M2 |
+| 312 | F562 | shared-contracts | packages/shared-contracts/ 신설, Discovery↔Shaping DTO | P1 |
+| 313 | F563 | fx-shaping E2E | Shaping 13 routes 순수 이관, KOAMI P2 완결 | P0 |
+| 313 | F564 | Strangler 완결 | CLI/Web 단일 진입점(fx-gateway), foundry-x-api 직결 0건 | M3 |
+| 314 | F565 | SDD-drift-check CI | SPEC drift 방지 자동화 게이트 | P2 |
+| 314 | F567 | Multi-hop latency | browser→fx-gateway→MAIN_API 3-hop p95 측정 + SLO | P1 |
+| 315 | F568 | EventBus PoC | D1 Event Table vs Cloudflare Queue 3종 비교 + 1 flow | P1 |
+| 315 | F569 | harness-kit | packages/harness-kit/ 공통 scaffold, new-worker.sh | P2 |
+| 316 | F570 | Offering 완전 이관 | Offering 12 routes 순수 이관, proxy 제거 | P1 |
+| 317 | F572 | modules 통합 분리 | portal/gate/launch 34 routes, 공통 auth 경로 | P2 |
+| 318 | F571 | Agent Walking Skeleton | fx-agent Worker 신규, 15 routes 초기 이관 | P1 |
+
+### 10.2 6 도메인 분리 우선순위 + 리소스/일정
+
+| 우선순위 | 도메인 | routes/services | Sprint | 난이도 | 롤백 시나리오 |
+|---------|--------|----------------|--------|--------|--------------|
+| 1 | Discovery (완결) | 10/26 잔여 | 311 | ★★☆ | gateway `/api/discovery/*` → MAIN_API catch-all으로 즉시 전환 |
+| 2 | Shaping (E2E 완결) | 13/22 | 313 | ★★★ | gateway `/api/shaping/*` 삭제 → MAIN_API |
+| 3 | Offering (완전 이관) | 12/29 | 316 | ★★☆ | gateway `/api/offerings/*` 삭제 → MAIN_API |
+| 4 | modules (portal/gate/launch) | 34/45 | 317 | ★★★ | gateway `/api/portal/*` 등 삭제 → MAIN_API |
+| 5 | Agent (Walking Skeleton) | 15/62 초기 | 318 | ★★★★★ | gateway `/api/agent/*` 삭제 → MAIN_API |
+| 6 | Harness | 22/49 | Phase 46+ | ★★★★ | gateway `/api/harness/*` 삭제 → MAIN_API |
+
+**롤백 공통 원칙**: 각 도메인의 gateway 라우트를 MAIN_API catch-all로 리다이렉트. 5분 이내 가능. Cloudflare Workers hot-swap 지원.
+
+### 10.3 Phase 45 MVP 정의
+
+| Milestone | 성공 기준 | F-item |
+|-----------|----------|--------|
+| M1 | Discovery 10 routes 모두 fx-discovery 소속 + proxy 0건 grep 확인 | F560 |
+| M2 | foundry-x-discovery-db 분리 + biz_items read/write E2E PASS + 롤백 리허설 1회 성공 | F561 |
+| M3 | CLI/Web 모두 VITE_API_URL=fx-gateway + foundry-x-api 직결 코드 0건 | F564 |
+
+M1~M3 달성 시 Phase 45 "Discovery 완전 분리" 선언. 나머지 F-item은 Phase 46으로 이월 가능.
+
+### 10.4 Phase 46+ 예측 로드맵
+
+| Phase | 목표 | 예상 Sprint | 선행 조건 |
+|-------|------|------------|---------|
+| Phase 46 | Harness 도메인 분리 + Agent 심화 (62 services 모듈화) | 319~322 | F571 Walking Skeleton |
+| Phase 47 | 멀티 테넌트 / 조직 분리 + SSO Hub Token 체계 재설계 | 325~330 | Phase 46 완료 |
+| Phase 48 | 멀티 리전 배포 (APAC/EU/US) | 335+ | D1 Option A 안정화 |
+
+> **주의**: Phase 47+ 일정은 GTM 이후 실제 트래픽 + 고객 요구사항에 따라 유동적.
+
+---
+
+## 11. F560 Sprint 311 구현 요약
+
+| 항목 | 결과 |
+|------|------|
+| ax-bd-artifacts.ts | ✅ fx-shaping 이전 (BdArtifactService 기존 활용) |
+| ax-bd-discovery.ts | ✅ fx-shaping 이전 (DiscoveryXIngestService stub) |
+| discovery-shape-pipeline.ts | 🔄 fx-gateway 명시 라우팅 → MAIN_API (F562 이후 완결) |
+| discovery-stage-runner.ts | 🔄 fx-gateway 명시 라우팅 → MAIN_API (F571 이후 완결) |
+| cross-domain grep | ✅ `core/discovery` import 0건 (fx-shaping/fx-offering) |
+| TDD | ✅ 11 tests PASS |
+
