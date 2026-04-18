@@ -308,3 +308,40 @@ slugify() {
     | sed 's/^-//;s/-$//' \
     | cut -c1-40
 }
+
+# ─── SPEC backlog DONE marker ─────────────────────────────────────────────────
+# mark_spec_done_row <task_id>
+#
+# SPEC.md의 <task_id> row 상태를 PLANNED → DONE으로 갱신하고 master에 push.
+# flock + pull --rebase → sed → commit → push 원자화 (C14/C15 사고 방지).
+# 이미 DONE이거나 미등록이면 no-op (idempotent).
+# task-daemon.sh phase_signals() 와 task-monitor.sh process_signal() 양쪽에서 호출.
+mark_spec_done_row() {
+  local task_id="$1"
+  local repo_root="${REPO_ROOT:-$(_repo_root)}"
+  local spec="$repo_root/SPEC.md"
+  [ -f "$spec" ] || return 0
+  grep -q "| ${task_id} |" "$spec" || { echo "📝 ${task_id} SPEC backlog: 미등록 (skip)"; return 0; }
+  (
+    cd "$repo_root"
+    flock -x -w 30 8 || { echo "⚠️  ${task_id}: SPEC DONE lock timeout"; exit 0; }
+    if ! git pull origin master --rebase 2>/dev/null; then
+      git rebase --abort 2>/dev/null || true
+      echo "⚠️  ${task_id}: SPEC DONE rebase 실패 — 수동 정리 필요"
+      exit 0
+    fi
+    sed -i "s/| ${task_id} \(|.*|\) PLANNED \(|.*\)/| ${task_id} \1 DONE \2/" "$spec" 2>/dev/null || true
+    if git diff --quiet "$spec"; then
+      echo "📝 ${task_id} SPEC backlog: 변경 없음 (이미 DONE 혹은 미등록)"
+      exit 0
+    fi
+    git add "$spec"
+    git commit -m "chore(${task_id}): mark DONE in SPEC backlog" >/dev/null 2>&1
+    if git push origin master 2>/dev/null; then
+      echo "📝 ${task_id} SPEC backlog → DONE (pushed)"
+    else
+      echo "⚠️  ${task_id} SPEC DONE push 실패 — 로컬 커밋 롤백 (silent drop 방지)"
+      git reset --hard HEAD^ 2>/dev/null || true
+    fi
+  ) 8>"$FX_LOCK_DIR/master-push.lock"
+}
