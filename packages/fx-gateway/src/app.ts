@@ -2,6 +2,7 @@
 // F538: ax-bd/discovery-report* 라우트도 fx-discovery로 이전
 // F539b: CORS 미들웨어 추가 — 브라우저 직접 접점 (FX-REQ-577)
 // F540: ax-bd/*, shaping/* → fx-shaping Worker
+// F541: offerings/*, bdp/*, methodologies/*, biz-items/*/business-plan*, biz-items/*/methodology* → fx-offering
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import type { GatewayEnv } from "./env.js";
@@ -28,6 +29,23 @@ app.all("/api/ax-bd/discovery-reports/*", async (c) => {
 });
 app.all("/api/ax-bd/discovery-report/*", async (c) => {
   return c.env.DISCOVERY.fetch(c.req.raw);
+});
+
+// F541: /api/biz-items/:id/business-plan* → fx-offering
+// 주의: /api/biz-items/:id catch-all보다 먼저 등록 필수 (D1 체크리스트)
+app.all("/api/biz-items/:id/business-plan", async (c) => {
+  return c.env.OFFERING.fetch(c.req.raw);
+});
+app.all("/api/biz-items/:id/business-plan/*", async (c) => {
+  return c.env.OFFERING.fetch(c.req.raw);
+});
+
+// F541: /api/biz-items/:id/methodology* → fx-offering
+app.all("/api/biz-items/:id/methodology", async (c) => {
+  return c.env.OFFERING.fetch(c.req.raw);
+});
+app.all("/api/biz-items/:id/methodology/*", async (c) => {
+  return c.env.OFFERING.fetch(c.req.raw);
 });
 
 // F539c Group B: discovery-stages (/:id/discovery-progress, /:id/discovery-stage)
@@ -75,6 +93,30 @@ app.all("/api/ideas/:id/bmc", async (c) => {
 });
 app.all("/api/ideas/:id/bmc/*", async (c) => {
   return c.env.SHAPING.fetch(c.req.raw);
+});
+
+// F541: /api/offerings/* → fx-offering
+app.all("/api/offerings", async (c) => {
+  return c.env.OFFERING.fetch(c.req.raw);
+});
+app.all("/api/offerings/*", async (c) => {
+  return c.env.OFFERING.fetch(c.req.raw);
+});
+
+// F541: /api/bdp/* → fx-offering
+app.all("/api/bdp", async (c) => {
+  return c.env.OFFERING.fetch(c.req.raw);
+});
+app.all("/api/bdp/*", async (c) => {
+  return c.env.OFFERING.fetch(c.req.raw);
+});
+
+// F541: /api/methodologies → fx-offering
+app.all("/api/methodologies", async (c) => {
+  return c.env.OFFERING.fetch(c.req.raw);
+});
+app.all("/api/methodologies/*", async (c) => {
+  return c.env.OFFERING.fetch(c.req.raw);
 });
 
 // 그 외 모든 /api/* 요청은 MAIN_API로

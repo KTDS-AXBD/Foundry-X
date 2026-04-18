@@ -1,14 +1,12 @@
 import { app, handleScheduled } from "./app.js";
 import { harnessRoute } from "./core/harness/routes/harness.js";
-import { methodologyRoute } from "./core/offering/routes/methodology.js";
 import { z } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 
 // ─── F126: Harness rules route (auth + tenant middleware from app.ts /api/* applies) ───
 app.route("/api", harnessRoute);
 
-// ─── F193+F194: Methodology management routes ───
-app.route("/api", methodologyRoute);
+// ─── F193+F194: Methodology routes → F541: fx-offering Worker로 이전 ───
 
 // ─── F128: Global error handler — structured error responses ───
 app.onError((err, c) => {

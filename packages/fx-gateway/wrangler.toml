@@ -22,6 +22,11 @@ service = "fx-discovery"
 binding = "SHAPING"
 service = "fx-shaping"
 
+# F541: Service Binding — Offering Worker
+[[services]]
+binding = "OFFERING"
+service = "fx-offering"
+
 # Local development
 [env.dev]
 name = "fx-gateway-dev"
@@ -37,3 +42,7 @@ service = "fx-discovery-dev"
 [[env.dev.services]]
 binding = "SHAPING"
 service = "fx-shaping-dev"
+
+[[env.dev.services]]
+binding = "OFFERING"
+service = "fx-offering-dev"

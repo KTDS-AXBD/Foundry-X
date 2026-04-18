@@ -36,11 +36,7 @@ import {
   discoveryPipelineRoute,
   discoveryStagesRoute, discoveryShapePipelineRoute, discoveryStageRunnerRoute,
   // shaping — F540: 전체 fx-shaping Worker로 이전 (routes 제거됨)
-  // offering (12 routes — Sprint 216: businessPlanExportRoute 추가)
-  offeringsRoute, offeringSectionsRoute, offeringExportRoute,
-  offeringValidateRoute, offeringMetricsRoute, offeringPrototypeRoute,
-  designTokensRoute, contentAdapterRoute, bdpRoute, methodologyRoute,
-  businessPlanRoute, businessPlanExportRoute,
+  // offering — F541: 전체 fx-offering Worker로 이전 (routes 제거됨)
   // agent (13 routes + F529 streaming)
   agentRoute, agentAdaptersRoute, agentDefinitionRoute,
   orchestrationRoute, executionEventsRoute, taskStateRoute,
@@ -281,8 +277,7 @@ app.route("/api", collectionRoute);
 
 // Sprint 56: discoveryRoute → fx-discovery (F538)
 
-// Sprint 59: Methodology registry + router (auth + tenant required)
-app.route("/api", methodologyRoute);
+// Sprint 59: Methodology registry + router → F541: fx-offering으로 이전
 
 // Sprint 61: AX BD Ideation — Ideas (auth + tenant required)
 // axBdBmcRoute → F540: fx-shaping
@@ -320,12 +315,9 @@ app.route("/api", shareLinksRoute);
 app.route("/api", notificationsRoute);
 app.route("/api", decisionsRoute);
 
-// Sprint 80: BDP + Gate Package (F234, F235, F237)
-app.route("/api", bdpRoute);
-// Sprint 215: 사업기획서 편집기 (F444)
-app.route("/api", businessPlanRoute);
-// Sprint 216: 사업기획서 내보내기 (F446)
-app.route("/api", businessPlanExportRoute);
+// Sprint 80: BDP → F541: fx-offering이전 / Gate Package (F234, F235, F237)
+// Sprint 215: 사업기획서 편집기 → F541: fx-offering이전 (F444)
+// Sprint 216: 사업기획서 내보내기 → F541: fx-offering이전 (F446)
 app.route("/api", gatePackageRoute);
 // Sprint 81: Offering Pack + MVP Tracking + IR Bottom-up (F236, F238, F240)
 app.route("/api", offeringPacksRoute);
@@ -404,21 +396,11 @@ app.route("/api", ogdGenericRoute);
 // Sprint 164: 운영 지표 라우트 (F362, Phase 17)
 app.route("/api", metricsRoute);
 
-// Sprint 167: Offerings Data Layer (F369, F370, F371, Phase 18)
-app.route("/api", offeringsRoute);
-app.route("/api", offeringSectionsRoute);
-
-// Sprint 168: Offering Export + Validate (F372, F373, Phase 18)
-app.route("/api", offeringExportRoute);
-app.route("/api", offeringValidateRoute);
-
-// Sprint 171: Content Adapter + Discovery→Shape Pipeline (F378, F379, Phase 18)
-app.route("/api", contentAdapterRoute);
+// Sprint 167: Offerings Data Layer → F541: fx-offering 이전 (F369, F370, F371, Phase 18)
+// Sprint 168: Offering Export + Validate → F541: fx-offering 이전 (F372, F373, Phase 18)
+// Sprint 171: Content Adapter + Design Tokens + Prototype → F541: fx-offering 이전 (F378, F379, Phase 18)
 app.route("/api", discoveryShapePipelineRoute);
-app.route("/api", designTokensRoute);
-app.route("/api", offeringPrototypeRoute);
-// Sprint 174: Offering Metrics (F383, Phase 18)
-app.route("/api", offeringMetricsRoute);
+// Sprint 174: Offering Metrics → F541: fx-offering 이전 (F383, Phase 18)
 
 // Sprint 178: Builder Quality Dashboard + User Evaluations (F390, F391, Phase 19)
 app.route("/api", qualityDashboardRoute);

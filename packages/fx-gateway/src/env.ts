@@ -6,4 +6,6 @@ export interface GatewayEnv {
   DISCOVERY: Fetcher;
   /** Service Binding — fx-shaping Worker (F540: Shaping 도메인 분리) */
   SHAPING: Fetcher;
+  /** Service Binding — fx-offering Worker (F541: Offering 도메인 분리) */
+  OFFERING: Fetcher;
 }
