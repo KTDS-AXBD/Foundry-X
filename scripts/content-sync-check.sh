@@ -23,29 +23,18 @@ if [ -z "$SPEC_LINE" ]; then
   exit 2
 fi
 
-# Sprint 번호: "Sprint NNN," 패턴
-SPRINT=$(echo "$SPEC_LINE" | grep -oP 'Sprint \K\d+' | head -1)
+# Sprint 번호: SPEC §5 테이블에서 최고 Sprint 번호 (SSOT)
+# "마지막 실측" 행은 갱신 누락 시 stale될 수 있으므로 §5 rows가 권위 소스
+SPRINT=$(grep -oP 'Sprint \K\d+' "$SPEC" | sort -n | tail -1)
 
-# Phase: CLAUDE.md "Current Phase" 섹션에서 첫 번째 Phase N 패턴 추출 (SSOT)
-# CLAUDE.md에는 "Phase 37: Work Lifecycle Platform" 형태로 현재 Phase가 기재됨
+# Phase: SPEC.md에서 최고 Phase 번호 (SSOT)
+# CLAUDE.md는 수동 관리라 Phase 추가 시 지연될 수 있으므로 SPEC.md가 권위 소스
+PHASE_NUM=$(grep -oP 'Phase \K\d+' "$SPEC" | sort -n | tail -1)
+PHASE_TITLE=""
+# Phase title은 CLAUDE.md에서 추출 (있으면)
 CLAUDE_MD="CLAUDE.md"
-if [ -f "$CLAUDE_MD" ]; then
-  # "Phase NN:" 패턴 중 ✅ 없는 첫 번째 = 진행 중 Phase (없으면 가장 높은 번호 = 최신 완료)
-  PHASE_LINE=$(grep -P '^\- \*\*Phase \d+' "$CLAUDE_MD" | grep -v '✅' | head -1 || true)
-  if [ -z "$PHASE_LINE" ]; then
-    # 모두 완료된 경우: 가장 높은 Phase 번호 선택
-    PHASE_LINE=$(grep -P '^\- \*\*Phase \d+' "$CLAUDE_MD" | tail -1 || true)
-  fi
-  PHASE_NUM=$(echo "$PHASE_LINE" | grep -oP 'Phase \K\d+' || true)
-  PHASE_TITLE=$(echo "$PHASE_LINE" | sed -E 's/.*Phase [0-9]+[: ]+//' | sed -E 's/\*\*.*$//' | xargs || true)
-fi
-# fallback: CLAUDE.md에서 못 찾으면 SPEC §3에서 가장 높은 ✅ Phase 사용
-if [ -z "$PHASE_NUM" ]; then
-  PHASE_NUM=$(grep -P 'Phase \d+.*✅' "$SPEC" | grep -oP 'Phase \K\d+' | sort -n | tail -1)
-  if [ -z "$PHASE_NUM" ]; then
-    PHASE_NUM=$(grep -P 'Phase \d+.*[📋🔧]' "$SPEC" | grep -oP 'Phase \K\d+' | sort -n | tail -1)
-  fi
-  PHASE_TITLE=""
+if [ -f "$CLAUDE_MD" ] && [ -n "$PHASE_NUM" ]; then
+  PHASE_TITLE=$(grep -P "Phase $PHASE_NUM" "$CLAUDE_MD" | head -1 | sed -E 's/.*Phase [0-9]+[: ]+//' | sed -E 's/\*\*.*$//' | xargs 2>/dev/null || true)
 fi
 
 DRIFT_COUNT=0
