@@ -19,6 +19,8 @@ export default tseslint.config(
       // MSA 원칙 룰 — core/{domain}/ 신규 파일에만 의도적으로 적용
       'foundry-x-api/no-cross-domain-import': 'error',
       'foundry-x-api/no-direct-route-register': 'error',
+      // C71: 하드코딩 모델 ID 차단 — @foundry-x/shared/model-defaults SSOT 강제
+      'foundry-x-api/use-model-ssot': 'error',
     },
   },
   {
