@@ -1,12 +1,13 @@
 # Foundry-X MSA Follow-up PRD — Structural Gaps & 3rd Separation Plan
 
-> **버전**: v1.0 (Draft)
-> **작성일**: 2026-04-18
+> **버전**: v1.0 (Final)
+> **작성일**: 2026-04-18 (v1.0 Draft)
+> **승격일**: 2026-04-19 (Final, S302)
 > **작성자**: Sinclair (kt ds AX BD팀 리드)
 > **근거 PRD**: `docs/specs/fx-msa-roadmap/prd-final.md` (Phase 39 Walking Skeleton) + `docs/specs/ax-bd-msa/prd-final.md` (Phase 20 재조정)
-> **상위 Phase**: Phase 45 "MSA 3rd Separation & Hardening" (제안)
-> **관련 SPEC**: F520~F523 (Phase 39 ✅), F538~F541 (Phase 44 🔧 진행 중)
-> **상태**: 📋(groomed) — F-item 등록 대기
+> **상위 Phase**: Phase 45 "MSA 3rd Separation & Hardening" (제안 → 확정 대기)
+> **관련 SPEC**: F520~F523 (Phase 39 ✅), F538~F544 (Phase 44 🔧 — F541 MERGED로 MSA 4 Worker live)
+> **상태**: 📋(plan) — Phase 45 F-item 등록 대기. S302 시점 Phase 44 현행 유지 결정으로 Phase 45 PRD를 Final 단계로 고정
 
 ---
 
