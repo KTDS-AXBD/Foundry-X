@@ -46,7 +46,7 @@ curl -s -X POST "${API_URL}/skills/metrics/record" \
     \"skillId\": \"ax-${SKILL_NAME}\",
     \"status\": \"${STATUS}\",
     \"durationMs\": ${DURATION_MS},
-    \"model\": \"claude-sonnet-4-20250514\",
+    \"model\": \"claude-sonnet-4-6\",
     \"inputTokens\": 0,
     \"outputTokens\": 0,
     \"costUsd\": 0
