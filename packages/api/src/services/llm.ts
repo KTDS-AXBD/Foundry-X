@@ -77,7 +77,7 @@ export class LLMService {
 
     return {
       content: data.content[0]?.text ?? "",
-      model: "claude-haiku-4-5",
+      model: MODEL_HAIKU,
       tokensUsed: data.usage.input_tokens + data.usage.output_tokens,
     };
   }
