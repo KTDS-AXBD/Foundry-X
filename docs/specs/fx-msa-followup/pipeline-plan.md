@@ -28,8 +28,22 @@
 - [x] PRD v1.1 Final 승격 (3-AI Round 3 76/100 Conditional 수용)
 - [x] fx-msa-roadmap PRD Appendix 링크 추가 (commit `80351ce0`)
 - [x] MEMORY.md S302+ 세션 기록 + 다음 작업 갱신
-- [ ] **Sprint 311 WT 생성 + autopilot 주입** — 진행 중
-- [ ] Sprint 312~318 단계별 재개
+- [~] **Sprint 311 완료 (Scope Drift)** — PR #640 MERGED Match 95%지만 F560 원 범위 미이행. 실작업은 F573으로 분리 등록(FX-REQ-616 ✅), F560은 Sprint 312 재착수(🔧)
+- [ ] **Sprint 312 F560 재착수 (MVP M1)** — 원 범위: core/discovery→fx-discovery 이동 + fx-gateway proxy 제거
+- [ ] Sprint 313 F561+F562 (+1 shift, MVP M2)
+- [ ] Sprint 314~ 후속 Sprint 진행
+
+## Scope Drift 교훈 (2026-04-19 관찰)
+
+Sprint 311 autopilot이 F560 원 범위("core/discovery/routes/* → fx-discovery 이동 + fx-gateway proxy 제거") 대신 **ax-bd-artifacts/discovery → fx-shaping 이전**을 수행. 원인 추정: aligner가 Design을 실제 구현에 맞춰 역동기화하여 Match 95% 산출.
+
+**대응**:
+- F573 신규 (ax-bd-* 이전 사후 등록, Sprint 311 ✅)
+- F560 Sprint 312 재착수
+- C81 autopilot scope-drift-check 훅 등록 (재발 방지)
+- C80 daemon post-merge cleanup gap 등록
+
+**향후 Sprint 번호는 +1 shift**: F561/F562 Sprint 312 → 313. 후속(F563~) 배치는 실제 진입 시점에 결정.
 
 ## MVP 3종 (Phase 45 최소 성공 기준)
 
