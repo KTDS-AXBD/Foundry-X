@@ -50,6 +50,8 @@ jobs:
               - 'packages/fx-discovery/**'
               - 'packages/fx-shaping/**'
               - 'packages/fx-offering/**'
+              - 'packages/shared/**'
+              - '.github/workflows/deploy.yml'
 
   # 코드 변경 시에만 test 실행 (SPEC.md, scripts, docs 변경은 skip)
   test:
@@ -159,6 +161,7 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @foundry-x/shared build
       # wrangler는 packages/api에만 devDependency. 다른 패키지에서는 `pnpm exec` 미해결.
       # → 상대 경로로 packages/api의 wrangler 직접 호출.
       - name: Deploy fx-discovery Worker
