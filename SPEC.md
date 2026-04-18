@@ -57,7 +57,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 > ```
 > wc -l SPEC.md && find packages/api/src/db/migrations/*.sql | sort | tail -1
 > ```
-> **마지막 실측** (Sprint 303, 2026-04-16): ~11 routes, ~31 services, ~14 schemas, D1 0138, 11 packages — Phase 46 F552 ✅ (Dual AI Review D1+Dashboard, PR #608 Match 100%, TDD 20/20, E2E 16/16). Phase 44 F541 Offering 📋 Sprint 309 배정(Sprint 298→299→309 2차 이월). fx-gateway + fx-discovery + fx-shaping 3 MSA Workers live
+> **마지막 실측** (Sprint 309, 2026-04-18): ~11 routes, ~31 services, ~14 schemas, D1 0138, 11 packages — Phase 44 F541 Offering ✅ MERGED (PR #624 Match 100%, Sprint 309 autopilot). fx-gateway + fx-discovery + fx-shaping + **fx-offering** 4 MSA Workers live. S300 부수: 모델 버전 2중 SSOT 정비(PR #625 B1/B2/B7) + ax-plugin daily-check Step 6e drift 감지 + C71/C72 차기 Sprint 등록
 
 ## §3 Phase 진행 현황
 
