@@ -230,11 +230,18 @@ export class DiagnosticCollector {
     return { axis: "Cost", score, rawValue, unit: "tokens/round", trend: "stable" };
   }
 
-  /** Convergence: end_turn으로 종료된 비율 */
+  /**
+   * Convergence: 라운드 효율 × end_turn 달성 복합 점수 (F556 재정의)
+   * rawValue = avgRounds (ToolEffectiveness.rawValue=ratio와 구별)
+   * score = endTurnRate × (IDEAL_ROUNDS / avgRounds) × 100
+   * — 라운드가 적고 end_turn으로 종료될수록 높은 점수
+   */
   private convergence(rows: AgentRunRow[]): AxisScore {
     const endTurnCount = rows.filter((r) => r.stop_reason === "end_turn").length;
-    const rawValue = endTurnCount / rows.length;
-    const score = clamp(rawValue * 100);
-    return { axis: "Convergence", score, rawValue, unit: "ratio", trend: "stable" };
+    const endTurnRate = endTurnCount / rows.length;
+    const avgRounds = rows.reduce((s, r) => s + r.rounds, 0) / rows.length;
+    const rawValue = avgRounds;
+    const score = clamp(endTurnRate * (3 / Math.max(avgRounds, 1)) * 100);
+    return { axis: "Convergence", score, rawValue, unit: "rounds", trend: "stable" };
   }
 }
