@@ -109,4 +109,49 @@ describe("F530 DiagnosticCollector", () => {
       expect(score.score).toBeLessThanOrEqual(100);
     }
   });
+
+  // F556: Convergence 재정의 — ToolEffectiveness와 구별되는 독립 신호
+  it("F556: Convergence.rawValue는 avgRounds 값이다 (ratio 아님)", async () => {
+    // rounds=5, end_turn → TE.rawValue=1.0(ratio), Convergence.rawValue=5(rounds)
+    await db.prepare(INSERT_SQL)
+      .bind("m4", "sess-conv-new", "agent-e", "completed", 5, "end_turn", 100, 80)
+      .run();
+
+    const report = await collector.collect("sess-conv-new", "agent-e");
+    const te = report.scores.find((s) => s.axis === "ToolEffectiveness")!;
+    const conv = report.scores.find((s) => s.axis === "Convergence")!;
+
+    expect(te.rawValue).toBe(1);       // end_turn ratio = 1.0
+    expect(conv.rawValue).toBe(5);     // avgRounds = 5
+    expect(te.rawValue).not.toBe(conv.rawValue); // 서로 다른 rawValue
+  });
+
+  it("F556: Convergence.unit은 'rounds'이다", async () => {
+    await db.prepare(INSERT_SQL)
+      .bind("m5", "sess-conv-unit", "agent-f", "completed", 3, "end_turn", 100, 80)
+      .run();
+
+    const report = await collector.collect("sess-conv-unit", "agent-f");
+    const conv = report.scores.find((s) => s.axis === "Convergence")!;
+
+    expect(conv.unit).toBe("rounds");
+  });
+
+  it("F556: Convergence.score — 라운드 수가 많을수록 감점된다", async () => {
+    // rounds=1: 효율 최고, rounds=10: 효율 낮음
+    await db.prepare(INSERT_SQL)
+      .bind("m6", "sess-conv-eff1", "agent-g", "completed", 1, "end_turn", 100, 80)
+      .run();
+    await db.prepare(INSERT_SQL)
+      .bind("m7", "sess-conv-eff10", "agent-g", "completed", 10, "end_turn", 100, 80)
+      .run();
+
+    const rep1 = await collector.collect("sess-conv-eff1", "agent-g");
+    const rep10 = await collector.collect("sess-conv-eff10", "agent-g");
+
+    const conv1 = rep1.scores.find((s) => s.axis === "Convergence")!;
+    const conv10 = rep10.scores.find((s) => s.axis === "Convergence")!;
+
+    expect(conv1.score).toBeGreaterThan(conv10.score);
+  });
 });
