@@ -119,6 +119,37 @@ app.all("/api/methodologies/*", async (c) => {
   return c.env.OFFERING.fetch(c.req.raw);
 });
 
+// F560: discovery-stage-runner 명시 라우팅 → MAIN_API
+// 이유: agent 도메인 deps (createAgentRunner/MetaAgent/DiagnosticCollector), F571(Sprint 318) 이후 fx-discovery 이전
+// 주의: /api/biz-items/:id/discovery-stage (exact POST) 는 위에서 DISCOVERY로 처리됨
+app.post("/api/biz-items/:id/discovery-stage/:stage/run", async (c) => {
+  return c.env.MAIN_API.fetch(c.req.raw);
+});
+app.post("/api/biz-items/:id/discovery-stage/:stage/confirm", async (c) => {
+  return c.env.MAIN_API.fetch(c.req.raw);
+});
+app.patch("/api/biz-items/:id/discovery-stage/:stage", async (c) => {
+  return c.env.MAIN_API.fetch(c.req.raw);
+});
+
+// F560: discovery-graph 명시 라우팅 → MAIN_API
+// 이유: agent 도메인 deps, F571(Sprint 318) 이후 fx-discovery 이전
+app.post("/api/biz-items/:id/discovery-graph/run-all", async (c) => {
+  return c.env.MAIN_API.fetch(c.req.raw);
+});
+app.get("/api/biz-items/:id/discovery-graph/sessions", async (c) => {
+  return c.env.MAIN_API.fetch(c.req.raw);
+});
+
+// F560: discovery-shape-pipeline 명시 라우팅 → MAIN_API
+// 이유: OfferingService/ContentAdapterService 의존성, F562(shared-contracts) 이후 분리
+app.post("/api/pipeline/shape/trigger", async (c) => {
+  return c.env.MAIN_API.fetch(c.req.raw);
+});
+app.get("/api/pipeline/shape/status", async (c) => {
+  return c.env.MAIN_API.fetch(c.req.raw);
+});
+
 // 그 외 모든 /api/* 요청은 MAIN_API로
 app.all("/api/*", async (c) => {
   return c.env.MAIN_API.fetch(c.req.raw);

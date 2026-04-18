@@ -1,5 +1,6 @@
 // fx-shaping app (F540: FX-REQ-579)
-// Shaping 도메인 독립 Worker — 13 routes, 22 services
+// F560: ax-bd-artifacts + ax-bd-discovery 이전 (api/core/discovery → fx-shaping)
+// Shaping 도메인 독립 Worker — 15 routes, 23 services
 import { Hono } from "hono";
 import type { ShapingEnv } from "./env.js";
 import { authMiddleware } from "./middleware/auth.js";
@@ -17,6 +18,8 @@ import { axBdPersonaEvalRoute } from "./routes/ax-bd-persona-eval.js";
 import { axBdProgressRoute } from "./routes/ax-bd-progress.js";
 import { personaConfigsRoute } from "./routes/persona-configs.js";
 import { personaEvalsRoute } from "./routes/persona-evals.js";
+import { axBdArtifactsRoute } from "./routes/ax-bd-artifacts.js";
+import { axBdDiscoveryRoute } from "./routes/ax-bd-discovery.js";
 
 const app = new Hono<{ Bindings: ShapingEnv }>();
 
@@ -52,6 +55,9 @@ authenticated.route("/api", personaConfigsRoute);
 authenticated.route("/api", personaEvalsRoute);
 // BD process progress
 authenticated.route("/api", axBdProgressRoute);
+// F560: BD artifacts + Discovery-X ingest (이전: api/core/discovery)
+authenticated.route("/api", axBdArtifactsRoute);
+authenticated.route("/api", axBdDiscoveryRoute);
 
 app.route("/", authenticated);
 
