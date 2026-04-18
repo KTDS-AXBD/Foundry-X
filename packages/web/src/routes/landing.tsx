@@ -79,7 +79,7 @@ const STATS_FALLBACK = [
   { value: "2", label: "BD 파이프라인" },
   { value: "10+", label: "AI 에이전트" },
   { value: "63", label: "자동화 스킬" },
-  { value: "303", label: "Sprints" },
+  { value: "308", label: "Sprints" },
 ];
 
 // Build-time content from TinaCMS-managed Markdown
