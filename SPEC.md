@@ -292,7 +292,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C72 | C | **packages/* 모델 literal → SSOT 참조 전환** (B3~B6 일괄) — (B3) `packages/api/src/core/agent/specs/{reviewer,infra,security,architect,qa}.agent.yaml` 5개 `claude-haiku-4-5-20251001` → yaml loader에서 SSOT 참조 또는 런타임 치환 패턴. (B4) `packages/gate-x/src/services/llm/providers/anthropic.ts:11` → `import { MODEL_SONNET } from '@foundry-x/shared/model-defaults'`. (B5) `packages/api/src/services/llm.ts:80` → `MODEL_HAIKU` import. (B6) `packages/fx-shaping/src/agent/services/{model-router,openrouter-runner}.ts` OpenRouter 경로 → `OR_MODEL_SONNET` 참조. 총 9+ 파일. typecheck + 기존 단위 테스트 회귀 PASS 필수. 전제: C73 완료 권장(자동 검증 용도, C71→C73 ID forward). S300 feedback_model_version_ssot 후속. 내부 리팩토링으로 C-track (FX-REQ-595, P2) | — | 📋(idea) → **C74 실행** | planning row, id-allocator가 C74 발급 (C72→C74 ID forward 패턴). 실제 구현 추적은 C74 row (task/C74-packages-literal-ssot-c72-b3-b6). C73(use-model-ssot 룰) merge됨(PR #628) — lint 자동 검증 가능 |
 | C73 | C | use-model-ssot ESLint 룰 (FX-REQ-596) | — | DONE | task orchestrator |
 | C74 | C | packages/* 모델 literal → SSOT 참조 (C72 B3~B6) (FX-REQ-597) | — | DONE | task orchestrator (PR #630, +39/-18) |
-| C75 | C | D1 격리 ESLint 룰 (C56 no-cross-domain-d1) (FX-REQ-598) | — | PLANNED | task orchestrator |
+| C75 | C | D1 격리 ESLint 룰 (C56 no-cross-domain-d1) (FX-REQ-598) | — | DONE | task orchestrator (PR #632, +333/-0) |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
