@@ -1,12 +1,12 @@
 ---
 code: FX-SPEC-001
 title: Foundry-X Project Specification
-version: 5.87
+version: 5.88
 status: Active
 category: SPEC
 system-version: Sprint 308
 created: 2026-03-16
-updated: 2026-04-17
+updated: 2026-04-18
 author: Sinclair Seo
 ---
 
@@ -288,6 +288,8 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | B4 | B | **Ontology 그래프 의미 명확화** — 리허설 D-1 dogfood에서 발견: F549 KG XAI 뷰어가 force simulation 기반 배치로 12노드가 중앙 밀집 + 의미 전달 부족. 범위: (a) `packages/web/src/routes/ai-foundry-os/ontology.tsx` force simulation 제거 → 타입별 Swimlane 5열 레이아웃(① 누가/② 어디서/③ 어떻게/④ 판단/⑤ 남겨야), (b) 엣지 라벨 항상 표시, (c) 3가지 경로 토글(성공/불가/부분 취소) + 기본 하이라이트, (d) 내러티브 패널 + 5-tile 통계. 우선순위 P1 (대표 보고 리허설 4/17). | — | DONE | 변경: 1 file(+235/-182). typecheck PASS. PR TBD (fix/ontology-swimlane-layout). Reality: fx.minu.best/ai-foundry-os/ontology 배포 후 dogfood 재검증 필요 |
 | C69 | C | **본부장 시연 준비 (fx-boss-demo)** — 4/17 오전 대표 보고 연계 15분 시연. 온누리상품권 LPON Spec(Decode-X) 기반 "전자화폐상품권 플랫폼" 신규 시나리오 발굴→형상화→Prototype 시연. 사전 생성 + 라이브(`bun test`) 혼합. PRD: `docs/specs/fx-boss-demo/prd-final.md`. 준비: 슬라이드 5장 + 시나리오 사전 생성 + Q&A 15개 + 리허설 | — | 🔧(impl) | S305. 기존 자산: F545~F549 데모 페이지 + Decode-X working-version |
 | C70 | C | wiki: AI Foundry OS 경험자산화+3대자산 등록 (FX-REQ-592) | — | DONE | task orchestrator |
+| C71 | C | **모델 SSOT ESLint 룰 신규** (`foundry-x-api/use-model-ssot`) — `packages/api/src/eslint-rules/use-model-ssot.js` 신규 작성 + `index.js` 등록 + 단위 테스트. 규칙: 활성 코드에서 `claude-(sonnet\|haiku\|opus)-[0-9]+-[0-9]+` 리터럴 하드코딩을 `error`로 차단하고 `@foundry-x/shared/model-defaults`의 `MODEL_SONNET`/`MODEL_HAIKU`/`OR_MODEL_*` import 강제. 면제: `packages/api/src/db/migrations/*.sql`, `**/__tests__/`, `packages/web/e2e/fixtures/`, `archive/`. 전제: 없음 — C72 착수 전 선행 권장(룰 도입 후 B3~B6 수정 시 즉시 강제). S300 feedback_model_version_ssot 후속. task-promotion 기준 2 충족 / 기준 3 불충족으로 C-track 유지 (FX-REQ-594, P2) | — | 📋(idea) | planning row, 실행 시 id-allocator가 다른 번호 발급 가능(ID forward 패턴) |
+| C72 | C | **packages/* 모델 literal → SSOT 참조 전환** (B3~B6 일괄) — (B3) `packages/api/src/core/agent/specs/{reviewer,infra,security,architect,qa}.agent.yaml` 5개 `claude-haiku-4-5-20251001` → yaml loader에서 SSOT 참조 또는 런타임 치환 패턴. (B4) `packages/gate-x/src/services/llm/providers/anthropic.ts:11` → `import { MODEL_SONNET } from '@foundry-x/shared/model-defaults'`. (B5) `packages/api/src/services/llm.ts:80` → `MODEL_HAIKU` import. (B6) `packages/fx-shaping/src/agent/services/{model-router,openrouter-runner}.ts` OpenRouter 경로 → `OR_MODEL_SONNET` 참조. 총 9+ 파일. typecheck + 기존 단위 테스트 회귀 PASS 필수. 전제: C71 완료 권장(자동 검증 용도). S300 feedback_model_version_ssot 후속. 내부 리팩토링으로 C-track (FX-REQ-595, P2) | — | 📋(idea) | planning row, id-allocator가 다른 번호 발급 가능(ID forward). 실행 시 C72 blocked by C71 체크 |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
@@ -316,6 +318,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | 5.84 | 2026-04-15 | **MSA 2단계 고도화 Pipeline 등록** (/ax:todo plan) — Phase 44 완결 + 운영 preflight. F540 Shaping(FX-REQ-579, Sprint 297) + F541 Offering(FX-REQ-580, Sprint 298) 순차. C56 D1 격리(ready, F540 직전 선행) + C57 shared 슬리밍(ready, F541 이후) + C69 신규 배포 preflight 자동화(F540 전 완료 권장). F540/F541은 PRD `docs/specs/fx-msa-roadmap-v2/prd-final.md` 재사용(신규 PRD 미작성). 병렬 Master pane에서 C56/C57/C69 진행 |
 | 5.85 | 2026-04-15 | **F539c ✅ 부분 + Phase 44 F539 전체 MERGED** — PR #597 (S296 Match 95%). 7 routes fx-discovery 이전(Group A+B 단일 PR 통합) + CLI scripts 7개 URL 전환 + fx-discovery 11 new tests. Phase Exit drift 3건: (a) 2 PR 분할 미이행(단일 PR), (b) KOAMI Smoke P2 미실측, (c) Retrospective 누락. packages/cli는 API URL 하드코딩 없음 확인(N/A). 후속: Smoke + Retrospective 별도 task, C69 preflight 선행 후 Sprint 297 F540 |
 | 5.86 | 2026-04-15 | **F540 ✅(부분) Shaping 분리 MERGED** — PR #598 (S297 Match 96%, 93 files, 1h 55m). fx-shaping Worker 신규(13 routes/22 services/15 schemas) + fx-gateway SHAPING Service Binding + `/api/shaping/*` + `/api/ax-bd/*` 라우팅. 초기 deploy.yml 24445867997 failure(ESLint 8 errors): autopilot `pnpm lint` 누락 → test job FAIL → deploy 3 job skip. **Hotfix `2efc06f3`**: 7 수동 + 1 auto-fix → deploy.yml 24446036032 success. Phase Exit P1 확증(smoke 200×2). P2 KOAMI는 F541 이월. C69 2차 개선 대상(lint pre-check) |
+| 5.88 | 2026-04-18 | **모델 버전 SSOT 정비 + C71/C72 등록** (S300) — PR #625 (`bbbe06d7`) B1/B2/B7 정리: `task-start.sh` `--model sonnet` alias 전환 / `model-defaults.ts` SSOT 주석 보강(업그레이드 절차+소비자 목록) / scripts/ stale `20250514` → `4-6`. 자동 반영 메커니즘: ax-plugin `502caef` daily-check Step 6e "모델 버전 Drift" 추가 + `9ba4468` sprint/SKILL.md alias 문구. MEMORY `feedback_model_version_ssot` 신규 — 2중 SSOT(CLI alias / SDK model-defaults.ts) 원칙. 차기 Sprint C71(use-model-ssot ESLint 룰, FX-REQ-594, P2) + C72(packages/* literal → SSOT 전환 B3~B6, FX-REQ-595, P2) 등록 |
 
 ## §10 버전 정책
 
