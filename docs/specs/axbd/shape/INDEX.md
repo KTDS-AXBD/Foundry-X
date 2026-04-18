@@ -3,6 +3,9 @@
 AX BD 프로세스 6단계 중 3단계: 발굴 산출물 → 사업기획서 형상화.
 발굴 단계(2-0~2-8)의 DiscoveryPackage를 입력으로 받아, 표준 포맷(HTML/PPTX)의 사업기획서를 생성한다.
 
+> **⚠️ 경로 변경 (2026-04-18, PR #623)**
+> 이 knowledge asset은 `.claude/skills/ax-bd/shape/` → `docs/specs/axbd/shape/`로 이동되었어요. `ax-bd/shape`는 논리 네임스페이스(도메인/스테이지/기능 식별자)로 유지되며, 물리 참조는 `docs/specs/axbd/shape/...` 경로를 사용해요. ax-bd-offering-agent는 경로 비의존이라 동작 영향 없음. 런타임 참조는 prototype-sentinel agent와 skill-registry sourceRef만 해당.
+
 ## Agent
 
 - **ax-bd-offering-agent** — shaping-orchestrator 확장, 형상화 전체 라이프사이클 관리
