@@ -295,6 +295,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C75 | C | D1 격리 ESLint 룰 (C56 no-cross-domain-d1) (FX-REQ-598) | — | DONE | task orchestrator (PR #632, +333/-0) |
 | C76 | C | task-monitor SPEC DONE 마킹 복원 (daemon orphan gap) (FX-REQ-599) | — | DONE | task orchestrator |
 | C78 | C | MSA preflight 후속 — shared 선빌드 + wrangler check 개선 + CI workflow 통합 (FX-REQ-600) | — | PLANNED | task orchestrator |
+| C79 | C | task-start auto-complete 이중 commit 개선 (C67 관찰 해소) (FX-REQ-601) | — | PLANNED | task orchestrator |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
