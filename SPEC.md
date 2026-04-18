@@ -57,7 +57,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 > ```
 > wc -l SPEC.md && find packages/api/src/db/migrations/*.sql | sort | tail -1
 > ```
-> **마지막 실측** (Sprint 309, 2026-04-19): ~11 routes, ~30 services, ~14 schemas, D1 0138, 11 packages — Phase 44 F541 Offering ✅ MERGED (PR #624 Match 100%, Sprint 309 autopilot). fx-gateway + fx-discovery + fx-shaping + **fx-offering** 4 MSA Workers live. S301: 모델 SSOT 3단 체인(C73 PR#628 use-model-ssot / C74 PR#630 literal→SSOT / C75 PR#632 no-cross-domain-d1) + C76 PR#634 daemon orphan SPEC mark fix. C56→C75 / C72→C74 / C71→C73 ID forward
+> **마지막 실측** (Sprint 310, 2026-04-19): ~11 routes, ~31 services, ~14 schemas, D1 0138, 11 packages — Phase 45 MSA 3rd Separation 착수. Sprint 310 F556 MetaAgent Rubric 튜닝 ✅ MERGED (PR #638 Match 100%, S302 autopilot). Phase 45 F560~F572 13 F-items 등록(FX-REQ-603~615, Sprint 311~318). S302: C69 ID 중복 해소(→C77), C78 preflight 후속 PR #637 MERGED. S307: tmux 3.5a segfault 대응 L2/L3 구현(TASK_MAX_RETRY=5 + phase_tmux_health)
 
 ## §3 Phase 진행 현황
 
