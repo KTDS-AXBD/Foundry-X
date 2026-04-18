@@ -1,0 +1,36 @@
+name = "fx-offering"
+account_id = "b6c06059b413892a92f150e5ca496236"
+main = "src/index.ts"
+compatibility_date = "2026-03-17"
+compatibility_flags = ["nodejs_compat"]
+
+# F541: D1 바인딩 (동일 DB 공유, Phase 44에서 독립 DB로 전환 예정)
+[[d1_databases]]
+binding = "DB"
+database_name = "foundry-x-db"
+database_id = "6338688e-b050-4835-98a2-7101f9215c76"
+
+# F541: R2 — offering prototype HTML 서빙
+[[r2_buckets]]
+binding = "FILES_BUCKET"
+bucket_name = "foundry-x-files"
+
+# F541: Workers AI — bdp ProposalGenerator
+[ai]
+binding = "AI"
+
+[vars]
+ENVIRONMENT = "production"
+
+# Local development
+[env.dev]
+name = "fx-offering-dev"
+
+[[env.dev.d1_databases]]
+binding = "DB"
+database_name = "foundry-x-db"
+database_id = "6338688e-b050-4835-98a2-7101f9215c76"
+
+[[env.dev.r2_buckets]]
+binding = "FILES_BUCKET"
+bucket_name = "foundry-x-files-dev"
