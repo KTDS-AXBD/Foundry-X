@@ -293,6 +293,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C73 | C | use-model-ssot ESLint 룰 (FX-REQ-596) | — | DONE | task orchestrator |
 | C74 | C | packages/* 모델 literal → SSOT 참조 (C72 B3~B6) (FX-REQ-597) | — | DONE | task orchestrator (PR #630, +39/-18) |
 | C75 | C | D1 격리 ESLint 룰 (C56 no-cross-domain-d1) (FX-REQ-598) | — | DONE | task orchestrator (PR #632, +333/-0) |
+| C76 | C | task-monitor SPEC DONE 마킹 복원 (daemon orphan gap) (FX-REQ-599) | — | PLANNED | task orchestrator |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
