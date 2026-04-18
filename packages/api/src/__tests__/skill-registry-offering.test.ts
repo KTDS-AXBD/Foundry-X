@@ -111,7 +111,7 @@ describe("Skill Registry — offering-html (F366)", () => {
     category: "generation",
     tags: ["offering", "html", "shape", "business-proposal"],
     sourceType: "derived",
-    sourceRef: ".claude/skills/ax-bd/shape/offering-html/SKILL.md",
+    sourceRef: "docs/specs/axbd/shape/offering-html/SKILL.md",
     modelPreference: "opus",
     maxTokens: 8192,
   };
@@ -164,7 +164,7 @@ describe("Skill Registry — offering-html (F366)", () => {
     expect(data.skillId).toBe("offering-html");
     expect(data.sourceType).toBe("derived");
     expect(data.sourceRef).toBe(
-      ".claude/skills/ax-bd/shape/offering-html/SKILL.md",
+      "docs/specs/axbd/shape/offering-html/SKILL.md",
     );
   });
 

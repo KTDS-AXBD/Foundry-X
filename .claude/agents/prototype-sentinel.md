@@ -224,7 +224,7 @@ IF ogd_rounds와 prototype_quality 간 불일치:
 - `.claude/agents/ogd-discriminator.md` (OGD Discriminator)
 - `.claude/agents/ogd-generator.md` (OGD Generator)
 - `.claude/agents/ax-bd-offering-agent.md` (Offering Agent)
-- `.claude/skills/ax-bd/shape/prototype-builder/SKILL.md` (Builder Skill)
+- `docs/specs/axbd/shape/prototype-builder/SKILL.md` (Builder Skill)
 
 **감지 패턴:**
 - 에이전트 간 입출력 스키마 불일치
@@ -245,7 +245,7 @@ IF 에이전트 스펙의 입출력이 실제 코드와 불일치:
 
 **검증 파일:**
 - `.claude/agents/*.md`
-- `.claude/skills/ax-bd/shape/*/SKILL.md`
+- `docs/specs/axbd/shape/*/SKILL.md`
 
 ### Sector 7: 엔드투엔드 산출물 품질
 
@@ -382,7 +382,7 @@ sentinel_report:
     files: [
       "packages/api/src/services/prototype-styles.ts",
       "packages/api/src/services/adapters/prototype-ogd-adapter.ts",
-      ".claude/skills/ax-bd/shape/prototype-builder/SKILL.md"
+      "docs/specs/axbd/shape/prototype-builder/SKILL.md"
     ]
     
   pending_approvals:

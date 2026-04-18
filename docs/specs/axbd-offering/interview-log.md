@@ -58,4 +58,4 @@ A: HTML 생성 + GAN 교차검증까지 되면 MVP
 A: Claude Code 스킬로 구현
 
 **Q: 기존 스킬 개선 vs 새로 만들기?**
-A: 기존 `.claude/skills/ax-bd/shape/offering-html/` 스킬 개선
+A: 기존 `docs/specs/axbd/shape/offering-html/` 스킬 개선

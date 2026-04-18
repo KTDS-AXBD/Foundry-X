@@ -111,7 +111,7 @@ describe("Skill Registry — offering-pptx (F367)", () => {
     category: "generation",
     tags: ["offering", "pptx", "shape", "business-proposal"],
     sourceType: "derived",
-    sourceRef: ".claude/skills/ax-bd/shape/offering-pptx/SKILL.md",
+    sourceRef: "docs/specs/axbd/shape/offering-pptx/SKILL.md",
     modelPreference: "opus",
     maxTokens: 8192,
   };
@@ -162,7 +162,7 @@ describe("Skill Registry — offering-pptx (F367)", () => {
     expect(data.skillId).toBe("offering-pptx");
     expect(data.sourceType).toBe("derived");
     expect(data.sourceRef).toBe(
-      ".claude/skills/ax-bd/shape/offering-pptx/SKILL.md",
+      "docs/specs/axbd/shape/offering-pptx/SKILL.md",
     );
   });
 

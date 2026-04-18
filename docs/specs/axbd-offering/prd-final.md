@@ -144,7 +144,7 @@ AX BD팀 전원이 발굴 산출물(2-0~2-8)을 기반으로 KT 연계 사업기
 <!-- CHANGED: 일정/우선순위 현실화 및 P0/P1 구분 강조, MVP 범위 구체 명시 -->
 
 ### 6.2 기술 스택
-- 구현 방식: Claude Code 스킬 (`.claude/skills/ax-bd/shape/offering-html/SKILL.md`)
+- 구현 방식: Claude Code 스킬 (`docs/specs/axbd/shape/offering-html/SKILL.md`)
 - 기존 스킬 v1 개선 방식
 - HTML 단일 파일 출력 (외부 의존 없음)
 - 에이전트: ax-bd-offering-agent 활용

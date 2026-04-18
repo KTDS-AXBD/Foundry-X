@@ -28,9 +28,9 @@
 
 - PRD: `docs/specs/axbd-offering/prd-final.md`
 - 참고자료: `docs/specs/axbd-offering/AX BD팀 사업기획서 생성 스킬.md`
-- 기존 스킬: `.claude/skills/ax-bd/shape/offering-html/SKILL.md`
-- 디자인 토큰: `.claude/skills/ax-bd/shape/offering-html/design-tokens.md`
-- 기존 예시: `.claude/skills/ax-bd/shape/offering-html/examples/KOAMI_v0.5.html`
+- 기존 스킬: `docs/specs/axbd/shape/offering-html/SKILL.md`
+- 디자인 토큰: `docs/specs/axbd/shape/offering-html/design-tokens.md`
+- 기존 예시: `docs/specs/axbd/shape/offering-html/examples/KOAMI_v0.5.html`
 
 ---
 
@@ -118,7 +118,7 @@
 ### 6.1 구현 범위
 
 이 기능은 **Claude Code 스킬 파일 개선**이므로 별도 패키지/서버 구현이 아님.
-변경 대상은 `.claude/skills/ax-bd/shape/offering-html/` 디렉토리 내 파일.
+변경 대상은 `docs/specs/axbd/shape/offering-html/` 디렉토리 내 파일.
 
 ### 6.2 변경 대상 파일
 
