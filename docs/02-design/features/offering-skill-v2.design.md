@@ -32,7 +32,7 @@
 ### 2.1 파일 구조 (v1 → v2 변경)
 
 ```
-.claude/skills/ax-bd/shape/offering-html/
+docs/specs/axbd/shape/offering-html/
 ├── SKILL.md                     # [변경] 목차 엔진 + 프로세스 강화
 ├── design-tokens.md             # [변경] 가이드 §5 완전 반영
 ├── section-mapping.md           # [신규] 가이드 §2 발굴→섹션 매핑

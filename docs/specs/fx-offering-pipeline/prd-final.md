@@ -49,7 +49,7 @@ Phase 18은 **형상화 단계의 전체 파이프라인을 자동화**한다:
 
 | F# | 요구사항 | REQ | P | Sprint |
 |----|---------|-----|---|--------|
-| F363 | offering-html SKILL.md 등록 — 사업기획서 Skill v0.5를 SKILL.md 표준 구조로 변환, `ax-bd/shape/` 디렉토리 생성, INDEX.md 작성 | FX-REQ-355 | P0 | 165 |
+| F363 | offering-html SKILL.md 등록 — 사업기획서 Skill v0.5를 SKILL.md 표준 구조로 변환, `docs/specs/axbd/shape/` 디렉토리 생성, INDEX.md 작성 | FX-REQ-355 | P0 | 165 |
 | F364 | HTML 템플릿 + 컴포넌트 분리 — KOAMI v0.5 HTML에서 base.html + 17종 컴포넌트 분리, examples/ 등록 | FX-REQ-356 | P0 | 165 |
 | F365 | 디자인 토큰 Phase 1 (MD) — 컬러/타이포/레이아웃 토큰을 design-tokens.md로 문서화 | FX-REQ-357 | P1 | 165 |
 | F366 | F275 Skill Registry 연동 — offering-html 스킬을 기존 Skill Registry에 등록, evolution 필드(DERIVED) 선언 | FX-REQ-358 | P1 | 165 |

@@ -6,6 +6,8 @@
 > **기반 문서:** self-evolving-harness-strategy v3.0, prd-shaping-v1.md, 사업기획서 Skill v0.5, KOAMI Template v0.5, prototype-auto-gen PRD
 > **v2.0 → v2.1 변경:** Phase 17 실제 구현 상태 반영, 기존 16 agents + 16 skills 인정, Offering 통합 전략 현실화
 > **현행 기준:** Phase 17 진행 중 / Sprint 164
+>
+> **⚠️ 경로 변경 공지 (2026-04-18):** `ax-bd/shape/` knowledge asset은 `.claude/skills/ax-bd/shape/` → `docs/specs/axbd/shape/`로 이동됨. 이 문서 내 `ax-bd/shape/...` 표기는 논리 네임스페이스(도메인/스테이지/기능 식별자)로 유지되며, 물리 파일 위치는 `docs/specs/axbd/shape/...`를 참조.
 
 ---
 
