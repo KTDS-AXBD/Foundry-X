@@ -37,7 +37,7 @@ export function mapCriteriaToSections(
       }
       if (contexts.length > 0) {
         parts.push("\n**분석 컨텍스트 요약:**");
-        for (const _ctx of contexts) {
+        for (const ctx of contexts) {
           parts.push(`- Step ${ctx.stepOrder} (${ctx.pmSkill}): ${ctx.outputText.slice(0, 200)}...`);
         }
       }
