@@ -161,36 +161,9 @@ phase_signals() {
       tmux kill-pane -t "$PANE_ID" 2>/dev/null || true
     fi
 
-    # SPEC.md backlog status → DONE (PRD §3.3: merge 시 1회 갱신)
-    # S257b fix: 이전에는 로컬 커밋만 하고 push 안 해서 master 분기 발생 (C14/C15 사고).
-    # 이제 master-push.lock 아래에서 pull --rebase → commit → push 원자화.
-    # 실패 시 HEAD^로 롤백해서 로컬 분기 상태를 만들지 않음.
-    if [ "$MERGED" = true ] && [ -f "$REPO_ROOT/SPEC.md" ]; then
-      if grep -q "| ${TASK_ID} |" "$REPO_ROOT/SPEC.md"; then
-        (
-          cd "$REPO_ROOT"
-          flock -x -w 30 8 || { log "⚠️  ${TASK_ID}: SPEC DONE lock timeout"; exit 0; }
-          # Sync with remote first so any concurrent merge is applied before we edit.
-          if ! git pull origin master --rebase 2>/dev/null; then
-            git rebase --abort 2>/dev/null || true
-            log "⚠️  ${TASK_ID}: SPEC DONE rebase 실패 — 수동 정리 필요"
-            exit 0
-          fi
-          sed -i "s/| ${TASK_ID} \\(|.*|\\) PLANNED \\(|.*\\)/| ${TASK_ID} \\1 DONE \\2/" SPEC.md 2>/dev/null || true
-          if git diff --quiet SPEC.md; then
-            log "📝 ${TASK_ID} SPEC backlog: 변경 없음 (이미 DONE 혹은 미등록)"
-            exit 0
-          fi
-          git add SPEC.md
-          git commit -m "chore(${TASK_ID}): mark DONE in SPEC backlog" >/dev/null 2>&1
-          if git push origin master 2>/dev/null; then
-            log "📝 ${TASK_ID} SPEC backlog → DONE (pushed)"
-          else
-            log "⚠️  ${TASK_ID} SPEC DONE push 실패 — 로컬 커밋 롤백 (silent drop 방지)"
-            git reset --hard HEAD^ 2>/dev/null || true
-          fi
-        ) 8>"$FX_LOCK_DIR/master-push.lock"
-      fi
+    # SPEC.md backlog status → DONE — lib.sh mark_spec_done_row() 위임 (C76)
+    if [ "$MERGED" = true ]; then
+      mark_spec_done_row "$TASK_ID"
     fi
 
     # cache + cleanup

@@ -94,7 +94,12 @@ process_signal() {
     tmux kill-pane -t "$PANE_ID" 2>/dev/null || true
   fi
 
-  # ─── 5. cache 갱신 ─────────────────────────────────────────────────────
+  # ─── 5. SPEC.md backlog → DONE (C76: daemon보다 먼저 signal 처리 시 누락 방지)
+  if [ "$MERGED" = true ]; then
+    mark_spec_done_row "$TASK_ID"
+  fi
+
+  # ─── 6. cache 갱신 ─────────────────────────────────────────────────────
   local FINAL_STATUS="merged"
   [ "$MERGED" = false ] && FINAL_STATUS="done_pending_merge"
 
@@ -103,7 +108,7 @@ process_signal() {
     --arg status "$FINAL_STATUS" --arg merged "$MERGED" \
     '{final_status:$status, auto_merged:$merged}')"
 
-  # ─── 6. signal 파일 삭제 (처리 완료) ───────────────────────────────────
+  # ─── 7. signal 파일 삭제 (처리 완료) ───────────────────────────────────
   rm -f "$sig_file"
   echo "[task-monitor] ✅ ${TASK_ID} 처리 완료 (${FINAL_STATUS})"
   echo "---"
