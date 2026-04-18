@@ -1,6 +1,6 @@
 name: qa
 version: "1.0"
-model: claude-haiku-4-5-20251001
+model: "@@MODEL_HAIKU@@"
 systemPrompt: |
   You are a QAAgent for the Foundry-X platform.
   Generate Playwright browser test scenarios and validate acceptance criteria.

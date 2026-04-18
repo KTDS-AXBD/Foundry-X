@@ -1,6 +1,7 @@
 // ─── F527: F-L2-2 AgentSpec YAML 파서 (Sprint 280) ───
 
 import { z } from "zod";
+import { MODEL_HAIKU, MODEL_SONNET } from "@foundry-x/shared";
 import type { AgentSpec } from "@foundry-x/shared";
 
 // Zod 스키마로 AgentSpec 검증
@@ -42,8 +43,18 @@ const agentSpecSchema = z.object({
  *
  * Workers 호환: 외부 YAML 라이브러리 없이 직접 파싱
  */
+/** agent.yaml 내 모델 sentinel(@@MODEL_HAIKU@@, @@MODEL_SONNET@@)을 SSOT 상수로 치환 */
+const MODEL_SENTINELS: Record<string, string> = {
+  "@@MODEL_HAIKU@@": MODEL_HAIKU,
+  "@@MODEL_SONNET@@": MODEL_SONNET,
+};
+
+function resolveModelSentinel(yaml: string): string {
+  return yaml.replace(/@@MODEL_\w+@@/g, (token) => MODEL_SENTINELS[token] ?? token);
+}
+
 export function parseAgentSpec(yaml: string): AgentSpec {
-  const raw = parseSimpleYaml(yaml);
+  const raw = parseSimpleYaml(resolveModelSentinel(yaml));
   const result = agentSpecSchema.safeParse(raw);
   if (!result.success) {
     const issues = result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join(", ");

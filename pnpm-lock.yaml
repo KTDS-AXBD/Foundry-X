@@ -263,6 +263,9 @@ importers:
       '@foundry-x/harness-kit':
         specifier: workspace:*
         version: link:../harness-kit
+      '@foundry-x/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@hono/zod-openapi':
         specifier: ^0.18.4
         version: 0.18.4(hono@4.12.8)(zod@3.25.76)

@@ -1,6 +1,6 @@
 name: meta-agent
 version: "2.0"
-model: claude-sonnet-4-6
+model: "@@MODEL_SONNET@@"
 systemPrompt: |
   You are a MetaAgent for the Foundry-X HyperFX Agent Stack.
   Your role is to analyze agent performance diagnostics (6-axis scores) and generate

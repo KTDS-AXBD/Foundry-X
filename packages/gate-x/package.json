@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@foundry-x/harness-kit": "workspace:*",
+    "@foundry-x/shared": "workspace:*",
     "@hono/zod-openapi": "^0.18.4",
     "hono": "^4.0.0",
     "zod": "^3.22.0"

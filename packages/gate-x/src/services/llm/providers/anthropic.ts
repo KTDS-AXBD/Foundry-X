@@ -1,3 +1,4 @@
+import { MODEL_SONNET } from '@foundry-x/shared';
 import type { LLMProvider, LLMRequest, LLMResponse } from '../types.js';
 
 export class AnthropicProvider implements LLMProvider {
@@ -8,7 +9,7 @@ export class AnthropicProvider implements LLMProvider {
       throw new Error('ANTHROPIC_API_KEY not set');
     }
 
-    const model = 'claude-sonnet-4-6';
+    const model = MODEL_SONNET;
     const body: Record<string, unknown> = {
       model,
       max_tokens: req.maxTokens ?? 1024,
