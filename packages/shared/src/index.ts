@@ -511,8 +511,10 @@ export type {
 
 // F555: Central model ID constants
 export {
+  MODEL_OPUS,
   MODEL_SONNET,
   MODEL_HAIKU,
+  OR_MODEL_OPUS,
   OR_MODEL_SONNET,
   OR_MODEL_HAIKU,
 } from './model-defaults.js';

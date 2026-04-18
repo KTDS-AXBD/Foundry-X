@@ -2,7 +2,7 @@
  * F136: 태스크별 모델 라우팅 — D1 규칙 기반 자동 모델 선택
  */
 import type { AgentTaskType, AgentRunnerType } from "./execution-types.js";
-import { OR_MODEL_SONNET, OR_MODEL_HAIKU } from "@foundry-x/shared";
+import { OR_MODEL_OPUS, OR_MODEL_SONNET, OR_MODEL_HAIKU } from "@foundry-x/shared";
 
 export interface RoutingRule {
   id: string;
@@ -18,16 +18,16 @@ export interface RoutingRule {
 
 /** D1 규칙 없을 때 하드코딩 폴백 */
 export const DEFAULT_MODEL_MAP: Record<AgentTaskType, string> = {
-  "code-review": "anthropic/claude-sonnet-4",
-  "code-generation": "anthropic/claude-sonnet-4",
-  "spec-analysis": "anthropic/claude-opus-4",
+  "code-review": OR_MODEL_SONNET,
+  "code-generation": OR_MODEL_SONNET,
+  "spec-analysis": OR_MODEL_OPUS,
   "test-generation": OR_MODEL_HAIKU,
   "policy-evaluation": OR_MODEL_HAIKU,
   "skill-query": OR_MODEL_HAIKU,
   "ontology-lookup": OR_MODEL_HAIKU,
   "security-review": OR_MODEL_SONNET,
   "qa-testing": OR_MODEL_HAIKU,
-  "infra-analysis": "anthropic/claude-sonnet-4",
+  "infra-analysis": OR_MODEL_SONNET,
   "bmc-generation": OR_MODEL_SONNET,
   "bmc-insight": OR_MODEL_SONNET,
   "market-summary": OR_MODEL_SONNET,
@@ -76,7 +76,7 @@ export class ModelRouter {
     }
 
     // D1 규칙 없으면 DEFAULT_MODEL_MAP 폴백
-    const modelId = DEFAULT_MODEL_MAP[taskType] ?? "anthropic/claude-sonnet-4";
+    const modelId = DEFAULT_MODEL_MAP[taskType] ?? OR_MODEL_SONNET;
     return {
       id: `default_${taskType}`,
       taskType,
