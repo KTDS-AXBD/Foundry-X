@@ -1,0 +1,353 @@
+{
+  "generated": "2026-04-18T23:06:53.731Z",
+  "totalItems": 57,
+  "byType": {
+    "flaw": 1,
+    "gap": 20,
+    "risk": 33
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "논리적 완결성\n\n**장점**\n- Gap 명세 → F-item 매핑 → Exit Criteria → 리스크 관리까지 논리 구조가 명확하게 정리됨.\n- Gap별 원인, 영향, 해결책, 성공 기준을 1:1 또는 다대일 구조로 연결하여, 무엇이 왜 문제고 어떻게 개선할지 일관되게 제시.\n- MVP/Out-of-scope/KPI 등 현실적 제한조건과 성공 정의가 명",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**리소스 산정**이 지나치게 “이론적”이다. 실제로는 MSA 분리 도중 예상치 못한 coupling, schema drift, legacy side effect, 외부 시스템 연계 이슈가 반드시 발생.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**QA/SRE/보안 리소스**가 “별도”로 산정되어 있지만, 실제로는 개발과 병행되는 작업이 많고, 사전/사후 검증(특히 데이터 마이그레이션, 서비스 전환, 인증/인가 drift 검증 등)이 반복적으로 필요하다.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**데이터 마이그레이션**은 실제 서비스 분리에서 가장 복잡/고위험 파트인데, “PoC 후 실서비스 적용”까지의 Gap(특히 운영 중 실시간 트래픽/데이터 동기화, 이중화, 다운타임 최소화 등)이 더 상세히 설계되어야 함.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "누락된 핵심 요소\n\n**1. 실제 “운영 전환 프로세스” 시나리오 부재**\n   - 예: “D1 분리” 등 데이터 경계 변경 시, 실시간 트래픽/데이터 동기화, 롤백 시나리오(Shadow Write/Read, Feature Flag 등) 실제 운영 단계별 Runbook 및 “Go/No-go” Decision Tree가 필요.\n   - “운영 중 장애 발생 ",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**데이터 마이그레이션/분리 Runbook**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**관측/모니터링/장애 대응 체계**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**QA 및 Regression/E2E Test 자동화 책임 주체 명확화**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**외부 연동 영향 분석/커뮤니케이션 플랜**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**리소스/일정 산정의 현실적 버퍼 추가**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**MVP/Exit Criteria 중 “운영 연속성” 체크리스트 명확화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "논리적 완결성\n\n**장점**\n- Gap 명세 → F-item 매핑 → Exit Criteria → 리스크 관리까지 논리 구조가 명확하게 정리됨.\n- Gap별 원인, 영향, 해결책, 성공 기준을 1:1 또는 다대일 구조로 연결하여, 무엇이 왜 문제고 어떻게 개선할지 일관되게 제시.\n- MVP/Out-of-scope/KPI 등 현실적 제한조건과 성공 정의가 명",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "리스크 (가장 크게 우려되는 실패 요인)\n\n**1. 데이터 분리/마이그레이션 실패**\n   - D1 Option A 전환시 FK, 데이터 일관성, 다운타임 등에서 실무적 장애 발생 시 “즉시 롤백/복구”가 어렵거나 실제로 데이터 손실이 발생할 수 있음.\n   - 특히, 실시간 트래픽 환경에서 “이중화/동기화”가 미흡하면, 서비스 중단이나 데이터 비일관성이 ",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**엣지 컴퓨팅의 이점 극대화**: Cloudflare Workers/D1을 사용하는 만큼, 엣지에서의 낮은 지연 시간(low latency)과 높은 가용성을 비즈니스 차별점으로 어떻게 활용할지 더 명확히 제시해야 합니다. 단순히 MSA 전환을 넘어, \"엣지 MSA\"가 Foundry-X의 최종 사용자에게 제공하는 고유한 가치가 무엇인지 강조할 필요가 있습니",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**도메인 특화된 MSA 패턴**: AX BD 도메인의 특성을 고려한 MSA 패턴(예: Saga 패턴을 활용한 장기 실행 트랜잭션 처리, CQRS/Event Sourcing을 통한 데이터 일관성 및 확장성 확보)을 도입하여 일반적인 MSA 구현을 넘어선 비즈니스 가치를 제공해야 합니다. PRD의 EventBus PoC(Gap 10)는 이러한 방향으로 나아갈",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**개발자 경험(DX)**: `harness-kit` 표준화(Gap 11)는 DX를 개선하려는 노력으로 보입니다. 유사 경쟁 서비스들이 제공하는 개발자 친화적인 환경(쉬운 배포, 테스트, 모니터링)을 넘어서, Foundry-X만의 특화된 AX BD 개발자 경험을 제공하는 것이 중요합니다. (예: 특정 AI/ML 라이브러리와의 통합 용이성, 데이터 과학자를 ",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "사용자 관점\n\nFoundry-X의 목표 사용자는 \"AX BD 발굴, 형상화 등 비즈니스 프로세스의 실제 사용자\"와 \"내부 개발팀/운영팀\"으로 나눌 수 있습니다.\n\n*   **내부 개발팀/운영팀 관점**:\n    *   **긍정적**: MSA 전환은 개발팀에게는 독립적인 개발/배포 환경, 특정 도메인에 대한 전문성 강화, 기술 스택 선택의 유연성 등 장기적으",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "누락된 시장 관점\n\nPRD는 기술적, 아키텍처적 관점에서 매우 상세하게 작성되었으나, 시장/경쟁/트렌드 측면에서 몇 가지 추가 고려사항이 있습니다.\n\n*   **경쟁사 분석 및 벤치마킹**: Foundry-X와 유사한 AI/ML 플랫폼 또는 데이터 파이프라인 서비스를 제공하는 경쟁사들이 MSA를 어떻게 구현하고 있는지, 특히 Cloudflare Worker",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**D1 Option A 전환(F561)의 상세 설계 및 롤백 플랜 확정**: 데이터 소유권 분리는 MSA의 핵심이며, 가장 높은 리스크(R1)를 동반합니다. F561 착수 전, 대상 테이블, 마이그레이션 전략(Blue-Green, Shadow Write 등), 데이터 일관성 검증 방안, 다운타임 최소화 방안, 그리고 최악의 경우를 대비한 단계별 롤백/리커",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**KOAMI P2 Deferred 시나리오 분석 및 해결 전략 수립(F563)**: \"KOAMI Smoke P2 deferred\"는 잠재적인 프로덕션 장애를 의미합니다. F563 착수 전, 해당 시나리오의 **구체적인 내용, 발생 원인, 비즈니스 영향도, 그리고 이를 해결하기 위한 기술적/운영적 전략**이 명확히 정의되어야 합니다. 이는 사용자 경험과 직",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**Multi-hop Latency Baseline 및 SLO 재검토(F567)**: 현재 \"p95 응답 시간 변화율 ≤ +10%\" 목표는 사용자 체감 저하를 유발할 수 있습니다. F567 착수 전, **주요 사용자 여정(User Journey)에 대한 multi-hop latency를 실제 측정하여 정확한 baseline을 설정**하고, **사용자 경험을",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**리소스 산정 최종 확정 및 팀 역량 확보**: 재산정된 14.5 인월은 현실성을 높였으나, 12~22주라는 전체 기간은 여전히 광범위합니다. 각 도메인별 복잡도(특히 Agent 도메인)를 고려하여 **팀의 실제 투입 가능 인력, 각 F-item별 담당자 지정, 그리고 MSA/Cloudflare Workers/D1에 대한 팀 전체의 숙련도 및 교육 계획*",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**SDD Triangle 자동화(F565) 전까지 수동 동기화 의무화**: F565가 자동화되기 전까지, `SPEC.md`와 실제 코드/배포 상태 간의 불일치(Gap 7)를 방지하기 위해 **매 Sprint 종료 시점에 `SPEC.md`를 최신화하는 수동 프로세스를 의무화**해야 합니다. 이는 모든 계획의 기준점 신뢰성을 확보하는 데 중요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "사실 확인\n\nPRD는 상세하고 구체적인 수치와 근거를 제시하고 있으나, 몇 가지 추가적인 사실 확인 및 검증이 필요합니다.\n\n*   **CLI 미전환 (Gap 5) 및 `VITE_API_URL`**: \"로컬 HEAD 기준이며 master/main 기준 실측 추가 검증 필요\"라고 명시되어 있습니다. 실제 운영 환경(master/main)에서 CLI가 여전히 ",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "사용자 관점\n\nFoundry-X의 목표 사용자는 \"AX BD 발굴, 형상화 등 비즈니스 프로세스의 실제 사용자\"와 \"내부 개발팀/운영팀\"으로 나눌 수 있습니다.\n\n*   **내부 개발팀/운영팀 관점**:\n    *   **긍정적**: MSA 전환은 개발팀에게는 독립적인 개발/배포 환경, 특정 도메인에 대한 전문성 강화, 기술 스택 선택의 유연성 등 장기적으",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**D1 Option A 전환(F561)의 상세 설계 및 롤백 플랜 확정**: 데이터 소유권 분리는 MSA의 핵심이며, 가장 높은 리스크(R1)를 동반합니다. F561 착수 전, 대상 테이블, 마이그레이션 전략(Blue-Green, Shadow Write 등), 데이터 일관성 검증 방안, 다운타임 최소화 방안, 그리고 최악의 경우를 대비한 단계별 롤백/리커",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**KOAMI P2 Deferred 시나리오 분석 및 해결 전략 수립(F563)**: \"KOAMI Smoke P2 deferred\"는 잠재적인 프로덕션 장애를 의미합니다. F563 착수 전, 해당 시나리오의 **구체적인 내용, 발생 원인, 비즈니스 영향도, 그리고 이를 해결하기 위한 기술적/운영적 전략**이 명확히 정의되어야 합니다. 이는 사용자 경험과 직",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**Multi-hop Latency Baseline 및 SLO 재검토(F567)**: 현재 \"p95 응답 시간 변화율 ≤ +10%\" 목표는 사용자 체감 저하를 유발할 수 있습니다. F567 착수 전, **주요 사용자 여정(User Journey)에 대한 multi-hop latency를 실제 측정하여 정확한 baseline을 설정**하고, **사용자 경험을",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**리소스 산정 최종 확정 및 팀 역량 확보**: 재산정된 14.5 인월은 현실성을 높였으나, 12~22주라는 전체 기간은 여전히 광범위합니다. 각 도메인별 복잡도(특히 Agent 도메인)를 고려하여 **팀의 실제 투입 가능 인력, 각 F-item별 담당자 지정, 그리고 MSA/Cloudflare Workers/D1에 대한 팀 전체의 숙련도 및 교육 계획*",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**SDD Triangle 자동화(F565) 전까지 수동 동기화 의무화**: F565가 자동화되기 전까지, `SPEC.md`와 실제 코드/배포 상태 간의 불일치(Gap 7)를 방지하기 위해 **매 Sprint 종료 시점에 `SPEC.md`를 최신화하는 수동 프로세스를 의무화**해야 합니다. 이는 모든 계획의 기준점 신뢰성을 확보하는 데 중요합니다.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**긍정적 요소**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**멀티홉 레이턴시**: 3-hop 경로에서 예상되는 30~42ms 지연은 사용자 체감 저하 가능성 있음. 특히 Agent 도메인(62 services)에서 증폭될 수 있음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**D1 마이그레이션 리스크**: 133개 migration을 도메인별로 분리할 때 FK 참조 끊김, 데이터 정합성 문제 발생 가능성 높음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**EventBus 미성숙**: D1 Event Table vs Queue vs Durable Objects 간 기술 선택 기준이 모호함",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**개선 필요 항목**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**데이터 격리 전략**: Option B(공유 DB)에서 Option A(별도 DB)로의 전환 시, Blue-Green 배포보다는 **Database Per Service** 패턴이 더 적합할 수 있음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**계약 설계**: shared-contracts 레이어가 monolith화되지 않도록 **Protobuf/gRPC** 기반 API 정의 고려 필요",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**관측성 부재**: 분산 트레이싱(OpenTelemetry)과 중앙 집중식 로깅 체계가 명시적으로 설계되지 않음",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**저평가된 복잡성**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Agent 도메인 분리**: 62 services의 규모는 단일 Sprint(4주)로 처리하기 어려움. **도메인 분할 전략**이 필요",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**롤백 시나리오**: DB 분리 실패 시 **Shadow Mode** 운영이 필수적이지만 구체적인 구현 방법이 부족",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**보안 경계**: JWT 전파 경로 재검증 없이 Worker 분리 시 인증/인가 체계 붕괴 위험",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**최우선 관리 대상**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**데이터 일관성**: D1 분리 시 FK 문제로 인한 무결성 위반 (R1)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**멀티홉 성능**: 3-hop에서 p95 <300ms SLO 달성 불가 시 UX 저하 (R9)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**모놀리스 재생산**: shared-contracts가 새로운 중앙 집중화 포인트로 전락할 위험 (R3)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**테스트 자동화 부재**: 238개 services에 대한 E2E 테스트 커버리지 미확보",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**필수 보완사항**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Circuit Breaker** 패턴 도입으로 멀티홉 실패 전파 차단",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Contract 테스트** 자동화를 위한 Pact 도구 도입 검토",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**선택적 권장사항**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "D1 마이그레이션을 위한 **Dual-Write 구현 전략**이 Sprint 300 내에 확보될 것",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "EventBus 기술 선택(PoC)이 **Sprint 301**로 앞당겨질 것",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "멀티홉 SLO 달성을 위해 **API Gateway 캐싱 전략**이 수립될 것",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}

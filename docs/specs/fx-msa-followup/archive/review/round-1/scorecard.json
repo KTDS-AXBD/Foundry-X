@@ -1,0 +1,137 @@
+{
+  "round": 1,
+  "timestamp": "2026-04-18T22:55:02.824Z",
+  "total": 63,
+  "verdict": "추가 검토 권장",
+  "emoji": "🔄",
+  "item1": {
+    "score": 20,
+    "max": 20,
+    "reason": "초안 검토 — 스킵(만점)",
+    "skipped": true,
+    "totalIssues": 80,
+    "weightedIssues": 90,
+    "density": 6.5,
+    "severityBreakdown": {
+      "flaws": 5,
+      "gaps": 38,
+      "risks": 37,
+      "weighted": 90,
+      "raw": 80
+    }
+  },
+  "item2": {
+    "score": 15,
+    "max": 30,
+    "details": [
+      {
+        "name": "ChatGPT",
+        "verdict": "Conditional",
+        "ratio": 0.5
+      },
+      {
+        "name": "Gemini",
+        "verdict": "Conditional",
+        "ratio": 0.5
+      },
+      {
+        "name": "DeepSeek",
+        "verdict": "Conditional",
+        "ratio": 0.5
+      }
+    ],
+    "readyPercent": 50,
+    "count": 3
+  },
+  "item3": {
+    "score": 14,
+    "max": 30,
+    "details": [
+      {
+        "name": "핵심 문제 정의",
+        "max": 5,
+        "grade": "충실",
+        "matchedKeywords": [
+          "현재",
+          "목표",
+          "문제"
+        ],
+        "score": 5
+      },
+      {
+        "name": "사용자/이해관계자",
+        "max": 5,
+        "grade": "최소",
+        "matchedKeywords": [
+          "여정",
+          "사용자"
+        ],
+        "score": 3
+      },
+      {
+        "name": "핵심 기능 범위",
+        "max": 5,
+        "grade": "최소",
+        "matchedKeywords": [],
+        "score": 3
+      },
+      {
+        "name": "Out-of-scope",
+        "max": 4,
+        "score": 0,
+        "grade": "없음"
+      },
+      {
+        "name": "KPI/성공 기준",
+        "max": 6,
+        "grade": "최소",
+        "matchedKeywords": [
+          "현재"
+        ],
+        "score": 3
+      },
+      {
+        "name": "MVP 기준",
+        "max": 5,
+        "score": 0,
+        "grade": "없음"
+      }
+    ]
+  },
+  "item4": {
+    "score": 14,
+    "max": 20,
+    "details": [
+      {
+        "name": "사용자 관점",
+        "max": 7,
+        "grade": "최소",
+        "matchedKeywords": [
+          "사용자 여정"
+        ],
+        "score": 4
+      },
+      {
+        "name": "기술 관점",
+        "max": 7,
+        "grade": "충실",
+        "matchedKeywords": [
+          "아키텍처",
+          "api",
+          "인프라"
+        ],
+        "score": 7
+      },
+      {
+        "name": "비즈니스 관점",
+        "max": 6,
+        "grade": "최소",
+        "matchedKeywords": [
+          "roi",
+          "비용"
+        ],
+        "score": 3
+      }
+    ]
+  }
+}

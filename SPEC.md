@@ -1,10 +1,10 @@
 ---
 code: FX-SPEC-001
 title: Foundry-X Project Specification
-version: 5.89
+version: 5.90
 status: Active
 category: SPEC
-system-version: Sprint 309
+system-version: Sprint 310
 created: 2026-03-16
 updated: 2026-04-19
 author: Sinclair Seo
@@ -198,6 +198,19 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F554 | **Phase 46 hotfix — Codex 실설치 + autopilot Phase 5b 훅 배선 + dogfood Smoke Reality** (FX-REQ-591, P0) | Sprint 302 | ✅ | PR #607 merge. Match 100%. 인프라 배선 완료(install-codex.sh + Phase 5c + codex-review.json mock PASS + 회고). 잔여: 실 API 호출은 OPENAI_API_KEY 설정 후 자동 활성화(mock→real 전환, codex-review.sh L107 분기) |
 | F555 | **LLM 모델 ID 현행화 + 중앙 상수화** — (1) 구버전 모델 ID 최신화(haiku-20250714→20251001, sonnet-4-5→4-6). (2) shared/model-defaults.ts 중앙 상수(MODEL_SONNET/MODEL_HAIKU) + undated alias 전환. 다음 모델 업그레이드 시 1파일만 수정 (FX-REQ-593, P1) | Sprint 308 | ✅ | PR #617(47파일 모델 ID 갱신) + PR #618(50파일 상수 추출+undated alias). typecheck+3747 tests PASS |
 | F556 | **MetaAgent Rubric 튜닝 — R6 rawValue=0 근본원인 + 6 proposals 변별력 확보** — F542/F544 관찰 데이터 기반 rubric 고도화. 범위: (a) `core/agent/meta/rubric-evaluator.ts` R6(또는 6번째 축) rawValue=0 원인 분석 — 계산 로직/데이터 누락/정규화 버그 중 식별, (b) rubric 6축 가중치·임계값 재조정으로 `rubric_score=100` 천장 현상 완화, (c) 기존 6 proposals 재채점 regression 테스트 + A/B 비교(튜닝 전후 score 분포), (d) 튜닝 기준 문서화(`docs/specs/fx-hyperfx-agent-stack/rubric-tuning-v1.md`) (FX-REQ-602, P1) | Sprint 310 | 📋(plan) | S302 착수. MEMORY "F542 관찰: rubric_score=100 변별력 약함" + "F542 R6 rawValue=0 근본원인 추적" 이월. 본 F-item이 Phase 42/43 HyperFX 후속(Phase 명명은 closure 시 확정) |
+| F560 | **Phase 45 · Discovery 완전 이관** — Gap 1 해소. F538 partial(7 routes Service Binding proxy 잔존)을 fx-discovery 순수 이관으로 완결. 범위: (a) `packages/api/src/core/discovery/routes/*` 7개 파일 fx-discovery로 이동, (b) fx-gateway Service Binding proxy 제거 + 직접 라우팅, (c) cross-domain import 전수 grep(`grep -rn "core/discovery"` 결과 fx-shaping/fx-offering 0건), (d) 배포 preflight 5항목 통과 + Phase Exit P1~P4 Smoke Reality. Phase 45 **MVP M1** (FX-REQ-603, P0) | Sprint 311 | 📋(groomed) | PRD: `docs/specs/fx-msa-followup/prd-final.md` §3-1 F560. 전제: F538 partial 상태 유지, F541 MERGED 기준 |
+| F561 | **Phase 45 · D1 Option A 전환 PoC (discovery_db 분리)** — Gap 2 해소. 데이터 소유권 분리 첫 단계 + 롤백 리허설. 범위: (a) 신규 D1 `foundry-x-discovery-db` 생성 + 관련 10+ migration 이동, (b) fx-discovery wrangler.toml `database_id` 교체, (c) biz_items Blue-Green/Shadow Write 검증, (d) 롤백 리허설 1회 성공, (e) FK 참조 끊김 목록화 + 마이그레이션 재번호 전략 문서화. Phase 45 **MVP M2** (FX-REQ-604, P0) | Sprint 312 | 📋(groomed) | PRD §3-1 F561 + §2-1 데이터 마이그레이션 전략. 전제: F560 완료. 리스크 R1(가장 높음) |
+| F562 | **Phase 45 · shared-contracts 레이어 신설** — Gap 3 해소. cross-domain DTO/Event 계약 분리 + consumer-driven contracts 패턴. 범위: (a) `packages/shared-contracts/` 신규 workspace, (b) Discovery↔Shaping Event/DTO v1.0 publish, (c) monolith화 방지 — 구현 로직 금지 (타입+스키마만), (d) 설계 가이드라인 md 동봉, (e) 기존 shared/ax-bd/* cross-domain 타입 전수 이동 (FX-REQ-605, P1) | Sprint 312 | 📋(groomed) | PRD §3-1 F562. 병렬 진행(F561). 리스크 R3 |
+| F563 | **Phase 45 · fx-shaping E2E + KOAMI P2 완결** — Gap 4 + 6 해소. F540 partial(E2E 미완료 + KOAMI P2 deferred) 완결. 범위: (a) Shaping 13 routes 순수 이관(F540 proxy 제거), (b) KOAMI P2 deferred 케이스 사전 분석 + 구현, (c) Shaping Graph E2E (bi-koami-001 proposals ≥ 1건), (d) Phase Exit P1~P4 Smoke Reality (FX-REQ-606, P0) | Sprint 313 | 📋(groomed) | PRD §3-1 F563. F540 partial 잔존 처리. 리스크 R5 |
+| F564 | **Phase 45 · CLI VITE_API_URL 전환 + Strangler 완결** — Gap 5 해소. CLI/Web 모두 fx-gateway 단일 진입점. 범위: (a) `packages/cli/src/` API_URL 기본값 전환, (b) foundry-x-api 직결 코드 grep 0건 확증, (c) SSO Hub Token 경로 호환성 E2E, (d) 환경 변수 migration 가이드 문서화. Phase 45 **MVP M3** (FX-REQ-607, P1) | Sprint 313 | 📋(groomed) | PRD §3-1 F564. 병렬 진행(F563) |
+| F565 | **Phase 45 · SDD Triangle 동기화 CI 게이트** — Gap 7 해소. SPEC drift 방지 자동화. 범위: (a) `.github/workflows/` SDD-drift-check job 추가, (b) SPEC.md §5 F-item vs `git log --since=last-sprint` 교차 검증, (c) drift > 0건 시 PR fail, (d) 주간 drift 리포트 자동 생성 (FX-REQ-608, P2) | Sprint 314 | 📋(groomed) | PRD §3-1 F565. 실제 자동화 스크립트 리소스 확보 선행 |
+| F566 | **Phase 45 · MSA Separation Roadmap v2** — Gap 8 해소. 6 도메인 분리 우선순위 + 일정 명문화 문서. 범위: (a) `docs/specs/fx-msa-roadmap-v2/prd-final.md` v2 발행, (b) 각 도메인 리소스/일정/롤백 시나리오, (c) Sprint 311~318 배치 근거, (d) Phase 46+ 예측 로드맵 (FX-REQ-609, P0) | Sprint 311 | 📋(groomed) | PRD §3-1 F566. F560과 병렬, 문서-only meta |
+| F567 | **Phase 45 · Multi-hop latency benchmark** — Gap 9 해소. 누적 latency 측정 + SLO 설정. 범위: (a) browser → fx-gateway → foundry-x-api → fx-discovery 3-hop 경로 k6 benchmark, (b) p50/p95/p99 측정 + 1-hop 대비 증분, (c) SLO p95 < 300ms 확정 + 미달 시 최적화 플랜, (d) Grafana 대시보드 등록 (FX-REQ-610, P1) | Sprint 314 | 📋(groomed) | PRD §3-1 F567. F543 1-hop 선례 확장 |
+| F568 | **Phase 45 · EventBus PoC (기술스택 선정 + 1 flow)** — Gap 10 해소. 비동기 파이프라인 가능성 확보. 범위: (a) D1 Event Table vs Cloudflare Queue vs Durable Object PoC 3종 비교, (b) 기술스택 최종 선정 + 의사결정 문서, (c) Discovery→Shaping 트리거 1 flow 구현, (d) 타임박스 2주 고정. 선행: F562 shared-contracts (FX-REQ-611, P1) | Sprint 315 | 📋(groomed) | PRD §3-1 F568. 오픈 이슈 #5 해소 |
+| F569 | **Phase 45 · harness-kit 표준화 (Workers scaffold)** — Gap 11 해소. 새 Worker 생성 비용 절감. 범위: (a) `packages/harness-kit/` 공통 Workers scaffold(JWT/CORS/Error handler/EventBus client), (b) fx-gateway/fx-discovery/fx-shaping/fx-offering 4 Worker에 적용, (c) 버전관리 전략(npm publish vs workspace internal) 확정, (d) 신규 Worker 생성 템플릿 `scripts/new-worker.sh` (FX-REQ-612, P2) | Sprint 315 | 📋(groomed) | PRD §3-1 F569. 오픈 이슈 #4 해소 |
+| F570 | **Phase 45 · Offering 완전 이관** — F541 Walking Skeleton 후속. F541 partial(proxy 잔존) → 순수 이관 완결. F560 Discovery 패턴 재사용. 범위: (a) Offering 12 routes 순수 이관, (b) fx-gateway proxy 제거, (c) cross-domain import 전수 grep 0건, (d) Phase Exit P1~P4 (FX-REQ-613, P1) | Sprint 316 | 📋(groomed) | PRD §3-1 F570. F541 MERGED 이후 잔존분 처리 |
+| F571 | **Phase 45 · Agent 도메인 분리 (Walking Skeleton)** — 62 services — 가장 복잡. Phase 45 **마지막** 배치. 범위: (a) fx-agent Worker 신규 생성, (b) 15 routes 초기 이관(하위 도메인 분할 검토), (c) Service Binding 통합, (d) 리그레션 방지 사전 모듈화 + Feature Flag. 리스크 R2 (FX-REQ-614, P1) | Sprint 318 | 📋(groomed) | PRD §3-1 F571. 최고 리스크 도메인, 최후 배치 |
+| F572 | **Phase 45 · modules/portal·gate·launch 통합 분리** — modules 계열 3개(portal 19/23, gate 7/8, launch 8/14) 묶어서 한번에 분리. 범위: (a) fx-modules Worker(또는 3 분리) 아키텍처 결정, (b) 총 34 routes/45 services 이관, (c) 종속관계/병렬 작업 가능성 분석 선행, (d) 공통 auth 경로 통합 (FX-REQ-615, P2) | Sprint 317 | 📋(groomed) | PRD §3-1 F572. F571 직전 배치 |
 
 <!-- fx-task-orchestrator-backlog -->
 ### Task Orchestrator Backlog (B/C/X)
