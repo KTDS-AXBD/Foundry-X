@@ -37,7 +37,11 @@ QUEUE_FILE="$FX_HOME/task-queue.ndjson"
 SPRINT_SIGNAL_DIR="${SPRINT_SIGNAL_DIR:-/tmp/sprint-signals}"
 SPRINT_CI_TIMEOUT="${SPRINT_CI_TIMEOUT:-300}"
 SPRINT_MAX_RETRY=3
-mkdir -p "$SPRINT_SIGNAL_DIR"
+# Task-level retry 상한 (S307 교훈, 2026-04-19):
+# tmux server segfault(3.5a)로 pane 영구 소실 시 phase_recover 무한 루프 발생 → 상한 도입.
+# 초과 시 tasks-cache.json status=failed + retry 파일 archive 이동.
+TASK_MAX_RETRY="${TASK_MAX_RETRY:-5}"
+mkdir -p "$SPRINT_SIGNAL_DIR" /tmp/task-retry/archive
 
 TICK=15  # 매 15초마다 전체 사이클
 
@@ -221,6 +225,59 @@ ERROR_PATTERNS=(
   "Permission denied"
   "Module not found"
 )
+
+# ═══════════════════════════════════════════════════════════════════════════
+# phase_tmux_health — tmux server 재시작 감지 (S307, 2026-04-19)
+# tmux segfault(3.5a) 등으로 server가 재기동되면 모든 pane %N이 영구 소실.
+# in_progress task가 stale pane을 계속 참조 → phase_watch 무한 retry.
+# server start_time을 tick마다 비교하여 변화 감지 시 모든 in_progress task를
+# failed(tmux_server_restarted)로 일괄 전환한다.
+# ═══════════════════════════════════════════════════════════════════════════
+phase_tmux_health() {
+  local state_file="$FX_HOME/tmux-server-start"
+  local current_start
+  current_start=$(tmux display -p '#{start_time}' 2>/dev/null || echo "")
+
+  # tmux server 미가동 (정상 케이스 — 사용자가 tmux 안 쓸 수도)
+  [ -z "$current_start" ] && return 0
+
+  if [ ! -f "$state_file" ]; then
+    echo "$current_start" > "$state_file"
+    log "📌 tmux server start_time 기록: $current_start"
+    return 0
+  fi
+
+  local prev_start
+  prev_start=$(cat "$state_file" 2>/dev/null || echo "")
+
+  if [ "$current_start" != "$prev_start" ]; then
+    log "🚨 tmux server 재시작 감지 (prev=${prev_start}, now=${current_start}) — 모든 in_progress task 일괄 failed"
+
+    # tasks-cache.json의 in_progress task를 모두 failed 전환
+    if [ -f "$FX_CACHE" ]; then
+      local tmp_cache; tmp_cache=$(mktemp)
+      local failed_count
+      failed_count=$(jq -r --arg ts "$(date -Iseconds)" --arg prev "$prev_start" --arg now "$current_start" \
+        '[.tasks | to_entries[] | select(.value.status == "in_progress")] | length' "$FX_CACHE" 2>/dev/null || echo 0)
+
+      jq --arg ts "$(date -Iseconds)" --arg prev "$prev_start" --arg now "$current_start" \
+        '.tasks |= with_entries(
+           if .value.status == "in_progress" then
+             .value.status = "failed"
+             | .value.fail_reason = "tmux_server_restarted"
+             | .value.failed_at = $ts
+             | .value.fail_context = ("tmux server restarted (" + $prev + " → " + $now + ") — pane lost")
+           else . end
+         )' \
+        "$FX_CACHE" > "$tmp_cache" && mv "$tmp_cache" "$FX_CACHE"
+
+      log "   → ${failed_count}개 task failed 처리"
+    fi
+
+    # state 갱신
+    echo "$current_start" > "$state_file"
+  fi
+}
 
 phase_watch() {
   local active_tasks
@@ -461,6 +518,35 @@ enqueue_retry() {
     prev_attempts=$(jq -r '.attempts // 0' "$retry_file" 2>/dev/null || echo 0)
   fi
   local attempts=$(( prev_attempts + 1 ))
+
+  # ── S307 MAX_RETRY 하드 상한 (2026-04-19) ─────────────────────────────
+  # TASK_MAX_RETRY 초과 시 무한 루프 방지: tasks-cache status=failed 마킹 +
+  # retry 파일을 archive로 이동. 재진입 차단.
+  if [ "$attempts" -gt "$TASK_MAX_RETRY" ]; then
+    log "❌ ${tid}: retry ${attempts}회 (limit=${TASK_MAX_RETRY}) 초과 — FAILED 마킹"
+    local archive_dir="/tmp/task-retry/archive"
+    mkdir -p "$archive_dir"
+
+    # tasks-cache.json status 전환 (atomic)
+    if [ -f "$FX_CACHE" ]; then
+      local tmp_cache; tmp_cache=$(mktemp)
+      jq --arg tid "$tid" --arg ts "$(date -Iseconds)" --argjson max "$TASK_MAX_RETRY" \
+        '.tasks[$tid].status = "failed"
+         | .tasks[$tid].fail_reason = "retry_exhausted_worker_inactive"
+         | .tasks[$tid].failed_at = $ts
+         | .tasks[$tid].fail_context = ("retry limit " + ($max|tostring) + " exceeded — pane lost or worker idle")' \
+        "$FX_CACHE" > "$tmp_cache" && mv "$tmp_cache" "$FX_CACHE"
+    fi
+
+    # retry 파일을 archive로 이동
+    [ -f "$retry_file" ] && mv "$retry_file" "${archive_dir}/$(basename "$retry_file")" 2>/dev/null
+
+    log_event "$tid" "phase_recover_retry_exhausted" \
+      "$(jq -nc --argjson a "$attempts" --argjson m "$TASK_MAX_RETRY" \
+         '{attempts:$a, max_retry:$m, reason:"retry_exhausted_worker_inactive"}')"
+    return 0
+  fi
+  # ──────────────────────────────────────────────────────────────────────
 
   local tmp; tmp=$(mktemp)
   jq -n \
@@ -911,6 +997,8 @@ run_daemon() {
     date -u +%Y-%m-%dT%H:%M:%SZ > "$DAEMON_HEARTBEAT"
 
     # 각 phase는 개별 실패해도 daemon loop 전체를 죽이지 않��록 방어 (S267)
+    # phase_tmux_health를 phase_watch 앞에 배치 — pane dead 체크 전에 server 재시작을 먼저 감지 (S307)
+    phase_tmux_health      || log "⚠️  phase_tmux_health 에러"
     phase_signals          || log "⚠️  phase_signals 에러"
     phase_sprint_signals   || log "⚠️  phase_sprint_signals 에러"
     phase_watch            || log "⚠️  phase_watch 에러"
