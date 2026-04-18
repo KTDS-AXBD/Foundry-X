@@ -21,6 +21,8 @@ export default tseslint.config(
       'foundry-x-api/no-direct-route-register': 'error',
       // C71: 하드코딩 모델 ID 차단 — @foundry-x/shared/model-defaults SSOT 강제
       'foundry-x-api/use-model-ssot': 'error',
+      // C75: D1 크로스도메인 테이블 접근 차단 (forward-only, 기존 23건 위반은 별도 fix PR)
+      'foundry-x-api/no-cross-domain-d1': 'warn',
     },
   },
   {
