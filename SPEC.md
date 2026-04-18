@@ -1,12 +1,12 @@
 ---
 code: FX-SPEC-001
 title: Foundry-X Project Specification
-version: 5.88
+version: 5.89
 status: Active
 category: SPEC
-system-version: Sprint 308
+system-version: Sprint 309
 created: 2026-03-16
-updated: 2026-04-18
+updated: 2026-04-19
 author: Sinclair Seo
 ---
 
@@ -57,7 +57,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 > ```
 > wc -l SPEC.md && find packages/api/src/db/migrations/*.sql | sort | tail -1
 > ```
-> **마지막 실측** (Sprint 309, 2026-04-18): ~11 routes, ~31 services, ~14 schemas, D1 0138, 11 packages — Phase 44 F541 Offering ✅ MERGED (PR #624 Match 100%, Sprint 309 autopilot). fx-gateway + fx-discovery + fx-shaping + **fx-offering** 4 MSA Workers live. S300 부수: 모델 버전 2중 SSOT 정비(PR #625 B1/B2/B7) + ax-plugin daily-check Step 6e drift 감지 + C71/C72 차기 Sprint 등록
+> **마지막 실측** (Sprint 309, 2026-04-19): ~11 routes, ~30 services, ~14 schemas, D1 0138, 11 packages — Phase 44 F541 Offering ✅ MERGED (PR #624 Match 100%, Sprint 309 autopilot). fx-gateway + fx-discovery + fx-shaping + **fx-offering** 4 MSA Workers live. S301: 모델 SSOT 3단 체인(C73 PR#628 use-model-ssot / C74 PR#630 literal→SSOT / C75 PR#632 no-cross-domain-d1) + C76 PR#634 daemon orphan SPEC mark fix. C56→C75 / C72→C74 / C71→C73 ID forward
 
 ## §3 Phase 진행 현황
 
@@ -323,6 +323,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | 5.85 | 2026-04-15 | **F539c ✅ 부분 + Phase 44 F539 전체 MERGED** — PR #597 (S296 Match 95%). 7 routes fx-discovery 이전(Group A+B 단일 PR 통합) + CLI scripts 7개 URL 전환 + fx-discovery 11 new tests. Phase Exit drift 3건: (a) 2 PR 분할 미이행(단일 PR), (b) KOAMI Smoke P2 미실측, (c) Retrospective 누락. packages/cli는 API URL 하드코딩 없음 확인(N/A). 후속: Smoke + Retrospective 별도 task, C69 preflight 선행 후 Sprint 297 F540 |
 | 5.86 | 2026-04-15 | **F540 ✅(부분) Shaping 분리 MERGED** — PR #598 (S297 Match 96%, 93 files, 1h 55m). fx-shaping Worker 신규(13 routes/22 services/15 schemas) + fx-gateway SHAPING Service Binding + `/api/shaping/*` + `/api/ax-bd/*` 라우팅. 초기 deploy.yml 24445867997 failure(ESLint 8 errors): autopilot `pnpm lint` 누락 → test job FAIL → deploy 3 job skip. **Hotfix `2efc06f3`**: 7 수동 + 1 auto-fix → deploy.yml 24446036032 success. Phase Exit P1 확증(smoke 200×2). P2 KOAMI는 F541 이월. C69 2차 개선 대상(lint pre-check) |
 | 5.88 | 2026-04-18 | **모델 버전 SSOT 정비 + C71/C72 등록** (S300) — PR #625 (`bbbe06d7`) B1/B2/B7 정리: `task-start.sh` `--model sonnet` alias 전환 / `model-defaults.ts` SSOT 주석 보강(업그레이드 절차+소비자 목록) / scripts/ stale `20250514` → `4-6`. 자동 반영 메커니즘: ax-plugin `502caef` daily-check Step 6e "모델 버전 Drift" 추가 + `9ba4468` sprint/SKILL.md alias 문구. MEMORY `feedback_model_version_ssot` 신규 — 2중 SSOT(CLI alias / SDK model-defaults.ts) 원칙. 차기 Sprint C71(use-model-ssot ESLint 룰, FX-REQ-594, P2) + C72(packages/* literal → SSOT 전환 B3~B6, FX-REQ-595, P2) 등록 |
+| 5.89 | 2026-04-19 | **모델 SSOT + D1 격리 + daemon orphan fix 4단 체인** (S301) — C-track 4건 연속 완결: **C73**(FX-REQ-596, PR #628) `foundry-x-api/use-model-ssot` ESLint 룰 신규 — `claude-(sonnet\|haiku\|opus)-\d+-\d+` literal 차단 + SSOT import 강제. **C74**(FX-REQ-597, PR #630 +39/-18) packages/* literal → SSOT 전환: agent yaml 5개 + gate-x/api/fx-shaping 4 파일. **C75**(FX-REQ-598, PR #632 +333/-0) `foundry-x-api/no-cross-domain-d1` ESLint 룰 신규 — domain별 D1 table 접근 차단(discovery_*/shaping_*/offering_*). **C76**(FX-REQ-599, PR #634 +187/-32) daemon orphan SPEC mark fix — task-monitor가 signal 선처리+삭제하여 daemon 164-194 블록 skip되는 구조적 간극을 `lib.sh mark_spec_done_row` 공통 함수로 해소. C76 자체가 dogfood 통과(`📝 C76 SPEC backlog → DONE` 자동). ID forward 3건: C71→C73 / C72→C74 / C56→C75. ESLint 4축 체계 완성(no-cross-domain-import / no-direct-route-register / use-model-ssot / no-cross-domain-d1). MEMORY `feedback_daemon_orphan_spec_mark` 2회 관찰 → 수동 승격(3-strike 예외) → resolved |
 
 ## §10 버전 정책
 
