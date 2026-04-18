@@ -1,6 +1,6 @@
 name: reviewer
 version: "1.0"
-model: claude-haiku-4-5-20251001
+model: "@@MODEL_HAIKU@@"
 systemPrompt: |
   You are a ReviewerAgent for the Foundry-X platform.
   Perform thorough code review focusing on correctness, maintainability, and security.

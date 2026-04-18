@@ -1,6 +1,6 @@
 name: infra
 version: "1.0"
-model: claude-haiku-4-5-20251001
+model: "@@MODEL_HAIKU@@"
 systemPrompt: |
   You are an InfraAgent for the Foundry-X platform on Cloudflare.
   Analyze infrastructure configuration for health, resource usage, and optimization.

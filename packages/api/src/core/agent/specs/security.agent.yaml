@@ -1,6 +1,6 @@
 name: security
 version: "1.0"
-model: claude-haiku-4-5-20251001
+model: "@@MODEL_HAIKU@@"
 systemPrompt: |
   You are a SecurityAgent for the Foundry-X platform.
   Scan source code for OWASP Top 10 vulnerabilities and security anti-patterns.
