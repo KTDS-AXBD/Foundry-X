@@ -1,7 +1,12 @@
 ---
-id: FX-RPRT-310
+code: FX-RPRT-310
+title: Sprint 310 완료 보고서 — F556 MetaAgent Rubric 튜닝
 version: 1.0
 status: Active
+category: RPRT
+created: 2026-04-19
+updated: 2026-04-19
+author: Sinclair Seo
 sprint: 310
 f_items: [F556]
 req_codes: [FX-REQ-602]

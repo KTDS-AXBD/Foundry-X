@@ -1,7 +1,12 @@
 ---
-id: FX-RPRT-309
+code: FX-RPRT-309
+title: Sprint 309 완료 보고서 — F541 Offering 도메인 분리
 version: 1.0
 status: Active
+category: RPRT
+created: 2026-04-18
+updated: 2026-04-19
+author: Sinclair Seo
 sprint: 309
 f_items: [F541]
 req_codes: [FX-REQ-580]
