@@ -310,7 +310,12 @@ specs/{project}/
 | [bizdevprocess-2/](specs/bizdevprocess-2/) | 사업개발 Harness Engineering | ✅ Go |
 | [FX-PLAN-012/](specs/FX-PLAN-012/) | Phase 6 Ecosystem Integration | ✅ 완료 |
 
-> **참고**: `review/round-N/` 하위의 `scorecard.json`, `actionable-items.json`, `sixhats-data.json`은 req-interview 중간 산출물이에요. GOV 문서가 아니므로 frontmatter 대상이 아니에요.
+> **참고 — GOV-001 frontmatter 비대상 명시** (S302+ 2026-04-19, C82 관련):
+> - `review/round-N/` 하위의 `scorecard.json`, `actionable-items.json`, `sixhats-data.json` — req-interview 중간 산출물
+> - `specs/{project}/review-history.md` — 인터뷰 라운드 요약, 자동 생성 산출물 (frontmatter 비대상으로 정식 명시. 이전엔 암묵적 비대상으로 처리됨)
+> - `specs/{project}/interview-log.md` — 인터뷰 원본 로그, GOV 문서 아님
+>
+> 위 3종은 `/ax:gov-doc check`에서 NOFM으로 카운트되더라도 정상이에요. GOV 표준 적용 대상은 `prd-final.md`와 PDCA 디렉토리(01~04) + specs/ 직속 SPEC 코드 부여 문서들이에요.
 
 ## Review
 
