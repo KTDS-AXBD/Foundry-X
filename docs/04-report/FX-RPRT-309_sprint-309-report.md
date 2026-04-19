@@ -1,10 +1,11 @@
 ---
-id: FX-REPORT-309
+id: FX-RPRT-309
+version: 1.0
+status: Active
 sprint: 309
 f_items: [F541]
 req_codes: [FX-REQ-580]
 phase: "Phase 44"
-status: completed
 date: "2026-04-18"
 match_rate: 100
 ---

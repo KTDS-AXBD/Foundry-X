@@ -1,10 +1,14 @@
 ---
-id: sprint-310-report
-feature: F556
+id: FX-RPRT-310
+version: 1.0
+status: Active
 sprint: 310
+f_items: [F556]
+req_codes: [FX-REQ-602]
+phase: "Phase 44"
+date: "2026-04-19"
 match_rate: 100
 test_result: pass
-date: 2026-04-19
 ---
 
 # Sprint 310 Report — F556 MetaAgent Rubric 튜닝

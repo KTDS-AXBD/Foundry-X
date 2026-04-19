@@ -1,7 +1,7 @@
 # 문서 인덱스
 
-> 마지막 갱신: 2026-04-02
-> 총 GOV 문서: 214개 | 자동 생성 (ax-gov-doc check)
+> 마지막 갱신: 2026-04-19
+> 총 GOV 문서: 216개 | 자동 생성 (ax-gov-doc check)
 
 ## SPEC
 
@@ -239,6 +239,8 @@
 | FX-RPRT-079 | Sprint 79 완료 보고서 — F232 파이프라인 + F233 공유 + F239 의사결정 | 1.0 | Active | [04-report/features/sprint-79.report.md](04-report/features/sprint-79.report.md) |
 | FX-RPRT-081 | Sprint 81 PDCA 완료 보고서 — F236 Offering Pack + F238 MVP 추적 + F240 IR Bottom-up 채널 | 1.0 | Active | [04-report/features/sprint-81.report.md](04-report/features/sprint-81.report.md) |
 | FX-RPRT-094 | Sprint 94 Report — 발굴 UX: 위저드 UI(F263) + 온보딩 투어(F265) | 1.0 | Active | [04-report/features/sprint-94.report.md](04-report/features/sprint-94.report.md) |
+| FX-RPRT-309 | Sprint 309 — F541 Offering 도메인 분리 (Phase 44) | 1.0 | Active | [04-report/FX-RPRT-309_sprint-309-report.md](04-report/FX-RPRT-309_sprint-309-report.md) |
+| FX-RPRT-310 | Sprint 310 — F556 MetaAgent Rubric 튜닝 (Phase 44) | 1.0 | Active | [04-report/FX-RPRT-310_sprint-310-report.md](04-report/FX-RPRT-310_sprint-310-report.md) |
 | FX-RPRT-S87 | Sprint 87 완료 보고서 — 팀 계정 일괄 생성 + 온보딩 가이드 고도화 | 1.0 | Active | [04-report/sprint-87.report.md](04-report/sprint-87.report.md) |
 | FX-RPRT-S88 | Sprint 88 — 팀 데이터 공유(Org-scope) + NPS 피드백 수집 | 1.0 | Active | [04-report/features/sprint-88.report.md](04-report/features/sprint-88.report.md) |
 | FX-RPRT-S89 | Sprint 89 — 완료 보고서 | 1.0 | Active | [04-report/features/sprint-89.report.md](04-report/features/sprint-89.report.md) |
