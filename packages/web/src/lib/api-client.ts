@@ -72,11 +72,17 @@ async function requestWithRetry(
 
   if (!res.ok) {
     if (res.status === 401) {
-      // refresh도 실패 → 로그아웃 처리
+      // 현재 경로 저장 → 로그인 후 복귀
+      sessionStorage.setItem("postLoginRedirect", window.location.pathname);
+      // 세션 만료 토스트 (CustomEvent → ToastProvider가 수신)
+      window.dispatchEvent(new CustomEvent("app:toast", {
+        detail: { message: "세션이 만료됐어요. 다시 로그인해 주세요", type: "warning" },
+      }));
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
-      window.location.href = "/login";
+      // 1.5초 후 리다이렉트 (toast 표시 시간 확보)
+      setTimeout(() => window.location.assign("/login"), 1500);
       throw new ApiError(401, "로그인이 필요해요");
     }
     // 본문에 {error, message, ...} 형태가 있으면 그대로 보존해서 호출자가 활용할 수 있게
