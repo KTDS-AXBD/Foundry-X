@@ -162,6 +162,11 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @foundry-x/shared build
+      - name: Secret Preflight Check (C83)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          WRANGLER_BIN: packages/api/node_modules/.bin/wrangler
+        run: bash scripts/preflight/check-worker-secrets.sh
       # wrangler는 packages/api에만 devDependency. 다른 패키지에서는 `pnpm exec` 미해결.
       # → 상대 경로로 packages/api의 wrangler 직접 호출.
       - name: Deploy fx-discovery Worker
