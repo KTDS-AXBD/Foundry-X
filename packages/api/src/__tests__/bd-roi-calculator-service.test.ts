@@ -97,10 +97,15 @@ describe("BdRoiCalculatorService", () => {
   }
 
   function seedExecutions(costTotal: number) {
-    (db as any).exec(`
+    // Use a date 7 days ago so it always falls within the default 30-day window
+    const recentDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+    const sql = `
       INSERT INTO skill_executions (id, tenant_id, skill_id, model, status, input_tokens, output_tokens, cost_usd, duration_ms, executed_by, executed_at)
-      VALUES ('e1', 'org_test', 'skill-a', 'claude-haiku', 'completed', 200, 200, ${costTotal}, 500, 'user1', '2026-03-20')
-    `);
+      VALUES ('e1', 'org_test', 'skill-a', 'claude-haiku', 'completed', 200, 200, ${costTotal}, 500, 'user1', '${recentDate}')
+    `;
+    (db as any).exec(sql);
   }
 
   it("should calculate BD_ROI with savings + signal", async () => {
