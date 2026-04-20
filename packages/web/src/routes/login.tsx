@@ -89,12 +89,18 @@ export function Component() {
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>("login");
 
+  function consumeRedirect() {
+    const path = sessionStorage.getItem("postLoginRedirect");
+    sessionStorage.removeItem("postLoginRedirect");
+    return path || "/dashboard";
+  }
+
   const handleGoogleCredential = useCallback(
     async (credential: string) => {
       setError(null);
       try {
         await googleLogin(credential);
-        navigate("/dashboard");
+        navigate(consumeRedirect(), { replace: true });
       } catch (err) {
         setError((err as Error).message);
       }
@@ -118,7 +124,7 @@ export function Component() {
           fd.get("password") as string,
         );
       }
-      navigate("/dashboard");
+      navigate(consumeRedirect(), { replace: true });
     } catch (err) {
       setError((err as Error).message);
     }
