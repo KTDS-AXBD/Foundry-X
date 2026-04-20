@@ -1,6 +1,6 @@
 ---
 name: deploy-verifier
-description: Foundry-X 배포 상태 검증 — Workers, Pages, D1 마이그레이션 정합성 체크
+description: Foundry-X 배포 상태 검증 — Workers, Pages, D1 마이그레이션 정합성 체크 + MSA secret matrix
 model: haiku
 tools:
   - Bash
@@ -24,6 +24,37 @@ Foundry-X 배포 환경의 건강 상태를 검증하는 에이전트예요.
    - `npx wrangler d1 migrations list foundry-x-db --remote` (프로덕션)
 4. **CORS 설정**: `packages/api/src/app.ts`에서 CORS 미들웨어 존재 확인
 5. **환경변수**: `NEXT_PUBLIC_API_URL`이 Workers URL과 일치하는지 확인
+6. **MSA Secret Matrix**: 각 MSA worker의 필수 secret 존재 여부 확인 (S303 fx-offering JWT_SECRET 누락 사고 재발 방지)
+
+   매트릭스 SSOT: `scripts/preflight/required-secrets.json`
+   ```json
+   {
+     "foundry-x-api": ["JWT_SECRET", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "ANTHROPIC_API_KEY", "WEBHOOK_SECRET", "GITHUB_TOKEN", "OPENROUTER_API_KEY"],
+     "fx-discovery": ["JWT_SECRET"],
+     "fx-shaping": ["JWT_SECRET"],
+     "fx-offering": ["JWT_SECRET"],
+     "fx-gateway": []
+   }
+   ```
+
+   실행 명령:
+   ```bash
+   bash scripts/preflight/check-worker-secrets.sh
+   ```
+
+   필수 환경변수:
+   - `CLOUDFLARE_API_TOKEN` — wrangler 인증 (CI: secrets.CLOUDFLARE_API_TOKEN)
+   - `CF_ACCOUNT_ID` — 복구 스니펫 사용 시 필요
+
+   누락 secret 감지 시 복구 CLI:
+   ```bash
+   curl -s -X PUT \
+     -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d "{\"name\":\"JWT_SECRET\",\"text\":\"<value>\",\"type\":\"secret_text\"}" \
+     "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/workers/scripts/<worker>/secrets"
+   ```
+   또는: `npx wrangler secret put JWT_SECRET --name <worker>`
 
 ## 출력 형식
 
@@ -34,6 +65,7 @@ Foundry-X 배포 환경의 건강 상태를 검증하는 에이전트예요.
 - D1: ✅/❌ (로컬 N개, 프로덕션 M개, 차이 K개)
 - CORS: ✅/❌
 - API URL: ✅/❌
+- Secret Matrix: ✅/⚠️ (누락 시 worker:key 목록)
 ```
 
 결과를 간결하게 보고하고, 문제가 있으면 해결 방안을 제안해요.
