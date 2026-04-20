@@ -57,7 +57,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 > ```
 > wc -l SPEC.md && find packages/api/src/db/migrations/*.sql | sort | tail -1
 > ```
-> **마지막 실측** (Sprint 311, 2026-04-19): ~11 routes, ~31 services, ~14 schemas, D1 0138, 11 packages — Phase 45 MSA 3rd Separation 진행. Sprint 311 PR #640 MERGED Match 95%지만 **F560 scope drift 감지** — 실제는 ax-bd-* → fx-shaping 이전, 원 F560(core/discovery→fx-discovery + proxy 제거) 미이행. 대응: **F573**(ax-bd-* 이전 사후 등록 FX-REQ-616 Sprint 311 ✅) + **F560 Sprint 312 재착수** + **C80**(daemon post-merge cleanup FX-REQ-617) + **C81**(autopilot scope-drift-check FX-REQ-618) 등록. Phase 45 F560~F573 14 F-items. Sprint 310 F556 MetaAgent Rubric 튜닝 ✅ MERGED (PR #638 Match 100%, S302 autopilot). S302: C69 ID 중복 해소(→C77), C78 preflight 후속 PR #637 MERGED. S307: tmux 3.5a segfault 대응 L2/L3 구현
+> **마지막 실측** (Sprint 311, 2026-04-20): ~11 routes, ~30 services, ~14 schemas, D1 0138, 11 packages — Phase 45 MSA 3rd Separation 진행. **S303 hotfix**: fx-offering JWT_SECRET 미주입 → 모든 /api/offerings·/methodology·/bdp·/biz-items/:id/business-plan 경로 401 → api-client 강제 /login 리다이렉트 루프. Cloudflare REST API로 secret 주입 즉시 복구(기존 토큰 유지). 재발 방지 C83(P1 preflight)/C84(P2 api-client UX)/C85(P2 deploy-verifier secret matrix) 등록. Sprint 311 PR #640 MERGED Match 95%지만 **F560 scope drift 감지** — 실제는 ax-bd-* → fx-shaping 이전, 원 F560(core/discovery→fx-discovery + proxy 제거) 미이행. 대응: **F573**(ax-bd-* 이전 사후 등록 FX-REQ-616 Sprint 311 ✅) + **F560 Sprint 312 재착수** + **C80**(daemon post-merge cleanup FX-REQ-617) + **C81**(autopilot scope-drift-check FX-REQ-618) 등록. Phase 45 F560~F573 14 F-items
 
 ## §3 Phase 진행 현황
 
