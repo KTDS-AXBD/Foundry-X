@@ -30,11 +30,10 @@ import {
   // collection (5 routes) — F401, Sprint 188
   axBdIdeasRoute, collectionRoute, ideaPortalWebhookRoute,
   irProposalsRoute, axBdInsightsRoute,
-  // discovery (9 routes — discoveryRoute/discoveryReportRoute/discoveryReportsRoute → fx-discovery F538)
+  // discovery — F560: Pipeline/Stages → fx-discovery 이관 완결. bizItemsRoute는 복합 MAIN_API 라우트 유지 (ax-bd/shapePipeline/stageRunner 잔존)
   axBdDiscoveryRoute, axBdArtifactsRoute,
   bizItemsRoute,
-  discoveryPipelineRoute,
-  discoveryStagesRoute, discoveryShapePipelineRoute, discoveryStageRunnerRoute,
+  discoveryShapePipelineRoute, discoveryStageRunnerRoute,
   // shaping — F540: 전체 fx-shaping Worker로 이전 (routes 제거됨)
   // offering — F541: 전체 fx-offering Worker로 이전 (routes 제거됨)
   // agent (13 routes + F529 streaming)
@@ -268,11 +267,10 @@ app.route("/api", srRoute);
 app.route("/api", auditRoute);
 app.route("/api", governanceRoute);
 
-// Sprint 51: BizItems — 사업 아이템 분류 + 멀티 페르소나 평가 (auth + tenant required)
+// Sprint 51: BizItems — 복합 MAIN_API 라우트 유지 (CRUD 3개는 fx-discovery, 그 외는 MAIN_API)
 app.route("/api", bizItemsRoute);
 
-// Sprint 94: Discovery Stages — biz-item별 단계 진행 추적 (F263)
-app.route("/api", discoveryStagesRoute);
+// Sprint 94: Discovery Stages → F560: fx-discovery 이관 완결 (등록 제거)
 
 // Sprint 234: Discovery Stage Runner — HITL 단계별 AI 분석 (F480)
 app.route("/api", discoveryStageRunnerRoute);
@@ -364,8 +362,7 @@ app.route("/api", pocRoute);
 app.route("/api", gtmCustomersRoute);
 app.route("/api", gtmOutreachRoute);
 
-// Sprint 132: Discovery Pipeline 오케스트레이션 (F312, F313)
-app.route("/api", discoveryPipelineRoute);
+// Sprint 132: Discovery Pipeline → F560: fx-discovery 이관 완결 (등록 제거)
 // Sprint 134: Pipeline Monitoring + Permissions (F315)
 app.route("/api", pipelineMonitoringRoute);
 // Sprint 136: Backup/Restore (F317)
