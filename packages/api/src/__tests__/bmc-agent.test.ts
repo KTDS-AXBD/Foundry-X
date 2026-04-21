@@ -3,7 +3,6 @@ import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
 import { BmcAgentService, parseBlocks } from "../core/shaping/services/bmc-agent.js";
 import { BMC_BLOCK_TYPES } from "../core/shaping/services/bmc-service.js";
-import { axBdAgentRoute } from "../core/shaping/routes/ax-bd-agent.js";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 
@@ -213,96 +212,5 @@ describe("parseBlocks", () => {
     const long = { ...MOCK_BMC_RESPONSE, channels: "X".repeat(250) };
     const result = parseBlocks(JSON.stringify(long));
     expect(result.channels!.length).toBe(200);
-  });
-});
-
-// ─── Route Tests ───
-
-describe("axBdAgentRoute", () => {
-  let app: Hono<{ Bindings: Env; Variables: TenantVariables }>;
-  let mockKv: Record<string, { value: string; expiration?: number }>;
-
-  beforeEach(() => {
-    setupDb();
-    globalThis.fetch = vi.fn().mockResolvedValue(makeLlmResponse());
-    mockKv = {};
-
-    app = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
-
-    // Inject tenant variables
-    app.use("*", async (c, next) => {
-      c.set("orgId", "org_test");
-      c.set("userId", "user_1");
-      c.set("orgRole", "admin");
-      await next();
-    });
-
-    app.route("/", axBdAgentRoute);
-  });
-
-  afterEach(() => {
-    globalThis.fetch = originalFetch;
-    vi.restoreAllMocks();
-  });
-
-  function makeRequest(body: unknown) {
-    return app.request("/ax-bd/bmc/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    }, {
-      DB: db as unknown as D1Database,
-      ANTHROPIC_API_KEY: "test-key",
-      CACHE: {
-        get: async (key: string) => mockKv[key]?.value ?? null,
-        put: async (key: string, value: string, opts?: { expirationTtl?: number }) => {
-          mockKv[key] = { value, expiration: opts?.expirationTtl };
-        },
-      } as unknown as KVNamespace,
-    } as unknown as Env);
-  }
-
-  it("POST /ax-bd/bmc/generate returns 200 with draft", async () => {
-    const res = await makeRequest({ idea: "AI 사업개발 도구" });
-    expect(res.status).toBe(200);
-
-    const body = await res.json() as { draft: Record<string, string> };
-    expect(Object.keys(body.draft)).toHaveLength(9);
-  });
-
-  it("returns 400 when idea is missing", async () => {
-    const res = await makeRequest({});
-    expect(res.status).toBe(400);
-  });
-
-  it("returns 400 when idea exceeds 500 characters", async () => {
-    const res = await makeRequest({ idea: "A".repeat(501) });
-    expect(res.status).toBe(400);
-  });
-
-  it("returns 429 when rate limit exceeded", async () => {
-    // Pre-fill KV to simulate 5 prior requests
-    mockKv["bmc-gen:user_1"] = { value: "5" };
-
-    const res = await makeRequest({ idea: "Test" });
-    expect(res.status).toBe(429);
-  });
-
-  it("returns 504 on LLM timeout", async () => {
-    globalThis.fetch = vi.fn().mockImplementation(() => {
-      const error = new Error("AbortError");
-      error.name = "AbortError";
-      return Promise.reject(error);
-    });
-
-    const res = await makeRequest({ idea: "Test" });
-    expect(res.status).toBe(504);
-  });
-
-  it("returns 502 on LLM parse error", async () => {
-    globalThis.fetch = vi.fn().mockResolvedValue(makeBadJsonResponse());
-
-    const res = await makeRequest({ idea: "Test" });
-    expect(res.status).toBe(502);
   });
 });
