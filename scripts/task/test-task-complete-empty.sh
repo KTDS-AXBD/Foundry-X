@@ -104,4 +104,40 @@ set -e
 [ "$RC" -eq 0 ] || { cat /tmp/fx-test-s3.log; fail "aggregate non-empty — expected exit 0, got $RC"; }
 pass "aggregate non-empty passes"
 
+# ─── Scenario 4: C79 — auto-commit skip when stage is empty after filter ────
+# Worker가 이미 fix commit을 만든 상태에서, 남은 untracked가 task-context/prompt만
+# 있어 filter 후 staging이 비어있는 경우, 두 번째 chore commit을 생성하지 않아야
+# 해요. 현재 구현은 "미커밋 변경 감지" 로그 후 `git commit ... || true`로 silently
+# fail하지만, 실행 의도(skip)가 로그에 드러나지 않음. 이 scenario는 after-fix의
+# explicit skip 로그를 회귀 보호해요.
+echo "[test] scenario 4 — C79 auto-commit skip when stage empty after filter"
+git reset --hard master -q
+echo "real worker fix" > payload.txt
+git add payload.txt
+git commit -qm "feat: worker fix commit"
+
+# .task-context from Scenario 1 setup remains as the only untracked file — it must
+# be stripped by the filter, leaving the stage empty after `git add`. Do NOT
+# overwrite it here; preserve the BRANCH/TASK_ID fields task-complete.sh sources.
+[ -f .task-context ] || fail "scenario 4 precondition: .task-context must exist from scenario 1 setup"
+
+PRE_COMMIT_COUNT=$(git rev-list master..HEAD --count)
+rm -f "$SIG_FILE"
+set +e
+bash "$TASK_COMPLETE" --dry-run >/tmp/fx-test-s4.log 2>&1
+RC=$?
+set -e
+POST_COMMIT_COUNT=$(git rev-list master..HEAD --count)
+
+[ "$RC" -eq 0 ] || { cat /tmp/fx-test-s4.log; fail "scenario 4 expected exit 0, got $RC"; }
+pass "exit code = 0"
+
+[ "$PRE_COMMIT_COUNT" -eq "$POST_COMMIT_COUNT" ] \
+  || { cat /tmp/fx-test-s4.log; fail "scenario 4 expected no new commits (pre=$PRE_COMMIT_COUNT post=$POST_COMMIT_COUNT)"; }
+pass "no auto-commit created (commit count preserved)"
+
+grep -q "auto-commit skip" /tmp/fx-test-s4.log \
+  || { cat /tmp/fx-test-s4.log; fail "scenario 4 expected 'auto-commit skip' marker in log"; }
+pass "auto-commit skip marker logged"
+
 echo "[test] ✅ ALL TESTS PASSED"
