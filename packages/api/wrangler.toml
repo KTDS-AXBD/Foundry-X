@@ -99,3 +99,48 @@ id = "030b30d47a98485ea3af95b3347163d6"
 # Sprint 8: Workers AI
 [ai]
 binding = "AI"
+
+# TD-36 (2026-04-21): Explicit production environment section (top-level mirror).
+# top-level config is retained for backward compatibility with current CI/CD
+# (`wrangler deploy` with no --env flag continues to use top-level).
+# [env.production] enables future transition to `wrangler deploy --env production`
+# and restores environment isolation parity with [env.dev] / [env.staging].
+[env.production]
+name = "foundry-x-api"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "foundry-x-db"
+database_id = "6338688e-b050-4835-98a2-7101f9215c76"
+migrations_dir = "src/db/migrations"
+
+[env.production.vars]
+GITHUB_REPO = "KTDS-AXBD/Foundry-X"
+ENVIRONMENT = "production"
+DEFAULT_SHARED_ORG_ID = "org_452b33c1"
+
+[[env.production.kv_namespaces]]
+binding = "CACHE"
+id = "030b30d47a98485ea3af95b3347163d6"
+
+[env.production.ai]
+binding = "AI"
+
+[[env.production.r2_buckets]]
+binding = "FILES_BUCKET"
+bucket_name = "foundry-x-files"
+
+[[env.production.services]]
+binding = "SVC_EXTRACTION"
+service = "svc-extraction"
+
+[[env.production.services]]
+binding = "SVC_ONTOLOGY"
+service = "svc-ontology"
+
+[[env.production.services]]
+binding = "SVC_SKILL"
+service = "svc-skill"
+
+[env.production.triggers]
+crons = ["0 */6 * * *"]
