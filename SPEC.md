@@ -57,7 +57,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 > ```
 > wc -l SPEC.md && find packages/api/src/db/migrations/*.sql | sort | tail -1
 > ```
-> **마지막 실측** (Sprint 311, 2026-04-20): ~11 routes, ~30 services, ~14 schemas, D1 0138, 11 packages — Phase 45 MSA 3rd Separation 진행. **S303 hotfix**: fx-offering JWT_SECRET 미주입 → 모든 /api/offerings·/methodology·/bdp·/biz-items/:id/business-plan 경로 401 → api-client 강제 /login 리다이렉트 루프. Cloudflare REST API로 secret 주입 즉시 복구(기존 토큰 유지). 재발 방지 C83(P1 preflight)/C84(P2 api-client UX)/C85(P2 deploy-verifier secret matrix) 등록. Sprint 311 PR #640 MERGED Match 95%지만 **F560 scope drift 감지** — 실제는 ax-bd-* → fx-shaping 이전, 원 F560(core/discovery→fx-discovery + proxy 제거) 미이행. 대응: **F573**(ax-bd-* 이전 사후 등록 FX-REQ-616 Sprint 311 ✅) + **F560 Sprint 312 재착수** + **C80**(daemon post-merge cleanup FX-REQ-617) + **C81**(autopilot scope-drift-check FX-REQ-618) 등록. Phase 45 F560~F573 14 F-items
+> **마지막 실측** (Sprint 312, 2026-04-21): ~11 routes, ~31 services, ~14 schemas, D1 0138, 11 packages — Phase 45 MSA 3rd Separation 진행. **S305 수확**: C79 근본 fix ✅ MERGED (PR #652 `d8c43fb6`) — task-complete.sh `git diff --cached --quiet` 분기로 이중 PR 패턴 차단. **C88 신규 등록** (FX-REQ-625 P2) — task-daemon crash loop cap + recovery hard stop. Live dogfood 실증: C79 MERGED 후 pane `%12` 복구 루프 attempts=22→36 포착 → daemon --stop + tasks-cache.json pane/wt clear로 차단. **(e) Terminal state guard 필수 승격** (S305 사용자 요청) — phase_recover/watch/signals 모든 진입점에서 status=merged/failed early return. **Sprint 312 F560 ✅ MERGED** (PR #654 `b64cc59b`) — MSA MVP M1 Discovery 완전 이관 + Sprint 311 scope drift 해소. **S303 hotfix**: fx-offering JWT_SECRET 미주입 복구(C83/C84/C85 3축 완결). Phase 45 F560~F573 14 F-items
 
 ## §3 Phase 진행 현황
 
