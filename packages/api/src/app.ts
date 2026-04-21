@@ -52,6 +52,7 @@ import {
   userEvaluationsRoute, builderRoute, mcpRoute, expansionPackRoute,
   axBdKgRoute,
 } from "./core/index.js";
+import { internalPrototypeJobsRoute } from "./core/harness/routes/internal-prototype-jobs.js";
 // Flat routes (shared infrastructure — 8 routes)
 import { requirementsRoute } from "./routes/requirements.js";
 import { specRoute } from "./routes/spec.js";
@@ -217,6 +218,10 @@ app.route("/api", feedbackQueueRoute);
 // `/api/decode/*`는 authMiddleware 이전에 mount하여 공개 read-only 접근 허용.
 // 읽기 전용 + Decode-X로 단방향 프록시라 CSRF/변조 리스크 낮음.
 app.route("/api", decodeBridgeRoute);
+
+// F355b Sprint 219: Decode-X handoff internal endpoint — X-Internal-Secret 전용, JWT 우회
+// authMiddleware 이전에 배치하여 JWT 없이 접근 가능
+app.route("/api", internalPrototypeJobsRoute);
 
 // Protected API routes — JWT required + tenant isolation
 app.use("/api/*", authMiddleware);
