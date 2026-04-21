@@ -325,7 +325,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C89 | C | `scripts/content-sync-check.sh` expected 계산 버그 — **3회 반복 관찰**(S303/S306/S307)로 C-track 승격. **증상**: script가 `expected=319` / `expected='Phase 46'`로 drift 9건 보고하지만 실제 **완료된 max Sprint = 313** / **완료된 max Phase = 45**. 사용자가 landing content를 실제 313으로 맞춰도 script는 여전히 319 기대로 drift 표시 → false positive. **근본 원인**: script의 expected 계산 로직이 SPEC §5 f-items 테이블에서 **모든 row**의 Sprint 번호/Phase 번호 중 max를 취함. 그러나 F574(Sprint 319, PLANNED) 또는 Phase 46(PLANNED) 같은 **미래 계획 row**도 포함됨. **올바른 expected**: status가 `✅` 인 row만 필터링한 max Sprint/Phase. **범위**: (a) `scripts/content-sync-check.sh`의 expected 계산 쿼리에 `grep '✅'` 또는 awk 조건 필터 추가, (b) 단위 테스트(`scripts/__tests__/test-content-sync-check.sh` 신규) — fixture SPEC.md로 완료/미래 row 혼합 시나리오 PASS 검증, (c) 본 세션(S307)에서 manual 업데이트한 landing 3 파일 + README가 script에 의해 자동 유지되는지 dogfood. **task-promotion 판정**: 2파일 내 변경(script + test) → **Backlog 유지**(F 승격 기준 미충족). **Out-of-scope**: expected 계산 알고리즘 전면 재설계 — 현재 버그만 fix (FX-REQ-626, P2) | — | PLANNED | S303/S306/S307 3회 관찰 후 memory-lifecycle rules §1 "정착 트리거 2회 이상" 충족하여 승격. 본 세션(S307)에서 hero.md/landing.tsx/footer.tsx/README.md manual update 수행 — script fix 후 이 패치가 자동 유지됨을 확증해야 함. Sprint 313 MVP M2 완료 후 하드닝 Sprint에서 처리 권장 |
 | C91 | C | C90 deploy-verifier D1 binding preflight (FX-REQ-628) | — | DONE | task orchestrator |
 | C92 | C | C89 content-sync-check.sh expected 계산 버그 fix (FX-REQ-629) | — | DONE | task orchestrator |
-| C93 | C | C88 잔여 (a)(b)(c)(d) — task-daemon hardening (FX-REQ-630) | — | PLANNED | task orchestrator |
+| C93 | C | C88 잔여 (a)(b)(c)(d) — task-daemon hardening (FX-REQ-630) | — | DONE | task orchestrator |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
