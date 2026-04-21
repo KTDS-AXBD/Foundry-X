@@ -52,6 +52,31 @@ mkdir -p "$FX_HOME" "$SNAPSHOT_DIR" /tmp/task-signals
 log() { echo "[$(date +%H:%M:%S)] $*" >> "$DAEMON_LOG"; }
 
 # ═══════════════════════════════════════════════════════════════════════════
+# (e) Terminal state guard — C88/S306 / FX-REQ-625
+# tasks-cache.json `.tasks[tid].status` 가 terminal(merged/failed/cancelled)
+# 이면 0(=terminal) 반환. 복구 진입점(phase_recover/phase_watch/phase_signals)
+# 모두가 이 판정을 공유하여 early return 한다.
+#
+# 근거: S305 Live dogfood (C79 MERGED 후 pane %12 stale 복구 루프 attempts=36).
+# pane 필드만 보고 복구를 시도하면 terminal state task 도 영구 loop 가 된다.
+# ═══════════════════════════════════════════════════════════════════════════
+is_terminal_state() {
+  local tid="$1"
+  local s
+  s=$(jq -r --arg tid "$tid" '.tasks[$tid].status // ""' "$FX_CACHE" 2>/dev/null || echo "")
+  case "$s" in
+    merged|failed|cancelled) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# cache 에서 status 문자열을 읽어 반환 (빈 문자열이면 "") — guard 이벤트 extra 용
+_cache_status() {
+  local tid="$1"
+  jq -r --arg tid "$tid" '.tasks[$tid].status // ""' "$FX_CACHE" 2>/dev/null || echo ""
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
 # Phase 1: Signal 처리 (기존 task-monitor.sh 역할)
 # ═══════════════════════════════════════════════════════════════════════════
 phase_signals() {
@@ -63,6 +88,16 @@ phase_signals() {
 
     [ "$STATUS" = "DONE" ] || continue
     [ -n "$TASK_ID" ] || continue
+
+    # (e) Terminal state guard — C88 — cache 이미 terminal 이면 중복 signal skip + 파일 보존.
+    # 재처리로 인한 WT 재-제거 / merge 재시도 / master pull 중복 방지.
+    if is_terminal_state "$TASK_ID"; then
+      local _termstate; _termstate=$(_cache_status "$TASK_ID")
+      log "🛡️  ${TASK_ID}: terminal state (${_termstate}) — phase_signals skip (signal 파일 보존)"
+      log_event "$TASK_ID" "phase_signals_terminal_skip" \
+        "$(jq -nc --arg s "$_termstate" '{status:$s, guard:"phase_signals"}')"
+      continue
+    fi
 
     log "📡 signal: ${TASK_ID}"
 
@@ -287,6 +322,17 @@ phase_watch() {
   while IFS='|' read -r task_id pane_id wt_path; do
     [ -z "$task_id" ] || [ -z "$pane_id" ] && continue
 
+    # (e) Terminal state guard — C88 — jq filter 이후 cache 가 변경된 race 방어.
+    # phase_watch 시작 시 in_progress 였지만 중간에 merged/failed/cancelled 로 바뀐
+    # task 는 phase_recover 를 호출하지 않는다.
+    if is_terminal_state "$task_id"; then
+      local _ws; _ws=$(_cache_status "$task_id")
+      log "🛡️  ${task_id}: terminal state (${_ws}) — phase_watch skip"
+      log_event "$task_id" "phase_watch_terminal_guard" \
+        "$(jq -nc --arg s "$_ws" '{status:$s, guard:"phase_watch"}')"
+      continue
+    fi
+
     # pane 존재 확인
     if ! tmux list-panes -a -F '#{pane_id}' 2>/dev/null | grep -q "^${pane_id}$"; then
       # pane 죽었지만 signal 없음 → 실패 기록 + 자동 복구 시도
@@ -444,6 +490,17 @@ phase_queue() {
 # ═══════════════════════════════════════════════════════════════════════════
 phase_recover() {
   local tid="$1" wt="$2"
+
+  # (e) Terminal state guard — C88 — 진입 차단 1차 방어선.
+  # phase_watch 의 2차 guard 가 race 로 뚫린 경우, 그리고 __debug-recover 같은
+  # 단독 CLI 진입점에서도 terminal state task 는 복구 로직을 건너뛴다.
+  if is_terminal_state "$tid"; then
+    local _rs; _rs=$(_cache_status "$tid")
+    log "🛡️  ${tid}: terminal state (${_rs}) — phase_recover skip (복구 진입 차단)"
+    log_event "$tid" "phase_recover_terminal_guard" \
+      "$(jq -nc --arg s "$_rs" '{status:$s, guard:"phase_recover"}')"
+    return 0
+  fi
 
   [ -d "$wt" ] || { log "복구: ${tid} WT 없음 — 포기"; return 1; }
 
