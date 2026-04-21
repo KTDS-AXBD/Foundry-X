@@ -66,6 +66,8 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Build shared-contracts (dependency of shared)
+        run: pnpm --filter @foundry-x/shared-contracts build
       - run: pnpm turbo typecheck lint test
 
   # Production deploy — API (코드 변경 시에만)
