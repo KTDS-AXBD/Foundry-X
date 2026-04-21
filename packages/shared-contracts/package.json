@@ -1,15 +1,18 @@
 {
-  "name": "@foundry-x/shared",
-  "version": "0.1.0",
+  "name": "@foundry-x/shared-contracts",
+  "version": "1.0.0",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@foundry-x/shared-contracts": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0"
