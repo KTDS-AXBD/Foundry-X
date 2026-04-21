@@ -66,7 +66,6 @@ DIRTY=$(git status --porcelain 2>/dev/null | grep -v '^\?' | head -1 || true)
 UNTRACKED=$(git status --porcelain 2>/dev/null | grep '^?' | head -1 || true)
 
 if [ -n "$DIRTY" ] || [ -n "$UNTRACKED" ]; then
-  echo "[fx-task-complete] 미커밋 변경 감지 — 자동 커밋"
   # stage tracked changes
   git add -u 2>/dev/null || true
   # stage new files (exclude task-context/prompt)
@@ -74,7 +73,16 @@ if [ -n "$DIRTY" ] || [ -n "$UNTRACKED" ]; then
     | grep -v '\.task-context\|\.task-prompt' \
     | xargs -r git add 2>/dev/null || true
 
-  git commit -m "chore(${TASK_ID}): auto-commit on task complete" 2>/dev/null || true
+  # C79 (FX-REQ-601): filter 적용 후 stage가 비어있으면 auto-commit 생략. worker가
+  # 이미 fix commit을 만든 뒤 task-context/prompt만 남아있는 경우 두 번째 chore
+  # 커밋이 같은 브랜치에 push되어 중복 PR(e.g. #594, #645 빈 squash)이 생성되는
+  # 패턴을 차단해요. C67(S294) 최초 관찰 → C83(S303) 재발 → S305 근본 fix.
+  if git diff --cached --quiet 2>/dev/null; then
+    echo "[fx-task-complete] auto-commit skip — stage 결과 비어있음 (filter 제외 후 변경 없음)"
+  else
+    echo "[fx-task-complete] 미커밋 변경 감지 — 자동 커밋"
+    git commit -m "chore(${TASK_ID}): auto-commit on task complete" 2>/dev/null || true
+  fi
 fi
 
 # ─── Step 2b: web 변경 시 스크린샷 검증 ──────────────────────────────────────
