@@ -18,15 +18,78 @@ source "$SCRIPT_DIR/lib.sh"
 
 FIX_MODE=0
 FILTER_TASK=""
+CRASH_LOOP_MODE=0
 while [ $# -gt 0 ]; do
   case "$1" in
-    --fix)    FIX_MODE=1; shift ;;
-    --task)   FILTER_TASK="$2"; shift 2 ;;
+    --fix)         FIX_MODE=1; shift ;;
+    --task)        FILTER_TASK="$2"; shift 2 ;;
+    --crash-loop)  CRASH_LOOP_MODE=1; shift ;;
     --help|-h)
       sed -n '2,12p' "$0"; exit 0 ;;
     *) echo "[doctor] unknown arg: $1" >&2; exit 2 ;;
   esac
 done
+
+# ─── --crash-loop diagnostics (C88 d) ─────────────────────────────────────────
+# 독립 실행 경로 — 정규 scan 루프 실행 없이 crash loop 진단만 출력하고 종료.
+if [ "$CRASH_LOOP_MODE" -eq 1 ]; then
+  echo ""
+  echo "🔍 Crash Loop Diagnostics"
+  echo "─────────────────────────────────────────────────"
+
+  HEARTBEAT_FILE="${FX_HOME}/daemon-heartbeat"
+  COUNTER_FILE="${FX_HOME}/daemon-restart-counter"
+  LOG_FILE="${FX_HOME}/task-log.ndjson"
+
+  # (1) 마지막 heartbeat 시각 + age
+  if [ -f "$HEARTBEAT_FILE" ]; then
+    hb_ts=$(cat "$HEARTBEAT_FILE" 2>/dev/null || echo "")
+    if [ -n "$hb_ts" ]; then
+      hb_epoch=$(date -d "$hb_ts" +%s 2>/dev/null || echo 0)
+      now=$(date +%s)
+      hb_age=$(( now - hb_epoch ))
+      echo "  [1] Daemon heartbeat: ${hb_ts} (${hb_age}초 전)"
+    else
+      echo "  [1] Daemon heartbeat: 파일 있으나 내용 없음"
+    fi
+  else
+    echo "  [1] Daemon heartbeat: 파일 없음 (daemon 미실행 또는 정상 종료)"
+  fi
+
+  # (2) DAEMON_RESTART_COUNTER 1h 내 재시작 횟수
+  if [ -f "$COUNTER_FILE" ]; then
+    now=$(date +%s)
+    window_start=$(( now - 3600 ))
+    count=$(jq --argjson ws "$window_start" '[.[] | select(. > $ws)] | length' "$COUNTER_FILE" 2>/dev/null || echo 0)
+    total=$(jq 'length' "$COUNTER_FILE" 2>/dev/null || echo 0)
+    echo "  [2] Restart counter: 1h 내 ${count}회 / 전체 ${total}회 기록"
+    if [ "$count" -gt 3 ]; then
+      echo "      ⚠️  임계치(3회) 초과 — crash loop 의심"
+    fi
+  else
+    echo "  [2] Restart counter: 파일 없음 (재시작 이력 0회)"
+  fi
+
+  # (3) task-log.ndjson에서 retry_attempts_total > 3 task 요약 (top 5)
+  if [ -f "$LOG_FILE" ]; then
+    echo "  [3] retry_attempts_total > 3 tasks (top 5):"
+    high_retry=$(jq -r 'select(.event == "retry_attempts_total" and (.extra.attempts // 0) > 3)
+      | "\(.id)\t attempts=\(.extra.attempts // 0)"' "$LOG_FILE" 2>/dev/null \
+      | sort -t$'\t' -k2 -rn | head -5)
+    if [ -n "$high_retry" ]; then
+      while IFS= read -r line; do
+        echo "      $line"
+      done <<< "$high_retry"
+    else
+      echo "      (없음)"
+    fi
+  else
+    echo "  [3] task-log.ndjson: 파일 없음"
+  fi
+
+  echo "─────────────────────────────────────────────────"
+  exit 0
+fi
 
 REPO_ROOT=$(_repo_root 2>/dev/null || echo "")
 SPEC_FILE="${REPO_ROOT}/SPEC.md"
