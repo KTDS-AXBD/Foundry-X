@@ -4,15 +4,15 @@ main = "src/index.ts"
 compatibility_date = "2026-03-17"
 compatibility_flags = ["nodejs_compat"]
 
-# F561: D1 Option A — foundry-x-discovery-db (신규, Phase 45 MVP M2)
-# PoC 상태: sinclairseo@gmail.com 계정에 생성됨 (ID: 51288e69-a614-40ac-9d4d-453f5faf7a37)
-# 프로덕션 전환 시: ktds.axbd@gmail.com 계정에서 재생성 필요 (§4 FK 분석 문서 참조)
+# F561: D1 Option A — foundry-x-discovery-db (Phase 45 MVP M2)
+# Prod: ktds.axbd@gmail.com (S307 2026-04-21 생성, ID f129f04b-0149-4ff4-bc2f-382b025130b9)
+# Dev:  sinclairseo@gmail.com (F561 PoC, ID 51288e69...) — env.dev 블록 참조
 # DISCOVERY_DB_MODE=shadow: 양쪽 write (기존 DB primary), 검증 전용
 # DISCOVERY_DB_MODE=legacy: 기존 foundry-x-db만 (rollback 시)
 [[d1_databases]]
 binding = "DISCOVERY_DB"
 database_name = "foundry-x-discovery-db"
-database_id = "51288e69-a614-40ac-9d4d-453f5faf7a37"
+database_id = "f129f04b-0149-4ff4-bc2f-382b025130b9"
 migrations_dir = "migrations"
 
 # 기존 shared DB (롤백 시 primary, legacy 모드)
