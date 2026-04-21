@@ -6,7 +6,12 @@
 
 set -eo pipefail
 
-REPO_ROOT="$(git -C "$(dirname "$0")/.." rev-parse --show-toplevel)"
+# 테스트 시 FOUNDRY_X_REPO_ROOT 환경변수로 repo root 오버라이드 가능
+if [ -n "${FOUNDRY_X_REPO_ROOT:-}" ]; then
+  REPO_ROOT="$FOUNDRY_X_REPO_ROOT"
+else
+  REPO_ROOT="$(git -C "$(dirname "$0")/.." rev-parse --show-toplevel)"
+fi
 cd "$REPO_ROOT"
 
 # --- 대상 파일 ---
@@ -23,18 +28,27 @@ if [ -z "$SPEC_LINE" ]; then
   exit 2
 fi
 
-# Sprint 번호: SPEC §5 테이블에서 최고 Sprint 번호 (SSOT)
-# "마지막 실측" 행은 갱신 누락 시 stale될 수 있으므로 §5 rows가 권위 소스
-SPRINT=$(grep -oP 'Sprint \K\d+' "$SPEC" | sort -n | tail -1)
+# Sprint 번호: SPEC §5 테이블의 ✅(완료) row만 필터링한 최고 Sprint 번호 (SSOT)
+# PLANNED(📋) row 포함 시 미래 Sprint 번호가 expected로 잡혀 false positive 발생
+SPRINT=$(grep -E '^\| F[0-9]' "$SPEC" | grep '✅' | grep -oP 'Sprint \K\d+' | sort -n | tail -1)
 
-# Phase: SPEC.md에서 최고 Phase 번호 (SSOT)
-# CLAUDE.md는 수동 관리라 Phase 추가 시 지연될 수 있으므로 SPEC.md가 권위 소스
-PHASE_NUM=$(grep -oP 'Phase \K\d+' "$SPEC" | sort -n | tail -1)
+# Phase: "마지막 실측" 행에서 추출 (SSOT — F-item 설명에는 Phase 번호가 없는 row가 많음)
+# fallback: ✅ F-item row 설명에서 Phase 번호 추출
+PHASE_NUM=$(echo "$SPEC_LINE" | grep -oP 'Phase \K\d+' | head -1 || true)
+if [ -z "$PHASE_NUM" ]; then
+  PHASE_NUM=$(grep -E '^\| F[0-9]' "$SPEC" | grep '✅' | grep -oP 'Phase \K\d+' | sort -n | tail -1)
+fi
 PHASE_TITLE=""
 # Phase title은 CLAUDE.md에서 추출 (있으면)
 CLAUDE_MD="CLAUDE.md"
 if [ -f "$CLAUDE_MD" ] && [ -n "$PHASE_NUM" ]; then
   PHASE_TITLE=$(grep -P "Phase $PHASE_NUM" "$CLAUDE_MD" | head -1 | sed -E 's/.*Phase [0-9]+[: ]+//' | sed -E 's/\*\*.*$//' | xargs 2>/dev/null || true)
+fi
+
+# ✅ row가 없으면 비교할 기준이 없으므로 skip
+if [ -z "$SPRINT" ] && [ -z "$PHASE_NUM" ]; then
+  echo "content sync: SKIP (no completed F-items in SPEC §5)"
+  exit 0
 fi
 
 DRIFT_COUNT=0
