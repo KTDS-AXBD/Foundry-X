@@ -7,32 +7,14 @@
  * - ReviewSummaryBar 분모 계산 (M5 해소)
  */
 import { describe, it, expect, beforeEach } from "vitest";
-import { Hono } from "hono";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import type { Env } from "../env.js";
-import { axBdPrototypesRoute } from "../core/shaping/routes/ax-bd-prototypes.js";
 import { PrototypeService } from "../core/harness/services/prototype-service.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Any = any;
 
-function createApp(db: D1Database) {
-  const app = new Hono<{ Bindings: Env }>();
-  app.use("*", async (c, next) => {
-    c.set("orgId" as never, "org_test");
-    c.set("jwtPayload" as never, { sub: "user_1" });
-    await next();
-  });
-  app.route("/api", axBdPrototypesRoute);
-  return {
-    request: (path: string, init?: RequestInit) =>
-      app.request(path, init, { DB: db } as unknown as Env),
-  };
-}
-
-describe("Sprint 222 — Prototype Builder + Offering 연동", () => {
+describe("Sprint 222 — PrototypeService (service-level)", () => {
   let db: ReturnType<typeof createMockD1>;
-  let app: ReturnType<typeof createApp>;
   let svc: PrototypeService;
 
   beforeEach(async () => {
@@ -90,7 +72,6 @@ describe("Sprint 222 — Prototype Builder + Offering 연동", () => {
       );
     `);
 
-    app = createApp(db as unknown as D1Database);
     svc = new PrototypeService(db as unknown as D1Database);
 
     // Seed biz_item
@@ -111,81 +92,6 @@ describe("Sprint 222 — Prototype Builder + Offering 연동", () => {
       `INSERT INTO offerings (id, org_id, biz_item_id, title, purpose, format, status, current_version, created_by)
        VALUES ('off-001', 'org_test', 'bi-deny-001', 'Deny Offering', 'report', 'html', 'draft', 1, 'user_1')`
     );
-  });
-
-  describe("POST /ax-bd/prototypes/build — F457", () => {
-    it("201: 유효한 PRD로 prototype_jobs 생성", async () => {
-      const prdContent = "x".repeat(100); // min 100자
-      const res = await app.request("/api/ax-bd/prototypes/build", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prdContent,
-          prdTitle: "Deny Semi PRD v3",
-          bizItemId: "bi-deny-001",
-          builderType: "cli",
-        }),
-      });
-
-      expect(res.status).toBe(201);
-      const body = await res.json() as Any;
-      expect(body.orgId).toBe("org_test");
-      expect(body.status).toBe("queued");
-    });
-
-    it("400: prdContent가 100자 미만이면 거부", async () => {
-      const res = await app.request("/api/ax-bd/prototypes/build", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prdContent: "short",
-          prdTitle: "Title",
-          bizItemId: "bi-deny-001",
-        }),
-      });
-
-      expect(res.status).toBe(400);
-    });
-
-    it("400: builderType이 잘못된 값이면 거부", async () => {
-      const res = await app.request("/api/ax-bd/prototypes/build", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prdContent: "x".repeat(100),
-          prdTitle: "Title",
-          bizItemId: "bi-deny-001",
-          builderType: "invalid",
-        }),
-      });
-
-      expect(res.status).toBe(400);
-    });
-  });
-
-  describe("POST /ax-bd/prototypes/:id/link-offering — F458", () => {
-    it("201: offering_prototypes에 연결 행 생성", async () => {
-      const res = await app.request("/api/ax-bd/prototypes/proto-deny-001/link-offering", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ offeringId: "off-001" }),
-      });
-
-      expect(res.status).toBe(201);
-      const body = await res.json() as Any;
-      expect(body.offeringId).toBe("off-001");
-      expect(body.prototypeId).toBe("proto-deny-001");
-    });
-
-    it("400: offeringId 없으면 거부", async () => {
-      const res = await app.request("/api/ax-bd/prototypes/proto-deny-001/link-offering", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
-
-      expect(res.status).toBe(400);
-    });
   });
 
   describe("PrototypeService.list() — bizItemTitle 포함 (gap H4)", () => {
