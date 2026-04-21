@@ -24,6 +24,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Build shared-contracts (dependency of shared)
+        run: pnpm -F @foundry-x/shared-contracts build
+
       - name: Build shared package
         run: pnpm -F @foundry-x/shared build
 
