@@ -1,0 +1,22 @@
+-- F520: Discovery Worker D1 바인딩 격리 (Phase 38, Sprint 268)
+-- FX-REQ-548: D1 스키마 격리
+--
+-- 전략: 옵션 B (동일 DB 공유, 규약 기반 격리)
+-- Phase 38.2에서 옵션 A (독립 foundry-x-discovery-db)로 전환 예정
+--
+-- Discovery 도메인 소유 테이블 목록:
+--   - biz_items (biz_item_id 기준, org 기반 multi-tenant)
+--   - discovery_stages (biz_item_id FK)
+--   - discovery_reports (biz_item_id FK)
+--   - discovery_criteria (biz_item_id FK)
+--   - analysis_contexts (biz_item_id FK)
+--   - pipeline_events (biz_item_id FK)
+--   - pipeline_stages (biz_item_id FK)
+--
+-- Cross-domain 사용 테이블 (Discovery에서 읽기만):
+--   - shaping_artifacts, ax_bd_artifacts — fx-discovery는 read-only 접근
+--   - prd_confirmations, evaluation_reports — offering 도메인 소유
+--
+-- 이 migration은 스키마 변경 없이 문서화 목적만.
+
+SELECT 1; -- no-op migration
