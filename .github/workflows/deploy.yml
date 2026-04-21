@@ -84,6 +84,7 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @foundry-x/shared-contracts build
       - run: pnpm --filter @foundry-x/shared build
       - run: pnpm --filter @foundry-x/harness-kit build
       - name: Apply D1 migrations (remote)
@@ -117,6 +118,7 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @foundry-x/shared-contracts build
       - run: pnpm --filter @foundry-x/shared build
       - run: pnpm --filter @foundry-x/web build
         env:
@@ -161,6 +163,7 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @foundry-x/shared-contracts build
       - run: pnpm --filter @foundry-x/shared build
       - name: Secret Preflight Check (C83)
         env:
