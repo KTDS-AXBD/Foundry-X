@@ -497,8 +497,13 @@ if [ -f "$DAEMON_PID_FILE" ] && kill -0 "$(cat "$DAEMON_PID_FILE")" 2>/dev/null;
 fi
 
 if [ "$DAEMON_RUNNING" = false ] && [ -f "$REPO_ROOT/scripts/task/task-daemon.sh" ]; then
-  bash "$REPO_ROOT/scripts/task/task-daemon.sh" --bg 2>/dev/null
-  DAEMON_STATUS="✅ daemon 시작 (PID $(cat "$DAEMON_PID_FILE" 2>/dev/null))"
+  # (b) crash loop guard 확인 — lib.sh daemon_restart_guard 재사용
+  if daemon_restart_guard 2>/dev/null; then
+    bash "$REPO_ROOT/scripts/task/task-daemon.sh" --bg 2>/dev/null
+    DAEMON_STATUS="✅ daemon 시작 (PID $(cat "$DAEMON_PID_FILE" 2>/dev/null))"
+  else
+    DAEMON_STATUS="⚠️  daemon crash loop 감지 — 자동 재기동 건너뜀 (수동 확인 필요)"
+  fi
 else
   DAEMON_STATUS="✅ daemon 실행 중 (PID $(cat "$DAEMON_PID_FILE" 2>/dev/null))"
 fi

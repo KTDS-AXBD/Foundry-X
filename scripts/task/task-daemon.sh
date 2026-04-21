@@ -492,14 +492,27 @@ phase_recover() {
   local tid="$1" wt="$2"
 
   # (e) Terminal state guard — C88 — 진입 차단 1차 방어선.
-  # phase_watch 의 2차 guard 가 race 로 뚫린 경우, 그리고 __debug-recover 같은
-  # 단독 CLI 진입점에서도 terminal state task 는 복구 로직을 건너뛴다.
   if is_terminal_state "$tid"; then
     local _rs; _rs=$(_cache_status "$tid")
     log "🛡️  ${tid}: terminal state (${_rs}) — phase_recover skip (복구 진입 차단)"
     log_event "$tid" "phase_recover_terminal_guard" \
       "$(jq -nc --arg s "$_rs" '{status:$s, guard:"phase_recover"}')"
     return 0
+  fi
+
+  # (a) Attempts cap 선제 체크 — C88 — enqueue_retry 진입 전 조기 차단.
+  # retry 파일에 기록된 attempts 가 TASK_MAX_RETRY 에 도달했으면 더 이상 복구를
+  # 시도하지 않는다. enqueue_retry 내부의 동일 guard 와 이중 방어를 구성한다.
+  local _retry_file="/tmp/task-retry/${PROJECT}-${tid}.json"
+  if [ -f "$_retry_file" ]; then
+    local _prev_attempts; _prev_attempts=$(jq -r '.attempts // 0' "$_retry_file" 2>/dev/null || echo 0)
+    if [ "$_prev_attempts" -ge "$TASK_MAX_RETRY" ]; then
+      log "🛡️  ${tid}: attempts=${_prev_attempts} >= TASK_MAX_RETRY=${TASK_MAX_RETRY} — phase_recover 선제 차단"
+      log_event "$tid" "retry_attempts_total" \
+        "$(jq -nc --argjson a "$_prev_attempts" --argjson m "$TASK_MAX_RETRY" \
+           '{attempts:$a, max_retry:$m, guard:"phase_recover_precheck"}')"
+      return 0
+    fi
   fi
 
   [ -d "$wt" ] || { log "복구: ${tid} WT 없음 — 포기"; return 1; }
@@ -1139,6 +1152,9 @@ show_status() {
 # ═══════════════════════════════════════════════════════════════════════════
 case "${1:-}" in
   --bg)
+    # (b)(c) crash loop guard — 재시작 전 안전 확인
+    daemon_restart_guard || exit 1
+
     # PID 살아있으면 heartbeat 확인 후 재시작 여부 결정
     if [ -f "$DAEMON_PID_FILE" ] && kill -0 "$(cat "$DAEMON_PID_FILE")" 2>/dev/null; then
       if [ -f "$DAEMON_HEARTBEAT" ]; then
@@ -1174,6 +1190,15 @@ case "${1:-}" in
   __debug-recover)
     # 단위 테스트 진입점 — phase_recover 직접 호출 (FX-REQ-517 / C23)
     phase_recover "${2:?task_id required}" "${3:?wt_path required}"
+    ;;
+  __debug-restart-guard)
+    # 단위 테스트 진입점 — daemon_restart_guard 직접 호출 (C88 b/c 검증)
+    daemon_restart_guard
+    ;;
+  __debug-heartbeat-stale)
+    # 단위 테스트 진입점 — heartbeat stale 경고 경로만 실행 (C88 c 검증)
+    # daemon_restart_guard 내부의 (c) 로직을 트리거함
+    daemon_restart_guard
     ;;
   __debug-phase-signals)
     # 단위 테스트 진입점 — phase_signals 직접 호출 (C61 B-fix 검증)

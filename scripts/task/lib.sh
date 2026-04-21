@@ -345,3 +345,53 @@ mark_spec_done_row() {
     fi
   ) 8>"$FX_LOCK_DIR/master-push.lock"
 }
+
+# ─── Daemon crash loop guard (C88 b/c) ───────────────────────────────────────
+# (b) 1시간 윈도우 내 재시작 횟수를 epoch JSON array로 추적.
+#     3회 초과 시 stderr 경고 + 비정상 종료(return 1).
+# (c) heartbeat 파일이 120초 이내에 갱신됐으면 crash loop 의심 WARN 출력.
+#
+# 반환값: 0 = 정상 기동 허용 / 1 = crash loop 감지, 재기동 거부
+#
+# 용도: task-daemon.sh --bg 핸들러 + task-start.sh 자동 기동 경로에서 호출.
+daemon_restart_guard() {
+  local counter_file="${FX_HOME}/daemon-restart-counter"
+  local heartbeat_file="${FX_HOME}/daemon-heartbeat"
+  local warn_log="${FX_HOME}/daemon-warn.log"
+  local now; now=$(date +%s)
+  local window_start=$(( now - 3600 ))
+  local max_restarts=3
+
+  # (c) heartbeat stale 경고: PID가 없는데 heartbeat가 120초 이내면 crash loop 의심
+  if [ -f "$heartbeat_file" ]; then
+    local hb_ts; hb_ts=$(cat "$heartbeat_file" 2>/dev/null || echo "")
+    if [ -n "$hb_ts" ]; then
+      local hb_epoch; hb_epoch=$(date -d "$hb_ts" +%s 2>/dev/null || echo 0)
+      local hb_age=$(( now - hb_epoch ))
+      if [ "$hb_age" -lt 120 ]; then
+        local msg="[task-daemon] ⚠️  WARN: heartbeat ${hb_age}초 전에 갱신됨 — crash loop 의심 (daemon 비정상 종료?)"
+        echo "$msg" >&2
+        echo "$(date -Iseconds) $msg" >> "$warn_log" 2>/dev/null || true
+      fi
+    fi
+  fi
+
+  # (b) restart counter: 현재 epoch 추가 후 1h 윈도우 필터링
+  local entries
+  if [ -f "$counter_file" ]; then
+    entries=$(jq --argjson now "$now" --argjson ws "$window_start" \
+      'map(select(. > $ws)) + [$now]' "$counter_file" 2>/dev/null || echo "[$now]")
+  else
+    entries="[$now]"
+  fi
+  printf '%s\n' "$entries" > "$counter_file"
+
+  local count; count=$(jq 'length' <<< "$entries" 2>/dev/null || echo 0)
+  if [ "$count" -gt "$max_restarts" ]; then
+    local cmsg="[task-daemon] ❌ crash loop 감지: 1시간 내 ${count}회 재시작 (상한=${max_restarts}) — 수동 intervention 필요. daemon-warn.log 확인."
+    echo "$cmsg" >&2
+    echo "$(date -Iseconds) $cmsg" >> "$warn_log" 2>/dev/null || true
+    return 1
+  fi
+  return 0
+}
