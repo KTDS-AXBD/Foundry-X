@@ -40,4 +40,6 @@ export type Env = {
   DECODE_X_INTERNAL_SECRET?: string;
   DECODE_X_EXTRACTION_URL?: string;
   DECODE_X_ONTOLOGY_URL?: string;
+  // F355b Sprint 219: shared secret for Decode-X → Foundry-X internal handoff calls
+  DECODE_X_HANDOFF_SECRET?: string;
 };
