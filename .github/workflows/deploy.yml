@@ -68,6 +68,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Build shared-contracts (dependency of shared)
         run: pnpm --filter @foundry-x/shared-contracts build
+      - name: Build shared (C97 — consistency with deploy jobs)
+        run: pnpm --filter @foundry-x/shared build
       - run: pnpm turbo typecheck lint test
 
   # Production deploy — API (코드 변경 시에만)
