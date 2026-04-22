@@ -81,4 +81,22 @@ describe('ConfigManager', () => {
 
     expect(read).toEqual(config);
   });
+
+  // F564 TDD Red — apiUrl 기본값 검증
+  describe('F564: apiUrl (fx-gateway 단일 진입점)', () => {
+    it('init() should include apiUrl defaulting to fx-gateway', async () => {
+      tmpDir = await mkdtemp(join(tmpdir(), 'fx-cfg-'));
+      const mgr = new ConfigManager(tmpDir);
+      const config = await mgr.init('greenfield', MINIMAL_PROFILE, 'standard');
+      expect(config.apiUrl).toBe('https://fx-gateway.ktds-axbd.workers.dev');
+    });
+
+    it('init() apiUrl should persist through write/read roundtrip', async () => {
+      tmpDir = await mkdtemp(join(tmpdir(), 'fx-cfg-'));
+      const mgr = new ConfigManager(tmpDir);
+      await mgr.init('greenfield', MINIMAL_PROFILE, 'standard');
+      const read = await mgr.read();
+      expect(read?.apiUrl).toBe('https://fx-gateway.ktds-axbd.workers.dev');
+    });
+  });
 });

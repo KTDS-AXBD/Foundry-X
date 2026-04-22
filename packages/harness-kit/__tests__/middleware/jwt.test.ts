@@ -64,4 +64,35 @@ describe("JWT Middleware", () => {
     }, {});
     expect(res.status).toBe(200);
   });
+
+  // F569 TDD Red — Worker별 public path 설정
+  describe("F569: Worker-specific public paths", () => {
+    it("fx-discovery health is public", async () => {
+      const app = createApp({ publicPaths: ["/api/discovery/health"] });
+      app.get("/api/discovery/health", (c) => c.json({ domain: "discovery", status: "ok" }));
+      const res = await app.request("/api/discovery/health", undefined, { JWT_SECRET: SECRET });
+      expect(res.status).toBe(200);
+    });
+
+    it("fx-shaping health is public", async () => {
+      const app = createApp({ publicPaths: ["/api/shaping/health", "/api/ax-bd/health"] });
+      app.get("/api/shaping/health", (c) => c.json({ domain: "shaping", status: "ok" }));
+      const res = await app.request("/api/shaping/health", undefined, { JWT_SECRET: SECRET });
+      expect(res.status).toBe(200);
+    });
+
+    it("fx-offering health is public", async () => {
+      const app = createApp({ publicPaths: ["/api/offering/health"] });
+      app.get("/api/offering/health", (c) => c.json({ domain: "offering", status: "ok" }));
+      const res = await app.request("/api/offering/health", undefined, { JWT_SECRET: SECRET });
+      expect(res.status).toBe(200);
+    });
+
+    it("protected route still requires JWT even with domain-specific public paths", async () => {
+      const app = createApp({ publicPaths: ["/api/discovery/health"] });
+      app.get("/api/discovery/items", (c) => c.json({ items: [] }));
+      const res = await app.request("/api/discovery/items", undefined, { JWT_SECRET: SECRET });
+      expect(res.status).toBe(401);
+    });
+  });
 });

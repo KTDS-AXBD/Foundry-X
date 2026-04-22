@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.36.3",
+    "@foundry-x/harness-kit": "workspace:*",
     "@foundry-x/shared": "workspace:*",
     "hono": "^4.0.0",
     "nanoid": "^5.0.0",
