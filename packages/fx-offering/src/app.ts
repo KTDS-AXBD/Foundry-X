@@ -1,5 +1,6 @@
 // fx-offering app (F541: FX-REQ-580)
 // Offering 도메인 독립 Worker — 12 routes, 29 services
+import "hono/jwt"; // side-effect: augment ContextVariableMap with jwtPayload
 import { Hono } from "hono";
 import type { OfferingEnv } from "./env.js";
 import { authMiddleware } from "./middleware/auth.js";
