@@ -1,0 +1,25 @@
+name: SDD Drift Check
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  sdd-drift-check:
+    name: SDD Triangle Drift Check (F565)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch master for diff range
+        run: git fetch origin master --depth=100
+
+      - name: Run SDD drift check
+        run: |
+          COMMIT_RANGE="origin/master...HEAD" \
+          bash scripts/sdd/check-drift.sh
+
+      - name: Run SDD drift tests
+        run: bash scripts/sdd/__tests__/test-sdd-drift.sh
