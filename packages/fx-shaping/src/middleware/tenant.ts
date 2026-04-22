@@ -15,7 +15,7 @@ export async function tenantGuard(
   c: Context<{ Bindings: ShapingEnv; Variables: TenantVariables }>,
   next: Next,
 ) {
-  const payload = c.get("jwtPayload") as
+  const payload = c.get("jwtPayload" as never) as
     | { sub?: string; orgId?: string; orgRole?: string }
     | undefined;
 

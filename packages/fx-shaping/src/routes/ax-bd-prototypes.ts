@@ -115,7 +115,7 @@ axBdPrototypesRoute.post("/ax-bd/prototypes/:id/sections/:sectionId/review", asy
   const orgId = c.get("orgId");
   const prototypeId = c.req.param("id");
   const sectionId = c.req.param("sectionId");
-  const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? (c.get("userId") as string) ?? "";
+  const userId = (c.get("jwtPayload" as never) as Record<string, string> | undefined)?.sub ?? (c.get("userId") as string) ?? "";
 
   const body = await c.req.json();
   const parsed = sectionReviewSchema.safeParse({ ...body, sectionId });
