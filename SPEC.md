@@ -1,10 +1,10 @@
 ---
 code: FX-SPEC-001
 title: Foundry-X Project Specification
-version: 6.04
+version: 6.05
 status: Active
 category: SPEC
-system-version: Sprint 314 (F563 ✅ MERGED + deploy hotfix PR #668, S308)
+system-version: Sprint 314 (F563 ✅ MERGED + C94 msa-lint harness-kit gap 등록, S309)
 created: 2026-03-16
 updated: 2026-04-22
 author: Sinclair Seo
@@ -326,6 +326,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C91 | C | C90 deploy-verifier D1 binding preflight (FX-REQ-628) | — | DONE | task orchestrator |
 | C92 | C | C89 content-sync-check.sh expected 계산 버그 fix (FX-REQ-629) | — | DONE | task orchestrator |
 | C93 | C | C88 잔여 (a)(b)(c)(d) — task-daemon hardening (FX-REQ-630) | — | DONE | task orchestrator |
+| C94 | C | **msa-lint workflow harness-kit 선행 빌드 gap fix** — S309 진단 완결. 8회 연속 fail(4/16~4/21) 근본 원인 = `msa-lint.yml` Step 8 `pnpm --filter @foundry-x/api build`가 `packages/api` tsc를 호출하지만 `packages/api`는 `@foundry-x/harness-kit` workspace dep 사용(`packages/api/src/routes/proxy.ts:7-8`) → harness-kit dist 미생성 상태에서 `TS2307 Cannot find module '@foundry-x/harness-kit'`로 fail → Step 9 MSA lint skip → PR CI blocking. **turbo.json**에 `typecheck.dependsOn: ["^build"]`가 이미 있으나 `pnpm --filter` 직접 호출은 turbo 우회하므로 미적용. **범위**: (a) `.github/workflows/msa-lint.yml` Step 8을 `pnpm --filter '@foundry-x/api...' build`로 변경(`...` = workspace dep 전체 포함 — harness-kit 자동 선행 빌드), (b) `.github/workflows/deploy-gate-x.yml` test job 2 스텝 동일 패턴 적용(`@foundry-x/gate-x...`) — deploy-gate-x도 5회 연속 fail(4/7~) 동일 원인으로 판정되나 gate-x dormant 상태라 별건 축에서 치유, (c) local reproduce: `rm -rf packages/harness-kit/dist && pnpm --filter @foundry-x/api build` → TS2307 재현 → `pnpm --filter '@foundry-x/api...' build`로 해결. **확증 데이터**: gh run view 24728578200 jobs JSON — Step 6/7(shared-contracts/shared build) success, Step 8(api build) failure, Step 9 skipped. **Out-of-scope**: F569 harness-kit 표준화 완결, deploy-gate-x 복구(dormant 해소는 별건), turbo 경유 전환(cache 스코프 검증 필요) (FX-REQ-631, P1) | — | PLANNED | S309 등록. msa-lint PR blocking 해소 최우선 |
 <!-- /fx-task-orchestrator-backlog -->
 
 ## §6 Sprint 실행 계획 (아카이브)
