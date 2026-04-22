@@ -8,6 +8,7 @@ import type { DiscoveryEnv } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 import { DiscoveryStageService } from "../services/discovery-stage.service.js";
 import { UpdateDiscoveryStageSchema } from "../schemas/discovery-stage.js";
+import { StagePublisher } from "../events/stage-publisher.js";
 
 export const discoveryStagesRoute = new Hono<{ Bindings: DiscoveryEnv; Variables: TenantVariables }>();
 
@@ -33,5 +34,10 @@ discoveryStagesRoute.post("/biz-items/:id/discovery-stage", async (c) => {
 
   const svc = new DiscoveryStageService(c.env.DB);
   const result = await svc.updateStage(bizItemId, orgId, parsed.data.stage, parsed.data.status);
+
+  // F568: stage 변경 이벤트 발행 (fire-and-forget — 실패해도 응답에 영향 없음)
+  const publisher = new StagePublisher(c.env.DB);
+  void publisher.publishIfComplete(bizItemId, orgId, null, parsed.data.stage);
+
   return c.json(result);
 });
