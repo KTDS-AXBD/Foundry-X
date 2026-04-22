@@ -59,7 +59,8 @@ spec_f_items=$(grep -E "^\| F[0-9]{3,}" "$SPEC_FILE" | \
   grep -oE "\bF[0-9]{3,}\b" | \
   sort -u || true)
 
-spec_count=$(echo "$spec_f_items" | grep -c "." 2>/dev/null || echo 0)
+spec_count=$(echo "$spec_f_items" | grep -c "[A-Z]" 2>/dev/null || echo "0")
+spec_count="${spec_count%%[^0-9]*}"
 log_info "SPEC §5 등록 F-item: ${spec_count}개"
 
 # Step 3: git commit F-item 번호 추출
@@ -67,17 +68,20 @@ commit_f_items=""
 if [ -n "$MOCK_GIT_LOG" ] && [ -f "$MOCK_GIT_LOG" ]; then
   commit_f_items=$(grep -oE "\bF[0-9]{3,}\b" "$MOCK_GIT_LOG" | sort -u || true)
 elif [ -n "$SINCE_DATE" ]; then
-  commit_f_items=$(git log --since="$SINCE_DATE" --format="%s %b" 2>/dev/null | \
+  # Subject만 스캔 — body에는 테스트/문서 설명에 F-번호가 포함될 수 있음
+  commit_f_items=$(git log --since="$SINCE_DATE" --format="%s" 2>/dev/null | \
     grep -oE "\bF[0-9]{3,}\b" | sort -u || true)
 else
-  commit_f_items=$(git log "$COMMIT_RANGE" --format="%s %b" 2>/dev/null | \
+  # Subject만 스캔 — body에는 테스트/문서 설명에 F-번호가 포함될 수 있음
+  commit_f_items=$(git log "$COMMIT_RANGE" --format="%s" 2>/dev/null | \
     grep -oE "\bF[0-9]{3,}\b" | sort -u || true)
 fi
 
-commit_count=$(echo "$commit_f_items" | grep -c "." 2>/dev/null || echo 0)
+commit_count=$(echo "$commit_f_items" | grep -c "[A-Z]" 2>/dev/null || echo "0")
+commit_count="${commit_count%%[^0-9]*}"
 log_info "커밋 참조 F-item: ${commit_count}개"
 
-if [ -z "$commit_f_items" ] || [ "$commit_count" -eq 0 ]; then
+if [ -z "$commit_f_items" ] || [ "${commit_count:-0}" -eq 0 ]; then
   log_skip "커밋에서 F-item 참조 없음 — drift 없음"
   echo ""
   log_pass "SDD Drift: 0건 (PASS)"
@@ -93,7 +97,8 @@ while IFS= read -r fnum; do
   fi
 done <<< "$commit_f_items"
 
-drift_count=$(printf "%b" "$drift_items" | grep -c "." 2>/dev/null || echo 0)
+drift_count=$(printf "%b" "$drift_items" | grep -c "[A-Z]" 2>/dev/null || echo "0")
+drift_count="${drift_count%%[^0-9]*}"
 
 # Step 5: 결과 출력
 echo ""
