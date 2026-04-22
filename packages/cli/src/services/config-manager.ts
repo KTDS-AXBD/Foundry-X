@@ -7,6 +7,7 @@ const CONFIG_FILE = 'config.json';
 
 const DEFAULT_PLUMB_TIMEOUT = 30_000;
 const DEFAULT_PYTHON_PATH = 'python3';
+const DEFAULT_API_URL = 'https://fx-gateway.ktds-axbd.workers.dev';
 
 export class ConfigManager {
   private readonly dirPath: string;
@@ -51,6 +52,7 @@ export class ConfigManager {
       template,
       mode,
       repoProfile,
+      apiUrl: DEFAULT_API_URL,
       plumb: {
         timeout: DEFAULT_PLUMB_TIMEOUT,
         pythonPath: DEFAULT_PYTHON_PATH,

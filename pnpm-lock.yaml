@@ -142,6 +142,9 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^0.36.3
         version: 0.36.3
+      '@foundry-x/harness-kit':
+        specifier: workspace:*
+        version: link:../harness-kit
       '@foundry-x/shared':
         specifier: workspace:*
         version: link:../shared
@@ -192,6 +195,9 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^0.36.3
         version: 0.36.3
+      '@foundry-x/harness-kit':
+        specifier: workspace:*
+        version: link:../harness-kit
       '@foundry-x/shared':
         specifier: workspace:*
         version: link:../shared
@@ -229,6 +235,9 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^0.36.3
         version: 0.36.3
+      '@foundry-x/harness-kit':
+        specifier: workspace:*
+        version: link:../harness-kit
       '@foundry-x/shared':
         specifier: workspace:*
         version: link:../shared

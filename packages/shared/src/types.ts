@@ -192,6 +192,8 @@ export interface FoundryXConfig {
   template: string;
   mode: RepoMode;
   repoProfile: RepoProfile;
+  /** F564: fx-gateway 단일 진입점 URL. 미설정 시 fx-gateway 기본값 사용 */
+  apiUrl?: string;
   plumb: {
     timeout: number;
     pythonPath: string;
