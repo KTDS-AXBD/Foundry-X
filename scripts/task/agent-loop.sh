@@ -121,15 +121,6 @@ mark_started() {
 
 # ─── Ensure daemons running ───────────────────────────────────────────────
 ensure_daemons() {
-  # Monitor
-  if ! [ -f /tmp/task-signals/.monitor.pid ] || ! kill -0 "$(cat /tmp/task-signals/.monitor.pid 2>/dev/null)" 2>/dev/null; then
-    nohup bash "$REPO_ROOT/scripts/task/task-monitor.sh" --interval 30 \
-      > "/tmp/task-signals/monitor-$(_project_name).log" 2>&1 &
-    echo $! > /tmp/task-signals/.monitor.pid
-    disown
-    log_loop "monitor 재시작 (PID $!)"
-  fi
-
   # Watch
   if ! [ -f /tmp/task-signals/.watch.pid ] || ! kill -0 "$(cat /tmp/task-signals/.watch.pid 2>/dev/null)" 2>/dev/null; then
     nohup bash "$REPO_ROOT/scripts/task/task-watch.sh" --interval 20 \

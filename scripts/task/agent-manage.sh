@@ -156,18 +156,6 @@ health_check() {
   local issues=0
 
   # 1. Daemon health
-  if ! [ -f /tmp/task-signals/.monitor.pid ] || ! kill -0 "$(cat /tmp/task-signals/.monitor.pid)" 2>/dev/null; then
-    echo "  ❌ task-monitor 중단 — 재시작 중..."
-    nohup bash "$REPO_ROOT/scripts/task/task-monitor.sh" --interval 30 \
-      > "/tmp/task-signals/monitor-${PROJECT}.log" 2>&1 &
-    echo $! > /tmp/task-signals/.monitor.pid
-    disown
-    echo "  ✅ task-monitor 재시작 (PID $(cat /tmp/task-signals/.monitor.pid))"
-    issues=$((issues + 1))
-  else
-    echo "  ✅ task-monitor 정상 (PID $(cat /tmp/task-signals/.monitor.pid))"
-  fi
-
   if ! [ -f /tmp/task-signals/.watch.pid ] || ! kill -0 "$(cat /tmp/task-signals/.watch.pid)" 2>/dev/null; then
     echo "  ❌ task-watch 중단 — 재시작 중..."
     nohup bash "$REPO_ROOT/scripts/task/task-watch.sh" --interval 20 \
