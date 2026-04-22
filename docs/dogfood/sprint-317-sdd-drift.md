@@ -13,7 +13,7 @@ date: 2026-04-22
 
 | # | 항목 | 결과 |
 |---|------|------|
-| P1 | 실전 Dogfood — 본 PR CI에서 sdd-drift-check job 실행 PASS | ✅ 로컬 dogfood PASS (PR CI 실행 후 URL 추가 예정) |
+| P1 | 실전 Dogfood — 본 PR CI에서 sdd-drift-check job 실행 PASS | ✅ Run [24775670115](https://github.com/KTDS-AXBD/Foundry-X/actions/runs/24775670115) — `SDD Triangle Drift Check (F565)` completed:success 7s |
 | P2 | 실측 — (a) 현 PR drift=0 PASS, (b) 고의 drift FAIL 확증 | ✅ (a) exit 0, (b) F999 주입 → exit 1 |
 | P3 | 증거 — CI run URL + weekly report artifact sample | ✅ drift-report-20260422.md 생성 확인 (PASS 0건) |
 | P4 | 회고 — Gap 7 해소 기록 + drift-check 민감도 관찰 | ✅ 아래 참조 |
@@ -60,8 +60,9 @@ commit body는 자유 텍스트이므로 false positive를 유발할 수 있다.
 
 ## 관련 PR
 
-- Sprint 317 PR: (CI 실행 후 URL 추가)
-- 참조: C98/C81 scope drift check (scripts/preflight/check-scope-drift.sh)
+- Sprint 317 PR: [#684](https://github.com/KTDS-AXBD/Foundry-X/pull/684) (`7af56897`, Match 100%, MERGED 2026-04-22 11:25 UTC)
+- Weekly report workflow: `.github/workflows/sdd-drift-report.yml` (cron `0 0 * * 1` 월요일 09:00 KST)
+- 참조: C98/C81 scope drift check (scripts/preflight/check-scope-drift.sh) — 상호 보완: C98은 Sprint 내 scope 경계, F565는 SPEC↔커밋 SDD 경계
 
 ## 다음 단계
 
