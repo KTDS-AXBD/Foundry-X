@@ -21,6 +21,7 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter '@foundry-x/gate-x...' build
       - run: pnpm --filter @foundry-x/gate-x typecheck
       - run: pnpm --filter @foundry-x/gate-x test
 
