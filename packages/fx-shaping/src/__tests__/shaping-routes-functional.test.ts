@@ -10,8 +10,8 @@ function createTestApp(db: AnyDb) {
   const app = new Hono();
   app.use("*", async (c, next) => {
     (c as any).env = { DB: db };
-    c.set("orgId" as any, "org_test");
-    c.set("userId" as any, "user-test");
+    c.set("orgId" as never, "org_test" as never);
+    c.set("userId" as never, "user-test" as never);
     await next();
   });
   app.route("/api", shapingRoute);
