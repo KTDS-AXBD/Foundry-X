@@ -1,6 +1,7 @@
 // fx-discovery app (F518: FX-REQ-546, F523: FX-REQ-551)
 // F538: 3개 clean route 추가 (discovery, discovery-report, discovery-reports)
 // F539c: 7 라우트 추가 (biz-items 3 + discovery-stages 2 + discovery-pipeline GET 2)
+import "hono/jwt"; // side-effect: augment ContextVariableMap with jwtPayload
 import { Hono } from "hono";
 import type { DiscoveryEnv } from "./env.js";
 import { authMiddleware } from "./middleware/auth.js";
