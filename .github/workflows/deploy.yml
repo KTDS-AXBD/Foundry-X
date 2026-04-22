@@ -179,6 +179,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @foundry-x/shared-contracts build
       - run: pnpm --filter @foundry-x/shared build
+      - run: pnpm --filter @foundry-x/harness-kit build
       - name: Secret Preflight Check (C83)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
