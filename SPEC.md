@@ -1,10 +1,10 @@
 ---
 code: FX-SPEC-001
 title: Foundry-X Project Specification
-version: 6.09
+version: 6.10
 status: Active
 category: SPEC
-system-version: Sprint 315 ✅ MERGED (F564 MVP M3 + F569 partial — Phase 45 Batch 1 완료, S309)
+system-version: Sprint 315 ✅ + C97 ✅ (C78 preflight 하드닝 — PR #676 MERGED, S309)
 created: 2026-03-16
 updated: 2026-04-22
 author: Sinclair Seo
@@ -310,7 +310,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | C74 | C | packages/* 모델 literal → SSOT 참조 (C72 B3~B6) (FX-REQ-597) | — | DONE | task orchestrator (PR #630, +39/-18) |
 | C75 | C | D1 격리 ESLint 룰 (C56 no-cross-domain-d1) (FX-REQ-598) | — | DONE | task orchestrator (PR #632, +333/-0) |
 | C76 | C | task-monitor SPEC DONE 마킹 복원 (daemon orphan gap) (FX-REQ-599) | — | DONE | task orchestrator |
-| C78 | C | MSA preflight 후속 — shared 선빌드 + wrangler check 개선 + CI workflow 통합 (FX-REQ-600) | — | PLANNED | task orchestrator |
+| C78 | C | MSA preflight 후속 — shared 선빌드 + wrangler check 개선 + CI workflow 통합 (FX-REQ-600) | — | → **C97 실행** | task orchestrator. S309 C97로 완결 (PR #676 `40ceec77` MERGED, +473/-0 7 files) — task orchestrator id-allocator가 C97 발급 (C78→C97 ID forward). 산출물: scripts/preflight/{lib.sh, check-lint.sh, check-wrangler-auth.sh, run-all.sh} + deploy.yml/deploy-gate-x.yml 통합 |
 | C79 | C | task-start auto-complete 이중 commit 개선 (C67 관찰 해소) (FX-REQ-601) | — | ✅ | S305 **완결** (2026-04-21). PR #652 merged (`d8c43fb6`) — `scripts/task/task-complete.sh` Step 2 분기 추가: `git add -u` + untracked filter add 이후 `git diff --cached --quiet` 체크하여 stage 비어있으면 `auto-commit skip` 로그만 출력하고 `chore(TASKID): auto-commit on task complete` 커밋 시도 생략. Red→Green TDD: `test-task-complete-empty.sh` Scenario 4 (C79 auto-commit skip marker assertion, 3 assertions PASS). 이중 PR 패턴(#593/#594, #644/#645 빈 squash) 차단. **자기 dogfood 관찰**: PR #652 자체는 수동 경로라 스크립트 dogfood 아님 — 다음 `/ax:task start` 경로에서 실측 필요 |
 | C80 | C | daemon post-merge cleanup gap — WT 자동 `git worktree remove` + signal 파일 archive + 로컬 브랜치 -d + tmux kill-session 일괄. 현재: Sprint 310/311 MERGED 후 WT/signal 잔존(2회 관찰), `phase_sprint_cleanup` 또는 `phase_sprint_signals` 후속 블록 부재. 해결: task-daemon `phase_post_merge_cleanup()` 신규 + STATUS=MERGED 진입 시 is_protected() 체크 후 정리. **F560/F573 Sprint 311 dogfood 관찰**에서 재발 (FX-REQ-617, P2) | — | PLANNED | task orchestrator. C76 mark_spec_done_row의 자매 문제 |
 | C81 | C | autopilot scope drift 감지 — SPEC F-item 범위 vs 실제 커밋 파일 변경 대조로 drift 자동 경고. Sprint 311 F560 dogfood에서 autopilot이 원 범위("core/discovery→fx-discovery 이동 + proxy 제거") 대신 ax-bd-* → fx-shaping 이전을 수행했으나 Match 95% 산출 — aligner가 Design을 실제 구현에 맞춰 역동기화했을 가능성. 해결: (a) Phase 5b(autopilot) scope-drift-check 훅 — SPEC F-item 비고 (a/b/c) 항목 vs `git diff --name-only` 경로 grep 대조, (b) drift ≥ 50% 시 autopilot 경고 + Gap Analysis 재실행. 근본 보강 방안 (FX-REQ-618, P2) | — | PLANNED | task orchestrator. F573 등록으로 1차 대응 완료, C81은 재발 방지 |
