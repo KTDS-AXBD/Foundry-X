@@ -1,0 +1,30 @@
+name: SDD Drift Weekly Report
+
+on:
+  schedule:
+    # 월요일 09:00 KST = UTC 00:00 Monday
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+jobs:
+  sdd-drift-report:
+    name: SDD Triangle Weekly Drift Report (F565)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate weekly drift report
+        run: |
+          SINCE_DATE="7 days ago" \
+          REPORT_MODE=true \
+          bash scripts/sdd/check-drift.sh || true
+
+      - name: Upload drift report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdd-drift-report-${{ github.run_id }}
+          path: drift-report-*.md
+          retention-days: 90
+          if-no-files-found: warn
