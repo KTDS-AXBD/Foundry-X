@@ -1,10 +1,10 @@
 ---
 code: FX-SPEC-001
 title: Foundry-X Project Specification
-version: 6.05
+version: 6.06
 status: Active
 category: SPEC
-system-version: Sprint 314 (F563 ✅ MERGED + C94 msa-lint harness-kit gap 등록, S309)
+system-version: Sprint 314 (C94 ✅ PR #670 MERGED + F569 scope 확장 turbo 전환 번들, S309)
 created: 2026-03-16
 updated: 2026-04-22
 author: Sinclair Seo
