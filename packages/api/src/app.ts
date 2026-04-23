@@ -18,7 +18,7 @@ import {
   validationTierRoute,
   // launch (Sprint 183)
   gtmCustomersRoute, gtmOutreachRoute, mvpTrackingRoute,
-  offeringPacksRoute, pipelineRoute, pipelineMonitoringRoute,
+  pipelineRoute, pipelineMonitoringRoute,
   pocRoute, shareLinksRoute,
 } from "./modules/index.js";
 // Core: discovery (S184), shaping (S184), offering (S184), agent (S184), harness (S184) — Phase 20-A
@@ -322,8 +322,7 @@ app.route("/api", decisionsRoute);
 // Sprint 215: 사업기획서 편집기 → F541: fx-offering이전 (F444)
 // Sprint 216: 사업기획서 내보내기 → F541: fx-offering이전 (F446)
 app.route("/api", gatePackageRoute);
-// Sprint 81: Offering Pack + MVP Tracking + IR Bottom-up (F236, F238, F240)
-app.route("/api", offeringPacksRoute);
+// Sprint 81: MVP Tracking + IR Bottom-up (F238, F240) → F570: offeringPacksRoute fx-offering 이관
 app.route("/api", mvpTrackingRoute);
 app.route("/api", irProposalsRoute);
 // Sprint 87: Admin bulk operations (F251)

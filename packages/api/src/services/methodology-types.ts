@@ -1,6 +1,7 @@
 /**
  * Sprint 60: 방법론 플러그인 인터페이스 (F193)
  * Sprint 59 F191에서 레지스트리로 통합 예정 — 선행 정의
+ * F570: core/offering/services/methodology-types → services/methodology-types (Sprint 318)
  */
 
 // ─── 공통 타입 ───

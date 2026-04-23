@@ -1,11 +1,12 @@
 /**
- * Sprint 81: Offering Pack Routes — Offering Pack 생성 + 번들 패키징 (F236)
+ * F570: Offering Pack 라우트 — api/modules/launch에서 fx-offering으로 이관 (Sprint 318)
+ * Sprint 81: Offering Pack + Offering Brief (F236, F293)
  */
 import { Hono } from "hono";
-import type { Env } from "../../../env.js";
-import type { TenantVariables } from "../../../middleware/tenant.js";
+import type { OfferingEnv } from "../env.js";
+import type { TenantVariables } from "../middleware/tenant.js";
 import { OfferingPackService } from "../services/offering-pack-service.js";
-import { OfferingBriefService } from "../../../core/offering/services/offering-brief-service.js";
+import { OfferingBriefService } from "../services/offering-brief-service.js";
 import {
   CreateOfferingPackSchema,
   CreatePackItemSchema,
@@ -13,9 +14,9 @@ import {
   CreatePackShareSchema,
   OfferingPackFilterSchema,
 } from "../schemas/offering-pack.schema.js";
-import { CreateOfferingBriefSchema, OfferingBriefFilterSchema } from "../../../core/offering/schemas/offering-brief.schema.js";
+import { CreateOfferingBriefSchema, OfferingBriefFilterSchema } from "../schemas/offering-brief.schema.js";
 
-export const offeringPacksRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
+export const offeringPacksRoute = new Hono<{ Bindings: OfferingEnv; Variables: TenantVariables }>();
 
 // POST /offering-packs — 생성 (draft)
 offeringPacksRoute.post("/offering-packs", async (c) => {
