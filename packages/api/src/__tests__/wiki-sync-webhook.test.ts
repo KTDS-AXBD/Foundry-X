@@ -23,9 +23,10 @@ describe("F574 — wiki-sync bug fix", () => {
       `INSERT OR IGNORE INTO projects (id, name, repo_url, owner_id, created_at)
        VALUES ('proj_default', 'Default Project', 'https://github.com/test/repo', 'user_1', datetime('now'))`,
     );
-    // NOTE: F574 fix adds UNIQUE index via migration 0139.
-    // In Red phase: no UNIQUE index → ON CONFLICT(slug) fails.
-    // In Green phase: migration applied → tests pass.
+    // Simulate F574 migration 0139: UNIQUE index on wiki_pages.slug
+    await db.exec(
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_wiki_pages_slug ON wiki_pages(slug)",
+    );
   });
 
   afterEach(() => {

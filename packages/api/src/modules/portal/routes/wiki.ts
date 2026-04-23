@@ -16,7 +16,7 @@ import { ErrorSchema, validationHook } from "../../../schemas/common.js";
 import { WikiSyncService } from "../services/wiki-sync.js";
 import { GitHubService } from "../services/github.js";
 
-const DEFAULT_PROJECT_ID = "default";
+const DEFAULT_PROJECT_ID = "proj_default";
 
 export const wikiRoute = new OpenAPIHono<{ Bindings: Env }>({
   defaultHook: validationHook as any,

@@ -50,7 +50,7 @@ export class WikiSyncService {
         await this.db
           .prepare(
             `INSERT INTO wiki_pages (id, project_id, slug, title, content, file_path, ownership_marker, updated_at)
-             VALUES (?, 'default', ?, ?, ?, ?, 'git', datetime('now'))
+             VALUES (?, 'proj_default', ?, ?, ?, ?, 'git', datetime('now'))
              ON CONFLICT(slug) DO UPDATE SET
                content = excluded.content,
                ownership_marker = 'git',
