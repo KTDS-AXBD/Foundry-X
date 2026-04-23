@@ -1,14 +1,14 @@
 ---
 code: FX-SPEC-001
 title: Foundry-X Project Specification
-version: 6.15
+version: 6.16
 status: Active
 category: SPEC
-system-version: Sprint 317 ✅ F565 MERGED (PR #684, Match 100%, S311) — Phase 45 Batch 3 1/4 완결
+system-version: Sprint 318 🔧 F570 착수 (S312) — Phase 45 Batch 4 Offering 완전 이관
 created: 2026-03-16
-updated: 2026-04-22
+updated: 2026-04-24
 author: Sinclair Seo
-sprint: 317
+sprint: 318
 ---
 
 # Foundry-X Project Specification
@@ -209,7 +209,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 | F567 | **Phase 45 · Multi-hop latency benchmark** — Gap 9 해소. 누적 latency 측정 + SLO 설정. 범위: (a) browser → fx-gateway → foundry-x-api → fx-discovery 3-hop 경로 k6 benchmark, (b) p50/p95/p99 측정 + 1-hop 대비 증분, (c) SLO p95 < 300ms 확정 + 미달 시 최적화 플랜, (d) Grafana 대시보드 등록 (FX-REQ-610, P1) | Sprint 316 | ✅ | **PR #678 MERGED** (S310, `3f426727`, Match 98%). F568 번들. k6 script + SLO p95 < 300ms 확정(F543 1-hop baseline 기반) + `docs/dogfood/sprint-316-latency.md` |
 | F568 | **Phase 45 · EventBus PoC (기술스택 선정 + 1 flow)** — Gap 10 해소. 비동기 파이프라인 가능성 확보. 범위: (a) D1 Event Table vs Cloudflare Queue vs Durable Object PoC 3종 비교, (b) 기술스택 최종 선정 + 의사결정 문서, (c) Discovery→Shaping 트리거 1 flow 구현, (d) 타임박스 2주 고정. 선행: F562 shared-contracts (FX-REQ-611, P1) | Sprint 316 | ✅ | **PR #678 MERGED** (S310). **D1 Event Table 선정** (3종 비교 후). `StagePublisher` + `DiscoveryTrigger` PoC + Discovery→Shaping FORMALIZATION 트리거 1 flow + `docs/specs/fx-eventbus/decision.md`. 83/83 tests PASS (fx-discovery 35 + fx-shaping 40 + k6 validation 8) |
 | F569 | **Phase 45 · harness-kit 표준화 (Workers scaffold + CI workflow turbo 경유 전환)** — Gap 11 해소. 새 Worker 생성 비용 절감 + CI drift 근본 방지. 범위: (a) `packages/harness-kit/` 공통 Workers scaffold(JWT/CORS/Error handler/EventBus client), (b) fx-gateway/fx-discovery/fx-shaping/fx-offering 4 Worker에 적용, (c) 버전관리 전략(npm publish vs workspace internal) 확정, (d) 신규 Worker 생성 템플릿 `scripts/new-worker.sh`, (e) **CI workflow turbo 경유 전환** — 6 workflow(msa-lint/deploy/deploy-gate-x/e2e 등) 17 step을 `turbo run build --filter=<pkg>` 1 step으로 정리. turbo.json `^build` dependsOn 이미 완비. (f) **Remote cache 도입 결정** — Vercel/Turbo Cloud 또는 self-host(S3). 선행 결정 필요. (g) workflow workspace dep 자동 해소로 S307 shared-contracts / S309 harness-kit 패턴 재발 차단. (FX-REQ-612, P2) | Sprint 315 | ✅(partial) | PRD §3-1 F569. 오픈 이슈 #4 해소. **S309 추가 scope** (2026-04-22): C94 msa-lint fix 후 turbo 전환 번들 결정(사용자 선택). PR #670 `pnpm --filter '...'` syntax로 증상 해소 후 ~2주 경과 관찰 → F569 본격 전환. **S309 Sprint 315 ✅(partial)** PR #673 MERGED (`85946b34`, Match 100%) — (a) `packages/harness-kit/__tests__/middleware/jwt.test.ts` 공통 JWT middleware + (b) fx-discovery/fx-shaping/fx-offering 3 Worker `src/middleware/auth.ts` 적용 + (d) `scripts/new-worker.sh` 템플릿. **잔여 scope**: (c) 버전관리 전략, (e) CI workflow turbo 전환, (f) Remote cache 도입 — 다음 Sprint에서 별도 처리 |
-| F570 | **Phase 45 · Offering 완전 이관** — F541 Walking Skeleton 후속. F541 partial(proxy 잔존) → 순수 이관 완결. F560 Discovery 패턴 재사용. 범위: (a) Offering 12 routes 순수 이관, (b) fx-gateway proxy 제거, (c) cross-domain import 전수 grep 0건, (d) Phase Exit P1~P4 (FX-REQ-613, P1) | Sprint 318 | 📋(groomed) | PRD §3-1 F570. F541 MERGED 이후 잔존분 처리. **S309 Sprint 316→318 재shift** — Batch 4 단독 |
+| F570 | **Phase 45 · Offering 완전 이관** — F541 Walking Skeleton 후속. F541 partial(proxy 잔존) → 순수 이관 완결. F560 Discovery 패턴 재사용. 범위: (a) Offering 12 routes 순수 이관 + `offeringPacksRoute`(Sprint 81 F236/F238/F240) + `core/offering/` + `__tests__/` offering 20+건 fx-offering 이동, (b) fx-gateway proxy 12줄(F541 명시 라우팅) 제거 + catch-all 단일화, (c) cross-domain import 전수 grep 0건 (`grep -rn "core/offering"` fx-*/packages/api 0건), (d) Phase Exit P1~P4 Smoke Reality (FX-REQ-613, P1) | Sprint 318 | 🔧(design) | PRD §3-1 F570. F541 MERGED 이후 잔존분 처리. **S312 착수** (2026-04-24) — Batch 4 단독, F560 SCOPE LOCKED 패턴 재사용. Fail criteria: cross-domain grep > 0 / Phase Exit 미충족 / offering proxy 잔존 모두 PR fail |
 | F571 | **Phase 45 · Agent 도메인 분리 (Walking Skeleton)** — 62 services — 가장 복잡. Phase 45 **마지막** 배치. 범위: (a) fx-agent Worker 신규 생성, (b) 15 routes 초기 이관(하위 도메인 분할 검토), (c) Service Binding 통합, (d) 리그레션 방지 사전 모듈화 + Feature Flag. 리스크 R2 (FX-REQ-614, P1) | Sprint 320 | 📋(groomed) | PRD §3-1 F571. 최고 리스크 도메인, 최후 배치. **S309 Sprint 318→320 재shift** — Batch 6 최후 단독 |
 | F572 | **Phase 45 · modules/portal·gate·launch 통합 분리** — modules 계열 3개(portal 19/23, gate 7/8, launch 8/14) 묶어서 한번에 분리. 범위: (a) fx-modules Worker(또는 3 분리) 아키텍처 결정, (b) 총 34 routes/45 services 이관, (c) 종속관계/병렬 작업 가능성 분석 선행, (d) 공통 auth 경로 통합 (FX-REQ-615, P2) | Sprint 319 | 📋(groomed) | PRD §3-1 F572. F571 직전 배치. **S309 Sprint 317→319 재shift** — Batch 5에 F574와 병렬 |
 | F573 | **Phase 45 · ax-bd-artifacts/discovery 경로 fx-shaping 이전** — Sprint 311 autopilot(F560 scope drift)에서 실제 수행된 작업을 사후 등록. 범위: (a) `core/discovery/routes/ax-bd-{artifacts,discovery}.ts` 7 routes → `packages/fx-shaping/src/routes/` 이동, (b) `discovery-x-ingest.service.ts` 신규, (c) fx-gateway에 discovery-stage-runner/graph/shape-pipeline 7개 MAIN_API 명시 라우팅 추가, (d) cross-domain import 0건 확증. 본 F-item은 F560 원 범위와 별개(ax-bd-* 경로는 Shaping 파이프라인의 일부) (FX-REQ-616, P2) | Sprint 311 | ✅ | **PR #640 MERGED** (2026-04-19, +677/-2, Match 95%). F560 scope drift 사후 분리 등록 |
