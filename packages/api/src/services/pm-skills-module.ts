@@ -6,7 +6,7 @@
 import type {
   MethodologyModule, ClassificationResult, AnalysisStepDefinition,
   CriterionDefinition, GateResult, ReviewMethod,
-} from "../core/offering/services/methodology-types.js";
+} from "./methodology-types.js";
 import { PM_SKILLS_CRITERIA, PmSkillsCriteriaService } from "../core/discovery/services/pm-skills-criteria.js";
 import {
   detectEntryPoint, buildAnalysisSteps, computeSkillScores,
@@ -87,7 +87,7 @@ export class PmSkillsModule implements MethodologyModule {
 
 // ─── 모듈 등록 (app 초기화 시 호출) ───
 
-import { registerMethodology } from "../core/offering/services/methodology-types.js";
+import { registerMethodology } from "./methodology-types.js";
 
 export function registerPmSkillsModule(): void {
   const module = new PmSkillsModule();

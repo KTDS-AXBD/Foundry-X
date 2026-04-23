@@ -17,6 +17,7 @@ import { bdpRoute } from "./routes/bdp.js";
 import { methodologyRoute } from "./routes/methodology.js";
 import { businessPlanRoute } from "./routes/business-plan.js";
 import { businessPlanExportRoute } from "./routes/business-plan-export.js";
+import { offeringPacksRoute } from "./routes/offering-packs.js";
 
 const app = new Hono<{ Bindings: OfferingEnv }>();
 
@@ -49,6 +50,8 @@ authenticated.route("/api", methodologyRoute);
 // Business plan
 authenticated.route("/api", businessPlanRoute);
 authenticated.route("/api", businessPlanExportRoute);
+// Offering Packs + Brief (F570: Sprint 81 F236/F293 — api/modules/launch 이관)
+authenticated.route("/api", offeringPacksRoute);
 
 app.route("/", authenticated);
 

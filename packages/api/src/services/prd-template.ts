@@ -1,10 +1,11 @@
 /**
  * Sprint 53: PRD 템플릿 + 매핑 로직 (F185)
  * 9기준 evidence + 분석 컨텍스트를 PRD 섹션에 매핑
+ * F570: core/offering/services/prd-template → services/prd-template (Sprint 318)
  */
 
-import type { DiscoveryCriterion } from "../../discovery/services/discovery-criteria.js";
-import type { AnalysisContext } from "../../discovery/services/analysis-context.js";
+import type { DiscoveryCriterion } from "../core/discovery/services/discovery-criteria.js";
+import type { AnalysisContext } from "../core/discovery/services/analysis-context.js";
 
 export const PRD_SECTIONS = [
   { section: 1, title: "요약 (Executive Summary)", criteriaSource: "all" as const, description: "전체 분석 결과를 1페이지 요약" },

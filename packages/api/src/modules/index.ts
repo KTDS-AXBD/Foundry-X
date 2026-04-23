@@ -19,9 +19,10 @@ export {
 } from "./gate/index.js";
 
 // Sprint 183: launch 모듈 (제품화/GTM → Launch-X)
+// F570: offeringPacksRoute → fx-offering 이관 (Sprint 318)
 export {
   gtmCustomersRoute, gtmOutreachRoute, mvpTrackingRoute,
-  offeringPacksRoute, pipelineRoute, pipelineMonitoringRoute,
+  pipelineRoute, pipelineMonitoringRoute,
   pocRoute, shareLinksRoute,
 } from "./launch/index.js";
 
