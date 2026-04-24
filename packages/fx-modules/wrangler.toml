@@ -1,0 +1,18 @@
+name = "fx-modules"
+account_id = "b6c06059b413892a92f150e5ca496236"
+main = "src/index.ts"
+compatibility_date = "2026-03-17"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+
+# D1 binding — shared with foundry-x-api (same DB)
+[[d1_databases]]
+binding = "DB"
+database_name = "foundry-x-db"
+database_id = "your-d1-database-id"
+
+# Local development
+[env.dev]
+name = "fx-modules-dev"

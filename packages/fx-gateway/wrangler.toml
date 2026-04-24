@@ -27,6 +27,11 @@ service = "fx-shaping"
 binding = "OFFERING"
 service = "fx-offering"
 
+# F572: Service Binding — Modules Worker (portal/gate/launch)
+[[services]]
+binding = "MODULES"
+service = "fx-modules"
+
 # Local development
 [env.dev]
 name = "fx-gateway-dev"
@@ -46,3 +51,7 @@ service = "fx-shaping-dev"
 [[env.dev.services]]
 binding = "OFFERING"
 service = "fx-offering-dev"
+
+[[env.dev.services]]
+binding = "MODULES"
+service = "fx-modules-dev"

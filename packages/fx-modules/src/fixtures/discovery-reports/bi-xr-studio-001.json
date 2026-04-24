@@ -1,0 +1,464 @@
+{
+  "version": "v2",
+  "bizItemId": "bi-xr-studio-001",
+  "bizItemTitle": "XR Exhibition Studio — AI 도슨트 VR 전시 플랫폼",
+  "typeCode": "P",
+  "subtitle": "AI 사업개발 2단계 발굴 리포트 — XR Exhibition Studio",
+  "tabs": {
+    "2-1": {
+      "stepNumber": "STEP 2-1",
+      "title": "레퍼런스 분석",
+      "engTitle": "Benchmark Deconstruction",
+      "subtitle": "XR 전시 시장의 글로벌 레퍼런스를 해체 분석한다",
+      "hitlVerified": true,
+      "tags": [
+        { "label": "XR·메타버스", "color": "purple" },
+        { "label": "AI 도슨트", "color": "blue" }
+      ],
+      "cards": [
+        {
+          "icon": "🔍",
+          "iconColor": "purple",
+          "title": "글로벌 XR 전시 레퍼런스 3-Layer",
+          "body": "Macro: Meta Quest 3 출시로 소비자 XR 진입 장벽 급감. VR 전시 관람 전 세계 연 2,300만 세션(Statista 2024). Meso: 박물관·갤러리·기업 전시관 세 섹터에서 '가상 전시' 도입 YoY +47%. Micro: 국내 문화예술 기관 312개 중 XR 도입 2%에 불과, AI 도슨트는 사실상 전무.",
+          "table": {
+            "headers": ["레이어", "핵심 동인", "기회"],
+            "rows": [
+              { "cells": ["Macro", "Meta Quest 3 대중화", "디바이스 보급 가속"] },
+              { "cells": ["Meso", "가상 전시 +47% YoY", "기업 전시관 디지털화"] },
+              { "cells": ["Micro", "국내 XR 도입 2%", "선점 공백 시장"] }
+            ]
+          }
+        },
+        {
+          "icon": "🏛️",
+          "iconColor": "blue",
+          "title": "경쟁사 비교",
+          "body": "국내 메타버스 플랫폼(ZEP·ifland)은 전시 특화 기능 없고 AI 도슨트 미지원. 해외 Matterport·Spatial.io는 3D 스캔 중심으로 AI 해설 없음. Cuseum(미국)이 가장 근접하나 국내 서비스 없음. 국내 AI 도슨트+XR 결합 서비스는 사실상 없음.",
+          "table": {
+            "headers": ["서비스", "강점", "AI 도슨트", "국내"],
+            "rows": [
+              { "cells": ["ZEP", "국내 인지도", "❌", "✅"] },
+              { "cells": ["Matterport", "3D 스캔 품질", "❌", "❌"] },
+              { "cells": ["Cuseum", "AI 도슨트", "✅", "❌"] },
+              { "cells": ["XR Studio (당사)", "AI 도슨트+XR 결합", "✅", "✅"] }
+            ]
+          }
+        },
+        {
+          "icon": "🎨",
+          "iconColor": "amber",
+          "title": "JTBD — 전시 담당자 핵심 3종",
+          "body": "① 학예사: 관람객이 전시 맥락을 깊게 이해하도록 돕고 싶다. ② 전시관 운영팀: 전시를 물리 공간 없이 전 세계에 배포하고 싶다. ③ 기업 마케팅: 제품 출시 행사를 몰입감 있는 가상 체험으로 전환하고 싶다.",
+          "table": {
+            "headers": ["JTBD", "현재", "Pain"],
+            "rows": [
+              { "cells": ["관람 이해도 향상", "인쇄 패널·오디오가이드", "콘텐츠 갱신 비용 높음 (7/10)"] },
+              { "cells": ["전 세계 배포", "유튜브 녹화본", "몰입감 없음 (8/10)"] },
+              { "cells": ["기업 체험 행사", "오프라인 팝업", "장소·비용 제약 (9/10)"] }
+            ]
+          }
+        }
+      ],
+      "insight": {
+        "title": "레퍼런스 분석 인사이트",
+        "items": [
+          "국내 AI 도슨트+XR 결합 서비스 공백 — 선점 타이밍 최적",
+          "기업 전시관(B2B)이 문화기관보다 예산 규모 크고 ROI 측정 용이",
+          "Cuseum 미국 시장 성공 사례가 국내 PMF 가능성 증명"
+        ]
+      }
+    },
+    "2-2": {
+      "stepNumber": "STEP 2-2",
+      "title": "수요 시장 검증",
+      "engTitle": "Market Size Validation",
+      "subtitle": "TAM-SAM-SOM 3단계로 공략 시장 규모를 확정한다",
+      "hitlVerified": true,
+      "tags": [
+        { "label": "TAM/SAM/SOM", "color": "purple" }
+      ],
+      "cards": [
+        {
+          "icon": "📊",
+          "iconColor": "purple",
+          "title": "TAM — 전체 가용 시장",
+          "metrics": [
+            { "value": "3.2조원", "label": "국내 XR·메타버스 시장 TAM (2025)", "color": "purple" },
+            { "value": "연 31%", "label": "CAGR (2024~2028)" },
+            { "value": "15,000개+", "label": "잠재 전시·체험 시설 수" }
+          ],
+          "body": "국내 XR 시장 전체(하드웨어·소프트웨어·서비스). 전시·체험 영역은 전체의 약 12% 추정."
+        },
+        {
+          "icon": "🎯",
+          "iconColor": "blue",
+          "title": "SAM — 공략 가능 시장",
+          "metrics": [
+            { "value": "892억원", "label": "SAM (2025)", "color": "blue" },
+            { "value": "1,200개", "label": "기업 전시관·박물관·갤러리" },
+            { "value": "40%", "label": "AI 도슨트 전환 의향" }
+          ],
+          "body": "기업 전시관(500개) + 국립·공립 박물관(350개) + 상업 갤러리(350개). 평균 계약 단가 5,000만원/년 가정."
+        },
+        {
+          "icon": "🚀",
+          "iconColor": "amber",
+          "title": "SOM — 실현 가능 시장",
+          "metrics": [
+            { "value": "27억원", "label": "Year-3 SOM 목표", "color": "amber" },
+            { "value": "54개", "label": "목표 고객 (ARR 5,000만/개)" },
+            { "value": "3%", "label": "SAM 점유율 목표" }
+          ],
+          "body": "기업 전시관 30개 + 문화기관 24개로 구성. 기업 전시관이 예산·속도 양면 유리."
+        }
+      ],
+      "chart": {
+        "type": "bar",
+        "labels": ["TAM", "SAM", "SOM (Year-3)"],
+        "datasets": [
+          {
+            "label": "시장 규모 (억원)",
+            "data": [32000, 892, 27],
+            "backgroundColor": ["#8b5cf640", "#3182f640", "#f59e0b40"]
+          }
+        ]
+      },
+      "insight": {
+        "title": "시장 검증 인사이트",
+        "items": [
+          "XR 전체 시장 성장률 31%로 빠르나, AI 도슨트 특화 SAM은 아직 형성 초기",
+          "기업 전시관 예산이 문화기관 3배 — 초기 세그먼트로 집중",
+          "SOM 27억원은 팀 8명 기준 흑자전환 가능한 규모"
+        ]
+      }
+    },
+    "2-3": {
+      "stepNumber": "STEP 2-3",
+      "title": "경쟁·자사 분석",
+      "engTitle": "Competitive & Internal Analysis",
+      "subtitle": "경쟁 구도와 자사 차별점을 명확히 한다",
+      "hitlVerified": false,
+      "tags": [
+        { "label": "차별화", "color": "blue" }
+      ],
+      "cards": [
+        {
+          "icon": "⚔️",
+          "iconColor": "blue",
+          "title": "경쟁 강도 요약",
+          "table": {
+            "headers": ["Force", "강도", "설명"],
+            "rows": [
+              { "cells": ["기존 경쟁", "낮음", "AI 도슨트+XR 결합 국내 전무"] },
+              { "cells": ["신규 진입", "중", "GPT API + Unity로 개인 개발자 진입 가능"] },
+              { "cells": ["구매자 교섭력", "중", "예산 사이클 연 1회, 장기 계약 선호"] },
+              { "cells": ["대체재", "높음", "유튜브 VR·360도 영상 무료 대체"] }
+            ]
+          }
+        },
+        {
+          "icon": "💡",
+          "iconColor": "purple",
+          "title": "자사 차별점",
+          "body": "① AI 도슨트가 관람객 질문에 실시간 답변 (GPT-4o + RAG, 전시 큐레이터 지식 베이스 내재화). ② Unity WebGL로 설치 없이 브라우저 접속 가능 — 마찰 제거. ③ 전시 콘텐츠 CMS로 학예사·마케터가 코딩 없이 갱신 가능. ④ 관람 데이터 분석(관람 경로, 체류 시간, 질문 로그) 제공.",
+          "metrics": [
+            { "value": "GPT-4o + RAG", "label": "AI 도슨트 엔진", "color": "purple" },
+            { "value": "설치 불필요", "label": "WebGL 배포", "color": "mint" },
+            { "value": "CMS 제공", "label": "코딩 없이 콘텐츠 갱신", "color": "blue" }
+          ]
+        }
+      ],
+      "insight": {
+        "title": "경쟁·자사 인사이트",
+        "items": [
+          "AI 도슨트+XR 결합 국내 공백 — 즉각 선점 가능",
+          "WebGL 브라우저 접속이 B2C 바이럴 경로 — QR코드 전시장 배포 전략 유효",
+          "유튜브 대체재 위협은 '실시간 대화' 기능으로 차별화"
+        ]
+      }
+    },
+    "2-4": {
+      "stepNumber": "STEP 2-4",
+      "title": "사업 아이템 도출",
+      "engTitle": "Business Opportunity Ideation",
+      "subtitle": "시장·역량 교차점에서 최적 아이템을 도출한다",
+      "hitlVerified": false,
+      "tags": [
+        { "label": "아이템 도출", "color": "blue" }
+      ],
+      "cards": [
+        {
+          "icon": "💡",
+          "iconColor": "blue",
+          "title": "아이템 후보",
+          "body": "① XR Studio B2B: 기업 전시관·신제품 발표회용 가상 체험 플랫폼 (초기 공략). ② XR Studio B2C: 미술관·박물관용 공개 전시 버전 (연간 구독). ③ XR Studio White-label: 이벤트 대행사·SI에 OEM 공급. 1순위: B2B 기업 전시관 — 예산·속도 최적.",
+          "table": {
+            "headers": ["안", "타겟", "시간", "선택"],
+            "rows": [
+              { "cells": ["① B2B 기업 전시관", "마케팅팀", "3개월 MVP", "1순위"], "highlight": true },
+              { "cells": ["② B2C 문화기관", "학예사", "5개월", "2순위"] },
+              { "cells": ["③ White-label", "이벤트 대행사", "6개월", "3순위"] }
+            ]
+          }
+        }
+      ],
+      "insight": {
+        "title": "아이템 도출 인사이트",
+        "items": [
+          "B2B 기업 전시관이 즉각 예산 결정 가능한 마케팅 예산 활용",
+          "White-label이 장기 스케일 아웃 경로 — MVP 이후 2단계 전략"
+        ]
+      }
+    },
+    "2-5": {
+      "stepNumber": "STEP 2-5",
+      "title": "핵심 아이템 선정 (Commit Gate)",
+      "engTitle": "Core Item Selection — Commit Gate",
+      "subtitle": "4문항 Commit Gate로 최종 판정을 내린다",
+      "hitlVerified": true,
+      "tags": [
+        { "label": "Commit Gate", "color": "amber" },
+        { "label": "Go (조건부)", "color": "amber" }
+      ],
+      "cards": [
+        {
+          "icon": "✅",
+          "iconColor": "amber",
+          "title": "Commit Gate 4문항",
+          "table": {
+            "headers": ["질문", "판정", "근거"],
+            "rows": [
+              { "cells": ["충분한 Pain?", "✅ YES", "기업 전시관 Pain 9/10, 오프라인 행사 비용 절감 요구"] },
+              { "cells": ["해결 가능?", "✅ YES", "GPT-4o + Unity WebGL 기술 스택 보유"] },
+              { "cells": ["시장 충분?", "⚠️ PARTIAL", "SAM 892억 확인, 단 AI 도슨트 WTP 검증 필요"] },
+              { "cells": ["지금 시작?", "✅ YES", "경쟁 공백 + XR 보급 가속화 타이밍"] }
+            ]
+          }
+        },
+        {
+          "icon": "🎯",
+          "iconColor": "amber",
+          "title": "최종 선정: XR Studio B2B",
+          "body": "3 YES + 1 PARTIAL → 조건부 GO. 조건: WTP 검증을 위한 파일럿 2개사 LOI 확보. MVP: 기업 전시관용 AI 도슨트 브라우저 VR, 3개월 개발.",
+          "metrics": [
+            { "value": "Go (조건부)", "label": "Commit Gate 판정", "color": "amber" },
+            { "value": "3 YES / 1 PARTIAL", "label": "문항 결과" },
+            { "value": "3개월 MVP", "label": "개발 기간" }
+          ]
+        }
+      ],
+      "insight": {
+        "title": "선정 인사이트",
+        "items": [
+          "WTP PARTIAL은 파일럿 전에 LOI로 보완 — 강도 낮은 조건",
+          "3개월 MVP가 빠른 시장 검증과 투자 Deck 동시 준비 가능"
+        ]
+      }
+    },
+    "2-6": {
+      "stepNumber": "STEP 2-6",
+      "title": "타겟 고객 정의",
+      "engTitle": "Target Customer Definition",
+      "subtitle": "초기 타겟 페르소나 3종을 정의한다",
+      "hitlVerified": false,
+      "tags": [
+        { "label": "페르소나", "color": "blue" }
+      ],
+      "cards": [
+        {
+          "icon": "👤",
+          "iconColor": "blue",
+          "title": "페르소나 A — 기업 마케팅 팀장 (챔피언)",
+          "body": "이름: 최수진 (가상). 연매출 5,000억 B2B 제조사 마케팅팀장. Pain: 신제품 발표 행사 1회 5,000만원, 참석자 200명 제한. 목표: 글로벌 파트너에게 동시 가상 체험 제공. WTP: 연 3,000만원 SaaS + 구축 1,500만원.",
+          "table": {
+            "headers": ["항목", "내용"],
+            "rows": [
+              { "cells": ["Pain 강도", "9/10 — 행사비 vs 글로벌 배포"] },
+              { "cells": ["예산 결정권", "3,000만원 이하 단독"] },
+              { "cells": ["성공 지표", "글로벌 체험 세션 수 + 리드 생성"] }
+            ]
+          }
+        },
+        {
+          "icon": "🏛️",
+          "iconColor": "purple",
+          "title": "페르소나 B — 박물관 학예사",
+          "body": "이름: 김예은 (가상). 국립현대미술관 교육팀 학예사. Pain: 전시 해설 자원봉사자 수 부족, 야간·온라인 관람 서비스 불가. WTP: 연 2,000만원 구독(교육 예산).",
+          "table": {
+            "headers": ["항목", "내용"],
+            "rows": [
+              { "cells": ["Pain 강도", "7/10 — 예산·인력 부족"] },
+              { "cells": ["예산 경로", "문화체육관광부 디지털 전환 지원금"] },
+              { "cells": ["성공 지표", "야간·온라인 관람객 수"] }
+            ]
+          }
+        },
+        {
+          "icon": "🎭",
+          "iconColor": "amber",
+          "title": "페르소나 C — 이벤트 대행사 PD",
+          "body": "이름: 박준혁 (가상). 연매출 30억 이벤트 대행사 PD. Pain: 클라이언트가 XR 체험 요구하는데 자체 기술 없음. White-label로 재판매 원함.",
+          "table": {
+            "headers": ["항목", "내용"],
+            "rows": [
+              { "cells": ["Pain 강도", "8/10 — 클라이언트 요구 미충족"] },
+              { "cells": ["거래 구조", "White-label 리셀러 (50% 마진)"] },
+              { "cells": ["성공 지표", "연 3건 이상 납품"] }
+            ]
+          }
+        }
+      ],
+      "insight": {
+        "title": "타겟 고객 인사이트",
+        "items": [
+          "기업 마케팅 팀장이 예산·Pain 양면 최적 — 초기 집중 타겟",
+          "이벤트 대행사 White-label이 영업 레버리지 최대화 경로",
+          "박물관 페르소나는 공공 지원금 경로 — 시간 길지만 장기 안정 고객"
+        ]
+      }
+    },
+    "2-7": {
+      "stepNumber": "STEP 2-7",
+      "title": "비즈니스 모델 정의",
+      "engTitle": "Business Model Definition",
+      "subtitle": "수익 구조와 Unit Economics를 확정한다",
+      "hitlVerified": false,
+      "tags": [
+        { "label": "SaaS + 구축", "color": "blue" }
+      ],
+      "cards": [
+        {
+          "icon": "💰",
+          "iconColor": "blue",
+          "title": "수익 모델",
+          "body": "① 구독 SaaS: 연 3,000만원/개사 (기업 전시관). ② 구축 서비스: 초기 1,500만원 (콘텐츠 임포트 + 커스터마이징). ③ White-label: 대행사 재판매 시 50% 레브쉐어. ④ 콘텐츠 팩: 추가 전시 1개당 200만원. Year-3: 구독 54사 + White-label 8사 = 27억 ARR.",
+          "table": {
+            "headers": ["수익원", "단가", "Year-3"],
+            "rows": [
+              { "cells": ["구독 (B2B)", "3,000만/년", "40사 → 12억"] },
+              { "cells": ["구독 (문화기관)", "2,000만/년", "14사 → 2.8억"] },
+              { "cells": ["구축 서비스", "1,500만/건", "20건 → 3억"] },
+              { "cells": ["White-label", "레브쉐어", "8사 → 4억"] },
+              { "cells": ["콘텐츠 팩", "200만/건", "추가 5.2억"] }
+            ]
+          }
+        },
+        {
+          "icon": "📐",
+          "iconColor": "mint",
+          "title": "Unit Economics",
+          "table": {
+            "headers": ["지표", "값", "비고"],
+            "rows": [
+              { "cells": ["ACV", "3,000만원/년", "B2B 구독 기준"] },
+              { "cells": ["CAC", "800만원", "인바운드 + 이벤트 마케팅"] },
+              { "cells": ["LTV", "9,000만원", "3년 유지 가정"] },
+              { "cells": ["LTV/CAC", "11.3x", "양호 (>3x)"] },
+              { "cells": ["Gross Margin", "78%", "클라우드·AI API 비용 제외"] }
+            ]
+          }
+        }
+      ],
+      "insight": {
+        "title": "BM 인사이트",
+        "items": [
+          "LTV/CAC 11.3x로 KOAMI 대비 더 높은 SaaS 효율",
+          "구축 서비스가 초기 현금 흐름을 보완 — 수익 혼합 모델이 리스크 분산",
+          "White-label 경로가 추가 팀원 없이 매출 확장 가능한 레버"
+        ]
+      }
+    },
+    "2-8": {
+      "stepNumber": "STEP 2-8",
+      "title": "발굴 결과 패키징",
+      "engTitle": "Discovery Packaging",
+      "subtitle": "5문장 요약과 검증 실험으로 결과를 패키징한다",
+      "hitlVerified": false,
+      "tags": [
+        { "label": "패키징", "color": "red" }
+      ],
+      "cards": [
+        {
+          "icon": "📋",
+          "iconColor": "red",
+          "title": "Executive Summary (5문장)",
+          "body": "① 문제: 기업 전시관과 문화기관은 오프라인 행사 비용·접근성 한계로 글로벌 관람객을 확보하지 못하고 있다. ② 솔루션: XR Exhibition Studio는 AI 도슨트가 탑재된 브라우저 기반 VR 전시를 3개월 MVP로 제공한다. ③ 시장: 국내 AI 도슨트+XR 결합 서비스 공백, SAM 892억원 연 31% 성장. ④ Why Us: 국내 유일 AI 도슨트+WebGL 결합 — 설치 없는 브라우저 접속이 바이럴 경로. ⑤ BM: 구독+구축 혼합, Year-3 ARR 27억원, LTV/CAC 11.3x."
+        },
+        {
+          "icon": "🧪",
+          "iconColor": "amber",
+          "title": "검증 실험 계획",
+          "table": {
+            "headers": ["가설", "실험", "기간", "성공 기준"],
+            "rows": [
+              { "cells": ["WTP 3,000만원 확인", "파일럿 2개사 LOI → 유료 계약 전환", "4주", "LOI 2개사 → 계약 1개사"] },
+              { "cells": ["브라우저 성능 검증", "QR코드 현장 배포 50명 테스트", "2주", "로딩 5초 이내 90%"] },
+              { "cells": ["AI 도슨트 만족도", "관람 후 NPS 조사", "4주", "NPS 50 이상"] },
+              { "cells": ["콘텐츠 갱신 용이성", "학예사 CMS 자가 갱신 테스트", "2주", "1시간 이내 갱신 가능"] }
+            ]
+          }
+        }
+      ],
+      "insight": {
+        "title": "패키징 인사이트",
+        "items": [
+          "WTP 검증이 Commit Gate PARTIAL 조건 해소의 핵심 — 최우선 실험",
+          "NPS 50+ 확보 시 문화체육관광부 공모사업 지원 가능",
+          "4주 내 LOI 확보 → 3개월 MVP 착수 → 시리즈 A Deck 준비 타이밍 최적"
+        ]
+      }
+    },
+    "2-9": {
+      "stepNumber": "STEP 2-9",
+      "title": "AI 멀티 페르소나 사전 평가",
+      "engTitle": "AI Multi-Persona Pre-Evaluation",
+      "subtitle": "내부 AI 페르소나 4명의 독립 평가 결과를 집계한다",
+      "hitlVerified": false,
+      "tags": [
+        { "label": "AI 평가", "color": "purple" }
+      ],
+      "cards": [
+        {
+          "icon": "🤖",
+          "iconColor": "purple",
+          "title": "페르소나 평가 결과",
+          "table": {
+            "headers": ["페르소나", "역할", "판정", "코멘트"],
+            "rows": [
+              { "cells": ["TA (기술 아키텍트)", "기술 타당성", "Go", "Unity WebGL + GPT-4o 결합 구현 검증됨. 브라우저 성능 최적화 필요."] },
+              { "cells": ["CA (클라우드 아키텍트)", "인프라", "Go", "CDN + WebGL 배포로 글로벌 지연 해소 가능. AWS CloudFront 사용."] },
+              { "cells": ["DA (데이터 아키텍트)", "데이터 품질", "Go", "관람 로그 수집 설계 완료. GDPR 준수 필요."] },
+              { "cells": ["QA (품질 보증)", "위험도", "Hold", "AI 도슨트 답변 품질 보장 어려움. RAG 지식베이스 품질 관리 프로세스 필요."] }
+            ]
+          }
+        },
+        {
+          "icon": "⚖️",
+          "iconColor": "purple",
+          "title": "합의 결론",
+          "body": "3 Go / 1 Hold → 조건부 GO. QA Hold 조건: RAG 지식베이스 품질 검증 프로세스 수립 + 파일럿에서 AI 답변 오류율 < 5% 확인. 조건 달성 시 Full GO.",
+          "metrics": [
+            { "value": "3 Go / 1 Hold", "label": "페르소나 판정" },
+            { "value": "Go (조건부)", "label": "최종 합의", "color": "purple" },
+            { "value": "AI 오류율 <5%", "label": "QA 조건" }
+          ]
+        }
+      ],
+      "insight": {
+        "title": "AI 평가 인사이트",
+        "items": [
+          "QA Hold는 기술 실행 가능성이 아닌 품질 보증 프로세스 미비 — 관리 절차로 해소 가능",
+          "관람 데이터 수집 시 GDPR·PIPA 준수 설계 선행 필요",
+          "파일럿 결과로 AI 오류율 < 5% 달성 시 B2C·공공 확장 근거 확보"
+        ]
+      }
+    }
+  },
+  "summary": {
+    "executiveSummary": "XR Exhibition Studio는 기업 전시관과 문화기관의 오프라인 행사 비용·접근성 한계를 AI 도슨트 탑재 브라우저 VR로 해결한다. 국내 AI 도슨트+XR 결합 서비스 공백에서 선점 기회가 존재하며 SAM 892억원 시장이 연 31% 성장 중이다. 기업 마케팅 팀장 Pain 9/10, WTP 3,000만원/년이 확인되었으며 Commit Gate 3 YES + 1 PARTIAL로 조건부 GO 판정을 받았다. AI 멀티 페르소나 평가에서도 3 Go + 1 Hold(QA 품질 조건)로 기술 실행 가능성이 확인되었다. LOI 2개사 확보 후 3개월 MVP를 착수하여 WTP와 품질 조건을 동시에 검증한다.",
+    "trafficLight": "yellow",
+    "goHoldDrop": "Go",
+    "recommendation": "파일럿 2개사 LOI를 4주 내 확보하고 WTP 3,000만원 유효성을 계약으로 검증하라. RAG 지식베이스 품질 관리 프로세스(편집-검토-승인 플로우)를 MVP 개발과 병행 수립하라. AI 도슨트 답변 오류율 < 5% 달성 시 문화기관·공공 확장 세그먼트로 전진하라."
+  }
+}
