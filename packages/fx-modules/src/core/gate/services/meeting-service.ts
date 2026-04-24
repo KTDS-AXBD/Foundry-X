@@ -165,7 +165,7 @@ export class MeetingService {
   }
 
   private mapRow(r: Record<string, unknown>): Meeting {
-    let attendees: string[] = [];
+    let attendees: string[];
     try {
       attendees = JSON.parse(r.attendees as string) as string[];
     } catch {

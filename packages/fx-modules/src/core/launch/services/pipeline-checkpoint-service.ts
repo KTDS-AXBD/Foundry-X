@@ -3,7 +3,7 @@
  */
 import { PipelineStateMachine } from "./pipeline-state-machine.js";
 import type { CheckpointDecision } from "../../../core/discovery/schemas/discovery-pipeline.js";
-import { CHECKPOINT_STEPS, COMMIT_GATE_STEP } from "../../../core/discovery/schemas/discovery-pipeline.js";
+import { CHECKPOINT_STEPS } from "../../../core/discovery/schemas/discovery-pipeline.js";
 
 interface CheckpointRow {
   id: string;

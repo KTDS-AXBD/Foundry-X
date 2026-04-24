@@ -2,7 +2,6 @@ import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { OrgService, OrgError } from "../services/org.js";
 import { tenantGuard } from "../../../middleware/tenant.js";
-import { roleGuard } from "../../../middleware/role-guard.js";
 import type { JwtPayload } from "../../../middleware/auth.js";
 import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";

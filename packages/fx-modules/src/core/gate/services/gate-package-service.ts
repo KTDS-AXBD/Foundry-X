@@ -146,7 +146,7 @@ export class GatePackageService {
   }
 
   private mapRow(r: Record<string, unknown>): GatePackage {
-    let items: GatePackageItem[] = [];
+    let items: GatePackageItem[];
     try {
       items = JSON.parse(r.items as string) as GatePackageItem[];
     } catch {
