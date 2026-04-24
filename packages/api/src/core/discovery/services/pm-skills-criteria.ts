@@ -3,7 +3,7 @@
  * BDP 9기준(DiscoveryCriteriaService)과 독립적인 pm-skills 전용 12기준
  */
 
-import type { CriterionDefinition, GateResult } from "../../offering/services/methodology-types.js";
+import type { CriterionDefinition, GateResult } from "../../../services/methodology-types.js";
 
 // ─── 12 기준 정의 ───
 

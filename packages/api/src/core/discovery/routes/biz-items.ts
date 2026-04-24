@@ -23,7 +23,7 @@ import { savePrdPersonaEvaluations, getPrdPersonaEvaluations } from "../../shapi
 // Sprint 53 imports (F183, F184, F185)
 import { DiscoveryCriteriaService } from "../services/discovery-criteria.js";
 import { AnalysisContextService } from "../services/analysis-context.js";
-import { PrdGeneratorService } from "../../offering/services/prd-generator.js";
+import { PrdGeneratorService } from "../../../services/prd-generator.js";
 import { UpdateCriterionSchema } from "../schemas/discovery-criteria.js";
 import { SaveAnalysisContextSchema } from "../../../schemas/analysis-context.js";
 import { GeneratePrdSchema } from "../../offering/schemas/prd.js";

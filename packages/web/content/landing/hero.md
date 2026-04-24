@@ -12,7 +12,7 @@ stats:
     label: "AI 에이전트"
   - value: "63"
     label: "자동화 스킬"
-  - value: "317"
+  - value: "318"
     label: "Sprints"
 ---
 

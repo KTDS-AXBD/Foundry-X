@@ -12,13 +12,7 @@ export {
 
 // Shaping — F540: fx-shaping Worker로 이전 (exports 제거됨)
 
-// Offering Pipeline — 12 routes (Sprint 216: businessPlanExportRoute 추가)
-export {
-  offeringsRoute, offeringSectionsRoute, offeringExportRoute,
-  offeringValidateRoute, offeringMetricsRoute, offeringPrototypeRoute,
-  designTokensRoute, contentAdapterRoute, bdpRoute, methodologyRoute,
-  businessPlanRoute, businessPlanExportRoute,
-} from "./offering/index.js";
+// Offering Pipeline — F541: 전체 fx-offering Worker로 이전 완료 (F570: offeringPacksRoute 포함)
 
 // Agent/Orchestration — 13 routes + F529 streaming
 export {
