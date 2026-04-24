@@ -190,6 +190,43 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/debug@4.1.13)(@types/node@20.19.37)(jiti@2.6.1)(jsdom@29.0.0(@noble/hashes@1.8.0))(lightningcss@1.32.0)(msw@2.12.12(@types/node@20.19.37)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.2)
 
+  packages/fx-modules:
+    dependencies:
+      '@foundry-x/harness-kit':
+        specifier: workspace:*
+        version: link:../harness-kit
+      '@foundry-x/shared':
+        specifier: workspace:*
+        version: link:../shared
+      '@foundry-x/shared-contracts':
+        specifier: workspace:*
+        version: link:../shared-contracts
+      '@hono/zod-openapi':
+        specifier: ^0.9.0
+        version: 0.9.10(hono@4.12.8)(zod@3.25.76)
+      drizzle-orm:
+        specifier: ^0.31.2
+        version: 0.31.4(@cloudflare/workers-types@4.20260316.1)(@opentelemetry/api@1.9.1)(@types/better-sqlite3@7.6.13)(@types/react@18.3.28)(better-sqlite3@12.8.0)(react@18.3.1)
+      hono:
+        specifier: ^4.0.0
+        version: 4.12.8
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20241218.0
+        version: 4.20260316.1
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.37
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/debug@4.1.13)(@types/node@20.19.37)(jiti@2.6.1)(jsdom@29.0.0(@noble/hashes@1.8.0))(lightningcss@1.32.0)(msw@2.12.12(@types/node@20.19.37)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.2)
+
   packages/fx-offering:
     dependencies:
       '@anthropic-ai/sdk':
@@ -5202,6 +5239,95 @@ packages:
   drizzle-kit@0.24.2:
     resolution: {integrity: sha512-nXOaTSFiuIaTMhS8WJC2d4EBeIcN9OSt2A2cyFbQYBAZbi7lRsVGJNqDpEwPqYfJz38yxbY/UtbvBBahBfnExQ==}
     hasBin: true
+
+  drizzle-orm@0.31.4:
+    resolution: {integrity: sha512-VGD9SH9aStF2z4QOTnVlVX/WghV/EnuEzTmsH3fSVp2E4fFgc8jl3viQrS/XUJx1ekW4rVVLJMH42SfGQdjX3Q==}
+    peerDependencies:
+      '@aws-sdk/client-rds-data': '>=3'
+      '@cloudflare/workers-types': '>=3'
+      '@electric-sql/pglite': '>=0.1.1'
+      '@libsql/client': '*'
+      '@neondatabase/serverless': '>=0.1'
+      '@op-engineering/op-sqlite': '>=2'
+      '@opentelemetry/api': ^1.4.1
+      '@planetscale/database': '>=1'
+      '@prisma/client': '*'
+      '@tidbcloud/serverless': '*'
+      '@types/better-sqlite3': '*'
+      '@types/pg': '*'
+      '@types/react': '>=18'
+      '@types/sql.js': '*'
+      '@vercel/postgres': '>=0.8.0'
+      '@xata.io/client': '*'
+      better-sqlite3: '>=7'
+      bun-types: '*'
+      expo-sqlite: '>=13.2.0'
+      knex: '*'
+      kysely: '*'
+      mysql2: '>=2'
+      pg: '>=8'
+      postgres: '>=3'
+      prisma: '*'
+      react: '>=18'
+      sql.js: '>=1'
+      sqlite3: '>=5'
+    peerDependenciesMeta:
+      '@aws-sdk/client-rds-data':
+        optional: true
+      '@cloudflare/workers-types':
+        optional: true
+      '@electric-sql/pglite':
+        optional: true
+      '@libsql/client':
+        optional: true
+      '@neondatabase/serverless':
+        optional: true
+      '@op-engineering/op-sqlite':
+        optional: true
+      '@opentelemetry/api':
+        optional: true
+      '@planetscale/database':
+        optional: true
+      '@prisma/client':
+        optional: true
+      '@tidbcloud/serverless':
+        optional: true
+      '@types/better-sqlite3':
+        optional: true
+      '@types/pg':
+        optional: true
+      '@types/react':
+        optional: true
+      '@types/sql.js':
+        optional: true
+      '@vercel/postgres':
+        optional: true
+      '@xata.io/client':
+        optional: true
+      better-sqlite3:
+        optional: true
+      bun-types:
+        optional: true
+      expo-sqlite:
+        optional: true
+      knex:
+        optional: true
+      kysely:
+        optional: true
+      mysql2:
+        optional: true
+      pg:
+        optional: true
+      postgres:
+        optional: true
+      prisma:
+        optional: true
+      react:
+        optional: true
+      sql.js:
+        optional: true
+      sqlite3:
+        optional: true
 
   drizzle-orm@0.33.0:
     resolution: {integrity: sha512-SHy72R2Rdkz0LEq0PSG/IdvnT3nGiWuRk+2tXZQ90GVq/XQhpCzu/EFT3V2rox+w8MlkBQxifF8pCStNYnERfA==}
@@ -13982,6 +14108,15 @@ snapshots:
       esbuild-register: 3.6.0(esbuild@0.19.12)
     transitivePeerDependencies:
       - supports-color
+
+  drizzle-orm@0.31.4(@cloudflare/workers-types@4.20260316.1)(@opentelemetry/api@1.9.1)(@types/better-sqlite3@7.6.13)(@types/react@18.3.28)(better-sqlite3@12.8.0)(react@18.3.1):
+    optionalDependencies:
+      '@cloudflare/workers-types': 4.20260316.1
+      '@opentelemetry/api': 1.9.1
+      '@types/better-sqlite3': 7.6.13
+      '@types/react': 18.3.28
+      better-sqlite3: 12.8.0
+      react: 18.3.1
 
   drizzle-orm@0.33.0(@cloudflare/workers-types@4.20260316.1)(@opentelemetry/api@1.9.1)(@types/better-sqlite3@7.6.13)(@types/react@18.3.28)(better-sqlite3@12.8.0)(react@18.3.1):
     optionalDependencies:

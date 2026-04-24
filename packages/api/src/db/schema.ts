@@ -33,7 +33,7 @@ export const wikiPages = sqliteTable("wiki_pages", {
   projectId: text("project_id")
     .notNull()
     .references(() => projects.id),
-  slug: text("slug").notNull(),
+  slug: text("slug").notNull().unique(),
   title: text("title").notNull(),
   content: text("content").notNull(),
   filePath: text("file_path"),

@@ -131,6 +131,17 @@ app.all("/api/offering-packs/*", async (c) => {
 // F560: discovery-stage-runner/graph/shape-pipeline 명시 라우트 제거 (Sprint 311 scope drift 해소)
 // stage-runner(F571)/graph/shape-pipeline(F562)는 catch-all → MAIN_API로 처리됨
 
+// F572: portal/gate/launch → fx-modules Worker
+app.all("/api/portal/*", async (c) => {
+  return c.env.MODULES.fetch(c.req.raw);
+});
+app.all("/api/gate/*", async (c) => {
+  return c.env.MODULES.fetch(c.req.raw);
+});
+app.all("/api/launch/*", async (c) => {
+  return c.env.MODULES.fetch(c.req.raw);
+});
+
 // 그 외 모든 /api/* 요청은 MAIN_API로
 app.all("/api/*", async (c) => {
   return c.env.MAIN_API.fetch(c.req.raw);

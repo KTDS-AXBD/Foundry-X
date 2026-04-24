@@ -2,24 +2,10 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 import { cors } from "hono/cors";
 import { Toucan } from "toucan-js";
-// Modules: auth (S181), portal (S182), gate+launch (S183) — Phase 20-A
+// Modules: auth (S181) — portal/gate/launch moved to fx-modules (F572, Sprint 319)
 import {
   // auth (Sprint 181)
   authRoute, ssoRoute, tokenRoute, profileRoute, adminRoute,
-  // portal (Sprint 182)
-  orgRoute, orgSharedRoute, kpiRoute, metricsRoute, wikiRoute,
-  onboardingRoute, inboxRoute, notificationsRoute, npsRoute,
-  feedbackRoute, feedbackQueueRoute, slackRoute, githubRoute,
-  jiraRoute, webhookRoute, webhookRegistryRoute, webhookInboundRoute,
-  projectOverviewRoute, partySessionRoute, reconciliationRoute,
-  // gate (Sprint 183)
-  axBdEvaluationsRoute, decisionsRoute, evaluationReportRoute,
-  gatePackageRoute, teamReviewsRoute, validationMeetingsRoute,
-  validationTierRoute,
-  // launch (Sprint 183)
-  gtmCustomersRoute, gtmOutreachRoute, mvpTrackingRoute,
-  pipelineRoute, pipelineMonitoringRoute,
-  pocRoute, shareLinksRoute,
 } from "./modules/index.js";
 // Core: discovery (S184), shaping (S184), offering (S184), agent (S184), harness (S184) — Phase 20-A
 import {
@@ -154,64 +140,15 @@ app.route("/api", ssoRoute);
 // BFF Proxy routes (self-authenticated via Hub Token)
 app.route("/api", proxyRoute);
 
-// Webhook (public — HMAC-SHA256 서명으로 보호)
-app.route("/api", webhookRoute);
-
-// Webhook inbound (public — signature-verified)
-app.route("/api", webhookInboundRoute);
-
-// Slack (public — Slack 자체 서명으로 보호)
-app.route("/api", slackRoute);
-
 // Idea Portal Webhook (public — HMAC-SHA256 서명으로 보호)
 app.route("/api", ideaPortalWebhookRoute);
-
-// KPI track (public — 인증 선택적, 비로그인 사용자도 page_view 기록 가능)
-app.route("/api", kpiRoute);
 
 // F518: Work KG public routes (인증 불필요 — Roadmap/Changelog/KG 공개 조회)
 app.route("/api", workPublicRoute);
 
-// Org routes — auth middleware applied internally, tenantGuard selective per-route
-app.use("/api/orgs", authMiddleware);
-app.use("/api/orgs/*", authMiddleware);
-app.route("/api", orgRoute);
+// F572: webhook/slack/kpi/org/github → fx-modules (moved)
 
-// GitHub API (auth + tenant required)
-app.use("/api/github/*", authMiddleware);
-app.use("/api/github/*", tenantGuard);
-app.route("/api", githubRoute);
-
-// Constant-time string comparison to prevent timing attacks on secret comparison
-function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let result = 0;
-  for (let i = 0; i < a.length; i++) {
-    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return result === 0;
-}
-
-// F340+F476: Feedback Queue — Webhook Secret 또는 JWT admin 인증
-app.use("/api/feedback-queue/*", async (c, next) => {
-  // 1) Webhook Secret 인증 (consumer.sh용) — constant-time 비교
-  const secret = c.req.header("X-Webhook-Secret");
-  if (secret && c.env.WEBHOOK_SECRET && timingSafeEqual(secret, c.env.WEBHOOK_SECRET)) {
-    return next();
-  }
-  // 2) JWT admin fallback (대시보드용 — F476)
-  try {
-    await authMiddleware(c, async () => {});
-    const payload = c.get("jwtPayload") as { role?: string } | undefined;
-    if (payload?.role === "admin") {
-      return next();
-    }
-  } catch {
-    // JWT 검증 실패 — fallthrough to 401
-  }
-  return c.json({ error: "Unauthorized — Webhook Secret or Admin JWT required" }, 401);
-});
-app.route("/api", feedbackQueueRoute);
+// F572: feedbackQueueRoute → fx-modules (moved)
 
 // F546 Sprint 298 hotfix: fx-decode-bridge public 접근 — 대표 보고 데모용
 // `/api/decode/*`는 authMiddleware 이전에 mount하여 공개 read-only 접근 허용.
@@ -231,7 +168,6 @@ app.route("/api", profileRoute);
 app.route("/api", integrityRoute);
 app.route("/api", healthRoute);
 app.route("/api", freshnessRoute);
-app.route("/api", wikiRoute);
 app.route("/api", requirementsRoute);
 app.route("/api", agentRoute);
 app.route("/api", streamingRoute);
@@ -239,23 +175,15 @@ app.route("/api", metaRoute);
 app.route("/api", tokenRoute);
 app.route("/api", specRoute);
 app.route("/api", mcpRoute);
-app.route("/api/agents/inbox", inboxRoute);
+// F572: inboxRoute/projectOverviewRoute/webhookRegistryRoute/jiraRoute → fx-modules (moved)
 
 // Sprint 24 routes (auth + tenant required — registered under /api/* middleware)
-app.route("/api", projectOverviewRoute);
-app.route("/api", webhookRegistryRoute);
-app.route("/api", jiraRoute);
 app.route("/api", workflowRoute);
 
 // Sprint 26: Cross-service entity registry (auth + tenant required)
 app.route("/api", entitiesRoute);
 
-// Sprint 27: Reconciliation (auth + tenant required)
-app.route("/api", reconciliationRoute);
-
-// Sprint 29: Onboarding feedback + progress (auth + tenant required)
-app.route("/api", feedbackRoute);
-app.route("/api", onboardingRoute);
+// F572: reconciliationRoute/feedbackRoute/onboardingRoute → fx-modules (moved)
 
 // Sprint 42: Automation quality reporting (auth + tenant required)
 app.route("/api", automationQualityRoute);
@@ -292,7 +220,7 @@ app.route("/api", axBdIdeasRoute);
 
 // Sprint 65: AX BD — 인사이트 + 평가관리 (auth + tenant required)
 app.route("/api", axBdInsightsRoute);
-app.route("/api", axBdEvaluationsRoute);
+// F572: axBdEvaluationsRoute → fx-modules (moved)
 
 // Sprint 66: Discovery-X API 인터페이스 계약 (auth + tenant required)
 app.route("/api", axBdDiscoveryRoute);
@@ -308,28 +236,16 @@ app.route("/api", shardDocRoute);
 // Sprint 77: F224~F228 Ecosystem Reference (auth + tenant required)
 app.route("/api", contextPassthroughRoute);
 app.route("/api", commandRegistryRoute);
-app.route("/api", partySessionRoute);
+// F572: partySessionRoute → fx-modules (moved)
 app.route("/api", specLibraryRoute);
 app.route("/api", expansionPackRoute);
 
-// Sprint 79: BD Pipeline E2E (F232, F233, F239)
-app.route("/api", pipelineRoute);
-app.route("/api", shareLinksRoute);
-app.route("/api", notificationsRoute);
-app.route("/api", decisionsRoute);
-
-// Sprint 80: BDP → F541: fx-offering이전 / Gate Package (F234, F235, F237)
-// Sprint 215: 사업기획서 편집기 → F541: fx-offering이전 (F444)
-// Sprint 216: 사업기획서 내보내기 → F541: fx-offering이전 (F446)
-app.route("/api", gatePackageRoute);
-// Sprint 81: MVP Tracking + IR Bottom-up (F238, F240) → F570: offeringPacksRoute fx-offering 이관
-app.route("/api", mvpTrackingRoute);
+// F572: pipelineRoute/shareLinksRoute/notificationsRoute/decisionsRoute → fx-modules (moved)
+// F572: gatePackageRoute/offeringPacksRoute/mvpTrackingRoute → fx-modules (moved)
+// F572: orgSharedRoute/npsRoute → fx-modules (moved)
 app.route("/api", irProposalsRoute);
 // Sprint 87: Admin bulk operations (F251)
 app.route("/api", adminRoute);
-// Sprint 88: Org shared data + NPS (F253, F254)
-app.route("/api", orgSharedRoute);
-app.route("/api", npsRoute);
 // Sprint 90: BD 스킬 실행 → F540: fx-shaping 이전 / 산출물 (F261)
 app.route("/api", axBdArtifactsRoute);
 // Sprint 91: BD 프로세스 진행 추적 → F540: fx-shaping 이전 / KG (F262)
@@ -349,21 +265,10 @@ app.route("/api", capturedEngineRoute);
 // Sprint 107: BD ROI 벤치마크 (F278)
 app.route("/api", roiBenchmarkRoute);
 // Sprint 112: BD 형상화 Phase F → F540: fx-shaping으로 이전
-// Sprint 116: 2-tier 검증 + 미팅 관리 (F294, F295)
-app.route("/api", validationTierRoute);
-app.route("/api", validationMeetingsRoute);
-// Sprint 117: 통합 평가 결과서 (F296)
-app.route("/api", evaluationReportRoute);
-// Sprint 120: PoC 관리 분리 (F298)
-app.route("/api", pocRoute);
-
-// Sprint 121: GTM Outreach (F299)
-app.route("/api", gtmCustomersRoute);
-app.route("/api", gtmOutreachRoute);
+// F572: validationTierRoute/validationMeetingsRoute/evaluationReportRoute → fx-modules (moved)
+// F572: pocRoute/gtmCustomersRoute/gtmOutreachRoute/pipelineMonitoringRoute → fx-modules (moved)
 
 // Sprint 132: Discovery Pipeline → F560: fx-discovery 이관 완결 (등록 제거)
-// Sprint 134: Pipeline Monitoring + Permissions (F315)
-app.route("/api", pipelineMonitoringRoute);
 // Sprint 136: Backup/Restore (F317)
 app.route("/api", backupRestoreRoute);
 // Sprint 137: Feedback Queue — moved above auth middleware (F340 JWT fix)
@@ -378,7 +283,7 @@ app.route("/api", agentAdaptersRoute);
 
 // Sprint 154: Discovery UI/UX v2 (F342) — personaConfigsRoute/personaEvalsRoute → F540: fx-shaping
 // discoveryReportsRoute → fx-discovery (F538)
-app.route("/api", teamReviewsRoute);
+// F572: teamReviewsRoute → fx-modules (moved)
 // Sprint 155: 멀티 페르소나 평가 → F540: fx-shaping으로 이전
 // Sprint 156: discoveryReportRoute → fx-discovery (F538)
 // Sprint 159: Prototype Auto-Gen (F353, F354, Phase 16)
@@ -394,8 +299,7 @@ app.route("/api", guardRailRoute);
 // Sprint 163: O-G-D Generic Interface (F360, Phase 17)
 app.route("/api", ogdGenericRoute);
 
-// Sprint 164: 운영 지표 라우트 (F362, Phase 17)
-app.route("/api", metricsRoute);
+// Sprint 164: 운영 지표 라우트 (F362, Phase 17) → F572: metricsRoute → fx-modules (moved)
 
 // Sprint 167: Offerings Data Layer → F541: fx-offering 이전 (F369, F370, F371, Phase 18)
 // Sprint 168: Offering Export + Validate → F541: fx-offering 이전 (F372, F373, Phase 18)
