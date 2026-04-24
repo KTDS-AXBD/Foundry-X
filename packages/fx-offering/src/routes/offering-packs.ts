@@ -88,7 +88,7 @@ offeringPacksRoute.post("/offering-packs/:id/items", async (c) => {
 // PATCH /offering-packs/:id/status — 상태 변경
 offeringPacksRoute.patch("/offering-packs/:id/status", async (c) => {
   const orgId = c.get("orgId");
-  const userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? "";
+  const _userId = (c.get("jwtPayload") as Record<string, string> | undefined)?.sub ?? "";
   const id = c.req.param("id");
 
   const body = await c.req.json();
