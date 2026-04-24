@@ -4,7 +4,7 @@
 import { NotificationService } from "../../../services/notification-service.js";
 import type { PipelineNotificationType } from "../schemas/pipeline-monitoring.schema.js";
 
-const DEDUP_WINDOW_MS = 5 * 60 * 1000; // 5분
+const _DEDUP_WINDOW_MS = 5 * 60 * 1000; // 5분 (reserved for future dedup logic)
 
 export class PipelineNotificationService {
   private notifSvc: NotificationService;
@@ -198,7 +198,7 @@ export class PipelineNotificationService {
     return row?.title ?? "Unknown";
   }
 
-  private async getAllRelatedUserIds(runId: string, orgId: string): Promise<string[]> {
+  private async getAllRelatedUserIds(runId: string, _orgId: string): Promise<string[]> {
     const ids = new Set<string>();
 
     // 생성자

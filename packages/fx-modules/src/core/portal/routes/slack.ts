@@ -1,5 +1,4 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
-import { z } from "@hono/zod-openapi";
 import { verifySlackSignature } from "../services/slack.js";
 import { SlackCommandSchema, SlackInteractionSchema } from "../schemas/slack.js";
 import { ErrorSchema } from "../../../schemas/common.js";

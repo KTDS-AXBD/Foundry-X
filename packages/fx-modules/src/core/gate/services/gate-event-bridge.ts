@@ -1,6 +1,6 @@
 // ─── F406: GateXEventBridge — Gate-X 검증 이벤트 연동 (Sprint 191) ───
 
-import { D1EventBus } from '@foundry-x/shared';
+import type { D1EventBus } from '@foundry-x/shared';
 import type {
   ValidationCompletedPayload,
   ValidationRejectedPayload,

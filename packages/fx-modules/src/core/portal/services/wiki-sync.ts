@@ -1,5 +1,5 @@
 import type { D1Database } from "@cloudflare/workers-types";
-import { GitHubService } from "./github.js";
+import type { GitHubService } from "./github.js";
 
 export class WikiSyncService {
   constructor(

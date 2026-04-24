@@ -35,7 +35,7 @@ export const HELP_COMMENT = `## 🤖 Foundry-X Commands
 ---
 _Powered by [Foundry-X](https://fx.minu.best)_`;
 
-const FX_LABEL_PREFIXES = ["fx-", "sdd:", "quality:", "security:"];
+const _FX_LABEL_PREFIXES = ["fx-", "sdd:", "quality:", "security:"];
 
 // ─── Command Parser ───
 
