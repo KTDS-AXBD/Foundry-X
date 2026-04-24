@@ -107,6 +107,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: packages/fx-discovery
           command: d1 migrations apply foundry-x-discovery-db --remote
+          packageManager: pnpm
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
