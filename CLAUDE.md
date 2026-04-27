@@ -27,7 +27,7 @@ turbo test / lint / typecheck  # 전체 검증
 
 ## Current Phase
 
-Phase 1~44 완료 + Phase 45 Batch 4 진행 중 (Sprint 1~318). 상세: SPEC.md §5
+Phase 1~44 완료 + Phase 45 Batch 5 완결 (Sprint 1~319, fx-modules prod LIVE). 상세: SPEC.md §5
 - **Phase 37: Work Lifecycle Platform** ✅ (F516~F518, Sprint 273~275). PRD: `docs/specs/fx-work-lifecycle-platform/prd-final.md`
 - **Phase 38: Dashboard Overhaul** ✅ (F519, Sprint 276 PR #543)
 - **Phase 39: MSA Walking Skeleton** ✅ (F520~F523). F520/F521 Sprint 268, F522/F523 Sprint 277 PR #544. PRD: `docs/specs/fx-msa-roadmap/prd-final.md`
@@ -36,7 +36,7 @@ Phase 1~44 완료 + Phase 45 Batch 4 진행 중 (Sprint 1~318). 상세: SPEC.md 
 - **Phase 42: HyperFX Deep Integration** ✅ (F531~F533, Sprint 284~286). 발굴 Graph 실행 연동 + 스트리밍 E2E + MetaAgent 실전 검증
 - **Phase 43: HyperFX Activation** ✅ (F534~F537, Sprint 287~289). Dogfood(KOAMI, S276)에서 확증된 3개 갭 해소 — DiagnosticCollector 훅 / Graph 정식 API+UI / MetaAgent 자동 진단
 - **Phase 44: MSA 2차 분리 + Agent 품질 튜닝** 🔧 (F538~F542). F542 ✅ Sprint 290 (MetaAgent 프롬프트 강화 + Sonnet 4.6 + A/B + Rubric, Dogfood P2 PASS 6 proposals), F538~F541 📋 W+6+ 구체화. 관찰: C65 F536 auto-trigger 저장 누락
-- **Phase 45: MSA 3rd Separation + SDD Triangle** 🔧 (F560~F574). Batch 1 F560 ✅ Sprint 312, Batch 2 F561+F562 ✅ Sprint 313 / F563 ✅ Sprint 314 / F564+F569 ✅ Sprint 315 / F567+F568 ✅ Sprint 316 / F565 ✅ Sprint 317 (Batch 3 SDD Triangle CI, PR #684 Match 100%). **Batch 4 완결**: F570 ✅ Sprint 318 (S312 Offering 완전 이관, PR #687 Match 97%, +340/-12089 87 files). 남은: F572+F574 Sprint 319 (🔧 S313 in-progress) / F571 Sprint 320 📋
+- **Phase 45: MSA 3rd Separation + SDD Triangle** 🔧 (F560~F574). Batch 1 F560 ✅ Sprint 312, Batch 2 F561+F562 ✅ Sprint 313 / F563 ✅ Sprint 314 / F564+F569 ✅ Sprint 315 / F567+F568 ✅ Sprint 316 / F565 ✅ Sprint 317 (Batch 3 SDD Triangle CI, PR #684 Match 100%). Batch 4 F570 ✅ Sprint 318 (S312, PR #687 Match 97%). **Batch 5 완결**: F572+F574 ✅ Sprint 319 (S313, PR #690 Match 100% + 3 hotfix #691/#692/#693). fx-modules Worker prod LIVE (직접+gateway 6/6 HTTP 200). 남은: F571 Sprint 320 📋 (최후 Batch 6, Agent 도메인 62 services)
 - 장기 backlog 2건: F112, F117
 - 수치: `/ax:daily-check` 또는 SPEC.md §2 (하드코딩 금지)
 
