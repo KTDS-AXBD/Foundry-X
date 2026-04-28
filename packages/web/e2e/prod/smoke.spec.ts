@@ -7,11 +7,10 @@ const API_URL =
 test.describe("Production Smoke", () => {
   /**
    * TC-1: API Health Check
-   * Workers API가 정상 응답하는지 확인해요.
-   * smoke-test.sh의 curl 체크를 브라우저 fetch로 보완해요.
+   * fx-gateway는 root("/") 핸들러가 없어 404. domain health endpoint는 200(공개).
    */
-  test("API root returns 200", async ({ request }) => {
-    const response = await request.get(`${API_URL}/`);
+  test("API health endpoint returns 200", async ({ request }) => {
+    const response = await request.get(`${API_URL}/api/discovery/health`);
     expect(response.status()).toBe(200);
   });
 

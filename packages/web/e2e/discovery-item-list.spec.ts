@@ -84,13 +84,13 @@ const MOCK_PROGRESS = {
 };
 
 test.describe("F436 — 내 아이템 목록", () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ authenticatedPage: page }) => {
     await page.route("**/api/biz-items", (route) => {
       route.fulfill({ json: MOCK_BIZ_ITEMS });
     });
   });
 
-  test("아이템 카드가 목록으로 표시된다", async ({ page }) => {
+  test("아이템 카드가 목록으로 표시된다", async ({ authenticatedPage: page }) => {
     await page.goto("/discovery");
     await expect(page.getByRole("heading", { name: "내 아이템" })).toBeVisible();
 
@@ -100,7 +100,7 @@ test.describe("F436 — 내 아이템 목록", () => {
     await expect(page.getByText("고객 데이터 플랫폼")).toBeVisible();
   });
 
-  test("상태 뱃지가 올바르게 표시된다", async ({ page }) => {
+  test("상태 뱃지가 올바르게 표시된다", async ({ authenticatedPage: page }) => {
     await page.goto("/discovery");
     // "분석 중" 뱃지 (status: analyzing)
     await expect(page.getByText("분석 중").first()).toBeVisible();
@@ -108,13 +108,13 @@ test.describe("F436 — 내 아이템 목록", () => {
     await expect(page.getByText("대기")).toBeVisible();
   });
 
-  test("새 아이템 버튼이 getting-started로 링크된다", async ({ page }) => {
+  test("새 아이템 버튼이 getting-started로 링크된다", async ({ authenticatedPage: page }) => {
     await page.goto("/discovery");
     const newItemLink = page.getByRole("link", { name: /새 아이템/ }).first();
     await expect(newItemLink).toHaveAttribute("href", "/getting-started");
   });
 
-  test("상태 필터 클릭 시 해당 상태만 표시된다", async ({ page }) => {
+  test("상태 필터 클릭 시 해당 상태만 표시된다", async ({ authenticatedPage: page }) => {
     await page.goto("/discovery");
     // "대기" 필터 클릭
     await page.getByRole("button", { name: "대기" }).click();
@@ -126,7 +126,7 @@ test.describe("F436 — 내 아이템 목록", () => {
     await expect(page.getByText("고객 데이터 플랫폼")).not.toBeVisible();
   });
 
-  test("검색어 입력 시 필터링된다", async ({ page }) => {
+  test("검색어 입력 시 필터링된다", async ({ authenticatedPage: page }) => {
     await page.goto("/discovery");
     await page.getByPlaceholder("아이템 검색...").fill("클라우드");
 
@@ -134,7 +134,7 @@ test.describe("F436 — 내 아이템 목록", () => {
     await expect(page.getByText("AI 비서 도입")).not.toBeVisible();
   });
 
-  test("빈 상태 — 아이템 없을 때 등록 CTA 표시", async ({ page }) => {
+  test("빈 상태 — 아이템 없을 때 등록 CTA 표시", async ({ authenticatedPage: page }) => {
     await page.route("**/api/biz-items", (route) => {
       route.fulfill({ json: { items: [] } });
     });
@@ -144,7 +144,7 @@ test.describe("F436 — 내 아이템 목록", () => {
     await expect(page.getByRole("link", { name: /첫 아이템 등록하기/ })).toBeVisible();
   });
 
-  test("카드 클릭 시 아이템 상세 페이지로 이동한다", async ({ page }) => {
+  test("카드 클릭 시 아이템 상세 페이지로 이동한다", async ({ authenticatedPage: page }) => {
     await page.route("**/api/biz-items/item-1", (route) => {
       route.fulfill({ json: MOCK_BIZ_ITEM_DETAIL });
     });
@@ -168,7 +168,7 @@ test.describe("F436 — 내 아이템 목록", () => {
 });
 
 test.describe("F437 — 발굴 9기준 체크리스트 패널", () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ authenticatedPage: page }) => {
     await page.route("**/api/biz-items/item-1", (route) => {
       route.fulfill({ json: MOCK_BIZ_ITEM_DETAIL });
     });
@@ -186,8 +186,10 @@ test.describe("F437 — 발굴 9기준 체크리스트 패널", () => {
     });
   });
 
-  test("9기준 체크리스트가 표시된다", async ({ page }) => {
+  test("9기준 체크리스트가 표시된다", async ({ authenticatedPage: page }) => {
     await page.goto("/discovery/items/item-1");
+    // F437 panel은 "발굴분석" 탭 안. default 탭은 "info"라 전환 필요.
+    await page.getByRole("tab", { name: "발굴분석" }).click();
     // F496 재설계: 3×3 그리드 + #N 형식
     const panel = page.getByTestId("discovery-criteria-panel");
     await expect(panel).toBeVisible();
@@ -195,14 +197,16 @@ test.describe("F437 — 발굴 9기준 체크리스트 패널", () => {
     await expect(page.getByText("검증 실험 계획")).toBeVisible();
   });
 
-  test("완료된 기준 수와 진행률이 표시된다", async ({ page }) => {
+  test("완료된 기준 수와 진행률이 표시된다", async ({ authenticatedPage: page }) => {
     await page.goto("/discovery/items/item-1");
+    await page.getByRole("tab", { name: "발굴분석" }).click();
     // F496 재설계: "N / M 기준 충족" 형식
     await expect(page.getByText(/기준 충족/)).toBeVisible();
   });
 
-  test("다음 단계 가이드가 표시된다", async ({ page }) => {
+  test("다음 단계 가이드가 표시된다", async ({ authenticatedPage: page }) => {
     await page.goto("/discovery/items/item-1");
+    await page.getByRole("tab", { name: "발굴분석" }).click();
     await expect(page.getByText("다음 단계")).toBeVisible();
     await expect(page.getByText("시장 기회 분석을 진행해주세요.")).toBeVisible();
   });

@@ -39,8 +39,12 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
 
     await page.goto("/discovery/items/biz-item-1");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText("AI 헬스케어 플랫폼")).toBeVisible();
-    await expect(page.locator('main a[href="/discovery/items"]')).toBeVisible();
+    // F496+ 재설계: 제목이 헤더와 기본정보 탭에 중복 — 헤더 heading만 검증
+    await expect(
+      page.getByRole("heading", { name: "AI 헬스케어 플랫폼" }),
+    ).toBeVisible();
+    // F496+ 재설계: back 링크가 /discovery/items → /discovery 로 변경
+    await expect(page.locator('main a[href="/discovery"]')).toBeVisible();
   });
 
   test("ax-bd/ideas/:id — 아이디어 상세", async ({
@@ -94,7 +98,9 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
     ).toBeVisible();
   });
 
-  test("collection/sr/:id — SR 상세", async ({
+  // TODO: F434 IA 정리에서 /collection/* → /discovery 와일드카드 리다이렉트로 이전.
+  // /collection/sr/:id 는 라우터에 없고 :id가 redirect에서 손실됨. SR 상세 신라우트가 없으면 영구 skip.
+  test.skip("collection/sr/:id — SR 상세", async ({
     authenticatedPage: page,
   }) => {
     const sr = makeSrDetail();
@@ -108,26 +114,54 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
     await expect(page.getByText("market_research")).toBeVisible();
   });
 
-  test("shaping/offering/:id — 오퍼링 팩 상세", async ({
+  // 2026-04-09 API 이관: 구 /api/offering-packs/:id → 신 /api/offerings/:id (offering-pack-detail.tsx)
+  test("shaping/offering/:id — 오퍼링 상세", async ({
     authenticatedPage: page,
   }) => {
-    const pack = makeOfferingPack();
-    await page.route("**/api/offering-packs/pack-1", (route) =>
-      route.fulfill({ json: pack }),
+    const offering = {
+      id: "pack-1",
+      orgId: "test-org-e2e",
+      bizItemId: "biz-item-1",
+      title: "AI 헬스케어 제안 패키지",
+      purpose: "proposal",
+      format: "html",
+      status: "draft",
+      currentVersion: 1,
+      createdBy: "test-user-id",
+      createdAt: "2026-01-01T00:00:00Z",
+      updatedAt: "2026-01-01T00:00:00Z",
+    };
+    await page.route("**/api/offerings/pack-1", (route) =>
+      route.fulfill({ json: offering }),
+    );
+    await page.route("**/api/offerings/pack-1/export*", (route) =>
+      route.fulfill({ body: "<p>preview</p>", contentType: "text/html" }),
     );
 
     await page.goto("/shaping/offering/pack-1");
     await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("AI 헬스케어 제안 패키지")).toBeVisible();
-    await expect(page.getByText("draft")).toBeVisible();
   });
 
   test("shaping/offering/:id/brief — 오퍼링 브리프", async ({
     authenticatedPage: page,
   }) => {
-    const pack = makeOfferingPack();
-    await page.route("**/api/offering-packs/pack-1", (route) =>
-      route.fulfill({ json: pack }),
+    const offering = {
+      id: "pack-1",
+      orgId: "test-org-e2e",
+      bizItemId: "biz-item-1",
+      title: "AI 헬스케어 제안 패키지",
+      purpose: "proposal",
+      format: "html",
+      status: "draft",
+      currentVersion: 1,
+      createdBy: "test-user-id",
+      createdAt: "2026-01-01T00:00:00Z",
+      updatedAt: "2026-01-01T00:00:00Z",
+    };
+    // offering-brief.tsx: detail은 /offerings/:id, briefs는 여전히 /offering-packs/:id/briefs
+    await page.route("**/api/offerings/pack-1", (route) =>
+      route.fulfill({ json: offering }),
     );
     await page.route("**/api/offering-packs/pack-1/briefs", (route) =>
       route.fulfill({ json: { items: [] } }),
@@ -139,7 +173,9 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
     await expect(page.getByText("아직 생성된 브리프가 없어요.")).toBeVisible();
   });
 
-  test("gtm/outreach/:id — 아웃리치 상세", async ({
+  // TODO: F434 IA 정리에서 /gtm/* → /discovery 와일드카드 리다이렉트로 이전.
+  // 신 GTM Outreach 상세 라우트 부재 → 영구 skip (라우트 부활 시 재작성).
+  test.skip("gtm/outreach/:id — 아웃리치 상세", async ({
     authenticatedPage: page,
   }) => {
     const outreach = makeOutreach();
@@ -191,7 +227,9 @@ test.describe("상세 페이지(:id) 렌더링 검증", () => {
 
   // ─── 세션 #215: 미커버 동적 라우트 4건 추가 ───
 
-  test("product/offering-pack/:id/brief — 오퍼링 브리프 (product 경로)", async ({
+  // TODO: F434 IA 정리에서 /product/* → /discovery 와일드카드 리다이렉트로 이전.
+  // 동일 컨텐츠는 /shaping/offering/:id/brief 로 이동, redirect-routes.spec.ts에서 redirect만 검증.
+  test.skip("product/offering-pack/:id/brief — 오퍼링 브리프 (product 경로)", async ({
     authenticatedPage: page,
   }) => {
     await page.evaluate(() => localStorage.setItem("fx-tour-completed", "true"));

@@ -4,6 +4,16 @@ import { test, expect } from "@playwright/test";
 // CLI/Web 모두 fx-gateway 단일 진입점 전환 후 health + SSO 경로 검증
 
 test.describe("F564: Strangler Gateway — fx-gateway 단일 진입점", () => {
+  // page.route intercepts only browser-context requests (fetch from page).
+  // page.request bypasses page.route, so we use page.evaluate(fetch) here.
+  async function fetchViaPage(page: import("@playwright/test").Page, url: string) {
+    await page.goto("/");
+    return page.evaluate(async (u) => {
+      const res = await fetch(u);
+      return { status: res.status, body: await res.json() };
+    }, url);
+  }
+
   test("discovery health via fx-gateway route", async ({ page }) => {
     await page.route("**/api/discovery/health", (route) =>
       route.fulfill({
@@ -13,9 +23,8 @@ test.describe("F564: Strangler Gateway — fx-gateway 단일 진입점", () => {
       }),
     );
 
-    const response = await page.request.get("/api/discovery/health");
-    expect(response.status()).toBe(200);
-    const body = await response.json();
+    const { status, body } = await fetchViaPage(page, "/api/discovery/health");
+    expect(status).toBe(200);
     expect(body.status).toBe("ok");
   });
 
@@ -28,9 +37,8 @@ test.describe("F564: Strangler Gateway — fx-gateway 단일 진입점", () => {
       }),
     );
 
-    const response = await page.request.get("/api/shaping/health");
-    expect(response.status()).toBe(200);
-    const body = await response.json();
+    const { status, body } = await fetchViaPage(page, "/api/shaping/health");
+    expect(status).toBe(200);
     expect(body.status).toBe("ok");
   });
 
@@ -43,9 +51,8 @@ test.describe("F564: Strangler Gateway — fx-gateway 단일 진입점", () => {
       }),
     );
 
-    const response = await page.request.get("/api/offering/health");
-    expect(response.status()).toBe(200);
-    const body = await response.json();
+    const { status, body } = await fetchViaPage(page, "/api/offering/health");
+    expect(status).toBe(200);
     expect(body.status).toBe("ok");
   });
 
