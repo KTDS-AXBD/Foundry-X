@@ -285,7 +285,7 @@ app.all("/api/orgs/:orgId/workflows/*", async (c) => {
 });
 ```
 
-> `GatewayEnv` 타입에 `AGENT: Service` 필드 추가 (`packages/fx-gateway/src/env.ts`).
+> `GatewayEnv` 타입에 `AGENT: Fetcher` 필드 추가 (`packages/fx-gateway/src/env.ts`). 기존 5 bindings(MAIN_API/DISCOVERY/SHAPING/OFFERING/MODULES) 모두 `Fetcher` 타입 사용 — 일관성 유지.
 
 ### §5.4 수정 (api) — 최소
 
