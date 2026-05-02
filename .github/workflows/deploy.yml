@@ -51,6 +51,7 @@ jobs:
               - 'packages/fx-shaping/**'
               - 'packages/fx-offering/**'
               - 'packages/fx-modules/**'
+              - 'packages/fx-agent/**'
               - 'packages/shared/**'
               - 'packages/harness-kit/**'
               - '.github/workflows/deploy.yml'
