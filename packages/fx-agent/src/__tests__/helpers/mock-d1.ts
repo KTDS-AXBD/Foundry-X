@@ -50,6 +50,8 @@ export function createMockEnv(): AgentEnv {
   return {
     DB: createMockD1(),
     JWT_SECRET: "test-secret",
+    GITHUB_TOKEN: "test-token",
+    AI: {} as unknown as Ai,
     MAIN_API: {} as unknown as Fetcher,
   };
 }

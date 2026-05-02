@@ -174,6 +174,35 @@ app.all("/api/orgs/:orgId/workflows/*", async (c) => {
   return c.env.AGENT.fetch(c.req.raw);
 });
 
+// F575: 잔여 7 routes → fx-agent (완전 분리)
+app.all("/api/agents", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/agents/*", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/telemetry/*", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/skills/*", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/plan", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/plan/*", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/worktrees", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/routing-rules", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/routing-rules/*", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+
 // 그 외 모든 /api/* 요청은 MAIN_API로
 app.all("/api/*", async (c) => {
   return c.env.MAIN_API.fetch(c.req.raw);

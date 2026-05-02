@@ -1,8 +1,6 @@
-import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { InfraAgent } from "../core/agent/services/infra-agent.js";
 import type { AgentExecutionRequest, AgentExecutionResult } from "../core/agent/services/execution-types.js";
-import { app } from "../app.js";
-import { createTestEnv, createAuthHeaders } from "./helpers/test-app.js";
 
 // Mock createRoutedRunner — must use hoisted fn to avoid TDZ
 const { mockRunner } = vi.hoisted(() => {
@@ -332,89 +330,3 @@ describe("InfraAgent", () => {
   });
 });
 
-// ─── API Endpoint Tests ───
-
-describe("InfraAgent API Endpoints", () => {
-  let env: ReturnType<typeof createTestEnv>;
-  let authHeader: Record<string, string>;
-
-  beforeAll(async () => {
-    authHeader = await createAuthHeaders({ role: "admin" });
-  });
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    env = createTestEnv();
-    mockRunner.execute.mockResolvedValue(makeSuccessResult(VALID_ANALYSIS));
-  });
-
-  it("POST /agents/infra/analyze returns 200", async () => {
-    const res = await app.request(
-      "/api/agents/infra/analyze",
-      {
-        method: "POST",
-        headers: { ...authHeader, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          taskType: "infra-analysis",
-          context: {
-            repoUrl: "https://github.com/KTDS-AXBD/Foundry-X",
-            branch: "master",
-            fileContents: { "wrangler.toml": "name = 'test'" },
-          },
-        }),
-      },
-      env,
-    );
-
-    expect(res.status).toBe(200);
-    const data = (await res.json()) as any;
-    expect(data.healthScore).toBeDefined();
-    expect(data.resources).toBeDefined();
-    expect(data.tokensUsed).toBeDefined();
-  });
-
-  it("POST /agents/infra/simulate returns 200", async () => {
-    mockRunner.execute.mockResolvedValue(makeSuccessResult(VALID_SIMULATION));
-
-    const res = await app.request(
-      "/api/agents/infra/simulate",
-      {
-        method: "POST",
-        headers: { ...authHeader, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          description: "Add new KV namespace binding",
-        }),
-      },
-      env,
-    );
-
-    expect(res.status).toBe(200);
-    const data = (await res.json()) as any;
-    expect(data.riskLevel).toBeDefined();
-    expect(data.rollbackPlan).toBeDefined();
-    expect(data.tokensUsed).toBeDefined();
-  });
-
-  it("POST /agents/infra/validate-migration returns 200", async () => {
-    mockRunner.execute.mockResolvedValue(makeSuccessResult(VALID_MIGRATION));
-
-    const res = await app.request(
-      "/api/agents/infra/validate-migration",
-      {
-        method: "POST",
-        headers: { ...authHeader, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sql: "CREATE TABLE test_table (id TEXT PRIMARY KEY, name TEXT NOT NULL);",
-        }),
-      },
-      env,
-    );
-
-    expect(res.status).toBe(200);
-    const data = (await res.json()) as any;
-    expect(data.safe).toBeDefined();
-    expect(data.riskScore).toBeDefined();
-    expect(data.issues).toBeDefined();
-    expect(data.schemaChanges).toBeDefined();
-  });
-});
