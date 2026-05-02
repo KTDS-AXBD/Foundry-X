@@ -1,7 +1,7 @@
 # 문서 인덱스
 
-> 마지막 갱신: 2026-04-19
-> 총 GOV 문서: 216개 | 자동 생성 (ax-gov-doc check)
+> 마지막 갱신: 2026-05-02
+> 총 GOV 문서: 224개 | 자동 생성 (ax-gov-doc check)
 
 ## SPEC
 
@@ -163,6 +163,7 @@
 |------|------|:----:|:----:|------|
 | FX-ANLS-015 | AI Test Agent & Code Review Agent 리서치 보고서 | 1.0 | Active | [03-analysis/FX-ANLS-015_ai-test-review-agent-research.md](03-analysis/FX-ANLS-015_ai-test-review-agent-research.md) |
 | FX-ANLS-016 | Agent SDK Test Agent PoC 비교 분석 보고서 | 1.0 | Active | [03-analysis/FX-ANLS-016_agent-sdk-test-agent-poc.md](03-analysis/FX-ANLS-016_agent-sdk-test-agent-poc.md) |
+| FX-ANLS-017 | Sprint 319 Gap Analysis — F572 + F574 | 1.0 | Active | [03-analysis/FX-ANLS-017_sprint-319-analysis.md](03-analysis/FX-ANLS-017_sprint-319-analysis.md) |
 | FX-ANLS-034 | Sprint 34 — F135 OpenRouter Runner Gap Analysis | 1.0 | Active | [03-analysis/features/sprint-34.analysis.md](03-analysis/features/sprint-34.analysis.md) |
 | FX-ANLS-037 | Sprint 37 — Gap Analysis: ArchitectAgent + TestAgent (F138+F139) | 1.0 | Active | [03-analysis/features/sprint-37.analysis.md](03-analysis/features/sprint-37.analysis.md) |
 | FX-ANLS-041 | Sprint 41 Gap Analysis — F146 CustomRoleManager + F147 EnsembleVoting | 1.0 | Active | [03-analysis/features/sprint-41.analysis.md](03-analysis/features/sprint-41.analysis.md) |
@@ -241,6 +242,9 @@
 | FX-RPRT-094 | Sprint 94 Report — 발굴 UX: 위저드 UI(F263) + 온보딩 투어(F265) | 1.0 | Active | [04-report/features/sprint-94.report.md](04-report/features/sprint-94.report.md) |
 | FX-RPRT-309 | Sprint 309 — F541 Offering 도메인 분리 (Phase 44) | 1.0 | Active | [04-report/FX-RPRT-309_sprint-309-report.md](04-report/FX-RPRT-309_sprint-309-report.md) |
 | FX-RPRT-310 | Sprint 310 — F556 MetaAgent Rubric 튜닝 (Phase 44) | 1.0 | Active | [04-report/FX-RPRT-310_sprint-310-report.md](04-report/FX-RPRT-310_sprint-310-report.md) |
+| FX-RPRT-311 | Sprint 313 완료 보고서 — Phase 45 MVP M2 (F561+F562) | 1.0 | Active | [04-report/FX-RPRT-311_sprint-313-report.md](04-report/FX-RPRT-311_sprint-313-report.md) |
+| FX-RPRT-312 | Sprint 315 Report — F564 + F569 (Phase 45 Batch 1) | 1.0 | Active | [04-report/FX-RPRT-312_sprint-315-report.md](04-report/FX-RPRT-312_sprint-315-report.md) |
+| FX-RPRT-313 | Sprint 319 Completion Report — F572 fx-modules + F574 wiki-sync | 1.0 | Active | [04-report/FX-RPRT-313_sprint-319-report.md](04-report/FX-RPRT-313_sprint-319-report.md) |
 | FX-RPRT-S87 | Sprint 87 완료 보고서 — 팀 계정 일괄 생성 + 온보딩 가이드 고도화 | 1.0 | Active | [04-report/sprint-87.report.md](04-report/sprint-87.report.md) |
 | FX-RPRT-S88 | Sprint 88 — 팀 데이터 공유(Org-scope) + NPS 피드백 수집 | 1.0 | Active | [04-report/features/sprint-88.report.md](04-report/features/sprint-88.report.md) |
 | FX-RPRT-S89 | Sprint 89 — 완료 보고서 | 1.0 | Active | [04-report/features/sprint-89.report.md](04-report/features/sprint-89.report.md) |
