@@ -4,6 +4,8 @@ export interface AgentEnv {
   JWT_SECRET: string;
   ANTHROPIC_API_KEY?: string;
   OPENROUTER_API_KEY?: string;
+  /** F542: MetaAgent 모델 선택 env var */
+  META_AGENT_MODEL?: string;
   /** Service Binding — Phase 46 잔여 cross-domain 호출 대비 (현재 unused) */
   MAIN_API: Fetcher;
 }
