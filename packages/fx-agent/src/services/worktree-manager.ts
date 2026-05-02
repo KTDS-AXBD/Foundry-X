@@ -118,7 +118,7 @@ export class WorktreeManager {
     return this.gitExecutor(["rebase", `origin/${onto}`]);
   }
 
-  async abortRebase(agentId: string): Promise<void> {
+  async abortRebase(_agentId: string): Promise<void> {
     if (!this.gitExecutor) return;
     try {
       await this.gitExecutor(["rebase", "--abort"]);
@@ -127,7 +127,7 @@ export class WorktreeManager {
     }
   }
 
-  async continueRebase(agentId: string): Promise<{ stdout: string; exitCode: number }> {
+  async continueRebase(_agentId: string): Promise<{ stdout: string; exitCode: number }> {
     if (!this.gitExecutor) return { stdout: "", exitCode: 0 };
     return this.gitExecutor(["rebase", "--continue"]);
   }

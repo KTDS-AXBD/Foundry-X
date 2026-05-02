@@ -1,7 +1,8 @@
 // ─── F335: FeedbackLoopContext Manager — 루프 상태 관리 (Sprint 150) ───
 
+import type {
+  TaskState} from "@foundry-x/shared";
 import {
-  TaskState,
   DEFAULT_CONVERGENCE,
   type FeedbackLoopContext,
   type LoopMode,

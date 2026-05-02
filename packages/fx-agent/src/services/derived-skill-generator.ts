@@ -21,7 +21,7 @@ export class DerivedSkillGeneratorService {
     tenantId: string,
     patternId: string,
     overrides?: { nameOverride?: string; categoryOverride?: string },
-    actorId?: string,
+    _actorId?: string,
   ): Promise<DerivedCandidate> {
     // 1. Fetch pattern
     const pattern = await this.db

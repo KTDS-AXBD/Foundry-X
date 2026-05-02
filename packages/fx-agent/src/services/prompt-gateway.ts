@@ -2,7 +2,6 @@
  * F149: PromptGatewayService — Prompt sanitization & code abstraction gateway
  * Strips secrets/PII/internal URLs before forwarding prompts to LLM backends.
  */
-import type { AgentTaskType } from "./execution-types.js";
 import { AuditLogService } from "./audit-logger.js";
 
 // ── Interfaces ──────────────────────────────────────────

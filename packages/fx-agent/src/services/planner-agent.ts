@@ -9,6 +9,7 @@ import type { SSEManager } from "./sse-manager.js";
 import type { GitHubService } from "./github.js";
 import { FileContextCollector, estimateTokens } from "./file-context-collector.js";
 import type { CollectorResult } from "./file-context-collector.js";
+import type { McpServerRegistry } from "./mcp-registry.js";
 import { getPlannerPrompt } from "./planner-prompts.js";
 
 interface ExternalToolInfo {
@@ -22,7 +23,7 @@ export interface PlannerAgentDeps {
   sse?: SSEManager;
   apiKey?: string;
   model?: string;
-  mcpRegistry?: import("./mcp-registry.js").McpServerRegistry;
+  mcpRegistry?: McpServerRegistry;
   githubService?: GitHubService;
 }
 

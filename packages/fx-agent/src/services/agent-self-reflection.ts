@@ -106,6 +106,7 @@ export class AgentSelfReflection {
   }
 
   enhanceWithReflection(runner: AgentRunner): AgentRunner {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias -- nested method scope binding
     const self = this;
 
     return {
@@ -113,16 +114,15 @@ export class AgentSelfReflection {
 
       async execute(request: AgentExecutionRequest): Promise<AgentExecutionResult> {
         let bestResult = await runner.execute(request);
-        let bestScore = -1;
         const history: Array<{ iteration: number; score: number; confidence: number }> = [];
         let retryCount = 0;
 
         const reflection = await self.reflect(runner, request, bestResult);
-        bestScore = reflection.score;
+        let bestScore = reflection.score;
         history.push({ iteration: 0, score: reflection.score, confidence: reflection.confidence });
 
         let currentRequest = request;
-        let currentResult = bestResult;
+        let currentResult: AgentExecutionResult;
         let lastReflection = reflection;
 
         while (self.shouldRetry(lastReflection.score) && retryCount < self.maxRetries) {
