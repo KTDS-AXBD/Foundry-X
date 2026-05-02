@@ -1,4 +1,5 @@
 import type { D1Database } from "@cloudflare/workers-types";
+import type { SlackEventType } from "./slack.js";
 
 // ─── Sprint 11: SSE Task Event Data Types (F55) ───
 export interface TaskStartedData {
@@ -189,7 +190,7 @@ export class SSEManager {
       "SELECT webhook_url, enabled FROM slack_notification_configs WHERE org_id = ? AND category = ?"
     ).bind(orgId, category).first<{ webhook_url: string; enabled: number }>();
 
-    let webhookUrl: string | null = null;
+    let webhookUrl: string | null;
 
     if (config) {
       if (!config.enabled) return;           // 명시적 비활성화
@@ -214,7 +215,7 @@ export class SSEManager {
     const slackType = event.event.replace("agent.", "");
 
     await slack.sendNotification({
-      type: slackType as import("./slack.js").SlackEventType,
+      type: slackType as SlackEventType,
       title: String(data.agentId ?? event.event),
       body: String(data.resultSummary ?? data.reason ?? data.error ?? ""),
       url: String(data.url ?? ""),

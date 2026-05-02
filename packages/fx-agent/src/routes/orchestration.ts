@@ -14,7 +14,7 @@ import { TaskStateService } from "../services/task-state-service.js";
 import { TelemetryCollector } from "../services/telemetry-collector.js";
 import { EventBus } from "../services/event-bus.js";
 import { createDefaultGuard } from "../services/transition-guard.js";
-import type { AgentAdapter, AgentResult, LoopMode } from "@foundry-x/shared";
+import type { AgentAdapter, LoopMode } from "@foundry-x/shared";
 import type { AgentEnv } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 

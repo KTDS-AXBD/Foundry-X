@@ -6,7 +6,6 @@ import type {
   AgentExecutionRequest,
   AgentExecutionResult,
 } from "./execution-types.js";
-import type { AgentRunner } from "./agent-runner.js";
 import { createRoutedRunner } from "./agent-runner.js";
 import {
   ARCHITECT_ANALYZE_PROMPT,

@@ -38,7 +38,7 @@ export class AgentFeedbackLoopService {
     executionId: string,
     taskType: AgentTaskType,
     result: AgentExecutionResult,
-    attemptedModels?: string[],
+    _attemptedModels?: string[],
   ): Promise<AgentFailureRecord> {
     const id = `afb-${crypto.randomUUID()}`;
     const now = new Date().toISOString();

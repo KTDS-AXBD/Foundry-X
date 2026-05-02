@@ -161,7 +161,7 @@ streamingRoute.get("/agents/stream/ws", async (c) => {
         }
       },
       close: () => server.close(),
-      error: (err: unknown) => server.close(),
+      error: (_err: unknown) => server.close(),
     } as unknown as ReadableStreamDefaultController;
 
     const wsHandler = new AgentStreamHandler(sessionId, metricsService);

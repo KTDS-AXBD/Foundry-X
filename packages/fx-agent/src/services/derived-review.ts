@@ -5,7 +5,6 @@
 import type {
   DerivedReview,
   DerivedStats,
-  SkillSafetyGrade,
 } from "@foundry-x/shared";
 import type { ReviewCandidateInput } from "../schemas/derived-engine.js";
 import { SafetyChecker } from "./safety-checker.js";

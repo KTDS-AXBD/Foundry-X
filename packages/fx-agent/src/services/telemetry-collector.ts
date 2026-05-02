@@ -2,7 +2,7 @@
 
 import type { TaskEvent } from "@foundry-x/shared";
 import type { ExecutionEventRecord } from "@foundry-x/shared";
-import { EventBus } from "./event-bus.js";
+import type { EventBus } from "./event-bus.js";
 
 export class TelemetryCollector {
   constructor(private db: D1Database) {}

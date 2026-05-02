@@ -3,7 +3,7 @@
  * McpServerRegistry 기반 리소스 발견/읽기/구독 + SSE 전파
  */
 import type { McpResource, McpResourceTemplate, McpResourceContent } from "@foundry-x/shared";
-import { McpServerRegistry } from "./mcp-registry.js";
+import type { McpServerRegistry } from "./mcp-registry.js";
 import { createTransport } from "./mcp-transport.js";
 import { McpRunner } from "./mcp-runner.js";
 import type { SSEManager } from "./sse-manager.js";

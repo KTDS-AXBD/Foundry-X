@@ -8,17 +8,15 @@ import {
   DEFAULT_CONVERGENCE,
   type AgentAdapter,
   type AgentExecutionContext,
-  type LoopMode,
   type LoopOutcome,
   type LoopRoundResult,
   type LoopStartParams,
   type ConvergenceCriteria,
   createTaskEvent,
 } from "@foundry-x/shared";
-import { TaskStateService } from "./task-state-service.js";
+import type { TaskStateService } from "./task-state-service.js";
 import { FeedbackLoopContextManager } from "./feedback-loop-context.js";
-import { EventBus } from "./event-bus.js";
-import { TransitionGuard } from "./transition-guard.js";
+import type { EventBus } from "./event-bus.js";
 import type { DiagnosticCollector } from "./diagnostic-collector.js";
 
 /** F536: MetaAgent 자동 진단 훅 인터페이스 */

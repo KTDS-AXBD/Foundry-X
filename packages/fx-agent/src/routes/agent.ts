@@ -24,7 +24,8 @@ import {
 } from "../schemas/agent.js";
 import type { AgentProfile, AgentActivity, PrReviewResult } from "@foundry-x/shared";
 import { MODEL_HAIKU } from "@foundry-x/shared";
-import type { AgentRunnerInfo, AgentTaskType } from "../services/execution-types.js";
+import type { AgentRunnerInfo, AgentTaskType, AgentExecutionRequest, AgentExecutionResult } from "../services/execution-types.js";
+import type { EvaluationCriteria } from "../services/evaluation-criteria.js";
 import { createAgentRunner } from "../services/agent-runner.js";
 import { getDb } from "../db/index.js";
 import { agentSessions } from "../db/schema.js";
@@ -1091,7 +1092,7 @@ import { EvaluatorOptimizer } from "../services/evaluator-optimizer.js";
 import { CodeReviewCriteria, TestCoverageCriteria, SpecComplianceCriteria } from "../services/evaluation-criteria.js";
 import { createRoutedRunner } from "../services/agent-runner.js";
 
-const CRITERIA_MAP: Record<string, () => import("../services/evaluation-criteria.js").EvaluationCriteria> = {
+const CRITERIA_MAP: Record<string, () => EvaluationCriteria> = {
   "code-review": () => new CodeReviewCriteria(),
   "test-coverage": () => new TestCoverageCriteria(),
   "spec-compliance": () => new SpecComplianceCriteria(),
@@ -1117,7 +1118,7 @@ agentRoute.openapi(evaluateOptimize, async (c) => {
 
   const criteria = config.criteria
     .map((name) => CRITERIA_MAP[name]?.())
-    .filter(Boolean) as import("../services/evaluation-criteria.js").EvaluationCriteria[];
+    .filter(Boolean) as EvaluationCriteria[];
 
   if (criteria.length === 0) {
     return c.json({ error: "No valid criteria specified" }, 400);
@@ -1641,10 +1642,10 @@ agentRoute.openapi(reflectExecute, async (c) => {
   const runner = createAgentRunner(c.env);
   const reflection = new AgentSelfReflection();
 
-  const execRequest: import("../services/execution-types.js").AgentExecutionRequest = {
+  const execRequest: AgentExecutionRequest = {
     taskId: originalRequest.taskId,
     agentId: "self-reflection",
-    taskType: originalRequest.taskType as import("../services/execution-types.js").AgentTaskType,
+    taskType: originalRequest.taskType as AgentTaskType,
     context: {
       repoUrl: "",
       branch: "",
@@ -1653,7 +1654,7 @@ agentRoute.openapi(reflectExecute, async (c) => {
     constraints: [],
   };
 
-  const execResult: import("../services/execution-types.js").AgentExecutionResult = {
+  const execResult: AgentExecutionResult = {
     status: result.status as "success" | "partial" | "failed",
     output: { analysis: result.output },
     tokensUsed: 0,
