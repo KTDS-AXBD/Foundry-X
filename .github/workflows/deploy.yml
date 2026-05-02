@@ -233,3 +233,5 @@ jobs:
         env:
           API_URL: https://foundry-x-api.ktds-axbd.workers.dev
           WEB_URL: https://fx.minu.best
+          # custom domain 다운(C99) 시 Pages 본체 URL로 자동 fallback → CI green 유지
+          WEB_URL_FALLBACK: https://foundry-x-web.pages.dev
