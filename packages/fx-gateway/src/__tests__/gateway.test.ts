@@ -29,7 +29,7 @@ describe("F523: Gateway DISCOVERY routing (hardwired)", () => {
     const mainApi = makeMainApiMock();
     const shapingMock = { fetch: vi.fn().mockResolvedValue(new Response("{}")) } as unknown as Fetcher;
     const offeringMock = { fetch: vi.fn().mockResolvedValue(new Response("{}")) } as unknown as Fetcher;
-    const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery, SHAPING: shapingMock, OFFERING: offeringMock, MODULES: makeModulesMock() };
+    const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery, SHAPING: shapingMock, OFFERING: offeringMock, MODULES: makeModulesMock(), AGENT: { fetch: vi.fn().mockResolvedValue(new Response("{}")) } as unknown as Fetcher };
 
     const res = await app.request("/api/discovery/items", {}, env);
 
@@ -43,7 +43,7 @@ describe("F523: Gateway DISCOVERY routing (hardwired)", () => {
     const mainApi = makeMainApiMock();
     const shapingMock = { fetch: vi.fn().mockResolvedValue(new Response("{}")) } as unknown as Fetcher;
     const offeringMock = { fetch: vi.fn().mockResolvedValue(new Response("{}")) } as unknown as Fetcher;
-    const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery, SHAPING: shapingMock, OFFERING: offeringMock, MODULES: makeModulesMock() };
+    const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery, SHAPING: shapingMock, OFFERING: offeringMock, MODULES: makeModulesMock(), AGENT: { fetch: vi.fn().mockResolvedValue(new Response("{}")) } as unknown as Fetcher };
 
     await app.request("/api/discovery/health", {}, env);
 
@@ -57,7 +57,7 @@ describe("F523: Gateway DISCOVERY routing (hardwired)", () => {
     const mainApi = makeMainApiMock();
     const shapingMock = { fetch: vi.fn().mockResolvedValue(new Response("{}")) } as unknown as Fetcher;
     const offeringMock = { fetch: vi.fn().mockResolvedValue(new Response("{}")) } as unknown as Fetcher;
-    const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery, SHAPING: shapingMock, OFFERING: offeringMock, MODULES: makeModulesMock() };
+    const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery, SHAPING: shapingMock, OFFERING: offeringMock, MODULES: makeModulesMock(), AGENT: { fetch: vi.fn().mockResolvedValue(new Response("{}")) } as unknown as Fetcher };
 
     const res = await app.request("/api/biz-items", {}, env);
 
@@ -71,7 +71,7 @@ describe("F523: Gateway DISCOVERY routing (hardwired)", () => {
     const discovery = makeDiscoveryMock();
     const shapingMock = { fetch: vi.fn().mockResolvedValue(new Response("{}")) } as unknown as Fetcher;
     const offeringMock = { fetch: vi.fn().mockResolvedValue(new Response("{}")) } as unknown as Fetcher;
-    const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery, SHAPING: shapingMock, OFFERING: offeringMock, MODULES: makeModulesMock() };
+    const env: GatewayEnv = { MAIN_API: mainApi, DISCOVERY: discovery, SHAPING: shapingMock, OFFERING: offeringMock, MODULES: makeModulesMock(), AGENT: { fetch: vi.fn().mockResolvedValue(new Response("{}")) } as unknown as Fetcher };
 
     await app.request(
       "/api/health",
@@ -95,6 +95,7 @@ describe("F539b: Gateway CORS (FX-REQ-577)", () => {
     SHAPING: makeShapingMock(),
     OFFERING: makeOfferingMock(),
     MODULES: makeModulesMock(),
+    AGENT: { fetch: vi.fn().mockResolvedValue(new Response("{}")) } as unknown as Fetcher,
   });
 
   it("OPTIONS preflight 요청에 CORS 헤더를 반환한다", async () => {

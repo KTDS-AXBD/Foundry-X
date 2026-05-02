@@ -32,6 +32,11 @@ service = "fx-offering"
 binding = "MODULES"
 service = "fx-modules"
 
+# F571: Service Binding — Agent Worker (Walking Skeleton)
+[[services]]
+binding = "AGENT"
+service = "fx-agent"
+
 # Local development
 [env.dev]
 name = "fx-gateway-dev"
@@ -55,3 +60,7 @@ service = "fx-offering-dev"
 [[env.dev.services]]
 binding = "MODULES"
 service = "fx-modules-dev"
+
+[[env.dev.services]]
+binding = "AGENT"
+service = "fx-agent-dev"

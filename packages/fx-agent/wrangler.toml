@@ -1,0 +1,32 @@
+name = "fx-agent"
+account_id = "b6c06059b413892a92f150e5ca496236"
+main = "src/index.ts"
+compatibility_date = "2026-03-17"
+compatibility_flags = ["nodejs_compat"]
+
+# F571: D1 바인딩 (동일 DB 공유)
+[[d1_databases]]
+binding = "DB"
+database_name = "foundry-x-db"
+database_id = "6338688e-b050-4835-98a2-7101f9215c76"
+
+# F571: MAIN_API Service Binding (Phase 46 잔여 cross-domain 호출 대비, 현재 unused)
+[[services]]
+binding = "MAIN_API"
+service = "foundry-x-api"
+
+[vars]
+ENVIRONMENT = "production"
+
+# Local development
+[env.dev]
+name = "fx-agent-dev"
+
+[[env.dev.d1_databases]]
+binding = "DB"
+database_name = "foundry-x-db"
+database_id = "6338688e-b050-4835-98a2-7101f9215c76"
+
+[[env.dev.services]]
+binding = "MAIN_API"
+service = "foundry-x-api-dev"

@@ -142,6 +142,38 @@ app.all("/api/launch/*", async (c) => {
   return c.env.MODULES.fetch(c.req.raw);
 });
 
+// F571: agent domain routes → fx-agent Worker (catch-all보다 위쪽에 등록)
+app.all("/api/agent-adapters/*", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/agent-definitions/*", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/command-registry/*", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/context-passthroughs/*", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/execution-events", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/execution-events/*", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/meta/*", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/task-states/*", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/orgs/:orgId/workflows", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+app.all("/api/orgs/:orgId/workflows/*", async (c) => {
+  return c.env.AGENT.fetch(c.req.raw);
+});
+
 // 그 외 모든 /api/* 요청은 MAIN_API로
 app.all("/api/*", async (c) => {
   return c.env.MAIN_API.fetch(c.req.raw);

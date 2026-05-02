@@ -10,4 +10,6 @@ export interface GatewayEnv {
   OFFERING: Fetcher;
   /** Service Binding — fx-modules Worker (F572: portal/gate/launch 통합) */
   MODULES: Fetcher;
+  /** Service Binding — fx-agent Worker (F571: Agent 도메인 분리) */
+  AGENT: Fetcher;
 }
