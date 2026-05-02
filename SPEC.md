@@ -1,14 +1,14 @@
 ---
 code: FX-SPEC-001
 title: Foundry-X Project Specification
-version: 6.22
+version: 6.23
 status: Active
 category: SPEC
-system-version: Sprint 321 ✅ F553 4주 관측 회고 CONDITIONAL GO (Match 98%) — Phase 46 착수 확정 / Sprint 322 F575 Ready
+system-version: Sprint 322 ✅ F575 — Phase 46 본격 진입 (fx-agent 15 routes 완성, PR #701 Match 97%). Sprint 321 ✅ F553 CONDITIONAL GO (PR #700) + GAP-1 해소(ax-marketplace 03a4e16) + F576 등록(Sprint 323 📋, core/agent 120 files cleanup)
 created: 2026-03-16
-updated: 2026-05-02
+updated: 2026-05-03
 author: Sinclair Seo
-sprint: 320
+sprint: 322
 ---
 
 # Foundry-X Project Specification
@@ -58,7 +58,7 @@ Foundry-X — AX 사업개발 라이프사이클을 AI 에이전트로 자동화
 > ```
 > wc -l SPEC.md && find packages/api/src/db/migrations/*.sql | sort | tail -1
 > ```
-> **마지막 실측** (Sprint 320, 2026-05-02): ~11 routes, ~34 services, ~14 schemas, D1 0139, 15 packages — **Phase 45 Batch 6 완결 (F571 ✅, fx-agent prod LIVE)**. **S314 수확**: **Sprint 320 F571 ✅** PR #697 `c9fa5657` Match 97% — fx-agent 신규 Worker. (a) `packages/fx-agent/` Hono Worker + 8 routes Walking Skeleton + Service Binding 구성, (b) fx-gateway 10줄 라우팅 추가, (c) JWT validation 401→403 정상(서명 검증 + RBAC 활성), (d) deploy.yml fx-agent step + path filter hotfix 2 commits + secret 3종(JWT_SECRET/ANTHROPIC_API_KEY/OPENROUTER_API_KEY) 등록. +6472/-9 56 files. autopilot 30분 완결 (16:51 CREATED → 17:23 MERGED). **신규 Worker 5종 체크리스트** → `feedback_msa_new_worker_5_artifacts.md` 등록. **S306~S314 8 세션 연속 성공**: Match 95→100→100→97→98→100→97→97% (F560~F571). 잔여 7 routes(agent/streaming/orchestration/captured-engine/derived-engine/skill-registry/skill-metrics)는 Phase 46 deferred. Phase 45 완전 종결
+> **마지막 실측** (Sprint 322, 2026-05-03): ~11 routes, ~34 services, ~14 schemas, D1 0139, 15 packages — **Phase 46 본격 진입 (F575 ✅, fx-agent 15 routes 완성)**. **S314 수확** (1세션 4 산출): **Sprint 321 F553 ✅** PR #700 Match 98% — Dual-AI 4주 회고 + **CONDITIONAL GO** 판정 (`docs/04-report/features/phase-46-f553-4week-retrospective.md`). 4 GAP 발견(GAP-1 save-dual-review 미호출 / GAP-2 output_tokens=0 / GAP-3 27 proposals pending / GAP-4 R6 rawValue=0). **GAP-1 즉시 해소** ax-marketplace `03a4e16` (sprint-autopilot Step 5c save-dual-review 호출 추가, drift=0 검증). **Sprint 322 F575 ✅** PR #701 Match 97% — Phase 46 잔여 7 routes(agent/streaming/orchestration/captured-engine/derived-engine/skill-registry/skill-metrics) fx-agent 완전 분리. +19,496/-2,331 (104 files). autopilot ~1시간 50분 완결. fx-agent **15 routes 완성**(F571 8 + F575 7), app.ts mount 0건. **잔존 cleanup**: `core/agent/` 120 files (services 65, schemas 15, routes 15, specs 8, orchestration 7, runtime 6, streaming 3) → **C102 등록 + 즉시 quick win 시도**(routes 12 통합 test 의존 차단) → **F576 승격** (Sprint 323 📋, FX-REQ-641, P1). **S306~S315 9 세션 연속 성공**: Match 95→100→100→97→98→100→97→97→**98→97**% (F560~F575). Phase 45 진정한 종결 + Phase 46 본격 진입
 
 ## §3 Phase 진행 현황
 
