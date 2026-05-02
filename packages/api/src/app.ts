@@ -22,12 +22,11 @@ import {
   discoveryShapePipelineRoute, discoveryStageRunnerRoute,
   // shaping — F540: 전체 fx-shaping Worker로 이전 (routes 제거됨)
   // offering — F541: 전체 fx-offering Worker로 이전 (routes 제거됨)
-  // agent (13 routes + F529 streaming)
-  agentRoute, agentAdaptersRoute, agentDefinitionRoute,
-  orchestrationRoute, executionEventsRoute, taskStateRoute,
+  // agent (8 routes — F575: agentRoute/orchestrationRoute/streamingRoute/capturedEngineRoute/derivedEngineRoute/skillRegistryRoute/skillMetricsRoute → fx-agent)
+  agentAdaptersRoute, agentDefinitionRoute,
+  executionEventsRoute, taskStateRoute,
   commandRegistryRoute, contextPassthroughRoute, workflowRoute,
-  capturedEngineRoute, derivedEngineRoute, skillRegistryRoute,
-  skillMetricsRoute, streamingRoute, metaRoute,
+  metaRoute,
   // harness (22 routes)
   harnessRoute, governanceRoute, guardRailRoute, auditRoute,
   backupRestoreRoute, ogdGenericRoute, ogdQualityRoute,
@@ -169,8 +168,7 @@ app.route("/api", integrityRoute);
 app.route("/api", healthRoute);
 app.route("/api", freshnessRoute);
 app.route("/api", requirementsRoute);
-app.route("/api", agentRoute);
-app.route("/api", streamingRoute);
+// F575: agentRoute/streamingRoute → fx-agent (Phase 46)
 app.route("/api", metaRoute);
 app.route("/api", tokenRoute);
 app.route("/api", specRoute);
@@ -254,14 +252,10 @@ app.route("/api", axBdKgRoute);
 app.route("/api", helpAgentRoute);
 // Sprint 96: HITL 인터랙션 패널 (F266)
 app.route("/api", hitlReviewRoute);
-// Sprint 103: 스킬 실행 메트릭 (F274)
-app.route("/api", skillMetricsRoute);
-// Sprint 104: 스킬 레지스트리 (F275)
-app.route("/api", skillRegistryRoute);
-// Sprint 105: DERIVED 엔진 (F276)
-app.route("/api", derivedEngineRoute);
-// Sprint 106: CAPTURED 엔진 (F277)
-app.route("/api", capturedEngineRoute);
+// Sprint 103: 스킬 실행 메트릭 (F274) → F575: fx-agent로 이전
+// Sprint 104: 스킬 레지스트리 (F275) → F575: fx-agent로 이전
+// Sprint 105: DERIVED 엔진 (F276) → F575: fx-agent로 이전
+// Sprint 106: CAPTURED 엔진 (F277) → F575: fx-agent로 이전
 // Sprint 107: BD ROI 벤치마크 (F278)
 app.route("/api", roiBenchmarkRoute);
 // Sprint 112: BD 형상화 Phase F → F540: fx-shaping으로 이전
@@ -276,8 +270,7 @@ app.route("/api", backupRestoreRoute);
 app.route("/api", taskStateRoute);
 // Sprint 149: Execution Events (F334, Phase 14)
 app.route("/api", executionEventsRoute);
-// Sprint 150: Orchestration Loop (F335, Phase 14)
-app.route("/api", orchestrationRoute);
+// Sprint 150: Orchestration Loop (F335, Phase 14) → F575: fx-agent로 이전
 // Sprint 151: Agent Adapter Registry (F336, Phase 14)
 app.route("/api", agentAdaptersRoute);
 
