@@ -3,7 +3,7 @@
  * MCP 서버가 호스트(Foundry-X)에게 LLM 추론을 요청할 때 처리
  * 보안: 모델 허용 목록, 토큰 한도, 분당 요청 제한, 이미지 차단
  */
-import type { LLMService } from "../../services/llm.js";
+import type { LLMService } from "../../../services/llm.js";
 import type { McpSamplingMessage } from "@foundry-x/shared";
 import { MODEL_HAIKU } from "@foundry-x/shared";
 

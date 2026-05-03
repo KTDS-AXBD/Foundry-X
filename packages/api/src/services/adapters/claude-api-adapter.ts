@@ -1,7 +1,7 @@
 // ─── F336: Claude API Runner → AgentAdapter (Sprint 151) ───
 
 import type { AgentAdapter } from "@foundry-x/shared";
-import { AgentAdapterFactory } from "../../services/agent/agent-adapter-factory.js";
+import { AgentAdapterFactory } from "../../core/agent/services/agent-adapter-factory.js";
 import { ClaudeApiRunner } from "../../core/agent/services/claude-api-runner.js";
 
 export function createClaudeApiAdapter(

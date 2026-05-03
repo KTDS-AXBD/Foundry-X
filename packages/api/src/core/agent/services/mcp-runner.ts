@@ -4,14 +4,14 @@ import type {
   McpTool,
   McpResource,
   McpResponse,
-} from "../../core/agent/services/mcp-adapter.js";
+} from "./mcp-adapter.js";
 import type { McpPrompt, McpPromptMessage, McpResourceTemplate, McpResourceContent } from "@foundry-x/shared";
-import { TASK_TYPE_TO_MCP_TOOL } from "../../core/agent/services/mcp-adapter.js";
+import { TASK_TYPE_TO_MCP_TOOL } from "./mcp-adapter.js";
 import type {
   AgentExecutionRequest,
   AgentExecutionResult,
   AgentTaskType,
-} from "./execution-types.js";
+} from "../../../services/agent/execution-types.js";
 
 let nextId = 1;
 

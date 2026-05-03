@@ -11,10 +11,10 @@ import type { TenantVariables } from "../../../middleware/tenant.js";
 import { createAgentRunner, createRoutedRunner } from "../../../services/agent/agent-runner.js";
 import { StageRunnerService } from "../services/stage-runner-service.js";
 import { DiscoveryGraphService } from "../services/discovery-graph-service.js";
-import { DiagnosticCollector } from "../../../services/agent/diagnostic-collector.js";
+import { DiagnosticCollector } from "../../agent/services/diagnostic-collector.js";
 import { MetaAgent } from "../../../core/agent/services/meta-agent.js";
 import { MetaApprovalService } from "../../../core/agent/services/meta-approval.js";
-import { ProposalRubric } from "../../../services/agent/proposal-rubric.js";
+import { ProposalRubric } from "../../agent/services/proposal-rubric.js";
 import type { DiscoveryType } from "../services/analysis-path-v82.js";
 import { GraphSessionService } from "../services/graph-session-service.js";
 
