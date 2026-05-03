@@ -6,8 +6,8 @@ import type {
   AgentRunnerType,
   AgentTaskType,
 } from "./execution-types.js";
-import { ClaudeApiRunner, MockRunner } from "./claude-api-runner.js";
-import { OpenRouterRunner } from "./openrouter-runner.js";
+import { ClaudeApiRunner, MockRunner } from "../../core/agent/services/claude-api-runner.js";
+import { OpenRouterRunner } from "../../core/agent/services/openrouter-runner.js";
 import { ModelRouter } from "./model-router.js";
 
 /**

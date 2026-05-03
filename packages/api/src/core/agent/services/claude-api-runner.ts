@@ -1,8 +1,8 @@
 import type {
   AgentExecutionRequest,
   AgentExecutionResult,
-} from "./execution-types.js";
-import type { AgentRunner } from "./agent-runner.js";
+} from "../../../services/agent/execution-types.js";
+import type { AgentRunner } from "../../../services/agent/agent-runner.js";
 import { TASK_SYSTEM_PROMPTS, buildUserPrompt, getSystemPrompt } from "./prompt-utils.js";
 import { MODEL_HAIKU } from "@foundry-x/shared";
 

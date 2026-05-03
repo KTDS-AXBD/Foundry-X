@@ -4,7 +4,7 @@
  * BMAD .agent.yaml 패턴을 Foundry-X에 적용
  */
 
-import { AgentDefinitionSchema } from "../../schemas/agent-definition.js";
+import { AgentDefinitionSchema } from "../../../schemas/agent-definition.js";
 import type { z } from "@hono/zod-openapi";
 
 export type AgentDefinition = z.infer<typeof AgentDefinitionSchema>;
