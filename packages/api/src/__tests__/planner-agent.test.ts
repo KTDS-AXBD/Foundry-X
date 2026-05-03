@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { PlannerAgent } from "../core/agent/services/planner-agent.js";
+import { PlannerAgent } from "../agent/services/planner-agent.js";
 
 function createMockDb() {
   return {

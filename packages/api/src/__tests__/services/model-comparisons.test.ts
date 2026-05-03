@@ -2,7 +2,7 @@
 // Sprint 290 — A/B 모델 비교 결과 D1 CRUD
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { ModelComparisonService } from "../../core/agent/services/model-comparisons.js";
+import { ModelComparisonService } from "../../agent/services/model-comparisons.js";
 import type { ModelComparison } from "@foundry-x/shared";
 
 // in-memory D1 mock

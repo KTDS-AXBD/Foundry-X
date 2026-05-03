@@ -16,7 +16,7 @@ const SCORE_JSON = JSON.stringify({
 });
 
 // Mock agent-runner
-vi.mock("../core/agent/services/agent-runner.js", () => ({
+vi.mock("../agent/services/agent-runner.js", () => ({
   createAgentRunner: () => ({
     type: "mock",
     execute: vi.fn().mockResolvedValue({

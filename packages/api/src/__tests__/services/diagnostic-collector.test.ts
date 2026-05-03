@@ -1,6 +1,6 @@
 // F530 Meta Layer (L4) — DiagnosticCollector TDD Red Phase
 import { describe, it, expect, beforeEach } from "vitest";
-import { DiagnosticCollector } from "../../core/agent/services/diagnostic-collector.js";
+import { DiagnosticCollector } from "../../agent/services/diagnostic-collector.js";
 import { createMockD1 } from "../helpers/mock-d1.js";
 import type { D1Database } from "@cloudflare/workers-types";
 

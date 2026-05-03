@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { McpServerRegistry } from "../core/agent/services/mcp-registry.js";
+import { McpServerRegistry } from "../agent/services/mcp-registry.js";
 import { createMockD1 } from "./helpers/mock-d1.js";
 
 describe("Service Integration (F63)", () => {

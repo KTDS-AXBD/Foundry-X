@@ -2,7 +2,7 @@
 // Sprint 310 — rubric_score=100 천장 현상 완화
 
 import { describe, it, expect } from "vitest";
-import { ProposalRubric } from "../../core/agent/services/proposal-rubric.js";
+import { ProposalRubric } from "../../agent/services/proposal-rubric.js";
 import type { ImprovementProposal } from "@foundry-x/shared";
 
 function makeProposal(overrides: Partial<ImprovementProposal> = {}): ImprovementProposal {

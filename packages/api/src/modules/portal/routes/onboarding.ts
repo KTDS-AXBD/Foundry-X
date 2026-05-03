@@ -8,11 +8,11 @@ import {
   SkillGuideResponseSchema,
   ProcessFlowResponseSchema,
   TeamFaqResponseSchema,
-} from "../../../core/agent/schemas/skill-guide.js";
+} from "../../../agent/schemas/skill-guide.js";
 import type { Env } from "../../../env.js";
 import { OnboardingProgressService } from "../services/onboarding-progress.js";
 import { KpiLogger } from "../services/kpi-logger.js";
-import { getSkillGuideData, getProcessFlowData, getTeamFaqData } from "../../../core/agent/services/skill-guide.js";
+import { getSkillGuideData, getProcessFlowData, getTeamFaqData } from "../../../agent/services/skill-guide.js";
 import type { JwtPayload } from "../../../middleware/auth.js";
 
 export const onboardingRoute = new OpenAPIHono<{ Bindings: Env }>();

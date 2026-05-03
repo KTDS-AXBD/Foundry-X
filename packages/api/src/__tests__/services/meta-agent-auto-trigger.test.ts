@@ -154,7 +154,7 @@ describe("F536: MetaAgent 자동 진단 훅", () => {
 
   it("OrchestrationLoop — MetaAgentHook 제공 시 5번째 인자로 수신", async () => {
     const { OrchestrationLoop } = await import(
-      "../../core/agent/services/orchestration-loop.js"
+      "../../agent/services/orchestration-loop.js"
     );
 
     const hookTrigger = vi.fn().mockResolvedValue(undefined);
@@ -176,7 +176,7 @@ describe("F536: MetaAgent 자동 진단 훅", () => {
 
   it("OrchestrationLoop — MetaAgentHook 미제공 시 에러 없음 (backward compat)", async () => {
     const { OrchestrationLoop } = await import(
-      "../../core/agent/services/orchestration-loop.js"
+      "../../agent/services/orchestration-loop.js"
     );
 
     // 기존 3개 인자만 전달 — backward compatible

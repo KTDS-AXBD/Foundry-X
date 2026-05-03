@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { AgentInbox } from "../core/agent/services/agent-inbox.js";
+import { AgentInbox } from "../agent/services/agent-inbox.js";
 
 function createMockDb() {
   return {

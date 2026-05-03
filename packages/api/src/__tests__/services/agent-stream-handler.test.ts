@@ -1,7 +1,7 @@
 // F529 Agent Streaming (L1) — TDD Red Phase
 import { describe, it, expect, vi } from "vitest";
-import { AgentStreamHandler, formatSSE } from "../../core/agent/streaming/agent-stream-handler.js";
-import { AgentMetricsService } from "../../core/agent/streaming/agent-metrics-service.js";
+import { AgentStreamHandler, formatSSE } from "../../agent/streaming/agent-stream-handler.js";
+import { AgentMetricsService } from "../../agent/streaming/agent-metrics-service.js";
 import type { AgentStreamEvent } from "@foundry-x/shared";
 
 // ─── 헬퍼: ReadableStream 컨트롤러 모킹 ───

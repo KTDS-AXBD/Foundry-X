@@ -2,7 +2,7 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { ExecutionEventService } from "../core/agent/services/execution-event-service.js";
+import { ExecutionEventService } from "../agent/services/execution-event-service.js";
 import { createTaskEvent } from "@foundry-x/shared";
 import type { HookEventPayload, CIEventPayload } from "@foundry-x/shared";
 

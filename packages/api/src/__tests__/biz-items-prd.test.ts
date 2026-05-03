@@ -3,7 +3,7 @@ import { app } from "../app.js";
 import { createTestEnv, createAuthHeaders } from "./helpers/test-app.js";
 
 // Mock agent-runner
-vi.mock("../core/agent/services/agent-runner.js", () => ({
+vi.mock("../agent/services/agent-runner.js", () => ({
   createAgentRunner: () => ({
     type: "mock",
     execute: vi.fn().mockResolvedValue({

@@ -14,13 +14,7 @@ export {
 
 // Offering Pipeline — F541: 전체 fx-offering Worker로 이전 완료 (F570: offeringPacksRoute 포함)
 
-// Agent/Orchestration — 8 routes (F575: 7 routes → fx-agent)
-export {
-  agentAdaptersRoute, agentDefinitionRoute,
-  executionEventsRoute, taskStateRoute,
-  commandRegistryRoute, contextPassthroughRoute, workflowRoute,
-  metaRoute,
-} from "./agent/index.js";
+// Agent/Orchestration — F576: 8 routes 제거 완료 (app.ts 등록 해제, fx-gateway → fx-agent Worker)
 
 // Harness/SDD/Governance — 22 routes
 export {

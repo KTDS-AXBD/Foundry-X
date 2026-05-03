@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { ContextPassthroughService } from "../core/agent/services/context-passthrough.js";
+import { ContextPassthroughService } from "../agent/services/context-passthrough.js";
 
 describe("ContextPassthroughService", () => {
   let service: ContextPassthroughService;

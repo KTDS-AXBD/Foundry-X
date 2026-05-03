@@ -16,7 +16,7 @@ import {
   autoAdvanceSchema,
   checkpointDecisionSchema,
 } from "../schemas/discovery-pipeline.js";
-import { SkillPipelineRunner } from "../../agent/services/skill-pipeline-runner.js";
+import { SkillPipelineRunner } from "../../../agent/services/skill-pipeline-runner.js";
 import { PipelineCheckpointService } from "../../../modules/launch/services/pipeline-checkpoint-service.js";
 import { PipelineNotificationService } from "../../../modules/launch/services/pipeline-notification-service.js";
 import { PipelinePermissionService } from "../../../modules/launch/services/pipeline-permission-service.js";

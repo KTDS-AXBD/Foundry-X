@@ -6,7 +6,7 @@ const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);
 
 // Mock the agent runner factory
-vi.mock("../core/agent/services/agent-runner.js", () => ({
+vi.mock("../agent/services/agent-runner.js", () => ({
   createAgentRunner: () => ({
     type: "mock",
     execute: vi.fn().mockResolvedValue({
@@ -25,7 +25,7 @@ vi.mock("../core/agent/services/agent-runner.js", () => ({
 vi.mock("../services/llm.js", () => ({
   LLMService: vi.fn().mockImplementation(() => ({})),
 }));
-vi.mock("../core/agent/services/reviewer-agent.js", () => ({
+vi.mock("../agent/services/reviewer-agent.js", () => ({
   ReviewerAgent: vi.fn().mockImplementation(() => ({
     reviewPullRequest: vi.fn().mockResolvedValue({
       decision: "approve",
@@ -38,7 +38,7 @@ vi.mock("../core/agent/services/reviewer-agent.js", () => ({
   })),
 }));
 
-import { agentRoute } from "../core/agent/routes/agent.js";
+import { agentRoute } from "../agent/routes/agent.js";
 
 describe("Agent Queue Routes (F68)", () => {
   let db: ReturnType<typeof createMockD1>;

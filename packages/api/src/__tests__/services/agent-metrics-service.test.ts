@@ -1,7 +1,7 @@
 // F529 Agent Streaming (L1) — AgentMetricsService TDD Red Phase
 import { describe, it, expect, beforeEach } from "vitest";
 import Database from "better-sqlite3";
-import { AgentMetricsService } from "../../core/agent/streaming/agent-metrics-service.js";
+import { AgentMetricsService } from "../../agent/streaming/agent-metrics-service.js";
 import type { D1Database } from "@cloudflare/workers-types";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";

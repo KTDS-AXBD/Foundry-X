@@ -1,7 +1,7 @@
 // F528 Graph Orchestration (L3) — DiscoveryGraph TDD Red Phase
 import { describe, it, expect, vi } from "vitest";
-import { createDiscoveryGraph } from "../../core/agent/orchestration/graphs/discovery-graph.js";
-import { GraphEngine } from "../../core/agent/orchestration/graph-engine.js";
+import { createDiscoveryGraph } from "../../agent/orchestration/graphs/discovery-graph.js";
+import { GraphEngine } from "../../agent/orchestration/graph-engine.js";
 
 describe("F528 DiscoveryGraph", () => {
   it("9개 이상의 노드가 정의되어 있다", () => {

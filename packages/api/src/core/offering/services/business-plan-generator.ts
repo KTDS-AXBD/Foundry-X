@@ -3,7 +3,7 @@
  * Sprint 215: F445 — 템플릿 파라미터 지원 추가
  */
 
-import type { AgentRunner } from "../../agent/services/agent-runner.js";
+import type { AgentRunner } from "../../../agent/services/agent-runner.js";
 import type { DiscoveryCriterion } from "../../discovery/services/discovery-criteria.js";
 import type { AnalysisContext } from "../../discovery/services/analysis-context.js";
 import type { BizItem, EvaluationWithScores } from "../../discovery/services/biz-item-service.js";

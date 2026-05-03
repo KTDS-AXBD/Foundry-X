@@ -1,10 +1,10 @@
 // F527 Agent Runtime (L2) — TDD Red Phase
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { defineTool } from "../../core/agent/runtime/define-tool.js";
-import { ToolRegistry } from "../../core/agent/runtime/tool-registry.js";
-import { TokenTracker } from "../../core/agent/runtime/token-tracker.js";
-import { parseAgentSpec } from "../../core/agent/runtime/agent-spec-loader.js";
-import { AgentRuntime } from "../../core/agent/runtime/agent-runtime.js";
+import { defineTool } from "../../agent/runtime/define-tool.js";
+import { ToolRegistry } from "../../agent/runtime/tool-registry.js";
+import { TokenTracker } from "../../agent/runtime/token-tracker.js";
+import { parseAgentSpec } from "../../agent/runtime/agent-spec-loader.js";
+import { AgentRuntime } from "../../agent/runtime/agent-runtime.js";
 import { z } from "zod";
 import type { RuntimeContext, AgentHooks } from "@foundry-x/shared";
 

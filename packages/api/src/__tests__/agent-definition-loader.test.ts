@@ -4,7 +4,7 @@ import {
   parseSimpleYaml,
   parseAgentDefinition,
   exportToYaml,
-} from "../core/agent/services/agent-definition-loader.js";
+} from "../agent/services/agent-definition-loader.js";
 import { CustomRoleManager } from "../core/harness/services/custom-role-manager.js";
 
 const CUSTOM_ROLES_DDL = `

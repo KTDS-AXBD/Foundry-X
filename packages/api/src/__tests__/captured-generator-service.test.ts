@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { CapturedSkillGeneratorService } from "../core/agent/services/captured-skill-generator.js";
+import { CapturedSkillGeneratorService } from "../agent/services/captured-skill-generator.js";
 
 const CAPTURED_TABLES = `
 CREATE TABLE IF NOT EXISTS captured_workflow_patterns (

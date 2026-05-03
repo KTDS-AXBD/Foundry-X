@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { contextPassthroughRoute, contextPassthroughServiceInstance } from "../core/agent/routes/context-passthrough.js";
+import { contextPassthroughRoute, contextPassthroughServiceInstance } from "../agent/routes/context-passthrough.js";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 

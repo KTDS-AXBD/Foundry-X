@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { createMockD1 } from "../helpers/mock-d1.js";
-import { metaRoute } from "../../core/agent/routes/meta.js";
+import { metaRoute } from "../../agent/routes/meta.js";
 import type { D1Database } from "@cloudflare/workers-types";
 import type { Env } from "../../env.js";
 

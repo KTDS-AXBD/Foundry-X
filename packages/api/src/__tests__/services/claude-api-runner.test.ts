@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { ClaudeApiRunner, MockRunner, TASK_SYSTEM_PROMPTS, UIHINT_INSTRUCTION, DEFAULT_LAYOUT_MAP } from "../../core/agent/services/claude-api-runner.js";
-import type { AgentExecutionRequest } from "../../core/agent/services/execution-types.js";
-import { uiHintSchema } from "../../core/agent/schemas/agent.js";
+import { ClaudeApiRunner, MockRunner, TASK_SYSTEM_PROMPTS, UIHINT_INSTRUCTION, DEFAULT_LAYOUT_MAP } from "../../agent/services/claude-api-runner.js";
+import type { AgentExecutionRequest } from "../../agent/services/execution-types.js";
+import { uiHintSchema } from "../../agent/schemas/agent.js";
 
 const makeRequest = (overrides?: Partial<AgentExecutionRequest>): AgentExecutionRequest => ({
   taskId: "task-abc123",

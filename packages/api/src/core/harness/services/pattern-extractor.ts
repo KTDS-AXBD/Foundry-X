@@ -10,7 +10,7 @@ import type {
   SkillRegistryEntry,
   SkillExecutionRecord,
 } from "@foundry-x/shared";
-import type { ExtractPatternsInput, ListPatternsQuery } from "../../agent/schemas/derived-engine.js";
+import type { ExtractPatternsInput, ListPatternsQuery } from "../../../agent/schemas/derived-engine.js";
 
 export class PatternExtractorService {
   constructor(private db: D1Database) {}

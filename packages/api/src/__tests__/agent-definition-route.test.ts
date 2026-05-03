@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
 import { createTestEnv } from "./helpers/test-app.js";
-import { agentDefinitionRoute } from "../core/agent/routes/agent-definition.js";
+import { agentDefinitionRoute } from "../agent/routes/agent-definition.js";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import type { Env } from "../env.js";
 

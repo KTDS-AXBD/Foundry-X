@@ -4,14 +4,14 @@
  * 2-1~2-8, 2-10 단계별 AI 분석 실행 + HITL 확인 로직
  */
 import { MODEL_HAIKU } from "@foundry-x/shared";
-import type { AgentRunner } from "../../agent/services/agent-runner.js";
-import type { AgentExecutionRequest } from "../../agent/services/execution-types.js";
+import type { AgentRunner } from "../../../agent/services/agent-runner.js";
+import type { AgentExecutionRequest } from "../../../agent/services/execution-types.js";
 import type { DiscoveryType, Intensity, Stage } from "./analysis-path-v82.js";
 import { ANALYSIS_PATH_MAP, STAGE_NAMES, VIABILITY_QUESTIONS, COMMIT_GATE_QUESTIONS } from "./analysis-path-v82.js";
 import { DiscoveryStageService } from "./discovery-stage-service.js";
 import { DiscoveryCriteriaService } from "./discovery-criteria.js";
 import type { DiscoveryGraphService } from "./discovery-graph-service.js";
-import type { DiagnosticCollector } from "../../agent/services/diagnostic-collector.js";
+import type { DiagnosticCollector } from "../../../agent/services/diagnostic-collector.js";
 
 /** F531: confirmStage graphMode 옵션 */
 export interface ConfirmStageOptions {

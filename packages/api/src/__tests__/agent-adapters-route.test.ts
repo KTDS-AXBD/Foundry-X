@@ -1,7 +1,7 @@
 // ─── F336: Agent Adapters Route Tests (Sprint 151) ───
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { agentAdaptersRoute, resetRegistry } from "../core/agent/routes/agent-adapters.js";
+import { agentAdaptersRoute, resetRegistry } from "../agent/routes/agent-adapters.js";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 

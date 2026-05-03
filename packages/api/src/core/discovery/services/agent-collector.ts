@@ -2,8 +2,8 @@
  * Sprint 57 F179: AgentCollector — LLM 기반 사업 아이템 자동 수집
  * ItemClassifier/StartingPointClassifier와 동일 패턴: AgentRunner.execute() + JSON parseResponse
  */
-import type { AgentRunner } from "../../agent/services/agent-runner.js";
-import type { AgentExecutionResult } from "../../agent/services/execution-types.js";
+import type { AgentRunner } from "../../../agent/services/agent-runner.js";
+import type { AgentExecutionResult } from "../../../agent/services/execution-types.js";
 import type { CollectionCandidate } from "../../collection/services/collection-pipeline.js";
 import {
   AGENT_COLLECTOR_SYSTEM_PROMPT,

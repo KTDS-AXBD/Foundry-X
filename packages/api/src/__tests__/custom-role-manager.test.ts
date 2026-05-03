@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
 import { CustomRoleManager, BUILTIN_ROLES } from "../core/harness/services/custom-role-manager.js";
-import { agentRoute } from "../core/agent/routes/agent.js";
+import { agentRoute } from "../agent/routes/agent.js";
 import { createTestEnv } from "./helpers/test-app.js";
 
 const CUSTOM_ROLES_DDL = `

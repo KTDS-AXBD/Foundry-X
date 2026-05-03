@@ -8,7 +8,7 @@ import {
   GeminiProvider,
   DeepSeekProvider,
   ExternalAiError,
-} from "../core/agent/services/external-ai-reviewer.js";
+} from "../agent/services/external-ai-reviewer.js";
 
 // ─── Sample valid review JSON ───
 

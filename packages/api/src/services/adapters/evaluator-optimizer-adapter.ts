@@ -1,7 +1,7 @@
 // ─── F336: EvaluatorOptimizer → AgentAdapter (Sprint 151) ───
 
 import type { AgentAdapter } from "@foundry-x/shared";
-import { AgentAdapterFactory } from "../../core/agent/services/agent-adapter-factory.js";
+import { AgentAdapterFactory } from "../../agent/services/agent-adapter-factory.js";
 import type { EvaluatorOptimizerConfig } from "../../core/harness/services/evaluator-optimizer.js";
 import { EvaluatorOptimizer } from "../../core/harness/services/evaluator-optimizer.js";
 

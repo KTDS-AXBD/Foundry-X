@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { McpSamplingHandler } from "../core/agent/services/mcp-sampling.js";
+import { McpSamplingHandler } from "../agent/services/mcp-sampling.js";
 import type { LLMService } from "../services/llm.js";
 import { createMockD1 } from "./helpers/mock-d1.js";
 
