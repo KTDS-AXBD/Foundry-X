@@ -911,11 +911,21 @@ phase_sprint_signals() {
     # ax-marketplace sprint-autopilot Step 5c가 우회된 경우에도 codex-review + save-dual-review를
     # 강제 호출하여 dual_ai_reviews D1 INSERT를 보장한다 (F553 GAP-1 실효 강화).
     # Foundry-X 전용. 스크립트 부재 시 silent skip (다른 프로젝트 영향 없음).
-    if [ -n "$wt_path" ] && [ -d "$wt_path" ]; then
+    #
+    # S319 강건화: PROJECT_ROOT 누락 케이스 (Sprint 328 hook miss, autopilot 신호 갱신 시
+    # PROJECT_ROOT 줄을 보존 안 한 경우 발견) — 표준 WT 경로로 fallback.
+    local hook_log="${SPRINT_SIGNAL_DIR}/save-dual-review-${sprint_num}.log"
+    if [ -z "$wt_path" ] || [ ! -d "$wt_path" ]; then
+      local fallback_wt="${CLAUDE_WT_BASE:-$HOME/work/worktrees}/${project}/sprint-${sprint_num}"
+      if [ -d "$fallback_wt" ]; then
+        wt_path="$fallback_wt"
+        log "🛟 sprint-${sprint_num} — wt_path PROJECT_ROOT 누락, 표준 경로 fallback ($wt_path)"
+      fi
+    fi
+    if [ -n "$wt_path" ] && [ -d "$wt_path" ] && [ ! -f "$hook_log" ]; then
       local cr_script="$wt_path/scripts/autopilot/codex-review.sh"
       local sd_script="$wt_path/scripts/autopilot/save-dual-review.sh"
       local cr_json="$wt_path/.claude/reviews/sprint-${sprint_num}/codex-review.json"
-      local hook_log="${SPRINT_SIGNAL_DIR}/save-dual-review-${sprint_num}.log"
       if [ -x "$sd_script" ]; then
         {
           echo "=== C103 fallback hook ($(date -Iseconds)) ==="
