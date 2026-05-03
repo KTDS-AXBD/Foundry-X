@@ -36,6 +36,9 @@ const SAMPLE_BODY = {
   model: "codex-cli",
 };
 
+// C103 (i) S315: POST는 X-Webhook-Secret 검증 필요. test 환경 secret 고정.
+const TEST_WEBHOOK_SECRET = "test-webhook-secret";
+
 function createApp(db: D1Database) {
   const app = new Hono<{ Bindings: Env }>();
   app.use("*", async (c, next) => {
@@ -45,8 +48,22 @@ function createApp(db: D1Database) {
   });
   app.route("/api", verificationRoute);
   return {
-    request: (path: string, init?: RequestInit) =>
-      app.request(path, init, { DB: db } as unknown as Env),
+    request: (path: string, init?: RequestInit) => {
+      // POST 요청에 X-Webhook-Secret 자동 첨부 (각 test가 명시 안 해도 됨)
+      const merged: RequestInit = { ...(init ?? {}) };
+      if (merged.method === "POST") {
+        const headers = new Headers(merged.headers);
+        if (!headers.has("x-webhook-secret")) {
+          headers.set("x-webhook-secret", TEST_WEBHOOK_SECRET);
+        }
+        merged.headers = headers;
+      }
+      return app.request(
+        path,
+        merged,
+        { DB: db, WEBHOOK_SECRET: TEST_WEBHOOK_SECRET } as unknown as Env,
+      );
+    },
   };
 }
 
@@ -62,6 +79,28 @@ describe("F552 Verification Routes", () => {
   });
 
   describe("POST /api/verification/dual-review", () => {
+    // C103 (i) S315: secret 미첨부/불일치 시 401
+    it("returns 401 when X-Webhook-Secret missing", async () => {
+      const res = await app.request("/api/verification/dual-review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-webhook-secret": "" },
+        body: JSON.stringify(SAMPLE_BODY),
+      });
+      expect(res.status).toBe(401);
+    });
+
+    it("returns 401 when X-Webhook-Secret mismatch", async () => {
+      const res = await app.request("/api/verification/dual-review", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-webhook-secret": "wrong-secret",
+        },
+        body: JSON.stringify(SAMPLE_BODY),
+      });
+      expect(res.status).toBe(401);
+    });
+
     it("creates a review and returns 201 with id", async () => {
       const res = await app.request("/api/verification/dual-review", {
         method: "POST",
