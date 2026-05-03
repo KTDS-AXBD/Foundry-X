@@ -152,42 +152,7 @@ describe("F536: MetaAgent 자동 진단 훅", () => {
     await expect(autoTriggerMetaAgent(db, sessionId, "test-api-key")).resolves.not.toThrow();
   });
 
-  it("OrchestrationLoop — MetaAgentHook 제공 시 5번째 인자로 수신", async () => {
-    const { OrchestrationLoop } = await import(
-      "../../services/agent/orchestration-loop.js"
-    );
-
-    const hookTrigger = vi.fn().mockResolvedValue(undefined);
-    const mockHook = { trigger: hookTrigger };
-
-    // OrchestrationLoop가 MetaAgentHook를 5번째 인자로 받는지 확인 (타입 캐스팅)
-    const loop = new (OrchestrationLoop as new (
-      a: unknown, b: unknown, c: unknown, d?: unknown, e?: unknown
-    ) => unknown)(
-      { getState: vi.fn().mockResolvedValue(null) },
-      { emit: vi.fn(), subscribe: vi.fn() },
-      db,
-      undefined,  // diagnostics (4번째)
-      mockHook,   // metaHook (5번째)
-    );
-
-    expect(loop).toBeDefined();
-  });
-
-  it("OrchestrationLoop — MetaAgentHook 미제공 시 에러 없음 (backward compat)", async () => {
-    const { OrchestrationLoop } = await import(
-      "../../services/agent/orchestration-loop.js"
-    );
-
-    // 기존 3개 인자만 전달 — backward compatible
-    expect(() => new (OrchestrationLoop as new (
-      a: unknown, b: unknown, c: unknown
-    ) => unknown)(
-      { getState: vi.fn() },
-      { emit: vi.fn(), subscribe: vi.fn() },
-      db,
-    )).not.toThrow();
-  });
+  // ─── F578: OrchestrationLoop 테스트 제거 (api/services/agent/orchestration-loop.ts 삭제, fx-agent 독립 구현) ───
 
   // ─── F544: bizItemId 기반 집계 + rubricScore 저장 ───────────────────────────
 
