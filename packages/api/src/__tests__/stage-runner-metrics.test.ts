@@ -2,7 +2,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
 import { StageRunnerService } from "../core/discovery/services/stage-runner-service.js";
-import { DiagnosticCollector } from "../agent/services/diagnostic-collector.js";
+import { DiagnosticCollector } from "../services/agent/diagnostic-collector.js";
 
 const EXTRA_SCHEMA = `ALTER TABLE biz_items ADD COLUMN discovery_type TEXT;`;
 

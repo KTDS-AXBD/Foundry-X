@@ -3,7 +3,7 @@ import mcpApp from "../core/harness/routes/mcp.js";
 import { createTestEnv } from "./helpers/test-app.js";
 
 // Mock transport + runner for prompts/sampling
-vi.mock("../agent/services/mcp-transport.js", () => ({
+vi.mock("../services/agent/mcp-transport.js", () => ({
   createTransport: vi.fn(() => ({
     type: "http",
     connect: vi.fn(),
@@ -13,7 +13,7 @@ vi.mock("../agent/services/mcp-transport.js", () => ({
   })),
 }));
 
-vi.mock("../agent/services/mcp-runner.js", () => ({
+vi.mock("../services/agent/mcp-runner.js", () => ({
   McpRunner: vi.fn().mockImplementation(() => ({
     listTools: vi.fn().mockResolvedValue([]),
     listPrompts: vi.fn().mockResolvedValue([

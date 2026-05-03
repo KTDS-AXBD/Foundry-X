@@ -5,8 +5,8 @@ import {
   HelpAgentLocalResponseSchema,
   HelpAgentHistoryResponseSchema,
 } from "../core/harness/schemas/help-agent-schema.js";
-import { OpenRouterService } from "../agent/services/openrouter-service.js";
-import { HelpAgentService } from "../agent/services/help-agent-service.js";
+import { OpenRouterService } from "../services/agent/openrouter-service.js";
+import { HelpAgentService } from "../services/agent/help-agent-service.js";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 

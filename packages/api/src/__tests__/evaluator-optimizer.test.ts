@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import type { AgentRunner } from "../agent/services/agent-runner.js";
+import type { AgentRunner } from "../services/agent/agent-runner.js";
 import type {
   AgentExecutionRequest,
   AgentExecutionResult,
-} from "../agent/services/execution-types.js";
+} from "../services/agent/execution-types.js";
 import {
   CodeReviewCriteria,
   TestCoverageCriteria,

@@ -3,7 +3,7 @@
  * F570: core/offering/services/prd-generator → services/prd-generator (Sprint 318)
  */
 
-import type { AgentRunner } from "../agent/services/agent-runner.js";
+import type { AgentRunner } from "../services/agent/agent-runner.js";
 import type { DiscoveryCriterion } from "../core/discovery/services/discovery-criteria.js";
 import type { AnalysisContext } from "../core/discovery/services/analysis-context.js";
 import type { StartingPointType } from "../core/discovery/services/analysis-paths.js";

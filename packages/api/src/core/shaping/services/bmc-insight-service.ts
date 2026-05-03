@@ -1,9 +1,9 @@
 /**
  * F201: BMC Block Insights — BMC 블록별 개선 인사이트를 LLM으로 생성
  */
-import { PromptGatewayService } from "../../../agent/services/prompt-gateway.js";
-import { ModelRouter } from "../../../agent/services/model-router.js";
-import type { AgentTaskType } from "../../../agent/services/execution-types.js";
+import { PromptGatewayService } from "../../../services/agent/prompt-gateway.js";
+import { ModelRouter } from "../../../services/agent/model-router.js";
+import type { AgentTaskType } from "../../../services/agent/execution-types.js";
 
 export interface BlockInsight {
   title: string;

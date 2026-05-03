@@ -3,7 +3,7 @@
  * 1차 PRD 기반 질문 생성 + 응답 반영 + 2차 PRD 생성
  */
 
-import type { AgentRunner } from "../../../agent/services/agent-runner.js";
+import type { AgentRunner } from "../../../services/agent/agent-runner.js";
 
 export interface InterviewQuestion {
   seq: number;

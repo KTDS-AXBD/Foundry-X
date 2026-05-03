@@ -1,7 +1,7 @@
 // ─── F336: Build Validator → AgentAdapter (Sprint 151) ───
 
 import type { AgentAdapter } from "@foundry-x/shared";
-import { AgentAdapterFactory } from "../../agent/services/agent-adapter-factory.js";
+import { AgentAdapterFactory } from "../../services/agent/agent-adapter-factory.js";
 
 export function createBuildValidatorAdapter(): AgentAdapter {
   return AgentAdapterFactory.fromYamlDefinition(

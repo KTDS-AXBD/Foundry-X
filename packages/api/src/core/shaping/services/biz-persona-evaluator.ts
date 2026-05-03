@@ -3,8 +3,8 @@
  * 8개 KT DS 역할 페르소나가 Promise.allSettled로 병렬 평가.
  * 최소 5/8 성공 시 판정 가능. G/K/R 비즈니스 규칙으로 최종 판정.
  */
-import type { AgentRunner } from "../../../agent/services/agent-runner.js";
-import type { AgentExecutionResult } from "../../../agent/services/execution-types.js";
+import type { AgentRunner } from "../../../services/agent/agent-runner.js";
+import type { AgentExecutionResult } from "../../../services/agent/execution-types.js";
 import {
   type BizItem,
   type Classification,

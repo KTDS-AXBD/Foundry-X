@@ -3,8 +3,8 @@
  * 3턴 대화 시뮬레이션으로 BizItem을 Type A/B/C로 분류한다.
  * AgentRunner를 통해 LLM 단일 호출, JSON 파싱 + 유효성 검증.
  */
-import type { AgentRunner } from "../../../agent/services/agent-runner.js";
-import type { AgentExecutionResult } from "../../../agent/services/execution-types.js";
+import type { AgentRunner } from "../../../services/agent/agent-runner.js";
+import type { AgentExecutionResult } from "../../../services/agent/execution-types.js";
 import {
   type BizItem,
   DEFAULT_WEIGHTS,
