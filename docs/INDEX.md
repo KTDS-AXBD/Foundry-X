@@ -99,6 +99,7 @@
 | FX-PLAN-324 | Sprint 324 — F577 packages/api/src/agent → fx-agent 실 이전 (Phase 46 진정 종결) | 1.0 | Approved | [01-plan/features/sprint-324.plan.md](01-plan/features/sprint-324.plan.md) |
 | FX-PLAN-325 | Sprint 325 — F578 api/services/agent 44 files 분류 + 부분 이전 (Phase 46 마지막 한 걸음) | 1.0 | Approved | [01-plan/features/sprint-325.plan.md](01-plan/features/sprint-325.plan.md) |
 | FX-PLAN-326 | Sprint 326 — F579 services/agent (i) 17 files deduplicate + 외부 import 갱신 | 1.0 | Approved | [01-plan/features/sprint-326.plan.md](01-plan/features/sprint-326.plan.md) |
+| FX-PLAN-327 | Sprint 327 — F580 services/agent KEEP 3 + (ii) 5 = 8 files contract 추출 + fx-agent 이전 (Phase 46 진정 종결 마지막 한 걸음) | 1.0 | Approved | [01-plan/features/sprint-327.plan.md](01-plan/features/sprint-327.plan.md) |
 
 ## DSGN
 
