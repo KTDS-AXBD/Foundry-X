@@ -96,6 +96,7 @@
 | FX-PLAN-S96 | Sprint 96 — HITL 인터랙션 패널 (F266) | 1.0 | Draft | [01-plan/features/sprint-96.plan.md](01-plan/features/sprint-96.plan.md) |
 | FX-PLAN-S97 | Sprint 97 — 발굴 UX 통합 QA + 팀 데모 | 1.0 | Draft | [01-plan/features/sprint-97.plan.md](01-plan/features/sprint-97.plan.md) |
 | FX-PLAN-S122 | Sprint 122 — E2E 테스트 종합 정비 + 주기적 점검 체계 | 1.0 | Draft | [01-plan/features/sprint-122.plan.md](01-plan/features/sprint-122.plan.md) |
+| FX-PLAN-324 | Sprint 324 — F577 packages/api/src/agent → fx-agent 실 이전 (Phase 46 진정 종결) | 1.0 | Approved | [01-plan/features/sprint-324.plan.md](01-plan/features/sprint-324.plan.md) |
 
 ## DSGN
 
