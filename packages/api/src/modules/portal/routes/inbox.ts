@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { AgentInbox } from "../../../services/agent/agent-inbox.js";
+import { AgentInbox } from "../../../services/agent-inbox.js";
 import { sendMessageSchema, listMessagesSchema, threadParamsSchema, threadQuerySchema, ackThreadParamsSchema } from "../schemas/inbox.js";
 import type { Env } from "../../../env.js";
 

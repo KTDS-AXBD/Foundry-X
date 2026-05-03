@@ -1,7 +1,7 @@
 /**
  * F136: 태스크별 모델 라우팅 — D1 규칙 기반 자동 모델 선택
  */
-import type { AgentTaskType, AgentRunnerType } from "./execution-types.js";
+import type { AgentTaskType, AgentRunnerType } from "./agent/execution-types.js";
 import { OR_MODEL_SONNET, OR_MODEL_HAIKU } from "@foundry-x/shared";
 
 export interface RoutingRule {

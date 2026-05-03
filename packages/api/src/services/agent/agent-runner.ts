@@ -8,7 +8,7 @@ import type {
 } from "./execution-types.js";
 import { ClaudeApiRunner, MockRunner } from "../../core/agent/services/claude-api-runner.js";
 import { OpenRouterRunner } from "../../core/agent/services/openrouter-runner.js";
-import { ModelRouter } from "./model-router.js";
+import { ModelRouter } from "../model-router.js";
 
 /**
  * 에이전트 실행의 추상화 계층.

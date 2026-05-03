@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { TransitionTrigger } from "../core/harness/services/transition-trigger.js";
 import { EventBus } from "../services/event-bus.js";
 import { TaskState, createTaskEvent } from "@foundry-x/shared";
-import type { TaskStateService } from "../services/agent/task-state-service.js";
+import type { TaskStateService } from "../services/task-state-service.js";
 import type { TaskStateRecord, HookEventPayload, CIEventPayload, ManualEventPayload } from "@foundry-x/shared";
 
 function makeTaskStateService(currentState: TaskState | null) {

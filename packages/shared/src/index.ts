@@ -527,3 +527,15 @@ export type {
   SkillExecutionResult,
   TriggerShapingInput,
 } from './discovery-contract.js';
+
+export type {
+  IDiscoveryPipelineRun,
+  IDiscoveryPipelineService,
+  IPipelineCheckpointService,
+  IDiscoveryStageService,
+  IBdSkillExecutor,
+  IAutoFixService,
+  IAuditEvent,
+  IAuditLogService,
+  ITransitionGuard,
+} from './agent-contracts.js';

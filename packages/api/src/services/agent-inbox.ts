@@ -1,5 +1,5 @@
 import type { AgentMessage, MessageType } from "@foundry-x/shared";
-import type { SSEManager } from "../../services/sse-manager.js";
+import type { SSEManager } from "./sse-manager.js";
 
 interface AgentInboxDeps {
   db: D1Database;
