@@ -27,7 +27,7 @@ turbo test / lint / typecheck  # 전체 검증
 
 ## Current Phase
 
-Phase 1~45 완료 (Sprint 1~320, fx-agent prod LIVE — Phase 45 Batch 6 완결). 상세: SPEC.md §5
+Phase 1~45 완료 + Phase 46 진행 중 (Sprint 1~323). 상세: SPEC.md §5
 - **Phase 37: Work Lifecycle Platform** ✅ (F516~F518, Sprint 273~275). PRD: `docs/specs/fx-work-lifecycle-platform/prd-final.md`
 - **Phase 38: Dashboard Overhaul** ✅ (F519, Sprint 276 PR #543)
 - **Phase 39: MSA Walking Skeleton** ✅ (F520~F523). F520/F521 Sprint 268, F522/F523 Sprint 277 PR #544. PRD: `docs/specs/fx-msa-roadmap/prd-final.md`
@@ -37,6 +37,7 @@ Phase 1~45 완료 (Sprint 1~320, fx-agent prod LIVE — Phase 45 Batch 6 완결)
 - **Phase 43: HyperFX Activation** ✅ (F534~F537, Sprint 287~289). Dogfood(KOAMI, S276)에서 확증된 3개 갭 해소 — DiagnosticCollector 훅 / Graph 정식 API+UI / MetaAgent 자동 진단
 - **Phase 44: MSA 2차 분리 + Agent 품질 튜닝** 🔧 (F538~F542). F542 ✅ Sprint 290 (MetaAgent 프롬프트 강화 + Sonnet 4.6 + A/B + Rubric, Dogfood P2 PASS 6 proposals), F538~F541 📋 W+6+ 구체화. 관찰: C65 F536 auto-trigger 저장 누락
 - **Phase 45: MSA 3rd Separation + SDD Triangle** ✅ (F560~F574). Batch 1 F560 ✅ Sprint 312, Batch 2 F561+F562 ✅ Sprint 313 / F563 ✅ Sprint 314 / F564+F569 ✅ Sprint 315 / F567+F568 ✅ Sprint 316 / F565 ✅ Sprint 317 (Batch 3 SDD Triangle CI, PR #684 Match 100%). Batch 4 F570 ✅ Sprint 318 (S312, PR #687 Match 97%). Batch 5 F572+F574 ✅ Sprint 319 (S313, PR #690 Match 100% + 3 hotfix). **Batch 6 완결**: F571 ✅ Sprint 320 (S314, PR #697 Match 97%, +6472/-9 56 files, autopilot 30분 완결). fx-agent Worker prod LIVE (gateway/agent 401 인증 보호 정상 응답). 잔여 7 routes(agent/streaming/orchestration/captured-engine/derived-engine/skill-registry/skill-metrics)는 Phase 46 deferred
+- **Phase 46: Strangler 종결 + Dual-AI 진정 해소** 🔧 (F553~F577). F553 ✅ Sprint 321 (PR #700, Match 98%, 4주 회고 CONDITIONAL GO + GAP-1 해소). F575 ✅ Sprint 322 (PR #701, Match 97%, fx-agent 15 routes 완성). F576 ⚠️(partial) Sprint 323 (PR #704, Match 97% literal but semantic ~30% — directory rename으로 `find core/agent=0`만 충족, PRD §3-2 7항목 중 1개만 통과). C103 ✅ S315 (3 layer silent fail 풀 fix: task-daemon hook + python NameError + verification public mount + X-Webhook-Secret) → dual_ai_reviews D1 INSERT 0→1건 (12일 stale 종료, F553 GAP-1 진정 해소). **다음**: F577 Sprint 324 — packages/api/src/agent → fx-agent 실 이전 (90 test + services 65 + cross-domain 20 contract화)
 - 장기 backlog 2건: F112, F117
 - 수치: `/ax:daily-check` 또는 SPEC.md §2 (하드코딩 금지)
 
