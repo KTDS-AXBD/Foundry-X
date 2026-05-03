@@ -1,6 +1,7 @@
 {
   "name": "foundry-x",
   "private": true,
+  "version": "1.9.0",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
     "build": "turbo build",

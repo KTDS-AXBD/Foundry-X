@@ -7,11 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-05-04
+
+> **마일스톤: Phase 46 100% literal 종결** — packages/api/src/services/agent 0 도달. fx-agent MSA 분리 완성 + Strangler 종결. Sprint 312~330 (S306~S321 14 세션 연속 성공, F560~F583).
+
 ### Added
-- F580 services/agent KEEP 3 + (ii) 5 = 8 files contract 추출 + fx-agent 이전 (PR #708) — Phase 46 진정 종결 마지막 한 걸음. autopilot ~30분 Match 97% literal + semantic 100% (OBSERVED P-a~P-h all PASS). services/agent 24→16, fx-agent 8 files 신설/이전, 외부 callers 20건 갱신, dual_ai_reviews 자동 INSERT 2건(누적 8건). 표면 충족 함정 13회차 회피 성공
-- F579 services/agent (i) 17 files deduplicate + 외부 import 갱신 (PR #707) — services/agent 41→24 + core/agent/services 신설(MSA 룰 부분 복원). codex_verdict=PASS 첫 발생
-- F578 api/services/agent 44 files 분류 + 부분 이전 (PR #706) — Design §A 3분류 작성(i 20/ii 5/iii 19) + dead code 3 deletion
-- F577 packages/api/src/agent → fx-agent 실 이전 (PR #705) — packages/api/src/agent/ 완전 제거
+- **F583 services/agent heavy 2 → core/agent/services/** (PR #713) — Phase 46 100% **literal** 종결 마지막 한 걸음. autopilot 14분 21초 (두 번째 빠른 기록), Match 98%, OBSERVED P-a~P-m 13/13 PASS (semantic 100%). services/agent 2→**0** 도달, 67 callers import 갱신, fx-agent self-contained closure 0건 확증, dual_ai_reviews 자동 INSERT 2건 (누적 14건). autopilot 옵션 A 변형 14회차 정착화 (cross-package binding 회피 + MSA core/{domain}/ 룰 부분 복원 acceptable variant)
+- **F581 services/agent 16→2** (PR #711) — autopilot 12분 32초 (Sprint 최단 기록), Match 100%. services/agent light 14 + DUP 12 + 신규 2 처리, 외부 callers 81건 갱신. codex_verdict=PASS-degraded 신규 카테고리 첫 발생 (codex가 acceptable variant 정교 평가)
+- **F582 Phase 47 GAP-4 회복** (PR #710) — Discovery 인프라 12일+ stop 회복. fx-discovery `DiscoveryStageService`에 DiagnosticCollector 호출 + autoTriggerMetaAgent 배선. 4월 21일 모든 metrics stop 패턴 해소 (F560 Pipeline/Stages fx-discovery 이관 부수효과 cross-cutting concern 도메인 분산 미정의). silent fail layer 5 발견·해소 (Sprint 328 signal PROJECT_ROOT 줄 누락 → daemon hook fallback 강건화 `af9308c7`)
+- **F580 services/agent KEEP 3 + (ii) 5 = 8 files contract 추출 + fx-agent 이전** (PR #708) — Phase 46 진정 종결 마지막 한 걸음. services/agent 24→16, fx-agent 8 files 신설/이전, 외부 callers 20건 갱신
+- **F579 services/agent (i) 17 files deduplicate + 외부 import 갱신** (PR #707) — services/agent 41→24 + core/agent/services 신설 (MSA 룰 부분 복원). codex_verdict=PASS 첫 발생
+- **F578 api/services/agent 44 files 분류 + 부분 이전** (PR #706) — Design §A 3분류 작성 (i 20/ii 5/iii 19) + dead code 3 deletion
+- **F577 packages/api/src/agent → fx-agent 실 이전** (PR #705) — packages/api/src/agent/ 완전 제거
+- **F576 directory rename** (PR #704) — `git mv core/agent → agent` directory rename (semantic ~30%, F577에서 실 이전 진행)
+- **F575 잔여 7 routes fx-agent 분리** (PR #701) — Phase 46 본격 진입. fx-agent 15 routes 완성 (F571 8 + F575 7), app.ts mount 0건. autopilot ~1시간 50분, Match 97%
+- **F553 Dual-AI 4주 회고 + CONDITIONAL GO** (PR #700) — `docs/04-report/features/phase-46-f553-4week-retrospective.md`. 4 GAP 발견 (GAP-1 save-dual-review 미호출 / GAP-2 output_tokens=0 / GAP-3 27 proposals pending / GAP-4 R6 rawValue=0). GAP-1 즉시 해소 ax-marketplace `03a4e16`
+- **Phase 45 SDD Triangle 종결** (Sprint 312~320, F560~F574) — Strangler 분리 + SDD Triangle CI. fx-discovery 7 routes (F567/568) + fx-shaping (F562/563) + fx-collection (F560) + fx-launch (F564/569) + fx-gateway (F570/F574)
+
+### Fixed
+- **C103 silent fail 3 layer 풀 fix** (S315) — F553 GAP-1 4주 stale 진정 해소. (a) task-daemon `phase_sprint_signals` STATUS=DONE hook 추가 + (b) save-dual-review.sh python NameError fix (degraded shell `False` literal 미변환, 한 달 silent — F553 GAP-1 hook 무효 1차 원인) + (c) verification routes public mount + X-Webhook-Secret 검증 (401 차단 해소). retroactive INSERT 검증 ✅ Sprint 323 verdict=BLOCK
+- **C104 silent fail layer 4 진정 해소** (S317) — `~/.bashrc sprint()`에 `.dev.vars` master→WT 자동 cp 로직 추가 (idempotent, snapshot, 사용자 커스텀 보호). Sprint 325/326/327 신규 WT 검증 ✅ — `🔐 .dev.vars 복사 (C104)` 두 줄 자동 출력. dual_ai_reviews 자동 INSERT 인프라 가동
+- **silent fail layer 5 진정 해소** (S319) — daemon `phase_sprint_signals` C103 hook에 PROJECT_ROOT fallback 추가 (`${CLAUDE_WT_BASE:-~/work/worktrees}/${project}/sprint-${N}` 표준 경로) + hook_log idempotent guard
+
+### Changed
+- **autopilot 옵션 A 변형 14회차 정착화** — `core/agent/services/`로 이동이 cross-package binding 회피 + MSA core/{domain}/ 룰 부분 복원의 안정적 trade-off. Plan 옵션 C deduplicate를 의도해도 autopilot은 일관되게 옵션 A 채택. fx-agent 분리 단방향 관성 (closure 충족) + MSA 부분 복원 양립
+- **F555 LLM 모델 ID 현행화 + 중앙 상수화** (PR #617, #618) — 구버전 모델 ID 최신화 (haiku-20250714→20251001, sonnet-4-5→4-6) + shared/model-defaults.ts 중앙 상수 도입 + undated alias 전환. 97파일, typecheck+3747 tests PASS
+
+### 통계 (v1.8.0 → v1.9.0)
+| 지표 | v1.8.0 (Phase 9a, 2026-03-31) | v1.9.0 (Phase 46, 2026-05-04) | 변화 |
+|------|:---:|:---:|:---:|
+| Phases 완료 | Phase 9a | Phase 46 | +37 phases |
+| Sprints | 86~91 | ~330 | +239 sprints |
+| F-items | F262 | F583 | +321 items |
+| Commits | — | 1,354 | — |
+| Days | — | 34 days | — |
+| Sprint 평균 Match Rate | — | 95~100% | 14 세션 연속 성공 (S306~S321) |
+
+### Phase 46 회고 핵심
+- **Phase 46 100% literal 종결**: services/agent 0 도달 (F576 directory rename → F577 실 이전 → F578 분류 → F579 deduplicate → F580 contract 추출 → F581 light 14 + DUP 12 + 신규 2 → F583 heavy 2 → 0). 점진적 종결 경로 확립
+- **autopilot 학습 진화**: PASS-degraded 신규 카테고리 발생 (F581 sprint 329) — codex가 acceptable variant 정교 평가 시작. dual_ai_reviews 인프라 정교화
+- **silent fail layer 5단 종결**: 한 layer fix 후 다음 layer 노출 사이클 반복 — C103 (3 layer) + C104 (.dev.vars) + S319 (PROJECT_ROOT fallback)
+- **표면 충족 함정 14회차 회피 패턴**: Plan §3 OBSERVED numerical 강제 (특히 P-a + P-c 동시 충족) + 사전 측정 정밀화 (callers 81 분류) 결합 효과
 
 ### Changed
 - F555 LLM 모델 ID 현행화 + 중앙 상수화 (PR #617, #618) — 구버전 모델 ID 최신화(haiku-20250714→20251001, sonnet-4-5→4-6) + shared/model-defaults.ts 중앙 상수 도입 + undated alias 전환. 97파일, typecheck+3747 tests PASS
