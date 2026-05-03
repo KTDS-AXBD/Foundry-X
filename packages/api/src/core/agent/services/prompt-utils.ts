@@ -2,7 +2,7 @@
  * F135: Shared prompt utilities — extracted from ClaudeApiRunner
  * for reuse across multiple runner backends (Claude API, OpenRouter, etc.)
  */
-import type { AgentExecutionRequest, AgentTaskType } from "../../../services/agent/execution-types.js";
+import type { AgentExecutionRequest, AgentTaskType } from "./execution-types.js";
 
 // F60: Generative UI — instruct LLM to include rendering hints
 export const UIHINT_INSTRUCTION = `\n\nAdditionally, include a "uiHint" field in your JSON response to suggest rendering.

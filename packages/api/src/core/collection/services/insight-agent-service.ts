@@ -3,7 +3,7 @@
  */
 import { PromptGatewayService } from "../../../services/prompt-gateway.js";
 import { ModelRouter } from "../../../services/model-router.js";
-import type { AgentTaskType } from "../../../services/agent/execution-types.js";
+import type { AgentTaskType } from "../../../core/agent/services/execution-types.js";
 
 export interface InsightJob {
   id: string;

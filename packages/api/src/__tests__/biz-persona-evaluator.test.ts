@@ -6,11 +6,11 @@ import {
 } from "../core/shaping/services/biz-persona-evaluator.js";
 import type { BizItem, Classification } from "../core/shaping/services/biz-persona-prompts.js";
 import { BIZ_PERSONAS } from "../core/shaping/services/biz-persona-prompts.js";
-import type { AgentRunner } from "../services/agent/agent-runner.js";
+import type { AgentRunner } from "../core/agent/services/agent-runner.js";
 import type {
   AgentExecutionRequest,
   AgentExecutionResult,
-} from "../services/agent/execution-types.js";
+} from "../core/agent/services/execution-types.js";
 
 // ─── Helpers ───
 

@@ -7,8 +7,8 @@ import type {
   AgentExecutionContext,
   AgentMetadata,
 } from "@foundry-x/shared";
-import type { AgentRunner } from "../../../services/agent/agent-runner.js";
-import type { AgentTaskType, AgentExecutionRequest, AgentExecutionResult } from "../../../services/agent/execution-types.js";
+import type { AgentRunner } from "./agent-runner.js";
+import type { AgentTaskType, AgentExecutionRequest, AgentExecutionResult } from "./execution-types.js";
 import type { EvaluatorOptimizer } from "../../harness/services/evaluator-optimizer.js";
 
 /**

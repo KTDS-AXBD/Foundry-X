@@ -1,6 +1,6 @@
-import type { AgentRunner } from "../../../services/agent/agent-runner.js";
+import type { AgentRunner } from "../../../core/agent/services/agent-runner.js";
 import type { SSEManager } from "../../../services/sse-manager.js";
-import type { AgentExecutionResult } from "../../../services/agent/execution-types.js";
+import type { AgentExecutionResult } from "../../../core/agent/services/execution-types.js";
 
 // ─── F101: Agent Hook AutoFix Service ───
 

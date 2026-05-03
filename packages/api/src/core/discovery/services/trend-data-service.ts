@@ -2,8 +2,8 @@
  * Sprint 57 F190: TrendDataService — 시장/트렌드 데이터 자동 연동
  * AgentRunner를 통해 LLM 호출 → JSON 파싱 → D1 저장, 24시간 캐시 TTL.
  */
-import type { AgentRunner } from "../../../services/agent/agent-runner.js";
-import type { AgentExecutionResult } from "../../../services/agent/execution-types.js";
+import type { AgentRunner } from "../../../core/agent/services/agent-runner.js";
+import type { AgentExecutionResult } from "../../../core/agent/services/execution-types.js";
 import { TREND_ANALYSIS_SYSTEM_PROMPT, buildTrendPrompt } from "./trend-data-prompts.js";
 
 export interface TrendReport {

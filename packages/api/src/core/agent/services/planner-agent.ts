@@ -1,5 +1,5 @@
 import type { AgentPlan } from "@foundry-x/shared";
-import type { AgentTaskType, AgentExecutionRequest } from "../../../services/agent/execution-types.js";
+import type { AgentTaskType, AgentExecutionRequest } from "./execution-types.js";
 
 export class PlannerAgent {
   constructor(private db: D1Database, private deps: unknown) {}

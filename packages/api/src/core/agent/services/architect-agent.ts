@@ -1,5 +1,5 @@
-import type { AgentExecutionRequest } from "../../../services/agent/execution-types.js";
-import { createRoutedRunner } from "../../../services/agent/agent-runner.js";
+import type { AgentExecutionRequest } from "./execution-types.js";
+import { createRoutedRunner } from "./agent-runner.js";
 
 export interface ArchitectureAnalysisResult {
   impactSummary: string;

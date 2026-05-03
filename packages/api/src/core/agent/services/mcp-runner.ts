@@ -11,7 +11,7 @@ import type {
   AgentExecutionRequest,
   AgentExecutionResult,
   AgentTaskType,
-} from "../../../services/agent/execution-types.js";
+} from "./execution-types.js";
 
 let nextId = 1;
 
