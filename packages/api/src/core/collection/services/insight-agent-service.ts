@@ -2,7 +2,7 @@
  * F202: InsightAgent — Market keyword summary agent with job queue
  */
 import { PromptGatewayService } from "../../../services/prompt-gateway.js";
-import { ModelRouter } from "../../../services/model-router.js";
+import { ModelRouter } from "../../agent/services/model-router.js";
 import type { AgentTaskType } from "../../../core/agent/services/execution-types.js";
 
 export interface InsightJob {
