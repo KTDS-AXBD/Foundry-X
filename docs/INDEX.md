@@ -1,7 +1,7 @@
 # 문서 인덱스
 
 > 마지막 갱신: 2026-05-03
-> 총 GOV 문서: 226개 | 자동 생성 (ax-gov-doc check)
+> 총 GOV 문서: 227개 | 자동 생성 (ax-gov-doc check)
 
 ## SPEC
 
@@ -100,6 +100,7 @@
 | FX-PLAN-325 | Sprint 325 — F578 api/services/agent 44 files 분류 + 부분 이전 (Phase 46 마지막 한 걸음) | 1.0 | Approved | [01-plan/features/sprint-325.plan.md](01-plan/features/sprint-325.plan.md) |
 | FX-PLAN-326 | Sprint 326 — F579 services/agent (i) 17 files deduplicate + 외부 import 갱신 | 1.0 | Approved | [01-plan/features/sprint-326.plan.md](01-plan/features/sprint-326.plan.md) |
 | FX-PLAN-327 | Sprint 327 — F580 services/agent KEEP 3 + (ii) 5 = 8 files contract 추출 + fx-agent 이전 (Phase 46 진정 종결 마지막 한 걸음) | 1.0 | Approved | [01-plan/features/sprint-327.plan.md](01-plan/features/sprint-327.plan.md) |
+| FX-PLAN-328 | Sprint 328 — F582 GAP-4 Discovery 인프라 회복 + DiagnosticCollector trigger 경로 fix (옵션 C: graph=main-api 유지, stage=fx-discovery 측 collector 추가) | 1.0 | Approved | [01-plan/features/sprint-328.plan.md](01-plan/features/sprint-328.plan.md) |
 
 ## DSGN
 
