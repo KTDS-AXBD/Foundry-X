@@ -2,7 +2,7 @@
 
 import type { AgentAdapter } from "@foundry-x/shared";
 import { AgentAdapterFactory } from "../../services/agent/agent-adapter-factory.js";
-import { ClaudeApiRunner } from "../../services/agent/claude-api-runner.js";
+import { ClaudeApiRunner } from "../../core/agent/services/claude-api-runner.js";
 
 export function createClaudeApiAdapter(
   apiKey: string,
