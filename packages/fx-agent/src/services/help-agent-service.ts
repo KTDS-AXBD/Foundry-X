@@ -1,4 +1,5 @@
-import { OpenRouterService, type ChatMessage } from "./openrouter-service.js";
+import type { OpenRouterService} from "./openrouter-service.js";
+import { type ChatMessage } from "./openrouter-service.js";
 
 export interface ChatParams {
   tenantId: string;

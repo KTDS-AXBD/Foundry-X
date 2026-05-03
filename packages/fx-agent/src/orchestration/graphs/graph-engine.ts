@@ -108,7 +108,6 @@ export class GraphEngine {
 
     while (queue.length > 0) {
       const currentBatch = [...queue];
-      queue = [];
 
       // 현재 배치를 병렬 실행
       const results = await Promise.all(

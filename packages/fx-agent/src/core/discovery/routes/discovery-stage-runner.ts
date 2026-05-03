@@ -43,7 +43,7 @@ export async function autoTriggerMetaAgent(
   if (overallScore >= 70) return;
 
   // Call MetaAgent (mocked in tests via vi.stubGlobal fetch)
-  let proposals: ProposalItem[] = [];
+  let proposals: ProposalItem[];
   try {
     const res = await fetch(ANTHROPIC_API_URL, {
       method: "POST",
