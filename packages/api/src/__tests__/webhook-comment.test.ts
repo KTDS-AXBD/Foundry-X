@@ -48,7 +48,7 @@ vi.mock("../services/llm.js", () => ({
   LLMService: vi.fn().mockImplementation(() => ({})),
 }));
 
-vi.mock("../services/agent/reviewer-agent.js", () => ({
+vi.mock("../services/reviewer-agent.js", () => ({
   ReviewerAgent: vi.fn().mockImplementation(() => ({})),
 }));
 

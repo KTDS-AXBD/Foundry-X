@@ -5,7 +5,7 @@ import { GitHubService } from "../services/github.js";
 import { GitHubSyncService } from "../services/github-sync.js";
 import { githubIssueEventSchema, githubPrEventSchema, githubCommentEventSchema } from "../schemas/webhook.js";
 import { LLMService } from "../../../services/llm.js";
-import { ReviewerAgent } from "../../../services/agent/reviewer-agent.js";
+import { ReviewerAgent } from "../../../services/reviewer-agent.js";
 import { GitHubReviewService, parseFoundryCommand, ReviewCooldownError, HELP_COMMENT, formatStatusComment } from "../services/github-review.js";
 import { FeedbackQueueService } from "../services/feedback-queue-service.js";
 import { SSEManager } from "../../../services/sse-manager.js";
