@@ -1,7 +1,7 @@
 # 문서 인덱스
 
 > 마지막 갱신: 2026-05-03
-> 총 GOV 문서: 225개 | 자동 생성 (ax-gov-doc check)
+> 총 GOV 문서: 226개 | 자동 생성 (ax-gov-doc check)
 
 ## SPEC
 
@@ -98,6 +98,7 @@
 | FX-PLAN-S122 | Sprint 122 — E2E 테스트 종합 정비 + 주기적 점검 체계 | 1.0 | Draft | [01-plan/features/sprint-122.plan.md](01-plan/features/sprint-122.plan.md) |
 | FX-PLAN-324 | Sprint 324 — F577 packages/api/src/agent → fx-agent 실 이전 (Phase 46 진정 종결) | 1.0 | Approved | [01-plan/features/sprint-324.plan.md](01-plan/features/sprint-324.plan.md) |
 | FX-PLAN-325 | Sprint 325 — F578 api/services/agent 44 files 분류 + 부분 이전 (Phase 46 마지막 한 걸음) | 1.0 | Approved | [01-plan/features/sprint-325.plan.md](01-plan/features/sprint-325.plan.md) |
+| FX-PLAN-326 | Sprint 326 — F579 services/agent (i) 17 files deduplicate + 외부 import 갱신 | 1.0 | Approved | [01-plan/features/sprint-326.plan.md](01-plan/features/sprint-326.plan.md) |
 
 ## DSGN
 
