@@ -7,6 +7,12 @@ SPRINT_NUM="${SPRINT_NUM:-}"
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 API_URL="${VITE_API_URL:-https://fx-gateway.ktds-axbd.workers.dev/api}"
 
+# C103 (i) S315: WEBHOOK_SECRET 로드 (env > .dev.vars 순)
+WEBHOOK_SECRET="${WEBHOOK_SECRET:-}"
+if [ -z "$WEBHOOK_SECRET" ] && [ -f "$REPO_ROOT/packages/api/.dev.vars" ]; then
+  WEBHOOK_SECRET=$(grep "^WEBHOOK_SECRET=" "$REPO_ROOT/packages/api/.dev.vars" | head -1 | cut -d= -f2- | sed 's/^"//;s/"$//')
+fi
+
 for arg in "$@"; do
   case "$arg" in
     --sprint) shift; SPRINT_NUM="${1:-}" ;;
@@ -71,10 +77,17 @@ if [ -z "$body" ]; then
   exit 0
 fi
 
+# C103 (i) S315: WEBHOOK_SECRET 헤더 첨부 (서버 측 abuse 방어 검증)
+if [ -z "$WEBHOOK_SECRET" ]; then
+  echo "[save-dual-review] ⚠️  WEBHOOK_SECRET 미설정 (env 또는 packages/api/.dev.vars) — POST skip"
+  exit 0
+fi
+
 # POST to API
 response=$(curl -s -w "\n%{http_code}" -X POST \
   "${API_URL}/verification/dual-review" \
   -H "Content-Type: application/json" \
+  -H "X-Webhook-Secret: ${WEBHOOK_SECRET}" \
   -d "$body" 2>/dev/null || echo "")
 
 http_code=$(echo "$response" | tail -1)

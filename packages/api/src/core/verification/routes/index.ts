@@ -1,4 +1,5 @@
 // F552: Dual AI Review routes (Hono sub-app)
+// C103 (i) S315: authMiddleware 이전 mount — X-Webhook-Secret 검증으로 POST abuse 방어.
 import { Hono } from "hono";
 import { DualReviewService } from "../services/dual-review.service.js";
 import { DualReviewInsertSchema } from "../schemas.js";
@@ -7,6 +8,13 @@ import type { Env } from "../../../env.js";
 const app = new Hono<{ Bindings: Env }>();
 
 app.post("/verification/dual-review", async (c) => {
+  // C103 (i): autopilot CI 시스템 호출 검증 (WEBHOOK_SECRET 미설정 시 거부)
+  const expected = c.env.WEBHOOK_SECRET;
+  const provided = c.req.header("x-webhook-secret");
+  if (!expected || !provided || expected !== provided) {
+    return c.json({ error: "invalid or missing x-webhook-secret" }, 401);
+  }
+
   const body = await c.req.json();
   const parsed = DualReviewInsertSchema.safeParse(body);
   if (!parsed.success) {

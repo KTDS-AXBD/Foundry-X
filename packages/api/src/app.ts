@@ -154,6 +154,11 @@ app.route("/api", decodeBridgeRoute);
 // authMiddleware 이전에 배치하여 JWT 없이 접근 가능
 app.route("/api", internalPrototypeJobsRoute);
 
+// C103 (i) Sprint 323 (S315): Dual AI Review (F552) — autopilot CI 시스템 호출 endpoint.
+// authMiddleware 이전 mount + 라우트 내부에서 X-Webhook-Secret 검증으로 abuse 방어.
+// scripts/autopilot/save-dual-review.sh가 task-daemon C103 (a) hook을 통해 호출.
+app.route("/api", verificationRoute);
+
 // Protected API routes — JWT required + tenant isolation
 app.use("/api/*", authMiddleware);
 app.use("/api/*", tenantGuard);
@@ -303,8 +308,7 @@ app.route("/api", filesRoute);
 
 // Sprint 298: fx-ai-foundry-os Decode-X 연동 (F546) — public mount는 line 220 이전으로 이동됨
 
-// Sprint 303: Dual AI Review (F552)
-app.route("/api", verificationRoute);
+// Sprint 303: Dual AI Review (F552) — C103 (i) S315에서 authMiddleware 이전으로 이동됨
 
 // Sprint 261: Work Observability Walking Skeleton (F509)
 app.route("/api", workRoute);
