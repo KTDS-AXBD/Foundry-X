@@ -1,7 +1,7 @@
 // ─── F531: DiscoveryGraphService — Graph 기반 발굴 파이프라인 오케스트레이터 ───
-import { GraphEngine } from "../../../agent/orchestration/graph-engine.js";
-import { createDiscoveryGraph, type GraphStageInput } from "../../../agent/orchestration/graphs/discovery-graph.js";
-import type { AgentRunner } from "../../../agent/services/agent-runner.js";
+import { GraphEngine } from "../../../services/agent/graph-engine.js";
+import { createDiscoveryGraph, type GraphStageInput } from "../../../services/agent/graphs/discovery-graph.js";
+import type { AgentRunner } from "../../../services/agent/agent-runner.js";
 import type { GraphRunResult } from "@foundry-x/shared";
 
 export type { GraphStageInput };

@@ -10,7 +10,7 @@ import { CreateBizItemSchema, ClassifyBizItemSchema } from "../schemas/biz-item.
 import { BizItemService } from "../services/biz-item-service.js";
 import { ItemClassifier, ClassificationError } from "../services/item-classifier.js";
 import { BizPersonaEvaluator, EvaluationError } from "../../shaping/services/biz-persona-evaluator.js";
-import { createAgentRunner } from "../../../agent/services/agent-runner.js";
+import { createAgentRunner } from "../../../services/agent/agent-runner.js";
 import { StartingPointClassifier, StartingPointError } from "../services/starting-point-classifier.js";
 // Sprint 221 imports (F456)
 import { PrdConfirmationService } from "../../offering/services/prd-confirmation-service.js";

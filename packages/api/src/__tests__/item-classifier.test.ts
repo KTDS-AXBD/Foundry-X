@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ItemClassifier, ClassificationError } from "../core/discovery/services/item-classifier.js";
 import type { BizItem } from "../core/discovery/services/item-classification-prompts.js";
 import { DEFAULT_WEIGHTS } from "../core/discovery/services/item-classification-prompts.js";
-import type { AgentRunner } from "../agent/services/agent-runner.js";
+import type { AgentRunner } from "../services/agent/agent-runner.js";
 import type {
   AgentExecutionRequest,
   AgentExecutionResult,
-} from "../agent/services/execution-types.js";
+} from "../services/agent/execution-types.js";
 
 // ─── Helpers ───
 

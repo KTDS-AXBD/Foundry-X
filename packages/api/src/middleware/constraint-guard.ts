@@ -1,5 +1,5 @@
 import type { MiddlewareHandler } from "hono";
-import { AgentOrchestrator } from "../agent/services/agent-orchestrator.js";
+import { AgentOrchestrator } from "../services/agent/agent-orchestrator.js";
 import type { Env } from "../env.js";
 
 export const constraintGuard: MiddlewareHandler<{ Bindings: Env }> = async (

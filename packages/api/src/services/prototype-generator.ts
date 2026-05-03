@@ -2,7 +2,7 @@
  * Sprint 58: Prototype 자동 생성 서비스 (F181)
  */
 
-import type { AgentRunner } from "../agent/services/agent-runner.js";
+import type { AgentRunner } from "../services/agent/agent-runner.js";
 import type { BizItem, EvaluationWithScores } from "../core/discovery/services/biz-item-service.js";
 import type { DiscoveryCriterion } from "../core/discovery/services/discovery-criteria.js";
 import type { StartingPointType } from "../core/discovery/services/analysis-paths.js";

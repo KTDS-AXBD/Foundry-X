@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { StartingPointClassifier, StartingPointError } from "../core/discovery/services/starting-point-classifier.js";
-import type { AgentRunner } from "../agent/services/agent-runner.js";
-import type { AgentExecutionResult } from "../agent/services/execution-types.js";
+import type { AgentRunner } from "../services/agent/agent-runner.js";
+import type { AgentExecutionResult } from "../services/agent/execution-types.js";
 
 function mockRunner(analysis: string, status: "success" | "failed" = "success"): AgentRunner {
   return {
