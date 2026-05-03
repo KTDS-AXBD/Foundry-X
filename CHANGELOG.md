@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- F580 services/agent KEEP 3 + (ii) 5 = 8 files contract 추출 + fx-agent 이전 (PR #708) — Phase 46 진정 종결 마지막 한 걸음. autopilot ~30분 Match 97% literal + semantic 100% (OBSERVED P-a~P-h all PASS). services/agent 24→16, fx-agent 8 files 신설/이전, 외부 callers 20건 갱신, dual_ai_reviews 자동 INSERT 2건(누적 8건). 표면 충족 함정 13회차 회피 성공
+- F579 services/agent (i) 17 files deduplicate + 외부 import 갱신 (PR #707) — services/agent 41→24 + core/agent/services 신설(MSA 룰 부분 복원). codex_verdict=PASS 첫 발생
+- F578 api/services/agent 44 files 분류 + 부분 이전 (PR #706) — Design §A 3분류 작성(i 20/ii 5/iii 19) + dead code 3 deletion
+- F577 packages/api/src/agent → fx-agent 실 이전 (PR #705) — packages/api/src/agent/ 완전 제거
+
 ### Changed
 - F555 LLM 모델 ID 현행화 + 중앙 상수화 (PR #617, #618) — 구버전 모델 ID 최신화(haiku-20250714→20251001, sonnet-4-5→4-6) + shared/model-defaults.ts 중앙 상수 도입 + undated alias 전환. 97파일, typecheck+3747 tests PASS
 
