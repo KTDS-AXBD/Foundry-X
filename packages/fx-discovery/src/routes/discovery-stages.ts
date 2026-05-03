@@ -41,13 +41,15 @@ discoveryStagesRoute.post("/biz-items/:id/discovery-stage", async (c) => {
   // F582: DiagnosticCollector — stage 업데이트 기록 (GAP-4 회복)
   // sessionId 패턴: "stage-{stage}-{bizItemId}" (StageRunnerService와 동일)
   const collector = new DiagnosticCollector(c.env.DB);
-  void collector.record(
-    `stage-${parsed.data.stage}-${bizItemId}`,
-    "discovery-stage-runner",
-    "success",
-    0,
-    0,
-  );
+  void collector
+    .record(
+      `stage-${parsed.data.stage}-${bizItemId}`,
+      "discovery-stage-runner",
+      "success",
+      0,
+      0,
+    )
+    .catch((e: unknown) => console.error("[F582] DiagnosticCollector.record failed:", e));
 
   // F582: autoTriggerMetaAgent — completed 상태 전환 시 MetaAgent 자동 진단 (fire-and-forget)
   if (parsed.data.status === "completed" && c.env.ANTHROPIC_API_KEY) {
