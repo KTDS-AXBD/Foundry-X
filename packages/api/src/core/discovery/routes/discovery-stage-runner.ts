@@ -8,7 +8,7 @@ import { z } from "zod";
 import type { Env } from "../../../env.js";
 import { MODEL_SONNET } from "@foundry-x/shared";
 import type { TenantVariables } from "../../../middleware/tenant.js";
-import { createAgentRunner, createRoutedRunner } from "../../../services/agent/agent-runner.js";
+import { createAgentRunner, createRoutedRunner } from "../../../core/agent/services/agent-runner.js";
 import { StageRunnerService } from "../services/stage-runner-service.js";
 import { DiscoveryGraphService } from "../services/discovery-graph-service.js";
 import { DiagnosticCollector } from "../../agent/services/diagnostic-collector.js";

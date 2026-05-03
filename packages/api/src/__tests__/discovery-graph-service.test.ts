@@ -3,7 +3,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import type { AgentRunner } from "../services/agent/agent-runner.js";
+import type { AgentRunner } from "../core/agent/services/agent-runner.js";
 import { DiscoveryGraphService } from "../core/discovery/services/discovery-graph-service.js";
 
 const SCHEMA = `

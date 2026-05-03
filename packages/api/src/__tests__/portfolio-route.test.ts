@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { app } from "../app.js";
 import { createTestEnv, createAuthHeaders } from "./helpers/test-app.js";
 
-vi.mock("../agent/services/agent-runner.js", () => ({
+vi.mock("../core/agent/services/agent-runner.js", () => ({
   createAgentRunner: () => ({ type: "mock", execute: vi.fn(), isAvailable: () => Promise.resolve(true), supportsTaskType: () => true }),
   createRoutedRunner: () => Promise.resolve({ type: "mock", execute: vi.fn(), isAvailable: () => Promise.resolve(true), supportsTaskType: () => true }),
 }));

@@ -4,7 +4,7 @@
 import { randomUUID } from "node:crypto";
 import type { D1Database } from "@cloudflare/workers-types";
 import type { DiagnosticReport, AxisScore, DiagnosticAxis, GraphRunResult } from "@foundry-x/shared";
-import type { AgentExecutionResult } from "../../../services/agent/execution-types.js";
+import type { AgentExecutionResult } from "./execution-types.js";
 
 interface AgentRunRow {
   rounds: number;

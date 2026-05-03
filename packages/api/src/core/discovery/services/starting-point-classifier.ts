@@ -3,8 +3,8 @@
  * BDP-002 §4 기반 — LLM으로 사업 아이템의 시작점을 분류
  */
 
-import type { AgentRunner } from "../../../services/agent/agent-runner.js";
-import type { AgentExecutionResult } from "../../../services/agent/execution-types.js";
+import type { AgentRunner } from "../../../core/agent/services/agent-runner.js";
+import type { AgentExecutionResult } from "../../../core/agent/services/execution-types.js";
 import {
   STARTING_POINT_SYSTEM_PROMPT,
   buildStartingPointPrompt,

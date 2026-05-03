@@ -3,7 +3,7 @@ import { app } from "../app.js";
 import { createTestEnv, createAuthHeaders } from "./helpers/test-app.js";
 
 // Mock agent-runner — 5시작점 분류 JSON 반환
-vi.mock("../services/agent/agent-runner.js", () => ({
+vi.mock("../core/agent/services/agent-runner.js", () => ({
   createAgentRunner: () => ({
     type: "mock",
     execute: vi.fn().mockResolvedValue({
@@ -152,7 +152,7 @@ describe("BizItems Starting Point Routes (F182)", () => {
 
   it("POST /starting-point — LLM 실패 → 500", async () => {
     // Override mock to return failed status
-    const { createAgentRunner } = await import("../services/agent/agent-runner.js");
+    const { createAgentRunner } = await import("../core/agent/services/agent-runner.js");
     const runner = createAgentRunner({});
     (runner.execute as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       status: "failed",

@@ -2,8 +2,8 @@ import type {
   AgentExecutionRequest,
   AgentExecutionResult,
   AgentTaskType,
-} from "./agent/execution-types.js";
-import type { AgentRunner } from "./agent/agent-runner.js";
+} from "../core/agent/services/execution-types.js";
+import type { AgentRunner } from "../core/agent/services/agent-runner.js";
 import type { SSEManager } from "./sse-manager.js";
 import type { McpServerRegistry } from "../core/agent/services/mcp-registry.js";
 import type { MergeQueueService } from "./merge-queue.js";
@@ -37,7 +37,7 @@ export class PlanCancelledError extends Error {
   }
 }
 import { OpenRouterRunner } from "../core/agent/services/openrouter-runner.js";
-import { createRoutedRunner } from "./agent/agent-runner.js";
+import { createRoutedRunner } from "../core/agent/services/agent-runner.js";
 import { McpRunner } from "../core/agent/services/mcp-runner.js";
 import { createTransport } from "../core/agent/services/mcp-transport.js";
 import { TASK_TYPE_TO_MCP_TOOL } from "../core/agent/services/mcp-adapter.js";

@@ -1,5 +1,5 @@
-import type { AgentRunner } from "../../../services/agent/agent-runner.js";
-import type { AgentTaskType } from "../../../services/agent/execution-types.js";
+import type { AgentRunner } from "./agent-runner.js";
+import type { AgentTaskType } from "./execution-types.js";
 import type { McpPrompt, McpPromptMessage, McpResourceTemplate, McpResourceContent } from "@foundry-x/shared";
 
 /**

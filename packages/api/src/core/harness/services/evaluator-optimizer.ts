@@ -1,8 +1,8 @@
 import type {
   AgentExecutionRequest,
   AgentExecutionResult,
-} from "../../../services/agent/execution-types.js";
-import type { AgentRunner } from "../../../services/agent/agent-runner.js";
+} from "../../../core/agent/services/execution-types.js";
+import type { AgentRunner } from "../../../core/agent/services/agent-runner.js";
 import type { EvaluationCriteria, EvaluationScore } from "../../../modules/gate/services/evaluation-criteria.js";
 
 // ── Types ───────────────────────────────────────────────────
