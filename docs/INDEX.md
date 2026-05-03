@@ -1,7 +1,7 @@
 # 문서 인덱스
 
-> 마지막 갱신: 2026-05-03
-> 총 GOV 문서: 227개 | 자동 생성 (ax-gov-doc check)
+> 마지막 갱신: 2026-05-04
+> 총 GOV 문서: 228개 | 자동 생성 (ax-gov-doc check)
 
 ## SPEC
 
@@ -33,6 +33,7 @@
 | OpenClaw MVP PRD | Draft | [specs/openclaw/prd-v2.md](specs/openclaw/prd-v2.md) |
 | Agent Evolution PRD | Active | [specs/agent-evolution/prd-final.md](specs/agent-evolution/prd-final.md) |
 | Phase 6 Ecosystem PRD | Active | [specs/FX-PLAN-012/FX-PLAN-012-ecosystem-integration-prd.md](specs/FX-PLAN-012/FX-PLAN-012-ecosystem-integration-prd.md) |
+| AI Foundry Phase 1 (~5월 기획 확정) | Draft | [specs/ai-foundry-phase1/02_ai_foundry_phase1_v0.3.md](specs/ai-foundry-phase1/02_ai_foundry_phase1_v0.3.md) |
 
 ## PLAN
 
@@ -102,6 +103,7 @@
 | FX-PLAN-327 | Sprint 327 — F580 services/agent KEEP 3 + (ii) 5 = 8 files contract 추출 + fx-agent 이전 (Phase 46 진정 종결 마지막 한 걸음) | 1.0 | Approved | [01-plan/features/sprint-327.plan.md](01-plan/features/sprint-327.plan.md) |
 | FX-PLAN-328 | Sprint 328 — F582 GAP-4 Discovery 인프라 회복 + DiagnosticCollector trigger 경로 fix (옵션 C: graph=main-api 유지, stage=fx-discovery 측 collector 추가) | 1.0 | Approved | [01-plan/features/sprint-328.plan.md](01-plan/features/sprint-328.plan.md) |
 | FX-PLAN-329 | Sprint 329 — F581 services/agent iii light 14 files 정리 (Phase 46 100% 종결 마지막 단계, heavy 2 → F583 분리) | 1.0 | Approved | [01-plan/features/sprint-329.plan.md](01-plan/features/sprint-329.plan.md) |
+| FX-PLAN-330 | Sprint 330 — F583 services/agent heavy 2 files deduplicate (옵션 C, fx-agent SSOT) — Phase 46 100% literal 종결 | 1.0 | Approved | [01-plan/features/sprint-330.plan.md](01-plan/features/sprint-330.plan.md) |
 
 ## DSGN
 
