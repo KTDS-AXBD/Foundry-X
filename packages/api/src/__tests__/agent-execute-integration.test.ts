@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { AgentOrchestrator } from "../core/agent/services/agent-orchestrator.js";
+import { AgentOrchestrator } from "../agent/services/agent-orchestrator.js";
 import { SSEManager } from "../services/sse-manager.js";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import type { AgentRunner } from "../core/agent/services/agent-runner.js";
-import type { AgentExecutionResult } from "../core/agent/services/execution-types.js";
+import type { AgentRunner } from "../agent/services/agent-runner.js";
+import type { AgentExecutionResult } from "../agent/services/execution-types.js";
 
 function createMockRunner(result?: Partial<AgentExecutionResult>): AgentRunner {
   return {

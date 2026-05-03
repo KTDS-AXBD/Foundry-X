@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { SkillMdGeneratorService } from "../core/agent/services/skill-md-generator.js";
+import { SkillMdGeneratorService } from "../agent/services/skill-md-generator.js";
 
 describe("SkillMdGeneratorService (F306)", () => {
   const svc = new SkillMdGeneratorService();

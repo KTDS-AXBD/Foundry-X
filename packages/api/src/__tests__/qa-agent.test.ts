@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { QAAgent } from "../core/agent/services/qa-agent.js";
-import type { AgentExecutionRequest, AgentExecutionResult } from "../core/agent/services/execution-types.js";
+import { QAAgent } from "../agent/services/qa-agent.js";
+import type { AgentExecutionRequest, AgentExecutionResult } from "../agent/services/execution-types.js";
 
 // Mock createRoutedRunner — must use hoisted fn to avoid TDZ
 const { mockRunner } = vi.hoisted(() => {
@@ -13,7 +13,7 @@ const { mockRunner } = vi.hoisted(() => {
   return { mockRunner };
 });
 
-vi.mock("../core/agent/services/agent-runner.js", () => ({
+vi.mock("../agent/services/agent-runner.js", () => ({
   createRoutedRunner: vi.fn().mockResolvedValue(mockRunner),
   createAgentRunner: vi.fn().mockReturnValue(mockRunner),
 }));

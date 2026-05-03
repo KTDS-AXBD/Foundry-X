@@ -1,6 +1,6 @@
 // F528 Graph Orchestration (L3) — ConversationManager TDD Red Phase
 import { describe, it, expect, vi } from "vitest";
-import { ConversationManager } from "../../core/agent/orchestration/conversation-manager.js";
+import { ConversationManager } from "../../agent/orchestration/conversation-manager.js";
 import type { AnthropicMessage } from "@foundry-x/shared";
 
 function makeMessages(count: number): AnthropicMessage[] {

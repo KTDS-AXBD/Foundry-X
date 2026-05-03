@@ -1,7 +1,7 @@
 // ─── F336: AgentAdapterRegistry Tests (Sprint 151) ───
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { AgentAdapterRegistry } from "../core/agent/services/agent-adapter-registry.js";
+import { AgentAdapterRegistry } from "../agent/services/agent-adapter-registry.js";
 import type { AgentAdapter, AgentExecutionContext, AgentResult } from "@foundry-x/shared";
 
 function makeAdapter(

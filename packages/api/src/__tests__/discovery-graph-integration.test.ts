@@ -3,7 +3,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import type { AgentRunner } from "../core/agent/services/agent-runner.js";
+import type { AgentRunner } from "../agent/services/agent-runner.js";
 
 const SCHEMA = `
   CREATE TABLE IF NOT EXISTS bd_artifacts (
@@ -88,7 +88,7 @@ describe("F531: createDiscoveryGraph — 실제 핸들러 연동", () => {
   it("test 1: createDiscoveryGraph(runner, db) - stage-2-1 노드 실행 시 LLM runner.execute() 호출됨", async () => {
     // F531: createDiscoveryGraph must accept runner + db and wire real LLM calls
     const { createDiscoveryGraph } = await import(
-      "../core/agent/orchestration/graphs/discovery-graph.js"
+      "../agent/orchestration/graphs/discovery-graph.js"
     );
 
     // 실제 핸들러가 연결된 graph 생성
@@ -96,7 +96,7 @@ describe("F531: createDiscoveryGraph — 실제 핸들러 연동", () => {
 
     // GraphEngine으로 실행 — stage-2-1 노드 실행 시 runner.execute 호출되어야 함
     const { GraphEngine } = await import(
-      "../core/agent/orchestration/graph-engine.js"
+      "../agent/orchestration/graph-engine.js"
     );
     const engine = new GraphEngine();
     for (const node of graph.nodes) engine.addNode(node);
@@ -113,11 +113,11 @@ describe("F531: createDiscoveryGraph — 실제 핸들러 연동", () => {
 
   it("test 2: createDiscoveryGraph(runner, db) - coordinator 노드 실행 후 stage-2-0 실행됨", async () => {
     const { createDiscoveryGraph } = await import(
-      "../core/agent/orchestration/graphs/discovery-graph.js"
+      "../agent/orchestration/graphs/discovery-graph.js"
     );
     const graph = createDiscoveryGraph(runner, db);
 
-    const { GraphEngine } = await import("../core/agent/orchestration/graph-engine.js");
+    const { GraphEngine } = await import("../agent/orchestration/graph-engine.js");
     const engine = new GraphEngine();
     for (const node of graph.nodes) engine.addNode(node);
     for (const edge of graph.edges) engine.addEdge(edge);

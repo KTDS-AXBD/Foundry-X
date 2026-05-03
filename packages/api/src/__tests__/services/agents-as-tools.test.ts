@@ -1,7 +1,7 @@
 // F528 Graph Orchestration (L3) — Agents-as-Tools TDD Red Phase
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { agentAsTool } from "../../core/agent/orchestration/agents-as-tools.js";
-import { ToolRegistry } from "../../core/agent/runtime/tool-registry.js";
+import { agentAsTool } from "../../agent/orchestration/agents-as-tools.js";
+import { ToolRegistry } from "../../agent/runtime/tool-registry.js";
 import type { AgentSpec, RuntimeContext } from "@foundry-x/shared";
 
 // AgentRuntime 인터페이스 최소 mock

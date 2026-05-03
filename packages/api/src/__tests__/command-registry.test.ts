@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { CommandRegistryService } from "../core/agent/services/command-registry.js";
+import { CommandRegistryService } from "../agent/services/command-registry.js";
 
 describe("CommandRegistryService", () => {
   let service: CommandRegistryService;

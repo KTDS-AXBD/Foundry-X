@@ -1,7 +1,7 @@
 // F528 Graph Orchestration (L3) — TDD Red Phase
 // describe: GraphEngine 핵심 실행 엔진 테스트
 import { describe, it, expect, vi } from "vitest";
-import { GraphEngine } from "../../core/agent/orchestration/graph-engine.js";
+import { GraphEngine } from "../../agent/orchestration/graph-engine.js";
 import type { GraphNodeInput, GraphNodeOutput, GraphExecutionContext } from "@foundry-x/shared";
 
 function makeHandler(outputData: unknown) {

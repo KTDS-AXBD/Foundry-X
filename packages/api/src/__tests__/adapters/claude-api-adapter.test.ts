@@ -1,9 +1,9 @@
 // ─── F336: Claude API Adapter Tests (Sprint 151) ───
 
 import { describe, it, expect, vi } from "vitest";
-import { AgentAdapterFactory } from "../../core/agent/services/agent-adapter-factory.js";
+import { AgentAdapterFactory } from "../../agent/services/agent-adapter-factory.js";
 import type { AgentExecutionContext } from "@foundry-x/shared";
-import type { AgentRunner } from "../../core/agent/services/agent-runner.js";
+import type { AgentRunner } from "../../agent/services/agent-runner.js";
 
 function makeContext(): AgentExecutionContext {
   return {

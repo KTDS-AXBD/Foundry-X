@@ -4,7 +4,7 @@ import {
   HttpTransport,
   McpTransportError,
   createTransport,
-} from "../core/agent/services/mcp-transport.js";
+} from "../agent/services/mcp-transport.js";
 
 const originalFetch = globalThis.fetch;
 

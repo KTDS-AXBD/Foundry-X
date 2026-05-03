@@ -2,13 +2,13 @@
 // TDD Red Phase — streaming.ts + AgentStreamHandler 검증
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { streamingRoute } from "../core/agent/routes/streaming.js";
-import { AgentStreamHandler } from "../core/agent/streaming/agent-stream-handler.js";
+import { streamingRoute } from "../agent/routes/streaming.js";
+import { AgentStreamHandler } from "../agent/streaming/agent-stream-handler.js";
 import { createTestEnv } from "./helpers/test-app.js";
 import type { AgentStreamEvent } from "@foundry-x/shared";
 
 // ─── AgentMetricsService mock ───
-vi.mock("../core/agent/streaming/agent-metrics-service.js", () => ({
+vi.mock("../agent/streaming/agent-metrics-service.js", () => ({
   AgentMetricsService: vi.fn().mockImplementation(() => ({
     createRunning: vi.fn().mockResolvedValue("mock-metric-id"),
     complete: vi.fn().mockResolvedValue(undefined),
@@ -18,7 +18,7 @@ vi.mock("../core/agent/streaming/agent-metrics-service.js", () => ({
 }));
 
 // ─── AgentRuntime mock (ANTHROPIC_API_KEY 없이 동작) ───
-vi.mock("../core/agent/runtime/agent-runtime.js", () => ({
+vi.mock("../agent/runtime/agent-runtime.js", () => ({
   AgentRuntime: vi.fn().mockImplementation(() => ({
     run: vi.fn().mockImplementation(async (_spec, input, ctx) => {
       // 훅 실행 시뮬레이션
@@ -140,7 +140,7 @@ describe("F532 — streamingRoute 통합 테스트", () => {
 
 describe("F532 — AgentStreamHandler 이벤트 순서", () => {
   it("test 5: createHooks → run_started → run_completed 순서 보장", async () => {
-    const { AgentMetricsService } = await import("../core/agent/streaming/agent-metrics-service.js");
+    const { AgentMetricsService } = await import("../agent/streaming/agent-metrics-service.js");
     const mockDb = {} as D1Database;
     const metricsService = new AgentMetricsService(mockDb);
 

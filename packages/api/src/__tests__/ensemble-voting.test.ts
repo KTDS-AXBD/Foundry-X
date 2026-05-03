@@ -3,17 +3,17 @@ import {
   EnsembleVoting,
   VOTING_STRATEGIES,
   ENSEMBLE_EVALUATION_PROMPT,
-} from "../core/agent/services/ensemble-voting.js";
+} from "../agent/services/ensemble-voting.js";
 import type {
   AgentExecutionResult,
   AgentExecutionRequest,
-} from "../core/agent/services/execution-types.js";
+} from "../agent/services/execution-types.js";
 
 // ─── Mock OpenRouterRunner ───
 
 const mockExecute = vi.fn();
 
-vi.mock("../core/agent/services/openrouter-runner.js", () => ({
+vi.mock("../agent/services/openrouter-runner.js", () => ({
   OpenRouterRunner: vi.fn().mockImplementation((_key: string, model: string) => ({
     type: "openrouter",
     execute: (...args: unknown[]) => mockExecute(model, ...args),

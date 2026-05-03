@@ -22,11 +22,7 @@ import {
   discoveryShapePipelineRoute, discoveryStageRunnerRoute,
   // shaping — F540: 전체 fx-shaping Worker로 이전 (routes 제거됨)
   // offering — F541: 전체 fx-offering Worker로 이전 (routes 제거됨)
-  // agent (8 routes — F575: agentRoute/orchestrationRoute/streamingRoute/capturedEngineRoute/derivedEngineRoute/skillRegistryRoute/skillMetricsRoute → fx-agent)
-  agentAdaptersRoute, agentDefinitionRoute,
-  executionEventsRoute, taskStateRoute,
-  commandRegistryRoute, contextPassthroughRoute, workflowRoute,
-  metaRoute,
+  // agent — F576: 8 remaining routes removed from app.ts (fx-gateway handles all agent paths → fx-agent Worker)
   // harness (22 routes)
   harnessRoute, governanceRoute, guardRailRoute, auditRoute,
   backupRestoreRoute, ogdGenericRoute, ogdQualityRoute,
@@ -168,15 +164,14 @@ app.route("/api", integrityRoute);
 app.route("/api", healthRoute);
 app.route("/api", freshnessRoute);
 app.route("/api", requirementsRoute);
-// F575: agentRoute/streamingRoute → fx-agent (Phase 46)
-app.route("/api", metaRoute);
+// F576: metaRoute → removed (fx-gateway → fx-agent)
 app.route("/api", tokenRoute);
 app.route("/api", specRoute);
 app.route("/api", mcpRoute);
 // F572: inboxRoute/projectOverviewRoute/webhookRegistryRoute/jiraRoute → fx-modules (moved)
 
 // Sprint 24 routes (auth + tenant required — registered under /api/* middleware)
-app.route("/api", workflowRoute);
+// F576: workflowRoute → removed (fx-gateway → fx-agent)
 
 // Sprint 26: Cross-service entity registry (auth + tenant required)
 app.route("/api", entitiesRoute);
@@ -228,12 +223,11 @@ app.route("/api", axBdDiscoveryRoute);
 // Sprint 69: F213 사업성 체크포인트 + Commit Gate → F540: fx-shaping으로 이전
 
 // Sprint 76: F221 Agent-as-Code + F223 Doc Sharding (auth + tenant required)
-app.route("/api", agentDefinitionRoute);
+// F576: agentDefinitionRoute → removed (fx-gateway → fx-agent)
 app.route("/api", shardDocRoute);
 
 // Sprint 77: F224~F228 Ecosystem Reference (auth + tenant required)
-app.route("/api", contextPassthroughRoute);
-app.route("/api", commandRegistryRoute);
+// F576: contextPassthroughRoute/commandRegistryRoute → removed (fx-gateway → fx-agent)
 // F572: partySessionRoute → fx-modules (moved)
 app.route("/api", specLibraryRoute);
 app.route("/api", expansionPackRoute);
@@ -266,13 +260,7 @@ app.route("/api", roiBenchmarkRoute);
 // Sprint 136: Backup/Restore (F317)
 app.route("/api", backupRestoreRoute);
 // Sprint 137: Feedback Queue — moved above auth middleware (F340 JWT fix)
-// Sprint 148: TaskState Machine (F333, Phase 14)
-app.route("/api", taskStateRoute);
-// Sprint 149: Execution Events (F334, Phase 14)
-app.route("/api", executionEventsRoute);
-// Sprint 150: Orchestration Loop (F335, Phase 14) → F575: fx-agent로 이전
-// Sprint 151: Agent Adapter Registry (F336, Phase 14)
-app.route("/api", agentAdaptersRoute);
+// Sprint 148~151: taskStateRoute/executionEventsRoute/agentAdaptersRoute — F576: removed (fx-gateway → fx-agent)
 
 // Sprint 154: Discovery UI/UX v2 (F342) — personaConfigsRoute/personaEvalsRoute → F540: fx-shaping
 // discoveryReportsRoute → fx-discovery (F538)

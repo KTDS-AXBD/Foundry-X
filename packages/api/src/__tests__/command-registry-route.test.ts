@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { commandRegistryRoute, commandRegistryServiceInstance } from "../core/agent/routes/command-registry.js";
+import { commandRegistryRoute, commandRegistryServiceInstance } from "../agent/routes/command-registry.js";
 import type { Env } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 

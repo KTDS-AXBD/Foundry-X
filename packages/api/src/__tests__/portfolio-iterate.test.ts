@@ -12,7 +12,7 @@ import { app } from "../app.js";
 import { createTestEnv, createAuthHeaders } from "./helpers/test-app.js";
 import { PortfolioService } from "../core/discovery/services/portfolio-service.js";
 
-vi.mock("../core/agent/services/agent-runner.js", () => ({
+vi.mock("../agent/services/agent-runner.js", () => ({
   createAgentRunner: () => ({
     type: "mock",
     execute: vi.fn(),

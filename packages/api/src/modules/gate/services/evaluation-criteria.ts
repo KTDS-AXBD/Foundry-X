@@ -1,7 +1,7 @@
 import type {
   AgentExecutionRequest,
   AgentExecutionResult,
-} from "../../../core/agent/services/execution-types.js";
+} from "../../../agent/services/execution-types.js";
 
 // ── Interfaces ──────────────────────────────────────────────
 

@@ -5,10 +5,10 @@ import {
   AgentAdapterFactory,
   contextToRequest,
   resultToAgentResult,
-} from "../core/agent/services/agent-adapter-factory.js";
+} from "../agent/services/agent-adapter-factory.js";
 import type { AgentExecutionContext } from "@foundry-x/shared";
-import type { AgentRunner } from "../core/agent/services/agent-runner.js";
-import type { AgentExecutionResult } from "../core/agent/services/execution-types.js";
+import type { AgentRunner } from "../agent/services/agent-runner.js";
+import type { AgentExecutionResult } from "../agent/services/execution-types.js";
 
 function makeContext(overrides?: Partial<AgentExecutionContext>): AgentExecutionContext {
   return {

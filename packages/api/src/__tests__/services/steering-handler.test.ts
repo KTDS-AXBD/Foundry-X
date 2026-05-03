@@ -1,7 +1,7 @@
 // F528 Graph Orchestration (L3) — SteeringHandler TDD Red Phase
 import { describe, it, expect } from "vitest";
-import { ConcreteSteeringHandler } from "../../core/agent/orchestration/steering-handler.js";
-import type { SteeringRule } from "../../core/agent/orchestration/steering-handler.js";
+import { ConcreteSteeringHandler } from "../../agent/orchestration/steering-handler.js";
+import type { SteeringRule } from "../../agent/orchestration/steering-handler.js";
 
 describe("F528 SteeringHandler", () => {
   it("beforeTool: 규칙 매칭 시 Interrupt를 반환한다", async () => {

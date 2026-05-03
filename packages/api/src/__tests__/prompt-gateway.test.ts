@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { PromptGatewayService } from "../core/agent/services/prompt-gateway.js";
-import type { SanitizationRule } from "../core/agent/services/prompt-gateway.js";
+import { PromptGatewayService } from "../agent/services/prompt-gateway.js";
+import type { SanitizationRule } from "../agent/services/prompt-gateway.js";
 
 function createMockDb() {
   return {

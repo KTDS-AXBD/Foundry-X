@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { ReviewerAgent } from "../core/agent/services/reviewer-agent.js";
+import { ReviewerAgent } from "../agent/services/reviewer-agent.js";
 
 function createMockLLM(response: string) {
   return {

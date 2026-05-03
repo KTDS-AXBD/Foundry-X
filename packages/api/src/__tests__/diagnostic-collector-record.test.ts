@@ -1,8 +1,8 @@
 // F534: DiagnosticCollector.record() TDD Red — Sprint 287
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { DiagnosticCollector } from "../core/agent/services/diagnostic-collector.js";
-import type { AgentExecutionResult } from "../core/agent/services/execution-types.js";
+import { DiagnosticCollector } from "../agent/services/diagnostic-collector.js";
+import type { AgentExecutionResult } from "../agent/services/execution-types.js";
 
 const METRICS_SCHEMA = `
   CREATE TABLE IF NOT EXISTS agent_run_metrics (

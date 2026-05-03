@@ -8,13 +8,13 @@ import { z } from "zod";
 import type { Env } from "../../../env.js";
 import { MODEL_SONNET } from "@foundry-x/shared";
 import type { TenantVariables } from "../../../middleware/tenant.js";
-import { createAgentRunner, createRoutedRunner } from "../../agent/services/agent-runner.js";
+import { createAgentRunner, createRoutedRunner } from "../../../agent/services/agent-runner.js";
 import { StageRunnerService } from "../services/stage-runner-service.js";
 import { DiscoveryGraphService } from "../services/discovery-graph-service.js";
-import { DiagnosticCollector } from "../../agent/services/diagnostic-collector.js";
-import { MetaAgent } from "../../agent/services/meta-agent.js";
-import { MetaApprovalService } from "../../agent/services/meta-approval.js";
-import { ProposalRubric } from "../../agent/services/proposal-rubric.js";
+import { DiagnosticCollector } from "../../../agent/services/diagnostic-collector.js";
+import { MetaAgent } from "../../../agent/services/meta-agent.js";
+import { MetaApprovalService } from "../../../agent/services/meta-approval.js";
+import { ProposalRubric } from "../../../agent/services/proposal-rubric.js";
 import type { DiscoveryType } from "../services/analysis-path-v82.js";
 import { GraphSessionService } from "../services/graph-session-service.js";
 

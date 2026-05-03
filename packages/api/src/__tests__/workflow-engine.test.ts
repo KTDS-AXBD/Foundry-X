@@ -1,19 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { app } from "../app.js";
-import { createTestEnv, createAuthHeaders } from "./helpers/test-app.js";
-import { WorkflowEngine, WORKFLOW_TEMPLATES } from "../core/agent/services/workflow-engine.js";
+import { createTestEnv } from "./helpers/test-app.js";
+import { WorkflowEngine, WORKFLOW_TEMPLATES } from "../agent/services/workflow-engine.js";
 
 let env: ReturnType<typeof createTestEnv>;
-
-function req(method: string, path: string, opts?: { body?: unknown; headers?: Record<string, string> }) {
-  const url = `http://localhost${path}`;
-  const init: RequestInit = {
-    method,
-    headers: { "Content-Type": "application/json", ...opts?.headers },
-  };
-  if (opts?.body) init.body = JSON.stringify(opts.body);
-  return app.request(url, init, env);
-}
 
 function seedDb(sql: string) {
   (env.DB as any).prepare(sql).run();
@@ -172,61 +161,5 @@ describe("WORKFLOW_TEMPLATES", () => {
     expect(WORKFLOW_TEMPLATES[3]!.id).toBe("tpl_sprint_standard");
     expect(WORKFLOW_TEMPLATES[4]!.id).toBe("tpl_sprint_fast");
     expect(WORKFLOW_TEMPLATES[5]!.id).toBe("tpl_sprint_review_heavy");
-  });
-});
-
-describe("Workflow Routes", () => {
-  it("POST /api/orgs/:orgId/workflows — creates workflow", async () => {
-    const headers = await createAuthHeaders({ orgId: "org_test", orgRole: "owner" });
-    const res = await req("POST", "/api/orgs/org_test/workflows", {
-      headers,
-      body: {
-        name: "Route Test",
-        description: "Testing route",
-        definition: sampleDefinition,
-      },
-    });
-    expect(res.status).toBe(201);
-    const data = await res.json() as any;
-    expect(data.name).toBe("Route Test");
-    expect(data.definition.nodes).toHaveLength(3);
-  });
-
-  it("GET /api/orgs/:orgId/workflows — lists with templates", async () => {
-    const headers = await createAuthHeaders({ orgId: "org_test", orgRole: "owner" });
-    const res = await req("GET", "/api/orgs/org_test/workflows", { headers });
-    expect(res.status).toBe(200);
-    const data = await res.json() as any;
-    expect(data.templates).toHaveLength(6);
-  });
-
-  it("POST /api/orgs/:orgId/workflows/:id/execute — executes workflow", async () => {
-    const headers = await createAuthHeaders({ orgId: "org_test", orgRole: "owner" });
-    // Create first
-    const createRes = await req("POST", "/api/orgs/org_test/workflows", {
-      headers,
-      body: { name: "Exec Test", definition: sampleDefinition },
-    });
-    const created = await createRes.json() as any;
-
-    const res = await req("POST", `/api/orgs/org_test/workflows/${created.id}/execute`, {
-      headers,
-      body: {},
-    });
-    expect(res.status).toBe(200);
-    const data = await res.json() as any;
-    expect(data.status).toBe("completed");
-  });
-
-  it("requires admin role for workflow creation", async () => {
-    // Use a different user that is a member (not owner/admin) in D1
-    seedDb("INSERT OR IGNORE INTO users (id, email, name, role, created_at, updated_at) VALUES ('member-user', 'member@example.com', 'Member', 'member', datetime('now'), datetime('now'))");
-    seedDb("INSERT OR IGNORE INTO org_members (org_id, user_id, role) VALUES ('org_test', 'member-user', 'member')");
-    const headers = await createAuthHeaders({ sub: "member-user", email: "member@example.com", role: "member", orgId: "org_test", orgRole: "member" });
-    const res = await req("POST", "/api/orgs/org_test/workflows", {
-      headers,
-      body: { name: "Forbidden", definition: sampleDefinition },
-    });
-    expect(res.status).toBe(403);
   });
 });

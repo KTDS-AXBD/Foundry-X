@@ -18,12 +18,12 @@ import {
   McpResourceContentSchema,
   ReadResourceRequestSchema,
   SubscribeResourceRequestSchema,
-} from "../../agent/schemas/mcp.js";
-import { McpServerRegistry } from "../../agent/services/mcp-registry.js";
-import { createTransport } from "../../agent/services/mcp-transport.js";
-import { McpRunner } from "../../agent/services/mcp-runner.js";
-import { McpSamplingHandler } from "../../agent/services/mcp-sampling.js";
-import { McpResourcesClient } from "../../agent/services/mcp-resources.js";
+} from "../../../agent/schemas/mcp.js";
+import { McpServerRegistry } from "../../../agent/services/mcp-registry.js";
+import { createTransport } from "../../../agent/services/mcp-transport.js";
+import { McpRunner } from "../../../agent/services/mcp-runner.js";
+import { McpSamplingHandler } from "../../../agent/services/mcp-sampling.js";
+import { McpResourcesClient } from "../../../agent/services/mcp-resources.js";
 import { SSEManager } from "../../../services/sse-manager.js";
 import { LLMService } from "../../../services/llm.js";
 import type { Env } from "../../../env.js";

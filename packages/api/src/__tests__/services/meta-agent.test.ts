@@ -1,6 +1,6 @@
 // F530 Meta Layer (L4) — MetaAgent TDD Red Phase
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MetaAgent } from "../../core/agent/services/meta-agent.js";
+import { MetaAgent } from "../../agent/services/meta-agent.js";
 import type { DiagnosticReport } from "@foundry-x/shared";
 
 // MetaAgent 내부에서 AgentRuntime을 사용하므로 fetch를 mock한다

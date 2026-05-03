@@ -7,8 +7,8 @@ import {
   getPrdPersonaEvaluations,
 } from "../core/shaping/services/biz-persona-evaluator.js";
 import { buildPrdEvaluationPrompt, BIZ_PERSONAS } from "../core/shaping/services/biz-persona-prompts.js";
-import type { AgentRunner } from "../core/agent/services/agent-runner.js";
-import type { AgentExecutionResult } from "../core/agent/services/execution-types.js";
+import type { AgentRunner } from "../agent/services/agent-runner.js";
+import type { AgentExecutionResult } from "../agent/services/execution-types.js";
 import type { BizItem } from "../core/shaping/services/biz-persona-prompts.js";
 
 const TABLES_SQL = `

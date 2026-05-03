@@ -4,8 +4,8 @@ import {
   DEFAULT_BASE_URL,
   DEFAULT_MODEL,
   REQUEST_TIMEOUT_MS,
-} from "../core/agent/services/openrouter-runner.js";
-import type { AgentExecutionRequest } from "../core/agent/services/execution-types.js";
+} from "../agent/services/openrouter-runner.js";
+import type { AgentExecutionRequest } from "../agent/services/execution-types.js";
 
 const makeRequest = (
   overrides?: Partial<AgentExecutionRequest>,
