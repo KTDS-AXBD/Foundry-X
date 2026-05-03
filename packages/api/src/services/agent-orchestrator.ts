@@ -5,7 +5,7 @@ import type {
 } from "./agent/execution-types.js";
 import type { AgentRunner } from "./agent/agent-runner.js";
 import type { SSEManager } from "./sse-manager.js";
-import type { McpServerRegistry } from "./agent/mcp-registry.js";
+import type { McpServerRegistry } from "../core/agent/services/mcp-registry.js";
 import type { MergeQueueService } from "./merge-queue.js";
 import type { PlannerAgent } from "../core/agent/services/planner-agent.js";
 import type { WorktreeManager } from "./worktree-manager.js";
@@ -38,8 +38,8 @@ export class PlanCancelledError extends Error {
 }
 import { OpenRouterRunner } from "../core/agent/services/openrouter-runner.js";
 import { createRoutedRunner } from "./agent/agent-runner.js";
-import { McpRunner } from "./agent/mcp-runner.js";
-import { createTransport } from "./agent/mcp-transport.js";
+import { McpRunner } from "../core/agent/services/mcp-runner.js";
+import { createTransport } from "../core/agent/services/mcp-transport.js";
 import { TASK_TYPE_TO_MCP_TOOL } from "../core/agent/services/mcp-adapter.js";
 
 // Local types — mirrors @foundry-x/shared F50 types (will import from shared once exported)

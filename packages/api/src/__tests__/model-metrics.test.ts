@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { ModelMetricsService } from "../services/agent/model-metrics.js";
+import { ModelMetricsService } from "../core/agent/services/model-metrics.js";
 import { createTestEnv } from "./helpers/test-app.js";
 import { tokenRoute } from "../modules/auth/routes/token.js";
 

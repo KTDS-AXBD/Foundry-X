@@ -9,7 +9,7 @@ import { AgentCollectSchema, IdeaPortalWebhookSchema, ScreeningRejectSchema, Age
 import { CollectionPipelineService } from "../services/collection-pipeline.js";
 import { AgentCollector, CollectorError } from "../../discovery/services/agent-collector.js";
 import { createAgentRunner } from "../../../services/agent/agent-runner.js";
-import { AgentCollectionService } from "../../../services/agent/agent-collection.js";
+import { AgentCollectionService } from "../../agent/services/agent-collection.js";
 
 export const collectionRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 

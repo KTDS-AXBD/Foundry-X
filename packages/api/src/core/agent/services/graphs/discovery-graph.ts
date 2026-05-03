@@ -2,10 +2,10 @@
 // ─── F531: 실제 StageRunnerService 핸들러 연결 ───
 import { GraphEngine } from "../graph-engine.js";
 import type { GraphDefinition, GraphNodeInput, GraphNodeOutput, GraphExecutionContext } from "@foundry-x/shared";
-import type { AgentRunner } from "../agent-runner.js";
-import { StageRunnerService } from "../../../core/discovery/services/stage-runner-service.js";
+import type { AgentRunner } from "../../../../services/agent/agent-runner.js";
+import { StageRunnerService } from "../../../discovery/services/stage-runner-service.js";
 import { DiagnosticCollector } from "../diagnostic-collector.js";
-import type { DiscoveryType } from "../../../core/discovery/services/analysis-path-v82.js";
+import type { DiscoveryType } from "../../../discovery/services/analysis-path-v82.js";
 
 /** F528 backward compat: runner/db 없을 때 stub 핸들러 */
 function makeStubHandler(stage: string) {

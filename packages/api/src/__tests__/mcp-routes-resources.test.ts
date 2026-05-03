@@ -9,7 +9,7 @@ const mockReadResource = vi.fn().mockResolvedValue([]);
 const mockSubscribeResource = vi.fn().mockResolvedValue(undefined);
 const mockOnNotification = vi.fn();
 
-vi.mock("../services/agent/mcp-transport.js", () => ({
+vi.mock("../core/agent/services/mcp-transport.js", () => ({
   createTransport: vi.fn(() => ({
     type: "http",
     connect: vi.fn(),
@@ -20,7 +20,7 @@ vi.mock("../services/agent/mcp-transport.js", () => ({
   })),
 }));
 
-vi.mock("../services/agent/mcp-runner.js", () => ({
+vi.mock("../core/agent/services/mcp-runner.js", () => ({
   McpRunner: vi.fn().mockImplementation(() => ({
     listTools: vi.fn().mockResolvedValue([]),
     listResources: mockListResources,

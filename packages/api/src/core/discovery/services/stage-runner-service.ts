@@ -11,7 +11,7 @@ import { ANALYSIS_PATH_MAP, STAGE_NAMES, VIABILITY_QUESTIONS, COMMIT_GATE_QUESTI
 import { DiscoveryStageService } from "./discovery-stage-service.js";
 import { DiscoveryCriteriaService } from "./discovery-criteria.js";
 import type { DiscoveryGraphService } from "./discovery-graph-service.js";
-import type { DiagnosticCollector } from "../../../services/agent/diagnostic-collector.js";
+import type { DiagnosticCollector } from "../../agent/services/diagnostic-collector.js";
 
 /** F531: confirmStage graphMode 옵션 */
 export interface ConfirmStageOptions {
