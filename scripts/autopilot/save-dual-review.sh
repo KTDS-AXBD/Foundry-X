@@ -38,6 +38,7 @@ codex_verdict=$(python3 -c "import json; print(json.load(open('$CODEX_JSON')).ge
 divergence_score=$(python3 -c "import json; print(json.load(open('$CODEX_JSON')).get('divergence_score', 0.0))" 2>/dev/null || echo "0.0")
 model=$(python3 -c "import json; print(json.load(open('$CODEX_JSON')).get('model','none'))" 2>/dev/null || echo "none")
 degraded=$(python3 -c "import json; print('true' if json.load(open('$CODEX_JSON')).get('degraded', False) else 'false')" 2>/dev/null || echo "false")
+[ "$degraded" = "true" ] && degraded_py="True" || degraded_py="False"
 degraded_reason=$(python3 -c "import json; print(json.load(open('$CODEX_JSON')).get('degraded_reason') or '')" 2>/dev/null || echo "")
 
 # Extract composite decision (from composite-verify.json if available)
@@ -59,7 +60,7 @@ print(json.dumps({
     'codex_json': json.dumps(json.load(open('$CODEX_JSON'))),
     'divergence_score': float('$divergence_score'),
     'decision': '$decision',
-    'degraded': $degraded,
+    'degraded': $degraded_py,
     'degraded_reason': '$degraded_reason' if '$degraded_reason' else None,
     'model': '$model',
 }))

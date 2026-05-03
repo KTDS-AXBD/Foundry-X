@@ -907,6 +907,31 @@ phase_sprint_signals() {
     [ -z "$sprint_num" ] && { log "⚠️  sprint signal skip — SPRINT_NUM 없음: $sig"; continue; }
     [ -z "$repo" ] && { log "⚠️  sprint-${sprint_num} skip — GITHUB_REPO 없음"; continue; }
 
+    # C103 (a) — Master inject 경로 fallback (S315, FX-REQ-643)
+    # ax-marketplace sprint-autopilot Step 5c가 우회된 경우에도 codex-review + save-dual-review를
+    # 강제 호출하여 dual_ai_reviews D1 INSERT를 보장한다 (F553 GAP-1 실효 강화).
+    # Foundry-X 전용. 스크립트 부재 시 silent skip (다른 프로젝트 영향 없음).
+    if [ -n "$wt_path" ] && [ -d "$wt_path" ]; then
+      local cr_script="$wt_path/scripts/autopilot/codex-review.sh"
+      local sd_script="$wt_path/scripts/autopilot/save-dual-review.sh"
+      local cr_json="$wt_path/.claude/reviews/sprint-${sprint_num}/codex-review.json"
+      local hook_log="${SPRINT_SIGNAL_DIR}/save-dual-review-${sprint_num}.log"
+      if [ -x "$sd_script" ]; then
+        {
+          echo "=== C103 fallback hook ($(date -Iseconds)) ==="
+          echo "sprint=$sprint_num wt=$wt_path"
+          echo "codex-review.json exists=$([ -f "$cr_json" ] && echo yes || echo no)"
+          if [ ! -f "$cr_json" ] && [ -x "$cr_script" ]; then
+            echo "→ codex-review.sh fallback (Master inject 경로 우회 보정)"
+            ( cd "$wt_path" && MOCK_CODEX="${MOCK_CODEX:-0}" bash "$cr_script" --sprint "$sprint_num" 2>&1 ) || echo "[codex-review exit=$?]"
+          fi
+          echo "→ save-dual-review.sh 호출"
+          ( cd "$wt_path" && bash "$sd_script" --sprint "$sprint_num" 2>&1 ) || echo "[save-dual-review exit=$?]"
+        } >> "$hook_log" 2>&1
+        log "🪝 sprint-${sprint_num} — C103 dual-review fallback (log=$hook_log)"
+      fi
+    fi
+
     sprint_sig_set "$sig" "STATUS" "MERGING"
     log "🚀 sprint-${sprint_num} — merge 시작 (repo=${repo} branch=${branch})"
 
