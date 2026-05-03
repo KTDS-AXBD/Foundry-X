@@ -104,6 +104,7 @@
 | FX-PLAN-328 | Sprint 328 — F582 GAP-4 Discovery 인프라 회복 + DiagnosticCollector trigger 경로 fix (옵션 C: graph=main-api 유지, stage=fx-discovery 측 collector 추가) | 1.0 | Approved | [01-plan/features/sprint-328.plan.md](01-plan/features/sprint-328.plan.md) |
 | FX-PLAN-329 | Sprint 329 — F581 services/agent iii light 14 files 정리 (Phase 46 100% 종결 마지막 단계, heavy 2 → F583 분리) | 1.0 | Approved | [01-plan/features/sprint-329.plan.md](01-plan/features/sprint-329.plan.md) |
 | FX-PLAN-330 | Sprint 330 — F583 services/agent heavy 2 files deduplicate (옵션 C, fx-agent SSOT) — Phase 46 100% literal 종결 | 1.0 | Approved | [01-plan/features/sprint-330.plan.md](01-plan/features/sprint-330.plan.md) |
+| FX-PLAN-331 | Sprint 331 — F584 services/model-router 자질구레 cleanup (P2, autopilot 옵션 A 14회차 패턴 + MSA core/{domain}/ 룰 부분 복원) | 1.0 | Approved | [01-plan/features/sprint-331.plan.md](01-plan/features/sprint-331.plan.md) |
 
 ## DSGN
 
