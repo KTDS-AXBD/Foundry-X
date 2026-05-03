@@ -4,7 +4,7 @@ import type {
   McpConnectionConfig,
   McpMessage,
   McpResponse,
-} from "./mcp-adapter.js";
+} from "../../core/agent/services/mcp-adapter.js";
 
 // ─── Error ───
 

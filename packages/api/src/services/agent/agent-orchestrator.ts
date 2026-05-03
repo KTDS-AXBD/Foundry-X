@@ -7,14 +7,14 @@ import type { AgentRunner } from "./agent-runner.js";
 import type { SSEManager } from "../../services/sse-manager.js";
 import type { McpServerRegistry } from "./mcp-registry.js";
 import type { MergeQueueService } from "../../services/merge-queue.js";
-import type { PlannerAgent } from "./planner-agent.js";
+import type { PlannerAgent } from "../../core/agent/services/planner-agent.js";
 import type { WorktreeManager } from "../../services/worktree-manager.js";
 import type { AutoFixService } from "../../core/harness/services/auto-fix.js";
-import type { ArchitectAgent } from "./architect-agent.js";
-import type { TestAgent } from "./test-agent.js";
-import type { SecurityAgent } from "./security-agent.js";
-import type { QAAgent } from "./qa-agent.js";
-import type { InfraAgent } from "./infra-agent.js";
+import type { ArchitectAgent } from "../../core/agent/services/architect-agent.js";
+import type { TestAgent } from "../../core/agent/services/test-agent.js";
+import type { SecurityAgent } from "../../core/agent/services/security-agent.js";
+import type { QAAgent } from "../../core/agent/services/qa-agent.js";
+import type { InfraAgent } from "../../core/agent/services/infra-agent.js";
 import type { CustomRoleManager } from "../../core/harness/services/custom-role-manager.js";
 import type { ParallelExecutionResult, ParallelPrResult, ConflictReport, AgentPlan } from "@foundry-x/shared";
 
@@ -36,11 +36,11 @@ export class PlanCancelledError extends Error {
     this.name = "PlanCancelledError";
   }
 }
-import { OpenRouterRunner } from "./openrouter-runner.js";
+import { OpenRouterRunner } from "../../core/agent/services/openrouter-runner.js";
 import { createRoutedRunner } from "./agent-runner.js";
 import { McpRunner } from "./mcp-runner.js";
 import { createTransport } from "./mcp-transport.js";
-import { TASK_TYPE_TO_MCP_TOOL } from "./mcp-adapter.js";
+import { TASK_TYPE_TO_MCP_TOOL } from "../../core/agent/services/mcp-adapter.js";
 
 // Local types — mirrors @foundry-x/shared F50 types (will import from shared once exported)
 interface AgentRegistration {

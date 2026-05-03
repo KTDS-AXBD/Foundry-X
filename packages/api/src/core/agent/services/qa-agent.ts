@@ -1,5 +1,5 @@
-import type { AgentExecutionRequest } from "./execution-types.js";
-import { createRoutedRunner } from "./agent-runner.js";
+import type { AgentExecutionRequest } from "../../../services/agent/execution-types.js";
+import { createRoutedRunner } from "../../../services/agent/agent-runner.js";
 
 export interface BrowserTestResult {
   scenarios: Array<{ name: string; description: string; steps: Array<{ action: string; selector?: string; expected: string }>; playwrightCode: string; priority: "critical" | "high" | "medium" | "low" }>;
