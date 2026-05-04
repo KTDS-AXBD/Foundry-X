@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { PrototypeGeneratorService } from "../services/prototype-generator.js";
+import { PrototypeGeneratorService } from "../core/offering/services/prototype-generator.js";
 import type { AgentRunner } from "../core/agent/services/agent-runner.js";
 import type { BizItem, EvaluationWithScores } from "../core/discovery/services/biz-item-service.js";
 import type { DiscoveryCriterion } from "../core/discovery/services/discovery-criteria.js";

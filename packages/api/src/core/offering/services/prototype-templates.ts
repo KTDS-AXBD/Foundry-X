@@ -2,7 +2,7 @@
  * Sprint 58: Prototype HTML 템플릿 — 5 Starting Point별 섹션 렌더링 (F181)
  */
 
-import type { StartingPointType } from "../core/discovery/services/analysis-paths.js";
+import type { StartingPointType } from "../../discovery/services/analysis-paths.js";
 import { getBaseCSS, getTheme, type DesignTokenOverride } from "./prototype-styles.js";
 
 export interface PrototypeData {
