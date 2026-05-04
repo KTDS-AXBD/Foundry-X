@@ -6,7 +6,7 @@ import type { TenantVariables } from "../../../middleware/tenant.js";
 import { GitHubService } from "../../../modules/portal/services/github.js";
 import { KVCacheService } from "../../../services/kv-cache.js";
 import { HealthCalculator } from "../services/health-calc.js";
-import { MonitoringService } from "../../../services/monitoring.js";
+import { MonitoringService } from "../services/monitoring.js";
 
 type EnvWithCache = Env & { CACHE: KVNamespace };
 

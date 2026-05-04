@@ -19,7 +19,7 @@ import {
 } from "../schemas/work.js";
 import type { Env } from "../env.js";
 import { WorkService } from "../services/work.service.js";
-import { TraceabilityService } from "../services/traceability.service.js";
+import { TraceabilityService } from "../core/work/services/traceability.service.js";
 import { WorkKGService } from "../services/work-kg.service.js";
 
 export const workRoute = new OpenAPIHono<{ Bindings: Env }>();
