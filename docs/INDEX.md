@@ -1,7 +1,7 @@
 # 문서 인덱스
 
 > 마지막 갱신: 2026-05-04
-> 총 GOV 문서: 228개 | 자동 생성 (ax-gov-doc check)
+> 총 GOV 문서: 229개 | 자동 생성 (ax-gov-doc check)
 
 ## SPEC
 
@@ -111,6 +111,7 @@
 | FX-PLAN-335 | Sprint 335 — F589 worktree-manager 도메인 분리 (P2, F588 deferred → core/harness/services/, 옵션 A 15회차, callers 4 + dist orphan 4 cleanup) | 1.0 | Approved | [01-plan/features/sprint-335.plan.md](01-plan/features/sprint-335.plan.md) |
 | FX-PLAN-336 | Sprint 336 — F590 pm-skills dead code 2 git rm + 1 도메인 이동 (P2, 옵션 B, F587 패턴 재현, services/ 26→23, fx-offering self-contained 별건) | 1.0 | Approved | [01-plan/features/sprint-336.plan.md](01-plan/features/sprint-336.plan.md) |
 | FX-PLAN-337 | Sprint 337 — F591 prd/prototype 5 files 도메인 분리 → core/offering/services/ (P2, 옵션 A1 관행 일관성, 인터뷰 4회 패턴, MSA 룰 grandfathered 18+2=20 의식적 인정) | 1.0 | Approved | [01-plan/features/sprint-337.plan.md](01-plan/features/sprint-337.plan.md) |
+| FX-PLAN-338 | Sprint 338 — F592 services/ 잔존 dead+sibling 2 files 정리 (P2, 옵션 D-a 보수, 인터뷰 4회 패턴 23회차, entity-sync rm + methodology-types → core/discovery/services/, entity-registry는 C105 보류) | 1.0 | Approved | [01-plan/features/sprint-338.plan.md](01-plan/features/sprint-338.plan.md) |
 
 ## DSGN
 
