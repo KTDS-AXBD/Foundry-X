@@ -6,7 +6,7 @@
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { workRoute } from "../routes/work.js";
+import { workRoute } from "../core/work/routes/work.js";
 import { z } from "@hono/zod-openapi";
 import type { Env } from "../env.js";
 

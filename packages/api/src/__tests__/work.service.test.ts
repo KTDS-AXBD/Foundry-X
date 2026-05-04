@@ -5,7 +5,7 @@
  * 총 15건 — 구현 전 FAIL 확인 목적
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { WorkService } from "../services/work.service.js";
+import { WorkService } from "../core/work/services/work.service.js";
 import type { Env } from "../env.js";
 
 // ── Minimal env (DB 불필요한 테스트용) ──────────────────────────────────────

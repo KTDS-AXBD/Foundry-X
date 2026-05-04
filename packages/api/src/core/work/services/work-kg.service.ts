@@ -1,6 +1,6 @@
 // F518: Work Lifecycle KG 서비스 — Green Phase 구현
-import type { Env } from "../env.js";
-import { TraceabilityService } from "../core/work/services/traceability.service.js";
+import type { Env } from "../../../env.js";
+import { TraceabilityService } from "./traceability.service.js";
 
 export interface KgNode {
   id: string;

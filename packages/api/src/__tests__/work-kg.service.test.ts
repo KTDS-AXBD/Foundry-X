@@ -1,6 +1,6 @@
 // F518: Work Lifecycle KG — TDD Red Phase
 import { describe, it, expect, beforeEach } from "vitest";
-import { WorkKGService } from "../services/work-kg.service.js";
+import { WorkKGService } from "../core/work/services/work-kg.service.js";
 import { createTestEnv } from "./helpers/test-app.js";
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────

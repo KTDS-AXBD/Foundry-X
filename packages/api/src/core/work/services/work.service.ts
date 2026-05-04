@@ -1,5 +1,5 @@
-import type { Env } from "../env.js";
-import { SSEManager } from "./sse-manager.js";
+import type { Env } from "../../../env.js";
+import { SSEManager } from "../../../services/sse-manager.js";
 import { MODEL_SONNET } from "@foundry-x/shared";
 
 interface WorkItem {
