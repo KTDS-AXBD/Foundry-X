@@ -69,7 +69,7 @@ function getSectionOrder(section: string): number {
    ═══════════════════════════════════════════════ */
 
 const SITE_META_FALLBACK = {
-  sprint: "Sprint 335",
+  sprint: "Sprint 336",
   phase: "Phase 47",
   phaseTitle: "Phase 47 동시 진행",
   tagline: "사업기회 발굴부터 데모까지, AI가 자동화하는 BD 플랫폼",
@@ -79,7 +79,7 @@ const STATS_FALLBACK = [
   { value: "2", label: "BD 파이프라인" },
   { value: "10+", label: "AI 에이전트" },
   { value: "63", label: "자동화 스킬" },
-  { value: "335", label: "Sprints" },
+  { value: "336", label: "Sprints" },
 ];
 
 // Build-time content from TinaCMS-managed Markdown
