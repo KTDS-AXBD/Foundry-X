@@ -83,6 +83,8 @@ export interface AgentExecutionResult {
     uiHint?: UIHint;  // F60: Generative UI
   };
   tokensUsed: number;
+  outputTokens?: number;
+  cacheReadTokens?: number;
   model: string;
   duration: number;
   reflection?: {             // F148: opt-in self-reflection metadata

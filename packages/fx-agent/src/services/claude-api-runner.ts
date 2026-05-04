@@ -52,7 +52,7 @@ export class ClaudeApiRunner implements AgentRunner {
 
     const data = (await res.json()) as {
       content: Array<{ type: string; text: string }>;
-      usage: { input_tokens: number; output_tokens: number };
+      usage: { input_tokens: number; output_tokens: number; cache_read_input_tokens?: number };
     };
 
     const text = data.content
@@ -61,6 +61,8 @@ export class ClaudeApiRunner implements AgentRunner {
       .join("");
 
     const tokensUsed = data.usage.input_tokens + data.usage.output_tokens;
+    const outputTokens = data.usage.output_tokens;
+    const cacheReadTokens = data.usage.cache_read_input_tokens ?? 0;
 
     try {
       const parsed = JSON.parse(text);
@@ -73,6 +75,8 @@ export class ClaudeApiRunner implements AgentRunner {
           uiHint: parsed.uiHint,  // F60
         },
         tokensUsed,
+        outputTokens,
+        cacheReadTokens,
         model: this.model,
         duration: Date.now() - startTime,
       };
@@ -81,6 +85,8 @@ export class ClaudeApiRunner implements AgentRunner {
         status: "partial",
         output: { analysis: text },
         tokensUsed,
+        outputTokens,
+        cacheReadTokens,
         model: this.model,
         duration: Date.now() - startTime,
       };

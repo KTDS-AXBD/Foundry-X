@@ -4,10 +4,10 @@
  * 각 단계의 스킬을 자동 실행하고, HITL 체크포인트에서 정지한다.
  * Workers 30초 제한을 고려하여, 한 호출에 1단계만 실행한다.
  */
-import { DiscoveryPipelineService } from "../core/discovery/services/discovery-pipeline-service.js";
-import { PipelineCheckpointService } from "../modules/launch/services/pipeline-checkpoint-service.js";
-import { BdSkillExecutor } from "../core/shaping/services/bd-skill-executor.js";
-import { DiscoveryStageService } from "../core/discovery/services/discovery-stage-service.js";
+import { DiscoveryPipelineService } from "../../discovery/services/discovery-pipeline-service.js";
+import { PipelineCheckpointService } from "../../../modules/launch/services/pipeline-checkpoint-service.js";
+import { BdSkillExecutor } from "../../shaping/services/bd-skill-executor.js";
+import { DiscoveryStageService } from "../../discovery/services/discovery-stage-service.js";
 
 export interface StepResult {
   stepId: string;

@@ -1,5 +1,5 @@
 import type { GitHubService } from "./github.js";
-import type { ReviewerAgent, PrReviewContext } from "../../../services/reviewer-agent.js";
+import type { ReviewerAgent, PrReviewContext } from "../../../core/agent/services/reviewer-agent.js";
 import type { PrReviewResult } from "@foundry-x/shared";
 
 // ─── Types ───

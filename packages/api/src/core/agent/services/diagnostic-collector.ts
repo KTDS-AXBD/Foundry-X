@@ -48,9 +48,13 @@ export class DiagnosticCollector {
            (id, session_id, agent_id, status, input_tokens, output_tokens,
             cache_read_tokens, rounds, stop_reason, duration_ms, error_msg,
             started_at, finished_at, created_at)
-         VALUES (?, ?, ?, ?, ?, 0, 0, 1, ?, ?, ?, ?, ?, ?)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?)`,
       )
-      .bind(id, sessionId, agentId, status, result.tokensUsed, stopReason, durationMs, errorMsg, now, now, now)
+      .bind(
+        id, sessionId, agentId, status,
+        result.tokensUsed, result.outputTokens ?? 0, result.cacheReadTokens ?? 0,
+        stopReason, durationMs, errorMsg, now, now, now,
+      )
       .run();
   }
 

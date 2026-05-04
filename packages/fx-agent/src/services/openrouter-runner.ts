@@ -77,8 +77,8 @@ export class OpenRouterRunner implements AgentRunner {
 
       const data = (await res.json()) as OpenRouterResponse;
       const text = data.choices[0]?.message?.content ?? "";
-      const tokensUsed =
-        (data.usage?.prompt_tokens ?? 0) + (data.usage?.completion_tokens ?? 0);
+      const outputTokens = data.usage?.completion_tokens ?? 0;
+      const tokensUsed = (data.usage?.prompt_tokens ?? 0) + outputTokens;
       const actualModel = data.model ?? this.model;
 
       try {
@@ -92,6 +92,7 @@ export class OpenRouterRunner implements AgentRunner {
             uiHint: parsed.uiHint,
           },
           tokensUsed,
+          outputTokens,
           model: actualModel,
           duration: Date.now() - startTime,
         };
@@ -100,6 +101,7 @@ export class OpenRouterRunner implements AgentRunner {
           status: "partial",
           output: { analysis: text },
           tokensUsed,
+          outputTokens,
           model: actualModel,
           duration: Date.now() - startTime,
         };
