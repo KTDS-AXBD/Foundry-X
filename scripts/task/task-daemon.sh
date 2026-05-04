@@ -1062,6 +1062,33 @@ phase_sprint_signals() {
     sprint_sig_set "$sig" "STATUS" "MERGED"
     sprint_sig_set "$sig" "MERGED_AT" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     log "✅ sprint-${sprint_num} — MERGED PR #${pr_num}"
+
+    # 9) Master pane 알림 (S262 — Sprint 종료 silent 패턴 방지)
+    # L1: notification 파일 append (UserPromptSubmit hook이 surface)
+    local notif_file="$HOME/.foundry-x/notifications.ndjson"
+    mkdir -p "$(dirname "$notif_file")"
+    printf '{"event":"sprint_merged","sprint":"%s","pr":"%s","project":"%s","f_items":"%s","match_rate":"%s","api":"%s","web":"%s","ts":"%s","consumed":false}\n' \
+      "$sprint_num" "$pr_num" "$project" "$f_items" "${match_rate:-N/A}" \
+      "$api_status" "$web_status" "$(date -Iseconds)" >> "$notif_file"
+
+    # L2: tmux display-message — claude TUI pane에 30s 토스트 (cwd가 master repo 또는 worktrees가 아닌 곳)
+    local master_pane
+    master_pane=$(tmux list-panes -a -F '#{pane_id} #{pane_current_command} #{pane_current_path} #{window_name}' 2>/dev/null \
+      | grep -E "claude" \
+      | grep -v "sprint-" \
+      | grep -v "worktrees" \
+      | head -1 | awk '{print $1}')
+    if [ -n "$master_pane" ]; then
+      tmux set-option -g display-time 30000 2>/dev/null
+      tmux display-message -t "$master_pane" \
+        "✅ Sprint ${sprint_num} MERGED — ${project} PR #${pr_num} (Match ${match_rate:-?}, API:${api_status} Web:${web_status})" 2>/dev/null
+    fi
+
+    # L3: notify-send (WSL/Linux desktop) — 비치명 silent fail
+    if command -v notify-send >/dev/null 2>&1; then
+      notify-send "Sprint ${sprint_num} MERGED" \
+        "${project} PR #${pr_num} — Match ${match_rate:-?}" 2>/dev/null || true
+    fi
   done
   # nullglob 복원 — 누출 시 phase_signals의 ls glob이 빈 확장되어 cwd listing → source crash (S267)
   "$_prev_nullglob" || shopt -u nullglob
