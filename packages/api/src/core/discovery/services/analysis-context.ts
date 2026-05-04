@@ -3,7 +3,7 @@
  */
 
 import type { AnalysisPath, AnalysisStep } from "./analysis-paths.js";
-import { getSkillGuide, type PmSkillGuide } from "../../../services/pm-skills-guide.js";
+import { getSkillGuide, type PmSkillGuide } from "./pm-skills-guide.js";
 
 export interface AnalysisContext {
   id: string;

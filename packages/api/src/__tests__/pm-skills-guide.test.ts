@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { PM_SKILLS_GUIDES, getSkillGuide, getGuidesForCriterion } from "../services/pm-skills-guide.js";
+import { PM_SKILLS_GUIDES, getSkillGuide, getGuidesForCriterion } from "../core/discovery/services/pm-skills-guide.js";
 
 describe("PmSkillsGuide (F184)", () => {
   it("PM_SKILLS_GUIDES — 10개 스킬 가이드 존재", () => {
