@@ -4,7 +4,7 @@
  */
 import { describe, it, expect, beforeAll } from "vitest";
 import Database from "better-sqlite3";
-import { WorkService } from "../services/work.service.js";
+import { WorkService } from "../core/work/services/work.service.js";
 import type { Env } from "../env.js";
 
 // ── Minimal D1 mock with agent_sessions schema ─────────────────────────────

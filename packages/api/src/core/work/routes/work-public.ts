@@ -1,7 +1,7 @@
 // F518: Work KG 공개 API 라우터 — 인증 불필요
 // app.ts에서 app.use("/api/*", authMiddleware) 이전에 등록해야 함
 import { Hono } from "hono";
-import type { Env } from "../env.js";
+import type { Env } from "../../../env.js";
 import { WorkService } from "../services/work.service.js";
 import { WorkKGService } from "../services/work-kg.service.js";
 
