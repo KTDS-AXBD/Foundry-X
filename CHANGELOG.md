@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **F589 services/worktree-manager.ts → core/harness/services/** (PR #724, S326) — autopilot ~8분, Match 100%, OBSERVED P-a~P-j 10/10 PASS, 표면 충족 함정 20회차 회피. 옵션 A 15회차 정착화 (F587 8분 14초 / F588 8분 15초 패턴 일관 재현). 인터뷰 3회 패턴 (사전 측정 → 정밀 측정 → 재결정): callers 0건이 dead code 가설 신호 → auto-rebase.test runtime 6건 + DI contract 2건 정밀 발견 → 옵션 A 채택. dist orphan 4 files 수동 cleanup (autopilot 미인식, 19회차 일관 재현). dual_ai_reviews INSERT 2건 (id 23+24 BLOCK, hook **10 sprint 연속 정상**, 누적 22→24)
+- **F588 work 도메인 본격 분리** (PR #722, S325) — autopilot 8분 15초, Match 100%, services/ 27→26. routes/work + work-public + services/work.{service,kg.service} → core/work/ closure 5 files (F587 traceability seed 위에)
+- **F587 services/ 루트 dead code 2 git rm + 도메인 이동 2** (PR #720, S324) — logger/telemetry-collector dead, monitoring→harness, traceability→work 신설. autopilot 8분 14초
+- **F585 services/ 루트 agent 7 → core/agent/services/** (PR #717 묶음, S323) — 옵션 A 17회차 패턴 정착화
+- **F586 Phase 47 GAP-2 output_tokens=0 fix** (PR #717 묶음, S323/S326) — diagnostic-collector outputTokens additive non-breaking. **P-m 진정 충족 ✅ (S326 KOAMI Dogfood)**: agent_run_metrics 125→134 (+9 stages output_tokens 1104~2313 정확 기록). GAP-2 진정 종결 확정
+- **F584 services/model-router → core/agent/services/** (PR #715, S322) — autopilot 7분 8초 sprint 최단 기록, 옵션 A 15회차 정착화
+
+### Changed
+- 19 세션 연속 성공 (S306~S326): Match 95→100→100→97→98→100→97→97→98→97→100→95+100→97→98→100→98→100→100→100→100% (F560~F589)
+- services/ 루트 직속 .ts: 40→26 (Phase 46 종결 + Phase 47 work 도메인 closure + worktree-manager harness 이동)
+
 ## [1.9.0] - 2026-05-04
 
 > **마일스톤: Phase 46 100% literal 종결** — packages/api/src/services/agent 0 도달. fx-agent MSA 분리 완성 + Strangler 종결. Sprint 312~330 (S306~S321 14 세션 연속 성공, F560~F583).
