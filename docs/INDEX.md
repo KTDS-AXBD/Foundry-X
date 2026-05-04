@@ -106,6 +106,7 @@
 | FX-PLAN-330 | Sprint 330 — F583 services/agent heavy 2 files deduplicate (옵션 C, fx-agent SSOT) — Phase 46 100% literal 종결 | 1.0 | Approved | [01-plan/features/sprint-330.plan.md](01-plan/features/sprint-330.plan.md) |
 | FX-PLAN-331 | Sprint 331 — F584 services/model-router 자질구레 cleanup (P2, autopilot 옵션 A 14회차 패턴 + MSA core/{domain}/ 룰 부분 복원) | 1.0 | Approved | [01-plan/features/sprint-331.plan.md](01-plan/features/sprint-331.plan.md) |
 | FX-PLAN-332 | Sprint 332 — F585 services/ 루트 agent 7 files cleanup (P2, F584 16회차 패턴 확장) + F586 Phase 47 GAP-2 output_tokens=0 fix (token 메트릭 정확성) — 1 sprint 묶음 | 1.0 | Approved | [01-plan/features/sprint-332.plan.md](01-plan/features/sprint-332.plan.md) |
+| FX-PLAN-333 | Sprint 333 — F587 services/ 루트 dead code 2 git rm + 도메인 이동 2 (P2, logger/telemetry dead + monitoring→harness + traceability→work 신설) | 1.0 | Approved | [01-plan/features/sprint-333.plan.md](01-plan/features/sprint-333.plan.md) |
 
 ## DSGN
 
