@@ -107,6 +107,7 @@
 | FX-PLAN-331 | Sprint 331 — F584 services/model-router 자질구레 cleanup (P2, autopilot 옵션 A 14회차 패턴 + MSA core/{domain}/ 룰 부분 복원) | 1.0 | Approved | [01-plan/features/sprint-331.plan.md](01-plan/features/sprint-331.plan.md) |
 | FX-PLAN-332 | Sprint 332 — F585 services/ 루트 agent 7 files cleanup (P2, F584 16회차 패턴 확장) + F586 Phase 47 GAP-2 output_tokens=0 fix (token 메트릭 정확성) — 1 sprint 묶음 | 1.0 | Approved | [01-plan/features/sprint-332.plan.md](01-plan/features/sprint-332.plan.md) |
 | FX-PLAN-333 | Sprint 333 — F587 services/ 루트 dead code 2 git rm + 도메인 이동 2 (P2, logger/telemetry dead + monitoring→harness + traceability→work 신설) | 1.0 | Approved | [01-plan/features/sprint-333.plan.md](01-plan/features/sprint-333.plan.md) |
+| FX-PLAN-334 | Sprint 334 — F588 work 도메인 본격 분리 (P1, F587 시드 위에 routes/work + services/work.{service,kg.service} → core/work/, A안 4 files, worktree-manager는 F589+ 별건) | 1.0 | Approved | [01-plan/features/sprint-334.plan.md](01-plan/features/sprint-334.plan.md) |
 
 ## DSGN
 
