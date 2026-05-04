@@ -27,7 +27,7 @@ turbo test / lint / typecheck  # 전체 검증
 
 ## Current Phase
 
-Phase 1~45 완료 + Phase 46 진정 종결 (Sprint 1~324, F577 ✅). 상세: SPEC.md §5
+Phase 1~45 완료 + Phase 46 100% literal 종결 + Phase 47 진행 (Sprint 1~332, F586 ✅). 상세: SPEC.md §5
 - **Phase 37: Work Lifecycle Platform** ✅ (F516~F518, Sprint 273~275). PRD: `docs/specs/fx-work-lifecycle-platform/prd-final.md`
 - **Phase 38: Dashboard Overhaul** ✅ (F519, Sprint 276 PR #543)
 - **Phase 39: MSA Walking Skeleton** ✅ (F520~F523). F520/F521 Sprint 268, F522/F523 Sprint 277 PR #544. PRD: `docs/specs/fx-msa-roadmap/prd-final.md`
@@ -37,7 +37,8 @@ Phase 1~45 완료 + Phase 46 진정 종결 (Sprint 1~324, F577 ✅). 상세: SPE
 - **Phase 43: HyperFX Activation** ✅ (F534~F537, Sprint 287~289). Dogfood(KOAMI, S276)에서 확증된 3개 갭 해소 — DiagnosticCollector 훅 / Graph 정식 API+UI / MetaAgent 자동 진단
 - **Phase 44: MSA 2차 분리 + Agent 품질 튜닝** 🔧 (F538~F542). F542 ✅ Sprint 290 (MetaAgent 프롬프트 강화 + Sonnet 4.6 + A/B + Rubric, Dogfood P2 PASS 6 proposals), F538~F541 📋 W+6+ 구체화. 관찰: C65 F536 auto-trigger 저장 누락
 - **Phase 45: MSA 3rd Separation + SDD Triangle** ✅ (F560~F574). Batch 1 F560 ✅ Sprint 312, Batch 2 F561+F562 ✅ Sprint 313 / F563 ✅ Sprint 314 / F564+F569 ✅ Sprint 315 / F567+F568 ✅ Sprint 316 / F565 ✅ Sprint 317 (Batch 3 SDD Triangle CI, PR #684 Match 100%). Batch 4 F570 ✅ Sprint 318 (S312, PR #687 Match 97%). Batch 5 F572+F574 ✅ Sprint 319 (S313, PR #690 Match 100% + 3 hotfix). **Batch 6 완결**: F571 ✅ Sprint 320 (S314, PR #697 Match 97%, +6472/-9 56 files, autopilot 30분 완결). fx-agent Worker prod LIVE (gateway/agent 401 인증 보호 정상 응답). 잔여 7 routes(agent/streaming/orchestration/captured-engine/derived-engine/skill-registry/skill-metrics)는 Phase 46 deferred
-- **Phase 46: Strangler 종결 + Dual-AI 진정 해소** ✅ (F553~F577). F553 ✅ Sprint 321 (PR #700, Match 98%, CONDITIONAL GO). F575 ✅ Sprint 322 (PR #701, Match 97%, fx-agent 15 routes 완성). F576 ⚠️(partial) Sprint 323 (PR #704, semantic ~30%, directory rename). C103 ✅ S315 (3 layer silent fail 풀 fix). **F577 ✅ Sprint 324** (PR #705, Match **100%**, autopilot ~1.5h, S316) — packages/api/src/agent/ 완전 제거 ✅. autopilot 설계 변형: services 65 → fx-agent 81 + api/services/agent 44(cross-package binding 회피, MSA 룰 관점 services/agent 44 잔존 → F578 후보). **silent fail layer 4 발견**(C103 hook 호출 ✅ but `WT/.dev.vars` 미존재 → C104 후보). dual_ai_reviews 누적 2건 retroactive 충족(P-i ✅). **다음 사이클**: F578(services/agent fx-agent 추가 분리, P1) + C104(.dev.vars master→WT 자동 복사, P1) + Phase 47 GAP 4건
+- **Phase 46: Strangler 종결 + Dual-AI 진정 해소** ✅ (F553~F584, Sprint 321~331). F583 ✅ Sprint 330 (services/agent 0 도달, Phase 46 100% literal 종결). F584 ✅ Sprint 331 (services/model-router 정리, autopilot 7분 8초 최단). 16 sprint 연속 성공 (S306~S322): Match 95→100→100→97→98→100→97→97→98→97→100→95+100→97→98→100→98→100% (F560~F584). silent fail layer 1~5 종결 (C103+C104). dual_ai_reviews 누적 16건. v1.9.0 마일스톤 태그
+- **Phase 47: Discovery 인프라 회복 + GAP 시리즈** 🔧 (F582~F586, Sprint 328~332). F582 ✅ Sprint 328 (GAP-4 Discovery 인프라 회복). F585 + F586 ✅ Sprint 332 (services/ 루트 agent 7 cleanup + GAP-2 output_tokens=0 fix, 1 sprint 묶음, autopilot 17분 40초). 잔존: GAP-2 P-m 운영자 KOAMI Dogfood / GAP-3 27 stale proposals 검토 / 모델 A/B Opus 4.7 vs Sonnet 4.6
 - 장기 backlog 2건: F112, F117
 - 수치: `/ax:daily-check` 또는 SPEC.md §2 (하드코딩 금지)
 
