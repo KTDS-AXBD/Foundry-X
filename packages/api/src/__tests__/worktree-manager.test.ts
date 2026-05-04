@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { WorktreeManager } from "../services/worktree-manager.js";
+import { WorktreeManager } from "../core/harness/services/worktree-manager.js";
 
 describe("WorktreeManager", () => {
   it("creates a worktree config with defaults", async () => {
