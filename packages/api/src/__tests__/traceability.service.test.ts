@@ -1,6 +1,6 @@
 // F517: 메타데이터 트레이서빌리티 — TDD Red/Green
 import { describe, it, expect, beforeEach } from "vitest";
-import { TraceabilityService } from "../services/traceability.service.js";
+import { TraceabilityService } from "../core/work/services/traceability.service.js";
 import { createTestEnv } from "./helpers/test-app.js";
 import { app } from "../app.js";
 import { createAuthHeaders } from "./helpers/test-app.js";

@@ -1,5 +1,5 @@
 // F517: 메타데이터 트레이서빌리티 — Green Phase 구현
-import type { Env } from "../env.js";
+import type { Env } from "../../../env.js";
 
 export interface FItemLink {
   id: string;

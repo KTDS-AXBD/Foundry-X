@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { app } from "../app.js";
 import { createTestEnv, createAuthHeaders } from "./helpers/test-app.js";
-import { MonitoringService } from "../services/monitoring.js";
+import { MonitoringService } from "../core/harness/services/monitoring.js";
 
 let env: ReturnType<typeof createTestEnv>;
 
