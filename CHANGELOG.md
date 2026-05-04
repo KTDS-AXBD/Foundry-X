@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **F590 pm-skills dead code 2 git rm + 1 도메인 이동** (PR #726, S327) — autopilot **7분 37초** 본 sprint 두 번째 빠른 기록 (F584 7분 8초 다음), Match 100%, OBSERVED P-a~P-j 9/10 PASS + P-h-1 acceptable variant. 옵션 B (F587 패턴 재현 21회차): pm-skills-module/pipeline + pipeline.test.ts dead 3 files git rm + pm-skills-guide → core/discovery/services/ + 2 callers 갱신 (analysis-context sibling import + test path). **인터뷰 3회 패턴 21회차** (S324~S327 정착): 1차 "F590 4 files 도메인 분리" → 2차 실측 3 files (pm-skills-criteria 이미 분리됨) + pm-skills-module callers 0 dead 발견 → 3차 옵션 B 채택. fx-offering self-contained 유지 (별건). dist orphan 12 files 수동 cleanup (autopilot 미인식, S326 패턴 21회차 일관 재현, gitignored). dual_ai_reviews INSERT 1건 (id=25 BLOCK, hook **11 sprint 연속 정상**, 누적 24→25). services/ 루트 직속 .ts 26→23 (-3). +68/-379 7 files
 - **F589 services/worktree-manager.ts → core/harness/services/** (PR #724, S326) — autopilot ~8분, Match 100%, OBSERVED P-a~P-j 10/10 PASS, 표면 충족 함정 20회차 회피. 옵션 A 15회차 정착화 (F587 8분 14초 / F588 8분 15초 패턴 일관 재현). 인터뷰 3회 패턴 (사전 측정 → 정밀 측정 → 재결정): callers 0건이 dead code 가설 신호 → auto-rebase.test runtime 6건 + DI contract 2건 정밀 발견 → 옵션 A 채택. dist orphan 4 files 수동 cleanup (autopilot 미인식, 19회차 일관 재현). dual_ai_reviews INSERT 2건 (id 23+24 BLOCK, hook **10 sprint 연속 정상**, 누적 22→24)
 - **F588 work 도메인 본격 분리** (PR #722, S325) — autopilot 8분 15초, Match 100%, services/ 27→26. routes/work + work-public + services/work.{service,kg.service} → core/work/ closure 5 files (F587 traceability seed 위에)
 - **F587 services/ 루트 dead code 2 git rm + 도메인 이동 2** (PR #720, S324) — logger/telemetry-collector dead, monitoring→harness, traceability→work 신설. autopilot 8분 14초
@@ -16,8 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **F584 services/model-router → core/agent/services/** (PR #715, S322) — autopilot 7분 8초 sprint 최단 기록, 옵션 A 15회차 정착화
 
 ### Changed
-- 19 세션 연속 성공 (S306~S326): Match 95→100→100→97→98→100→97→97→98→97→100→95+100→97→98→100→98→100→100→100→100% (F560~F589)
-- services/ 루트 직속 .ts: 40→26 (Phase 46 종결 + Phase 47 work 도메인 closure + worktree-manager harness 이동)
+- 20 세션 연속 성공 (S306~S327): Match 95→100→100→97→98→100→97→97→98→97→100→95+100→97→98→100→98→100→100→100→100→100% (F560~F590)
+- services/ 루트 직속 .ts: 40→23 (Phase 46 종결 + Phase 47 work 도메인 closure + worktree-manager harness 이동 + pm-skills dead 2 + guide → discovery)
 
 ## [1.9.0] - 2026-05-04
 
