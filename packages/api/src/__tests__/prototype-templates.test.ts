@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { renderPrototypeHtml, escapeHtml, SECTION_ORDER, type PrototypeData } from "../services/prototype-templates.js";
-import { VERDICT_THEMES } from "../services/prototype-styles.js";
+import { renderPrototypeHtml, escapeHtml, SECTION_ORDER, type PrototypeData } from "../core/offering/services/prototype-templates.js";
+import { VERDICT_THEMES } from "../core/offering/services/prototype-styles.js";
 import type { StartingPointType } from "../core/discovery/services/analysis-paths.js";
 
 function makeProtoData(overrides: Partial<PrototypeData> = {}): PrototypeData {

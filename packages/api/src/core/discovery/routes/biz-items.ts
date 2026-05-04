@@ -23,7 +23,7 @@ import { savePrdPersonaEvaluations, getPrdPersonaEvaluations } from "../../shapi
 // Sprint 53 imports (F183, F184, F185)
 import { DiscoveryCriteriaService } from "../services/discovery-criteria.js";
 import { AnalysisContextService } from "../services/analysis-context.js";
-import { PrdGeneratorService } from "../../../services/prd-generator.js";
+import { PrdGeneratorService } from "../../offering/services/prd-generator.js";
 import { UpdateCriterionSchema } from "../schemas/discovery-criteria.js";
 import { SaveAnalysisContextSchema } from "../../../schemas/analysis-context.js";
 import { GeneratePrdSchema } from "../../offering/schemas/prd.js";
@@ -36,7 +36,7 @@ import { TrendReportRequestSchema } from "../../../schemas/trend.js";
 // Sprint 58 imports (F180, F181)
 import { BusinessPlanGeneratorService } from "../../offering/services/business-plan-generator.js";
 import { GenerateBusinessPlanSchema } from "../../offering/schemas/business-plan.js";
-import { PrototypeGeneratorService } from "../../../services/prototype-generator.js";
+import { PrototypeGeneratorService } from "../../offering/services/prototype-generator.js";
 import { GeneratePrototypeSchema } from "../../harness/schemas/prototype.js";
 // Sprint 69 imports (F213)
 import { SetDiscoveryTypeSchema } from "../../shaping/schemas/viability-checkpoint.schema.js";
