@@ -109,6 +109,7 @@
 | FX-PLAN-333 | Sprint 333 — F587 services/ 루트 dead code 2 git rm + 도메인 이동 2 (P2, logger/telemetry dead + monitoring→harness + traceability→work 신설) | 1.0 | Approved | [01-plan/features/sprint-333.plan.md](01-plan/features/sprint-333.plan.md) |
 | FX-PLAN-334 | Sprint 334 — F588 work 도메인 본격 분리 (P1, F587 시드 위에 routes/work + services/work.{service,kg.service} → core/work/, A안 4 files, worktree-manager는 F589+ 별건) | 1.0 | Approved | [01-plan/features/sprint-334.plan.md](01-plan/features/sprint-334.plan.md) |
 | FX-PLAN-335 | Sprint 335 — F589 worktree-manager 도메인 분리 (P2, F588 deferred → core/harness/services/, 옵션 A 15회차, callers 4 + dist orphan 4 cleanup) | 1.0 | Approved | [01-plan/features/sprint-335.plan.md](01-plan/features/sprint-335.plan.md) |
+| FX-PLAN-336 | Sprint 336 — F590 pm-skills dead code 2 git rm + 1 도메인 이동 (P2, 옵션 B, F587 패턴 재현, services/ 26→23, fx-offering self-contained 별건) | 1.0 | Approved | [01-plan/features/sprint-336.plan.md](01-plan/features/sprint-336.plan.md) |
 
 ## DSGN
 
