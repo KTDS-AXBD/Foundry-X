@@ -6,7 +6,7 @@ import {
   type TaskEvent,
   type EventSource,
 } from "@foundry-x/shared";
-import type { TaskStateService } from "../../../services/task-state-service.js";
+import type { TaskStateService } from "../../agent/services/task-state-service.js";
 import type { EventBus } from "../../../services/event-bus.js";
 
 /**

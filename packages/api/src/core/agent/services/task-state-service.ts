@@ -9,7 +9,7 @@ import {
   type TaskStateHistoryRecord,
   getAvailableTransitions,
 } from "@foundry-x/shared";
-import { TransitionGuard } from "../core/harness/services/transition-guard.js";
+import { TransitionGuard } from "../../harness/services/transition-guard.js";
 
 export class TaskStateService {
   constructor(

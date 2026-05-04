@@ -1,4 +1,4 @@
-import type { LLMService } from "./llm.js";
+import type { LLMService } from "../../../services/llm.js";
 import type { PrReviewResult, PrReviewComment } from "@foundry-x/shared";
 
 const MAX_DIFF_LENGTH = 15000;
