@@ -97,14 +97,22 @@ AskUserQuestion(
 ### Step 4: 안전화 + 충돌 방지
 
 ```bash
-# 특수문자 제거 (한글/영숫자/공백/하이픈/언더스코어만 유지), 80자 제한
-SAFE_TITLE=$(echo "$TITLE" | sed 's/[^[:alnum:]가-힣 ._-]//g' | sed 's/  */ /g' | sed 's/^ *//;s/ *$//' | head -c 80)
+# 위험 특수문자만 제거 (denylist 방식 — POSIX bracket + 한글 collation 충돌 회피)
+# 제거 대상: tmux session 이름에 문제되는 문자 ( * : ( ) [ ] \ / )
+# 유지: 한글, 영숫자, 공백, +, _, -, ., 그 외 일반 기호
+SAFE_TITLE=$(echo "$TITLE" \
+  | sed 's/[*:()[]\\/]//g' \
+  | tr -s ' ' \
+  | sed 's/^ *//;s/ *$//' \
+  | head -c 80)
 
 # 동일 이름 session이 존재하면 (현재 session 제외) suffix 추가
 if [ "$SAFE_TITLE" != "$SESSION" ] && tmux has-session -t "$SAFE_TITLE" 2>/dev/null; then
   SAFE_TITLE="${SAFE_TITLE} (${PANE_ID})"
 fi
 ```
+
+> **주의**: `sed 's/[^[:alnum:]가-힣 ._-]//g'` 같은 POSIX bracket + 한글 범위 + literal char 조합은 일부 로케일에서 `Invalid collation character` 에러 발생. **denylist 방식**(제거할 문자만 명시) 또는 `LC_ALL=C` 강제가 안전.
 
 ### Step 5: tmux rename 실행
 
@@ -131,9 +139,10 @@ echo "✅ Session renamed: '$SESSION' → '$SAFE_TITLE' (source=$SOURCE)"
 
 - TMUX 외 환경 작동 불가 (`$TMUX` 가드)
 - session 이름 80자 제한 (tmux 표준)
-- 한글 + 영숫자 + ` ._-`만 유지, `*` `:` `(` 등 제거
+- 위험 특수문자 `*` `:` `(` `)` `[` `]` `\` `/` 만 제거 (denylist), 한글 + 영숫자 + `+` `_` `-` `.` 등 유지
 - worktree 안이 아니면 priority 2 (signal) 건너뜀
 - SPEC.md F-item 행 형식이 `| F### | **제목**` 패턴 가정 (Foundry-X 표준)
+- POSIX bracket + 한글 + literal char 조합 sed는 로케일에 따라 collation 에러 — denylist 방식 사용 (S332 버그 fix)
 
 ## 테스트 시나리오
 
