@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1600 1180" xmlns="http://www.w3.org/2000/svg" role="img" font-family="Noto Sans CJK KR, Pretendard, sans-serif">
+<title>AI Foundry OS 목표 아키텍처 — 3-Plane + Side Rail + Self-Improving</title>
+<desc>L1 채널, Asset Rail, Input/Control/Delivery Plane, Eval Rail, L5 Foundation의 통합 아키텍처. 자기진화 피드백 루프와 Self-Improving 5 보완 포인트 포함.</desc>
+
+<defs>
+  <style>
+    .bg-page { fill: #ffffff; }
+    .bg-card { fill: #f8fafc; }
+    .bg-white { fill: #ffffff; }
+    .text-100 { fill: #1a1a1a; }
+    .text-200 { fill: #333333; }
+    .text-300 { fill: #6b7280; }
+    .border-200 { stroke: #d4d4d4; }
+  </style>
+  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#F97316"/>
+  </marker>
+</defs>
+
+<!-- 배경 -->
+<rect width="1600" height="1180" fill="#ffffff"/>
+
+<!-- 헤더 -->
+<text x="800" y="32" text-anchor="middle" font-size="22" font-weight="700" fill="#1a1a1a">AI Foundry OS 목표 아키텍처 (최종안)</text>
+<text x="800" y="54" text-anchor="middle" font-size="13" fill="#6b7280">3-Plane + Side Rail + Self-Improving Architecture</text>
+
+<!-- L1 Channel -->
+<rect x="40" y="80" width="1520" height="62" rx="8" fill="#f8fafc" stroke="#d4d4d4"/>
+<text x="60" y="105" font-size="13" font-weight="700" fill="#1a1a1a">L1 Channel / Experience Layer</text>
+<text x="60" y="124" font-size="11" fill="#6b7280">Foundry-X Web 사용자 접점</text>
+<g font-size="11" fill="#333333">
+  <rect x="380" y="92" width="200" height="38" rx="4" fill="#ffffff" stroke="#d4d4d4"/>
+  <text x="480" y="116" text-anchor="middle">Portal &amp; Workspace</text>
+  <rect x="600" y="92" width="220" height="38" rx="4" fill="#ffffff" stroke="#d4d4d4"/>
+  <text x="710" y="116" text-anchor="middle">Showcase / Asset Search</text>
+  <rect x="840" y="92" width="160" height="38" rx="4" fill="#ffffff" stroke="#d4d4d4"/>
+  <text x="920" y="116" text-anchor="middle">API / SDK</text>
+  <rect x="1020" y="92" width="200" height="38" rx="4" fill="#ffffff" stroke="#d4d4d4"/>
+  <text x="1120" y="116" text-anchor="middle">Admin / Dashboard</text>
+</g>
+
+<!-- Asset Rail -->
+<rect x="40" y="160" width="220" height="720" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+<text x="150" y="185" text-anchor="middle" font-size="14" font-weight="700" fill="#92400E">Asset Rail</text>
+<text x="150" y="203" text-anchor="middle" font-size="10" fill="#92400E">자산 축적·재사용·유통</text>
+
+<g font-size="10" fill="#333333">
+  <rect x="55" y="220" width="190" height="120" rx="6" fill="white" stroke="#F59E0B"/>
+  <text x="150" y="240" text-anchor="middle" font-size="11" font-weight="700" fill="#1a1a1a">Spec Asset Store</text>
+  <line x1="70" y1="248" x2="230" y2="248" stroke="#F59E0B" opacity="0.4"/>
+  <text x="150" y="266" text-anchor="middle">Business Spec</text>
+  <text x="150" y="282" text-anchor="middle">Technical Spec</text>
+  <text x="150" y="298" text-anchor="middle">Quality Spec</text>
+  <text x="150" y="314" text-anchor="middle">PRD</text>
+
+  <rect x="55" y="350" width="190" height="120" rx="6" fill="white" stroke="#F59E0B"/>
+  <text x="150" y="370" text-anchor="middle" font-size="11" font-weight="700" fill="#1a1a1a">Reusable Deliverables</text>
+  <line x1="70" y1="378" x2="230" y2="378" stroke="#F59E0B" opacity="0.4"/>
+  <text x="150" y="396" text-anchor="middle">Offering · Proposal</text>
+  <text x="150" y="412" text-anchor="middle">Prototype</text>
+  <text x="150" y="428" text-anchor="middle">Agent Asset</text>
+
+  <rect x="55" y="480" width="190" height="110" rx="6" fill="white" stroke="#F59E0B"/>
+  <text x="150" y="500" text-anchor="middle" font-size="11" font-weight="700" fill="#1a1a1a">Enterprise Search</text>
+  <line x1="70" y1="508" x2="230" y2="508" stroke="#F59E0B" opacity="0.4"/>
+  <text x="150" y="526" text-anchor="middle">사내 자산 탐색</text>
+  <text x="150" y="542" text-anchor="middle">KG 연결</text>
+  <text x="150" y="558" text-anchor="middle">재사용 검색</text>
+
+  <rect x="55" y="600" width="190" height="90" rx="6" fill="white" stroke="#F59E0B"/>
+  <text x="150" y="620" text-anchor="middle" font-size="11" font-weight="700" fill="#1a1a1a">Customer Showcase</text>
+  <text x="150" y="636" text-anchor="middle" font-size="11" font-weight="700" fill="#1a1a1a">/ AI Asset Portal</text>
+  <line x1="70" y1="644" x2="230" y2="644" stroke="#F59E0B" opacity="0.4"/>
+  <text x="150" y="662" text-anchor="middle">외부 노출용 자산</text>
+  <text x="150" y="678" text-anchor="middle">사례 라이브러리</text>
+
+  <rect x="55" y="700" width="190" height="40" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-dasharray="3,3"/>
+  <text x="150" y="725" text-anchor="middle" font-size="11" font-weight="600" fill="#92400E">Cross-cutting</text>
+</g>
+
+<!-- Input Plane -->
+<rect x="280" y="160" width="220" height="720" rx="10" fill="#DBEAFE" stroke="#3B82F6" stroke-width="1.5"/>
+<text x="390" y="185" text-anchor="middle" font-size="14" font-weight="700" fill="#1E40AF">Input Plane</text>
+<text x="390" y="203" text-anchor="middle" font-size="10" fill="#1E40AF">경험·시장·문서 → 구조화 Spec</text>
+
+<g font-size="10" fill="#333333">
+  <rect x="295" y="220" width="190" height="160" rx="6" fill="white" stroke="#3B82F6"/>
+  <circle cx="310" cy="240" r="6" fill="#94A3B8"/>
+  <text x="320" y="244" font-size="9" fill="#6b7280">Scaffold 30%</text>
+  <text x="390" y="265" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">Decode-X</text>
+  <line x1="305" y1="275" x2="475" y2="275" stroke="#3B82F6" opacity="0.4"/>
+  <text x="390" y="295" text-anchor="middle">SI/ITO 코드</text>
+  <text x="390" y="311" text-anchor="middle">문서 역공학</text>
+  <text x="390" y="327" text-anchor="middle">Spec 추출</text>
+  <text x="390" y="343" text-anchor="middle">Reverse Engineering</text>
+
+  <rect x="295" y="395" width="190" height="160" rx="6" fill="white" stroke="#3B82F6"/>
+  <circle cx="310" cy="415" r="6" fill="#FBBF24"/>
+  <text x="320" y="419" font-size="9" fill="#6b7280">Pilot 60%</text>
+  <text x="390" y="440" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">Discovery-X</text>
+  <line x1="305" y1="450" x2="475" y2="450" stroke="#3B82F6" opacity="0.4"/>
+  <text x="390" y="470" text-anchor="middle">시장·고객·기술</text>
+  <text x="390" y="486" text-anchor="middle">사업기회 발굴</text>
+  <text x="390" y="502" text-anchor="middle">아이디어 → 가설</text>
+  <text x="390" y="518" text-anchor="middle">→ 검증 → 문서화</text>
+
+  <rect x="295" y="570" width="190" height="140" rx="6" fill="white" stroke="#3B82F6"/>
+  <text x="390" y="595" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">RAG / Ingestion</text>
+  <text x="390" y="611" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">Pipeline</text>
+  <line x1="305" y1="621" x2="475" y2="621" stroke="#3B82F6" opacity="0.4"/>
+  <text x="390" y="641" text-anchor="middle">문서 자성·데이터화</text>
+  <text x="390" y="657" text-anchor="middle">벡터DB</text>
+  <text x="390" y="673" text-anchor="middle">시맨틱 검색</text>
+
+  <rect x="295" y="730" width="190" height="40" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <text x="390" y="755" text-anchor="middle" font-size="11" font-weight="600" fill="#92400E">▶ 보유 자산 반영</text>
+</g>
+
+<!-- Control Plane -->
+<rect x="520" y="160" width="540" height="720" rx="10" fill="#EDE9FE" stroke="#7C3AED" stroke-width="1.5"/>
+<text x="790" y="185" text-anchor="middle" font-size="14" font-weight="700" fill="#5B21B6">Control Plane</text>
+<text x="790" y="203" text-anchor="middle" font-size="10" fill="#5B21B6">AI 실행 두뇌 + Ontology 중심 운영</text>
+
+<g font-size="10" fill="#333333">
+  <rect x="540" y="220" width="500" height="100" rx="8" fill="white" stroke="#7C3AED" stroke-width="2"/>
+  <circle cx="560" cy="245" r="7" fill="#10B981"/>
+  <text x="572" y="249" font-size="10" font-weight="700" fill="#065F46">LIVE 85%</text>
+  <text x="790" y="252" text-anchor="middle" font-size="14" font-weight="700" fill="#5B21B6">Foundry-X Orchestrator</text>
+  <line x1="555" y1="262" x2="1025" y2="262" stroke="#7C3AED" opacity="0.4"/>
+  <text x="790" y="282" text-anchor="middle">Lead Agent / Workflow Coordinator</text>
+  <text x="790" y="302" text-anchor="middle">Spec → 반제품 자동 생성 엔진</text>
+
+  <rect x="540" y="340" width="245" height="200" rx="6" fill="white" stroke="#7C3AED"/>
+  <text x="662" y="365" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">L3 AI Engine</text>
+  <line x1="555" y1="375" x2="770" y2="375" stroke="#7C3AED" opacity="0.4"/>
+  <text x="662" y="395" text-anchor="middle">LLM Core · RAG</text>
+  <text x="662" y="413" text-anchor="middle">Planning</text>
+  <text x="662" y="431" text-anchor="middle">Tool Use</text>
+  <text x="662" y="449" text-anchor="middle">Prompt / Policy</text>
+  <text x="662" y="467" text-anchor="middle">Registry</text>
+  <text x="662" y="495" text-anchor="middle" font-size="9" fill="#6b7280">(Tier 1/2/3 + Multi-Evidence)</text>
+
+  <rect x="795" y="340" width="245" height="200" rx="6" fill="white" stroke="#7C3AED"/>
+  <text x="918" y="365" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">L4 Ontology / KG</text>
+  <line x1="810" y1="375" x2="1025" y2="375" stroke="#7C3AED" opacity="0.4"/>
+  <text x="918" y="395" text-anchor="middle">Domain Ontology</text>
+  <text x="918" y="413" text-anchor="middle">Spec Schema</text>
+  <text x="918" y="431" text-anchor="middle">Entity Registry</text>
+  <text x="918" y="449" text-anchor="middle">Explainability</text>
+  <text x="918" y="475" text-anchor="middle" font-size="9" fill="#6b7280">(9-Type · 파일+Git+PostgreSQL)</text>
+  <text x="918" y="495" text-anchor="middle" font-size="9" fill="#6b7280">Graph DB 미사용</text>
+
+  <rect x="540" y="560" width="500" height="80" rx="6" fill="white" stroke="#7C3AED"/>
+  <text x="790" y="585" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">Tool &amp; Integration Gateway</text>
+  <line x1="555" y1="595" x2="1025" y2="595" stroke="#7C3AED" opacity="0.4"/>
+  <text x="790" y="615" text-anchor="middle">ax-plugin · External Tools · Enterprise Systems · API Connectors</text>
+  <text x="790" y="632" text-anchor="middle" font-size="9" fill="#6b7280">(MCP Tools Interface — BeSir 등 외부 통합)</text>
+
+  <rect x="540" y="660" width="500" height="80" rx="6" fill="white" stroke="#7C3AED"/>
+  <text x="790" y="685" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">Workflow / Event Bus &amp; Memory</text>
+  <line x1="555" y1="695" x2="1025" y2="695" stroke="#7C3AED" opacity="0.4"/>
+  <text x="790" y="715" text-anchor="middle">세션 메모리 · 상태관리 · 이벤트 기반 오케스트레이션</text>
+  <text x="790" y="732" text-anchor="middle" font-size="9" fill="#6b7280">(HITL 80-20-80 + Audit Log Bus)</text>
+
+  <rect x="540" y="760" width="245" height="100" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-dasharray="2,2"/>
+  <text x="662" y="785" text-anchor="middle" font-size="11" font-weight="700" fill="#1a1a1a">4대 진단 (빌드)</text>
+  <text x="662" y="803" text-anchor="middle" font-size="9">Missing/Duplicate</text>
+  <text x="662" y="819" text-anchor="middle" font-size="9">Overspec/Inconsistency</text>
+  <text x="662" y="841" text-anchor="middle" font-size="9" fill="#6b7280">정책 세트 정합성</text>
+
+  <rect x="795" y="760" width="245" height="100" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-dasharray="2,2"/>
+  <text x="918" y="785" text-anchor="middle" font-size="11" font-weight="700" fill="#1a1a1a">CQ 5축 (운영)</text>
+  <text x="918" y="803" text-anchor="middle" font-size="9">온톨로지/툴/코드/결과/거버넌스</text>
+  <text x="918" y="821" text-anchor="middle" font-size="9">90점 핸드오프</text>
+  <text x="918" y="841" text-anchor="middle" font-size="9" fill="#6b7280">호출 결과 정합성</text>
+</g>
+
+<!-- Delivery Plane -->
+<rect x="1080" y="160" width="220" height="720" rx="10" fill="#D1FAE5" stroke="#10B981" stroke-width="1.5"/>
+<text x="1190" y="185" text-anchor="middle" font-size="14" font-weight="700" fill="#065F46">Delivery Plane</text>
+<text x="1190" y="203" text-anchor="middle" font-size="10" fill="#065F46">반제품 → 고객 성과 / 운영</text>
+
+<g font-size="10" fill="#333333">
+  <rect x="1095" y="220" width="190" height="150" rx="6" fill="white" stroke="#10B981"/>
+  <circle cx="1110" cy="240" r="6" fill="#EF4444"/>
+  <text x="1120" y="244" font-size="9" fill="#6b7280">To-Do</text>
+  <text x="1190" y="265" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">Guard-X</text>
+  <line x1="1105" y1="275" x2="1275" y2="275" stroke="#10B981" opacity="0.4"/>
+  <text x="1190" y="295" text-anchor="middle">보안·규제·품질 검증</text>
+  <text x="1190" y="313" text-anchor="middle">Policy Check</text>
+  <text x="1190" y="329" text-anchor="middle">Guardrail</text>
+  <text x="1190" y="345" text-anchor="middle">Approval</text>
+
+  <rect x="1095" y="385" width="190" height="150" rx="6" fill="white" stroke="#10B981"/>
+  <circle cx="1110" cy="405" r="6" fill="#EF4444"/>
+  <text x="1120" y="409" font-size="9" fill="#6b7280">To-Do</text>
+  <text x="1190" y="430" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">Launch-X</text>
+  <line x1="1105" y1="440" x2="1275" y2="440" stroke="#10B981" opacity="0.4"/>
+  <text x="1190" y="460" text-anchor="middle">배포·패키징·운영전환</text>
+  <text x="1190" y="478" text-anchor="middle">Release · Packaging</text>
+  <text x="1190" y="494" text-anchor="middle">Runtime</text>
+  <text x="1190" y="510" text-anchor="middle">Deployment</text>
+
+  <rect x="1095" y="555" width="190" height="135" rx="6" fill="white" stroke="#10B981"/>
+  <text x="1190" y="580" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">Type 1 Delivery</text>
+  <line x1="1105" y1="590" x2="1275" y2="590" stroke="#10B981" opacity="0.4"/>
+  <text x="1190" y="610" text-anchor="middle">소스 기반</text>
+  <text x="1190" y="626" text-anchor="middle">반제품 딜리버리</text>
+  <text x="1190" y="650" text-anchor="middle" font-size="9" fill="#6b7280">SI 프로젝트 투입</text>
+
+  <rect x="1095" y="705" width="190" height="135" rx="6" fill="white" stroke="#10B981"/>
+  <text x="1190" y="730" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">Type 2 Delivery</text>
+  <line x1="1105" y1="740" x2="1275" y2="740" stroke="#10B981" opacity="0.4"/>
+  <text x="1190" y="760" text-anchor="middle">도메인 Agent</text>
+  <text x="1190" y="776" text-anchor="middle">서비스 (구독형)</text>
+  <text x="1190" y="800" text-anchor="middle" font-size="9" fill="#6b7280">반복 매출</text>
+</g>
+
+<!-- Eval Rail -->
+<rect x="1320" y="160" width="240" height="720" rx="10" fill="#FED7AA" stroke="#F97316" stroke-width="1.5"/>
+<text x="1440" y="185" text-anchor="middle" font-size="14" font-weight="700" fill="#9A3412">Eval Rail</text>
+<text x="1440" y="203" text-anchor="middle" font-size="10" fill="#9A3412">측정·검증·자기진화</text>
+
+<g font-size="10" fill="#333333">
+  <rect x="1335" y="220" width="210" height="115" rx="6" fill="white" stroke="#F97316"/>
+  <text x="1440" y="245" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">KPI Matrix</text>
+  <line x1="1345" y1="255" x2="1535" y2="255" stroke="#F97316" opacity="0.4"/>
+  <text x="1440" y="275" text-anchor="middle">활용도 · 품질</text>
+  <text x="1440" y="293" text-anchor="middle">생산성 · 매출</text>
+
+  <rect x="1335" y="350" width="210" height="115" rx="6" fill="white" stroke="#F97316"/>
+  <text x="1440" y="375" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">Auto Evals</text>
+  <line x1="1345" y1="385" x2="1535" y2="385" stroke="#F97316" opacity="0.4"/>
+  <text x="1440" y="405" text-anchor="middle">G-Eval</text>
+  <text x="1440" y="421" text-anchor="middle">Braintrust</text>
+  <text x="1440" y="437" text-anchor="middle">Regression Test</text>
+
+  <rect x="1335" y="480" width="210" height="115" rx="6" fill="white" stroke="#F97316"/>
+  <text x="1440" y="505" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">Human-in-the-Loop</text>
+  <line x1="1345" y1="515" x2="1535" y2="515" stroke="#F97316" opacity="0.4"/>
+  <text x="1440" y="535" text-anchor="middle">도메인 전문가</text>
+  <text x="1440" y="551" text-anchor="middle">리뷰 · 승인</text>
+  <text x="1440" y="573" text-anchor="middle" font-size="9" fill="#6b7280">(80-20-80 Stage 3)</text>
+
+  <rect x="1335" y="610" width="210" height="115" rx="6" fill="white" stroke="#F97316"/>
+  <text x="1440" y="635" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">Learning Loop</text>
+  <line x1="1345" y1="645" x2="1535" y2="645" stroke="#F97316" opacity="0.4"/>
+  <text x="1440" y="665" text-anchor="middle">결과 → 피드백</text>
+  <text x="1440" y="683" text-anchor="middle">Spec / Prompt /</text>
+  <text x="1440" y="699" text-anchor="middle">Ontology 개선</text>
+
+  <rect x="1335" y="740" width="210" height="115" rx="6" fill="white" stroke="#F97316"/>
+  <text x="1440" y="765" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">Experiment &amp;</text>
+  <text x="1440" y="781" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">Versioning</text>
+  <line x1="1345" y1="791" x2="1535" y2="791" stroke="#F97316" opacity="0.4"/>
+  <text x="1440" y="811" text-anchor="middle">Model · Prompt</text>
+  <text x="1440" y="827" text-anchor="middle">Policy · Asset</text>
+  <text x="1440" y="845" text-anchor="middle" font-size="9" fill="#6b7280">버전 관리</text>
+</g>
+
+<!-- 자기진화 피드백 루프 -->
+<path d="M 1440 880 Q 1440 920 1200 920 Q 800 920 400 920 Q 150 920 150 880" fill="none" stroke="#F97316" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrowhead)" opacity="0.7"/>
+<text x="800" y="912" text-anchor="middle" font-size="11" font-weight="700" fill="#9A3412">자기진화 피드백 루프 (폐쇄형)</text>
+
+<!-- L5 Foundation Layer -->
+<rect x="40" y="935" width="1520" height="100" rx="8" fill="#f8fafc" stroke="#d4d4d4"/>
+<text x="60" y="958" font-size="13" font-weight="700" fill="#1a1a1a">L5 Foundation Layer</text>
+<text x="60" y="976" font-size="10" fill="#6b7280">Runtime · Memory · Identity · Observability · Security</text>
+
+<g font-size="10" fill="#333333">
+  <rect x="220" y="950" width="160" height="68" rx="4" fill="#ffffff" stroke="#d4d4d4"/>
+  <text x="300" y="970" text-anchor="middle" font-weight="700" font-size="11" fill="#1a1a1a">Runtime</text>
+  <text x="300" y="990" text-anchor="middle">Cloudflare Workers</text>
+
+  <rect x="390" y="950" width="160" height="68" rx="4" fill="#ffffff" stroke="#d4d4d4"/>
+  <text x="470" y="970" text-anchor="middle" font-weight="700" font-size="11" fill="#1a1a1a">Data / Storage</text>
+  <text x="470" y="990" text-anchor="middle">D1 · Object · Vector</text>
+
+  <rect x="560" y="950" width="140" height="68" rx="4" fill="#ffffff" stroke="#d4d4d4"/>
+  <text x="630" y="970" text-anchor="middle" font-weight="700" font-size="11" fill="#1a1a1a">Identity</text>
+  <text x="630" y="990" text-anchor="middle">JWT · RBAC · SSO</text>
+
+  <rect x="710" y="950" width="160" height="68" rx="4" fill="#ffffff" stroke="#d4d4d4"/>
+  <text x="790" y="970" text-anchor="middle" font-weight="700" font-size="11" fill="#1a1a1a">Observability</text>
+  <text x="790" y="990" text-anchor="middle">Metrics · Logs · Traces</text>
+
+  <rect x="880" y="950" width="120" height="68" rx="4" fill="#ffffff" stroke="#d4d4d4"/>
+  <text x="940" y="970" text-anchor="middle" font-weight="700" font-size="11" fill="#1a1a1a">DevOps / CI-CD</text>
+
+  <rect x="1010" y="950" width="160" height="68" rx="4" fill="#ffffff" stroke="#d4d4d4"/>
+  <text x="1090" y="970" text-anchor="middle" font-weight="700" font-size="11" fill="#1a1a1a">Security &amp;</text>
+  <text x="1090" y="985" text-anchor="middle" font-weight="700" font-size="11" fill="#1a1a1a">Governance</text>
+
+  <rect x="1180" y="950" width="190" height="68" rx="4" fill="#ffffff" stroke="#d4d4d4"/>
+  <text x="1275" y="970" text-anchor="middle" font-weight="700" font-size="11" fill="#1a1a1a">AXIS Design System</text>
+  <text x="1275" y="990" text-anchor="middle">Tokens · UI · Agentic</text>
+
+  <rect x="1380" y="950" width="160" height="68" rx="4" fill="#ffffff" stroke="#d4d4d4"/>
+  <text x="1460" y="970" text-anchor="middle" font-weight="700" font-size="11" fill="#1a1a1a">Multi-Cloud</text>
+  <text x="1460" y="990" text-anchor="middle">Azure / AWS</text>
+</g>
+
+<!-- 범례 -->
+<rect x="40" y="1055" width="700" height="110" rx="8" fill="#f8fafc" stroke="#d4d4d4"/>
+<text x="60" y="1078" font-size="12" font-weight="700" fill="#1a1a1a">범례 (Status)</text>
+<g font-size="11" fill="#333333">
+  <circle cx="80" cy="1100" r="7" fill="#10B981"/><text x="95" y="1104">LIVE</text>
+  <circle cx="170" cy="1100" r="7" fill="#FBBF24"/><text x="185" y="1104">Pilot</text>
+  <circle cx="270" cy="1100" r="7" fill="#94A3B8"/><text x="285" y="1104">Scaffold</text>
+  <circle cx="380" cy="1100" r="7" fill="#EF4444"/><text x="395" y="1104">To-Do</text>
+</g>
+<text x="60" y="1135" font-size="11" fill="#6b7280">Foundry-X LIVE 85% / Discovery-X Pilot 60% / Decode-X Scaffold 30% / Guard-X·Launch-X To-Do</text>
+<text x="60" y="1153" font-size="10" fill="#6b7280">5월 W21 G1+G2 게이트 시점 목표 — 모든 컴포넌트 Pilot 60% 도달, Foundry-X LIVE 95%+ 유지</text>
+
+<!-- Self-Improving 5 -->
+<rect x="760" y="1055" width="800" height="110" rx="8" fill="#FEF3C7" stroke="#F59E0B"/>
+<text x="780" y="1078" font-size="12" font-weight="700" fill="#92400E">보완된 Self-Improving 5 포인트</text>
+<g font-size="11" fill="#333333">
+  <text x="780" y="1099">❶ Prompt / Policy / Model Registry 추가</text>
+  <text x="780" y="1117">❷ Session Memory + Event Bus 명시</text>
+  <text x="780" y="1135">❸ Human Approval 포함한 폐쇄형 피드백 루프</text>
+  <text x="1180" y="1099">❹ EvalOps + Experiment Tracking 내재화</text>
+  <text x="1180" y="1117">❺ Asset 재사용성 + KPI를 전 Plane에 연결</text>
+  <text x="1180" y="1135" font-size="10" fill="#6b7280">v0.3 정의서 §13 Changelog와 정합</text>
+</g>
+
+</svg>
