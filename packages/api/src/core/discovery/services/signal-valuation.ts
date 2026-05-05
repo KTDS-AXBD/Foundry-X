@@ -5,7 +5,7 @@
  */
 
 import type { SignalValuation } from "@foundry-x/shared";
-import type { UpdateSignalValuationsInput } from "../../harness/schemas/roi-benchmark.js";
+import { type UpdateSignalValuationsInput } from "../../harness/types.js";
 
 export const DEFAULT_SIGNAL_VALUATIONS = {
   go: 50_000,

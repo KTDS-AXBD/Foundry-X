@@ -6,7 +6,7 @@ import { Hono } from "hono";
 import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
 import { RoiBenchmarkService } from "../services/roi-benchmark.js";
-import { SignalValuationService } from "../../discovery/services/signal-valuation.js";
+import { SignalValuationService } from "../../discovery/types.js";
 import { BdRoiCalculatorService } from "../services/bd-roi-calculator.js";
 import {
   runBenchmarkSchema,

@@ -3,9 +3,8 @@
 import { GraphEngine } from "../graph-engine.js";
 import type { GraphDefinition, GraphNodeInput, GraphNodeOutput, GraphExecutionContext } from "@foundry-x/shared";
 import type { AgentRunner } from "../agent-runner.js";
-import { StageRunnerService } from "../../../discovery/services/stage-runner-service.js";
+import { StageRunnerService, type DiscoveryType } from "../../../discovery/types.js";
 import { DiagnosticCollector } from "../diagnostic-collector.js";
-import type { DiscoveryType } from "../../../discovery/services/analysis-path-v82.js";
 
 /** F528 backward compat: runner/db 없을 때 stub 핸들러 */
 function makeStubHandler(stage: string) {

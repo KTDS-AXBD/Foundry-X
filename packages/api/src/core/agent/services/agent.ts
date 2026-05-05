@@ -2,7 +2,7 @@
 
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
-import { CustomRoleManager } from "../../harness/services/custom-role-manager.js";
+import { CustomRoleManager } from "../../harness/types.js";
 import type { Env } from "../../../env.js";
 
 // ─── Schemas ───

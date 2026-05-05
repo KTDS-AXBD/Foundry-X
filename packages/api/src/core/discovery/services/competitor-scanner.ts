@@ -2,8 +2,7 @@
  * Sprint 57 F190: CompetitorScanner — 경쟁사/유사 서비스 스캔
  * AgentRunner를 통해 LLM 호출 → JSON 파싱.
  */
-import type { AgentRunner } from "../../../core/agent/services/agent-runner.js";
-import type { AgentExecutionResult } from "../../../core/agent/services/execution-types.js";
+import { type AgentExecutionResult, type AgentRunner } from "../../agent/types.js";
 import { COMPETITOR_SCAN_SYSTEM_PROMPT, buildCompetitorPrompt } from "./competitor-scanner-prompts.js";
 
 export interface CompetitorScanResult {

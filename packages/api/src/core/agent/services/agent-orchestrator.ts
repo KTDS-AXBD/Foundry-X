@@ -8,14 +8,12 @@ import type { SSEManager } from "../../../services/sse-manager.js";
 import type { McpServerRegistry } from "./mcp-registry.js";
 import type { MergeQueueService } from "../../../services/merge-queue.js";
 import type { PlannerAgent } from "./planner-agent.js";
-import type { WorktreeManager } from "../../harness/services/worktree-manager.js";
-import type { AutoFixService } from "../../harness/services/auto-fix.js";
+import { type AutoFixService, type CustomRoleManager, type WorktreeManager } from "../../harness/types.js";
 import type { ArchitectAgent } from "./architect-agent.js";
 import type { TestAgent } from "./test-agent.js";
 import type { SecurityAgent } from "./security-agent.js";
 import type { QAAgent } from "./qa-agent.js";
 import type { InfraAgent } from "./infra-agent.js";
-import type { CustomRoleManager } from "../../harness/services/custom-role-manager.js";
 import type { ParallelExecutionResult, ParallelPrResult, ConflictReport, AgentPlan } from "@foundry-x/shared";
 
 export class PlanTimeoutError extends Error {

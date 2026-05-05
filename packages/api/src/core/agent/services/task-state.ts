@@ -3,7 +3,7 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { TaskStateService } from "./task-state-service.js";
-import { createDefaultGuard } from "../../harness/services/transition-guard.js";
+import { createDefaultGuard } from "../../harness/types.js";
 import { TaskState, TASK_STATES, type EventSource } from "@foundry-x/shared";
 import type { Env } from "../../../env.js";
 

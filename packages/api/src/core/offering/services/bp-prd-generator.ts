@@ -2,7 +2,7 @@
  * Sprint 220 F454: 사업기획서(HTML) 기반 1차 PRD 생성 서비스
  */
 
-import type { AgentRunner } from "../../../core/agent/services/agent-runner.js";
+import { type AgentRunner } from "../../agent/types.js";
 import type { ParsedBusinessPlan, BpSectionKey } from "./bp-html-parser.js";
 
 export interface BpPrdInput {

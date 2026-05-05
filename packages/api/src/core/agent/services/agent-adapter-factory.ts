@@ -9,7 +9,7 @@ import type {
 } from "@foundry-x/shared";
 import type { AgentRunner } from "./agent-runner.js";
 import type { AgentTaskType, AgentExecutionRequest, AgentExecutionResult } from "./execution-types.js";
-import type { EvaluatorOptimizer } from "../../harness/services/evaluator-optimizer.js";
+import { type EvaluatorOptimizer } from "../../harness/types.js";
 
 /**
  * AgentExecutionContext → AgentExecutionRequest 변환

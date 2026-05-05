@@ -2,7 +2,7 @@
  * F379: Discovery→Shape Pipeline Zod Schemas (Sprint 171)
  */
 import { z } from "zod";
-import { AdaptToneEnum } from "../../offering/schemas/content-adapter.schema.js";
+import { AdaptToneEnum } from "../../offering/types.js";
 
 export const PipelineTriggerSchema = z.object({
   itemId: z.string().min(1),

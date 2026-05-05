@@ -1,4 +1,4 @@
-import { IdeaService, type Idea } from "../../collection/services/idea-service.js";
+import { IdeaService, type Idea } from "../../collection/types.js";
 import { BmcService, type Bmc } from "./bmc-service.js";
 
 // ─── Summary 타입 ───

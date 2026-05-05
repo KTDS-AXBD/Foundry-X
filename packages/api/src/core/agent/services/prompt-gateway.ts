@@ -3,7 +3,7 @@
  * Strips secrets/PII/internal URLs before forwarding prompts to LLM backends.
  */
 import type { AgentTaskType } from "./execution-types.js";
-import { AuditLogService } from "../../harness/services/audit-logger.js";
+import { AuditLogService } from "../../harness/types.js";
 
 // ── Interfaces ──────────────────────────────────────────
 

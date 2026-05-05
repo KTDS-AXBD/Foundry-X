@@ -4,10 +4,7 @@
  * Discovery 분석 결과 + 평가 + 트렌드를 사업계획서 10개 섹션에 매핑
  */
 
-import type { DiscoveryCriterion } from "../../discovery/services/discovery-criteria.js";
-import type { AnalysisContext } from "../../discovery/services/analysis-context.js";
-import type { BizItem, EvaluationWithScores } from "../../discovery/services/biz-item-service.js";
-import type { StartingPointType } from "../../discovery/services/analysis-paths.js";
+import { type AnalysisContext, type BizItem, type DiscoveryCriterion, type EvaluationWithScores, type StartingPointType } from "../../discovery/types.js";
 
 // ─── 10 섹션 정의 ───
 
