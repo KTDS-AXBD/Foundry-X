@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
-import { BdArtifactService } from "../../shaping/services/bd-artifact-service.js";
+import { BdArtifactService } from "../../shaping/types.js";
 import { artifactListQuerySchema } from "../schemas/bd-artifact.js";
 
 export const axBdArtifactsRoute = new Hono<{

@@ -1,8 +1,7 @@
 /**
  * F199: BMCAgent — 아이디어 텍스트를 받아 BMC 9개 블록 초안을 LLM으로 생성
  */
-import { PromptGatewayService } from "../../agent/services/prompt-gateway.js";
-import { ModelRouter } from "../../agent/services/model-router.js";
+import { ModelRouter, PromptGatewayService } from "../../agent/types.js";
 import { BMC_BLOCK_TYPES } from "./bmc-service.js";
 
 export interface BmcDraftResult {

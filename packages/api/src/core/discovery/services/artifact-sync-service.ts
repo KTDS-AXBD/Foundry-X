@@ -2,7 +2,7 @@
  * Sprint 235 F482: bd_artifacts 자동 등록 파이프라인 — 동기화 서비스
  * Claude Code 스킬에서 분석 완료 시 API를 통해 산출물을 Foundry-X DB로 동기화
  */
-import { BdArtifactService } from "../../shaping/services/bd-artifact-service.js";
+import { BdArtifactService } from "../../shaping/types.js";
 import { DiscoveryStageService } from "./discovery-stage-service.js";
 import { BizItemService } from "./biz-item-service.js";
 import type { SyncArtifactStage, SyncResult } from "../schemas/artifact-sync.js";

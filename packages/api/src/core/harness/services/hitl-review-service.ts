@@ -3,7 +3,7 @@
  */
 
 import type { HitlReview } from "../schemas/hitl-review-schema.js";
-import { BdArtifactService } from "../../shaping/services/bd-artifact-service.js";
+import { BdArtifactService } from "../../shaping/types.js";
 
 interface ReviewRow {
   id: string;

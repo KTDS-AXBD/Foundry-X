@@ -3,7 +3,7 @@
  * Sprint 230: F470 — revision_requested → 피드백 자동 생성 연결
  */
 
-import type { SectionReviewInput } from "../../shaping/schemas/hitl-section.schema.js";
+import { type SectionReviewInput } from "../../shaping/types.js";
 
 export interface PrototypeSectionReview {
   id: string;

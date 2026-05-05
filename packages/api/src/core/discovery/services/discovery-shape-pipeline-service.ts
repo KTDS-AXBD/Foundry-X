@@ -8,9 +8,7 @@
 import type { TaskEvent } from "@foundry-x/shared";
 import { createTaskEvent } from "@foundry-x/shared";
 import type { EventBus } from "../../../services/event-bus.js";
-import { OfferingService } from "../../offering/services/offering-service.js";
-import { ContentAdapterService } from "../../offering/services/content-adapter-service.js";
-import type { AdaptTone } from "../../offering/schemas/content-adapter.schema.js";
+import { ContentAdapterService, OfferingService, type AdaptTone } from "../../offering/types.js";
 import type {
   ShapePipelineResult,
   ShapePipelineStatus,

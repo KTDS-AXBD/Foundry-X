@@ -1,7 +1,7 @@
 /**
  * Sprint 56 F188: Six Hats 토론 시뮬레이션 — 20턴 순차 실행 + D1 저장
  */
-import { createAgentRunner, type AgentRunner } from "../../../core/agent/services/agent-runner.js";
+import { createAgentRunner, type AgentRunner } from "../../agent/types.js";
 import {
   TURN_SEQUENCE, HAT_CONFIGS, CONTEXT_WINDOW_TURNS,
   summarizePrd, buildTurnPrompt,

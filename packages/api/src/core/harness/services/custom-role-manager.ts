@@ -4,8 +4,7 @@
  * F221: Agent-as-Code 확장 — persona, dependencies, customization, menu
  */
 
-import { parseAgentDefinition, exportToYaml } from "../../../core/agent/services/agent-definition-loader.js";
-import type { MenuItem } from "../../../core/agent/services/agent-definition-loader.js";
+import { exportToYaml, parseAgentDefinition, type MenuItem } from "../../agent/types.js";
 
 export interface CustomRole {
   id: string;

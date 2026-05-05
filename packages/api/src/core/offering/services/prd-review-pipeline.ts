@@ -1,8 +1,7 @@
 /**
  * Sprint 55 F186: PRD 다중 AI 검토 파이프라인 — 병렬 호출 + 스코어카드 집계 + D1 저장
  */
-import type { AiReviewProvider, AiReviewResponse } from "../../../core/agent/services/external-ai-reviewer.js";
-import { ChatGptProvider, GeminiProvider, DeepSeekProvider } from "../../../core/agent/services/external-ai-reviewer.js";
+import { ChatGptProvider, DeepSeekProvider, GeminiProvider, type AiReviewProvider, type AiReviewResponse } from "../../agent/types.js";
 
 export const MIN_REVIEW_SUCCESS = 2;
 
