@@ -115,6 +115,9 @@
 | FX-PLAN-339 | Sprint 339 — F593 entity 도메인 신설 + closure 3 files (P3, 옵션 c, F587/F588 선례 재현, C105→F593 승격, routes/entities + services/entity-registry + schemas/entity → core/entity/) | 1.0 | Approved | [01-plan/features/sprint-339.plan.md](01-plan/features/sprint-339.plan.md) |
 | FX-PLAN-340 | Sprint 340 — F595 sr 도메인 신설 + closure 5 files (P3, 옵션 B, F593 entity 패턴 재현, routes/sr + services/sr-classifier + services/hybrid-sr-classifier + services/sr-workflow-mapper + schemas/sr → core/sr/) | 1.0 | Approved | [01-plan/features/sprint-340.plan.md](01-plan/features/sprint-340.plan.md) |
 | FX-PLAN-341 | Sprint 341 — F594 spec 도메인 신설 + closure 6 files (P3, 옵션 A 18회차, F593+F595 패턴 재현, routes/spec + routes/spec-library + services/spec-parser + services/spec-library + schemas/spec + schemas/spec-library → core/spec/, modules/portal grandfathered 2 depth 갱신만 + 신규 grandfathered ~+8) | 1.0 | Approved | [01-plan/features/sprint-341.plan.md](01-plan/features/sprint-341.plan.md) |
+| FX-PLAN-342 | Sprint 342 — F608 MSA 룰 강제 교정 Pass 1 — lint script src/ 확장 + Forward-only baseline 160 fingerprints (P2, S332 누적 압력 정점 해소, 측정 추정 ~21~41 → 실측 161건 silent fail 차단막) | 1.0 | Approved | [01-plan/features/sprint-342.plan.md](01-plan/features/sprint-342.plan.md) |
+| FX-PLAN-343 | Sprint 343 — F609 MSA 룰 강제 교정 Pass 2 — types.ts 13 도메인 신설 + single-domain 44 fix (P2, F609 re-export 패턴 정립, baseline 161→~77 자동화 ~3분) | 1.0 | Approved | [01-plan/features/sprint-343.plan.md](01-plan/features/sprint-343.plan.md) |
+| FX-PLAN-344 | Sprint 344 — F610 MSA 룰 강제 교정 Pass 3 — biz-items.ts 19건 단일 파일 리팩터링 (P2, 옵션 A 자동화 ~20분, F609 re-export 패턴 재현, baseline 161→142, shaping +7 / offering +16 / harness +1 = 24 re-export 추가) | 1.0 | Approved | [01-plan/features/sprint-344.plan.md](01-plan/features/sprint-344.plan.md) |
 
 ## DSGN
 
