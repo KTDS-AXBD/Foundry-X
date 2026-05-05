@@ -113,6 +113,7 @@
 | FX-PLAN-337 | Sprint 337 — F591 prd/prototype 5 files 도메인 분리 → core/offering/services/ (P2, 옵션 A1 관행 일관성, 인터뷰 4회 패턴, MSA 룰 grandfathered 18+2=20 의식적 인정) | 1.0 | Approved | [01-plan/features/sprint-337.plan.md](01-plan/features/sprint-337.plan.md) |
 | FX-PLAN-338 | Sprint 338 — F592 services/ 잔존 dead+sibling 2 files 정리 (P2, 옵션 D-a 보수, 인터뷰 4회 패턴 23회차, entity-sync rm + methodology-types → core/discovery/services/, entity-registry는 C105 보류) | 1.0 | Approved | [01-plan/features/sprint-338.plan.md](01-plan/features/sprint-338.plan.md) |
 | FX-PLAN-339 | Sprint 339 — F593 entity 도메인 신설 + closure 3 files (P3, 옵션 c, F587/F588 선례 재현, C105→F593 승격, routes/entities + services/entity-registry + schemas/entity → core/entity/) | 1.0 | Approved | [01-plan/features/sprint-339.plan.md](01-plan/features/sprint-339.plan.md) |
+| FX-PLAN-340 | Sprint 340 — F595 sr 도메인 신설 + closure 5 files (P3, 옵션 B, F593 entity 패턴 재현, routes/sr + services/sr-classifier + services/hybrid-sr-classifier + services/sr-workflow-mapper + schemas/sr → core/sr/) | 1.0 | Approved | [01-plan/features/sprint-340.plan.md](01-plan/features/sprint-340.plan.md) |
 
 ## DSGN
 
