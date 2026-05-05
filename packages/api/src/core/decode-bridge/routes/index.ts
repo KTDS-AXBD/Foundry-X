@@ -18,6 +18,7 @@ import {
   getOrgSpec,
   getSkillSpec,
 } from "../services/decode-client.js";
+import { countAcceptedProposals } from "../../agent/types.js";
 import { LPON_HARNESS_METRICS } from "../data/lpon-mock.js";
 
 export const decodeBridgeRoute = new OpenAPIHono<{ Bindings: Env }>();
@@ -68,11 +69,9 @@ decodeBridgeRoute.get("/decode/harness/metrics", async (c) => {
   // F548: Currently mock-based. Real-time indicator: agent_improvement_proposals count
   let concreteness = LPON_HARNESS_METRICS.concreteness;
   try {
-    const row = await c.env.DB
-      .prepare("SELECT COUNT(*) as cnt FROM agent_improvement_proposals WHERE status = 'accepted'")
-      .first<{ cnt: number }>();
-    if (row?.cnt !== undefined) {
-      concreteness = Math.min(100, 60 + Math.floor(row.cnt * 2));
+    const cnt = await countAcceptedProposals(c.env.DB);
+    if (cnt !== undefined) {
+      concreteness = Math.min(100, 60 + Math.floor(cnt * 2));
     }
   } catch {
     // Table may not exist — use mock

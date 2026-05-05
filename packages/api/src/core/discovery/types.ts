@@ -8,3 +8,13 @@ export type { DiscoveryCriterion } from "./services/discovery-criteria.js";
 export type { AnalysisContext } from "./services/analysis-context.js";
 export type { BizItem, EvaluationWithScores } from "./services/biz-item-service.js";
 export type { StartingPointType } from "./services/analysis-paths.js";
+
+// F611: discovery D1 API — cross-domain callers import from here
+export {
+  queryPipelineRunsByBizItem,
+  queryPipelineRunsByTenant,
+  queryPipelineCheckpointsByTenant,
+  queryPipelineEventsByTenant,
+  updatePipelineRunCurrentStep,
+  linkShapingRunToPipeline,
+} from "./services/discovery-d1-api.js";

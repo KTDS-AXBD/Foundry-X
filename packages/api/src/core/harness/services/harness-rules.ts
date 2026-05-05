@@ -5,6 +5,11 @@
  * kpi_events에 'harness_violation' event_type으로 직접 INSERT (KpiLogger 타입 제약 우회).
  */
 import type { SSEManager } from "../../../services/sse-manager.js";
+import {
+  countAgentsByOrg,
+  countActiveSessionsByProject,
+  countTasksByProjectSessions,
+} from "../../agent/types.js";
 
 export interface HarnessViolation {
   rule: string;
@@ -50,19 +55,10 @@ export class HarnessRulesService {
 
     // 규칙 2: consistency-check — 에이전트 프로필과 세션 정합성
     if (project) {
-      const agentCount = await this.db
-        .prepare(
-          "SELECT COUNT(*) as cnt FROM agents WHERE org_id = ?",
-        )
-        .bind(tenantId)
-        .first<{ cnt: number }>();
-
-      const activeSessionCount = await this.db
-        .prepare(
-          "SELECT COUNT(*) as cnt FROM agent_sessions WHERE project_id = ? AND status = 'active'",
-        )
-        .bind(projectId)
-        .first<{ cnt: number }>();
+      const agentCnt = await countAgentsByOrg(this.db, tenantId);
+      const activeSessionCnt = await countActiveSessionsByProject(this.db, projectId);
+      const agentCount = { cnt: agentCnt };
+      const activeSessionCount = { cnt: activeSessionCnt };
 
       if ((agentCount?.cnt ?? 0) === 0) {
         violations.push({
@@ -117,12 +113,8 @@ export class HarnessRulesService {
         .bind(projectId)
         .first<{ cnt: number }>();
 
-      const taskCount = await this.db
-        .prepare(
-          "SELECT COUNT(*) as cnt FROM agent_tasks WHERE agent_session_id IN (SELECT id FROM agent_sessions WHERE project_id = ?)",
-        )
-        .bind(projectId)
-        .first<{ cnt: number }>();
+      const taskCnt = await countTasksByProjectSessions(this.db, projectId);
+      const taskCount = { cnt: taskCnt };
 
       if ((specCount?.cnt ?? 0) > 0 && (taskCount?.cnt ?? 0) === 0) {
         violations.push({

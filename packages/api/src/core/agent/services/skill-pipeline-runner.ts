@@ -8,6 +8,7 @@ import { DiscoveryPipelineService } from "../../discovery/services/discovery-pip
 import { PipelineCheckpointService } from "../../../modules/launch/services/pipeline-checkpoint-service.js";
 import { BdSkillExecutor } from "../../shaping/services/bd-skill-executor.js";
 import { DiscoveryStageService } from "../../discovery/services/discovery-stage-service.js";
+import { updatePipelineRunCurrentStep } from "../../discovery/types.js";
 
 export interface StepResult {
   stepId: string;
@@ -115,13 +116,7 @@ export class SkillPipelineRunner {
       };
     }
 
-    // current_step을 다음으로 갱신
-    await this.db
-      .prepare(
-        "UPDATE discovery_pipeline_runs SET current_step = ?, updated_at = datetime('now') WHERE id = ?",
-      )
-      .bind(nextStep, pipelineRunId)
-      .run();
+    await updatePipelineRunCurrentStep(this.db, pipelineRunId, nextStep);
 
     // 다음 단계 진행 추적 시작
     await this.stageService.updateStage(bizItemId, orgId, nextStep as never, "in_progress").catch(() => {});

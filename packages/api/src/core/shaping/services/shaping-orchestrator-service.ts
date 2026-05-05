@@ -6,6 +6,7 @@
 import { ShapingService } from "./shaping-service.js";
 import { PipelineStateMachine } from "../../../modules/launch/services/pipeline-state-machine.js";
 import type { TriggerShapingInput } from "@foundry-x/shared";
+import { linkShapingRunToPipeline } from "../../discovery/types.js";
 
 const SHAPING_PHASES = ["A", "B", "C", "D", "E", "F"] as const;
 
@@ -59,14 +60,7 @@ export class ShapingOrchestratorService {
     }
 
     // 3. pipeline에 shaping_run_id 연결 + shaping_queued → shaping_running
-    await this.db
-      .prepare(
-        `UPDATE discovery_pipeline_runs
-         SET shaping_run_id = ?, updated_at = datetime('now')
-         WHERE id = ?`,
-      )
-      .bind(shapingRun.id, pipelineRunId)
-      .run();
+    await linkShapingRunToPipeline(this.db, pipelineRunId, shapingRun.id);
 
     await this.fsm.transition(pipelineRunId, "START", { stepId: "phase-A" });
 

@@ -20,3 +20,12 @@ export { BpPrdGenerator } from "./services/bp-prd-generator.js";
 export { PrdInterviewService } from "./services/prd-interview-service.js";
 export { GeneratePrdFromBpSchema } from "./schemas/bp-prd.js";
 export { StartInterviewSchema, AnswerInterviewSchema } from "./schemas/prd-interview.js";
+
+// F611: offering D1 API — cross-domain callers import from here
+export {
+  queryLinkedOfferings,
+  countOfferingSections,
+  countOfferingVersions,
+  queryOfferingPrototypeLinks,
+  getOfferingSectionContents,
+} from "./services/offering-d1-api.js";

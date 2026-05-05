@@ -212,6 +212,13 @@ const SUGGESTION_RULES: Array<{
 
 // ── 서비스 ──────────────────────────────────
 
+import {
+  queryAgentFeedbackTopReasons,
+  countAgentFeedbackPending,
+  getTopAgentFeedbackReason,
+  aggregateAgentFeedbackStatus,
+} from "../../agent/types.js";
+
 export class AutomationQualityReporter {
   constructor(private db: D1Database) {}
 
@@ -312,34 +319,18 @@ export class AutomationQualityReporter {
     const patterns: FailurePattern[] = [];
 
     for (const row of rows.results) {
-      // topReasons from agent_feedback
-      const reasons = await this.db
-        .prepare(
-          `SELECT failure_reason, COUNT(*) as cnt
-           FROM agent_feedback
-           WHERE task_type = ?
-             AND failure_reason IS NOT NULL
-             AND date(created_at) >= ?
-             AND date(created_at) <= ?
-           GROUP BY failure_reason
-           ORDER BY cnt DESC
-           LIMIT 3`,
-        )
-        .bind(row.task_type, range.from, range.to)
-        .all<{ failure_reason: string; cnt: number }>();
-
-      // pendingFeedback count
-      const pending = await this.db
-        .prepare(
-          `SELECT COUNT(*) as cnt
-           FROM agent_feedback
-           WHERE task_type = ?
-             AND status = 'pending'
-             AND date(created_at) >= ?
-             AND date(created_at) <= ?`,
-        )
-        .bind(row.task_type, range.from, range.to)
-        .first<{ cnt: number }>();
+      const reasonsList = await queryAgentFeedbackTopReasons(this.db, {
+        taskType: row.task_type,
+        from: range.from,
+        to: range.to,
+      });
+      const pendingCnt = await countAgentFeedbackPending(this.db, {
+        taskType: row.task_type,
+        from: range.from,
+        to: range.to,
+      });
+      const reasons = { results: reasonsList };
+      const pending = { cnt: pendingCnt };
 
       patterns.push({
         taskType: row.task_type,
@@ -397,20 +388,10 @@ export class AutomationQualityReporter {
     const fb = await this.aggregateFeedback(date, date, taskType ?? undefined);
     const fallback = await this.aggregateFallbacks(date, date);
 
-    // top failure reason
-    const topReason = await this.db
-      .prepare(
-        `SELECT failure_reason, COUNT(*) as cnt
-         FROM agent_feedback
-         WHERE failure_reason IS NOT NULL
-           AND date(created_at) = ?
-           ${taskType ? "AND task_type = ?" : ""}
-         GROUP BY failure_reason
-         ORDER BY cnt DESC
-         LIMIT 1`,
-      )
-      .bind(...(taskType ? [date, taskType] : [date]))
-      .first<{ failure_reason: string; cnt: number }>();
+    const topReason = await getTopAgentFeedbackReason(this.db, {
+      date,
+      taskType: taskType ?? undefined,
+    });
 
     const id = `qs_${date}_${taskType ?? "all"}_${crypto.randomUUID().slice(0, 8)}`;
     const successRate = safeRate(exec.success, exec.total);
@@ -504,25 +485,7 @@ export class AutomationQualityReporter {
     to: string,
     taskType?: string,
   ): Promise<{ pending: number; reviewed: number; applied: number }> {
-    const taskFilter = taskType ? "AND task_type = ?" : "";
-    const row = await this.db
-      .prepare(
-        `SELECT
-           SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-           SUM(CASE WHEN status = 'reviewed' THEN 1 ELSE 0 END) as reviewed,
-           SUM(CASE WHEN status = 'applied' THEN 1 ELSE 0 END) as applied
-         FROM agent_feedback
-         WHERE date(created_at) >= ? AND date(created_at) <= ?
-           ${taskFilter}`,
-      )
-      .bind(...(taskType ? [from, to, taskType] : [from, to]))
-      .first<{ pending: number; reviewed: number; applied: number }>();
-
-    return {
-      pending: row?.pending ?? 0,
-      reviewed: row?.reviewed ?? 0,
-      applied: row?.applied ?? 0,
-    };
+    return aggregateAgentFeedbackStatus(this.db, { from, to, taskType });
   }
 
   private async aggregateFallbacks(

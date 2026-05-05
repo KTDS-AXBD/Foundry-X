@@ -3,6 +3,12 @@
  */
 
 import type { BackupMeta, BackupListQuery, ImportResult } from "../schemas/backup-restore.js";
+import {
+  queryPipelineRunsByBizItem,
+  queryPipelineRunsByTenant,
+  queryPipelineCheckpointsByTenant,
+  queryPipelineEventsByTenant,
+} from "../../discovery/types.js";
 
 interface BackupRow {
   id: string;
@@ -84,14 +90,11 @@ export class BackupRestoreService {
         .all();
       data.bd_artifacts = artifacts;
 
-      const { results: runs } = await this.db
-        .prepare("SELECT * FROM discovery_pipeline_runs WHERE tenant_id = ? AND biz_item_id = ?")
-        .bind(tenantId, bizItemId)
-        .all();
+      const runs = await queryPipelineRunsByBizItem(this.db, tenantId, bizItemId);
       data.discovery_pipeline_runs = runs;
 
-      // Checkpoints + events by pipeline_run_id
-      const runIds = runs.map((r) => (r as Record<string, unknown>).id as string);
+      // Checkpoints + events by pipeline_run_id (pipeline_checkpoints/events are shared tables)
+      const runIds = runs.map((r) => r.id as string);
       if (runIds.length > 0) {
         const placeholders = runIds.map(() => "?").join(",");
         const { results: checkpoints } = await this.db
@@ -114,31 +117,9 @@ export class BackupRestoreService {
         .all();
       data.bd_artifacts = artifacts;
 
-      const { results: runs } = await this.db
-        .prepare("SELECT * FROM discovery_pipeline_runs WHERE tenant_id = ?")
-        .bind(tenantId)
-        .all();
-      data.discovery_pipeline_runs = runs;
-
-      const { results: checkpoints } = await this.db
-        .prepare(
-          `SELECT pc.* FROM pipeline_checkpoints pc
-           JOIN discovery_pipeline_runs dpr ON pc.pipeline_run_id = dpr.id
-           WHERE dpr.tenant_id = ?`,
-        )
-        .bind(tenantId)
-        .all();
-      data.pipeline_checkpoints = checkpoints;
-
-      const { results: events } = await this.db
-        .prepare(
-          `SELECT pe.* FROM pipeline_events pe
-           JOIN discovery_pipeline_runs dpr ON pe.pipeline_run_id = dpr.id
-           WHERE dpr.tenant_id = ?`,
-        )
-        .bind(tenantId)
-        .all();
-      data.pipeline_events = events;
+      data.discovery_pipeline_runs = await queryPipelineRunsByTenant(this.db, tenantId);
+      data.pipeline_checkpoints = await queryPipelineCheckpointsByTenant(this.db, tenantId);
+      data.pipeline_events = await queryPipelineEventsByTenant(this.db, tenantId);
     }
 
     const payload: BackupPayload = {

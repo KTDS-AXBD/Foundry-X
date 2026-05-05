@@ -1,4 +1,9 @@
-import { type AgentExecutionResult, type AgentRunner } from "../../agent/types.js";
+import {
+  type AgentExecutionResult,
+  type AgentRunner,
+  insertAgentMessage,
+  updateAgentTaskHookStatus,
+} from "../../agent/types.js";
 import type { SSEManager } from "../../../services/sse-manager.js";
 
 // ─── F101: Agent Hook AutoFix Service ───
@@ -128,23 +133,19 @@ export class AutoFixService {
   ): Promise<void> {
     const now = new Date().toISOString();
 
-    await this.db
-      .prepare(
-        `INSERT INTO agent_messages (id, task_id, role, content, message_type, created_at)
-         VALUES (?, ?, 'system', ?, 'hook_escalation', ?)`,
-      )
-      .bind(
-        `msg-${crypto.randomUUID().slice(0, 8)}`,
-        taskId,
-        JSON.stringify({
-          hookType,
-          error,
-          attemptCount: attempts.length,
-          lastAttemptError: attempts[attempts.length - 1]?.error,
-        }),
-        now,
-      )
-      .run();
+    await insertAgentMessage(this.db, {
+      id: `msg-${crypto.randomUUID().slice(0, 8)}`,
+      taskId,
+      role: "system",
+      content: JSON.stringify({
+        hookType,
+        error,
+        attemptCount: attempts.length,
+        lastAttemptError: attempts[attempts.length - 1]?.error,
+      }),
+      messageType: "hook_escalation",
+      createdAt: now,
+    });
 
     this.sse?.pushEvent({
       event: "agent.hook.escalated",
@@ -169,25 +170,18 @@ export class AutoFixService {
         ? "auto_fixed"
         : "failed";
 
-    await this.db
-      .prepare(
-        `UPDATE agent_tasks
-         SET hook_status = ?, auto_fix_attempts = ?, auto_fix_log = ?, updated_at = datetime('now')
-         WHERE id = ?`,
-      )
-      .bind(
-        hookStatus,
-        attempts.length,
-        JSON.stringify(
-          attempts.map((a) => ({
-            attempt: a.attempt,
-            success: a.success,
-            diffLines: a.diffLines,
-            error: a.error,
-          })),
-        ),
-        taskId,
-      )
-      .run();
+    await updateAgentTaskHookStatus(this.db, {
+      taskId,
+      hookStatus,
+      attempts: attempts.length,
+      log: JSON.stringify(
+        attempts.map((a) => ({
+          attempt: a.attempt,
+          success: a.success,
+          diffLines: a.diffLines,
+          error: a.error,
+        })),
+      ),
+    });
   }
 }

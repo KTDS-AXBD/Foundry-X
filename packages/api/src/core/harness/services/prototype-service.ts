@@ -2,6 +2,7 @@
  * Sprint 67: F209 — Prototype CRUD 래퍼 서비스
  * 기존 PrototypeGeneratorService는 생성 전담, 이 서비스는 조회/삭제 CRUD
  */
+import { queryLinkedOfferings } from "../../offering/types.js";
 
 interface ProtoRow {
   id: string;
@@ -185,13 +186,7 @@ export class PrototypeService {
     ).bind(id, tenantId).first<ProtoRow>();
     if (!row) return null;
 
-    // Fetch linked offerings
-    const { results: offeringRows } = await this.db.prepare(
-      `SELECT o.id AS offering_id, o.title AS offering_title
-       FROM offering_prototypes op
-       JOIN offerings o ON o.id = op.offering_id
-       WHERE op.prototype_id = ?`
-    ).bind(id).all<{ offering_id: string; offering_title: string }>();
+    const offeringRows = await queryLinkedOfferings(this.db, id);
 
     // Fetch related poc_env and tech_review
     const pocRow = await this.db.prepare(

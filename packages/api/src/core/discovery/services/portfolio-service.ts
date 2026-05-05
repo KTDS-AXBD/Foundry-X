@@ -5,6 +5,11 @@
  */
 
 import type { PortfolioTree, PortfolioProgress, PortfolioOffering, PortfolioListItem, ArtifactLookupResponse } from "../schemas/portfolio.js";
+import {
+  countOfferingSections,
+  countOfferingVersions,
+  queryOfferingPrototypeLinks,
+} from "../../offering/types.js";
 
 export class NotFoundError extends Error {
   constructor(message: string) {
@@ -267,15 +272,9 @@ export class PortfolioService {
     // 각 offering의 섹션/버전 카운트 조회
     const enriched = await Promise.all(
       offs.map(async (o) => {
-        const [sectionsResult, versionsResult] = await Promise.all([
-          this.db
-            .prepare("SELECT COUNT(*) as cnt FROM offering_sections WHERE offering_id = ?")
-            .bind(o.id)
-            .first<{ cnt: number }>(),
-          this.db
-            .prepare("SELECT COUNT(*) as cnt FROM offering_versions WHERE offering_id = ?")
-            .bind(o.id)
-            .first<{ cnt: number }>(),
+        const [sectionsCnt, versionsCnt] = await Promise.all([
+          countOfferingSections(this.db, o.id),
+          countOfferingVersions(this.db, o.id),
         ]);
 
         return {
@@ -285,8 +284,8 @@ export class PortfolioService {
           format: o.format as "html" | "pptx",
           status: o.status,
           currentVersion: o.current_version,
-          sectionsCount: sectionsResult?.cnt ?? 0,
-          versionsCount: versionsResult?.cnt ?? 0,
+          sectionsCount: sectionsCnt,
+          versionsCount: versionsCnt,
           linkedPrototypeIds: [] as string[],
         };
       }),
@@ -328,11 +327,7 @@ export class PortfolioService {
     offerings: PortfolioOffering[],
     offeringIds: string[],
   ): Promise<PortfolioOffering[]> {
-    const placeholders = offeringIds.map(() => "?").join(",");
-    const { results } = await this.db
-      .prepare(`SELECT offering_id, prototype_id FROM offering_prototypes WHERE offering_id IN (${placeholders})`)
-      .bind(...offeringIds)
-      .all<RawOfferingPrototype>();
+    const results = await queryOfferingPrototypeLinks(this.db, offeringIds);
 
     const linkMap = new Map<string, string[]>();
     for (const r of results) {

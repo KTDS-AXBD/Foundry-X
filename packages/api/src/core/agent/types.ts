@@ -25,3 +25,31 @@ export type { TaskStateService } from "./services/task-state-service.js";
 export type { AiReviewProvider, AiReviewResponse } from "./services/external-ai-reviewer.js";
 export { ChatGptProvider, GeminiProvider, DeepSeekProvider } from "./services/external-ai-reviewer.js";
 export { SkillMetricsService } from "./services/skill-metrics.js";
+
+// F611: agent D1 API — cross-domain callers import from here
+export {
+  queryAllAgentSessions,
+  queryDistinctAgentWorktrees,
+  syncAgentSessionsData,
+  countActiveSessionsByProject,
+  countTasksByProjectSessions,
+  countAgentsByOrg,
+  countRecentAgentTasks,
+  insertAgentMessage,
+  updateAgentTaskHookStatus,
+  insertAgentWorktree,
+  cleanAgentWorktree,
+  queryAgentFeedbackTopReasons,
+  countAgentFeedbackPending,
+  getTopAgentFeedbackReason,
+  aggregateAgentFeedbackStatus,
+  countAcceptedProposals,
+} from "./services/agent-d1-api.js";
+export type {
+  AgentSessionRow,
+  SyncAgentSessionsInput,
+  InsertAgentMessageParams,
+  UpdateAgentTaskHookStatusParams,
+  InsertAgentWorktreeParams,
+  FeedbackDateRangeParams,
+} from "./services/agent-d1-api.js";
