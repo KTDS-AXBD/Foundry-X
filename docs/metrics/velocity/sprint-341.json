@@ -1,0 +1,20 @@
+{
+  "sprint": 341,
+  "f_items": ["F594"],
+  "phase": 47,
+  "pr": 737,
+  "merged_at": "2026-05-05T13:26:59+09:00",
+  "match_rate": 100,
+  "test_result": "pass",
+  "autopilot_duration_seconds": 435,
+  "autopilot_duration_label": "~7분 15초",
+  "files_changed": "git mv 6 + cross-domain depth + 8 callers",
+  "closure_files": 6,
+  "domain": "spec",
+  "option": "A 18회차",
+  "session": "S331",
+  "sprint_chain_success": 25,
+  "match_history": "95→100→100→97→98→100→97→97→98→97→100→95+100→97→98→100→98→100→100→100→100→100→100→100→100→100",
+  "memory_session": "S331",
+  "interview_pattern": "4회 26회차"
+}
