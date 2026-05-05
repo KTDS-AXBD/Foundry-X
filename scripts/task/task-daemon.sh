@@ -857,18 +857,31 @@ sprint_cleanup_pane() {
   fi
 
   # 케이스 A: WT cwd 기반 스윕 (PANE_ID 없거나 dead, 별도 탭/cs 세션)
+  # ⚠️ session_name 가드: 'sprint-${sprint_num}*' session의 pane만 kill, 다른 session 보호
+  # (S332 사고: cwd만 보고 kill → 사용자 master/외부 pane이 worktree로 cd한 경우 함께 kill됨)
   if [ -n "$wt_path" ]; then
     local swept=0
-    while IFS=$'\t' read -r _pid _pcwd; do
+    local protected=0
+    while IFS=$'\t' read -r _pid _pcwd _psname; do
       [ -z "$_pid" ] && continue
       case "$_pcwd" in
         "$wt_path"|"$wt_path"/*)
-          tmux kill-pane -t "$_pid" 2>/dev/null || true
-          log "🧹 sprint-${sprint_num}: WT cwd 스윕 pane ${_pid} kill (케이스 A)"
-          swept=$((swept + 1))
+          # session_name 가드 — sprint-${num} 또는 sprint-${num}<space|*> 만 kill
+          case "$_psname" in
+            "sprint-${sprint_num}"|"sprint-${sprint_num} "*|"sprint-${sprint_num}_"*)
+              tmux kill-pane -t "$_pid" 2>/dev/null || true
+              log "🧹 sprint-${sprint_num}: WT cwd 스윕 pane ${_pid} kill (케이스 A, session=${_psname})"
+              swept=$((swept + 1))
+              ;;
+            *)
+              log "🛡️  sprint-${sprint_num}: pane ${_pid} 보호 (session=${_psname}, cwd=${_pcwd} — 다른 session)"
+              protected=$((protected + 1))
+              ;;
+          esac
           ;;
       esac
-    done < <(tmux list-panes -a -F '#{pane_id}'$'\t''#{pane_current_path}' 2>/dev/null || true)
+    done < <(tmux list-panes -a -F '#{pane_id}'$'\t''#{pane_current_path}'$'\t''#{session_name}' 2>/dev/null || true)
+    [ "$protected" -gt 0 ] && log "ℹ️  sprint-${sprint_num}: ${protected} pane 보호 — sprint session 외 pane은 cleanup에서 제외"
 
     # cs(Claude Squad) 세션 정리 — cs reset은 HOME 정합성 필요
     if command -v cs >/dev/null 2>&1; then
