@@ -5,8 +5,8 @@ import {
   SpecLibraryUpdateSchema,
   SpecLibraryQuerySchema,
 } from "../schemas/spec-library.js";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { SpecLibraryService } from "../services/spec-library.js";
 
 export const specLibraryRoute = new OpenAPIHono<{ Bindings: Env; Variables: TenantVariables }>();

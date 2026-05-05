@@ -2,7 +2,7 @@ import type { Env } from "./env.js";
 import { GitHubService } from "./modules/portal/services/github.js";
 import { ReconciliationService } from "./modules/portal/services/reconciliation.js";
 import { KpiLogger } from "./modules/portal/services/kpi-logger.js";
-import { parseSpecRequirements } from "./services/spec-parser.js";
+import { parseSpecRequirements } from "./core/spec/services/spec-parser.js";
 import { BackupRestoreService } from "./core/harness/services/backup-restore-service.js";
 import { processDomainEvents } from './core/events/event-cron.js';
 

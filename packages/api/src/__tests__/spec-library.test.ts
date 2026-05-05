@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { SpecLibraryService } from "../services/spec-library.js";
+import { SpecLibraryService } from "../core/spec/services/spec-library.js";
 
 const DDL = `
   CREATE TABLE IF NOT EXISTS spec_library (

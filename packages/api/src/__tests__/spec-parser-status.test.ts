@@ -9,7 +9,7 @@ import { describe, it, expect } from "vitest";
 import {
   parseSpecRequirements,
   parseStatusEmoji,
-} from "../services/spec-parser.js";
+} from "../core/spec/services/spec-parser.js";
 
 // ── parseStatusEmoji: 기존 이모지 ──
 
