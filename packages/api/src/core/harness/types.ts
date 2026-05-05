@@ -8,3 +8,6 @@ export { CustomRoleManager } from "./services/custom-role-manager.js";
 export { AuditLogService } from "./services/audit-logger.js";
 export { TransitionGuard, createDefaultGuard } from "./services/transition-guard.js";
 export type { UpdateSignalValuationsInput } from "./schemas/roi-benchmark.js";
+
+// F610: biz-items.ts cross-domain caller re-exports
+export { GeneratePrototypeSchema } from "./schemas/prototype.js";

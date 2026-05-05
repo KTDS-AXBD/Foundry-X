@@ -6,3 +6,8 @@ export { BmcInsightService } from "./services/bmc-insight-service.js";
 export { BMC_BLOCK_TYPES } from "./services/bmc-service.js";
 export { BdArtifactService } from "./services/bd-artifact-service.js";
 export type { SectionReviewInput } from "./schemas/hitl-section.schema.js";
+
+// F610: biz-items.ts cross-domain caller re-exports
+export { BizPersonaEvaluator, EvaluationError, savePrdPersonaEvaluations, getPrdPersonaEvaluations } from "./services/biz-persona-evaluator.js";
+export { SixHatsDebateService, SixHatsDebateError } from "./services/sixhats-debate.js";
+export { SetDiscoveryTypeSchema } from "./schemas/viability-checkpoint.schema.js";

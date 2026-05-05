@@ -9,44 +9,44 @@ import type { TenantVariables } from "../../../middleware/tenant.js";
 import { CreateBizItemSchema, ClassifyBizItemSchema } from "../schemas/biz-item.js";
 import { BizItemService } from "../services/biz-item-service.js";
 import { ItemClassifier, ClassificationError } from "../services/item-classifier.js";
-import { BizPersonaEvaluator, EvaluationError } from "../../shaping/services/biz-persona-evaluator.js";
-import { createAgentRunner } from "../../../core/agent/services/agent-runner.js";
+import { BizPersonaEvaluator, EvaluationError } from "../../shaping/types.js";
+import { createAgentRunner } from "../../agent/types.js";
 import { StartingPointClassifier, StartingPointError } from "../services/starting-point-classifier.js";
 // Sprint 221 imports (F456)
-import { PrdConfirmationService } from "../../offering/services/prd-confirmation-service.js";
-import { prdEditSchema, prdDiffQuerySchema } from "../../offering/schemas/prd-confirmation-schema.js";
+import { PrdConfirmationService } from "../../offering/types.js";
+import { prdEditSchema, prdDiffQuerySchema } from "../../offering/types.js";
 import { getAnalysisPath, type StartingPointType } from "../services/analysis-paths.js";
 import { ClassifyStartingPointSchema, ConfirmStartingPointSchema } from "../../../schemas/starting-point.js";
 // Sprint 55 imports (F186, F187)
-import { PrdReviewPipeline, PipelineError } from "../../offering/services/prd-review-pipeline.js";
-import { savePrdPersonaEvaluations, getPrdPersonaEvaluations } from "../../shaping/services/biz-persona-evaluator.js";
+import { PrdReviewPipeline, PipelineError } from "../../offering/types.js";
+import { savePrdPersonaEvaluations, getPrdPersonaEvaluations } from "../../shaping/types.js";
 // Sprint 53 imports (F183, F184, F185)
 import { DiscoveryCriteriaService } from "../services/discovery-criteria.js";
 import { AnalysisContextService } from "../services/analysis-context.js";
-import { PrdGeneratorService } from "../../offering/services/prd-generator.js";
+import { PrdGeneratorService } from "../../offering/types.js";
 import { UpdateCriterionSchema } from "../schemas/discovery-criteria.js";
 import { SaveAnalysisContextSchema } from "../../../schemas/analysis-context.js";
-import { GeneratePrdSchema } from "../../offering/schemas/prd.js";
+import { GeneratePrdSchema } from "../../offering/types.js";
 // Sprint 56 imports (F188)
-import { SixHatsDebateService, SixHatsDebateError } from "../../shaping/services/sixhats-debate.js";
+import { SixHatsDebateService, SixHatsDebateError } from "../../shaping/types.js";
 // Sprint 57 imports (F179, F190)
 import { TrendDataService, TrendAnalysisError } from "../services/trend-data-service.js";
 import { CompetitorScanner, CompetitorScanError } from "../services/competitor-scanner.js";
 import { TrendReportRequestSchema } from "../../../schemas/trend.js";
 // Sprint 58 imports (F180, F181)
-import { BusinessPlanGeneratorService } from "../../offering/services/business-plan-generator.js";
-import { GenerateBusinessPlanSchema } from "../../offering/schemas/business-plan.js";
-import { PrototypeGeneratorService } from "../../offering/services/prototype-generator.js";
-import { GeneratePrototypeSchema } from "../../harness/schemas/prototype.js";
+import { BusinessPlanGeneratorService } from "../../offering/types.js";
+import { GenerateBusinessPlanSchema } from "../../offering/types.js";
+import { PrototypeGeneratorService } from "../../offering/types.js";
+import { GeneratePrototypeSchema } from "../../harness/types.js";
 // Sprint 69 imports (F213)
-import { SetDiscoveryTypeSchema } from "../../shaping/schemas/viability-checkpoint.schema.js";
+import { SetDiscoveryTypeSchema } from "../../shaping/types.js";
 import { getAnalysisPathV82, type DiscoveryType } from "../services/analysis-path-v82.js";
 // Sprint 220 imports (F454, F455)
-import { BpHtmlParser } from "../../offering/services/bp-html-parser.js";
-import { BpPrdGenerator } from "../../offering/services/bp-prd-generator.js";
-import { PrdInterviewService } from "../../offering/services/prd-interview-service.js";
-import { GeneratePrdFromBpSchema } from "../../offering/schemas/bp-prd.js";
-import { StartInterviewSchema, AnswerInterviewSchema } from "../../offering/schemas/prd-interview.js";
+import { BpHtmlParser } from "../../offering/types.js";
+import { BpPrdGenerator } from "../../offering/types.js";
+import { PrdInterviewService } from "../../offering/types.js";
+import { GeneratePrdFromBpSchema } from "../../offering/types.js";
+import { StartInterviewSchema, AnswerInterviewSchema } from "../../offering/types.js";
 // Sprint 223 imports (F459)
 import { PortfolioService, NotFoundError } from "../services/portfolio-service.js";
 // Sprint 234 imports (F479)
