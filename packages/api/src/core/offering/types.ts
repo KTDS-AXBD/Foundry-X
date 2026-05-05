@@ -21,6 +21,9 @@ export { PrdInterviewService } from "./services/prd-interview-service.js";
 export { GeneratePrdFromBpSchema } from "./schemas/bp-prd.js";
 export { StartInterviewSchema, AnswerInterviewSchema } from "./schemas/prd-interview.js";
 
+// F612: Pass 5 — multi-domain caller re-exports
+export { OfferingMetricsService } from "./services/offering-metrics-service.js";
+
 // F611: offering D1 API — cross-domain callers import from here
 export {
   queryLinkedOfferings,

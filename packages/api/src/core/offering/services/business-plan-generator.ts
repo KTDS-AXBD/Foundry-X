@@ -3,11 +3,8 @@
  * Sprint 215: F445 — 템플릿 파라미터 지원 추가
  */
 
-import type { AgentRunner } from "../../../core/agent/services/agent-runner.js";
-import type { DiscoveryCriterion } from "../../discovery/services/discovery-criteria.js";
-import type { AnalysisContext } from "../../discovery/services/analysis-context.js";
-import type { BizItem, EvaluationWithScores } from "../../discovery/services/biz-item-service.js";
-import type { StartingPointType } from "../../discovery/services/analysis-paths.js";
+import type { AgentRunner } from "../../agent/types.js";
+import type { DiscoveryCriterion, AnalysisContext, BizItem, EvaluationWithScores, StartingPointType } from "../../discovery/types.js";
 import {
   mapDataToSections, renderBpMarkdown, getTemplateSections, buildGenerationPrompt,
   type BpDataBundle, type TemplateType, type ToneType, type LengthType,

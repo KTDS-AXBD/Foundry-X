@@ -5,3 +5,6 @@ export { DiscoveryXIngestService } from "./services/discovery-x-ingest-service.j
 export { discoveryIngestPayloadSchema } from "./schemas/discovery-x.schema.js";
 export { IdeaService } from "./services/idea-service.js";
 export type { Idea } from "./services/idea-service.js";
+
+// F612: Pass 5 — multi-domain caller re-exports
+export type { CollectionCandidate } from "./services/collection-pipeline.js";

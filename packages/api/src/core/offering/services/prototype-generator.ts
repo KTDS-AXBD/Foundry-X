@@ -2,10 +2,8 @@
  * Sprint 58: Prototype 자동 생성 서비스 (F181)
  */
 
-import type { AgentRunner } from "../../agent/services/agent-runner.js";
-import type { BizItem, EvaluationWithScores } from "../../discovery/services/biz-item-service.js";
-import type { DiscoveryCriterion } from "../../discovery/services/discovery-criteria.js";
-import type { StartingPointType } from "../../discovery/services/analysis-paths.js";
+import type { AgentRunner } from "../../agent/types.js";
+import type { BizItem, EvaluationWithScores, DiscoveryCriterion, StartingPointType } from "../../discovery/types.js";
 import type { GeneratedPrd } from "./prd-generator.js";
 import { renderPrototypeHtml, type PrototypeData } from "./prototype-templates.js";
 import { flattenTokens, type DesignTokenOverride } from "./prototype-styles.js";

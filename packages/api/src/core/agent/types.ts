@@ -26,6 +26,10 @@ export type { AiReviewProvider, AiReviewResponse } from "./services/external-ai-
 export { ChatGptProvider, GeminiProvider, DeepSeekProvider } from "./services/external-ai-reviewer.js";
 export { SkillMetricsService } from "./services/skill-metrics.js";
 
+// F612: Pass 5 — multi-domain caller re-exports
+export { AgentCollectionService } from "./services/agent-collection.js";
+export { SkillPipelineRunner } from "./services/skill-pipeline-runner.js";
+
 // F611: agent D1 API — cross-domain callers import from here
 export {
   queryAllAgentSessions,

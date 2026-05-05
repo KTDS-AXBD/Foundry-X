@@ -11,3 +11,7 @@ export type { SectionReviewInput } from "./schemas/hitl-section.schema.js";
 export { BizPersonaEvaluator, EvaluationError, savePrdPersonaEvaluations, getPrdPersonaEvaluations } from "./services/biz-persona-evaluator.js";
 export { SixHatsDebateService, SixHatsDebateError } from "./services/sixhats-debate.js";
 export { SetDiscoveryTypeSchema } from "./schemas/viability-checkpoint.schema.js";
+
+// F612: Pass 5 — multi-domain caller re-exports
+export { BdSkillExecutor } from "./services/bd-skill-executor.js";
+export { ShapingOrchestratorService } from "./services/shaping-orchestrator-service.js";

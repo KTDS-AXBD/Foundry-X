@@ -5,8 +5,8 @@
 import { Hono } from "hono";
 import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
-import { DiscoveryPipelineService } from "../services/discovery-pipeline-service.js";
-import { ShapingOrchestratorService } from "../../shaping/services/shaping-orchestrator-service.js";
+import { DiscoveryPipelineService } from "../types.js";
+import { ShapingOrchestratorService } from "../../shaping/types.js";
 import {
   createPipelineRunSchema,
   stepCompleteSchema,
@@ -16,7 +16,7 @@ import {
   autoAdvanceSchema,
   checkpointDecisionSchema,
 } from "../schemas/discovery-pipeline.js";
-import { SkillPipelineRunner } from "../../agent/services/skill-pipeline-runner.js";
+import { SkillPipelineRunner } from "../../agent/types.js";
 import { PipelineCheckpointService } from "../../../modules/launch/services/pipeline-checkpoint-service.js";
 import { PipelineNotificationService } from "../../../modules/launch/services/pipeline-notification-service.js";
 import { PipelinePermissionService } from "../../../modules/launch/services/pipeline-permission-service.js";
