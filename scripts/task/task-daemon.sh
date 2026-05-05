@@ -1106,13 +1106,24 @@ phase_sprint_signals() {
     # L4: Master pane rename — sprint context 청소 (S333)
     # MERGED 시점에 master pane은 다음 활성 sprint 또는 git branch로 자동 갱신
     # tmux-rename-pane.sh가 활성 sprint signal을 자동 스캔 (이 sprint는 이미 MERGED 처리됨)
+    #
+    # master_pane 재선택 (L2와 별도) — PROJECT path 가드 필수.
+    # L2 master_pane은 cwd 무관하게 첫번째 claude pane이라 다른 프로젝트 pane 잡힘 가능.
+    local rename_master_pane=""
+    if [ -n "$REPO_ROOT" ]; then
+      rename_master_pane=$(tmux list-panes -a -F '#{pane_id}|#{pane_current_command}|#{pane_current_path}' 2>/dev/null \
+        | awk -F'|' -v root="$REPO_ROOT" '$2=="claude" && $3==root {print $1; exit}')
+    fi
     local rename_script="$HOME/scripts/tmux-rename-pane.sh"
-    if [ -n "$master_pane" ] && [ -x "$rename_script" ]; then
-      tmux send-keys -t "$master_pane" "" 2>/dev/null  # no-op, pane 활성 확인용
-      # master pane TMUX context에서 직접 호출 — pane 환경 재현
+    if [ -n "$rename_master_pane" ] && [ -x "$rename_script" ]; then
+      # master pane TMUX context 재현해서 호출. stderr는 daemon log로.
+      local rename_log="${SPRINT_SIGNAL_DIR}/tmux-rename-${sprint_num}.log"
       (cd "$REPO_ROOT" 2>/dev/null && \
-        TMUX_PANE="$master_pane" TMUX="${TMUX:-default}" \
-        bash "$rename_script" 2>/dev/null) || true
+        TMUX_PANE="$rename_master_pane" TMUX="${TMUX:-default}" \
+        bash "$rename_script" 2>&1) > "$rename_log"
+      log "🏷️  sprint-${sprint_num} — master pane rename: $(cat "$rename_log" 2>/dev/null | head -1)"
+    else
+      log "ℹ️  sprint-${sprint_num} — master pane rename skip (pane=${rename_master_pane:-none}, script=${rename_script})"
     fi
   done
   # nullglob 복원 — 누출 시 phase_signals의 ls glob이 빈 확장되어 cwd listing → source crash (S267)
