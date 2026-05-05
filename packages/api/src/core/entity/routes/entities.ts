@@ -9,9 +9,9 @@ import {
   EntityLinkResponseSchema,
   GraphResponseSchema,
 } from "../schemas/entity.js";
-import { ErrorSchema, validationHook } from "../schemas/common.js";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import { ErrorSchema, validationHook } from "../../../schemas/common.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 
 export const entitiesRoute = new OpenAPIHono<{ Bindings: Env; Variables: TenantVariables }>({
   defaultHook: validationHook as any,
