@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { SrClassifier } from "../services/sr-classifier.js";
+import { SrClassifier } from "../core/sr/services/sr-classifier.js";
 
 describe("SrClassifier", () => {
   const c = new SrClassifier();

@@ -38,7 +38,7 @@ import { requirementsRoute } from "./routes/requirements.js";
 import { specRoute } from "./routes/spec.js";
 import { proxyRoute } from "./routes/proxy.js";
 import { entitiesRoute } from "./core/entity/routes/entities.js";
-import { srRoute } from "./routes/sr.js";
+import { srRoute } from "./core/sr/routes/sr.js";
 import { shardDocRoute } from "./routes/shard-doc.js";
 import { specLibraryRoute } from "./routes/spec-library.js";
 import { helpAgentRoute } from "./routes/help-agent.js";

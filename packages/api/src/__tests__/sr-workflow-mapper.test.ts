@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { SrWorkflowMapper } from "../services/sr-workflow-mapper.js";
-import type { SrType } from "../schemas/sr.js";
+import { SrWorkflowMapper } from "../core/sr/services/sr-workflow-mapper.js";
+import type { SrType } from "../core/sr/schemas/sr.js";
 
 describe("SrWorkflowMapper", () => {
   const m = new SrWorkflowMapper();
