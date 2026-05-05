@@ -114,13 +114,27 @@ fi
 
 > **주의**: `sed 's/[^[:alnum:]가-힣 ._-]//g'` 같은 POSIX bracket + 한글 범위 + literal char 조합은 일부 로케일에서 `Invalid collation character` 에러 발생. **denylist 방식**(제거할 문자만 명시) 또는 `LC_ALL=C` 강제가 안전.
 
-### Step 5: tmux rename 실행
+### Step 5: tmux rename 실행 — 4중 갱신 (session + window + pane title + ESC sequence)
+
+`tmux rename-session`만으로는 **pane title이 갱신되지 않아요**. tmux의 pane title은 별도 속성(`#{pane_title}`)이고, status bar가 이걸 표시할 때가 많아 4중 갱신이 안전해요.
 
 ```bash
+# (1) Session name (좌측 status bar)
 tmux rename-session -t "$SESSION" "$SAFE_TITLE"
+
+# (2) Window name (status bar window list)
 tmux rename-window -t "${SAFE_TITLE}:${WINDOW}" "$(echo "$SAFE_TITLE" | head -c 50)"
-echo "✅ Session renamed: '$SESSION' → '$SAFE_TITLE' (source=$SOURCE)"
+
+# (3) Pane title (#{pane_title} — pane border 또는 status bar에 표시)
+tmux select-pane -t "%${PANE_ID}" -T "$SAFE_TITLE"
+
+# (4) Terminal title escape sequence (xterm/screen — 일부 status-format이 이걸 캡처)
+printf '\033]2;%s\033\\' "$SAFE_TITLE"
+
+echo "✅ Session/Window/Pane all renamed: '$SESSION' → '$SAFE_TITLE' (source=$SOURCE)"
 ```
+
+> **왜 4중인가**: tmux 표시 메커니즘은 사용자 status-format 설정에 따라 달라요. `#S` (session) / `#W` (window) / `#T` (pane title) 중 어떤 걸 쓸지 모르니 모두 갱신하는 게 안전. terminal escape는 tmux가 자동 캡처해서 `#{pane_title}` 동기화 — `set-titles off`인 환경에서도 작동.
 
 ### Step 6: 보고
 
@@ -143,6 +157,7 @@ echo "✅ Session renamed: '$SESSION' → '$SAFE_TITLE' (source=$SOURCE)"
 - worktree 안이 아니면 priority 2 (signal) 건너뜀
 - SPEC.md F-item 행 형식이 `| F### | **제목**` 패턴 가정 (Foundry-X 표준)
 - POSIX bracket + 한글 + literal char 조합 sed는 로케일에 따라 collation 에러 — denylist 방식 사용 (S332 버그 fix)
+- **pane title은 `tmux rename-session`만으로 갱신 안 됨** — Step 5의 4중 갱신(session + window + pane title + ESC sequence) 필수 (S332 fix)
 
 ## 테스트 시나리오
 
