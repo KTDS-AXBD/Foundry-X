@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "../helpers/mock-d1.js";
-import { SrClassifier } from "../../services/sr-classifier.js";
-import { SrWorkflowMapper } from "../../services/sr-workflow-mapper.js";
-import type { SrResponse } from "../../schemas/sr.js";
+import { SrClassifier } from "../../core/sr/services/sr-classifier.js";
+import { SrWorkflowMapper } from "../../core/sr/services/sr-workflow-mapper.js";
+import type { SrResponse } from "../../core/sr/schemas/sr.js";
 
 const SR_DDL = `CREATE TABLE IF NOT EXISTS sr_requests (id TEXT PRIMARY KEY, org_id TEXT NOT NULL, title TEXT NOT NULL, description TEXT, sr_type TEXT NOT NULL, priority TEXT NOT NULL DEFAULT 'medium', status TEXT NOT NULL DEFAULT 'open', confidence REAL DEFAULT 0, matched_keywords TEXT, requester_id TEXT, workflow_id TEXT, created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now')), closed_at TEXT)`;
 const WR_DDL = `CREATE TABLE IF NOT EXISTS sr_workflow_runs (id TEXT PRIMARY KEY, sr_id TEXT NOT NULL, workflow_template TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', steps_completed INTEGER DEFAULT 0, steps_total INTEGER DEFAULT 0, result_summary TEXT, started_at TEXT, completed_at TEXT)`;
@@ -44,7 +44,7 @@ describe("SR Routes", () => {
   });
 
   it("POST /api/sr — title 검증", async () => {
-    const { createSrRequest } = await import("../../schemas/sr.js");
+    const { createSrRequest } = await import("../../core/sr/schemas/sr.js");
     expect(createSrRequest.safeParse({}).success).toBe(false);
     expect(createSrRequest.safeParse({ title: "" }).success).toBe(false);
     expect(createSrRequest.safeParse({ title: "valid" }).success).toBe(true);

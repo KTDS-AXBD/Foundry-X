@@ -2,12 +2,12 @@
  * SR (Service Request) Routes — F116 KT DS SR 시나리오 구체화 + F167 하이브리드 분류기
  */
 import { Hono } from "hono";
-import type { Env } from "../env.js";
-import type { TenantVariables } from "../middleware/tenant.js";
+import type { Env } from "../../../env.js";
+import type { TenantVariables } from "../../../middleware/tenant.js";
 import { createSrRequest, updateSrRequest, listSrQuery, executeSrRequest, srFeedbackRequest, type SrResponse, type SrDetailResponse, type SrStatsResponse } from "../schemas/sr.js";
 import { SrWorkflowMapper } from "../services/sr-workflow-mapper.js";
 import { HybridSrClassifier } from "../services/hybrid-sr-classifier.js";
-import { LLMService } from "../services/llm.js";
+import { LLMService } from "../../../services/llm.js";
 
 export const srRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 const workflowMapper = new SrWorkflowMapper();
