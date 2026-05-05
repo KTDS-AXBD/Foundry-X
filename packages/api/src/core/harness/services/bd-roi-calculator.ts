@@ -7,8 +7,8 @@
 import type { BdRoiSummary } from "@foundry-x/shared";
 import type { RoiSummaryQuery } from "../schemas/roi-benchmark.js";
 import { RoiBenchmarkService } from "./roi-benchmark.js";
-import { SignalValuationService } from "../../discovery/services/signal-valuation.js";
-import { OfferingMetricsService } from "../../offering/services/offering-metrics-service.js";
+import { SignalValuationService } from "../../discovery/types.js";
+import { OfferingMetricsService } from "../../offering/types.js";
 
 export class BdRoiCalculatorService {
   constructor(

@@ -9,6 +9,11 @@ export type { AnalysisContext } from "./services/analysis-context.js";
 export type { BizItem, EvaluationWithScores } from "./services/biz-item-service.js";
 export type { StartingPointType } from "./services/analysis-paths.js";
 
+// F612: Pass 5 — multi-domain caller re-exports
+export { AgentCollector, CollectorError } from "./services/agent-collector.js";
+export { DiscoveryPipelineService } from "./services/discovery-pipeline-service.js";
+export { DiscoveryStageService } from "./services/discovery-stage-service.js";
+
 // F611: discovery D1 API — cross-domain callers import from here
 export {
   queryPipelineRunsByBizItem,
