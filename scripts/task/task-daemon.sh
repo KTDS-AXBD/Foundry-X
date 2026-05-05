@@ -895,6 +895,47 @@ sprint_cleanup_pane() {
   fi
 }
 
+## phase_sprint_created — Sprint CREATED/IN_PROGRESS signal 감지 시 master pane title 자동 갱신 (S333 L5)
+## - phase_sprint_signals는 STATUS=DONE만 처리 → CREATED 시점 master pane 갱신 트리거 부재
+## - 매 tick 활성 signal 스캔하지 않고, 신규 CREATED + 마킹 파일 부재 시에만 1회 발화
+## - 마킹: ${SPRINT_SIGNAL_DIR}/rename-fired-${sprint_num}.flag
+phase_sprint_created() {
+  local _prev_nullglob=false
+  shopt -q nullglob && _prev_nullglob=true
+  shopt -s nullglob
+  local sig
+  for sig in "$SPRINT_SIGNAL_DIR"/*-*.signal; do
+    [ -f "$sig" ] || continue
+    local status sprint_num project flag rename_script
+    status=$(sprint_sig_get "$sig" "STATUS")
+    case "$status" in CREATED|IN_PROGRESS) ;; *) continue ;; esac
+    sprint_num=$(sprint_sig_get "$sig" "SPRINT_NUM")
+    project=$(sprint_sig_get "$sig" "PROJECT")
+    [ "$project" = "$PROJECT" ] || continue
+    [ -n "$sprint_num" ] || continue
+    flag="${SPRINT_SIGNAL_DIR}/rename-fired-${sprint_num}.flag"
+    [ -f "$flag" ] && continue  # 이미 발화
+
+    rename_script="$HOME/scripts/tmux-rename-pane.sh"
+    [ -x "$rename_script" ] || { touch "$flag"; continue; }
+
+    local rename_master_pane
+    rename_master_pane=$(tmux list-panes -a -F '#{pane_id}|#{pane_current_command}|#{pane_current_path}' 2>/dev/null \
+      | awk -F'|' -v root="$REPO_ROOT" '$2=="claude" && $3==root {print $1; exit}')
+    if [ -n "$rename_master_pane" ]; then
+      local rename_log="${SPRINT_SIGNAL_DIR}/tmux-rename-${sprint_num}-created.log"
+      (cd "$REPO_ROOT" 2>/dev/null && \
+        TMUX_PANE="$rename_master_pane" TMUX="${TMUX:-default}" \
+        bash "$rename_script" 2>&1) > "$rename_log"
+      log "🏷️  sprint-${sprint_num} CREATED — master pane rename: $(cat "$rename_log" 2>/dev/null | head -1)"
+    else
+      log "ℹ️  sprint-${sprint_num} CREATED — master pane rename skip (REPO_ROOT=$REPO_ROOT pane match 0)"
+    fi
+    touch "$flag"  # 1회만 발화 (signal 처음 보일 때)
+  done
+  "$_prev_nullglob" || shopt -u nullglob
+}
+
 phase_sprint_signals() {
   local _prev_nullglob=false
   shopt -q nullglob && _prev_nullglob=true
@@ -1168,6 +1209,7 @@ run_daemon() {
     # phase_tmux_health를 phase_watch 앞에 배치 — pane dead 체크 전에 server 재시작을 먼저 감지 (S307)
     phase_tmux_health      || log "⚠️  phase_tmux_health 에러"
     phase_signals          || log "⚠️  phase_signals 에러"
+    phase_sprint_created   || log "⚠️  phase_sprint_created 에러"
     phase_sprint_signals   || log "⚠️  phase_sprint_signals 에러"
     phase_watch            || log "⚠️  phase_watch 에러"
     phase_queue            || log "⚠️  phase_queue 에러"
