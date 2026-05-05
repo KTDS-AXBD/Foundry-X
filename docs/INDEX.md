@@ -121,6 +121,7 @@
 | FX-PLAN-345 | Sprint 345 — F611 MSA 룰 강제 교정 Pass 4 — cross-domain-d1 30 violations service API 신설 (P2, 옵션 A 채택, 3 owner-domain d1-api.ts 신설 + types.ts +10 re-export + 30 caller service 경유 변경, baseline 57→27, ~60분 autopilot) | 1.0 | Approved | [01-plan/features/sprint-345.plan.md](01-plan/features/sprint-345.plan.md) |
 | FX-PLAN-346 | Sprint 346 — F612 MSA 룰 강제 교정 Pass 5 — multi-domain 26 violations 8 파일 fix (P2, F609/F610 정착 패턴 자동 재현, 5 target types.ts +13~16 re-export + 8 caller 26 import line types.ts 경유, baseline 27→1, ~25분 autopilot) | 1.0 | Approved | [01-plan/features/sprint-346.plan.md](01-plan/features/sprint-346.plan.md) |
 | FX-PLAN-347 | Sprint 347 — F613 MSA 룰 강제 교정 Pass 6 — `/api/docs` sub-app 신설 (Pass 시리즈 종결, P3, 옵션 A, core/docs/routes/index.ts 신설 + app.ts mount 변경, baseline 1→0, ~10분 autopilot, MSA 룰 161→0 완결) | 1.0 | Approved | [01-plan/features/sprint-347.plan.md](01-plan/features/sprint-347.plan.md) |
+| FX-PLAN-348 | Sprint 348 — F596 infra closure — sse-manager + kv-cache + event-bus → core/infra/ 신설 (P3, 옵션 A 19회차 + A2 평탄 구조, F609 types.ts re-export 패턴, 3 files git mv + types.ts 신규 + 31 callers 갱신, baseline 0 유지, ~5~10분 autopilot) | 1.0 | Approved | [01-plan/features/sprint-348.plan.md](01-plan/features/sprint-348.plan.md) |
 
 ## DSGN
 
