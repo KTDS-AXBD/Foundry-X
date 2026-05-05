@@ -9,7 +9,7 @@ import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
 import { GitHubService } from "../services/github.js";
 import { ReconciliationService } from "../services/reconciliation.js";
-import { parseSpecRequirements } from "../../../services/spec-parser.js";
+import { parseSpecRequirements } from "../../../core/spec/services/spec-parser.js";
 
 // ─── F99: Reconciliation Routes ───
 

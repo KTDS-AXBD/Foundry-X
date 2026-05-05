@@ -14,7 +14,7 @@ import { KVCacheService } from "../services/kv-cache.js";
 import {
   parseSpecRequirements as parseSpecFItems,
   type SpecRequirement,
-} from "../services/spec-parser.js";
+} from "../core/spec/services/spec-parser.js";
 
 export const requirementsRoute = new OpenAPIHono<{ Bindings: Env }>({
   defaultHook: validationHook as any,

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { specLibraryRoute } from "../routes/spec-library.js";
+import { specLibraryRoute } from "../core/spec/routes/spec-library.js";
 import type { Env } from "../env.js";
 
 const DDL = `

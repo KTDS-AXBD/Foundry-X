@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   parseSpecRequirements,
   parseStatusEmoji,
-} from "../../services/spec-parser.js";
+} from "../../core/spec/services/spec-parser.js";
 
 describe("parseSpecRequirements", () => {
   const SAMPLE_SPEC = `
