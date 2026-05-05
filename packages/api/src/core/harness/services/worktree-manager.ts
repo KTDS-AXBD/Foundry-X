@@ -1,3 +1,5 @@
+import { insertAgentWorktree, cleanAgentWorktree } from "../../agent/types.js";
+
 export interface WorktreeConfig {
   id: string;
   agentId: string;
@@ -53,14 +55,14 @@ export class WorktreeManager {
     this.worktrees.set(agentId, config);
 
     if (this.db) {
-      await this.db
-        .prepare(
-          `INSERT INTO agent_worktrees
-           (id, agent_id, branch_name, worktree_path, base_branch, status, created_at)
-           VALUES (?, ?, ?, ?, ?, 'active', ?)`,
-        )
-        .bind(id, agentId, branchName, worktreePath, baseBranch, now)
-        .run();
+      await insertAgentWorktree(this.db, {
+        id,
+        agentId,
+        branchName,
+        worktreePath,
+        baseBranch,
+        createdAt: now,
+      });
     }
 
     return config;
@@ -84,13 +86,7 @@ export class WorktreeManager {
     config.cleanedAt = new Date().toISOString();
 
     if (this.db) {
-      await this.db
-        .prepare(
-          `UPDATE agent_worktrees SET status = 'cleaned', cleaned_at = ?
-           WHERE agent_id = ? AND status = 'active'`,
-        )
-        .bind(config.cleanedAt, agentId)
-        .run();
+      await cleanAgentWorktree(this.db, agentId, config.cleanedAt ?? new Date().toISOString());
     }
 
     return true;

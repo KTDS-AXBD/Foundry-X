@@ -8,7 +8,12 @@
 import type { TaskEvent } from "@foundry-x/shared";
 import { createTaskEvent } from "@foundry-x/shared";
 import type { EventBus } from "../../../services/event-bus.js";
-import { ContentAdapterService, OfferingService, type AdaptTone } from "../../offering/types.js";
+import {
+  ContentAdapterService,
+  OfferingService,
+  type AdaptTone,
+  getOfferingSectionContents,
+} from "../../offering/types.js";
 import type {
   ShapePipelineResult,
   ShapePipelineStatus,
@@ -195,13 +200,8 @@ export class DiscoveryShapePipelineService {
       return { status: "idle" };
     }
 
-    // 프리필 완료 여부 확인
-    const sections = await this.db
-      .prepare("SELECT content FROM offering_sections WHERE offering_id = ?")
-      .bind(offering.id)
-      .all<SectionRow>();
-
-    const prefilledCount = sections.results.filter(
+    const sectionContents = await getOfferingSectionContents(this.db, offering.id);
+    const prefilledCount = sectionContents.filter(
       (s) => s.content !== null && s.content.trim().length > 0,
     ).length;
 

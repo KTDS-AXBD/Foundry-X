@@ -25,6 +25,8 @@ export interface WorkerStats {
   timestamp: string;
 }
 
+import { countRecentAgentTasks } from "../../agent/types.js";
+
 export class MonitoringService {
   constructor(
     private kv: KVNamespace,
@@ -113,13 +115,10 @@ export class MonitoringService {
   }
 
   private async collectStats(): Promise<WorkerStats> {
-    // Aggregate from D1 — count recent requests/tasks as proxy
-    const recentTasks = await this.db
-      .prepare("SELECT COUNT(*) as cnt FROM agent_tasks WHERE created_at >= datetime('now', '-1 hour')")
-      .first<{ cnt: number }>();
+    const recentTasksCnt = await countRecentAgentTasks(this.db);
 
     return {
-      requestsPerMinute: Math.round((recentTasks?.cnt ?? 0) / 60),
+      requestsPerMinute: Math.round(recentTasksCnt / 60),
       avgResponseTimeMs: 45,
       errorRate: 0.01,
       activeConnections: 0,
