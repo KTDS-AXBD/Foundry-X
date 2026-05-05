@@ -14,8 +14,11 @@
     "db:seed:local": "wrangler d1 execute foundry-x-db --local --file=src/db/seed.sql",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/eslint-rules/ --max-warnings 0",
-    "lint:msa-new": "bash ../../scripts/lint-new-files.sh"
+    "lint": "eslint src/ --max-warnings 0",
+    "lint:rules": "eslint src/eslint-rules/ --max-warnings 0",
+    "lint:msa-new": "bash ../../scripts/lint-new-files.sh",
+    "lint:msa-baseline": "bash ../../scripts/lint-baseline-check.sh",
+    "lint:ci": "pnpm lint:rules && pnpm lint:msa-new && pnpm lint:msa-baseline"
   },
   "dependencies": {
     "@foundry-x/harness-kit": "workspace:*",

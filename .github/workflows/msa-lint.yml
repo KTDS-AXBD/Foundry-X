@@ -37,3 +37,6 @@ jobs:
 
       - name: MSA lint — 신규/수정 파일만
         run: bash scripts/lint-new-files.sh origin/master
+
+      - name: MSA Baseline Check — 신규 위반 0건 강제 (F608)
+        run: pnpm --filter @foundry-x/api lint:msa-baseline
