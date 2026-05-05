@@ -1102,6 +1102,18 @@ phase_sprint_signals() {
       notify-send "Sprint ${sprint_num} MERGED" \
         "${project} PR #${pr_num} — Match ${match_rate:-?}" 2>/dev/null || true
     fi
+
+    # L4: Master pane rename — sprint context 청소 (S333)
+    # MERGED 시점에 master pane은 다음 활성 sprint 또는 git branch로 자동 갱신
+    # tmux-rename-pane.sh가 활성 sprint signal을 자동 스캔 (이 sprint는 이미 MERGED 처리됨)
+    local rename_script="$HOME/scripts/tmux-rename-pane.sh"
+    if [ -n "$master_pane" ] && [ -x "$rename_script" ]; then
+      tmux send-keys -t "$master_pane" "" 2>/dev/null  # no-op, pane 활성 확인용
+      # master pane TMUX context에서 직접 호출 — pane 환경 재현
+      (cd "$REPO_ROOT" 2>/dev/null && \
+        TMUX_PANE="$master_pane" TMUX="${TMUX:-default}" \
+        bash "$rename_script" 2>/dev/null) || true
+    fi
   done
   # nullglob 복원 — 누출 시 phase_signals의 ls glob이 빈 확장되어 cwd listing → source crash (S267)
   "$_prev_nullglob" || shopt -u nullglob
