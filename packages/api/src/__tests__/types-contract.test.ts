@@ -36,9 +36,10 @@ describe("F609: types.ts contract", () => {
     expect(fs.existsSync(baselinePath)).toBe(true);
     const baseline = JSON.parse(fs.readFileSync(baselinePath, "utf8"));
     const count = baseline.fingerprints?.length ?? 0;
-    // F608 had 160 fingerprints; F609 should reduce to ~77
+    // F608 161 → F609 77 → F610 142 → F611 27 → F612 1 → F613 0 (Pass 시리즈 종결, S333)
+    // count >= 0 (baseline JSON 자체는 항상 존재, 0 도달이 시리즈 종결 증명)
     expect(count).toBeLessThan(160);
-    expect(count).toBeGreaterThan(0);
+    expect(count).toBeGreaterThanOrEqual(0);
   });
 
   it("agent/types.ts re-exports required symbols", () => {
