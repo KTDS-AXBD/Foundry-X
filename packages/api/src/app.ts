@@ -1,5 +1,4 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { swaggerUI } from "@hono/swagger-ui";
 import { cors } from "hono/cors";
 import { Toucan } from "toucan-js";
 // Modules: auth (S181) — portal/gate/launch moved to fx-modules (F572, Sprint 319)
@@ -46,6 +45,7 @@ import { eventStatusRoute } from "./routes/event-status.js";
 import { workRoute } from "./core/work/routes/work.js";
 import { workPublicRoute } from "./core/work/routes/work-public.js";
 import { verificationRoute } from "./core/verification/routes/index.js";
+import { docsApp } from "./core/docs/routes/index.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -126,7 +126,7 @@ app.doc("/api/openapi.json", {
     { name: "NPS", description: "NPS survey scheduling and team analytics" },
   ],
 });
-app.get("/api/docs", swaggerUI({ url: "/api/openapi.json" }));
+app.route("/api/docs", docsApp);
 
 // Auth routes (public — /auth/sso/verify is public, /auth/sso/token needs auth via JWT)
 app.route("/api", authRoute);

@@ -1,11 +1,9 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-05T07:13:58.048Z",
-  "description": "F608 Forward-only MSA baseline — known violations as of 2026-05-05. Do NOT add entries here; use scripts/lint-baseline-update.sh after fixing.",
-  "msa_total": 1,
-  "msa_errors": 1,
+  "generated_at": "2026-05-05T18:30:00.000Z",
+  "description": "F613 Pass 시리즈 종결 baseline — violations 0, MSA 룰 강제 교정 완결 (F608~F613).",
+  "msa_total": 0,
+  "msa_errors": 0,
   "msa_warnings": 0,
-  "fingerprints": [
-    "src/app.ts:129:foundry-x-api/no-direct-route-register"
-  ]
+  "fingerprints": []
 }
