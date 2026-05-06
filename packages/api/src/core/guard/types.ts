@@ -79,4 +79,6 @@ export interface GuardDecisionRecord {
 }
 
 export { GuardEngine } from "./services/guard-engine.service.js";
+export { WorkflowHookService } from "./services/workflow-hook.service.js";
+export { RuleEngine } from "./services/rule-engine.service.js";
 export * from "./schemas/guard.js";

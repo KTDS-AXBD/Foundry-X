@@ -33,3 +33,26 @@ export const GuardCheckResponseSchema = z
     decidedAt: z.number(),
   })
   .openapi("GuardCheckResponse");
+
+// F617: Workflow Hook schemas
+export const WorkflowHookSchema = z
+  .object({
+    workflowId: z.string().min(1),
+    action: z.enum(["publish_policy_pack", "deploy_skill", "export_artifact"]),
+    orgId: z.string().min(1),
+    actor: z.string().min(1),
+    sensitivityLabel: z.enum(["public", "internal", "confidential", "secret"]).optional(),
+    metadata: z.record(z.unknown()).optional(),
+  })
+  .openapi("WorkflowHook");
+
+export const InterceptResponseSchema = z
+  .object({
+    blocked: z.boolean(),
+    checkId: z.string(),
+    reason: z.string().optional(),
+    violations: z.array(
+      z.object({ ruleId: z.string(), message: z.string() }),
+    ),
+  })
+  .openapi("InterceptResponse");

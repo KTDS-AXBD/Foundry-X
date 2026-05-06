@@ -45,9 +45,9 @@ function makeAuditMock() {
   const emits: Array<{ event: string; payload: unknown }> = [];
   return {
     emits,
-    emit: vi.fn().mockImplementation((event: string, payload: unknown) => {
+    emit: vi.fn().mockImplementation((event: string, payload: unknown, ..._rest: unknown[]) => {
       emits.push({ event, payload });
-      return Promise.resolve({ id: 1 });
+      return Promise.resolve(undefined);
     }),
   };
 }
@@ -80,7 +80,7 @@ describe("F617 Guard-X Integration", () => {
       expect(result.blocked).toBe(true);
       expect(result.checkId).toBeTruthy();
       expect(result.violations).toHaveLength(1);
-      expect(result.violations[0].ruleId).toBe("rule-confidential-publish-block");
+      expect(result.violations[0]!.ruleId).toBe("rule-confidential-publish-block");
 
       const emittedEvents = audit.emits.map((e) => e.event);
       expect(emittedEvents).toContain("guard.workflow_hook_invoked");
@@ -148,8 +148,8 @@ describe("F617 Guard-X Integration", () => {
 
       const rules = await engine.getActiveRules();
       expect(rules).toHaveLength(1);
-      expect(rules[0].id).toBe("rule-confidential-publish-block");
-      expect(rules[0].severity).toBe("critical");
+      expect(rules[0]!.id).toBe("rule-confidential-publish-block");
+      expect(rules[0]!.severity).toBe("critical");
     });
 
     it("T5: getActiveRules fallback — in-memory 없으면 D1 SELECT 호출", async () => {
@@ -193,7 +193,7 @@ describe("F617 Guard-X Integration", () => {
 
       const violations = await engine.evaluateRules(action);
       expect(violations).toHaveLength(1);
-      expect(violations[0].severity).toBe("critical");
+      expect(violations[0]!.severity).toBe("critical");
 
       // D1 INSERT called
       expect(db.prepare).toHaveBeenCalledWith(
@@ -203,6 +203,8 @@ describe("F617 Guard-X Integration", () => {
       expect(audit.emit).toHaveBeenCalledWith(
         "guard.rule_violation",
         expect.objectContaining({ ruleId: "rule-confidential-publish-block" }),
+        expect.anything(), // TraceContext
+        expect.any(String), // actor
       );
     });
   });
