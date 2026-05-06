@@ -47,6 +47,7 @@ import { workPublicRoute } from "./core/work/routes/work-public.js";
 import { verificationRoute } from "./core/verification/routes/index.js";
 import { docsApp } from "./core/docs/routes/index.js";
 import { assetApp } from "./core/asset/routes/index.js";
+import { policyApp } from "./core/policy/routes/index.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -320,6 +321,9 @@ app.route("/api", workRoute);
 
 // Sprint 353: F629 5-Asset Model — System Knowledge (T1 토대)
 app.route("/api/asset", assetApp);
+
+// Sprint 355: F631 자동화 정책 코드 강제 (whitelist + default-deny)
+app.route("/api/policy", policyApp);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
