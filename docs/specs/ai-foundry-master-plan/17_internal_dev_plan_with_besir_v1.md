@@ -40,18 +40,19 @@ classification: 기업비밀II급 / Enterprise부문
 | F# | 작업 | 외부 의존 | Tier |
 |----|------|-----------|------|
 | F600 | 5-Layer 통합 운영 | **5 repo orchestration** (Decode-X/Discovery-X/AXIS-DS/ax-plugin) | T7 (외부 동기) |
-| F601 | Multi-Tenant PG + RBAC + KT DS SSO | **PG 인프라 결정 + KT DS SSO 협의** | T6 (외부 결정) |
+| F601 (SSO 부분) | OIDC 표준 어댑터 + 5역 RBAC 코드 | **80% 자체** — client_id/JWKS URL 발급(20%)만 외부 | **T4 ✅ 내부 (코드 골격) / T6 client 등록(외부)** |
+| F601 (PG 부분) | D1+RLS dual storage 골격 + Tenant context middleware | **60% 자체** — PG 서비스 선정(40%)만 외부 | **T4~T5 ✅ 내부 (D1 fallback) / T6 PG 도입 결정(외부)** |
 | F602 | 4대 진단 PoC | (없음) | **T3 ✅ 내부** |
 | F603 | Cross-Org PoC + default-deny | default-deny 코드 자체, **SME 워크샵 외부** | **T4 부분 내부** |
-| F604 | KPI 위젯 4종 | **AXIS-DS PR #55 머지** | T6 (외부) |
-| F605 | HITL Console | **AXIS-DS v1.2** | T6 (외부) |
+| F604 | KPI 위젯 4종 | **AXIS-DS PR #55 머지** — 사용자 PR 머지 권한 확인 시 즉시 unlock 가능 | T6 (외부 / **권한 확인 후 T4 가능**) |
+| F605 | HITL Console | **AXIS-DS v1.2** — 동일, 머지 권한 확인 시 unlock | T6 (외부 / **권한 확인 후 T4 가능**) |
 | F606 | Audit Log Bus | (없음) — Foundry-X 횡단 | **T1 ✅ 토대** |
 | F607 | AI 투명성 + 윤리 임계 | (없음) | **T3 ✅ 내부** |
 | F615 | Guard-X Solo | (없음) | **T4 ✅ 내부** |
 | F616 | Launch-X Solo | (없음) | **T4 ✅ 내부** |
 | F617 | Guard-X Integration | F615 의존 | T5 (F615 후) |
 | F618 | Launch-X Integration | F616 의존 | T5 (F616 후) |
-| F619 | 4대 진단 Integration (Multi-Evidence + Decode-X 흡수) | **Decode-X Phase 2-E** | T6 (외부) |
+| F619 (알고리즘) | Multi-Evidence E1/E2/E3 통합 알고리즘 + Decode-X stub adapter + mock event PoC | **80% 자체** — 알고리즘 + stub 코드 자체, 실 이벤트 hook(20%)만 외부 | **T4~T5 ✅ 내부 (mock 기반) / T6 실 이벤트 hook(외부)** |
 | F620 | Cross-Org Integration | F603 + Launch-X 차단 신호 + **Expert HITL 외부** | T5 부분 |
 | F621 | KPI 통합 화면 | F604 + F605 의존 | T6 (외부 의존 후) |
 | F622 | 운영·QA·교육 패키지 | **W28~W29 외부 시점** | T7 (Phase 5 마감) |
@@ -65,7 +66,9 @@ classification: 기업비밀II급 / Enterprise부문
 | **F631** | 분석X 자동화O 정책 코드 강제 (신규) | F606 의존 | **T2 ✅ 내부** |
 | **F632** | CQ 5축 + 80-20-80 통합 (신규) | F602 + F605 의존 | T3 (F602 후) |
 
-**합계**: 27 F-item 중 **내부 즉시 진행 가능 13건** (T1~T4) / **외부 의존 8건** (T5~T7) / **부분 의존 3건** / **나머지 토대 의존 3건**.
+**합계 정정 (S336 후속, 외부 의존 4건 분석 결과 반영)**: 27 F-item 중 **내부 즉시 진행 가능 17건** (T1~T4 + 부분 분리 4건) / **순수 외부 의존 4건** (F600 5-Layer + AXIS-DS PR #55 미머지 + Decode-X 진척 + 본부 SME 워크샵) / **나머지 토대·시점 의존 6건**.
+
+**핵심 인사이트**: 처음 분류한 "외부 의존" 다수가 실은 80% 자체 가능. F601 SSO/PG, F619 Decode-X, F604/F605 AXIS-DS는 **골격을 자체 작성한 후 외부 unlock 시점에 마지막 hook만 연결**하는 패턴이 가능.
 
 ---
 
@@ -98,15 +101,21 @@ classification: 기업비밀II급 / Enterprise부문
 | Sprint 359 | F625 | CQ 5축 운영 검증 (F632에 통합 가능, 별도 등록 시 cosmetic) | F632 | (F632에 흡수) |
 | Sprint 360 | F607 | AI 투명성 + 윤리 임계 (confidence < 0.7 HITL escalation) | F606 | ~15분 |
 
-### Tier 4 — Sub-app Solo (외부 의존 일부) — Sprint 361~365
+### Tier 4 — Sub-app Solo + 외부 의존 골격 분리 (즉시 가능) — Sprint 361~369
+
+**S336 정정**: F601 SSO/PG, F619 Decode-X 골격을 T4로 승격. 외부 unlock 시점에는 마지막 hook만 추가.
 
 | Sprint 후보 | F# | 작업 | 의존 | 추정 |
 |------------|----|------|------|------|
-| Sprint 361 | F615 | **Guard-X Solo** (`core/guard/` sub-app) | F606 + F601 | ~30분 (단, F601 PG 미결 시 D1 fallback) |
+| Sprint 361 | F615 | **Guard-X Solo** (`core/guard/` sub-app) | F606 + F601 (SSO 골격 OK) | ~30분 |
 | Sprint 362 | F616 | **Launch-X Solo** (`core/launch/` sub-app) | F606 | ~30분 |
 | Sprint 363 | F623 | /ax:domain-init β 스킬 (ax-plugin) | F628 + F629 | ~20분 |
-| Sprint 364 | F603 (자체 부분) | Cross-Org default-deny 코드 골격 (SME 워크샵 사전 준비) | 0 | ~20분 (SME 결과는 후속) |
+| Sprint 364 | F603 (자체 부분) | Cross-Org default-deny 코드 골격 (SME 워크샵 사전 준비) | 0 | ~20분 |
 | Sprint 365 | F626 (자체 부분) | core_diff 차단율 측정 코드 (F603 default-deny 후) | F603 | ~15분 |
+| **Sprint 366** | **F601-SSO** (자체 부분, 신규) | **OIDC 표준 어댑터 (arctic) + 5역 RBAC 코드 + JWKS URL 환경변수** | 0 | ~25분 — IT 협의 결과 받은 시점에 1시간 내 production 가능 |
+| **Sprint 367** | **F601-MT** (자체 부분, 신규) | **D1+RLS dual storage 골격 + Tenant context middleware + tenant_id 강제** | F606 | ~30분 — PG 결정 후 storage layer만 swap |
+| **Sprint 368** | **F619-stub** (자체 부분, 신규) | **Multi-Evidence E1/E2/E3 알고리즘 + Decode-X stub adapter + mock event PoC** | F602 + F606 | ~25분 — 실 이벤트 시점에 stub만 swap |
+| **Sprint 369** | **F604/F605 골격** (조건부) | **AXIS-DS PR #55 vendored fork** 또는 자체 KPI 위젯 임시 구현 | (PR 머지 권한 확인 후) | ~20분 — 권한 확인 시 즉시 |
 
 ### Tier 5 — Integration (T4 후) — Sprint 366~369
 
@@ -142,25 +151,38 @@ classification: 기업비밀II급 / Enterprise부문
 
 ---
 
-## 4. 즉시 시동 가능 Sprint 후보 (T1~T3, 외부 의존 0)
+## 4. 즉시 시동 가능 Sprint 후보 (T1~T4, 외부 의존 분리 후)
+
+**S336 정정**: 외부 의존 분리 매트릭스로 **13건 → 17건**으로 확장.
 
 ```
-Sprint 351 — F606 Audit Log Bus      (T1 토대, 가장 먼저)
-Sprint 352 — F628 7-타입 Entity        (T1 토대)
-Sprint 353 — F629 5-Asset Model        (T1 토대)
-Sprint 354 — F630 7-타입 자동 추출     (T2)
-Sprint 355 — F631 자동화 정책 코드     (T2)
-Sprint 356 — F624 Six Hats LLM 패턴    (T2)
-Sprint 357 — F602 4대 진단 PoC         (T3)
-Sprint 358 — F632 CQ 5축 + 80-20-80    (T3)
-Sprint 359 — F607 AI 투명성/윤리       (T3)
-Sprint 360 — F615 Guard-X Solo         (T4, F606 의존 OK)
-Sprint 361 — F616 Launch-X Solo        (T4)
-Sprint 362 — F623 /ax:domain-init β    (T4)
-Sprint 363 — F603 default-deny 골격    (T4)
+[T1 토대 — 모든 후속의 의존성 핵심]
+Sprint 351 — F606 Audit Log Bus      ★ 가장 먼저 ★
+Sprint 352 — F628 7-타입 Entity        BeSir 핵심
+Sprint 353 — F629 5-Asset Model        System Knowledge
+
+[T2 Domain Extraction]
+Sprint 354 — F630 7-타입 자동 추출     인터뷰 → 트랜스크립트
+Sprint 355 — F631 자동화 정책 코드     분석X 자동화O
+Sprint 356 — F624 Six Hats LLM 패턴
+
+[T3 Diagnostic & HITL]
+Sprint 357 — F602 4대 진단 PoC
+Sprint 358 — F632 CQ 5축 + 80-20-80
+Sprint 359 — F607 AI 투명성/윤리
+
+[T4 Sub-app Solo + 외부 의존 골격 분리 (S336 신규 승격)]
+Sprint 360 — F615 Guard-X Solo
+Sprint 361 — F616 Launch-X Solo
+Sprint 362 — F623 /ax:domain-init β
+Sprint 363 — F603 default-deny 골격
+Sprint 364 — F601-SSO OIDC 어댑터       ★ 신규 승격 (S336)
+Sprint 365 — F601-MT D1+RLS 골격         ★ 신규 승격 (S336)
+Sprint 366 — F619-stub Multi-Evidence    ★ 신규 승격 (S336)
+Sprint 367 — F604/F605 골격 (조건부)     ★ PR 권한 확인 시 (S336)
 ─────────────────────────────────────
-13 sprint 분량 = 약 5~8주 작업
-외부 의존 0, 내부 즉시 시작 가능
+17 sprint 분량 = 약 7~10주 작업
+외부 의존 0~20% (마지막 hook만 외부 unlock 시점)
 ```
 
 > 본 sprint 350(F627 services/ closure)도 본 시리즈와 평행 가능.
