@@ -52,9 +52,13 @@ import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
 import { tenantGuard, type TenantVariables } from "./middleware/tenant.js";
 import { usageLimiter } from "./middleware/usage-limiter.js";
 import { billingRoute } from "./modules/billing/index.js";
+import { traceContextMiddleware } from "./core/infra/middleware/trace-context.middleware.js";
 import type { Env } from "./env.js";
 
 export const app = new OpenAPIHono<{ Bindings: Env; Variables: TenantVariables }>();
+
+// F606: W3C Trace Context — outermost middleware (trace_id 전파, 응답 header echo)
+app.use("*", traceContextMiddleware);
 
 // CORS — allow fx.minu.best and local dev
 app.use("*", cors({
