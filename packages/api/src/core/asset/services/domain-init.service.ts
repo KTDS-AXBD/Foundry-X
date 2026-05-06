@@ -1,8 +1,8 @@
 // F623: DomainInitService — 5-Asset 스캐폴드 오케스트레이터 (domain-init β endpoint)
 import { generateTraceId, generateSpanId } from "../../infra/types.js";
-import type { AuditBus } from "../../infra/audit-bus.js";
-import type { EntityRegistry } from "../../entity/services/entity-registry.js";
-import type { PolicyEngine } from "../../policy/services/policy-engine.service.js";
+import type { AuditBus } from "../../infra/types.js";
+import type { EntityRegistry } from "../../entity/types.js";
+import type { PolicyEngine } from "../../policy/types.js";
 import type { SystemKnowledgeService } from "./system-knowledge.service.js";
 
 export interface DomainInitInput {

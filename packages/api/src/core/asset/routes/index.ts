@@ -2,9 +2,9 @@ import { Hono } from "hono";
 import { SystemKnowledgeService } from "../services/system-knowledge.service.js";
 import { DomainInitService } from "../services/domain-init.service.js";
 import { RegisterSystemKnowledgeSchema, DomainInitSchema } from "../schemas/asset.js";
-import { EntityRegistry } from "../../entity/services/entity-registry.js";
-import { PolicyEngine } from "../../policy/services/policy-engine.service.js";
-import { AuditBus } from "../../infra/audit-bus.js";
+import { EntityRegistry } from "../../entity/types.js";
+import { PolicyEngine } from "../../policy/types.js";
+import { AuditBus } from "../../infra/types.js";
 import type { Env } from "../../../env.js";
 
 export const assetApp = new Hono<{ Bindings: Env }>();
