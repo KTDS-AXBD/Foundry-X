@@ -48,6 +48,7 @@ import { verificationRoute } from "./core/verification/routes/index.js";
 import { docsApp } from "./core/docs/routes/index.js";
 import { assetApp } from "./core/asset/routes/index.js";
 import { policyApp } from "./core/policy/routes/index.js";
+import { cqApp } from "./core/cq/routes/index.js";
 import { ethicsApp } from "./core/ethics/routes/index.js";
 import { diagnosticApp } from "./core/diagnostic/routes/index.js";
 import { handleScheduled } from "./scheduled.js";
@@ -135,6 +136,7 @@ app.doc("/api/openapi.json", {
   ],
 });
 app.route("/api/docs", docsApp);
+app.route("/api/cq", cqApp);
 
 // Auth routes (public — /auth/sso/verify is public, /auth/sso/token needs auth via JWT)
 app.route("/api", authRoute);
