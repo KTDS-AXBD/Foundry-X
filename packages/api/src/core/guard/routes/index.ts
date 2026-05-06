@@ -3,7 +3,9 @@ import type { Env } from "../../../env.js";
 import { AuditBus } from "../../infra/types.js";
 import { PolicyEngine } from "../../policy/types.js";
 import { GuardEngine } from "../services/guard-engine.service.js";
-import { GuardCheckRequestSchema } from "../schemas/guard.js";
+import { WorkflowHookService } from "../services/workflow-hook.service.js";
+import { RuleEngine } from "../services/rule-engine.service.js";
+import { GuardCheckRequestSchema, WorkflowHookSchema, InterceptResponseSchema } from "../schemas/guard.js";
 
 export const guardApp = new Hono<{ Bindings: Env }>();
 
@@ -18,6 +20,19 @@ function getEngine(env: Env): GuardEngine {
   );
 }
 
+function getWorkflowHookService(env: Env): WorkflowHookService {
+  const bus = new AuditBus(env.DB, env.AUDIT_HMAC_KEY ?? "default-hmac-key-32chars-pad");
+  const policyEngine = new PolicyEngine(env.DB, bus);
+  const guardEngine = new GuardEngine(
+    env.DB,
+    policyEngine,
+    bus,
+    env.GUARD_HMAC_KEY ?? "default-guard-hmac-key-32chars",
+  );
+  const ruleEngine = new RuleEngine(env.DB, bus);
+  return new WorkflowHookService(guardEngine, ruleEngine, bus);
+}
+
 guardApp.post("/check", async (c) => {
   const body = await c.req.json();
   const parsed = GuardCheckRequestSchema.safeParse(body);
@@ -26,5 +41,17 @@ guardApp.post("/check", async (c) => {
   }
   const engine = getEngine(c.env);
   const result = await engine.check(parsed.data);
+  return c.json(result, 200);
+});
+
+guardApp.post("/workflow-hook", async (c) => {
+  const body = await c.req.json();
+  const parsed = WorkflowHookSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: parsed.error.issues }, 400);
+  }
+  const svc = getWorkflowHookService(c.env);
+  const raw = await svc.interceptPolicyPackPublish(parsed.data);
+  const result = InterceptResponseSchema.parse(raw);
   return c.json(result, 200);
 });

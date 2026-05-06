@@ -42,5 +42,34 @@ export interface LaunchDecisionRecord {
   decidedAt: number;
 }
 
+// F618: Additional types for SkillRegistry + ObjectStore + Rollback
+export interface SkillEntry {
+  skillId: string;
+  skillVersion: string;
+  skillMeta: Record<string, unknown>;
+  active: boolean;
+  registeredAt: number;
+}
+
+export interface ObjectUploadResult {
+  releaseId: string;
+  downloadUrl: string;
+  expiresAt: number;
+  size: number;
+}
+
+export interface RollbackRecord {
+  rollbackId: string;
+  releaseId: string;
+  fromVersion: string;
+  toVersion: string;
+  reason: string;
+  requester: string;
+  executedAt: number;
+}
+
 export { LaunchEngine } from "./services/launch-engine.service.js";
+export { SkillRegistryService } from "./services/skill-registry.service.js";
+export { ObjectStoreService } from "./services/object-store.service.js";
+export { RollbackService } from "./services/rollback.service.js";
 export * from "./schemas/launch.js";

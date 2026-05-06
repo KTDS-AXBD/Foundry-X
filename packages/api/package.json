@@ -32,21 +32,22 @@
     "nanoid": "^5.0.0",
     "pptxgenjs": "^4.0.1",
     "toucan-js": "^4.1.1",
+    "yaml": "^2.8.4",
     "zod": "^3.23.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.0.0",
+    "@eslint/js": "^10.0.1",
     "@hono/node-server": "^1.0.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20.0.0",
     "better-sqlite3": "^12.8.0",
     "drizzle-kit": "^0.24.0",
+    "eslint": "^10.0.3",
     "tsx": "^4.0.0",
     "typescript": "^5.7.0",
+    "typescript-eslint": "^8.57.0",
     "vitest": "^3.0.0",
-    "wrangler": "^4.78.0",
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.0.3",
-    "typescript-eslint": "^8.57.0"
+    "wrangler": "^4.78.0"
   }
 }

@@ -20,3 +20,28 @@ export const LaunchResponseSchema = z.object({
   manifest: z.any(),
   status: z.string(),
 });
+
+// F618: SkillRegistry + Rollback schemas
+export const RegisterSkillSchema = z.object({
+  skillId: z.string().min(1),
+  skillVersion: z.string().min(1),
+  meta: z.record(z.unknown()).optional(),
+});
+
+export const RollbackRequestSchema = z.object({
+  releaseId: z.string().min(1),
+  fromVersion: z.string().min(1),
+  toVersion: z.string().min(1),
+  reason: z.string().min(1),
+  requester: z.string().min(1),
+});
+
+export const RollbackResponseSchema = z.object({
+  rollbackId: z.string(),
+  releaseId: z.string(),
+  fromVersion: z.string(),
+  toVersion: z.string(),
+  reason: z.string(),
+  requester: z.string(),
+  executedAt: z.number(),
+});
