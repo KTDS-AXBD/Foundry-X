@@ -15,3 +15,7 @@ export { SetDiscoveryTypeSchema } from "./schemas/viability-checkpoint.schema.js
 // F612: Pass 5 — multi-domain caller re-exports
 export { BdSkillExecutor } from "./services/bd-skill-executor.js";
 export { ShapingOrchestratorService } from "./services/shaping-orchestrator-service.js";
+
+// F624: Six Hats LLM 호출 정책
+export { SixHatsLLMPolicy } from "./services/sixhats-llm-policy.js";
+export type { SixHatsLLMCallContext, CallStats } from "./services/sixhats-llm-policy.js";
