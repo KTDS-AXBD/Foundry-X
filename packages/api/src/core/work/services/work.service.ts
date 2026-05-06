@@ -1,5 +1,5 @@
 import type { Env } from "../../../env.js";
-import { SSEManager } from "../../../services/sse-manager.js";
+import { SSEManager } from "../../../core/infra/types.js";
 import { MODEL_SONNET } from "@foundry-x/shared";
 import {
   queryAllAgentSessions,

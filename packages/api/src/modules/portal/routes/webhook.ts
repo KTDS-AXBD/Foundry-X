@@ -8,7 +8,7 @@ import { LLMService } from "../../../services/llm.js";
 import { ReviewerAgent } from "../../../core/agent/services/reviewer-agent.js";
 import { GitHubReviewService, parseFoundryCommand, ReviewCooldownError, HELP_COMMENT, formatStatusComment } from "../services/github-review.js";
 import { FeedbackQueueService } from "../services/feedback-queue-service.js";
-import { SSEManager } from "../../../services/sse-manager.js";
+import { SSEManager } from "../../../core/infra/sse-manager.js";
 import type { Env } from "../../../env.js";
 
 export const webhookRoute = new OpenAPIHono<{ Bindings: Env }>();

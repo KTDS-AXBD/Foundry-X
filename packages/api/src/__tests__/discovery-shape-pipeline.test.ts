@@ -3,7 +3,7 @@
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { EventBus } from "../services/event-bus.js";
+import { EventBus } from "../core/infra/event-bus.js";
 import { DiscoveryShapePipelineService } from "../core/discovery/services/discovery-shape-pipeline-service.js";
 import { discoveryShapePipelineRoute } from "../core/discovery/routes/discovery-shape-pipeline.js";
 import { createTaskEvent } from "@foundry-x/shared";

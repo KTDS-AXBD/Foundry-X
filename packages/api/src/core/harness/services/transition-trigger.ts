@@ -7,7 +7,7 @@ import {
   type EventSource,
 } from "@foundry-x/shared";
 import { type TaskStateService } from "../../agent/types.js";
-import type { EventBus } from "../../../services/event-bus.js";
+import type { EventBus } from "../../../core/infra/types.js";
 
 /**
  * EventBus 구독자 — error/critical 이벤트 기반으로 FEEDBACK_LOOP 자동 전이 트리거

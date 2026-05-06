@@ -1,7 +1,7 @@
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { harnessCheckResultSchema, violationHistorySchema } from "../schemas/harness.js";
 import { HarnessRulesService } from "../services/harness-rules.js";
-import { SSEManager } from "../../../services/sse-manager.js";
+import { SSEManager } from "../../../core/infra/types.js";
 import type { Env } from "../../../env.js";
 import type { JwtPayload } from "../../../middleware/auth.js";
 

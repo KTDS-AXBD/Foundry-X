@@ -1,5 +1,5 @@
 import type { GitHubService } from "./github.js";
-import type { SSEManager } from "../../../services/sse-manager.js";
+import type { SSEManager } from "../../../core/infra/sse-manager.js";
 import { parseSpecRequirements, type SpecRequirement } from "../../../core/spec/services/spec-parser.js";
 
 // ─── F99: Git↔D1 Reconciliation Service ───

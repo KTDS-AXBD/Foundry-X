@@ -4,7 +4,7 @@
  * 4가지 규칙을 검사하고 위반 시 kpi_events 기록 + SSE 알림.
  * kpi_events에 'harness_violation' event_type으로 직접 INSERT (KpiLogger 타입 제약 우회).
  */
-import type { SSEManager } from "../../../services/sse-manager.js";
+import type { SSEManager } from "../../../core/infra/types.js";
 import {
   countAgentsByOrg,
   countActiveSessionsByProject,

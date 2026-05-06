@@ -1,6 +1,6 @@
 import type { WorktreeManager } from "./worktree-manager.js";
 import { type AgentInbox, type AgentRunner } from "../../agent/types.js";
-import type { SSEManager } from "../../../services/sse-manager.js";
+import type { SSEManager } from "../../../core/infra/types.js";
 
 // ─── F102: Agent Auto-Rebase Service ───
 

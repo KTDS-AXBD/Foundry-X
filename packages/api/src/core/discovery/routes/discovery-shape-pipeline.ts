@@ -4,7 +4,7 @@
 import { Hono } from "hono";
 import type { Env } from "../../../env.js";
 import type { TenantVariables } from "../../../middleware/tenant.js";
-import { EventBus } from "../../../services/event-bus.js";
+import { EventBus } from "../../../core/infra/types.js";
 import { DiscoveryShapePipelineService } from "../services/discovery-shape-pipeline-service.js";
 import {
   PipelineTriggerSchema,

@@ -56,4 +56,6 @@ export type {
   UpdateAgentTaskHookStatusParams,
   InsertAgentWorktreeParams,
   FeedbackDateRangeParams,
+  AgentSessionSseRow,
 } from "./services/agent-d1-api.js";
+export { queryRecentAgentSessions } from "./services/agent-d1-api.js";

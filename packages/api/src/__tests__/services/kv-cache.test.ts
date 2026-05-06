@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { KVCacheService } from "../../services/kv-cache.js";
+import { KVCacheService } from "../../core/infra/kv-cache.js";
 
 class MockKV {
   private store = new Map<string, string>();

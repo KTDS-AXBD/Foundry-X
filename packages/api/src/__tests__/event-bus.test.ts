@@ -1,7 +1,7 @@
 // ─── F334: EventBus 단위 테스트 (Sprint 149) ───
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { EventBus } from "../services/event-bus.js";
+import { EventBus } from "../core/infra/event-bus.js";
 import { createTaskEvent } from "@foundry-x/shared";
 import type { HookEventPayload, ManualEventPayload } from "@foundry-x/shared";
 
