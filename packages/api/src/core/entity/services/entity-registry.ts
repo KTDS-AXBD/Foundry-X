@@ -1,7 +1,10 @@
+import type { BesirEntityType } from "../types.js";
+
 export interface ServiceEntity {
   id: string;
   serviceId: string;
   entityType: string;
+  besirType: BesirEntityType | null;
   externalId: string;
   title: string;
   status: string | null;
@@ -30,22 +33,24 @@ export class EntityRegistry {
     status?: string;
     metadata?: Record<string, unknown>;
     orgId: string;
+    besirType?: BesirEntityType;
   }): Promise<ServiceEntity> {
     const id = crypto.randomUUID();
     const metadataJson = entity.metadata ? JSON.stringify(entity.metadata) : null;
 
     await this.db
       .prepare(
-        `INSERT INTO service_entities (id, service_id, entity_type, external_id, title, status, metadata, org_id)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO service_entities (id, service_id, entity_type, external_id, title, status, metadata, org_id, besir_type)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
-      .bind(id, entity.serviceId, entity.entityType, entity.externalId, entity.title, entity.status ?? null, metadataJson, entity.orgId)
+      .bind(id, entity.serviceId, entity.entityType, entity.externalId, entity.title, entity.status ?? null, metadataJson, entity.orgId, entity.besirType ?? null)
       .run();
 
     return {
       id,
       serviceId: entity.serviceId,
       entityType: entity.entityType,
+      besirType: entity.besirType ?? null,
       externalId: entity.externalId,
       title: entity.title,
       status: entity.status ?? null,
@@ -59,6 +64,7 @@ export class EntityRegistry {
     orgId: string;
     serviceId?: string;
     entityType?: string;
+    besirType?: BesirEntityType;
     query?: string;
     limit?: number;
     offset?: number;
@@ -73,6 +79,10 @@ export class EntityRegistry {
     if (params.entityType) {
       conditions.push("entity_type = ?");
       binds.push(params.entityType);
+    }
+    if (params.besirType) {
+      conditions.push("besir_type = ?");
+      binds.push(params.besirType);
     }
     if (params.query) {
       conditions.push("title LIKE ?");
@@ -220,6 +230,7 @@ export class EntityRegistry {
       id: row.id as string,
       serviceId: row.service_id as string,
       entityType: row.entity_type as string,
+      besirType: (row.besir_type as BesirEntityType) ?? null,
       externalId: row.external_id as string,
       title: row.title as string,
       status: (row.status as string) ?? null,

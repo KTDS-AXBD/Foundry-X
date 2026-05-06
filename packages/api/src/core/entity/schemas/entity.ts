@@ -1,4 +1,7 @@
 import { z } from "@hono/zod-openapi";
+import { BESIR_ENTITY_TYPES } from "../types.js";
+
+export const BesirEntityTypeSchema = z.enum(BESIR_ENTITY_TYPES);
 
 export const RegisterEntitySchema = z
   .object({
@@ -11,6 +14,7 @@ export const RegisterEntitySchema = z
     status: z.string().optional().openapi({ description: "Entity status" }),
     metadata: z.record(z.unknown()).optional().openapi({ description: "Additional metadata (JSON)" }),
     orgId: z.string().min(1).openapi({ description: "Organization ID" }),
+    besirType: BesirEntityTypeSchema.optional().openapi({ description: "BeSir 7-타입 (선택)" }),
   })
   .openapi("RegisterEntity");
 
@@ -19,6 +23,7 @@ export const SearchEntitiesSchema = z
     orgId: z.string().min(1),
     serviceId: z.enum(["foundry-x", "discovery-x", "ai-foundry"]).optional(),
     entityType: z.string().optional(),
+    besirType: BesirEntityTypeSchema.optional(),
     query: z.string().optional(),
     limit: z.coerce.number().int().min(1).max(100).default(20),
     offset: z.coerce.number().int().min(0).default(0),
@@ -41,6 +46,7 @@ export const EntityResponseSchema = z
     id: z.string(),
     serviceId: z.string(),
     entityType: z.string(),
+    besirType: z.enum(BESIR_ENTITY_TYPES).nullable(),
     externalId: z.string(),
     title: z.string(),
     status: z.string().nullable(),
