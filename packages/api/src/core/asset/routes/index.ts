@@ -17,7 +17,7 @@ assetApp.post("/system-knowledge", async (c) => {
 });
 
 assetApp.get("/system-knowledge/:id", async (c) => {
-  const { id } = c.req.param();
+  const id = c.req.param("id");
   const svc = new SystemKnowledgeService(c.env.DB);
   const result = await svc.getKnowledge(id);
   if (!result) return c.json({ error: "not found" }, 404);
