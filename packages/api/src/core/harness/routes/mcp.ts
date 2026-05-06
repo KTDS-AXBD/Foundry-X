@@ -20,7 +20,7 @@ import {
   SubscribeResourceRequestSchema,
 } from "../../../schemas/mcp.js";
 import { McpResourcesClient, McpRunner, McpSamplingHandler, McpServerRegistry, createTransport } from "../../agent/types.js";
-import { SSEManager } from "../../../services/sse-manager.js";
+import { SSEManager } from "../../../core/infra/types.js";
 import { LLMService } from "../../../services/llm.js";
 import type { Env } from "../../../env.js";
 

@@ -6,7 +6,7 @@ import type { McpResource, McpResourceTemplate, McpResourceContent } from "@foun
 import { McpServerRegistry } from "./mcp-registry.js";
 import { createTransport } from "./mcp-transport.js";
 import { McpRunner } from "./mcp-runner.js";
-import type { SSEManager } from "../../../services/sse-manager.js";
+import type { SSEManager } from "../../../core/infra/types.js";
 
 export class McpResourcesClient {
   constructor(

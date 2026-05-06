@@ -3,7 +3,7 @@ import { IntegritySchema } from "../schemas/integrity.js";
 import type { HarnessIntegrity } from "@foundry-x/shared";
 import type { Env } from "../../../env.js";
 import { GitHubService } from "../../../modules/portal/services/github.js";
-import { KVCacheService } from "../../../services/kv-cache.js";
+import { KVCacheService } from "../../../core/infra/types.js";
 import { IntegrityChecker } from "../services/integrity-checker.js";
 
 type EnvWithCache = Env & { CACHE: KVNamespace };

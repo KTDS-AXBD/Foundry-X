@@ -4,7 +4,7 @@ import type {
   AgentTaskType,
 } from "./execution-types.js";
 import type { AgentRunner } from "./agent-runner.js";
-import type { SSEManager } from "../../../services/sse-manager.js";
+import type { SSEManager } from "../../../core/infra/types.js";
 import type { McpServerRegistry } from "./mcp-registry.js";
 import type { MergeQueueService } from "../../../services/merge-queue.js";
 import type { PlannerAgent } from "./planner-agent.js";

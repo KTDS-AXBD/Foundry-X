@@ -7,7 +7,7 @@
 
 import type { TaskEvent } from "@foundry-x/shared";
 import { createTaskEvent } from "@foundry-x/shared";
-import type { EventBus } from "../../../services/event-bus.js";
+import type { EventBus } from "../../../core/infra/types.js";
 import {
   ContentAdapterService,
   OfferingService,

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { SSEManager } from "../services/sse-manager.js";
+import { SSEManager } from "../core/infra/sse-manager.js";
 import { createMockD1 } from "./helpers/mock-d1.js";
 
 function createManager(): SSEManager {

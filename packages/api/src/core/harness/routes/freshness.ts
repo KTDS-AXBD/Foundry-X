@@ -3,7 +3,7 @@ import { FreshnessSchema } from "../schemas/freshness.js";
 import type { FreshnessReport } from "@foundry-x/shared";
 import type { Env } from "../../../env.js";
 import { GitHubService } from "../../../modules/portal/services/github.js";
-import { KVCacheService } from "../../../services/kv-cache.js";
+import { KVCacheService } from "../../../core/infra/types.js";
 import { FreshnessChecker } from "../services/freshness-checker.js";
 
 type EnvWithCache = Env & { CACHE: KVNamespace };

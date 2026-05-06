@@ -1,6 +1,6 @@
 import type { HarnessIntegrity, IntegrityCheck } from "@foundry-x/shared";
 import type { GitHubService } from "../../../modules/portal/services/github.js";
-import type { KVCacheService } from "../../../services/kv-cache.js";
+import type { KVCacheService } from "../../../core/infra/types.js";
 
 const REQUIRED_FILES = [
   { path: "CLAUDE.md", name: "CLAUDE.md exists", required: true },

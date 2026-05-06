@@ -34,7 +34,7 @@ vi.mock("../core/agent/services/mcp-runner.js", () => ({
   })),
 }));
 
-vi.mock("../services/sse-manager.js", () => ({
+vi.mock("../core/infra/sse-manager.js", () => ({
   SSEManager: vi.fn().mockImplementation(() => ({
     pushEvent: vi.fn(),
     subscribers: new Set(),

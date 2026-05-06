@@ -333,3 +333,29 @@ export async function countAcceptedProposals(db: D1Database): Promise<number> {
     .first<{ cnt: number }>();
   return row?.cnt ?? 0;
 }
+
+export interface AgentSessionSseRow {
+  id: string;
+  agent_name: string;
+  status: string;
+  branch: string | null;
+  started_at: string;
+  ended_at: string | null;
+}
+
+export async function queryRecentAgentSessions(
+  db: D1Database,
+  since: string,
+): Promise<AgentSessionSseRow[]> {
+  const result = await db
+    .prepare(
+      `SELECT id, agent_name, status, branch, started_at, ended_at
+       FROM agent_sessions
+       WHERE started_at > ? OR ended_at > ?
+       ORDER BY started_at DESC
+       LIMIT 10`,
+    )
+    .bind(since, since)
+    .all<AgentSessionSseRow>();
+  return result.results ?? [];
+}

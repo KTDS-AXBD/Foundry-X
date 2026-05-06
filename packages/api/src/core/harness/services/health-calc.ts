@@ -1,6 +1,6 @@
 import type { HealthScore } from "@foundry-x/shared";
 import type { GitHubService } from "../../../modules/portal/services/github.js";
-import type { KVCacheService } from "../../../services/kv-cache.js";
+import type { KVCacheService } from "../../../core/infra/types.js";
 import { parseSpecRequirements } from "../../spec/types.js";
 
 export class HealthCalculator {

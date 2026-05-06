@@ -4,7 +4,7 @@ import {
   insertAgentMessage,
   updateAgentTaskHookStatus,
 } from "../../agent/types.js";
-import type { SSEManager } from "../../../services/sse-manager.js";
+import type { SSEManager } from "../../../core/infra/types.js";
 
 // ─── F101: Agent Hook AutoFix Service ───
 

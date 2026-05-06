@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { HealthCalculator } from "../../core/harness/services/health-calc.js";
 import type { GitHubService } from "../../modules/portal/services/github.js";
-import type { KVCacheService } from "../../services/kv-cache.js";
+import type { KVCacheService } from "../../core/infra/kv-cache.js";
 
 function createMockGitHub(
   files: Record<string, string>,

@@ -12,7 +12,7 @@ import { LLMService, NL_TO_SPEC_SYSTEM_PROMPT, buildUserPrompt } from "../../../
 import { ConflictDetector } from "../../../services/conflict-detector.js";
 import { validationHook, SuccessSchema, ErrorSchema } from "../../../schemas/common.js";
 import { GitHubService } from "../../../modules/portal/services/github.js";
-import { KVCacheService } from "../../../services/kv-cache.js";
+import { KVCacheService } from "../../../core/infra/types.js";
 import {
   parseSpecRequirements as parseSpecFItems,
   type SpecRequirement,

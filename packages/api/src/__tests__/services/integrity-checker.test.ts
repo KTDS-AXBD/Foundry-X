@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { IntegrityChecker } from "../../core/harness/services/integrity-checker.js";
 import type { GitHubService } from "../../modules/portal/services/github.js";
-import type { KVCacheService } from "../../services/kv-cache.js";
+import type { KVCacheService } from "../../core/infra/kv-cache.js";
 
 function createMockGitHub(
   existingFiles: string[],
