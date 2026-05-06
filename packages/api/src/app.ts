@@ -48,6 +48,7 @@ import { verificationRoute } from "./core/verification/routes/index.js";
 import { docsApp } from "./core/docs/routes/index.js";
 import { assetApp } from "./core/asset/routes/index.js";
 import { policyApp } from "./core/policy/routes/index.js";
+import { cqApp } from "./core/cq/routes/index.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -133,6 +134,7 @@ app.doc("/api/openapi.json", {
   ],
 });
 app.route("/api/docs", docsApp);
+app.route("/api/cq", cqApp);
 
 // Auth routes (public — /auth/sso/verify is public, /auth/sso/token needs auth via JWT)
 app.route("/api", authRoute);
