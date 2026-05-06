@@ -44,4 +44,6 @@ export type Env = {
   DECODE_X_HANDOFF_SECRET?: string;
   // F606 Sprint 351: Audit Log Bus HMAC signing key
   AUDIT_HMAC_KEY?: string;
+  // F615 Sprint 360: Guard-X decision HMAC signing key
+  GUARD_HMAC_KEY?: string;
 };

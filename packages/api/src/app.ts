@@ -50,6 +50,7 @@ import { assetApp } from "./core/asset/routes/index.js";
 import { policyApp } from "./core/policy/routes/index.js";
 import { ethicsApp } from "./core/ethics/routes/index.js";
 import { diagnosticApp } from "./core/diagnostic/routes/index.js";
+import { guardApp } from "./core/guard/routes/index.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -332,6 +333,9 @@ app.route("/api/diagnostic", diagnosticApp);
 
 // Sprint 359: F607 AI 투명성 + 윤리 임계 (confidence threshold + FP + kill switch)
 app.route("/api/ethics", ethicsApp);
+
+// Sprint 360: F615 Guard-X Solo (T4, PolicyEngine consumer + HMAC + audit-bus)
+app.route("/api/guard", guardApp);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
