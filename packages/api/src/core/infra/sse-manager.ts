@@ -185,7 +185,7 @@ export class SSEManager {
   }
 
   private async forwardToSlack(orgId: string, event: SSEEvent): Promise<void> {
-    const { eventToCategory, SlackService } = await import("../modules/portal/services/slack.js");
+    const { eventToCategory, SlackService } = await import("../../modules/portal/services/slack.js");
     const category = eventToCategory(event.event);
     if (!category) return;
 
@@ -219,7 +219,7 @@ export class SSEManager {
     const slackType = event.event.replace("agent.", "");
 
     await slack.sendNotification({
-      type: slackType as import("../modules/portal/services/slack.js").SlackEventType,
+      type: slackType as import("../../modules/portal/services/slack.js").SlackEventType,
       title: String(data.agentId ?? event.event),
       body: String(data.resultSummary ?? data.reason ?? data.error ?? ""),
       url: String(data.url ?? ""),
