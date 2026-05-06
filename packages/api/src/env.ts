@@ -42,4 +42,6 @@ export type Env = {
   DECODE_X_ONTOLOGY_URL?: string;
   // F355b Sprint 219: shared secret for Decode-X → Foundry-X internal handoff calls
   DECODE_X_HANDOFF_SECRET?: string;
+  // F606 Sprint 351: Audit Log Bus HMAC signing key
+  AUDIT_HMAC_KEY?: string;
 };
