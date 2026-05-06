@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS service_entities (
   besir_type  TEXT
 );
 
-CREATE TRIGGER IF NOT EXISTS se_besir_insert
+CREATE TRIGGER IF NOT EXISTS service_entities_besir_type_check_insert
 BEFORE INSERT ON service_entities
 WHEN NEW.besir_type IS NOT NULL
   AND NEW.besir_type NOT IN ('fact','dimension','workflow','event','actor','policy','support')
@@ -58,7 +58,7 @@ BEGIN
   SELECT RAISE(ABORT, 'besir_type must be one of: fact, dimension, workflow, event, actor, policy, support');
 END;
 
-CREATE TRIGGER IF NOT EXISTS se_besir_update
+CREATE TRIGGER IF NOT EXISTS service_entities_besir_type_check_update
 BEFORE UPDATE ON service_entities
 WHEN NEW.besir_type IS NOT NULL
   AND NEW.besir_type NOT IN ('fact','dimension','workflow','event','actor','policy','support')
