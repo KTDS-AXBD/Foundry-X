@@ -28,7 +28,10 @@ import { UpdateCriterionSchema } from "../schemas/discovery-criteria.js";
 import { SaveAnalysisContextSchema } from "../../../schemas/analysis-context.js";
 import { GeneratePrdSchema } from "../../offering/types.js";
 // Sprint 56 imports (F188)
-import { SixHatsDebateService, SixHatsDebateError } from "../../shaping/types.js";
+import { SixHatsDebateService, SixHatsDebateError, SixHatsLLMPolicy } from "../../shaping/types.js";
+// F624: LLM policy dependencies
+import { KVCacheService } from "../../infra/types.js";
+import { AuditBus } from "../../infra/types.js";
 // Sprint 57 imports (F179, F190)
 import { TrendDataService, TrendAnalysisError } from "../services/trend-data-service.js";
 import { CompetitorScanner, CompetitorScanError } from "../services/competitor-scanner.js";
@@ -876,7 +879,11 @@ bizItemsRoute.post("/biz-items/:id/prd/:prdId/sixhats", async (c) => {
   ).bind(prdId, id).first<{ content: string }>();
   if (!prd) return c.json({ error: "PRD_NOT_FOUND" }, 404);
 
-  const service = new SixHatsDebateService(c.env.DB, c.env);
+  const sixhatsPolicy = new SixHatsLLMPolicy(
+    new KVCacheService(c.env.CACHE),
+    new AuditBus(c.env.DB, c.env.AUDIT_HMAC_KEY ?? ""),
+  );
+  const service = new SixHatsDebateService(c.env.DB, c.env, sixhatsPolicy);
   try {
     const result = await service.startDebate(prdId, id, prd.content, orgId);
     return c.json(result, 201);
