@@ -48,6 +48,7 @@ import { verificationRoute } from "./core/verification/routes/index.js";
 import { docsApp } from "./core/docs/routes/index.js";
 import { assetApp } from "./core/asset/routes/index.js";
 import { policyApp } from "./core/policy/routes/index.js";
+import { ethicsApp } from "./core/ethics/routes/index.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -324,6 +325,9 @@ app.route("/api/asset", assetApp);
 
 // Sprint 355: F631 자동화 정책 코드 강제 (whitelist + default-deny)
 app.route("/api/policy", policyApp);
+
+// Sprint 359: F607 AI 투명성 + 윤리 임계 (confidence threshold + FP + kill switch)
+app.route("/api/ethics", ethicsApp);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
