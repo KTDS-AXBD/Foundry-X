@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { AuditBus } from "../../infra/audit-bus.js";
+import { AuditBus } from "../../infra/types.js";
 import { PolicyEngine } from "../services/policy-engine.service.js";
 import { EvaluatePolicySchema, RegisterPolicySchema } from "../schemas/policy.js";
 import type { Env } from "../../../env.js";

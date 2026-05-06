@@ -1,7 +1,7 @@
 // F624: Six Hats LLM 호출 정책 — 캐시 + audit-bus 통합
-import { KVCacheService } from "../../infra/kv-cache.js";
-import { AuditBus, generateTraceId, generateSpanId } from "../../infra/audit-bus.js";
-import type { TraceContext } from "../../infra/audit-bus.js";
+import { KVCacheService } from "../../infra/types.js";
+import { AuditBus, generateTraceId, generateSpanId } from "../../infra/types.js";
+import type { TraceContext } from "../../infra/types.js";
 
 export interface SixHatsLLMCallContext {
   prdId: string;
