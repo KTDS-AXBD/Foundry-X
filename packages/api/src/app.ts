@@ -54,6 +54,7 @@ import { ethicsApp } from "./core/ethics/routes/index.js";
 import { diagnosticApp } from "./core/diagnostic/routes/index.js";
 import { guardApp } from "./core/guard/routes/index.js";
 import { launchApp } from "./core/launch/routes/index.js";
+import { crossOrgApp } from "./core/cross-org/routes/index.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -343,6 +344,9 @@ app.route("/api/guard", guardApp);
 
 // Sprint 361: F616 Launch-X Solo (Type 1/2 Delivery + DecisionLogger)
 app.route("/api/launch", launchApp);
+
+// Sprint 363: F603 Cross-Org default-deny 골격 (4그룹 분류 + core_differentiator 차단)
+app.route("/api/cross-org", crossOrgApp);
 
 // F630: BeSir 7-타입 자동 추출 (Sprint 354 → master cherry-pick)
 app.route("/api", sevenTypeExtractionRoute);
