@@ -5,7 +5,7 @@ import { PolicyEngine } from "../../policy/types.js";
 import { GuardEngine } from "../services/guard-engine.service.js";
 import { WorkflowHookService } from "../services/workflow-hook.service.js";
 import { RuleEngine } from "../services/rule-engine.service.js";
-import { GuardCheckRequestSchema, WorkflowHookSchema } from "../schemas/guard.js";
+import { GuardCheckRequestSchema, WorkflowHookSchema, InterceptResponseSchema } from "../schemas/guard.js";
 
 export const guardApp = new Hono<{ Bindings: Env }>();
 
@@ -51,6 +51,7 @@ guardApp.post("/workflow-hook", async (c) => {
     return c.json({ error: parsed.error.issues }, 400);
   }
   const svc = getWorkflowHookService(c.env);
-  const result = await svc.interceptPolicyPackPublish(parsed.data);
+  const raw = await svc.interceptPolicyPackPublish(parsed.data);
+  const result = InterceptResponseSchema.parse(raw);
   return c.json(result, 200);
 });
