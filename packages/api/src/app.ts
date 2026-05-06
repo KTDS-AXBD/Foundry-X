@@ -46,6 +46,7 @@ import { workRoute } from "./core/work/routes/work.js";
 import { workPublicRoute } from "./core/work/routes/work-public.js";
 import { verificationRoute } from "./core/verification/routes/index.js";
 import { docsApp } from "./core/docs/routes/index.js";
+import { sevenTypeExtractionRoute } from "./core/discovery/routes/seven-type-extraction.js";
 import { assetApp } from "./core/asset/routes/index.js";
 import { policyApp } from "./core/policy/routes/index.js";
 import { cqApp } from "./core/cq/routes/index.js";
@@ -338,6 +339,9 @@ app.route("/api/ethics", ethicsApp);
 
 // Sprint 361: F616 Launch-X Solo (Type 1/2 Delivery + DecisionLogger)
 app.route("/api/launch", launchApp);
+
+// F630: BeSir 7-타입 자동 추출 (Sprint 354 → master cherry-pick)
+app.route("/api", sevenTypeExtractionRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

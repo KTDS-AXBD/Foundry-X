@@ -23,3 +23,7 @@ export {
   updatePipelineRunCurrentStep,
   linkShapingRunToPipeline,
 } from "./services/discovery-d1-api.js";
+
+// F630: 7-타입 자동 추출 계약 re-exports
+export type { TranscriptInput, ExtractionResult } from "./services/seven-type-extractor.service.js";
+export { SevenTypeExtractor } from "./services/seven-type-extractor.service.js";
