@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { shardDocRoute } from "../routes/shard-doc.js";
+import { shardDocRoute } from "../core/docs/routes/shard-doc.js";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import type { Env } from "../env.js";
 

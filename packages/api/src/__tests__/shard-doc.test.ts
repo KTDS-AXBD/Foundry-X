@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { describe, it, expect, beforeEach } from "vitest";
 import { createMockD1 } from "./helpers/mock-d1.js";
-import { ShardDocService } from "../services/shard-doc.js";
+import { ShardDocService } from "../core/docs/services/shard-doc.js";
 
 const SHARDS_DDL = `
   CREATE TABLE IF NOT EXISTS document_shards (
