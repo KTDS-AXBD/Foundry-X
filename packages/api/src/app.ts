@@ -46,6 +46,7 @@ import { workRoute } from "./core/work/routes/work.js";
 import { workPublicRoute } from "./core/work/routes/work-public.js";
 import { verificationRoute } from "./core/verification/routes/index.js";
 import { docsApp } from "./core/docs/routes/index.js";
+import { sevenTypeExtractionRoute } from "./core/discovery/routes/seven-type-extraction.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -316,6 +317,9 @@ app.route("/api", filesRoute);
 
 // Sprint 261: Work Observability Walking Skeleton (F509)
 app.route("/api", workRoute);
+
+// Sprint 354: F630 — 인터뷰 → BeSir 7-타입 자동 추출 (auth + tenant required)
+app.route("/api", sevenTypeExtractionRoute);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);

@@ -1,3 +1,7 @@
+// F630: 7-타입 자동 추출 계약 re-exports
+export type { TranscriptInput, ExtractionResult } from "./services/seven-type-extractor.service.js";
+export { SevenTypeExtractor } from "./services/seven-type-extractor.service.js";
+
 // F609: cross-domain contract re-exports
 // External callers must import from this file, not from internal services/
 
