@@ -10,7 +10,7 @@ import {
   ShardQuerySchema,
 } from "../schemas/shard-doc.js";
 import { ShardDocService } from "../services/shard-doc.js";
-import type { Env } from "../env.js";
+import type { Env } from "../../../env.js";
 
 export const shardDocRoute = new OpenAPIHono<{ Bindings: Env }>();
 
