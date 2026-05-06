@@ -1,4 +1,4 @@
-import { AuditBus, generateTraceId, generateSpanId } from "../../infra/audit-bus.js";
+import { AuditBus, generateTraceId, generateSpanId } from "../../infra/types.js";
 import type { AutomationActionType, PolicyEvaluation } from "../types.js";
 
 export class PolicyEngine {
