@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { Env } from "../../../env.js";
-import { AuditBus } from "../../infra/audit-bus.js";
+import { AuditBus } from "../../infra/types.js";
 import { PolicyEngine } from "../../policy/types.js";
 import { GuardEngine } from "../services/guard-engine.service.js";
 import { WorkflowHookService } from "../services/workflow-hook.service.js";

@@ -1,6 +1,5 @@
 import { parse as yamlParse } from "yaml";
-import { generateTraceId, generateSpanId } from "../../infra/audit-bus.js";
-import type { AuditBus } from "../../infra/audit-bus.js";
+import { generateTraceId, generateSpanId, type AuditBus } from "../../infra/types.js";
 import type { RuleDefinition, RuleViolation, WorkflowAction } from "../types.js";
 
 export class RuleEngine {

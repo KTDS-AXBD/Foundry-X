@@ -1,7 +1,6 @@
 import type { WorkflowAction, InterceptResult } from "../types.js";
 import type { AutomationActionType } from "../../policy/types.js";
-import { generateTraceId, generateSpanId } from "../../infra/audit-bus.js";
-import type { AuditBus } from "../../infra/audit-bus.js";
+import { generateTraceId, generateSpanId, type AuditBus } from "../../infra/types.js";
 import type { GuardEngine } from "./guard-engine.service.js";
 import type { RuleEngine } from "./rule-engine.service.js";
 
