@@ -8,7 +8,7 @@ import {
   ConflictResolveRequestSchema,
   ExistingSpecSchema,
 } from "../schemas/spec.js";
-import { LLMService, NL_TO_SPEC_SYSTEM_PROMPT, buildUserPrompt } from "../../../services/llm.js";
+import { LLMService, NL_TO_SPEC_SYSTEM_PROMPT, buildUserPrompt } from "../../infra/types.js";
 import { ConflictDetector } from "../../../services/conflict-detector.js";
 import { validationHook, SuccessSchema, ErrorSchema } from "../../../schemas/common.js";
 import { GitHubService } from "../../../modules/portal/services/github.js";

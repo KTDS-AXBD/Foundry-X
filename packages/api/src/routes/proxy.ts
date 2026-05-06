@@ -7,7 +7,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { createStranglerMiddleware } from "@foundry-x/harness-kit";
 import type { StranglerRoute } from "@foundry-x/harness-kit";
 import { SsoService } from "../modules/auth/services/sso.js";
-import { ServiceProxy } from "../services/service-proxy.js";
+import { ServiceProxy } from "../core/infra/types.js";
 import type { Env } from "../env.js";
 
 export const proxyRoute = new OpenAPIHono<{ Bindings: Env }>();
