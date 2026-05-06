@@ -48,9 +48,11 @@ import { verificationRoute } from "./core/verification/routes/index.js";
 import { docsApp } from "./core/docs/routes/index.js";
 import { assetApp } from "./core/asset/routes/index.js";
 import { policyApp } from "./core/policy/routes/index.js";
+import { cqApp } from "./core/cq/routes/index.js";
 import { ethicsApp } from "./core/ethics/routes/index.js";
 import { diagnosticApp } from "./core/diagnostic/routes/index.js";
 import { guardApp } from "./core/guard/routes/index.js";
+import { launchApp } from "./core/launch/routes/index.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -136,6 +138,7 @@ app.doc("/api/openapi.json", {
   ],
 });
 app.route("/api/docs", docsApp);
+app.route("/api/cq", cqApp);
 
 // Auth routes (public — /auth/sso/verify is public, /auth/sso/token needs auth via JWT)
 app.route("/api", authRoute);
@@ -336,6 +339,9 @@ app.route("/api/ethics", ethicsApp);
 
 // Sprint 360: F615 Guard-X Solo (T4, PolicyEngine consumer + HMAC + audit-bus)
 app.route("/api/guard", guardApp);
+
+// Sprint 361: F616 Launch-X Solo (Type 1/2 Delivery + DecisionLogger)
+app.route("/api/launch", launchApp);
 
 // Sprint 47: PII masker middleware — AI API 경로에만 적용
 app.use("/api/agents/*", piiMaskerMiddleware);
