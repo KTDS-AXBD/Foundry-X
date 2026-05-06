@@ -1,5 +1,6 @@
 /**
  * Sprint 56 F188: Six Hats 토론 시뮬레이션 — 20턴 순차 실행 + D1 저장
+ * F624: SixHatsLLMPolicy optional hook — cache + audit
  */
 import { createAgentRunner, type AgentRunner } from "../../agent/types.js";
 import {
@@ -7,6 +8,7 @@ import {
   summarizePrd, buildTurnPrompt,
   type HatColor,
 } from "./sixhats-prompts.js";
+import type { SixHatsLLMPolicy } from "./sixhats-llm-policy.js";
 
 export class SixHatsDebateError extends Error {
   constructor(message: string, public code: string) {
@@ -42,11 +44,15 @@ export interface TurnResult {
 export class SixHatsDebateService {
   private runner: AgentRunner;
 
-  constructor(private db: D1Database, env: {
-    OPENROUTER_API_KEY?: string;
-    OPENROUTER_DEFAULT_MODEL?: string;
-    ANTHROPIC_API_KEY?: string;
-  }) {
+  constructor(
+    private db: D1Database,
+    env: {
+      OPENROUTER_API_KEY?: string;
+      OPENROUTER_DEFAULT_MODEL?: string;
+      ANTHROPIC_API_KEY?: string;
+    },
+    private policy?: SixHatsLLMPolicy,
+  ) {
     this.runner = createAgentRunner(env);
   }
 
@@ -90,22 +96,53 @@ export class SixHatsDebateService {
           roundInfo: "",
         });
 
-        const turnStart = Date.now();
-        const result = await this.runner.execute({
-          taskId: `sixhats-${debateId}-turn-${turnNumber}`,
-          agentId: "sixhats-debate",
-          taskType: "spec-analysis",
-          context: {
-            repoUrl: "",
-            branch: "",
-            instructions: user,
-            systemPromptOverride: system,
-          },
-          constraints: [],
-        });
+        // F624: policy cache check before LLM call
+        let policyKey: string | undefined;
+        let cachedContent: string | undefined;
+        if (this.policy) {
+          const evalResult = await this.policy.evaluateCall({
+            prdId, hatColor, round: turnNumber,
+            opinionPrefix: user.slice(0, 64), orgId,
+          });
+          if (evalResult.type === "cache_hit") {
+            cachedContent = evalResult.cachedResponse;
+          } else {
+            policyKey = evalResult.cacheKey;
+          }
+        }
 
-        const content = result.output?.analysis ?? "";
-        const turnTokens = result.tokensUsed ?? 0;
+        const turnStart = Date.now();
+        let content: string;
+        let turnTokens: number;
+
+        if (cachedContent !== undefined) {
+          content = cachedContent;
+          turnTokens = 0;
+        } else {
+          const result = await this.runner.execute({
+            taskId: `sixhats-${debateId}-turn-${turnNumber}`,
+            agentId: "sixhats-debate",
+            taskType: "spec-analysis",
+            context: {
+              repoUrl: "",
+              branch: "",
+              instructions: user,
+              systemPromptOverride: system,
+            },
+            constraints: [],
+          });
+          content = result.output?.analysis ?? "";
+          turnTokens = result.tokensUsed ?? 0;
+          if (this.policy && policyKey) {
+            await this.policy.recordCall(
+              { prdId, hatColor, round: turnNumber, opinionPrefix: user.slice(0, 64), orgId },
+              policyKey,
+              content,
+              { costEstimate: 0, promptTokens: 0, completionTokens: turnTokens, durationMs: Date.now() - turnStart },
+            );
+          }
+        }
+
         const turnDuration = (Date.now() - turnStart) / 1000;
 
         const turnResult: TurnResult = {
