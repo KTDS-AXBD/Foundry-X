@@ -1,0 +1,9 @@
+rules:
+  - id: rule-confidential-publish-block
+    name: ConfidentialPublishBlock
+    description: confidential 또는 secret 라벨이 붙은 정책팩 publish 차단
+    matchPattern:
+      sensitivityLabel: ["confidential", "secret"]
+      actionType: ["publish_policy_pack"]
+    action: deny
+    severity: critical
