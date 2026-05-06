@@ -33,10 +33,12 @@ Six Hats 토론 sub-routine의 LLM 호출 시점·횟수·캐시 정책 명시.
 
 ### D1 주입 사이트 전수 검증
 
-`SixHatsDebateService` 인스턴스화 위치 3곳 모두 수정:
-- `core/discovery/routes/biz-items.ts:879` — startDebate route
-- `core/discovery/routes/biz-items.ts:895` — getDebate route
-- `core/discovery/routes/biz-items.ts:904` — listDebates route
+`SixHatsDebateService` 인스턴스화 위치 3곳:
+- `core/discovery/routes/biz-items.ts` startDebate route → **policy 주입** (LLM 호출 경로)
+- `core/discovery/routes/biz-items.ts` getDebate route → policy 미주입 (**의식적 결정**: read-only 조회, LLM 미호출)
+- `core/discovery/routes/biz-items.ts` listDebates route → policy 미주입 (**의식적 결정**: 동일 이유)
+
+> Gap 분석 역동기화 (2026-05-06): listDebates/getDebate는 LLM 미호출 경로라 policy 주입 불필요. 불필요한 KVCache/AuditBus 인스턴스화 방지.
 
 ### D2 식별자 계약
 
