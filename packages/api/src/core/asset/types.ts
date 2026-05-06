@@ -38,4 +38,6 @@ export interface SystemKnowledgeAsset {
 export type Asset = SystemKnowledgeAsset;
 
 export { SystemKnowledgeService } from "./services/system-knowledge.service.js";
+export { DomainInitService } from "./services/domain-init.service.js";
+export type { DomainInitInput, DomainInitResult, DomainScaffold } from "./services/domain-init.service.js";
 export * from "./schemas/asset.js";

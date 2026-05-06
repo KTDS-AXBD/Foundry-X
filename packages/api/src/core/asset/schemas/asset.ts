@@ -40,3 +40,28 @@ export const SystemKnowledgeResponseSchema = z
     updatedAt: z.number(),
   })
   .openapi("SystemKnowledgeResponse");
+
+// F623: /ax:domain-init β — 5-Asset 스캐폴드
+export const DomainInitSchema = z
+  .object({
+    domainName: z.string().min(1).max(64),
+    orgId: z.string().min(1),
+    ownerId: z.string().min(1),
+    description: z.string().max(1000).optional(),
+  })
+  .openapi("DomainInit");
+
+export const DomainInitResponseSchema = z
+  .object({
+    domainName: z.string(),
+    orgId: z.string(),
+    scaffoldedAssets: z.object({
+      policy: z.object({ policyId: z.string() }),
+      ontology: z.object({ entityId: z.string() }),
+      skill: z.object({ skillRef: z.string() }),
+      log: z.object({ auditEventId: z.string() }),
+      systemKnowledge: z.object({ knowledgeId: z.string() }),
+    }),
+    initializedAt: z.number(),
+  })
+  .openapi("DomainInitResponse");

@@ -87,7 +87,7 @@ describe("F623: DomainInitService", () => {
   it("T3: scaffold — auditBus.emit을 domain.initialized로 1회 호출한다", async () => {
     await svc.scaffold(input);
     expect(mocks.auditBus.emit).toHaveBeenCalledTimes(1);
-    const [eventType, payload] = mocks.auditBus.emit.mock.calls[0] as [string, unknown];
+    const [eventType, payload] = vi.mocked(mocks.auditBus.emit).mock.calls[0] as unknown as [string, unknown];
     expect(eventType).toBe("domain.initialized");
     expect(payload).toMatchObject({ domainName: "kotra", orgId: "org-1" });
   });
