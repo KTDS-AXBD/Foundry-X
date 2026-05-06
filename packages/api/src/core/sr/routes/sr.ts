@@ -7,7 +7,7 @@ import type { TenantVariables } from "../../../middleware/tenant.js";
 import { createSrRequest, updateSrRequest, listSrQuery, executeSrRequest, srFeedbackRequest, type SrResponse, type SrDetailResponse, type SrStatsResponse } from "../schemas/sr.js";
 import { SrWorkflowMapper } from "../services/sr-workflow-mapper.js";
 import { HybridSrClassifier } from "../services/hybrid-sr-classifier.js";
-import { LLMService } from "../../../services/llm.js";
+import { LLMService } from "../../infra/types.js";
 
 export const srRoute = new Hono<{ Bindings: Env; Variables: TenantVariables }>();
 const workflowMapper = new SrWorkflowMapper();

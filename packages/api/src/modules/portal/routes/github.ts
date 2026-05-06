@@ -1,7 +1,7 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { GitHubService } from "../services/github.js";
-import { LLMService } from "../../../services/llm.js";
+import { LLMService } from "../../../core/infra/types.js";
 import { ReviewerAgent } from "../../../core/agent/services/reviewer-agent.js";
 import { GitHubReviewService, ReviewCooldownError } from "../services/github-review.js";
 import { prNumberParamsSchema } from "../schemas/github.js";

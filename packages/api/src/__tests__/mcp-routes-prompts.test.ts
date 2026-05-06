@@ -27,7 +27,7 @@ vi.mock("../core/agent/services/mcp-runner.js", () => ({
   })),
 }));
 
-vi.mock("../services/llm.js", () => ({
+vi.mock("../core/infra/llm.js", () => ({
   LLMService: vi.fn().mockImplementation(() => ({
     generate: vi.fn().mockResolvedValue({
       content: "LLM response text",

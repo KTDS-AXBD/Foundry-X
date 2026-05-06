@@ -3,7 +3,7 @@
  * F167 ML 하이브리드 SR 분류기
  */
 import { SrClassifier, type ClassificationResult } from "./sr-classifier.js";
-import { LLMService } from "../../../services/llm.js";
+import { LLMService } from "../../infra/types.js";
 import type { SrType } from "../schemas/sr.js";
 
 export interface HybridClassificationResult extends ClassificationResult {

@@ -44,7 +44,7 @@ vi.mock("../modules/portal/services/github-review.js", () => {
   };
 });
 
-vi.mock("../services/llm.js", () => ({
+vi.mock("../core/infra/llm.js", () => ({
   LLMService: vi.fn().mockImplementation(() => ({})),
 }));
 

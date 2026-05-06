@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { LLMService, buildUserPrompt, NL_TO_SPEC_SYSTEM_PROMPT } from "../../services/llm.js";
+import { LLMService, buildUserPrompt, NL_TO_SPEC_SYSTEM_PROMPT } from "../../core/infra/llm.js";
 
 describe("LLMService", () => {
   afterEach(() => {

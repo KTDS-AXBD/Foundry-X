@@ -1,4 +1,4 @@
-import type { LLMService } from "./llm.js";
+import type { LLMService } from "../core/infra/llm.js";
 
 // Local types — mirrors @foundry-x/shared F54 types (will import from shared once exported)
 type SpecConflictType = "direct" | "dependency" | "priority" | "scope";

@@ -4,7 +4,7 @@ import { WikiSyncService } from "../services/wiki-sync.js";
 import { GitHubService } from "../services/github.js";
 import { GitHubSyncService } from "../services/github-sync.js";
 import { githubIssueEventSchema, githubPrEventSchema, githubCommentEventSchema } from "../schemas/webhook.js";
-import { LLMService } from "../../../services/llm.js";
+import { LLMService } from "../../../core/infra/types.js";
 import { ReviewerAgent } from "../../../core/agent/services/reviewer-agent.js";
 import { GitHubReviewService, parseFoundryCommand, ReviewCooldownError, HELP_COMMENT, formatStatusComment } from "../services/github-review.js";
 import { FeedbackQueueService } from "../services/feedback-queue-service.js";

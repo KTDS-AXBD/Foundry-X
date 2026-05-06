@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { HybridSrClassifier, extractJson, validateSrType } from "../core/sr/services/hybrid-sr-classifier.js";
-import { LLMService } from "../services/llm.js";
+import { LLMService } from "../core/infra/llm.js";
 
 function mockLlm(response?: { srType: string; confidence: number }, shouldFail = false): LLMService {
   const llm = new LLMService(undefined, undefined);
