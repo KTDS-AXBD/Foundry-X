@@ -881,7 +881,7 @@ bizItemsRoute.post("/biz-items/:id/prd/:prdId/sixhats", async (c) => {
 
   const sixhatsPolicy = new SixHatsLLMPolicy(
     new KVCacheService(c.env.CACHE),
-    new AuditBus(c.env.DB, c.env.AUDIT_HMAC_KEY ?? ""),
+    new AuditBus(c.env.DB, c.env.AUDIT_HMAC_KEY ?? "default-hmac-key-32chars-pad"),
   );
   const service = new SixHatsDebateService(c.env.DB, c.env, sixhatsPolicy);
   try {
