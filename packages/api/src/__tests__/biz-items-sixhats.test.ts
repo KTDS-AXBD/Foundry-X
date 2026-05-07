@@ -122,6 +122,19 @@ const BIZ_TABLES_SQL = `
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(debate_id, turn_number)
   );
+  CREATE TABLE IF NOT EXISTS audit_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    trace_id TEXT NOT NULL,
+    span_id TEXT NOT NULL,
+    parent_span_id TEXT,
+    event_type TEXT NOT NULL,
+    timestamp INTEGER NOT NULL,
+    tenant_id TEXT,
+    actor TEXT,
+    payload TEXT NOT NULL,
+    hmac_signature TEXT NOT NULL,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
+  );
 `;
 
 function seedBizItem(id = "item-1") {

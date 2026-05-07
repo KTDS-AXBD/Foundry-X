@@ -43,6 +43,7 @@ export function createTestEnv() {
     GITHUB_REPO: "KTDS-AXBD/Foundry-X",
     CACHE: new MockKVNamespace() as unknown as KVNamespace,
     AI: {} as Ai,
+    AUDIT_HMAC_KEY: "test-hmac-key-32-chars-padding",
   };
 }
 

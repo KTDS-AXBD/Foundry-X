@@ -60,6 +60,12 @@ export class AuditBus {
     private readonly db: D1Database,
     hmacKey: string,
   ) {
+    if (!hmacKey || hmacKey.length === 0) {
+      throw new Error(
+        "AuditBus: hmacKey must be a non-empty string. " +
+          "Set AUDIT_HMAC_KEY env var or pass an explicit fallback at call site.",
+      );
+    }
     this.keyPromise = crypto.subtle.importKey(
       "raw",
       new TextEncoder().encode(hmacKey),
