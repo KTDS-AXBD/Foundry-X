@@ -100,16 +100,15 @@ describe("OpenAPI spec generation (/api/openapi.json)", () => {
       if (req?.params) containers.push({ label: "params", schema: req.params });
       if (req?.query) containers.push({ label: "query", schema: req.query });
       if (req?.body?.content) {
-        for (const ct of Object.keys(req.body.content)) {
-          containers.push({ label: `body.${ct}`, schema: req.body.content[ct].schema });
+        for (const [ct, entry] of Object.entries(req.body.content)) {
+          containers.push({ label: `body.${ct}`, schema: entry.schema });
         }
       }
       const responses = (route as Definition["route"])?.responses ?? {};
-      for (const code of Object.keys(responses)) {
-        const r = responses[code];
-        if (r.content) {
-          for (const ct of Object.keys(r.content)) {
-            containers.push({ label: `res.${code}.${ct}`, schema: r.content[ct].schema });
+      for (const [code, r] of Object.entries(responses)) {
+        if (r?.content) {
+          for (const [ct, entry] of Object.entries(r.content)) {
+            containers.push({ label: `res.${code}.${ct}`, schema: entry.schema });
           }
         }
       }
