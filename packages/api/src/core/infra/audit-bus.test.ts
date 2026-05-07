@@ -57,6 +57,11 @@ describe("F606: AuditBus", () => {
     await bus.queryByTrace(FAKE_TRACE.traceId);
     expect(db.prepare).toHaveBeenCalledOnce();
   });
+
+  it("T4b: 빈 hmacKey 생성자 인자는 즉시 throw (silent fail 차단)", () => {
+    const d1 = makeD1Mock() as unknown as D1Database;
+    expect(() => new AuditBus(d1, "")).toThrow(/hmacKey must be a non-empty string/);
+  });
 });
 
 describe("F606: TraceContext helpers", () => {
