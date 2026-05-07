@@ -1,11 +1,11 @@
 ---
 code: FX-PLAN-352
 title: Sprint 352 — F628 BeSir 7-타입 Entity 모델 (T1 토대)
-version: 1.0
-status: Active
+version: 1.1
+status: SUPERSEDED
 category: PLAN
 created: 2026-05-06
-updated: 2026-05-06
+updated: 2026-05-08
 sprint: 352
 f_item: F628
 req: FX-REQ-693
@@ -13,6 +13,8 @@ priority: P2
 ---
 
 # Sprint 352 — F628 BeSir 7-타입 Entity 모델 (T1 토대)
+
+> **STATUS: SUPERSEDED (S337, 2026-05-08)** — F628은 S335 17 sprint 시동 신기록 세션에서 코드화 완료. plan §3 (a~e) 100% 충족: D1 0141_entity_besir_type.sql (BEFORE INSERT/UPDATE trigger 패턴으로 SQLite ADD COLUMN CHECK 한계 우회) + types.ts BesirEntityType + BESIR_ENTITY_TYPES + schemas BesirEntityTypeSchema + entity-registry.ts INSERT/WHERE 처리 + 4 unit tests. 본 sprint 번호로 정식 WT 시동된 적 없음. S337 SPEC sync PR이 row를 ✅로 마킹 + schema contract test 4건 추가. SPEC.md F628 row가 진실 — `Sprint 352 | ✅`.
 
 > SPEC.md §5 F628 row가 권위 소스. 본 plan은 17 internal dev plan §3 T1 토대 두 번째 sprint로서 실행 절차 + Phase Exit 체크리스트.
 
