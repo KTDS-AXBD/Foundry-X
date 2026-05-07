@@ -25,4 +25,6 @@ export interface BesirEntity {
 }
 
 export { EntityRegistry } from "./services/entity-registry.js";
-export * from "./schemas/entity.js";
+// NOTE: schemas/entity.js는 types.js의 BESIR_ENTITY_TYPES를 import하므로 여기서 re-export하면
+// 순환 import 발생 → schema 평가 시점에 BESIR_ENTITY_TYPES가 undefined → z.enum(undefined) →
+// /api/openapi.json 500 (S336 발견). schemas는 호출자가 "./schemas/entity.js"에서 직접 import.
