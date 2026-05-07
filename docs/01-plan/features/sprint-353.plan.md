@@ -1,11 +1,11 @@
 ---
 code: FX-PLAN-353
 title: Sprint 353 — F629 5-Asset Model + System Knowledge (T1 토대)
-version: 1.0
-status: Active
+version: 1.1
+status: SUPERSEDED
 category: PLAN
 created: 2026-05-06
-updated: 2026-05-06
+updated: 2026-05-08
 sprint: 353
 f_item: F629
 req: FX-REQ-694
@@ -13,6 +13,8 @@ priority: P2
 ---
 
 # Sprint 353 — F629 5-Asset Model + System Knowledge (T1 토대)
+
+> **STATUS: SUPERSEDED (S337, 2026-05-08)** — F629는 S335 17 sprint 시동 신기록 세션에서 코드화 완료. plan §3 (a~h) 100% 충족: D1 0142_system_knowledge.sql + core/asset/{types,schemas,services,routes}/ 평탄 구조 + ASSET_TYPES enum + Asset discriminated union + SystemKnowledgeAsset + AssetTypeSchema + SystemKnowledgeContentTypeSchema + SystemKnowledgeService + Hono sub-app + app.ts `/api/asset` mount + 4 unit tests PASS. 본 sprint 번호로 정식 WT 시동된 적 없음. S337 SPEC sync PR이 row를 ✅로 마킹. SPEC.md F629 row가 진실 — `Sprint 353 | ✅`.
 
 > SPEC.md §5 F629 row가 권위 소스. 본 plan은 17 internal dev plan §3 T1 토대 세 번째 sprint로서 실행 절차 + Phase Exit 체크리스트.
 
