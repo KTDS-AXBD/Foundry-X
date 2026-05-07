@@ -1,11 +1,11 @@
 ---
 code: FX-PLAN-351
 title: Sprint 351 — F606 Audit Log Bus (T1 토대)
-version: 1.0
-status: Active
+version: 1.1
+status: SUPERSEDED
 category: PLAN
 created: 2026-05-06
-updated: 2026-05-06
+updated: 2026-05-08
 sprint: 351
 f_item: F606
 req: FX-REQ-670
@@ -13,6 +13,8 @@ priority: P2
 ---
 
 # Sprint 351 — F606 Audit Log Bus (T1 토대)
+
+> **STATUS: SUPERSEDED (S337, 2026-05-08)** — F606은 S335에서 코드화 완료(MEMORY entry "P0-7 F606 Audit Bus ✅"). audit-bus.ts + types.ts + D1 0140 + trace-context middleware + app.ts mount + 17 호출 사이트 + 9 tests 모두 정착. 본 plan §3 (a~h) 항목 모두 충족. **S337 hardening은 PR #766 (`c6cc48ac`)이 별도로 처리** — biz-items.ts:884 `?? ""` outlier가 14 sprint 연속 master deploy CI fail 유발 → empty key throw guard + 컨벤션 fallback 정합 + test-app + audit_events 테이블 시드 포함. 본 sprint 번호로 정식 WT가 시동된 적 없음. SPEC.md F606 row가 진실 — `Sprint 351 | ✅`.
 
 > SPEC.md §5 F606 row가 권위 소스. 본 plan은 17 internal dev plan §3 T1 토대 첫 sprint로서 실행 절차 + Phase Exit 체크리스트.
 
