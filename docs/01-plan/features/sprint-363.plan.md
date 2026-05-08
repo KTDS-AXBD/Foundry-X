@@ -1,11 +1,11 @@
 ---
 code: FX-PLAN-363
 title: Sprint 363 — F603 Cross-Org default-deny 골격 (T4)
-version: 1.0
-status: Active
+version: 1.1
+status: SUPERSEDED
 category: PLAN
 created: 2026-05-06
-updated: 2026-05-06
+updated: 2026-05-08
 sprint: 363
 f_item: F603
 req: FX-REQ-667
@@ -13,6 +13,8 @@ priority: P2
 ---
 
 # Sprint 363 — F603 Cross-Org default-deny 골격 (T4)
+
+> **STATUS: SUPERSEDED (S337, 2026-05-08)** — F603는 S335 17 sprint 시동 신기록 세션에서 코드화 완료. 본 sprint 번호로 정식 WT 시동된 적 없음. S337 batch SPEC sync PR이 row를 ✅로 마킹 + plan SUPERSEDED. plan §3 항목들은 모두 코드 측에 정착 (자세한 위치는 SPEC.md row 또는 core/{도메인}/ 디렉토리 참조). SPEC.md F603 row가 진실 — `Sprint 363 | ✅`.
 
 > SPEC.md §5 F603 row가 권위 소스. 17 internal dev plan §3 T4 네 번째 sprint.
 > **본 sprint = 자체 부분만** (SME 워크샵 결과는 외부, 본 sprint는 default-deny 코드 강제 + assignGroup 인터페이스).
