@@ -18,13 +18,13 @@ Foundry-X가 이를 읽고 분석하고 동기화를 강제해요.
 <!-- README_SYNC_START: daily-check가 SPEC.md 실측값 기준으로 자동 동기화 -->
 | 항목 | 수치 |
 |------|------|
-| Phase | 47 (Sprint 366) |
-| Sprints | 366 완료 |
+| Phase | 47 (Sprint 367) |
+| Sprints | 367 완료 |
 | API Routes | ~4 |
-| API Services | ~4 |
+| API Services | ~5 |
 | API Schemas | ~13 |
 | Tests | ~3,174 + E2E 273 |
-| D1 Migrations | 162 (latest: 0152) |
+| D1 Migrations | 163 (latest: 0153) |
 <!-- README_SYNC_END -->
 
 ## 주요 기능
