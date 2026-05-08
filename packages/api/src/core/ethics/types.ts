@@ -37,4 +37,6 @@ export interface FPRateResult {
 }
 
 export { EthicsEnforcer } from "./services/ethics-enforcer.service.js";
-export * from "./schemas/ethics.js";
+// NOTE: schemas/ethics.js 의 z.enum(ETHICS_VIOLATION_TYPES) 가 이 파일을 import 하므로
+// 여기서 re-export 하면 순환 import → ETHICS_VIOLATION_TYPES=undefined 위험 (S336 entity 선례).
+// schemas 심볼은 호출자가 "./schemas/ethics.js" 에서 직접 import.

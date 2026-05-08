@@ -58,4 +58,6 @@ export interface ReviewCycleResult {
 
 export { CQEvaluator } from "./services/cq-evaluator.service.js";
 export { ReviewCycle } from "./services/review-cycle.service.js";
-export * from "./schemas/cq.js";
+// NOTE: schemas/cq.js 의 z.enum(CQ_AXES/REVIEW_CYCLE_STAGES) 가 이 파일을 import 하므로
+// 여기서 re-export 하면 순환 import → const=undefined 위험 (S336 entity 선례).
+// schemas 심볼은 호출자가 "./schemas/cq.js" 에서 직접 import.
