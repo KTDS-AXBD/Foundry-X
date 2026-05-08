@@ -7,5 +7,9 @@
     ".": "./index.mjs"
   },
   "license": "UNLICENSED",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "@eslint/js": "^10.0.1",
+    "typescript-eslint": "^8.57.0"
+  }
 }
