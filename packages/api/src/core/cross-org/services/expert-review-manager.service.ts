@@ -1,7 +1,7 @@
 // F620 CO-I04: ExpertReviewManager — Cross-Org 분류 결정 HITL 라이프사이클
 // SME가 자동 분류 결과(특히 core_differentiator)를 검토 → approve/reject/reclassify
 // F605 HITL Console UI는 외부 — 본 service는 escalation 큐 contract만 제공
-import { generateTraceId, generateSpanId } from "../../infra/audit-bus.js";
+import { generateTraceId, generateSpanId } from "../../infra/types.js";
 import type { AuditBus } from "../../infra/types.js";
 
 export type ReviewStatus = "pending" | "in_review" | "signed_off";

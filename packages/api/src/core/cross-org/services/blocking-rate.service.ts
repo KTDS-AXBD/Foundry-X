@@ -2,7 +2,7 @@
 // PRD §5.3 "차단율 100% 미달 시 외부 제안 중단" 게이트 측정 메커니즘
 // 의존: F603 cross_org_export_blocks + F606 audit-bus
 import type { AuditBus } from "../../infra/types.js";
-import { generateTraceId, generateSpanId } from "../../infra/audit-bus.js";
+import { generateTraceId, generateSpanId } from "../../infra/types.js";
 
 export interface BlockingRateResult {
   orgId: string;
