@@ -72,4 +72,5 @@ export { LaunchEngine } from "./services/launch-engine.service.js";
 export { SkillRegistryService } from "./services/skill-registry.service.js";
 export { ObjectStoreService } from "./services/object-store.service.js";
 export { RollbackService } from "./services/rollback.service.js";
-export * from "./schemas/launch.js";
+// NOTE: schemas barrel re-export 금지 (S336 — foundry-x-api/no-types-schema-barrel).
+// schemas 심볼은 호출자가 "./schemas/launch.js" 에서 직접 import.

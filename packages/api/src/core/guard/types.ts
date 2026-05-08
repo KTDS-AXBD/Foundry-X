@@ -81,4 +81,5 @@ export interface GuardDecisionRecord {
 export { GuardEngine } from "./services/guard-engine.service.js";
 export { WorkflowHookService } from "./services/workflow-hook.service.js";
 export { RuleEngine } from "./services/rule-engine.service.js";
-export * from "./schemas/guard.js";
+// NOTE: schemas barrel re-export 금지 (S336 — foundry-x-api/no-types-schema-barrel).
+// schemas 심볼은 호출자가 "./schemas/guard.js" 에서 직접 import.

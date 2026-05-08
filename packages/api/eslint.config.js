@@ -23,6 +23,8 @@ export default tseslint.config(
       'foundry-x-api/use-model-ssot': 'error',
       // C75: D1 크로스도메인 테이블 접근 차단 (forward-only, 기존 23건 위반은 별도 fix PR)
       'foundry-x-api/no-cross-domain-d1': 'warn',
+      // S336: types.ts 의 schemas barrel re-export 차단 (순환 import → openapi.json 500 시한폭탄)
+      'foundry-x-api/no-types-schema-barrel': 'error',
     },
   },
   {
