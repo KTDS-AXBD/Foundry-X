@@ -1,11 +1,11 @@
 ---
 code: FX-PLAN-365
 title: Sprint 365 — F617 Guard-X Integration (T5 첫 sprint)
-version: 1.0
-status: Active
+version: 1.1
+status: SUPERSEDED
 category: PLAN
 created: 2026-05-06
-updated: 2026-05-06
+updated: 2026-05-08
 sprint: 365
 f_item: F617
 req: FX-REQ-682
@@ -13,6 +13,8 @@ priority: P2
 ---
 
 # Sprint 365 — F617 Guard-X Integration (T5 첫 sprint)
+
+> **STATUS: SUPERSEDED (S337, 2026-05-08)** — F617는 S335 17 sprint 시동 신기록 세션에서 코드화 완료. 본 sprint 번호로 정식 WT 시동된 적 없음. S337 batch SPEC sync PR이 row를 ✅로 마킹 + plan SUPERSEDED. plan §3 항목들은 모두 코드 측에 정착 (자세한 위치는 SPEC.md row 또는 core/{도메인}/ 디렉토리 참조). SPEC.md F617 row가 진실 — `Sprint 365 | ✅`.
 
 > SPEC.md §5 F617 row가 권위 소스. 17 internal dev plan §3 T5 Integration 첫 sprint.
 > 09 dev_plan_guard_x_v1.md §7.2 GX-I01~I08 중 **GX-I01 + GX-I02(sample.yaml 1건) + GX-I06 (Minimal)** 적용.

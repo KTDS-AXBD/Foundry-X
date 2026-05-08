@@ -1,11 +1,11 @@
 ---
 code: FX-PLAN-358
 title: Sprint 358 — F632 CQ 5축 + 80-20-80 검수 룰 (T3, Full 통합)
-version: 1.0
-status: Active
+version: 1.1
+status: SUPERSEDED
 category: PLAN
 created: 2026-05-06
-updated: 2026-05-06
+updated: 2026-05-08
 sprint: 358
 f_item: F632
 req: FX-REQ-697
@@ -13,6 +13,8 @@ priority: P2
 ---
 
 # Sprint 358 — F632 CQ 5축 + 80-20-80 검수 룰 (T3, Full 통합)
+
+> **STATUS: SUPERSEDED (S337, 2026-05-08)** — F632는 S335 17 sprint 시동 신기록 세션에서 코드화 완료. 본 sprint 번호로 정식 WT 시동된 적 없음. S337 batch SPEC sync PR이 row를 ✅로 마킹 + plan SUPERSEDED. plan §3 항목들은 모두 코드 측에 정착 (자세한 위치는 SPEC.md row 또는 core/{도메인}/ 디렉토리 참조). SPEC.md F632 row가 진실 — `Sprint 358 | ✅`.
 
 > SPEC.md §5 F632 row가 권위 소스.
 > **시동 조건**: T2 sprint 1개 MERGED 후 (3 sprint 한도 준수). Sprint 355 ✅ MERGED 직후 시동 가능.

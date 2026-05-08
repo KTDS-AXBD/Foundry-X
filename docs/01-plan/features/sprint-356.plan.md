@@ -1,11 +1,11 @@
 ---
 code: FX-PLAN-356
 title: Sprint 356 — F624 Six Hats LLM 호출 정책 (T2 마무리)
-version: 1.0
-status: Active
+version: 1.1
+status: SUPERSEDED
 category: PLAN
 created: 2026-05-06
-updated: 2026-05-06
+updated: 2026-05-08
 sprint: 356
 f_item: F624
 req: FX-REQ-689
@@ -13,6 +13,8 @@ priority: P2
 ---
 
 # Sprint 356 — F624 Six Hats LLM 호출 정책 (T2 마무리)
+
+> **STATUS: SUPERSEDED (S337, 2026-05-08)** — F624는 S335 17 sprint 시동 신기록 세션에서 코드화 완료. 본 sprint 번호로 정식 WT 시동된 적 없음. S337 batch SPEC sync PR이 row를 ✅로 마킹 + plan SUPERSEDED. plan §3 항목들은 모두 코드 측에 정착 (자세한 위치는 SPEC.md row 또는 core/{도메인}/ 디렉토리 참조). SPEC.md F624 row가 진실 — `Sprint 356 | ✅`.
 
 > SPEC.md §5 F624 row가 권위 소스. 본 plan은 17 internal dev plan §3 T2 Domain Extraction 세 번째(마무리) sprint.
 
