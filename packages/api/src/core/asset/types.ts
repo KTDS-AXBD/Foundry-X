@@ -40,4 +40,6 @@ export type Asset = SystemKnowledgeAsset;
 export { SystemKnowledgeService } from "./services/system-knowledge.service.js";
 export { DomainInitService } from "./services/domain-init.service.js";
 export type { DomainInitInput, DomainInitResult, DomainScaffold } from "./services/domain-init.service.js";
-export * from "./schemas/asset.js";
+// NOTE: schemas/asset.js 의 z.enum(ASSET_TYPES/SYSTEM_KNOWLEDGE_CONTENT_TYPES) 가 이 파일을
+// import 하므로 여기서 re-export 하면 순환 import → const=undefined 위험 (S336 entity 선례).
+// schemas 심볼은 호출자가 "./schemas/asset.js" 에서 직접 import.
