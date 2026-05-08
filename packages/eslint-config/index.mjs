@@ -1,8 +1,8 @@
-import { noCrossDomainD1 } from './no-cross-domain-d1.mjs';
-import { noCrossDomainImport } from './no-cross-domain-import.mjs';
-import { noDirectRouteRegister } from './no-direct-route-register.mjs';
-import { noTypesSchemaBarrel } from './no-types-schema-barrel.mjs';
-import { useModelSsot } from './use-model-ssot.mjs';
+import { noCrossDomainD1 } from './rules/no-cross-domain-d1.mjs';
+import { noCrossDomainImport } from './rules/no-cross-domain-import.mjs';
+import { noDirectRouteRegister } from './rules/no-direct-route-register.mjs';
+import { noTypesSchemaBarrel } from './rules/no-types-schema-barrel.mjs';
+import { useModelSsot } from './rules/use-model-ssot.mjs';
 
 export const foundryXApiPlugin = {
   meta: { name: 'eslint-plugin-foundry-x-api', version: '1.0.0' },

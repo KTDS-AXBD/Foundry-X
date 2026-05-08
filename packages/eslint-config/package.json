@@ -1,0 +1,11 @@
+{
+  "name": "@foundry-x/eslint-config",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./index.mjs",
+  "exports": {
+    ".": "./index.mjs"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}
