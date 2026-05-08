@@ -2,7 +2,7 @@
 // F618 Launch-X(release/publish) 시도 시 cross_org default-deny가 만든 block을 발행
 // Minimal: audit emit 1 event (cross_org.launch_blocked).
 // 후속 sprint(CO-I08): F618 LaunchEngine consumer 직접 호출로 release 차단까지 강제.
-import { generateTraceId, generateSpanId } from "../../infra/audit-bus.js";
+import { generateTraceId, generateSpanId } from "../../infra/types.js";
 import type { AuditBus } from "../../infra/types.js";
 
 export interface LaunchBlockingSignal {

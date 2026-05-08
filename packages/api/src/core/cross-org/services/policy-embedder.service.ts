@@ -1,8 +1,7 @@
 // F620 CO-I01: PolicyEmbedder — 정책 텍스트 임베딩 + KVCache + D1 영속
 // Minimal: 진정 vector embedding은 후속 sprint(CO-I02 LLM 보조 동치 판정)에서 정밀화
 // 본 sprint는 stub 패턴 (sha256 → vector_json) + KVCache + D1 cache 다층 구조
-import type { LLMService } from "../../infra/llm.js";
-import type { KVCacheService } from "../../infra/kv-cache.js";
+import type { LLMService, KVCacheService } from "../../infra/types.js";
 
 const STUB_MODEL = "stub-sha256-v1";
 const STUB_VECTOR_DIM = 8; // Minimal embedding 차원 (real 384/768 미사용)
