@@ -1,6 +1,6 @@
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import { foundryXApiPlugin } from './src/eslint-rules/index.mjs';
+import { foundryXApiPlugin } from '@foundry-x/eslint-config';
 
 export default tseslint.config(
   eslint.configs.recommended,

@@ -1,7 +1,7 @@
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
-// S336: foundry-x-api 플러그인의 no-types-schema-barrel 룰 공유 (모노리포 상대경로)
-import { foundryXApiPlugin } from '../api/src/eslint-rules/index.mjs';
+// S336 → F633: foundry-x-api 플러그인 (workspace 패키지로 격상)
+import { foundryXApiPlugin } from '@foundry-x/eslint-config';
 
 export default tseslint.config(
   eslint.configs.recommended,

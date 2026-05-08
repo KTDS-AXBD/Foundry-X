@@ -60,6 +60,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.0.3(jiti@2.6.1))
+      '@foundry-x/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
       '@hono/node-server':
         specifier: ^1.0.0
         version: 1.19.11(hono@4.12.8)
@@ -140,6 +143,8 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/debug@4.1.13)(@types/node@22.19.15)(jiti@2.6.1)(jsdom@29.0.0(@noble/hashes@1.8.0))(lightningcss@1.32.0)(msw@2.12.12(@types/node@22.19.15)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4)
 
+  packages/eslint-config: {}
+
   packages/fx-agent:
     dependencies:
       '@anthropic-ai/sdk':
@@ -170,6 +175,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20241218.0
         version: 4.20260316.1
+      '@foundry-x/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
       '@types/better-sqlite3':
         specifier: ^7.6.13
         version: 7.6.13
@@ -210,6 +218,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20241218.0
         version: 4.20260316.1
+      '@foundry-x/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.37
@@ -266,6 +277,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20241218.0
         version: 4.20260316.1
+      '@foundry-x/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.37
@@ -306,6 +320,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20241218.0
         version: 4.20260316.1
+      '@foundry-x/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.37
@@ -343,6 +360,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20241218.0
         version: 4.20260316.1
+      '@foundry-x/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
       '@types/better-sqlite3':
         specifier: ^7.6.13
         version: 7.6.13
