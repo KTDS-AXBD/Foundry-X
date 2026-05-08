@@ -1,11 +1,11 @@
 ---
 code: FX-PLAN-367
 title: Sprint 367 — F620 Cross-Org Integration (T5 마지막)
-version: 1.0
-status: Active
+version: 1.1
+status: SUPERSEDED
 category: PLAN
 created: 2026-05-06
-updated: 2026-05-06
+updated: 2026-05-08
 sprint: 367
 f_item: F620
 req: FX-REQ-685
@@ -13,6 +13,8 @@ priority: P2
 ---
 
 # Sprint 367 — F620 Cross-Org Integration (T5 마지막)
+
+> **STATUS: SUPERSEDED (S337, 2026-05-08)** — F620 코드화 완료. plan §3 (a~k) 모두 충족: D1 0153 + 3 service(PolicyEmbedder/ExpertReviewManager/LaunchBlockingSignalService) + types.ts 7 export + schemas 7 + routes 6 endpoints + audit-bus 4 events + 11 unit tests + 1 E2E CO-I09 cascade. 정식 sprint WT 시동 없이 master cascade 패턴(본 세션 6번째 PR)으로 처리. CO-I02(LLM 보조 동치) + CO-I03(business_impact 자동 평가)는 후속 sprint deferred — stub embedding은 sha256 deterministic. SPEC.md F620 row가 진실 — `Sprint 367 | ✅`. **T5 종결 → T6 진입 가능** (외부 의존 게이트).
 
 > SPEC.md §5 F620 row 권위 소스. T5 Integration 세 번째(마지막).
 > **시동 조건**: Sprint 366 F618 MERGED 후 (CO-I07 Launch-X 차단 contract 의존).
