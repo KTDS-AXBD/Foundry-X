@@ -48,3 +48,21 @@ export const ExportCheckResponseSchema = z.object({
   reason: ExportBlockReasonSchema.nullable(),
   blockId: z.string().nullable(),
 });
+
+// F626: 차단율 측정
+export const BlockingRateQuerySchema = z.object({
+  org_id: z.string().min(1),
+  days: z.coerce.number().int().min(1).max(365).optional(),
+});
+
+export const BlockingRateResponseSchema = z.object({
+  orgId: z.string(),
+  windowDays: z.number(),
+  totalCoreDiffAssets: z.number(),
+  totalExportAttempts: z.number(),
+  blockedCount: z.number(),
+  blockingRate: z.number().min(0).max(1),
+  threshold: z.number(),
+  passed: z.boolean(),
+  measuredAt: z.number(),
+});
