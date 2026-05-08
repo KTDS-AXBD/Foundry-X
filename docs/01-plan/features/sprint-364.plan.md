@@ -1,11 +1,11 @@
 ---
 code: FX-PLAN-364
 title: Sprint 364 — F626 core_differentiator 차단율 측정 (T4 마무리)
-version: 1.0
-status: Active
+version: 1.1
+status: SUPERSEDED
 category: PLAN
 created: 2026-05-06
-updated: 2026-05-06
+updated: 2026-05-08
 sprint: 364
 f_item: F626
 req: FX-REQ-691
@@ -13,6 +13,8 @@ priority: P2
 ---
 
 # Sprint 364 — F626 core_differentiator 차단율 측정 (T4 마무리)
+
+> **STATUS: SUPERSEDED (S337, 2026-05-08)** — F626 코드화 완료. `blocking-rate.service.ts` (BlockingRateService 2 method) + types.ts re-export 2 + schemas (BlockingRateQuerySchema + BlockingRateResponseSchema) + routes `GET /api/cross-org/blocking-rate` + audit-bus `cross_org.blocking_rate_alerted` 이벤트 + 4 unit tests. plan §3 (a~h) 모두 충족. 정식 sprint WT 시동 없이 master cascade 패턴(본 세션 Master 직접 + PR auto-merge)으로 처리. SPEC.md F626 row가 진실 — `Sprint 364 | ✅`.
 
 > SPEC.md §5 F626 row가 권위 소스. 17 internal dev plan §3 T4 마무리 sprint.
 > **시동 조건**: Sprint 363 F603 MERGED 후 (cross_org_export_blocks 테이블 의존).
