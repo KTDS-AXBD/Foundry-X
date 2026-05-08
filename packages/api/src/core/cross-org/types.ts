@@ -49,6 +49,17 @@ export interface GroupStats {
 export { CrossOrgEnforcer } from "./services/cross-org-enforcer.service.js";
 export { BlockingRateService } from "./services/blocking-rate.service.js";
 export type { BlockingRateResult, BlockingRateAlert } from "./services/blocking-rate.service.js";
+// F620 CO-I01/I04/I07
+export { PolicyEmbedder } from "./services/policy-embedder.service.js";
+export type { PolicyEmbedding, SimilarPolicy } from "./services/policy-embedder.service.js";
+export { ExpertReviewManager } from "./services/expert-review-manager.service.js";
+export type {
+  ReviewQueueEntry,
+  ReviewStatus,
+  ReviewDecision,
+} from "./services/expert-review-manager.service.js";
+export { LaunchBlockingSignalService } from "./services/launch-blocking-signal.service.js";
+export type { LaunchBlockingSignal } from "./services/launch-blocking-signal.service.js";
 // NOTE: schemas/cross-org.js 의 z.enum(CROSS_ORG_GROUPS/ASSET_KINDS/EXPORT_BLOCK_REASONS) 가
 // 이 파일을 import 하므로 여기서 re-export 하면 순환 import → const=undefined 위험
 // (S336 entity 선례). schemas 심볼은 호출자가 "./schemas/cross-org.js" 에서 직접 import.

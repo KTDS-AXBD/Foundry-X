@@ -66,3 +66,42 @@ export const BlockingRateResponseSchema = z.object({
   passed: z.boolean(),
   measuredAt: z.number(),
 });
+
+// F620 CO-I01 PolicyEmbedder
+export const EmbedPolicySchema = z.object({
+  text: z.string().min(1),
+  orgId: z.string().min(1),
+  sourceKind: z.enum(["policy", "ontology", "skill", "system_knowledge"]).optional(),
+});
+
+export const FindSimilarSchema = z.object({
+  text: z.string().min(1),
+  orgId: z.string().min(1),
+  threshold: z.number().min(0).max(1).optional(),
+  limit: z.number().int().min(1).max(50).optional(),
+});
+
+// F620 CO-I04 ExpertReviewManager
+export const ReviewStatusSchema = z.enum(["pending", "in_review", "signed_off"]);
+export const ReviewDecisionSchema = z.enum(["approve", "reject", "reclassify"]);
+
+export const EnqueueReviewSchema = z.object({
+  assignmentId: z.string().min(1),
+  orgId: z.string().min(1),
+});
+
+export const SignOffReviewSchema = z.object({
+  reviewId: z.string().min(1),
+  expertId: z.string().min(1),
+  decision: ReviewDecisionSchema,
+  reclassifiedTo: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+// F620 CO-I07 LaunchBlockingSignal
+export const NotifyLaunchSchema = z.object({
+  blockId: z.string().min(1),
+  releaseId: z.string().min(1),
+  assetId: z.string().min(1),
+  orgId: z.string().min(1),
+});
